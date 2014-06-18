@@ -1,3 +1,4 @@
+package ui;
 
 public enum EntityType {
 	MILESTONE,

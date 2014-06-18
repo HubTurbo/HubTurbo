@@ -1,3 +1,4 @@
+package ui;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyStringWrapper;
 

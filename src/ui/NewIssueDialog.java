@@ -1,3 +1,4 @@
+package ui;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.collections.ObservableList;
