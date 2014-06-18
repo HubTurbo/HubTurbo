@@ -3,10 +3,12 @@ package logic;
 import org.eclipse.egit.github.core.User;
 
 public class TurboContributor {
+	private User ghUser;
 	private String githubName;
 	private String realName;
 	
 	public TurboContributor(User user) {
+		this.ghUser = user;
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
 	}

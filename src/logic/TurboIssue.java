@@ -1,13 +1,16 @@
 package logic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.util.ArrayList;
-
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
 
 public class TurboIssue {
+	private Issue ghIssue;
 //	private String title;
 	private String description;
 	private int id;
@@ -15,22 +18,39 @@ public class TurboIssue {
 	private TurboContributor assignee;
 	private TurboMilestone milestone;
 	
+	
+	
 	public TurboIssue(String title, String desc) {
 		setTitle(title);
 		this.description = desc;
 	}
 	
 	public TurboIssue(Issue issue) {
+		this.ghIssue = issue;
 		setTitle(issue.getTitle());
 		this.description = issue.getBody();
 		this.id = issue.getNumber();
 		this.assignee = new TurboContributor(issue.getAssignee());
 		this.milestone = new TurboMilestone(issue.getMilestone());
+		this.labels = getLabels(issue);
 	}
 	
+	private ArrayList<TurboLabel> getLabels(Issue issue) {
+		ArrayList<TurboLabel> turboLabels = new ArrayList<TurboLabel>();
+		List<Label> labels = issue.getLabels();
+		for (Label label : labels) {
+			turboLabels.add(new TurboLabel(label));
+		}
+		return turboLabels;
+	}
+
 	@Override
 	public String toString() {
 		return "Issue " + getTitle();
+	}
+	
+	public Issue getGhIssue() {
+		return ghIssue;
 	}
 	
 //	public String getTitle() {
@@ -53,9 +73,6 @@ public class TurboIssue {
 	}
 	public int getId() {
 		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
 	}
 	public ArrayList<TurboLabel> getLabels() {
 		return labels;
