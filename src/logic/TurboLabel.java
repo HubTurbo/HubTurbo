@@ -1,16 +1,18 @@
 package logic;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel {
 	private Label ghLabel;
-	private String name;
 	
 	
 	public TurboLabel(Label label) {
 		this.ghLabel = label;
 		if (label != null) {
-			this.name = label.getName();
+			setName(label.getName());
 		}
 	}
 	
@@ -18,13 +20,10 @@ public class TurboLabel {
 		return ghLabel;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
+    private StringProperty name = new SimpleStringProperty();
+    public final String getName() {return name.get();}
+    public final void setName(String value) {name.set(value);}
+    public StringProperty nameProperty() {return name;}
 	
 	
 }
