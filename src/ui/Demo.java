@@ -157,9 +157,8 @@ public class Demo extends Application {
 		// col.setSpacing(10);
 		issuePanel.setPrefWidth(400);
 		HBox.setHgrow(issuePanel, Priority.ALWAYS);
-
 		issuePanel.setStyle(STYLE_BORDERS);
-		issuePanel.setAlignment(Pos.TOP_CENTER);
+//		issuePanel.setAlignment(Pos.TOP_CENTER);
 
 		return issuePanel;
 	}

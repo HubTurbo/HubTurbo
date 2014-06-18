@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import logic.TurboIssue;
@@ -27,6 +29,7 @@ public class IssuePanel extends VBox {
 		
 		filteredList = new FilteredList<>(issues, p -> true);
 		listView.setItems(filteredList);
+		setVgrow(listView, Priority.ALWAYS);
 	}
 
 	public void filter(Filter filter) {
