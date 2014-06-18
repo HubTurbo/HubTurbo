@@ -21,6 +21,10 @@ public class TurboIssue {
 	public TurboIssue(String title, String desc) {
 		setTitle(title);
 		setDescription(desc);
+		labels = FXCollections.observableArrayList();
+//		TurboLabel tl = new TurboLabel();
+//		tl.setName("feature");
+//		labels.add(tl);
 	}
 	
 	public TurboIssue(Issue issue) {
