@@ -1,9 +1,11 @@
 package logic;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import java.util.ArrayList;
 
 public class Issue {
-	private String title;
+//	private String title;
 	private String description;
 	private int id;
 	private ArrayList<Label> labels;
@@ -11,23 +13,27 @@ public class Issue {
 	private Milestone milestone;
 	
 	public Issue(String title, String desc) {
-		System.out.println(title);
-		System.out.println(desc);
-		this.title = title;
+		setTitle(title);
 		this.description = desc;
 	}
 	
 	@Override
 	public String toString() {
-		return "Issue " + title;
+		return "Issue " + getTitle();
 	}
 	
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
+//	public String getTitle() {
+//		return title;
+//	}
+//	public void setTitle(String title) {
+//		this.title = title;
+//	}
+	
+    private StringProperty title = new SimpleStringProperty();
+    public final String getTitle() {return title.get();}
+    public final void setTitle(String value) {title.set(value);}
+    public StringProperty titleProperty() {return title;}
+	
 	public String getDescription() {
 		return description;
 	}

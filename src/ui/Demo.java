@@ -221,22 +221,24 @@ public class Demo extends Application {
 
 	private void changePanelCount(int to) {
 
-		// TODO the panels aren't ordered in insertion order? watch out for that
-		ObservableList<Node> panels = columns.getChildren();
-		int panelSize = panels.size();
-
-		if (panelSize == to) {
-			return;
-		}
-
-		if (panelSize < to) {
-			for (int i = 0; i < to - panelSize; i++) {
-				panels.add(createIssuePanel());
-			}
-		} else { // panels.size() > to
-			int numberToRemove = panels.size() - to;
-			panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-		}
+//		// TODO the panels aren't ordered in insertion order? watch out for that
+//		ObservableList<Node> panels = columns.getChildren();
+//		int panelSize = panels.size();
+//
+//		if (panelSize == to) {
+//			return;
+//		}
+//
+//		if (panelSize < to) {
+//			for (int i = 0; i < to - panelSize; i++) {
+//				panels.add(createIssuePanel());
+//			}
+//		} else { // panels.size() > to
+//			int numberToRemove = panels.size() - to;
+//			panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
+//		}
+		
+		test.setTitle("new title");
 	}
 
 	private void setUpHotkeys(Scene scene) {
@@ -278,6 +280,8 @@ public class Demo extends Application {
 				(Runnable) () -> changePanelCount(9));
 	}
 
+	Issue test;
+	
 	private Parent createRoot() {
 		MenuBar menuBar = createMenuBar();
 		
@@ -291,7 +295,7 @@ public class Demo extends Application {
 		IssuePanel col2 = createIssuePanel();
 		IssuePanel col3 = createIssuePanel();
 		
-		col1.getItems().add(new Issue("kasjldjkdl", "desc"));
+		col1.getItems().add(test = new Issue("kasjldjkdl", "desc"));
 		col1.getItems().add(new Issue("luihhjgsdf", "desc"));
 		
 		// VBox col3 = createColumn();

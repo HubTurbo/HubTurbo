@@ -1,4 +1,6 @@
 package ui;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -20,6 +22,12 @@ public class CustomListCell extends ListCell<Issue> {
         
         Text issueName = new Text(issue.getTitle());
         issueName.setStyle(STYLE_ISSUE_NAME);
+        issue.titleProperty().addListener(new ChangeListener<String>(){
+			@Override
+			public void changed(ObservableValue<? extends String> stringProperty, String oldValue, String newValue) {
+				issueName.setText(newValue);
+			}
+          });
         
         Text parentName = new Text("parent");
         parentName.setStyle(STYLE_PARENT_NAME);
