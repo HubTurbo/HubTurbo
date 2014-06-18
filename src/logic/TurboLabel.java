@@ -1,6 +1,6 @@
 package logic;
 
-public class Label {
+public class TurboLabel {
 	private String name;
 
 	public String getName() {

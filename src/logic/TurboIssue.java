@@ -4,15 +4,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import java.util.ArrayList;
 
-public class Issue {
+public class TurboIssue {
 //	private String title;
 	private String description;
 	private int id;
-	private ArrayList<Label> labels;
-	private Contributor assignee;
-	private Milestone milestone;
+	private ArrayList<TurboLabel> labels;
+	private TurboContributor assignee;
+	private TurboMilestone milestone;
 	
-	public Issue(String title, String desc) {
+	public TurboIssue(String title, String desc) {
 		setTitle(title);
 		this.description = desc;
 	}
@@ -46,22 +46,22 @@ public class Issue {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public ArrayList<Label> getLabels() {
+	public ArrayList<TurboLabel> getLabels() {
 		return labels;
 	}
-	public void setLabels(ArrayList<Label> labels) {
+	public void setLabels(ArrayList<TurboLabel> labels) {
 		this.labels = labels;
 	}
-	public Contributor getAssignee() {
+	public TurboContributor getAssignee() {
 		return assignee;
 	}
-	public void setAssignee(Contributor assignee) {
+	public void setAssignee(TurboContributor assignee) {
 		this.assignee = assignee;
 	}
-	public Milestone getMilestone() {
+	public TurboMilestone getMilestone() {
 		return milestone;
 	}
-	public void setMilestone(Milestone milestone) {
+	public void setMilestone(TurboMilestone milestone) {
 		this.milestone = milestone;
 	}
 }

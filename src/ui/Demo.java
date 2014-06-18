@@ -43,7 +43,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import logic.Issue;
+import logic.TurboIssue;
 
 public class Demo extends Application {
 
@@ -280,7 +280,7 @@ public class Demo extends Application {
 				(Runnable) () -> changePanelCount(9));
 	}
 
-	Issue test;
+	TurboIssue test;
 	
 	private Parent createRoot() {
 		MenuBar menuBar = createMenuBar();
@@ -295,8 +295,8 @@ public class Demo extends Application {
 		IssuePanel col2 = createIssuePanel();
 		IssuePanel col3 = createIssuePanel();
 		
-		col1.getItems().add(test = new Issue("kasjldjkdl", "desc"));
-		col1.getItems().add(new Issue("luihhjgsdf", "desc"));
+		col1.getItems().add(test = new TurboIssue("kasjldjkdl", "desc"));
+		col1.getItems().add(new TurboIssue("luihhjgsdf", "desc"));
 		
 		// VBox col3 = createColumn();
 		// col1.getChildren().addAll(createItem(), createItem());

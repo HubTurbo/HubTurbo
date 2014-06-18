@@ -5,16 +5,16 @@ import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import logic.Issue;
+import logic.TurboIssue;
 
-public class CustomListCell extends ListCell<Issue> {
+public class CustomListCell extends ListCell<TurboIssue> {
 	
 
     private static final String STYLE_PARENT_NAME = "-fx-font-size: 9px;";
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	@Override
-    public void updateItem(Issue issue, boolean empty) {
+    public void updateItem(TurboIssue issue, boolean empty) {
         super.updateItem(issue, empty);
         if (issue == null) return;
         

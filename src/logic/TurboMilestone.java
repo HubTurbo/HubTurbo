@@ -1,6 +1,6 @@
 package logic;
 
-public class Milestone {
+public class TurboMilestone {
 	private String name;
 
 	public String getName() {

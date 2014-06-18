@@ -1,6 +1,6 @@
 package logic;
 
-public class Contributor {
+public class TurboContributor {
 	private String githubName;
 	private String realName;
 	
