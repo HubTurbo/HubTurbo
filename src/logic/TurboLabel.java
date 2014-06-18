@@ -9,7 +9,9 @@ public class TurboLabel {
 	
 	public TurboLabel(Label label) {
 		this.ghLabel = label;
-		this.name = label.getName();
+		if (label != null) {
+			this.name = label.getName();
+		}
 	}
 	
 	public Label getGhLabel() {

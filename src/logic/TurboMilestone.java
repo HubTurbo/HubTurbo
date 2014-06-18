@@ -8,7 +8,9 @@ public class TurboMilestone {
 	
 	public TurboMilestone(Milestone milestone) {
 		this.ghMilestone = milestone;
-		this.title = milestone.getTitle();
+		if (milestone != null) {
+			this.title = milestone.getTitle();
+		}
 	}
 	
 	public Milestone getGhMilestone() {

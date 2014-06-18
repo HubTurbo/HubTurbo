@@ -9,8 +9,10 @@ public class TurboContributor {
 	
 	public TurboContributor(User user) {
 		this.ghUser = user;
-		this.githubName = user.getLogin();
-		this.realName = user.getName();
+		if (user != null) {
+			this.githubName = user.getLogin();
+			this.realName = user.getName();
+		}
 	}
 	
 	public String getGithubName() {

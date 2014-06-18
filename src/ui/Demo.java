@@ -51,6 +51,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import logic.LogicFacade;
 import logic.TurboIssue;
 
 public class Demo extends Application {
@@ -60,6 +61,7 @@ public class Demo extends Application {
 
 	private Stage mainStage;
 	private HBox columns;
+	private LogicFacade logic = new LogicFacade(); 
 
 	private final ArrayList<BorderPane> items = new ArrayList<>();
 
@@ -248,7 +250,7 @@ public class Demo extends Application {
 		// Tests
 		
 //		col1.filter(new Filter().withTitle("one"));
-		test.setTitle("data binding demo");
+//		test.setTitle("data binding demo");
 	}
 
 	private void setUpHotkeys(Scene scene) {
@@ -401,10 +403,10 @@ public class Demo extends Application {
 
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
-				System.out.println(repoURLField.getText());
-				System.out.println(usernameField.getText());
-				System.out.println(passwordField.getText());
+				logic.login(usernameField.getText(), passwordField.getText());
+				logic.setRepository(repoURLField.getText());
 				dialogStage.hide();
+				loadIssues();
 			});
 			
 			HBox buttons = new HBox(10);
@@ -423,6 +425,10 @@ public class Demo extends Application {
 
 			dialogStage.show();
 		});
+	}
+
+	private void loadIssues() {
+		col1.getItems().setAll(logic.getIssues());
 	}
 
 	@Override
