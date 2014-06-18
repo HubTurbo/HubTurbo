@@ -10,14 +10,13 @@ public class LogicFacade {
 	
 	private GitHubClient client = new GitHubClient();
 	private IRepositoryIdProvider repoId = null;
+	private AuthenticationManager authManager = new AuthenticationManager(client);
 	private IssueManager issueManager = new IssueManager(client);
 	private MilestoneManager milestoneManager = new MilestoneManager(client);
 	private LabelManager labelManager = new LabelManager(client);
 	
 	public boolean login(String userId, String password) {
-		client.setCredentials(userId, password);
-		//TODO check login success
-		return true; // stub
+		return authManager.login(userId, password);
 	}
 	
 	public void setRepository(String repository) {
