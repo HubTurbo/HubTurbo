@@ -51,6 +51,7 @@ public class Demo extends Application {
 	private HBox columns;
 
 	private final ArrayList<BorderPane> items = new ArrayList<>();
+	
 
 	private BorderPane createItem(String text3) {
 		BorderPane item = new BorderPane();
