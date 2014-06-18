@@ -248,9 +248,8 @@ public class Demo extends Application {
 
 		// Tests
 		
-//		test.setTitle("data binding demo");
-		col1.filter(new Filter().withTitle("one"));
-		System.out.println("performed filtering");
+//		col1.filter(new Filter().withTitle("one"));
+		test.setTitle("data binding demo");
 	}
 
 	private void setUpHotkeys(Scene scene) {
@@ -370,55 +369,60 @@ public class Demo extends Application {
 
 	private void initLoginForm(MenuItem login) {
 		login.setOnAction((e) -> {
-			Stage secondStage = new Stage();
-			secondStage.setTitle("Github Login");
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("GitHub Login");
 
-			secondStage.setTitle("JavaFX Welcome");
 			GridPane grid = new GridPane();
 			grid.setAlignment(Pos.CENTER);
 			grid.setHgap(10);
 			grid.setVgap(10);
 			grid.setPadding(new Insets(25, 25, 25, 25));
 
-			Text sceneTitle = new Text("Welcome");
-			sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-			grid.add(sceneTitle, 0, 0, 2, 1);
+			Text title = new Text("GitHub Login");
+			title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			grid.add(title, 0, 0, 2, 1);
 
-			Label userName = new Label("User Name:");
-			grid.add(userName, 0, 1);
+			Label repoURL = new Label("Repository URL:");
+			grid.add(repoURL, 0, 1);
 
-			TextField userTextField = new TextField();
-			grid.add(userTextField, 1, 1);
+			TextField repoURLField = new TextField();
+			grid.add(repoURLField, 1, 1);
+			
+			Label username = new Label("User Name:");
+			grid.add(username, 0, 2);
 
-			Label pw = new Label("Password:");
-			grid.add(pw, 0, 2);
+			TextField usernameField = new TextField();
+			grid.add(usernameField, 1, 2);
 
-			PasswordField pwBox = new PasswordField();
-			grid.add(pwBox, 1, 2);
+			Label password = new Label("Password:");
+			grid.add(password, 0, 3);
 
-			Button btn = new Button("Sign in");
-			HBox hbBtn = new HBox(10);
-			hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-			hbBtn.getChildren().add(btn);
-			grid.add(hbBtn, 1, 4);
+			PasswordField passwordField = new PasswordField();
+			grid.add(passwordField, 1, 3);
 
-			final Text actiontarget = new Text();
-			grid.add(actiontarget, 1, 6);
-
-			btn.setOnAction((ev) -> {
-				System.out.println("sign in button pressed");
+			Button loginButton = new Button("Sign in");
+			loginButton.setOnAction((ev) -> {
+				System.out.println(repoURLField.getText());
+				System.out.println(usernameField.getText());
+				System.out.println(passwordField.getText());
+				dialogStage.hide();
 			});
+			
+			HBox buttons = new HBox(10);
+			buttons.setAlignment(Pos.BOTTOM_RIGHT);
+			buttons.getChildren().add(loginButton);
+			grid.add(buttons, 1, 4);
 
-			Scene scene = new Scene(grid, 300, 275);
-			secondStage.setScene(scene);
+			Scene scene = new Scene(grid, 350, 275);
+			dialogStage.setScene(scene);
 
-			secondStage.initOwner(mainStage);
-			secondStage.initModality(Modality.APPLICATION_MODAL);
+			dialogStage.initOwner(mainStage);
+			dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-			secondStage.setX(mainStage.getX());
-			secondStage.setY(mainStage.getY());
+			dialogStage.setX(mainStage.getX());
+			dialogStage.setY(mainStage.getY());
 
-			secondStage.show();
+			dialogStage.show();
 		});
 	}
 
