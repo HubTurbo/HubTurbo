@@ -1,14 +1,20 @@
 package logic;
 
-public class TurboMilestone {
-	private String name;
+import org.eclipse.egit.github.core.Milestone;
 
-	public String getName() {
-		return name;
+public class TurboMilestone {
+	private String title;
+	
+	public TurboMilestone(Milestone milestone) {
+		this.title = milestone.getTitle();
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String name) {
+		this.title = name;
 	}
 	
 	

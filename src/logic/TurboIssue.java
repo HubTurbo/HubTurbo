@@ -2,7 +2,10 @@ package logic;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
 import java.util.ArrayList;
+
+import org.eclipse.egit.github.core.Issue;
 
 public class TurboIssue {
 //	private String title;
@@ -15,6 +18,14 @@ public class TurboIssue {
 	public TurboIssue(String title, String desc) {
 		setTitle(title);
 		this.description = desc;
+	}
+	
+	public TurboIssue(Issue issue) {
+		setTitle(issue.getTitle());
+		this.description = issue.getBody();
+		this.id = issue.getNumber();
+		this.assignee = new TurboContributor(issue.getAssignee());
+		this.milestone = new TurboMilestone(issue.getMilestone());
 	}
 	
 	@Override
