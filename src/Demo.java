@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -156,6 +157,15 @@ public class Demo extends Application {
 		items.add("asakda");
 		items.add("kljkljhsk");
 		listView.setItems(items);
+		
+		listView.setCellFactory(new Callback<ListView<String>, 
+	            ListCell<String>>() {
+	                @Override 
+	                public ListCell<String> call(ListView<String> list) {
+	                    return new CustomListCell();
+	                }
+	            }
+	        );
 		
 		col.getChildren().add(listView);
 		
