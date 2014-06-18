@@ -34,6 +34,10 @@ public class Filter {
 		return disjunct;
 	}
 	
+	public Filter or() {
+		return this.or(new Filter());
+	}
+	
 	public boolean isSatisfiedBy(TurboIssue issue) {
 		boolean containsTitle = false;
 		for (String title : titles) {
