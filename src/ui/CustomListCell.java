@@ -1,4 +1,5 @@
 package ui;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListCell;
@@ -8,7 +9,6 @@ import javafx.scene.text.Text;
 import logic.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
-	
 
     private static final String STYLE_PARENT_NAME = "-fx-font-size: 9px;";
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";

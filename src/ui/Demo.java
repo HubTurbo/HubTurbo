@@ -1,4 +1,5 @@
 package ui;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyStringWrapper;
 
@@ -245,7 +246,11 @@ public class Demo extends Application {
 		// panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
 		// }
 
-		test.setTitle("new title");
+		// Tests
+		
+//		test.setTitle("data binding demo");
+		col1.filter(new Filter().withTitle("one"));
+		System.out.println("performed filtering");
 	}
 
 	private void setUpHotkeys(Scene scene) {
@@ -288,27 +293,30 @@ public class Demo extends Application {
 	}
 
 	TurboIssue test;
-	
+	IssuePanel col1;
+
 	private Parent createRoot() {
 		MenuBar menuBar = createMenuBar();
-		
+
 		BorderPane root = new BorderPane();
 
 		columns = new HBox();
-//		columns.setPadding(new Insets(15, 12, 15, 12));
-//		columns.setSpacing(10);
+		// columns.setPadding(new Insets(15, 12, 15, 12));
+		// columns.setSpacing(10);
 
-		IssuePanel col1 = createIssuePanel();
+		col1 = createIssuePanel();
 		IssuePanel col2 = createIssuePanel();
 		IssuePanel col3 = createIssuePanel();
-		
-		col1.getItems().add(test = new TurboIssue("kasjldjkdl", "desc"));
-		col1.getItems().add(new TurboIssue("luihhjgsdf", "desc"));
-		
+
+		col1.getItems().add(test = new TurboIssue("issue one", "desc"));
+		col1.getItems().add(new TurboIssue("issue two", "desc"));
+
+		col2.getItems().add(test);
+
 		// VBox col3 = createColumn();
 		// col1.getChildren().addAll(createItem(), createItem());
 
-		columns.getChildren().addAll(col1, col2 , col3);
+		columns.getChildren().addAll(col1, col2, col3);
 
 		// SplitPane splitPane = new SplitPane();
 		// splitPane.getItems().addAll(createTreeView(), columns);
@@ -319,7 +327,7 @@ public class Demo extends Application {
 
 		return root;
 	}
-	
+
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar();
 
@@ -397,26 +405,21 @@ public class Demo extends Application {
 			final Text actiontarget = new Text();
 			grid.add(actiontarget, 1, 6);
 
-			btn.setOnAction(new EventHandler<ActionEvent>() {
-
-				@Override
-				public void handle(ActionEvent e) {
-					// add login logic here
-					System.out.println("sign in button pressed");
-				}
+			btn.setOnAction((ev) -> {
+				System.out.println("sign in button pressed");
 			});
 
 			Scene scene = new Scene(grid, 300, 275);
 			secondStage.setScene(scene);
 
 			secondStage.initOwner(mainStage);
-			secondStage.initModality(Modality.APPLICATION_MODAL);;
+			secondStage.initModality(Modality.APPLICATION_MODAL);
 
 			secondStage.setX(mainStage.getX());
 			secondStage.setY(mainStage.getY());
 
 			secondStage.show();
-		});		
+		});
 	}
 
 	@Override
