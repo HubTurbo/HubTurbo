@@ -54,7 +54,6 @@ public class Demo extends Application {
 	private HBox columns;
 
 	private final ArrayList<BorderPane> items = new ArrayList<>();
-	
 
 	private BorderPane createItem(String text3) {
 		BorderPane item = new BorderPane();
@@ -146,8 +145,8 @@ public class Demo extends Application {
 
 	private IssuePanel createIssuePanel() {
 		IssuePanel issuePanel = new IssuePanel();
-//		col.setPadding(new Insets(15, 12, 15, 12));
-//		col.setSpacing(10);
+		// col.setPadding(new Insets(15, 12, 15, 12));
+		// col.setSpacing(10);
 		issuePanel.setPrefWidth(400);
 		HBox.setHgrow(issuePanel, Priority.ALWAYS);
 
@@ -221,23 +220,24 @@ public class Demo extends Application {
 
 	private void changePanelCount(int to) {
 
-//		// TODO the panels aren't ordered in insertion order? watch out for that
-//		ObservableList<Node> panels = columns.getChildren();
-//		int panelSize = panels.size();
-//
-//		if (panelSize == to) {
-//			return;
-//		}
-//
-//		if (panelSize < to) {
-//			for (int i = 0; i < to - panelSize; i++) {
-//				panels.add(createIssuePanel());
-//			}
-//		} else { // panels.size() > to
-//			int numberToRemove = panels.size() - to;
-//			panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-//		}
-		
+		// // TODO the panels aren't ordered in insertion order? watch out for
+		// that
+		// ObservableList<Node> panels = columns.getChildren();
+		// int panelSize = panels.size();
+		//
+		// if (panelSize == to) {
+		// return;
+		// }
+		//
+		// if (panelSize < to) {
+		// for (int i = 0; i < to - panelSize; i++) {
+		// panels.add(createIssuePanel());
+		// }
+		// } else { // panels.size() > to
+		// int numberToRemove = panels.size() - to;
+		// panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
+		// }
+
 		test.setTitle("new title");
 	}
 
@@ -303,31 +303,33 @@ public class Demo extends Application {
 
 		columns.getChildren().addAll(col1, col2 , col3);
 
-//		SplitPane splitPane = new SplitPane();
-//		splitPane.getItems().addAll(createTreeView(), columns);
-//		splitPane.setDividerPositions(0.2);
+		// SplitPane splitPane = new SplitPane();
+		// splitPane.getItems().addAll(createTreeView(), columns);
+		// splitPane.setDividerPositions(0.2);
 
 		root.setCenter(columns);
 		root.setTop(menuBar);
 
 		return root;
 	}
-
+	
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar();
 
 		Menu projects = new Menu("Projects");
+		MenuItem login = new MenuItem("Login");
+		initLoginForm(login);
 		MenuItem config = new MenuItem("Configuration");
-		projects.getItems().addAll(config);
-		
+		projects.getItems().addAll(login, config);
+
 		Menu milestones = new Menu("Milestones");
 		MenuItem newMilestone = new MenuItem("New Milestone");
 		milestones.getItems().addAll(newMilestone);
-		
+
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
 		issues.getItems().addAll(newIssue);
-		
+
 		Menu labels = new Menu("Labels");
 		MenuItem newLabel = new MenuItem("New Label");
 		labels.getItems().addAll(newLabel);
@@ -337,24 +339,84 @@ public class Demo extends Application {
 		view.getItems().addAll(columns);
 
 		final ToggleGroup numberOfCols = new ToggleGroup();
-		for (int i=2; i<=9; i++) {
-		    RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
-		    item.setUserData(i);
-		    item.setToggleGroup(numberOfCols);
-		    columns.getItems().add(item);
-		    
-		    if (i == 3) item.setSelected(true);
+		for (int i = 2; i <= 9; i++) {
+			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
+			item.setUserData(i);
+			item.setToggleGroup(numberOfCols);
+			columns.getItems().add(item);
+
+			if (i == 3)
+				item.setSelected(true);
 		}
-		
+
 		menuBar.getMenus().addAll(projects, milestones, issues, labels, view);
 		return menuBar;
+	}
+
+	private void initLoginForm(MenuItem login) {
+		login.setOnAction((e) -> {
+			Stage secondStage = new Stage();
+			secondStage.setTitle("Github Login");
+
+			secondStage.setTitle("JavaFX Welcome");
+			GridPane grid = new GridPane();
+			grid.setAlignment(Pos.CENTER);
+			grid.setHgap(10);
+			grid.setVgap(10);
+			grid.setPadding(new Insets(25, 25, 25, 25));
+
+			Text sceneTitle = new Text("Welcome");
+			sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			grid.add(sceneTitle, 0, 0, 2, 1);
+
+			Label userName = new Label("User Name:");
+			grid.add(userName, 0, 1);
+
+			TextField userTextField = new TextField();
+			grid.add(userTextField, 1, 1);
+
+			Label pw = new Label("Password:");
+			grid.add(pw, 0, 2);
+
+			PasswordField pwBox = new PasswordField();
+			grid.add(pwBox, 1, 2);
+
+			Button btn = new Button("Sign in");
+			HBox hbBtn = new HBox(10);
+			hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+			hbBtn.getChildren().add(btn);
+			grid.add(hbBtn, 1, 4);
+
+			final Text actiontarget = new Text();
+			grid.add(actiontarget, 1, 6);
+
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent e) {
+					// add login logic here
+					System.out.println("sign in button pressed");
+				}
+			});
+
+			Scene scene = new Scene(grid, 300, 275);
+			secondStage.setScene(scene);
+
+			secondStage.initOwner(mainStage);
+			secondStage.initModality(Modality.APPLICATION_MODAL);;
+
+			secondStage.setX(mainStage.getX());
+			secondStage.setY(mainStage.getY());
+
+			secondStage.show();
+		});		
 	}
 
 	@Override
 	public void start(Stage stage) {
 		Scene scene = new Scene(createRoot(), 800, 600);
 		setUpHotkeys(scene);
-	
+
 		mainStage = stage;
 		stage.setTitle("Demo");
 		stage.setMinWidth(800);
