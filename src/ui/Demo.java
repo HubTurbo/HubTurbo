@@ -143,212 +143,17 @@ public class Demo extends Application {
 
 	boolean done = false;
 
-	private VBox createColumn() {
-		VBox col = new VBox();
+	private IssuePanel createIssuePanel() {
+		IssuePanel issuePanel = new IssuePanel();
 //		col.setPadding(new Insets(15, 12, 15, 12));
 //		col.setSpacing(10);
-		col.setPrefWidth(400);
-		HBox.setHgrow(col, Priority.ALWAYS);
+		issuePanel.setPrefWidth(400);
+		HBox.setHgrow(issuePanel, Priority.ALWAYS);
 
-		col.setStyle(STYLE_BORDERS);
-		col.setAlignment(Pos.TOP_CENTER);
-		
-		ListView<String> listView = new ListView<>();
-		ObservableList<String> items = FXCollections.observableArrayList();
-		items.add("asakda");
-		items.add("kljkljhsk");
-		listView.setItems(items);
-		
-		listView.setCellFactory(new Callback<ListView<String>, 
-	            ListCell<String>>() {
-	                @Override 
-	                public ListCell<String> call(ListView<String> list) {
-	                    return new CustomListCell();
-	                }
-	            }
-	        );
-		
-		col.getChildren().add(listView);
-		
+		issuePanel.setStyle(STYLE_BORDERS);
+		issuePanel.setAlignment(Pos.TOP_CENTER);
 
-//		col.setOnDragOver((DragEvent event) -> {
-//			if (event.getGestureSource() != col
-//					&& event.getDragboard().hasString()) {
-//				event.acceptTransferModes(TransferMode.COPY);
-//			}
-//
-//			event.consume();
-//		});
-//
-//		col.setOnDragEntered((DragEvent event) -> {
-//			if (event.getGestureSource() != col
-//					&& event.getDragboard().hasString()) {
-//
-//				if (done)
-//					return;
-//
-//				col.setStyle(STYLE_YELLOW_BORDERS);
-//			}
-//
-//			event.consume();
-//		});
-//
-//		col.setOnDragExited((DragEvent event) -> {
-//			col.setStyle(STYLE_BORDERS);
-//
-//			event.consume();
-//		});
-//
-//		col.setOnDragDropped((DragEvent event) -> {
-//			Dragboard db = event.getDragboard();
-//			boolean success = false;
-//			if (db.hasString() && !done) {
-//				done = true;
-//				success = true;
-//
-//				// add the item here
-//				DragData dd = DragData.deserialize(db.getString());
-//
-//				if (dd.source == DragSource.PANEL_MILESTONES) {
-//					BorderPane item = items.get(dd.index);
-//					col.getChildren().add(item);
-//				} else if (dd.source == DragSource.TREE_ISSUES) {
-//					BorderPane item = createItem("issue: " + dd.text);
-//					col.getChildren().add(item);
-//				} else if (dd.source == DragSource.TREE_MILESTONES) {
-//					col.getChildren().clear();
-//
-//					col.setPadding(new Insets(15, 12, 15, 12));
-//					Label which = new Label();
-//					which.setText("Milestone " + dd.text);
-//
-//					which.setFont(Font.font("System Regular", FontWeight.BOLD,
-//							16));
-//
-//					Label issuesLabel = new Label();
-//					issuesLabel.setText("Issues");
-//
-//					ObservableList<String> data = FXCollections
-//							.observableArrayList();
-//					// data.addAll("one", "two", "three");
-//
-//					ListView<String> issues = new ListView<>(data);
-//					String defaultIssuesStyle = issues.getStyle();
-//
-//					issues.setOnDragOver((e) -> {
-//						if (event.getGestureSource() != issues
-//								&& event.getDragboard().hasString()) {
-//							event.acceptTransferModes(TransferMode.COPY);
-//						}
-//						event.consume();
-//					});
-//
-//					issues.setOnDragEntered((e) -> {
-//						if (event.getGestureSource() != issues
-//								&& event.getDragboard().hasString()) {
-//							Dragboard db2 = event.getDragboard();
-//							if (db2.hasString()) {
-//								DragData dd2 = DragData.deserialize(db
-//										.getString());
-//								if (dd2.source == DragSource.TREE_ISSUES) {
-//									issues.setStyle(STYLE_YELLOW_BORDERS);
-//								}
-//							}
-//						}
-//						event.consume();
-//					});
-//
-//					issues.setOnDragExited((e) -> {
-//						issues.setStyle(defaultIssuesStyle);
-//
-//						event.consume();
-//					});
-//
-//					issues.setOnDragDropped((e) -> {
-//						Dragboard db2 = event.getDragboard();
-//						boolean success2 = false;
-//						if (db2.hasString()) {
-//							success2 = true;
-//							DragData dd2 = DragData.deserialize(db2.getString());
-//							System.out.println("oiukjjkjl");
-//							if (dd2.source == DragSource.TREE_ISSUES) {
-//								data.add(dd2.text);
-//								System.out.println("aklsjdkasjl");
-//							}
-//						}
-//						event.setDropCompleted(success2);
-//
-//						event.consume();
-//					});
-//
-//					// // Creating tree items
-//					// final TreeItem<String> childNode1 = new TreeItem<>(
-//					// "Child Node 1");
-//					// final TreeItem<String> childNode2 = new TreeItem<>(
-//					// "Child Node 2");
-//					// final TreeItem<String> childNode3 = new TreeItem<>(
-//					// "Child Node 3");
-//					//
-//					// // Creating the root element
-//					// final TreeItem<String> root = new
-//					// TreeItem<>("Root node");
-//					// root.setExpanded(true);
-//					//
-//					// // Adding tree items to the root
-//					// root.getChildren().add(childNode1);
-//					// root.getChildren().add(childNode2);
-//					// root.getChildren().add(childNode3);
-//					//
-//					// // Creating a column
-//					// TreeTableColumn<String, String> column = new
-//					// TreeTableColumn<>(
-//					// "Issue");
-//					// column.setPrefWidth(150);
-//					//
-//					// TreeTableColumn<String, String> length = new
-//					// TreeTableColumn<>(
-//					// "Length");
-//					// length.setPrefWidth(150);
-//					//
-//					// // Defining cell content
-//					// column.setCellValueFactory((
-//					// CellDataFeatures<String, String> p) -> new
-//					// ReadOnlyStringWrapper(
-//					// p.getValue().getValue()));
-//					// length.setCellValueFactory((
-//					// CellDataFeatures<String, String> p) -> new
-//					// ReadOnlyStringWrapper(
-//					// Integer.toString(p.getValue().getValue().length())));
-//					//
-//					// // Creating a tree table view
-//					// final TreeTableView<String> issues = new TreeTableView<>(
-//					// root);
-//					// issues.getColumns().add(column);
-//					// issues.getColumns().add(length);
-//					// issues.setPrefWidth(152);
-//					// issues.setShowRoot(true);
-//
-//					col.getChildren().add(which);
-//					col.getChildren().add(issuesLabel);
-//					col.getChildren().add(issues);
-//
-//				} else if (dd.source == DragSource.TREE_LABELS) {
-//					BorderPane item = createItem("label: " + dd.text);
-//					col.getChildren().add(item);
-//				} else if (dd.source == DragSource.TREE_CONTRIBUTORS) {
-//					BorderPane item = createItem("contributor: " + dd.text);
-//					col.getChildren().clear();
-//					col.getChildren().add(item);
-//				}
-//			}
-//
-//			// this removes the item from its previous parent
-//			event.setDropCompleted(success);
-//
-//			event.consume();
-//		});
-
-		return col;
+		return issuePanel;
 	}
 
 	private Parent createTreeView() {
@@ -425,7 +230,7 @@ public class Demo extends Application {
 
 		if (panelSize < to) {
 			for (int i = 0; i < to - panelSize; i++) {
-				panels.add(createColumn());
+				panels.add(createIssuePanel());
 			}
 		} else { // panels.size() > to
 			int numberToRemove = panels.size() - to;
@@ -481,9 +286,13 @@ public class Demo extends Application {
 //		columns.setPadding(new Insets(15, 12, 15, 12));
 //		columns.setSpacing(10);
 
-		VBox col1 = createColumn();
-		VBox col2 = createColumn();
-		VBox col3 = createColumn();
+		IssuePanel col1 = createIssuePanel();
+		IssuePanel col2 = createIssuePanel();
+		IssuePanel col3 = createIssuePanel();
+		
+		col1.getItems().add("kasjldjkdl");
+		col1.getItems().add("lkjldjfh");
+		
 		// VBox col3 = createColumn();
 		// col1.getChildren().addAll(createItem(), createItem());
 
