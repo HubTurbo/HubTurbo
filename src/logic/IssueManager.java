@@ -13,7 +13,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 public class IssueManager {
-	
 	private IssueService service;
 	private GitHubClient client;
 	

@@ -11,6 +11,7 @@ public class LogicFacade {
 	private GitHubClient client = new GitHubClient();
 	private IRepositoryIdProvider repoId = null;
 	private IssueManager issueManager = new IssueManager(client);
+	private MilestoneManager milestoneManager = new MilestoneManager(client);
 	
 	public boolean login(String userId, String password) {
 		client.setCredentials(userId, password);
@@ -24,6 +25,10 @@ public class LogicFacade {
 	
 	public List<TurboIssue> getIssues() {
 		return issueManager.getAllIssues();
+	}
+	
+	public List<TurboMilestone> getMilestones() {
+		return milestoneManager.getAllMilestones(repoId);
 	}
 	
 	public TurboIssue getIssue(int issueNumber) {
