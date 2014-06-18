@@ -10,6 +10,18 @@ public class Issue {
 	private Contributor assignee;
 	private Milestone milestone;
 	
+	public Issue(String title, String desc) {
+		System.out.println(title);
+		System.out.println(desc);
+		this.title = title;
+		this.description = desc;
+	}
+	
+	@Override
+	public String toString() {
+		return "Issue " + title;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

@@ -6,24 +6,25 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import logic.Issue;
 
 public class IssuePanel extends VBox {
 
-	private ListView<String> listView = new ListView<>();
-	private ObservableList<String> items = FXCollections.observableArrayList();
+	private ListView<Issue> listView = new ListView<>();
+	private ObservableList<Issue> issues = FXCollections.observableArrayList();
 
 	public IssuePanel() {
-		listView.setItems(items);
-		listView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+		listView.setItems(issues);
+		listView.setCellFactory(new Callback<ListView<Issue>, ListCell<Issue>>() {
 			@Override
-			public ListCell<String> call(ListView<String> list) {
+			public ListCell<Issue> call(ListView<Issue> list) {
 				return new CustomListCell();
 			}
 		});
 		getChildren().add(listView);
 	}
 
-	public ObservableList<String> getItems() {
-		return items;
+	public ObservableList<Issue> getItems() {
+		return issues;
 	}
 }

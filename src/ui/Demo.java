@@ -43,6 +43,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import logic.Issue;
 
 public class Demo extends Application {
 
@@ -290,8 +291,8 @@ public class Demo extends Application {
 		IssuePanel col2 = createIssuePanel();
 		IssuePanel col3 = createIssuePanel();
 		
-		col1.getItems().add("kasjldjkdl");
-		col1.getItems().add("lkjldjfh");
+		col1.getItems().add(new Issue("kasjldjkdl", "desc"));
+		col1.getItems().add(new Issue("luihhjgsdf", "desc"));
 		
 		// VBox col3 = createColumn();
 		// col1.getChildren().addAll(createItem(), createItem());
