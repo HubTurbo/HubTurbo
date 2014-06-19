@@ -1,50 +1,47 @@
 package ui;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.ReadOnlyStringWrapper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
+import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.DefaultDialogAction;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialog.ActionTrait;
+import org.controlsfx.dialog.DialogStyle;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -62,7 +59,7 @@ public class Demo extends Application {
 
 	private Stage mainStage;
 	private HBox columns;
-	private LogicFacade logic = new LogicFacade(); 
+	private LogicFacade logic = new LogicFacade();
 
 	private final ArrayList<BorderPane> items = new ArrayList<>();
 
@@ -161,7 +158,7 @@ public class Demo extends Application {
 		issuePanel.setPrefWidth(400);
 		HBox.setHgrow(issuePanel, Priority.ALWAYS);
 		issuePanel.setStyle(STYLE_BORDERS);
-//		issuePanel.setAlignment(Pos.TOP_CENTER);
+		// issuePanel.setAlignment(Pos.TOP_CENTER);
 
 		return issuePanel;
 	}
@@ -249,11 +246,10 @@ public class Demo extends Application {
 		// }
 
 		// Tests
-		
+
 		col1.filter(new Filter().withTitle("one")
-				.exceptUnderMilestone("v0.0.1")
-				.or().withTitle("akjshdkj"));
-		//		test.setTitle("data binding demo");
+				.exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
+		// test.setTitle("data binding demo");
 	}
 
 	private void setUpHotkeys(Scene scene) {
@@ -317,7 +313,7 @@ public class Demo extends Application {
 		TurboIssue three = new TurboIssue("issue two", "desc three");
 		TurboIssue four = new TurboIssue("issue four", "desc four");
 		TurboIssue five = new TurboIssue("issue five", "desc five");
-		
+
 		col1.getItems().add(test);
 		col1.getItems().add(two);
 		col1.getItems().add(three);
@@ -401,7 +397,7 @@ public class Demo extends Application {
 
 			TextField repoURLField = new TextField();
 			grid.add(repoURLField, 1, 1);
-			
+
 			Label username = new Label("User Name:");
 			grid.add(username, 0, 2);
 
@@ -421,7 +417,7 @@ public class Demo extends Application {
 				dialogStage.hide();
 				loadIssues();
 			});
-			
+
 			HBox buttons = new HBox(10);
 			buttons.setAlignment(Pos.BOTTOM_RIGHT);
 			buttons.getChildren().add(loginButton);
