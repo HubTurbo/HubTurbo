@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import logic.TurboCollaborator;
 import logic.TurboIssue;
 import logic.TurboLabel;
 
@@ -52,16 +53,19 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		});
 		populateLabels(labels, issue.getLabels());
 
-		Text assignees = new Text("assignees");
+		HBox assignee = new HBox();
+		assignee.setSpacing(3);
+		Text assignedToLabel = new Text("Assigned to:");
+		TurboCollaborator collaborator = issue.getAssignee();
+		Text assigneeName = new Text(collaborator == null ? "none" : collaborator.getGithubName());
+		assignee.getChildren().addAll(assignedToLabel, assigneeName);
 
-		everything.getChildren().addAll(issueName, parentName, labels,
-				assignees);
+		everything.getChildren()
+				.addAll(issueName, parentName, labels, assignee);
 		// everything.getChildren().stream().forEach((node) ->
 		// node.setStyle(Demo.STYLE_BORDERS));
 
-		if (issue != null) {
-			setGraphic(everything);
-		}
+		setGraphic(everything);
 	}
 
 	private void populateLabels(HBox parent, ObservableList<TurboLabel> labels) {
