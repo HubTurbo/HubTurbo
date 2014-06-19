@@ -3,23 +3,8 @@ package ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.CheckListView;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DefaultDialogAction;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialog.ActionTrait;
-import org.controlsfx.dialog.DialogStyle;
-
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -31,7 +16,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
@@ -152,7 +136,7 @@ public class Demo extends Application {
 	boolean done = false;
 
 	private IssuePanel createIssuePanel() {
-		IssuePanel issuePanel = new IssuePanel();
+		IssuePanel issuePanel = new IssuePanel(mainStage);
 		// col.setPadding(new Insets(15, 12, 15, 12));
 		// col.setSpacing(10);
 		issuePanel.setPrefWidth(400);
@@ -442,10 +426,11 @@ public class Demo extends Application {
 
 	@Override
 	public void start(Stage stage) {
+		mainStage = stage;
+		
 		Scene scene = new Scene(createRoot(), 800, 600);
 		setUpHotkeys(scene);
 
-		mainStage = stage;
 		stage.setTitle("Demo");
 		stage.setMinWidth(800);
 		stage.setMinHeight(600);

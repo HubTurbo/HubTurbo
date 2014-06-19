@@ -27,6 +27,22 @@ public class TurboIssue {
 //		labels.add(tl);
 	}
 	
+	// Copy constructor
+	public TurboIssue(TurboIssue other) {
+		other.cloneInto(this);
+	}
+	
+	public TurboIssue cloneInto(TurboIssue other) {
+		setTitle(other.getTitle());
+		setDescription(other.getDescription());
+		setId(other.getId());
+		setLabels(FXCollections.observableArrayList(other.getLabels()));
+		setAssignee(other.getAssignee());
+		setMilestone(other.getMilestone());
+		setGhIssue(other.getGhIssue());
+		return other;
+	}
+	
 	public TurboIssue(Issue issue) {
 		this.ghIssue = issue;
 		
@@ -57,7 +73,11 @@ public class TurboIssue {
 		return ghIssue;
 	}
 	
-    private StringProperty title = new SimpleStringProperty();
+    private void setGhIssue(Issue ghIssue2) {
+		ghIssue = ghIssue2;
+	}
+
+	private StringProperty title = new SimpleStringProperty();
     public final String getTitle() {return title.get();}
     public final void setTitle(String value) {title.set(value);}
     public StringProperty titleProperty() {return title;}
