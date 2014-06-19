@@ -2,12 +2,12 @@ package logic;
 
 import org.eclipse.egit.github.core.User;
 
-public class TurboContributor {
+public class TurboCollaborator {
 	private User ghUser;
 	private String githubName;
 	private String realName;
 	
-	public TurboContributor(User user) {
+	public TurboCollaborator(User user) {
 		this.ghUser = user;
 		if (user != null) {
 			this.githubName = user.getLogin();

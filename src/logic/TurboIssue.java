@@ -15,7 +15,7 @@ import org.eclipse.egit.github.core.Label;
 public class TurboIssue {
 	private Issue ghIssue;
 	private ObservableList<TurboLabel> labels;
-	private TurboContributor assignee;
+	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
 	
 	public TurboIssue(String title, String desc) {
@@ -34,7 +34,7 @@ public class TurboIssue {
 		setDescription(issue.getBody());
 		setId(issue.getNumber());
 		
-		this.assignee = new TurboContributor(issue.getAssignee());
+		this.assignee = new TurboCollaborator(issue.getAssignee());
 		this.milestone = new TurboMilestone(issue.getMilestone());
 		this.labels = getLabels(issue);
 	}
@@ -78,10 +78,10 @@ public class TurboIssue {
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		this.labels = labels;
 	}
-	public TurboContributor getAssignee() {
+	public TurboCollaborator getAssignee() {
 		return assignee;
 	}
-	public void setAssignee(TurboContributor assignee) {
+	public void setAssignee(TurboCollaborator assignee) {
 		this.assignee = assignee;
 	}
 	public TurboMilestone getMilestone() {
