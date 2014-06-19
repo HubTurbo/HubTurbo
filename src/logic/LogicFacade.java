@@ -14,6 +14,7 @@ public class LogicFacade {
 	private IssueManager issueManager = new IssueManager(client);
 	private MilestoneManager milestoneManager = new MilestoneManager(client);
 	private LabelManager labelManager = new LabelManager(client);
+	private CollaboratorManager colManager = new CollaboratorManager(client);
 	
 	public boolean login(String userId, String password) {
 		return authManager.login(userId, password);
@@ -33,6 +34,10 @@ public class LogicFacade {
 	
 	public List<TurboLabel> getLabels() {
 		return labelManager.getAllLabels(repoId);
+	}
+	
+	public List<TurboCollaborator> getCollaborators() {
+		return colManager.getAllCollaborators(repoId);
 	}
 	
 	public TurboIssue getIssue(int issueNumber) {
