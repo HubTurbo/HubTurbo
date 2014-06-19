@@ -12,20 +12,23 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import logic.LogicFacade;
 import logic.TurboCollaborator;
 import logic.TurboIssue;
 import logic.TurboLabel;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
-	private Stage mainStage;
+	private final Stage mainStage;
+	private final LogicFacade logic;
 
 	private static final String STYLE_PARENT_NAME = "-fx-font-size: 11px;";
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
-	public CustomListCell(Stage mainStage) {
+	public CustomListCell(Stage mainStage, LogicFacade logic) {
 		super();
 		this.mainStage = mainStage;
+		this.logic = logic;
 	}
 
 	@Override
@@ -92,7 +95,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
-		(new IssueDialog(mainStage, issue)).show().thenApply(newIssue -> {
+		(new IssueDialog(mainStage, logic, issue)).show().thenApply(newIssue -> {
 			return true;
 		});
 	}
@@ -114,8 +117,10 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private String getStyleFor(TurboLabel label) {
-		String colour = label.getColour();//"slateblue";
-		
+		String colour = label.getColour();
+//		if (colour.equals("#000000")) {
+//			
+//		}
 //		if (label.getName().equals("bug")) {
 //			colour = "red";
 //		} else if (label.getName().equals("feature")) {

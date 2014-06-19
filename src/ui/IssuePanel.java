@@ -10,21 +10,28 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import logic.LogicFacade;
+import logic.TurboCollaborator;
 import logic.TurboIssue;
+import logic.TurboLabel;
+import logic.TurboMilestone;
 
 public class IssuePanel extends VBox {
 
 	private final Stage mainStage;
+	private final LogicFacade logic;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList;
-
-	public IssuePanel(Stage mainStage) {
+	
+	public IssuePanel(Stage mainStage, LogicFacade logic) {
 		this.mainStage = mainStage;
 		listView = new ListView<>();
 		getChildren().add(listView);
 		setVgrow(listView, Priority.ALWAYS);
+		
+		this.logic = logic;
 		
 		refreshItems();
 	}
@@ -46,7 +53,7 @@ public class IssuePanel extends VBox {
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new CustomListCell(mainStage);
+				return new CustomListCell(mainStage, logic);
 			}
 		});
 		

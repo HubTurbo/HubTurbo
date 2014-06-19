@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -33,8 +34,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import logic.LogicFacade;
+import logic.TurboCollaborator;
 import logic.TurboIssue;
 import logic.TurboLabel;
+import logic.TurboMilestone;
 
 public class Demo extends Application {
 
@@ -136,8 +139,8 @@ public class Demo extends Application {
 	boolean done = false;
 
 	private IssuePanel createIssuePanel() {
-		IssuePanel issuePanel = new IssuePanel(mainStage);
-		// col.setPadding(new Insets(15, 12, 15, 12));
+		IssuePanel issuePanel = new IssuePanel(mainStage, logic);
+		// col.setPadng(new Insets(15, 12, 15, 12));
 		// col.setSpacing(10);
 		issuePanel.setPrefWidth(400);
 		HBox.setHgrow(issuePanel, Priority.ALWAYS);

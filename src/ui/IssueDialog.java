@@ -3,6 +3,7 @@ package ui;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -15,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import logic.LogicFacade;
 import logic.TurboIssue;
 
 public class IssueDialog {
@@ -29,12 +31,14 @@ public class IssueDialog {
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
 	Stage parentStage;
+	LogicFacade logic;
 	TurboIssue issue;
 
 	CompletableFuture<String> response;
 
-	public IssueDialog(Stage parentStage, TurboIssue issue) {
+	public IssueDialog(Stage parentStage, LogicFacade logic, TurboIssue issue) {
 		this.parentStage = parentStage;
+		this.logic = logic;
 		this.issue = issue;
 
 		response = new CompletableFuture<>();
@@ -79,12 +83,27 @@ public class IssueDialog {
 
 		TextField milestoneField = new TextField();
 		milestoneField.setPromptText("Milestone");
+		milestoneField.setOnMouseClicked((e) -> {
+			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getMilestones()))).show().thenApply((response) -> {
+				return true;
+			});
+		});
 
 		TextField labelsField = new TextField();
 		labelsField.setPromptText("Labels");
+		labelsField.setOnMouseClicked((e) -> {
+			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getLabels()))).show().thenApply((response) -> {
+				return true;
+			});
+		});
 
 		TextField assigneeField = new TextField();
 		assigneeField.setPromptText("Assignee");
+		assigneeField.setOnMouseClicked((e) -> {
+			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getCollaborators()))).show().thenApply((response) -> {
+				return true;
+			});
+		});
 
 		HBox buttons = new HBox();
 		buttons.setAlignment(Pos.BASELINE_RIGHT);
