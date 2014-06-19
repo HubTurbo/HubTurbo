@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
-public class TurboIssue {
+public class TurboIssue implements Listable {
 	private Issue ghIssue;
 	private ObservableList<TurboLabel> labels;
 	private TurboCollaborator assignee;
@@ -109,5 +109,10 @@ public class TurboIssue {
 	}
 	public void setMilestone(TurboMilestone milestone) {
 		this.milestone = milestone;
+	}
+
+	@Override
+	public String getListName() {
+		return "#" + getId() + " " + getTitle();
 	}
 }

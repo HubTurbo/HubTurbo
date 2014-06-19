@@ -2,7 +2,7 @@ package logic;
 
 import org.eclipse.egit.github.core.User;
 
-public class TurboCollaborator {
+public class TurboCollaborator implements Listable {
 	private User ghUser;
 	private String githubName;
 	private String realName;
@@ -26,6 +26,11 @@ public class TurboCollaborator {
 	}
 	public void setRealName(String realName) {
 		this.realName = realName;
+	}
+
+	@Override
+	public String getListName() {
+		return getGithubName();
 	}
 	
 	

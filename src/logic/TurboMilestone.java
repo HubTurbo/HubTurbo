@@ -2,7 +2,7 @@ package logic;
 
 import org.eclipse.egit.github.core.Milestone;
 
-public class TurboMilestone {
+public class TurboMilestone implements Listable {
 	private Milestone ghMilestone;
 	private String title;
 	
@@ -23,6 +23,11 @@ public class TurboMilestone {
 
 	public void setTitle(String name) {
 		this.title = name;
+	}
+
+	@Override
+	public String getListName() {
+		return getTitle();
 	}
 	
 	

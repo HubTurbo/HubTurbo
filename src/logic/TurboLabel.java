@@ -5,7 +5,7 @@ import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Label;
 
-public class TurboLabel {
+public class TurboLabel implements Listable {
 	private Label ghLabel;
 	
 	public TurboLabel(String name) {
@@ -34,5 +34,10 @@ public class TurboLabel {
     public final String getColour() {return colour.get();}
     public final void setColour(String value) {colour.set(value);}
     public StringProperty colourProperty() {return colour;}
+
+	@Override
+	public String getListName() {
+		return getName();
+	}
 	
 }
