@@ -4,12 +4,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -35,16 +34,14 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		if (issue == null)
 			return;
 
-		VBox everything = new VBox();
-
-		Text issueName = new Text(issue.getTitle());
+		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueName.setStyle(STYLE_ISSUE_NAME);
 		issue.titleProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
 					ObservableValue<? extends String> stringProperty,
 					String oldValue, String newValue) {
-				issueName.setText(newValue);
+				issueName.setText("#" + issue.getId() + " " + newValue);
 			}
 		});
 
@@ -52,7 +49,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		parentName.setStyle(STYLE_PARENT_NAME);
 
 		HBox labels = new HBox();
-		labels.setStyle(Demo.STYLE_BORDERS);
+		labels.setSpacing(3);
 		issue.getLabels().addListener(new ListChangeListener<TurboLabel>() {
 
 			@Override
@@ -72,6 +69,8 @@ public class CustomListCell extends ListCell<TurboIssue> {
 				: collaborator.getGithubName());
 		assignee.getChildren().addAll(assignedToLabel, assigneeName);
 
+		VBox everything = new VBox();
+		everything.setSpacing(2);
 		everything.getChildren()
 				.addAll(issueName, parentName, labels, assignee);
 		// everything.getChildren().stream().forEach((node) ->
@@ -94,17 +93,14 @@ public class CustomListCell extends ListCell<TurboIssue> {
 
 	private void onDoubleClick(TurboIssue issue) {
 		(new IssueDialog(mainStage, issue)).show().thenApply(newIssue -> {
-//			System.out.println(msg);
-//			if (msg.equals("ok")) {
-//				System.out.println("YES");
-//			}
 			return true;
 		});
 	}
 
 	private void populateLabels(HBox parent, ObservableList<TurboLabel> labels) {
 		for (TurboLabel label : labels) {
-			Text labelText = new Text(label.getName());
+			Label labelText = new Label(label.getName());
+			labelText.setStyle(getStyleFor(label));
 			label.nameProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(
@@ -115,5 +111,16 @@ public class CustomListCell extends ListCell<TurboIssue> {
 			});
 			parent.getChildren().add(labelText);
 		}
+	}
+
+	private String getStyleFor(TurboLabel label) {
+		String colour = "slateblue";
+		if (label.getName().equals("bug")) {
+			colour = "red";
+		} else if (label.getName().equals("feature")) {
+			colour = "green";
+		}
+		String style = "-fx-background-color: " + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
+		return style;
 	}
 }

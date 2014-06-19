@@ -292,10 +292,11 @@ public class Demo extends Application {
 		IssuePanel col3 = createIssuePanel();
 
 		test = new TurboIssue("issue one", "description one");
-		test.getLabels().add(new TurboLabel("a"));
+		test.getLabels().addAll(new TurboLabel("bug"), new TurboLabel("thisisalonglabel"));
 		TurboIssue two = new TurboIssue("issue two", "desc two");
 		TurboIssue three = new TurboIssue("issue two", "desc three");
 		TurboIssue four = new TurboIssue("issue four", "desc four");
+		four.getLabels().addAll(new TurboLabel("request"), new TurboLabel("feature"));
 		TurboIssue five = new TurboIssue("issue five", "desc five");
 
 		col1.getItems().add(test);
