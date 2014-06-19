@@ -10,6 +10,7 @@ public class TurboLabel {
 	
 	public TurboLabel(String name) {
 		setName(name);
+		setColour("#000000");
 	}
 	
 	public TurboLabel(Label label) {
@@ -17,6 +18,7 @@ public class TurboLabel {
 		if (label != null) {
 			setName(label.getName());
 		}
+		setColour(label.getColor());
 	}
 	
 	public Label getGhLabel() {
@@ -28,5 +30,9 @@ public class TurboLabel {
     public final void setName(String value) {name.set(value);}
     public StringProperty nameProperty() {return name;}
 	
+    private StringProperty colour = new SimpleStringProperty();
+    public final String getColour() {return colour.get();}
+    public final void setColour(String value) {colour.set(value);}
+    public StringProperty colourProperty() {return colour;}
 	
 }

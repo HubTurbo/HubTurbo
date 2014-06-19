@@ -114,12 +114,13 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private String getStyleFor(TurboLabel label) {
-		String colour = "slateblue";
-		if (label.getName().equals("bug")) {
-			colour = "red";
-		} else if (label.getName().equals("feature")) {
-			colour = "green";
-		}
+		String colour = label.getColour();//"slateblue";
+		
+//		if (label.getName().equals("bug")) {
+//			colour = "red";
+//		} else if (label.getName().equals("feature")) {
+//			colour = "green";
+//		}
 		String style = "-fx-background-color: " + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
 		return style;
 	}
