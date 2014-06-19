@@ -8,7 +8,8 @@ import org.eclipse.egit.github.core.Label;
 public class TurboLabel {
 	private Label ghLabel;
 	
-	public TurboLabel() {
+	public TurboLabel(String name) {
+		setName(name);
 	}
 	
 	public TurboLabel(Label label) {

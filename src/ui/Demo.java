@@ -53,6 +53,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import logic.LogicFacade;
 import logic.TurboIssue;
+import logic.TurboLabel;
 
 public class Demo extends Application {
 
@@ -310,8 +311,18 @@ public class Demo extends Application {
 		IssuePanel col2 = createIssuePanel();
 		IssuePanel col3 = createIssuePanel();
 
-		col1.getItems().add(test = new TurboIssue("issue one", "desc"));
-		col1.getItems().add(new TurboIssue("issue two", "desc"));
+		test = new TurboIssue("issue one", "description one");
+		test.getLabels().add(new TurboLabel("a"));
+		TurboIssue two = new TurboIssue("issue two", "desc two");
+		TurboIssue three = new TurboIssue("issue two", "desc three");
+		TurboIssue four = new TurboIssue("issue four", "desc four");
+		TurboIssue five = new TurboIssue("issue five", "desc five");
+		
+		col1.getItems().add(test);
+		col1.getItems().add(two);
+		col1.getItems().add(three);
+		col1.getItems().add(four);
+		col1.getItems().add(five);
 
 		col2.getItems().add(test);
 
@@ -385,7 +396,7 @@ public class Demo extends Application {
 			title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			grid.add(title, 0, 0, 2, 1);
 
-			Label repoURL = new Label("Repository URL:");
+			Label repoURL = new Label("Repository name:");
 			grid.add(repoURL, 0, 1);
 
 			TextField repoURLField = new TextField();
@@ -430,7 +441,7 @@ public class Demo extends Application {
 	}
 
 	private void loadIssues() {
-		col1.getItems().setAll(logic.getIssues());
+		col1.setItems(FXCollections.observableArrayList(logic.getIssues()));
 	}
 
 	@Override
