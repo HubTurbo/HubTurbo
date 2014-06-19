@@ -21,13 +21,13 @@ public class IssueManager {
 		service = new IssueService(this.client);
 	}
 	
-	List<TurboIssue> getAllIssues() {
+	List<TurboIssue> getAllIssues(IRepositoryIdProvider repository) {
 		List<TurboIssue> turboIssues = new ArrayList<TurboIssue>();
 		Map<String, String> filters = new HashMap<String, String>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		
 		try {		
-			List<RepositoryIssue> issues = service.getIssues(filters);
+			List<Issue> issues = service.getIssues(repository, filters);
 			for (Issue issue : issues) {
 				turboIssues.add(new TurboIssue(issue));
 			}

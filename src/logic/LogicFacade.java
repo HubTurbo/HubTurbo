@@ -24,7 +24,7 @@ public class LogicFacade {
 	}
 	
 	public List<TurboIssue> getIssues() {
-		return issueManager.getAllIssues();
+		return issueManager.getAllIssues(repoId);
 	}
 	
 	public List<TurboMilestone> getMilestones() {
