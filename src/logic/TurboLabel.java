@@ -61,7 +61,7 @@ public class TurboLabel implements Listable {
 		if (name == null) {
 			if (other.name != null)
 				return false;
-		} else if (getName() != other.getName())
+		} else if (!getName().equals(other.getName()))
 			return false;
 		return true;
 	}
