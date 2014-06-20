@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -28,46 +30,37 @@ import logic.Listable;
 
 public class FilterableCheckboxList {
 
-	// private static final double HEIGHT_FACTOR = 0.3;
-	//
-	// private static final int TITLE_SPACING = 5;
-	// private static final int ELEMENT_SPACING = 10;
-	// private static final int MIDDLE_SPACING = 20;
-	//
-	// public static final String STYLE_YELLOW =
-	// "-fx-background-color: #FFFA73;";
-	// public static final String STYLE_BORDERS =
-	// "-fx-border-color: #000000; -fx-border-width: 1px;";
-
 	Stage parentStage;
-	// TurboIssue issue;
 	FilteredList<String> objects;
 
-	CompletableFuture<String> response;
+	CompletableFuture<List<Integer>> response;
 
-	public FilterableCheckboxList(Stage parentStage, ObservableList<Listable> objects) {
+	public FilterableCheckboxList(Stage parentStage,
+			ObservableList<Listable> objects) {
 		this.parentStage = parentStage;
-		ObservableList<String> stringRepresentations = FXCollections.observableArrayList(objects.stream().map((obj) -> obj.getListName()).collect(Collectors.toList()));
-		this.objects = new FilteredList<>(stringRepresentations, p -> true);;
+		ObservableList<String> stringRepresentations = FXCollections
+				.observableArrayList(objects.stream()
+						.map((obj) -> obj.getListName())
+						.collect(Collectors.toList()));
+		this.objects = new FilteredList<>(stringRepresentations, p -> true);
 
 		response = new CompletableFuture<>();
 	}
 
-	public CompletableFuture<String> show() {
+	public CompletableFuture<List<Integer>> show() {
 		showDialog();
 		return response;
 	}
 
 	private void showDialog() {
 
-		VBox layout = new VBox();
-
 		TextField searchField = new TextField();
 		searchField.setPromptText("Search");
 
 		CheckListView<String> checkListView = new CheckListView<>(objects);
 		checkListView.getSelectionModel().setSelectionMode(
-				SelectionMode.MULTIPLE);
+				multipleSelection ? SelectionMode.MULTIPLE
+						: SelectionMode.SINGLE);
 
 		// checkListView.getSelectionModel().getSelectedItems()
 		// .addListener(new ListChangeListener<Listable>() {
@@ -87,29 +80,59 @@ public class FilterableCheckboxList {
 		// System.out.println("check state changed");
 		// }
 		// });
+		
+		Stage stage = new Stage();
 
-		// layout.setPadding(new Insets(15));
-		// layout.setSpacing(MIDDLE_SPACING);
-
-		layout.getChildren().addAll(searchField, checkListView);
+		Button close = new Button("Close");
+		VBox.setMargin(close, new Insets(5));
+		close.setOnAction((e) -> {
+			response.complete(checkListView.getCheckModel().getSelectedIndices());
+			stage.hide();
+		});
+		
+		VBox layout = new VBox();
+		layout.setAlignment(Pos.CENTER_RIGHT);
+		layout.getChildren().addAll(searchField, checkListView, close);
 
 		Scene scene = new Scene(layout, 400, 300);
 
-		Stage stage = new Stage();
-		// stage.setTitle("Select");
+		stage.setTitle(windowTitle);
 		stage.setScene(scene);
+		
+		stage.setOnCloseRequest((e) -> {
+			response.complete(checkListView.getCheckModel().getSelectedIndices());
+		});
 
 		Platform.runLater(() -> stage.requestFocus());
-
-		// layout.getChildren().addAll();
 
 		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
 
 		// stage.setX(parentStage.getX());
-		// stage.setY(parentStage.getY() + parentStage.getHeight() * (1 -
-		// HEIGHT_FACTOR));
+		// stage.setY(parentStage.getY());
 
 		stage.show();
+	}
+
+	String windowTitle = "";
+
+	public String getWindowTitle() {
+		return windowTitle;
+	}
+
+	public FilterableCheckboxList setWindowTitle(String windowTitle) {
+		this.windowTitle = windowTitle;
+		return this;
+	}
+
+	boolean multipleSelection = true;
+
+	public boolean getMultipleSelection() {
+		return multipleSelection;
+	}
+
+	public FilterableCheckboxList setMultipleSelection(boolean multipleSelection) {
+		this.multipleSelection = multipleSelection;
+		return this;
 	}
 }

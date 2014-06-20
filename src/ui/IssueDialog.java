@@ -1,9 +1,11 @@
 package ui;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -16,8 +18,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import logic.Listable;
 import logic.LogicFacade;
 import logic.TurboIssue;
+import logic.TurboMilestone;
 
 public class IssueDialog {
 
@@ -26,7 +30,7 @@ public class IssueDialog {
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
 	private static final int MIDDLE_SPACING = 20;
-	
+
 	public static final String STYLE_YELLOW = "-fx-background-color: #FFFA73;";
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
@@ -58,18 +62,20 @@ public class IssueDialog {
 		Label issueId = new Label("#" + issue.getId());
 		TextField issueTitle = new TextField(issue.getTitle());
 		issueTitle.setPromptText("Title");
-		issueTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-			issue.setTitle(newValue);
-		});
+		issueTitle.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					issue.setTitle(newValue);
+				});
 		title.getChildren().addAll(issueId, issueTitle);
 
 		TextArea issueDesc = new TextArea(issue.getDescription());
 		issueDesc.setPrefRowCount(5);
 		issueDesc.setPrefColumnCount(42);
 		issueDesc.setPromptText("Description");
-		issueDesc.textProperty().addListener((observable, oldValue, newValue) -> {
-			issue.setDescription(newValue);
-		});
+		issueDesc.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					issue.setDescription(newValue);
+				});
 
 		VBox left = new VBox();
 		left.setSpacing(ELEMENT_SPACING);
@@ -84,25 +90,35 @@ public class IssueDialog {
 		TextField milestoneField = new TextField();
 		milestoneField.setPromptText("Milestone");
 		milestoneField.setOnMouseClicked((e) -> {
-			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getMilestones()))).show().thenApply((response) -> {
-				return true;
-			});
+			(new FilterableCheckboxList(stage, FXCollections
+					.observableArrayList(logic.getMilestones())))
+					.setWindowTitle("Milestones").setMultipleSelection(false)
+					.show().thenApply((response) -> {
+						System.out.println(response);
+						return true;
+					});
 		});
 
 		TextField labelsField = new TextField();
 		labelsField.setPromptText("Labels");
 		labelsField.setOnMouseClicked((e) -> {
-			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getLabels()))).show().thenApply((response) -> {
-				return true;
-			});
+			(new FilterableCheckboxList(stage, FXCollections
+					.observableArrayList(logic.getLabels())))
+					.setWindowTitle("Labels").setMultipleSelection(true).show()
+					.thenApply((List<Integer> response) -> {
+						return true;
+					});
 		});
 
 		TextField assigneeField = new TextField();
 		assigneeField.setPromptText("Assignee");
 		assigneeField.setOnMouseClicked((e) -> {
-			(new FilterableCheckboxList(parentStage, FXCollections.observableArrayList(logic.getCollaborators()))).show().thenApply((response) -> {
-				return true;
-			});
+			(new FilterableCheckboxList(stage, FXCollections
+					.observableArrayList(logic.getCollaborators())))
+					.setWindowTitle("Assignee").setMultipleSelection(false)
+					.show().thenApply((response) -> {
+						return true;
+					});
 		});
 
 		HBox buttons = new HBox();
@@ -142,7 +158,8 @@ public class IssueDialog {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(MIDDLE_SPACING);
 
-		Scene scene = new Scene(layout, parentStage.getWidth(), parentStage.getHeight() * HEIGHT_FACTOR);
+		Scene scene = new Scene(layout, parentStage.getWidth(),
+				parentStage.getHeight() * HEIGHT_FACTOR);
 
 		Stage stage = new Stage();
 		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
@@ -156,7 +173,8 @@ public class IssueDialog {
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
 
 		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY() + parentStage.getHeight() * (1 - HEIGHT_FACTOR));
+		stage.setY(parentStage.getY() + parentStage.getHeight()
+				* (1 - HEIGHT_FACTOR));
 
 		stage.show();
 	}

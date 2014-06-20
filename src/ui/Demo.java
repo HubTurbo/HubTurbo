@@ -376,10 +376,6 @@ public class Demo extends Application {
 			grid.setVgap(10);
 			grid.setPadding(new Insets(25, 25, 25, 25));
 
-//			Text title = new Text("GitHub Login");
-//			title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-//			grid.add(title, 0, 0, 2, 1);
-
 			Label repoName = new Label("Repository:");
 			grid.add(repoName, 0, 0);
 
@@ -392,7 +388,7 @@ public class Demo extends Application {
 			TextField repoNameField = new TextField();
 			grid.add(repoNameField, 3, 0);
 
-			Label username = new Label("User Name:");
+			Label username = new Label("Username:");
 			grid.add(username, 0, 1);
 
 			TextField usernameField = new TextField();
