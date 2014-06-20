@@ -24,7 +24,7 @@ public class IssueManager {
 		List<TurboIssue> turboIssues = new ArrayList<TurboIssue>();
 		Map<String, String> filters = new HashMap<String, String>();
 		filters.put(IssueService.FIELD_FILTER, "all");
-		
+		filters.put(IssueService.FILTER_STATE, "all");
 		try {		
 			List<Issue> issues = service.getIssues(repository, filters);
 			for (Issue issue : issues) {
