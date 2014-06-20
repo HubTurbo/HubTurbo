@@ -2,9 +2,6 @@ package ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -15,7 +12,6 @@ import javafx.stage.Stage;
 import logic.LogicFacade;
 import logic.TurboCollaborator;
 import logic.TurboIssue;
-import logic.TurboLabel;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
@@ -51,18 +47,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		Text parentName = new Text("parent");
 		parentName.setStyle(STYLE_PARENT_NAME);
 
-		HBox labels = new HBox();
-		labels.setSpacing(3);
-		issue.getLabels().addListener(new ListChangeListener<TurboLabel>() {
-
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends TurboLabel> arg0) {
-				populateLabels(labels, issue.getLabels());
-			}
-
-		});
-		populateLabels(labels, issue.getLabels());
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels());
 
 		HBox assignee = new HBox();
 		assignee.setSpacing(3);
@@ -98,35 +83,5 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		(new IssueDialog(mainStage, logic, issue)).show().thenApply(newIssue -> {
 			return true;
 		});
-	}
-
-	private void populateLabels(HBox parent, ObservableList<TurboLabel> labels) {
-		for (TurboLabel label : labels) {
-			Label labelText = new Label(label.getName());
-			labelText.setStyle(getStyleFor(label));
-			label.nameProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends String> stringProperty,
-						String oldValue, String newValue) {
-					labelText.setText(newValue);
-				}
-			});
-			parent.getChildren().add(labelText);
-		}
-	}
-
-	private String getStyleFor(TurboLabel label) {
-		String colour = label.getColour();
-//		if (colour.equals("#000000")) {
-//			
-//		}
-//		if (label.getName().equals("bug")) {
-//			colour = "red";
-//		} else if (label.getName().equals("feature")) {
-//			colour = "green";
-//		}
-		String style = "-fx-background-color: " + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
-		return style;
 	}
 }
