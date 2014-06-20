@@ -52,10 +52,10 @@ public class TurboIssue implements Listable {
 		
 		this.assignee = new TurboCollaborator(issue.getAssignee());
 		this.milestone = new TurboMilestone(issue.getMilestone());
-		this.labels = getLabels(issue);
+		this.labels = translateLabels(issue);
 	}
 	
-	private ObservableList<TurboLabel> getLabels(Issue issue) {
+	private ObservableList<TurboLabel> translateLabels(Issue issue) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		List<Label> labels = issue.getLabels();
 		for (Label label : labels) {

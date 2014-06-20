@@ -60,7 +60,7 @@ public class IssuePanel extends VBox {
 			}
 		});
 		
-		// Supposedly this causes the list view to update - not sure
+		// Supposedly this also causes the list view to update - not sure
 		// if it actually does on platforms other than Linux...
 		listView.setItems(null);
 		

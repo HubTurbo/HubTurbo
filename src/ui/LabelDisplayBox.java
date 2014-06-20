@@ -1,7 +1,5 @@
 package ui;
 
-import java.util.List;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -13,22 +11,21 @@ import logic.TurboLabel;
 
 public class LabelDisplayBox extends FlowPane {
 
-	private ObservableList<TurboLabel> labels;
-	
+	ObservableList<TurboLabel> labels; // cange back to priate
+
 	public LabelDisplayBox() {
-		this.labels = FXCollections.observableArrayList();
-		setup();
+		this(FXCollections.observableArrayList());
 	}
-	
-	public LabelDisplayBox(List<TurboLabel> labels) {
-		this.labels = FXCollections.observableArrayList(labels);
+
+	public LabelDisplayBox(ObservableList<TurboLabel> labels) {
+		this.labels = labels;
 		setup();
 	}
 
 	private void setup() {
 		setHgap(3);
 		setVgap(3);
-				
+
 		labels.addListener(new ListChangeListener<TurboLabel>() {
 			@Override
 			public void onChanged(
@@ -38,9 +35,9 @@ public class LabelDisplayBox extends FlowPane {
 		});
 		populateWithLabels();
 	}
-	
-	public LabelDisplayBox setLabels(List<TurboLabel> labels) {
-		this.labels = FXCollections.observableArrayList(labels);
+
+	public LabelDisplayBox setLabels(ObservableList<TurboLabel> labels) {
+		this.labels = labels;
 		populateWithLabels();
 		return this;
 	}
@@ -61,27 +58,12 @@ public class LabelDisplayBox extends FlowPane {
 			getChildren().add(labelText);
 		}
 	}
-	
-	public LabelDisplayBox showBordersAndPlaceholder() {
-		setStyle(Demo.STYLE_BORDERS_FADED);
 
-		Label noLabels = new Label("Labels");
-		noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-		getChildren().add(noLabels);
-		return this;
-	}
-	
 	private String getStyleFor(TurboLabel label) {
 		String colour = label.getColour();
-//		if (colour.equals("#000000")) {
-//			
-//		}
-//		if (label.getName().equals("bug")) {
-//			colour = "red";
-//		} else if (label.getName().equals("feature")) {
-//			colour = "green";
-//		}
-		String style = "-fx-background-color: #" + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
+		String style = "-fx-background-color: #"
+				+ colour
+				+ "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
 		return style;
 	}
 }

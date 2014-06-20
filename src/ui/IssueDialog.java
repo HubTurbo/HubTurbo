@@ -94,19 +94,17 @@ public class IssueDialog {
 					.setWindowTitle("Choose milestone")
 					.setMultipleSelection(false).show()
 					.thenApply((response) -> {
-						System.out.println("milestone");
 						return true;
 					});
 		});
 
-		// TextField labelsField = new TextField();
-		// labelsField.setPromptText("Labels");
-		final LabelDisplayBox labelsField = issue.getLabels().size() == 0 ? new LabelDisplayBox()
-				.showBordersAndPlaceholder() : new LabelDisplayBox(
-				issue.getLabels());
-
+		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels());
+		labelBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		Label noLabels = new Label("Labels");
+		noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+		labelBox.getChildren().add(noLabels);
 		List<TurboLabel> allLabels = logic.getLabels();
-		labelsField.setOnMouseClicked((e) -> {
+		labelBox.setOnMouseClicked((e) -> {
 			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
 					.map((label) -> {
 						for (int i = 0; i < allLabels.size(); i++) {
@@ -117,7 +115,6 @@ public class IssueDialog {
 						assert false;
 						return -1;
 					}).collect(Collectors.toList());
-			System.out.println("existing indices " + indicesForExistingLabels);
 
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(allLabels)))
@@ -127,12 +124,9 @@ public class IssueDialog {
 					.show()
 					.thenApply(
 							(List<Integer> response) -> {
-								System.out.println("labels");
-								System.out.println(response);
 								List<TurboLabel> labels = response.stream()
 										.map((i) -> allLabels.get(i))
 										.collect(Collectors.toList());
-								labelsField.setLabels(labels);
 								issue.setLabels(FXCollections
 										.observableArrayList(labels));
 								return true;
@@ -147,7 +141,6 @@ public class IssueDialog {
 					.setWindowTitle("Choose assignee")
 					.setMultipleSelection(false).show()
 					.thenApply((response) -> {
-						System.out.println("assignee");
 						return true;
 					});
 		});
@@ -174,7 +167,7 @@ public class IssueDialog {
 
 		VBox right = new VBox();
 		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(milestoneField, labelsField, assigneeField,
+		right.getChildren().addAll(milestoneField, labelBox, assigneeField,
 				buttons);
 
 		return right;

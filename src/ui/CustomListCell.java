@@ -15,12 +15,12 @@ import logic.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
+	private static final String STYLE_PARENT_NAME = "-fx-font-size: 11px;";
+	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
+
 	private final Stage mainStage;
 	private final LogicFacade logic;
 	private final IssuePanel parentIssuePanel;
-
-	private static final String STYLE_PARENT_NAME = "-fx-font-size: 11px;";
-	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	public CustomListCell(Stage mainStage, LogicFacade logic, IssuePanel parent) {
 		super();
@@ -82,10 +82,9 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
-		(new IssueDialog(mainStage, logic, issue)).show().thenApply(newIssue -> {
-			// Perform a manual refresh in case anything was changed
-			parentIssuePanel.refreshItems();
-			return true;
-		});
+		(new IssueDialog(mainStage, logic, issue)).show().thenApply(
+				newIssue -> {
+					return true;
+				});
 	}
 }
