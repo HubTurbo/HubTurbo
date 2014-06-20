@@ -47,7 +47,10 @@ public class IssuePanel extends VBox {
 	}
 
 	public void setItems(ObservableList<TurboIssue> issues) {
-		filteredList = new FilteredList<>(issues, p -> true);
+		this.issues.clear();
+		this.issues.addAll(issues);
+
+		filteredList = new FilteredList<>(this.issues, p -> true);
 				
 		// Set the cell factory every time - this forces the list view to update
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {

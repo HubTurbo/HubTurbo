@@ -123,8 +123,10 @@ public class FilterableCheckboxList {
 		return initialCheckedState;
 	}
 
-	public void setInitialCheckedState(List<Integer> initialCheckedState) {
+	public FilterableCheckboxList setInitialCheckedState(
+			List<Integer> initialCheckedState) {
 		this.initialCheckedState = initialCheckedState;
+		return this;
 	}
 
 	String windowTitle = "";

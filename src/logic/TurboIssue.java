@@ -96,7 +96,8 @@ public class TurboIssue implements Listable {
 		return labels;
 	}
 	public void setLabels(ObservableList<TurboLabel> labels) {
-		this.labels = labels;
+		this.labels.clear();
+		this.labels.addAll(labels);
 	}
 	public TurboCollaborator getAssignee() {
 		return assignee;
