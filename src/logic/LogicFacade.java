@@ -20,8 +20,12 @@ public class LogicFacade {
 		return authManager.login(userId, password);
 	}
 	
-	public void setRepository(String repository) {
-		repoId = RepositoryId.create(client.getUser(), repository);
+	public void setRepository(String owner, String repository) {
+		if (owner != null) {
+			repoId = RepositoryId.create(owner, repository);
+		} else {
+			repoId = RepositoryId.create(client.getUser(), repository);
+		}
 	}
 	
 	public List<TurboIssue> getIssues() {
