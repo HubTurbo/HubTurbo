@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.List;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -12,15 +14,15 @@ import logic.TurboLabel;
 
 public class LabelDisplayBox extends FlowPane {
 
-	ObservableList<TurboLabel> labels;
+	private ObservableList<TurboLabel> labels;
 	
 	public LabelDisplayBox() {
 		this.labels = FXCollections.observableArrayList();
 		setup();
 	}
 	
-	public LabelDisplayBox(ObservableList<TurboLabel> labels) {
-		this.labels = labels;
+	public LabelDisplayBox(List<TurboLabel> labels) {
+		this.labels = FXCollections.observableArrayList(labels);
 		setup();
 	}
 
@@ -36,6 +38,12 @@ public class LabelDisplayBox extends FlowPane {
 			}
 		});
 		populateWithLabels();
+	}
+	
+	public LabelDisplayBox setLabels(List<TurboLabel> labels) {
+		this.labels = FXCollections.observableArrayList(labels);
+		populateWithLabels();
+		return this;
 	}
 	
 	private void populateWithLabels() {
@@ -74,7 +82,7 @@ public class LabelDisplayBox extends FlowPane {
 //		} else if (label.getName().equals("feature")) {
 //			colour = "green";
 //		}
-		String style = "-fx-background-color: " + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
+		String style = "-fx-background-color: #" + colour + "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
 		return style;
 	}
 }

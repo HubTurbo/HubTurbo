@@ -2,6 +2,7 @@ package ui;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import logic.Listable;
 import logic.LogicFacade;
 import logic.TurboIssue;
+import logic.TurboLabel;
 import logic.TurboMilestone;
 
 public class IssueDialog {
@@ -94,7 +96,7 @@ public class IssueDialog {
 					.observableArrayList(logic.getMilestones())))
 					.setWindowTitle("Choose milestone").setMultipleSelection(false)
 					.show().thenApply((response) -> {
-						System.out.println(response);
+						System.out.println("milestone");
 						return true;
 					});
 		});
@@ -102,11 +104,15 @@ public class IssueDialog {
 //		TextField labelsField = new TextField();
 //		labelsField.setPromptText("Labels");
 		LabelDisplayBox labelsField = new LabelDisplayBox().showBordersAndPlaceholder();
+		List<TurboLabel> allLabels = logic.getLabels();
 		labelsField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(logic.getLabels())))
+					.observableArrayList(allLabels)))
 					.setWindowTitle("Choose labels").setMultipleSelection(true).show()
 					.thenApply((List<Integer> response) -> {
+						System.out.println("labels");
+						System.out.println(response);
+						labelsField.setLabels(response.stream().map((i) -> allLabels.get(i)).collect(Collectors.toList()));
 						return true;
 					});
 		});
@@ -118,6 +124,7 @@ public class IssueDialog {
 					.observableArrayList(logic.getCollaborators())))
 					.setWindowTitle("Choose assignee").setMultipleSelection(false)
 					.show().thenApply((response) -> {
+						System.out.println("assignee");
 						return true;
 					});
 		});
