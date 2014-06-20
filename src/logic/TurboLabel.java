@@ -14,10 +14,11 @@ public class TurboLabel implements Listable {
 	}
 	
 	public TurboLabel(Label label) {
+		assert label != null;
+		
 		this.ghLabel = label;
-		if (label != null) {
-			setName(label.getName());
-		}
+		
+		setName(label.getName());
 		setColour(label.getColor());
 	}
 	

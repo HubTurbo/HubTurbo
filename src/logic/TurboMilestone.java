@@ -7,10 +7,10 @@ public class TurboMilestone implements Listable {
 	private String title;
 	
 	public TurboMilestone(Milestone milestone) {
+		assert milestone != null;
+
 		this.ghMilestone = milestone;
-		if (milestone != null) {
-			this.title = milestone.getTitle();
-		}
+		this.title = milestone.getTitle();
 	}
 	
 	public Milestone getGhMilestone() {

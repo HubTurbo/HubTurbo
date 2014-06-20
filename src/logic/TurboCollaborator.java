@@ -8,11 +8,11 @@ public class TurboCollaborator implements Listable {
 	private String realName;
 	
 	public TurboCollaborator(User user) {
+		assert user != null;
+
 		this.ghUser = user;
-		if (user != null) {
-			this.githubName = user.getLogin();
-			this.realName = user.getName();
-		}
+		this.githubName = user.getLogin();
+		this.realName = user.getName();
 	}
 	
 	public String getGithubName() {

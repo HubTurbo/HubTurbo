@@ -19,6 +19,9 @@ public class TurboIssue implements Listable {
 	private TurboMilestone milestone;
 	
 	public TurboIssue(String title, String desc) {
+		assert title != null;
+		assert desc != null;
+		
 		setTitle(title);
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
@@ -44,19 +47,24 @@ public class TurboIssue implements Listable {
 	}
 	
 	public TurboIssue(Issue issue) {
+		assert issue != null;
+		
 		this.ghIssue = issue;
 		
 		setTitle(issue.getTitle());
 		setDescription(issue.getBody());
 		setId(issue.getNumber());
 		
-		this.assignee = new TurboCollaborator(issue.getAssignee());
-		this.milestone = new TurboMilestone(issue.getMilestone());
+		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
+		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue);
 	}
 	
 	private ObservableList<TurboLabel> translateLabels(Issue issue) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
+		
+		if (issue.getLabels() == null) return turboLabels;
+		
 		List<Label> labels = issue.getLabels();
 		for (Label label : labels) {
 			turboLabels.add(new TurboLabel(label));
