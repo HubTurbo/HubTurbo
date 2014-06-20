@@ -66,5 +66,8 @@ public class TurboLabel implements Listable {
 		return true;
 	}
 
-	
+	@Override
+	public String toString() {
+		return getName() + "/" + getColour();
+	}
 }
