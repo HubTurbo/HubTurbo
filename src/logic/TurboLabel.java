@@ -10,7 +10,7 @@ public class TurboLabel implements Listable {
 	
 	public TurboLabel(String name) {
 		setName(name);
-		setColour("#000000");
+		setColour("000000");
 	}
 	
 	public TurboLabel(Label label) {
@@ -39,5 +39,29 @@ public class TurboLabel implements Listable {
 	public String getListName() {
 		return getName();
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ghLabel == null) ? 0 : ghLabel.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TurboLabel other = (TurboLabel) obj;
+		if (ghLabel == null) {
+			if (other.ghLabel != null)
+				return false;
+		} else if (!ghLabel.equals(other.ghLabel))
+			return false;
+		return true;
+	}
 }

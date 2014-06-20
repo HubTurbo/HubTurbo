@@ -236,9 +236,10 @@ public class Demo extends Application {
 
 		// Tests
 
-		col1.filter(new Filter().withTitle("one")
-				.exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
+//		col1.filter(new Filter().withTitle("one")
+//				.exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
 		// test.setTitle("data binding demo");
+		col1.refreshItems();
 	}
 
 	private void setUpHotkeys(Scene scene) {

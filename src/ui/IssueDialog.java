@@ -94,27 +94,52 @@ public class IssueDialog {
 		milestoneField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getMilestones())))
-					.setWindowTitle("Choose milestone").setMultipleSelection(false)
-					.show().thenApply((response) -> {
+					.setWindowTitle("Choose milestone")
+					.setMultipleSelection(false).show()
+					.thenApply((response) -> {
 						System.out.println("milestone");
 						return true;
 					});
 		});
 
-//		TextField labelsField = new TextField();
-//		labelsField.setPromptText("Labels");
-		LabelDisplayBox labelsField = new LabelDisplayBox().showBordersAndPlaceholder();
+		// TextField labelsField = new TextField();
+		// labelsField.setPromptText("Labels");
+		final LabelDisplayBox labelsField = issue.getLabels().size() == 0 ? new LabelDisplayBox()
+				.showBordersAndPlaceholder() : new LabelDisplayBox(
+				issue.getLabels());
+
 		List<TurboLabel> allLabels = logic.getLabels();
 		labelsField.setOnMouseClicked((e) -> {
+			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
+					.map((label) -> {
+						for (int i = 0; i < allLabels.size(); i++) {
+							if (allLabels.get(i).equals(label)) {
+								return i;
+							}
+						}
+						assert false;
+						return -1;
+					}).collect(Collectors.toList());
+			System.out.println("existing indices " + indicesForExistingLabels);
+
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(allLabels)))
-					.setWindowTitle("Choose labels").setMultipleSelection(true).show()
-					.thenApply((List<Integer> response) -> {
-						System.out.println("labels");
-						System.out.println(response);
-						labelsField.setLabels(response.stream().map((i) -> allLabels.get(i)).collect(Collectors.toList()));
-						return true;
-					});
+					.setWindowTitle("Choose labels")
+					.setMultipleSelection(true)
+					.setInitialCheckedState(indicesForExistingLabels)
+					.show()
+					.thenApply(
+							(List<Integer> response) -> {
+								System.out.println("labels");
+								System.out.println(response);
+								List<TurboLabel> labels = response.stream()
+										.map((i) -> allLabels.get(i))
+										.collect(Collectors.toList());
+								labelsField.setLabels(labels);
+								issue.setLabels(FXCollections
+										.observableArrayList(labels));
+								return true;
+							});
 		});
 
 		TextField assigneeField = new TextField();
@@ -122,8 +147,9 @@ public class IssueDialog {
 		assigneeField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getCollaborators())))
-					.setWindowTitle("Choose assignee").setMultipleSelection(false)
-					.show().thenApply((response) -> {
+					.setWindowTitle("Choose assignee")
+					.setMultipleSelection(false).show()
+					.thenApply((response) -> {
 						System.out.println("assignee");
 						return true;
 					});

@@ -63,6 +63,9 @@ public class FilterableCheckboxList {
 				multipleSelection ? SelectionMode.MULTIPLE
 						: SelectionMode.SINGLE);
 
+		initialCheckedState.forEach((i) -> checkListView.getCheckModel()
+				.select(i));
+
 		// checkListView.getSelectionModel().getSelectedItems()
 		// .addListener(new ListChangeListener<Listable>() {
 		// @Override
