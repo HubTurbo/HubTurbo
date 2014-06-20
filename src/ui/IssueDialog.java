@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -19,11 +18,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import logic.Listable;
 import logic.LogicFacade;
 import logic.TurboIssue;
 import logic.TurboLabel;
-import logic.TurboMilestone;
 
 public class IssueDialog {
 

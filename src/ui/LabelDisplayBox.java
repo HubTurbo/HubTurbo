@@ -9,7 +9,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.text.Text;
 import logic.TurboLabel;
 
 public class LabelDisplayBox extends FlowPane {

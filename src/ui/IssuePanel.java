@@ -11,10 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import logic.LogicFacade;
-import logic.TurboCollaborator;
 import logic.TurboIssue;
-import logic.TurboLabel;
-import logic.TurboMilestone;
 
 public class IssuePanel extends VBox {
 
@@ -22,18 +19,26 @@ public class IssuePanel extends VBox {
 	private final LogicFacade logic;
 	
 	private ListView<TurboIssue> listView;
-	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	private ObservableList<TurboIssue> issues;
 	private FilteredList<TurboIssue> filteredList;
-	
+
 	public IssuePanel(Stage mainStage, LogicFacade logic) {
 		this.mainStage = mainStage;
+		this.logic = logic;
+
+		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
 		getChildren().add(listView);
-		setVgrow(listView, Priority.ALWAYS);
 		
-		this.logic = logic;
-		
+		setup();
 		refreshItems();
+	}
+
+	private void setup() {
+		setPrefWidth(400);
+		setVgrow(listView, Priority.ALWAYS);
+		HBox.setHgrow(this, Priority.ALWAYS);
+		setStyle(Demo.STYLE_BORDERS);
 	}
 
 	public void filter(Filter filter) {
@@ -45,11 +50,13 @@ public class IssuePanel extends VBox {
 	public void refreshItems() {
 		filteredList = new FilteredList<>(this.issues, p -> true);
 		
+		IssuePanel that = this;
+		
 		// Set the cell factory every time - this forces the list view to update
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new CustomListCell(mainStage, logic);
+				return new CustomListCell(mainStage, logic, that);
 			}
 		});
 		

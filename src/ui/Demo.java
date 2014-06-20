@@ -144,9 +144,6 @@ public class Demo extends Application {
 		IssuePanel issuePanel = new IssuePanel(mainStage, logic);
 		// col.setPadng(new Insets(15, 12, 15, 12));
 		// col.setSpacing(10);
-		issuePanel.setPrefWidth(400);
-		HBox.setHgrow(issuePanel, Priority.ALWAYS);
-		issuePanel.setStyle(STYLE_BORDERS);
 		// issuePanel.setAlignment(Pos.TOP_CENTER);
 
 		return issuePanel;
@@ -382,13 +379,13 @@ public class Demo extends Application {
 			Label repoName = new Label("Repository:");
 			grid.add(repoName, 0, 0);
 
-			TextField repoOwnerField = new TextField();
+			TextField repoOwnerField = new TextField("dariusf");
 			grid.add(repoOwnerField, 1, 0);
 
 			Label slash = new Label("/");
 			grid.add(slash, 2, 0);
 
-			TextField repoNameField = new TextField();
+			TextField repoNameField = new TextField("issues");
 			grid.add(repoNameField, 3, 0);
 
 			Label username = new Label("Username:");
