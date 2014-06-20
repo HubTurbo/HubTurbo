@@ -24,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.TurboIssue;
 import logic.Listable;
@@ -80,16 +81,17 @@ public class FilterableCheckboxList {
 		// System.out.println("check state changed");
 		// }
 		// });
-		
+
 		Stage stage = new Stage();
 
 		Button close = new Button("Close");
 		VBox.setMargin(close, new Insets(5));
 		close.setOnAction((e) -> {
-			response.complete(checkListView.getCheckModel().getSelectedIndices());
+			response.complete(checkListView.getCheckModel()
+					.getSelectedIndices());
 			stage.hide();
 		});
-		
+
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
 		layout.getChildren().addAll(searchField, checkListView, close);
@@ -98,20 +100,31 @@ public class FilterableCheckboxList {
 
 		stage.setTitle(windowTitle);
 		stage.setScene(scene);
-		
+
 		stage.setOnCloseRequest((e) -> {
-			response.complete(checkListView.getCheckModel().getSelectedIndices());
+			response.complete(checkListView.getCheckModel()
+					.getSelectedIndices());
 		});
 
 		Platform.runLater(() -> stage.requestFocus());
 
 		stage.initOwner(parentStage);
-		// secondStage.initModality(Modality.APPLICATION_MODAL);
+		stage.initModality(Modality.APPLICATION_MODAL);
 
 		// stage.setX(parentStage.getX());
 		// stage.setY(parentStage.getY());
 
 		stage.show();
+	}
+
+	List<Integer> initialCheckedState = new ArrayList<>();
+
+	public List<Integer> getInitialCheckedState() {
+		return initialCheckedState;
+	}
+
+	public void setInitialCheckedState(List<Integer> initialCheckedState) {
+		this.initialCheckedState = initialCheckedState;
 	}
 
 	String windowTitle = "";

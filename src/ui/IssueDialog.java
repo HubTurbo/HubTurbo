@@ -92,7 +92,7 @@ public class IssueDialog {
 		milestoneField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getMilestones())))
-					.setWindowTitle("Milestones").setMultipleSelection(false)
+					.setWindowTitle("Choose milestone").setMultipleSelection(false)
 					.show().thenApply((response) -> {
 						System.out.println(response);
 						return true;
@@ -104,7 +104,7 @@ public class IssueDialog {
 		labelsField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getLabels())))
-					.setWindowTitle("Labels").setMultipleSelection(true).show()
+					.setWindowTitle("Choose labels").setMultipleSelection(true).show()
 					.thenApply((List<Integer> response) -> {
 						return true;
 					});
@@ -115,7 +115,7 @@ public class IssueDialog {
 		assigneeField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getCollaborators())))
-					.setWindowTitle("Assignee").setMultipleSelection(false)
+					.setWindowTitle("Choose assignee").setMultipleSelection(false)
 					.show().thenApply((response) -> {
 						return true;
 					});
