@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import logic.LogicFacade;
 import logic.TurboIssue;
 import logic.TurboLabel;
+import logic.TurboMilestone;
 
 public class IssueDialog {
 
@@ -86,24 +88,70 @@ public class IssueDialog {
 
 	private Parent right(Stage stage) {
 
-		TextField milestoneField = new TextField();
-		milestoneField.setPromptText("Milestone");
-		milestoneField.setOnMouseClicked((e) -> {
+		Parent milestoneField = createMilestoneBox(stage);
+		Parent labelBox = createLabelBox(stage);
+		Parent assigneeField = createAssigneeBox(stage);
+		
+		HBox buttons = createButtons(stage);
+
+		VBox right = new VBox();
+		right.setSpacing(ELEMENT_SPACING);
+		right.getChildren().addAll(milestoneField, labelBox, assigneeField,
+				buttons);
+
+		return right;
+	}
+
+	private HBox createButtons(Stage stage) {
+		HBox buttons = new HBox();
+		buttons.setAlignment(Pos.BASELINE_RIGHT);
+
+		Button cancel = new Button();
+		cancel.setText("Cancel");
+		cancel.setOnMouseClicked((MouseEvent e) -> {
+			response.complete("cancel");
+			stage.close();
+		});
+
+		Button ok = new Button();
+		ok.setText("OK");
+		ok.setOnMouseClicked((MouseEvent e) -> {
+			response.complete("ok");
+			stage.close();
+		});
+		HBox.setMargin(ok, new Insets(0, 12, 0, 0)); // top right bottom left
+
+		buttons.getChildren().addAll(ok, cancel);
+		return buttons;
+	}
+
+	private Parent createAssigneeBox(Stage stage) {
+		TextField assigneeField = new TextField();
+		assigneeField.setPromptText("Assignee");
+		assigneeField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(logic.getMilestones())))
-					.setWindowTitle("Choose milestone")
+					.observableArrayList(logic.getCollaborators())))
+					.setWindowTitle("Choose assignee")
 					.setMultipleSelection(false).show()
 					.thenApply((response) -> {
 						return true;
 					});
 		});
+		return assigneeField;
+	}
 
+	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels());
 		labelBox.setStyle(Demo.STYLE_BORDERS_FADED);
-		Label noLabels = new Label("Labels");
-		noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-		labelBox.getChildren().add(noLabels);
+		
+		if (issue.getLabels().size() == 0) {
+			Label noLabels = new Label("Labels");
+			noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+			labelBox.getChildren().add(noLabels);
+		}
+		
 		List<TurboLabel> allLabels = logic.getLabels();
+		
 		labelBox.setOnMouseClicked((e) -> {
 			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
 					.map((label) -> {
@@ -132,45 +180,67 @@ public class IssueDialog {
 								return true;
 							});
 		});
+		return labelBox;
+	}
 
-		TextField assigneeField = new TextField();
-		assigneeField.setPromptText("Assignee");
-		assigneeField.setOnMouseClicked((e) -> {
+	private Parent createMilestoneBox(Stage stage) {
+		
+		final HBox milestoneBox = new HBox();
+		milestoneBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		
+		Label label;
+		if (issue.getMilestone() == null) {
+			label = new Label("Milestone");
+			label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+		} else {
+			label = new Label(issue.getMilestone().getTitle());
+			label.setStyle("-fx-padding: 5 5 5 5;");
+		}
+		milestoneBox.getChildren().add(label);
+		
+		List<TurboMilestone> allMilestones = logic.getMilestones();
+		
+		milestoneBox.setOnMouseClicked((e) -> {
+			
+			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
+			if (issue.getMilestone() != null) {
+				int existingIndex = -1;
+				for (int i=0; i<allMilestones.size(); i++) {
+					if (allMilestones.get(i).equals(issue.getMilestone())) {
+						existingIndex = i;
+					}
+				}
+				assert existingIndex != -1;
+				existingIndices.add(existingIndex);
+			}
+			
 			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(logic.getCollaborators())))
-					.setWindowTitle("Choose assignee")
-					.setMultipleSelection(false).show()
+					.observableArrayList(allMilestones)))
+					.setWindowTitle("Choose milestone")
+					.setMultipleSelection(false)
+					.setInitialCheckedState(existingIndices)
+					.show()
 					.thenApply((response) -> {
-						return true;
-					});
+							boolean wasAnythingSelected = response.size() > 0;
+							if (wasAnythingSelected) {
+								TurboMilestone milestone = allMilestones.get(response.get(0));
+								
+								// We don't have data binding for this box; set it manually
+								label.setText(milestone.getTitle());
+								
+								issue.setMilestone(milestone);
+							} else {
+								
+								// Again, no data binding
+								label.setText("Milestone");
+								label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+
+								issue.setMilestone(null);
+							}
+							return true;
+						});
 		});
-
-		HBox buttons = new HBox();
-		buttons.setAlignment(Pos.BASELINE_RIGHT);
-
-		Button cancel = new Button();
-		cancel.setText("Cancel");
-		cancel.setOnMouseClicked((MouseEvent e) -> {
-			response.complete("cancel");
-			stage.close();
-		});
-
-		Button ok = new Button();
-		ok.setText("OK");
-		ok.setOnMouseClicked((MouseEvent e) -> {
-			response.complete("ok");
-			stage.close();
-		});
-		HBox.setMargin(ok, new Insets(0, 12, 0, 0)); // top right bottom left
-
-		buttons.getChildren().addAll(ok, cancel);
-
-		VBox right = new VBox();
-		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(milestoneField, labelBox, assigneeField,
-				buttons);
-
-		return right;
+		return milestoneBox;
 	}
 
 	private void showDialog() {
