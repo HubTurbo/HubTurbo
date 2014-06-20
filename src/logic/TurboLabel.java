@@ -45,7 +45,7 @@ public class TurboLabel implements Listable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ghLabel == null) ? 0 : ghLabel.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -58,11 +58,13 @@ public class TurboLabel implements Listable {
 		if (getClass() != obj.getClass())
 			return false;
 		TurboLabel other = (TurboLabel) obj;
-		if (ghLabel == null) {
-			if (other.ghLabel != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!ghLabel.equals(other.ghLabel))
+		} else if (getName() != other.getName())
 			return false;
 		return true;
 	}
+
+	
 }
