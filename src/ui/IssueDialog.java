@@ -20,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import logic.LogicFacade;
+import logic.TurboCollaborator;
 import logic.TurboIssue;
 import logic.TurboLabel;
 import logic.TurboMilestone;
@@ -126,18 +127,63 @@ public class IssueDialog {
 	}
 
 	private Parent createAssigneeBox(Stage stage) {
-		TextField assigneeField = new TextField();
-		assigneeField.setPromptText("Assignee");
-		assigneeField.setOnMouseClicked((e) -> {
+		
+		final HBox assigneeBox = new HBox();
+		assigneeBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		
+		Label label;
+		if (issue.getAssignee() == null) {
+			label = new Label("Assignee");
+			label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+		} else {
+			label = new Label(issue.getAssignee().getGithubName());
+			label.setStyle("-fx-padding: 5 5 5 5;");
+		}
+		assigneeBox.getChildren().add(label);
+		
+		List<TurboCollaborator> allAssignees = logic.getCollaborators();
+		
+		assigneeBox.setOnMouseClicked((e) -> {
+			
+			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
+			if (issue.getAssignee() != null) {
+				int existingIndex = -1;
+				for (int i=0; i<allAssignees.size(); i++) {
+					if (allAssignees.get(i).equals(issue.getAssignee())) {
+						existingIndex = i;
+					}
+				}
+				assert existingIndex != -1;
+				existingIndices.add(existingIndex);
+			}
+			
 			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(logic.getCollaborators())))
+					.observableArrayList(allAssignees)))
 					.setWindowTitle("Choose assignee")
-					.setMultipleSelection(false).show()
+					.setMultipleSelection(false)
+					.setInitialCheckedState(existingIndices)
+					.show()
 					.thenApply((response) -> {
-						return true;
-					});
+							boolean wasAnythingSelected = response.size() > 0;
+							if (wasAnythingSelected) {
+								TurboCollaborator assignee = allAssignees.get(response.get(0));
+								
+								// We don't have data binding for this box; set it manually
+								label.setText(assignee.getGithubName());
+								
+								issue.setAssignee(assignee);
+							} else {
+								
+								// Again, no data binding
+								label.setText("Assignee");
+								label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+
+								issue.setAssignee(null);
+							}
+							return true;
+						});
 		});
-		return assigneeField;
+		return assigneeBox;
 	}
 
 	private LabelDisplayBox createLabelBox(Stage stage) {
