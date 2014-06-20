@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -57,10 +59,12 @@ public class Demo extends Application {
 	// Temporary
 
 	TurboIssue test;
-	IssuePanel col1;
+	IssuePanel col1, col2;
 
 	private void loadIssuesIntoCol1() {
-		col1.setItems(FXCollections.observableArrayList(logic.getIssues()));
+		List<TurboIssue> issues = logic.getIssues();
+		col1.setItems(FXCollections.observableArrayList(issues));
+		col2.setItems(FXCollections.observableArrayList(issues));
 	}
 
 	// Node definitions
@@ -70,7 +74,7 @@ public class Demo extends Application {
 		columns = new HBox();
 
 		col1 = new IssuePanel(mainStage, logic);
-		IssuePanel col2 = new IssuePanel(mainStage, logic);
+		col2 = new IssuePanel(mainStage, logic);
 		IssuePanel col3 = new IssuePanel(mainStage, logic);
 
 		test = new TurboIssue("issue one", "description one");
