@@ -41,8 +41,10 @@ import logic.TurboMilestone;
 
 public class Demo extends Application {
 
-	private static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
+	public static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
+	public static final String STYLE_BORDERS_FADED = "-fx-border-color: #B2B1AE; -fx-border-width: 1px; -fx-border-radius: 3;";
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
+	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
 
 	private Stage mainStage;
 	private HBox columns;

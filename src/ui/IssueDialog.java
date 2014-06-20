@@ -99,8 +99,9 @@ public class IssueDialog {
 					});
 		});
 
-		TextField labelsField = new TextField();
-		labelsField.setPromptText("Labels");
+//		TextField labelsField = new TextField();
+//		labelsField.setPromptText("Labels");
+		LabelDisplayBox labelsField = new LabelDisplayBox().showBordersAndPlaceholder();
 		labelsField.setOnMouseClicked((e) -> {
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(logic.getLabels())))

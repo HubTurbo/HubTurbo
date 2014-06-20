@@ -2,15 +2,22 @@ package ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.text.Text;
 import logic.TurboLabel;
 
 public class LabelDisplayBox extends FlowPane {
 
 	ObservableList<TurboLabel> labels;
+	
+	public LabelDisplayBox() {
+		this.labels = FXCollections.observableArrayList();
+		setup();
+	}
 	
 	public LabelDisplayBox(ObservableList<TurboLabel> labels) {
 		this.labels = labels;
@@ -20,7 +27,7 @@ public class LabelDisplayBox extends FlowPane {
 	private void setup() {
 		setHgap(3);
 		setVgap(3);
-		
+				
 		labels.addListener(new ListChangeListener<TurboLabel>() {
 			@Override
 			public void onChanged(
@@ -32,6 +39,7 @@ public class LabelDisplayBox extends FlowPane {
 	}
 	
 	private void populateWithLabels() {
+		getChildren().clear();
 		for (TurboLabel label : labels) {
 			Label labelText = new Label(label.getName());
 			labelText.setStyle(getStyleFor(label));
@@ -45,6 +53,15 @@ public class LabelDisplayBox extends FlowPane {
 			});
 			getChildren().add(labelText);
 		}
+	}
+	
+	public LabelDisplayBox showBordersAndPlaceholder() {
+		setStyle(Demo.STYLE_BORDERS_FADED);
+
+		Label noLabels = new Label("Labels");
+		noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+		getChildren().add(noLabels);
+		return this;
 	}
 	
 	private String getStyleFor(TurboLabel label) {
