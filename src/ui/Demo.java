@@ -376,32 +376,41 @@ public class Demo extends Application {
 			grid.setVgap(10);
 			grid.setPadding(new Insets(25, 25, 25, 25));
 
-			Text title = new Text("GitHub Login");
-			title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-			grid.add(title, 0, 0, 2, 1);
+//			Text title = new Text("GitHub Login");
+//			title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+//			grid.add(title, 0, 0, 2, 1);
 
-			Label repoURL = new Label("Repository name:");
-			grid.add(repoURL, 0, 1);
+			Label repoName = new Label("Repository:");
+			grid.add(repoName, 0, 0);
 
-			TextField repoURLField = new TextField();
-			grid.add(repoURLField, 1, 1);
+			TextField repoOwnerField = new TextField();
+			grid.add(repoOwnerField, 1, 0);
+
+			Label slash = new Label("/");
+			grid.add(slash, 2, 0);
+
+			TextField repoNameField = new TextField();
+			grid.add(repoNameField, 3, 0);
 
 			Label username = new Label("User Name:");
-			grid.add(username, 0, 2);
+			grid.add(username, 0, 1);
 
 			TextField usernameField = new TextField();
-			grid.add(usernameField, 1, 2);
+			grid.add(usernameField, 1, 1, 3, 1);
 
 			Label password = new Label("Password:");
-			grid.add(password, 0, 3);
+			grid.add(password, 0, 2);
 
 			PasswordField passwordField = new PasswordField();
-			grid.add(passwordField, 1, 3);
+			grid.add(passwordField, 1, 2, 3, 1);
 
+			repoOwnerField.setMaxWidth(80);
+			repoNameField.setMaxWidth(80);
+			
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
 				logic.login(usernameField.getText(), passwordField.getText());
-				logic.setRepository(repoURLField.getText());
+				logic.setRepository(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				loadIssues();
 			});
@@ -409,9 +418,9 @@ public class Demo extends Application {
 			HBox buttons = new HBox(10);
 			buttons.setAlignment(Pos.BOTTOM_RIGHT);
 			buttons.getChildren().add(loginButton);
-			grid.add(buttons, 1, 4);
+			grid.add(buttons, 3, 3);
 
-			Scene scene = new Scene(grid, 350, 275);
+			Scene scene = new Scene(grid, 320, 200);
 			dialogStage.setScene(scene);
 
 			dialogStage.initOwner(mainStage);
