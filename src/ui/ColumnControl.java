@@ -62,7 +62,7 @@ public class ColumnControl extends HBox {
 			panels.remove(panels.size() - numberToRemove, panels.size());
 		}
 
-		System.out.println(panels);
+//		System.out.println(panels);
 
 		return this;
 	}

@@ -165,7 +165,6 @@ public class Demo extends Application {
 		final ToggleGroup numberOfCols = new ToggleGroup();
 		for (int i = 1; i <= 9; i++) {
 			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
-			item.setUserData(i);
 			item.setToggleGroup(numberOfCols);
 			columnsMenu.getItems().add(item);
 			

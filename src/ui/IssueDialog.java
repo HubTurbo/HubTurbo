@@ -291,9 +291,6 @@ public class IssueDialog implements Dialog<String> {
 
 	private void showDialog() {
 
-		// TODO bind changes to the issue directly?
-		// TODO make text field read only until a button is pressed
-
 		HBox layout = new HBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(MIDDLE_SPACING);
