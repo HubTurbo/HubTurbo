@@ -1,7 +1,5 @@
 package ui;
 
-import java.util.ArrayList;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -15,17 +13,13 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final LogicFacade logic;
 
-	private ArrayList<IssuePanel> panels;
-	
 	// TODO remove this once caching is done logic-side
 	ObservableList<TurboIssue> issues = null;
 
 	public ColumnControl(Stage stage, LogicFacade logic) {
 		this.stage = stage;
 		this.logic = logic;
-		
-		panels = new ArrayList<>();
-		
+				
 		addColumn();
 		addSampleIssues();
 	}
@@ -34,16 +28,16 @@ public class ColumnControl extends HBox {
 		// TODO remove this once caching is done logic-side
 		if (issues == null) issues = FXCollections.observableArrayList(logic.getIssues());
 
-		for (IssuePanel panel : panels) {
+		for (Node node : getChildren()) {
+			IssuePanel panel = (IssuePanel) node;
 			panel.setItems(issues);
 		}
 	}
 
 	public ColumnControl addColumn() {
 		IssuePanel panel = new IssuePanel(stage, logic);
-		panels.add(panel);
 		getChildren().add(panel);
-		if (issues != null) panel.setItems(issues); // TODO change once caching is done
+//		if (issues != null) panel.setItems(issues); // TODO change once caching is done
 		
 		return this;
 	}
@@ -65,10 +59,10 @@ public class ColumnControl extends HBox {
 		} else {
 			assert panels.size() > to;
 			int numberToRemove = panels.size() - to;
-			panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-//			columns.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-//			columns.remove
+			panels.remove(panels.size() - numberToRemove, panels.size());
 		}
+
+		System.out.println(panels);
 
 		return this;
 	}
