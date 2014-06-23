@@ -1,8 +1,6 @@
 package ui;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -23,7 +21,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.LogicFacade;
-import logic.TurboIssue;
 
 public class Demo extends Application {
 
@@ -35,9 +32,6 @@ public class Demo extends Application {
 	private Stage mainStage;
 	private ColumnControl columns;
 	private LogicFacade logic = new LogicFacade();
-
-	// TODO remove this once caching is done logic-side
-	ObservableList<TurboIssue> issues = null;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -114,11 +108,8 @@ public class Demo extends Application {
 				logic.setRepository(repoOwnerField.getText(),
 						repoNameField.getText());
 				dialogStage.hide();
-
-				// TODO remove this once caching is done logic-side
-				if (issues == null) issues = FXCollections.observableArrayList(logic.getIssues());
 				
-				columns.loadIssues(issues);
+				columns.loadIssues();
 			});
 
 			HBox buttons = new HBox(10);

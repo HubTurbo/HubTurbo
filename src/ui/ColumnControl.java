@@ -1,6 +1,8 @@
 package ui;
 
 import java.util.ArrayList;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -15,6 +17,9 @@ public class ColumnControl extends HBox {
 
 	private ArrayList<IssuePanel> panels;
 	
+	// TODO remove this once caching is done logic-side
+	ObservableList<TurboIssue> issues = null;
+
 	public ColumnControl(Stage stage, LogicFacade logic) {
 		this.stage = stage;
 		this.logic = logic;
@@ -25,7 +30,10 @@ public class ColumnControl extends HBox {
 		addSampleIssues();
 	}
 	
-	public void loadIssues(ObservableList<TurboIssue> issues) {
+	public void loadIssues() {
+		// TODO remove this once caching is done logic-side
+		if (issues == null) issues = FXCollections.observableArrayList(logic.getIssues());
+
 		for (IssuePanel panel : panels) {
 			panel.setItems(issues);
 		}
@@ -35,12 +43,12 @@ public class ColumnControl extends HBox {
 		IssuePanel panel = new IssuePanel(stage, logic);
 		panels.add(panel);
 		getChildren().add(panel);
+		if (issues != null) panel.setItems(issues); // TODO change once caching is done
 		
 		return this;
 	}
 
 	public ColumnControl setColumnCount(int to) {
-System.out.println("klsjdk " + to);
 		// TODO the panels aren't ordered in insertion order? watch out for that
 
 		ObservableList<Node> panels = getChildren();
