@@ -1,9 +1,8 @@
 package ui;
 
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -25,7 +24,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.LogicFacade;
 import logic.TurboIssue;
-import logic.TurboLabel;
 
 public class Demo extends Application {
 
@@ -35,8 +33,11 @@ public class Demo extends Application {
 	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
 
 	private Stage mainStage;
-	private HBox columns;
+	private ColumnControl columns;
 	private LogicFacade logic = new LogicFacade();
+
+	// TODO remove this once caching is done logic-side
+	ObservableList<TurboIssue> issues = null;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -55,48 +56,13 @@ public class Demo extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
-
-	// Temporary
-
-	TurboIssue test;
-	IssuePanel col1, col2;
-
-	private void loadIssuesIntoCol1() {
-		List<TurboIssue> issues = logic.getIssues();
-		col1.setItems(FXCollections.observableArrayList(issues));
-		col2.setItems(FXCollections.observableArrayList(issues));
-	}
-
+	
 	// Node definitions
-
+		
 	private Parent createRoot() {
 
-		columns = new HBox();
-
-		col1 = new IssuePanel(mainStage, logic);
-		col2 = new IssuePanel(mainStage, logic);
-		IssuePanel col3 = new IssuePanel(mainStage, logic);
-
-		test = new TurboIssue("issue one", "description one");
-		test.getLabels().addAll(new TurboLabel("bug"),
-				new TurboLabel("thisisalonglabel"));
-		TurboIssue two = new TurboIssue("issue two", "desc two");
-		TurboIssue three = new TurboIssue("issue two", "desc three");
-		TurboIssue four = new TurboIssue("issue four", "desc four");
-		four.getLabels().addAll(new TurboLabel("request"),
-				new TurboLabel("feature"));
-		TurboIssue five = new TurboIssue("issue five", "desc five");
-
-		col1.getItems().add(test);
-		col1.getItems().add(two);
-		col1.getItems().add(three);
-		col1.getItems().add(four);
-		col1.getItems().add(five);
-
-		col2.getItems().add(test);
-
-		columns.getChildren().addAll(col1, col2, col3);
-
+		columns = new ColumnControl(mainStage, logic);
+		
 		BorderPane root = new BorderPane();
 		root.setCenter(columns);
 		root.setTop(createMenuBar());
@@ -149,7 +115,10 @@ public class Demo extends Application {
 						repoNameField.getText());
 				dialogStage.hide();
 
-				loadIssuesIntoCol1();
+				// TODO remove this once caching is done logic-side
+				if (issues == null) issues = FXCollections.observableArrayList(logic.getIssues());
+				
+				columns.loadIssues(issues);
 			});
 
 			HBox buttons = new HBox(10);
@@ -172,28 +141,10 @@ public class Demo extends Application {
 
 	private void changePanelCount(int to) {
 
-		// TODO the panels aren't ordered in insertion order? watch out for that
-		//
-		// ObservableList<Node> panels = columns.getChildren();
-		// int panelSize = panels.size();
-		//
-		// if (panelSize == to) {
-		// return;
-		// }
-		//
-		// if (panelSize < to) {
-		// for (int i = 0; i < to - panelSize; i++) {
-		// panels.add(createIssuePanel());
-		// }
-		// } else { // panels.size() > to
-		// int numberToRemove = panels.size() - to;
-		// panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-		// }
-
 		// col1.filter(new Filter().withTitle("one")
 		// .exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
 		// test.setTitle("data binding demo");
-		col1.refreshItems();
+//		col1.refreshItems();
 	}
 
 	private void setUpHotkeys(Scene scene) {

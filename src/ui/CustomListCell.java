@@ -20,13 +20,11 @@ public class CustomListCell extends ListCell<TurboIssue> {
 
 	private final Stage mainStage;
 	private final LogicFacade logic;
-	private final IssuePanel parentIssuePanel;
-
+	
 	public CustomListCell(Stage mainStage, LogicFacade logic, IssuePanel parent) {
 		super();
 		this.mainStage = mainStage;
 		this.logic = logic;
-		this.parentIssuePanel = parent;
 	}
 
 	@Override
