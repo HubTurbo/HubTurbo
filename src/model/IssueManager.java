@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +49,8 @@ public class IssueManager {
 		return new TurboIssue(issue);
 	}
 	
-	
-
+	public void createIssue(Issue issue) {
+		
+	}
 
 }

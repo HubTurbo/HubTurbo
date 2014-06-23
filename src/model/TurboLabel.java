@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,9 @@ public class TurboLabel implements Listable {
 	
 	public static List<Label> toGhLabels(List<TurboLabel> turboLabels) {
 		List<Label> ghLabels = new ArrayList<Label>();
+		
+		if (turboLabels == null) return ghLabels;
+		
 		for (TurboLabel turboLabel : turboLabels) {
 			Label label = new Label();
 			label.setName(turboLabel.getName());

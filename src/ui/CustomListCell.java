@@ -9,9 +9,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import logic.LogicFacade;
-import logic.TurboCollaborator;
-import logic.TurboIssue;
+import model.ModelFacade;
+import model.TurboCollaborator;
+import model.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
@@ -19,9 +19,9 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	private final Stage mainStage;
-	private final LogicFacade logic;
+	private final ModelFacade logic;
 	
-	public CustomListCell(Stage mainStage, LogicFacade logic, IssuePanel parent) {
+	public CustomListCell(Stage mainStage, ModelFacade logic, IssuePanel parent) {
 		super();
 		this.mainStage = mainStage;
 		this.logic = logic;

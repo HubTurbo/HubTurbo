@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 
-public class LogicFacade {
+public class ModelFacade {
 	
 	private GitHubClient client = new GitHubClient();
 	private IRepositoryIdProvider repoId = null;

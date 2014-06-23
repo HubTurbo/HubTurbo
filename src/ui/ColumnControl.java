@@ -5,18 +5,18 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import logic.LogicFacade;
-import logic.TurboIssue;
+import model.ModelFacade;
+import model.TurboIssue;
 
 public class ColumnControl extends HBox {
 
 	private final Stage stage;
-	private final LogicFacade logic;
+	private final ModelFacade logic;
 
 	// TODO remove this once caching is done logic-side
 	ObservableList<TurboIssue> issues = null;
 
-	public ColumnControl(Stage stage, LogicFacade logic) {
+	public ColumnControl(Stage stage, ModelFacade logic) {
 		this.stage = stage;
 		this.logic = logic;
 				

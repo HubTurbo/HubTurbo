@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import logic.TurboIssue;
+import model.TurboIssue;
 
 public class Filter {
 	
