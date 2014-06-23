@@ -40,7 +40,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public ColumnControl setColumnCount(int to) {
-
+System.out.println("klsjdk " + to);
 		// TODO the panels aren't ordered in insertion order? watch out for that
 
 		ObservableList<Node> panels = getChildren();

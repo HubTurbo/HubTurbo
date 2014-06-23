@@ -48,7 +48,7 @@ public class Demo extends Application {
 		mainStage = stage;
 
 		Scene scene = new Scene(createRoot(), 800, 600);
-		setUpHotkeys(scene);
+//		setUpHotkeys(scene);
 
 		stage.setTitle("HubTurbo");
 		stage.setMinWidth(800);
@@ -139,52 +139,12 @@ public class Demo extends Application {
 		});
 	}
 
-	private void changePanelCount(int to) {
-
-		// col1.filter(new Filter().withTitle("one")
-		// .exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
-		// test.setTitle("data binding demo");
-//		col1.refreshItems();
-	}
-
-	private void setUpHotkeys(Scene scene) {
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT1,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(1));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT2,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(2));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT3,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(3));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT4,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(4));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT5,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(5));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT6,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(6));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT7,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(7));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT8,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(8));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT9,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(9));
-	}
+//	private void setUpHotkeys(Scene scene) {
+//		scene.getAccelerators().put(
+//				new KeyCodeCombination(KeyCode.DIGIT1,
+//						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
+//				(Runnable) () -> changePanelCount(1));
+//	}
 
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar();
@@ -208,17 +168,21 @@ public class Demo extends Application {
 		labels.getItems().addAll(newLabel);
 
 		Menu view = new Menu("View");
-		Menu columns = new Menu("Change number of columns....");
-		view.getItems().addAll(columns);
+		Menu columnsMenu = new Menu("Change number of columns....");
+		view.getItems().addAll(columnsMenu);
 
 		final ToggleGroup numberOfCols = new ToggleGroup();
-		for (int i = 2; i <= 9; i++) {
+		for (int i = 1; i <= 9; i++) {
 			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
 			item.setUserData(i);
 			item.setToggleGroup(numberOfCols);
-			columns.getItems().add(item);
+			columnsMenu.getItems().add(item);
+			
+			final int j = i;
+			item.setOnAction((e) -> columns.setColumnCount(j));
+			item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf("DIGIT" + Integer.toString(j)), KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN));
 
-			if (i == 3)
+			if (i == 1)
 				item.setSelected(true);
 		}
 
