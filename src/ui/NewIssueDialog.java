@@ -18,7 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class NewIssueDialog {
+public class NewIssueDialog implements Dialog<String> {
 
 	public static final String STYLE_YELLOW = "-fx-background-color: #FFFA73;";
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";

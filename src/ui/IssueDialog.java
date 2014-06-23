@@ -25,7 +25,7 @@ import logic.TurboIssue;
 import logic.TurboLabel;
 import logic.TurboMilestone;
 
-public class IssueDialog {
+public class IssueDialog implements Dialog<String> {
 
 	private static final double HEIGHT_FACTOR = 0.3;
 
