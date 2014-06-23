@@ -3,6 +3,8 @@ package ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
@@ -26,12 +28,27 @@ public class IssuePanel extends VBox {
 		this.mainStage = mainStage;
 		this.logic = logic;
 
+		getChildren().add(createFilterBox());
+		
 		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
 		getChildren().add(listView);
 		
 		setup();
 		refreshItems();
+	}
+
+	private Node createFilterBox() {
+		HBox box = new HBox();
+		Label label = new Label("<no filter>");
+		box.setOnMouseClicked((e) -> {
+			(new FilterDialog(mainStage, logic)).show().thenApply(
+					newIssue -> {
+						return true;
+					});
+		});
+		box.getChildren().add(label);
+		return box;
 	}
 
 	private void setup() {
