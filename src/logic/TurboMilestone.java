@@ -3,17 +3,19 @@ package logic;
 import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
-	private Milestone ghMilestone;
 	private String title;
+	private int number;
 	
 	public TurboMilestone(Milestone milestone) {
 		assert milestone != null;
-
-		this.ghMilestone = milestone;
+		
 		this.title = milestone.getTitle();
+		this.number = milestone.getNumber();
 	}
 	
-	public Milestone getGhMilestone() {
+	public Milestone toGhMilestone() {
+		Milestone ghMilestone = new Milestone();
+		ghMilestone.setNumber(number);
 		return ghMilestone;
 	}
 
@@ -24,7 +26,11 @@ public class TurboMilestone implements Listable {
 	public void setTitle(String name) {
 		this.title = name;
 	}
-
+	
+	public int getNumber() {
+		return number;
+	}
+	
 	@Override
 	public String getListName() {
 		return getTitle();
@@ -34,7 +40,7 @@ public class TurboMilestone implements Listable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + number;
 		return result;
 	}
 
@@ -47,15 +53,9 @@ public class TurboMilestone implements Listable {
 		if (getClass() != obj.getClass())
 			return false;
 		TurboMilestone other = (TurboMilestone) obj;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
+		if (number != other.number)
 			return false;
 		return true;
 	}
-	
-	
-	
 	
 }

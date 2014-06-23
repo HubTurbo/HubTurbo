@@ -1,12 +1,14 @@
 package logic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
-	private Label ghLabel;
 	
 	public TurboLabel(String name) {
 		setName(name);
@@ -16,14 +18,18 @@ public class TurboLabel implements Listable {
 	public TurboLabel(Label label) {
 		assert label != null;
 		
-		this.ghLabel = label;
-		
 		setName(label.getName());
 		setColour(label.getColor());
 	}
 	
-	public Label getGhLabel() {
-		return ghLabel;
+	public static List<Label> toGhLabels(List<TurboLabel> turboLabels) {
+		List<Label> ghLabels = new ArrayList<Label>();
+		for (TurboLabel turboLabel : turboLabels) {
+			Label label = new Label();
+			label.setName(turboLabel.getName());
+			ghLabels.add(label);
+		}
+		return ghLabels;
 	}
 
     private StringProperty name = new SimpleStringProperty();

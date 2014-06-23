@@ -3,16 +3,20 @@ package logic;
 import org.eclipse.egit.github.core.User;
 
 public class TurboCollaborator implements Listable {
-	private User ghUser;
 	private String githubName;
 	private String realName;
 	
 	public TurboCollaborator(User user) {
 		assert user != null;
 
-		this.ghUser = user;
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
+	}
+	
+	public User toGhUser() {
+		User ghUser = new User();
+		ghUser.setLogin(githubName);
+		return ghUser;
 	}
 	
 	public String getGithubName() {
@@ -58,4 +62,5 @@ public class TurboCollaborator implements Listable {
 			return false;
 		return true;
 	}
+
 }

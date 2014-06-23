@@ -11,9 +11,9 @@ import javafx.collections.ObservableList;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 
 public class TurboIssue implements Listable {
-	private Issue ghIssue;
 	private ObservableList<TurboLabel> labels;
 	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
@@ -42,14 +42,11 @@ public class TurboIssue implements Listable {
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
-		setGhIssue(other.getGhIssue());
 		return other;
 	}
 	
 	public TurboIssue(Issue issue) {
 		assert issue != null;
-		
-		this.ghIssue = issue;
 		
 		setTitle(issue.getTitle());
 		setDescription(issue.getBody());
@@ -71,18 +68,20 @@ public class TurboIssue implements Listable {
 		}
 		return turboLabels;
 	}
-
-	@Override
-	public String toString() {
-		return "Issue " + getTitle();
-	}
 	
-	public Issue getGhIssue() {
+	public Issue toGhIssue() {
+		Issue ghIssue = new Issue();
+		ghIssue.setTitle(getTitle());
+		ghIssue.setBody(getDescription());
+		ghIssue.setAssignee(assignee.toGhUser());
+		ghIssue.setMilestone(milestone.toGhMilestone());
+		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
 		return ghIssue;
 	}
 	
-    private void setGhIssue(Issue ghIssue2) {
-		ghIssue = ghIssue2;
+	@Override
+	public String toString() {
+		return "Issue " + getTitle();
 	}
 
 	private StringProperty title = new SimpleStringProperty();
@@ -152,5 +151,5 @@ public class TurboIssue implements Listable {
 		return true;
 	}
 	
-	
+
 }
