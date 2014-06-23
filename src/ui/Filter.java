@@ -44,7 +44,14 @@ public class Filter {
 		return this.or(new Filter());
 	}
 	
+	public boolean isEmpty() {
+		return titles.isEmpty() && exceptTitles.isEmpty() && milestones.isEmpty() && exceptMilestones.isEmpty()
+				&& disjunct == null;
+	}
+	
 	public boolean isSatisfiedBy(TurboIssue issue) {
+		if (isEmpty()) return true;
+		
 		boolean containsTitle = false;
 		for (String title : titles) {
 			if (issue.getTitle().contains(title)) {
@@ -68,5 +75,9 @@ public class Filter {
 				+ ", milestones=" + milestones + ", exceptMilestones="
 				+ exceptMilestones + ", disjunct=" + disjunct + "]";
 	}
+
+//	public String toReadableString() {
+//		return "filtered";
+//	}
 
 }

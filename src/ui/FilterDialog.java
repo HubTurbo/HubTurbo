@@ -40,7 +40,7 @@ public class FilterDialog implements Dialog<Filter> {
 	}
 
 	private Node createRoot(Stage stage) {
-        TextField field = new TextField();
+        TextField field = new TextField("title: one");
         HBox.setHgrow(field, Priority.ALWAYS);
         setupAutocompletion(field);
                  
