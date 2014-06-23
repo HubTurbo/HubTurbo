@@ -1,8 +1,12 @@
 package ui;
 
+import java.util.function.Predicate;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
@@ -21,17 +25,37 @@ public class IssuePanel extends VBox {
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
 	private FilteredList<TurboIssue> filteredList;
+	
+	private Predicate<TurboIssue> predicate;
 
 	public IssuePanel(Stage mainStage, LogicFacade logic) {
 		this.mainStage = mainStage;
 		this.logic = logic;
 
+		getChildren().add(createFilterBox());
+		
 		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
 		getChildren().add(listView);
+		predicate = p -> true;
 		
 		setup();
 		refreshItems();
+	}
+
+	private Node createFilterBox() {
+		HBox box = new HBox();
+		Label label = new Label("<no filter>");
+		box.setOnMouseClicked((e) -> {
+			(new FilterDialog(mainStage, logic)).show().thenApply(
+					filter -> {
+						this.filter(filter);
+						label.setText(filter.toString());
+						return true;
+					});
+		});
+		box.getChildren().add(label);
+		return box;
 	}
 
 	private void setup() {
@@ -42,13 +66,12 @@ public class IssuePanel extends VBox {
 	}
 
 	public void filter(Filter filter) {
-		filteredList.setPredicate(filter::isSatisfiedBy);
-		
+		predicate = filter::isSatisfiedBy;
 		refreshItems();
 	}
 	
 	public void refreshItems() {
-		filteredList = new FilteredList<>(this.issues, p -> true);
+		filteredList = new FilteredList<TurboIssue>(issues, predicate);
 		
 		IssuePanel that = this;
 		

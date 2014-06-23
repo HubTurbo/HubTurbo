@@ -23,7 +23,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.Listable;
 
-public class FilterableCheckboxList {
+public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 	Stage parentStage;
 	FilteredList<String> objects;

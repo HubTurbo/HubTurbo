@@ -1,9 +1,6 @@
 package ui;
 
-import java.util.List;
-
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -24,8 +21,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.LogicFacade;
-import logic.TurboIssue;
-import logic.TurboLabel;
 
 public class Demo extends Application {
 
@@ -35,7 +30,7 @@ public class Demo extends Application {
 	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
 
 	private Stage mainStage;
-	private HBox columns;
+	private ColumnControl columns;
 	private LogicFacade logic = new LogicFacade();
 
 	public static void main(String[] args) {
@@ -47,7 +42,7 @@ public class Demo extends Application {
 		mainStage = stage;
 
 		Scene scene = new Scene(createRoot(), 800, 600);
-		setUpHotkeys(scene);
+//		setUpHotkeys(scene);
 
 		stage.setTitle("HubTurbo");
 		stage.setMinWidth(800);
@@ -55,48 +50,13 @@ public class Demo extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
-
-	// Temporary
-
-	TurboIssue test;
-	IssuePanel col1, col2;
-
-	private void loadIssuesIntoCol1() {
-		List<TurboIssue> issues = logic.getIssues();
-		col1.setItems(FXCollections.observableArrayList(issues));
-		col2.setItems(FXCollections.observableArrayList(issues));
-	}
-
+	
 	// Node definitions
-
+		
 	private Parent createRoot() {
 
-		columns = new HBox();
-
-		col1 = new IssuePanel(mainStage, logic);
-		col2 = new IssuePanel(mainStage, logic);
-		IssuePanel col3 = new IssuePanel(mainStage, logic);
-
-		test = new TurboIssue("issue one", "description one");
-		test.getLabels().addAll(new TurboLabel("bug"),
-				new TurboLabel("thisisalonglabel"));
-		TurboIssue two = new TurboIssue("issue two", "desc two");
-		TurboIssue three = new TurboIssue("issue two", "desc three");
-		TurboIssue four = new TurboIssue("issue four", "desc four");
-		four.getLabels().addAll(new TurboLabel("request"),
-				new TurboLabel("feature"));
-		TurboIssue five = new TurboIssue("issue five", "desc five");
-
-		col1.getItems().add(test);
-		col1.getItems().add(two);
-		col1.getItems().add(three);
-		col1.getItems().add(four);
-		col1.getItems().add(five);
-
-		col2.getItems().add(test);
-
-		columns.getChildren().addAll(col1, col2, col3);
-
+		columns = new ColumnControl(mainStage, logic);
+		
 		BorderPane root = new BorderPane();
 		root.setCenter(columns);
 		root.setTop(createMenuBar());
@@ -148,8 +108,8 @@ public class Demo extends Application {
 				logic.setRepository(repoOwnerField.getText(),
 						repoNameField.getText());
 				dialogStage.hide();
-
-				loadIssuesIntoCol1();
+				
+				columns.loadIssues();
 			});
 
 			HBox buttons = new HBox(10);
@@ -170,70 +130,12 @@ public class Demo extends Application {
 		});
 	}
 
-	private void changePanelCount(int to) {
-
-		// TODO the panels aren't ordered in insertion order? watch out for that
-		//
-		// ObservableList<Node> panels = columns.getChildren();
-		// int panelSize = panels.size();
-		//
-		// if (panelSize == to) {
-		// return;
-		// }
-		//
-		// if (panelSize < to) {
-		// for (int i = 0; i < to - panelSize; i++) {
-		// panels.add(createIssuePanel());
-		// }
-		// } else { // panels.size() > to
-		// int numberToRemove = panels.size() - to;
-		// panels.remove(panels.size() - 1 - numberToRemove, panels.size() - 1);
-		// }
-
-		// col1.filter(new Filter().withTitle("one")
-		// .exceptUnderMilestone("v0.0.1").or().withTitle("akjshdkj"));
-		// test.setTitle("data binding demo");
-		col1.refreshItems();
-	}
-
-	private void setUpHotkeys(Scene scene) {
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT1,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(1));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT2,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(2));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT3,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(3));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT4,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(4));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT5,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(5));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT6,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(6));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT7,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(7));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT8,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(8));
-		scene.getAccelerators().put(
-				new KeyCodeCombination(KeyCode.DIGIT9,
-						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-				(Runnable) () -> changePanelCount(9));
-	}
+//	private void setUpHotkeys(Scene scene) {
+//		scene.getAccelerators().put(
+//				new KeyCodeCombination(KeyCode.DIGIT1,
+//						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
+//				(Runnable) () -> changePanelCount(1));
+//	}
 
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar();
@@ -257,17 +159,20 @@ public class Demo extends Application {
 		labels.getItems().addAll(newLabel);
 
 		Menu view = new Menu("View");
-		Menu columns = new Menu("Change number of columns....");
-		view.getItems().addAll(columns);
+		Menu columnsMenu = new Menu("Change number of columns....");
+		view.getItems().addAll(columnsMenu);
 
 		final ToggleGroup numberOfCols = new ToggleGroup();
-		for (int i = 2; i <= 9; i++) {
+		for (int i = 1; i <= 9; i++) {
 			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
-			item.setUserData(i);
 			item.setToggleGroup(numberOfCols);
-			columns.getItems().add(item);
+			columnsMenu.getItems().add(item);
+			
+			final int j = i;
+			item.setOnAction((e) -> columns.setColumnCount(j));
+			item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf("DIGIT" + Integer.toString(j)), KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN));
 
-			if (i == 3)
+			if (i == 1)
 				item.setSelected(true);
 		}
 

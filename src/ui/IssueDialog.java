@@ -25,7 +25,7 @@ import logic.TurboIssue;
 import logic.TurboLabel;
 import logic.TurboMilestone;
 
-public class IssueDialog {
+public class IssueDialog implements Dialog<String> {
 
 	private static final double HEIGHT_FACTOR = 0.3;
 
@@ -290,9 +290,6 @@ public class IssueDialog {
 	}
 
 	private void showDialog() {
-
-		// TODO bind changes to the issue directly?
-		// TODO make text field read only until a button is pressed
 
 		HBox layout = new HBox();
 		layout.setPadding(new Insets(15));
