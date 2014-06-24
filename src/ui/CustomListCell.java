@@ -19,12 +19,12 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	private final Stage mainStage;
-	private final Model logic;
+	private final Model model;
 	
 	public CustomListCell(Stage mainStage, Model logic, IssuePanel parent) {
 		super();
 		this.mainStage = mainStage;
-		this.logic = logic;
+		this.model = logic;
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
-		(new IssueDialog(mainStage, logic, issue)).show().thenApply(
+		(new IssueDialog(mainStage, model, issue)).show().thenApply(
 				newIssue -> {
 					return true;
 				});

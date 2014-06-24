@@ -92,10 +92,7 @@ public class IssuePanel extends VBox {
 
 	public void setItems(ObservableList<TurboIssue> issues) {
 		
-		if (this.issues != issues) {
-			this.issues.clear();
-			this.issues.addAll(issues);
-		}
+		this.issues = issues;
 		
 		refreshItems();
 	}

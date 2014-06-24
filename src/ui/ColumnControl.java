@@ -1,14 +1,10 @@
 package ui;
 
-import java.util.List;
-
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboIssue;
 
 public class ColumnControl extends HBox {
 
@@ -23,17 +19,21 @@ public class ColumnControl extends HBox {
 		addSampleIssues();
 	}
 	
+	public void refresh() {
+		getChildren().forEach(child -> ((IssuePanel) child).refreshItems());
+	}
+	
 	public void loadIssues() {
 		for (Node node : getChildren()) {
 			IssuePanel panel = (IssuePanel) node;
-			panel.setItems(FXCollections.observableArrayList(model.getIssues()));
+			panel.setItems(model.getIssues());
 		}
 	}
 
 	public ColumnControl addColumn() {
 		IssuePanel panel = new IssuePanel(stage, model);
 		getChildren().add(panel);
-		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
+		panel.setItems(model.getIssues());
 		
 		return this;
 	}
