@@ -1,5 +1,12 @@
 package ui;
 
+import java.io.IOException;
+
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +27,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import command.GetIssuesCommand;
+import command.GetLabelsCommand;
+import command.GetMilestonesCommand;
+import command.GetCollaboratorsCommand;
 import model.ModelFacade;
 
 public class Demo extends Application {
@@ -32,6 +43,7 @@ public class Demo extends Application {
 	private Stage mainStage;
 	private ColumnControl columns;
 	private ModelFacade logic = new ModelFacade();
+	private GitHubClient client;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -104,12 +116,16 @@ public class Demo extends Application {
 
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
-				logic.login(usernameField.getText(), passwordField.getText());
-				logic.setRepository(repoOwnerField.getText(),
-						repoNameField.getText());
+				login(usernameField.getText(), passwordField.getText());
+				IRepositoryIdProvider repoId = RepositoryId.create(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
-				columns.loadIssues();
+				new GetIssuesCommand(client, repoId, logic.getIssueManager().getIssues()).execute();
+				new GetLabelsCommand(client, repoId, logic.getLabelManager().getLabels()).execute();
+				new GetCollaboratorsCommand(client, repoId, logic.getCollaboratorManager().getCollaborators()).execute();
+				new GetMilestonesCommand(client, repoId, logic.getMilestoneManager().getMilestones()).execute();
+				
+				columns.loadIssues(logic.getIssueManager().getIssues());
 			});
 
 			HBox buttons = new HBox(10);
@@ -179,4 +195,19 @@ public class Demo extends Application {
 		menuBar.getMenus().addAll(projects, milestones, issues, labels, view);
 		return menuBar;
 	}
+	
+	public boolean login(String userId, String password) {
+		client = new GitHubClient();
+		client.setCredentials(userId, password);
+		try {
+			GitHubRequest request = new GitHubRequest();
+			request.setUri("/");
+			client.get(request);
+		} catch (IOException e) {
+			// Login failed
+			return false;
+		}
+		return true;
+	}
+
 }

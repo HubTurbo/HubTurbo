@@ -141,7 +141,7 @@ public class IssueDialog implements Dialog<String> {
 		}
 		assigneeBox.getChildren().add(label);
 		
-		List<TurboCollaborator> allAssignees = logic.getCollaborators();
+		List<TurboCollaborator> allAssignees = logic.getCollaboratorManager().getCollaborators();
 		
 		assigneeBox.setOnMouseClicked((e) -> {
 			
@@ -196,7 +196,7 @@ public class IssueDialog implements Dialog<String> {
 			labelBox.getChildren().add(noLabels);
 		}
 		
-		List<TurboLabel> allLabels = logic.getLabels();
+		List<TurboLabel> allLabels = logic.getLabelManager().getLabels();
 		
 		labelBox.setOnMouseClicked((e) -> {
 			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
@@ -244,7 +244,7 @@ public class IssueDialog implements Dialog<String> {
 		}
 		milestoneBox.getChildren().add(label);
 		
-		List<TurboMilestone> allMilestones = logic.getMilestones();
+		List<TurboMilestone> allMilestones = logic.getMilestoneManager().getMilestones();
 		
 		milestoneBox.setOnMouseClicked((e) -> {
 			
