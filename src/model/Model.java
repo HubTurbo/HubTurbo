@@ -135,36 +135,36 @@ public class Model {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		TurboIssue returnIssue = new TurboIssue(createdIssue);
-		issues.add(returnIssue);
-		return returnIssue;
+		TurboIssue returnedIssue = new TurboIssue(createdIssue);
+		issues.add(returnedIssue);
+		return returnedIssue;
 	}
 	
-	public TurboIssue createLabel(TurboLabel newLabel) {
-		Issue ghIssue = newIssue.toGhIssue();
-		Issue createdIssue = null;
+	public TurboLabel createLabel(TurboLabel newLabel) {
+		Label ghLabel = newLabel.toGhLabel();
+		Label createdLabel = null;
 		try {
-			createdIssue = issueService.createIssue(repoId, ghIssue);
+			createdLabel = labelService.createLabel(repoId, ghLabel);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		TurboIssue returnIssue = new TurboIssue(createdIssue);
-		issues.add(returnIssue);
-		return returnIssue;
+		TurboLabel returnedLabel = new TurboLabel(createdLabel);
+		labels.add(returnedLabel);
+		return returnedLabel;
 	}
 	
-	public TurboIssue createMilestone(TurboMilestone newMilestone) {
-		Issue ghIssue = newIssue.toGhIssue();
-		Issue createdIssue = null;
+	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
+		Milestone ghMilestone = newMilestone.toGhMilestone();
+		Milestone createdMilestone = null;
 		try {
-			createdIssue = issueService.createIssue(repoId, ghIssue);
+			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		TurboIssue returnIssue = new TurboIssue(createdIssue);
-		issues.add(returnIssue);
-		return returnIssue;
+		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
+		milestones.add(returnedMilestone);
+		return returnedMilestone;
 	}
 }

@@ -1,21 +1,32 @@
 package model;
 
+import java.util.Date;
+
 import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
 	private String title;
 	private int number;
+	private String state;
+	private String description;
+	private Date dueOn;
 	
 	public TurboMilestone(Milestone milestone) {
 		assert milestone != null;
-		
 		this.title = milestone.getTitle();
 		this.number = milestone.getNumber();
+		this.state = milestone.getState();
+		this.description = milestone.getDescription();
+		this.dueOn = milestone.getDueOn();
 	}
 	
 	public Milestone toGhMilestone() {
 		Milestone ghMilestone = new Milestone();
+		ghMilestone.setTitle(title);
 		ghMilestone.setNumber(number);
+		ghMilestone.setState(state);
+		ghMilestone.setDescription(description);
+		ghMilestone.setDueOn(dueOn);
 		return ghMilestone;
 	}
 

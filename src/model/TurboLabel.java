@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
@@ -20,6 +21,13 @@ public class TurboLabel implements Listable {
 		
 		setName(label.getName());
 		setColour(label.getColor());
+	}
+	
+	public Label toGhLabel() {
+		Label ghLabel = new Label();
+		ghLabel.setName(getName());
+		ghLabel.setColor(getColour());
+		return ghLabel;
 	}
 	
 	public static List<Label> toGhLabels(List<TurboLabel> turboLabels) {
@@ -79,4 +87,5 @@ public class TurboLabel implements Listable {
 	public String toString() {
 		return getName() + "/" + getColour();
 	}
+
 }
