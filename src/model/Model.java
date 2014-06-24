@@ -10,6 +10,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
@@ -22,6 +23,8 @@ public class Model {
 	public static final String MILESTONES_ALL = "all";
 	public static final String MILESTONES_OPEN = "open";
 	public static final String MILESTONES_CLOSED = "closed";
+	
+	private IRepositoryIdProvider repoId;
 	
 	private CollaboratorService collabService;
 	private IssueService issueService;
@@ -38,6 +41,14 @@ public class Model {
 		this.issueService = new IssueService(ghClient);
 		this.labelService = new LabelService(ghClient);
 		this.milestoneService = new MilestoneService(ghClient);
+	}
+	
+	public void setRepoId(String owner, String name) {
+		repoId = RepositoryId.create(owner, name);
+		loadCollaborators();
+		loadIssues();
+		loadLabels();
+		loadMilestones();
 	}
 
 	public List<TurboCollaborator> getCollaborators() {
@@ -56,7 +67,7 @@ public class Model {
 		return milestones;
 	}
 	
-	public boolean loadCollaborators(IRepositoryIdProvider repoId) {
+	private boolean loadCollaborators() {
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
 			for(User ghCollaborator : ghCollaborators) {
@@ -70,7 +81,7 @@ public class Model {
 		return true;
 	}
 	
-	public boolean loadIssues(IRepositoryIdProvider repoId) {
+	private boolean loadIssues() {
 		Map<String, String> filters = new HashMap<String, String>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
@@ -87,7 +98,7 @@ public class Model {
 		return true;
 	}
 	
-	public boolean loadLabels(IRepositoryIdProvider repoId){
+	private boolean loadLabels(){
 		try {
 			List<Label> ghLabels = labelService.getLabels(repoId);
 			for (Label ghLabel : ghLabels) {
@@ -101,7 +112,7 @@ public class Model {
 		return true;
 	}
 	
-	public boolean loadMilestones(IRepositoryIdProvider repoId){
+	private boolean loadMilestones(){
 		try {		
 			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, Model.MILESTONES_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
@@ -115,5 +126,45 @@ public class Model {
 		return true;
 	}
 	
+	public TurboIssue createIssue(TurboIssue newIssue) {
+		Issue ghIssue = newIssue.toGhIssue();
+		Issue createdIssue = null;
+		try {
+			createdIssue = issueService.createIssue(repoId, ghIssue);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		TurboIssue returnIssue = new TurboIssue(createdIssue);
+		issues.add(returnIssue);
+		return returnIssue;
+	}
 	
+	public TurboIssue createLabel(TurboLabel newLabel) {
+		Issue ghIssue = newIssue.toGhIssue();
+		Issue createdIssue = null;
+		try {
+			createdIssue = issueService.createIssue(repoId, ghIssue);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		TurboIssue returnIssue = new TurboIssue(createdIssue);
+		issues.add(returnIssue);
+		return returnIssue;
+	}
+	
+	public TurboIssue createMilestone(TurboMilestone newMilestone) {
+		Issue ghIssue = newIssue.toGhIssue();
+		Issue createdIssue = null;
+		try {
+			createdIssue = issueService.createIssue(repoId, ghIssue);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		TurboIssue returnIssue = new TurboIssue(createdIssue);
+		issues.add(returnIssue);
+		return returnIssue;
+	}
 }
