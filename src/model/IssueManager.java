@@ -11,7 +11,7 @@ public class IssueManager {
 	}
 
 	public List<TurboIssue> getIssues() {
-		return issues;
+		return this.issues;
 	}
 	
 /*	

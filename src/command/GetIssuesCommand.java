@@ -14,12 +14,12 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 public class GetIssuesCommand implements Command {
 	
-	private IssueService iService;
+	private IssueService issueService;
 	private IRepositoryIdProvider repoId;
 	private List<TurboIssue> issues;
 	
 	public GetIssuesCommand(GitHubClient ghClient, IRepositoryIdProvider repoId, List<TurboIssue> issues) {
-		this.iService = new IssueService(ghClient);
+		this.issueService = new IssueService(ghClient);
 		this.repoId = repoId;
 		this.issues = issues;
 	}
@@ -30,7 +30,7 @@ public class GetIssuesCommand implements Command {
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
 		try {		
-			List<Issue> ghIssues = iService.getIssues(repoId, filters);
+			List<Issue> ghIssues = issueService.getIssues(repoId, filters);
 			for (Issue ghIssue : ghIssues) {
 				issues.add(new TurboIssue(ghIssue));
 			}

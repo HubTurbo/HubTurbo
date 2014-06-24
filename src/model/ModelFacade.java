@@ -10,9 +10,10 @@ public class ModelFacade {
 	
 	private GitHubClient client = new GitHubClient();
 	private IRepositoryIdProvider repoId = null;
+	private IssueManager issueManager = new IssueManager();
 	private AuthenticationManager authManager = new AuthenticationManager(client);
 	private MilestoneManager milestoneManager = new MilestoneManager(client);
-	private LabelManager labelManager = new LabelManager(client);
+	private LabelManager labelManager = new LabelManager();
 	private CollaboratorManager colManager = new CollaboratorManager(client);
 	
 	public boolean login(String userId, String password) {
@@ -27,12 +28,16 @@ public class ModelFacade {
 		}
 	}
 	
-	public List<TurboMilestone> getMilestones() {
-		return milestoneManager.getAllMilestones(repoId);
+	public IssueManager getIssueManager() {
+		return this.issueManager;
 	}
 	
-	public List<TurboLabel> getLabels() {
-		return labelManager.getAllLabels(repoId);
+	public LabelManager getLabelManager() {
+		return this.labelManager;
+	}
+	
+	public List<TurboMilestone> getMilestones() {
+		return milestoneManager.getAllMilestones(repoId);
 	}
 	
 	public List<TurboCollaborator> getCollaborators() {
