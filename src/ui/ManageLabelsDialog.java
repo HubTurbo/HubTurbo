@@ -85,7 +85,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 	private TreeView<String> createTreeView() {
 		
 		final TreeItem<String> treeRoot = new TreeItem<>("Groups");
-
+		treeRoot.setExpanded(true);
+		
 		TreeItem<String> status = new TreeItem<>("Status");
 
 		treeRoot.getChildren().addAll(
@@ -98,8 +99,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 		final TreeView<String> treeView = new TreeView<>();
 		treeView.setRoot(treeRoot);
 		treeView.setShowRoot(false);
-		treeRoot.setExpanded(true);
 		treeView.setPrefWidth(180);
+		treeView.setEditable(true);
 
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
 
