@@ -61,10 +61,10 @@ public class FilterDialog implements Dialog<Filter> {
 
 	private void setupAutocompletion(TextField field) {
         ArrayList<String> words = new ArrayList<String>();
-        words.addAll(logic.getIssues().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
-        words.addAll(logic.getLabels().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
-        words.addAll(logic.getMilestones().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
-        words.addAll(logic.getCollaborators().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
+        words.addAll(logic.getIssueManager().getIssues().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
+        words.addAll(logic.getLabelManager().getLabels().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
+        words.addAll(logic.getMilestoneManager().getMilestones().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
+        words.addAll(logic.getCollaboratorManager().getCollaborators().stream().map((x) -> x.getListName()).collect(Collectors.toList()));
         addSyntax(words);
         
         TextFields.bindAutoCompletion(field, words.toArray());

@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -24,13 +26,13 @@ public class ColumnControl extends HBox {
 		addSampleIssues();
 	}
 	
-	public void loadIssues() {
+	public void loadIssues(List<TurboIssue> issues) {
 		// TODO remove this once caching is done logic-side
-		if (issues == null) issues = FXCollections.observableArrayList(logic.getIssues());
+		if (this.issues == null) this.issues = FXCollections.observableArrayList(issues);
 
 		for (Node node : getChildren()) {
 			IssuePanel panel = (IssuePanel) node;
-			panel.setItems(issues);
+			panel.setItems(this.issues);
 		}
 	}
 
