@@ -11,7 +11,6 @@ public class ModelFacade {
 	private GitHubClient client = new GitHubClient();
 	private IRepositoryIdProvider repoId = null;
 	private AuthenticationManager authManager = new AuthenticationManager(client);
-	private IssueManager issueManager = new IssueManager(client);
 	private MilestoneManager milestoneManager = new MilestoneManager(client);
 	private LabelManager labelManager = new LabelManager(client);
 	private CollaboratorManager colManager = new CollaboratorManager(client);
@@ -28,10 +27,6 @@ public class ModelFacade {
 		}
 	}
 	
-	public List<TurboIssue> getIssues() {
-		return issueManager.getAllIssues(repoId);
-	}
-	
 	public List<TurboMilestone> getMilestones() {
 		return milestoneManager.getAllMilestones(repoId);
 	}
@@ -44,7 +39,4 @@ public class ModelFacade {
 		return colManager.getAllCollaborators(repoId);
 	}
 	
-	public TurboIssue getIssue(int issueNumber) {
-		return issueManager.getIssue(repoId, issueNumber);
-	}
 }

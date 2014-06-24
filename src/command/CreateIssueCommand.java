@@ -4,7 +4,7 @@ import model.TurboIssue;
 
 import org.eclipse.egit.github.core.Issue;
 
-public class CreateIssueCommand implements Command {
+public class CreateIssueCommand implements UndoableCommand {
 	
 	private TurboIssue newIssue;
 	
@@ -24,5 +24,6 @@ public class CreateIssueCommand implements Command {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }
