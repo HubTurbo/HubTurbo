@@ -1,7 +1,7 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Model {
 	
@@ -9,24 +9,24 @@ public class Model {
 	public static final String MILESTONES_OPEN = "open";
 	public static final String MILESTONES_CLOSED = "closed";
 	
-	private List<TurboCollaborator> collaborators = new ArrayList<TurboCollaborator>();
-	private List<TurboIssue> issues = new ArrayList<TurboIssue>();
-	private List<TurboLabel> labels = new ArrayList<TurboLabel>();
-	private List<TurboMilestone> milestones = new ArrayList<TurboMilestone>(); 
+	private ObservableList<TurboCollaborator> collaborators = FXCollections.observableArrayList();
+	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
-	public List<TurboIssue> getIssues() {
+	public ObservableList<TurboIssue> getIssues() {
 		return this.issues;
 	}
 
-	public List<TurboCollaborator> getCollaborators() {
+	public ObservableList<TurboCollaborator> getCollaborators() {
 		return collaborators;
 	}
 
-	public List<TurboLabel> getLabels() {
+	public ObservableList<TurboLabel> getLabels() {
 		return labels;
 	}
 
-	public List<TurboMilestone> getMilestones() {
+	public ObservableList<TurboMilestone> getMilestones() {
 		return milestones;
 	}
 }
