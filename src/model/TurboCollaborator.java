@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 import org.eclipse.egit.github.core.User;
 

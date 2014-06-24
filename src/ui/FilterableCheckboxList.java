@@ -20,7 +20,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import logic.Listable;
+import model.Listable;
 
 public class FilterableCheckboxList implements Dialog<List<Integer>> {
 

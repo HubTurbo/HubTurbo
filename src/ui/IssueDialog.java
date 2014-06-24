@@ -19,11 +19,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import logic.LogicFacade;
-import logic.TurboCollaborator;
-import logic.TurboIssue;
-import logic.TurboLabel;
-import logic.TurboMilestone;
+import model.ModelFacade;
+import model.TurboCollaborator;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
 
 public class IssueDialog implements Dialog<String> {
 
@@ -37,12 +37,12 @@ public class IssueDialog implements Dialog<String> {
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
 	Stage parentStage;
-	LogicFacade logic;
+	ModelFacade logic;
 	TurboIssue issue;
 
 	CompletableFuture<String> response;
 
-	public IssueDialog(Stage parentStage, LogicFacade logic, TurboIssue issue) {
+	public IssueDialog(Stage parentStage, ModelFacade logic, TurboIssue issue) {
 		this.parentStage = parentStage;
 		this.logic = logic;
 		this.issue = issue;

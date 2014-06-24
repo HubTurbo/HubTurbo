@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
 
 public class TurboIssue implements Listable {
 	private ObservableList<TurboLabel> labels;

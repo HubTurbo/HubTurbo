@@ -20,7 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import logic.LogicFacade;
+import model.ModelFacade;
 
 public class Demo extends Application {
 
@@ -31,7 +31,7 @@ public class Demo extends Application {
 
 	private Stage mainStage;
 	private ColumnControl columns;
-	private LogicFacade logic = new LogicFacade();
+	private ModelFacade logic = new ModelFacade();
 
 	public static void main(String[] args) {
 		Application.launch(args);

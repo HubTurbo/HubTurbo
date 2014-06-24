@@ -14,13 +14,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import logic.LogicFacade;
-import logic.TurboIssue;
+import model.ModelFacade;
+import model.TurboIssue;
 
 public class IssuePanel extends VBox {
 
 	private final Stage mainStage;
-	private final LogicFacade logic;
+	private final ModelFacade logic;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -28,7 +28,7 @@ public class IssuePanel extends VBox {
 	
 	private Predicate<TurboIssue> predicate;
 
-	public IssuePanel(Stage mainStage, LogicFacade logic) {
+	public IssuePanel(Stage mainStage, ModelFacade logic) {
 		this.mainStage = mainStage;
 		this.logic = logic;
 
