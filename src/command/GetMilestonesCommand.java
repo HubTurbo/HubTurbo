@@ -3,6 +3,7 @@ package command;
 import java.io.IOException;
 import java.util.List;
 
+import model.Model;
 import model.TurboMilestone;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
@@ -25,7 +26,7 @@ public class GetMilestonesCommand implements Command {
 	@Override
 	public void execute() {
 		try {		
-			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, model.MilestoneManager.STATE_ALL);
+			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, Model.MILESTONES_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
 				milestones.add(new TurboMilestone(ghMilestone));
 			}

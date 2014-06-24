@@ -120,12 +120,12 @@ public class UI extends Application {
 				IRepositoryIdProvider repoId = RepositoryId.create(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
-				new GetIssuesCommand(client, repoId, model.getIssueManager().getIssues()).execute();
-				new GetLabelsCommand(client, repoId, model.getLabelManager().getLabels()).execute();
-				new GetCollaboratorsCommand(client, repoId, model.getCollaboratorManager().getCollaborators()).execute();
-				new GetMilestonesCommand(client, repoId, model.getMilestoneManager().getMilestones()).execute();
+				new GetIssuesCommand(client, repoId, model.getIssues()).execute();
+				new GetLabelsCommand(client, repoId, model.getLabels()).execute();
+				new GetCollaboratorsCommand(client, repoId, model.getCollaborators()).execute();
+				new GetMilestonesCommand(client, repoId, model.getMilestones()).execute();
 				
-				columns.loadIssues(model.getIssueManager().getIssues());
+				columns.loadIssues(model.getIssues());
 			});
 
 			HBox buttons = new HBox(10);

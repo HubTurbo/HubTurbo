@@ -1,26 +1,32 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Model {
 	
-	private IssueManager issueManager = new IssueManager();
-	private MilestoneManager milestoneManager = new MilestoneManager();
-	private LabelManager labelManager = new LabelManager();
-	private CollaboratorManager collaboratorManager = new CollaboratorManager();
-		
-	public IssueManager getIssueManager() {
-		return this.issueManager;
-	}
+	public static final String MILESTONES_ALL = "all";
+	public static final String MILESTONES_OPEN = "open";
+	public static final String MILESTONES_CLOSED = "closed";
 	
-	public LabelManager getLabelManager() {
-		return this.labelManager;
+	private List<TurboCollaborator> collaborators = new ArrayList<TurboCollaborator>();
+	private List<TurboIssue> issues = new ArrayList<TurboIssue>();
+	private List<TurboLabel> labels = new ArrayList<TurboLabel>();
+	private List<TurboMilestone> milestones = new ArrayList<TurboMilestone>(); 
+
+	public List<TurboIssue> getIssues() {
+		return this.issues;
 	}
-	
-	public MilestoneManager getMilestoneManager() {
-		return this.milestoneManager;
+
+	public List<TurboCollaborator> getCollaborators() {
+		return collaborators;
 	}
-	
-	public CollaboratorManager getCollaboratorManager() {
-		return this.collaboratorManager;
+
+	public List<TurboLabel> getLabels() {
+		return labels;
 	}
-	
+
+	public List<TurboMilestone> getMilestones() {
+		return milestones;
+	}
 }
