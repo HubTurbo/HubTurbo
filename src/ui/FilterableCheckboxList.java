@@ -162,6 +162,8 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
 		layout.getChildren().addAll(searchField, checkListView, close);
+		layout.setSpacing(5);
+		layout.setPadding(new Insets(5));
 
 		Scene scene = new Scene(layout, 400, 300);
 
