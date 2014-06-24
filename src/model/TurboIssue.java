@@ -72,8 +72,8 @@ public class TurboIssue implements Listable {
 		Issue ghIssue = new Issue();
 		ghIssue.setTitle(getTitle());
 		ghIssue.setBody(getDescription());
-		ghIssue.setAssignee(assignee.toGhUser());
-		ghIssue.setMilestone(milestone.toGhMilestone());
+		if (assignee != null) ghIssue.setAssignee(assignee.toGhUser());
+		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
 		return ghIssue;
 	}

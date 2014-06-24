@@ -2,8 +2,6 @@ package ui;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
@@ -165,10 +163,10 @@ public class UI extends Application {
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
 		newIssue.setOnAction(e -> {
-			TurboIssue createdIssue = new TurboIssue("", "");
+			TurboIssue createdIssue = new TurboIssue("New issue", "");
+			createdIssue = model.createIssue(createdIssue);
 			(new IssueDialog(mainStage, model, createdIssue)).show().thenApply(
 					response -> {
-						model.getIssues().add(createdIssue);
 						columns.refresh();
 						return true;
 					});
