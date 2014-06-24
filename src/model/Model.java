@@ -167,4 +167,23 @@ public class Model {
 		milestones.add(returnedMilestone);
 		return returnedMilestone;
 	}
+	
+	public void deleteLabel(TurboLabel label) {
+		try {
+			labelService.deleteLabel(repoId, label.getName());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteMilestone(TurboMilestone milestone) {
+		try {
+			milestoneService.deleteMilestone(repoId, milestone.getNumber());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
