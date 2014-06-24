@@ -6,7 +6,6 @@ import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
@@ -19,13 +18,21 @@ public class TurboLabel implements Listable {
 	public TurboLabel(Label label) {
 		assert label != null;
 		
-		setName(label.getName());
+		String[] tokens = label.getName().split(".");
+		
+		if (tokens.length > 1) {
+			setGroup(tokens[0]);
+			setName(tokens[1]);
+		} else {
+			setName(label.getName());
+		}
 		setColour(label.getColor());
 	}
 	
 	public Label toGhLabel() {
 		Label ghLabel = new Label();
-		ghLabel.setName(getName());
+		String groupAppended = getGroup() + "." + getName();
+		ghLabel.setName(groupAppended);
 		ghLabel.setColor(getColour());
 		return ghLabel;
 	}
@@ -52,6 +59,11 @@ public class TurboLabel implements Listable {
     public final String getColour() {return colour.get();}
     public final void setColour(String value) {colour.set(value);}
     public StringProperty colourProperty() {return colour;}
+    
+    private StringProperty group = new SimpleStringProperty();
+    public final String getGroup() {return group.get();}
+    public final void setGroup(String value) {group.set(value);}
+    public StringProperty groupProperty() {return group;}
 
 	@Override
 	public String getListName() {
@@ -85,7 +97,7 @@ public class TurboLabel implements Listable {
 
 	@Override
 	public String toString() {
-		return getName() + "/" + getColour();
+		return getGroup() + "/" + getName() + "/" + getColour();
 	}
 
 }

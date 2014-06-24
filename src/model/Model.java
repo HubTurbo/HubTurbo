@@ -187,8 +187,16 @@ public class Model {
 	}
 	
 	public void updateIssue(TurboIssue issue) {
-		Issue ghIssue = issue.toGhIssue();
+		Issue editedIssue = issue.toGhIssue();
+		
 		try {
+			Issue ghIssue = issueService.getIssue(repoId, issue.getId());
+			ghIssue.setTitle(editedIssue.getTitle());
+			ghIssue.setBody(editedIssue.getBody());
+			ghIssue.setAssignee(editedIssue.getAssignee());
+			ghIssue.setState(editedIssue.getState());
+			ghIssue.setMilestone(editedIssue.getMilestone());
+			ghIssue.setLabels(editedIssue.getLabels());
 			issueService.editIssue(repoId, ghIssue);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
