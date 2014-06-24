@@ -1,7 +1,5 @@
 package ui;
 
-import utils.Pair;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +17,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -64,11 +61,11 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 	private void showDialog() {
 
-		TextField searchField = new TextField();
-		searchField.setPromptText("Search");
-		searchField.textProperty().addListener((e) -> {
-			objects.setPredicate((o) -> o.contains(searchField.getText()));
-		});
+//		TextField searchField = new TextField();
+//		searchField.setPromptText("Search");
+//		searchField.textProperty().addListener((e) -> {
+//			objects.setPredicate((o) -> o.contains(searchField.getText()));
+//		});
 		
 		CheckListView<String> checkListView = new CheckListView<>(objects);
 		checkListView.getSelectionModel()
@@ -155,13 +152,15 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		Button close = new Button("Close");
 		VBox.setMargin(close, new Insets(5));
 		close.setOnAction((e) -> {
-			completeResponse(searchField, checkListView);
+			completeResponse(checkListView);
+//			completeResponse(searchField, checkListView);
 			stage.hide();
 		});
 
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
-		layout.getChildren().addAll(searchField, checkListView, close);
+//		layout.getChildren().addAll(searchField, checkListView, close);
+		layout.getChildren().addAll(checkListView, close);
 		layout.setSpacing(5);
 		layout.setPadding(new Insets(5));
 
@@ -171,7 +170,8 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		stage.setScene(scene);
 
 		stage.setOnCloseRequest((e) -> {
-			completeResponse(searchField, checkListView);
+			completeResponse(checkListView);
+//			completeResponse(searchField, checkListView);
 		});
 
 		Platform.runLater(() -> stage.requestFocus());
@@ -185,24 +185,28 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		stage.show();
 	}
 
-	private void completeResponse(TextField searchField, CheckListView<String> checkListView) {
+//	private void completeResponse(TextField searchField, CheckListView<String> checkListView) {
+//
+//		// Get source indices
+//		// Iterative because index required
+//		ArrayList<Integer> sourceIndices = new ArrayList<>();
+//		for (int i=0; i<objects.size(); i++) {
+//			sourceIndices.add(objects.getSourceIndex(i));
+//		}
+//		
+//		// Get only the selected indices and unpair them
+//		ArrayList<Integer> onlyRequiredIndices = new ArrayList<>(checkListView.getCheckModel().getSelectedIndices()
+//				.stream()
+//				.map((i) -> sourceIndices.get(i))
+//				.collect(Collectors.toList()));
+//
+//		response.complete(onlyRequiredIndices);
+//	}
 
-		// Get source indices
-		// Iterative because index required
-		ArrayList<Integer> sourceIndices = new ArrayList<>();
-		for (int i=0; i<objects.size(); i++) {
-			sourceIndices.add(objects.getSourceIndex(i));
-		}
-		
-		// Get only the selected indices and unpair them
-		ArrayList<Integer> onlyRequiredIndices = new ArrayList<>(checkListView.getCheckModel().getSelectedIndices()
-				.stream()
-				.map((i) -> sourceIndices.get(i))
-				.collect(Collectors.toList()));
-
-		response.complete(onlyRequiredIndices);
+	private void completeResponse(CheckListView<String> checkListView) {
+		response.complete(checkListView.getCheckModel().getSelectedIndices());
 	}
-
+	
 	List<Integer> initialCheckedState = new ArrayList<>();
 
 	public List<Integer> getInitialCheckedState() {
