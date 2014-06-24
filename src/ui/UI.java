@@ -117,14 +117,9 @@ public class UI extends Application {
 
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
+				model.setRepoId(repoOwnerField.getText(), repoNameField.getText());
 				login(usernameField.getText(), passwordField.getText());
-				IRepositoryIdProvider repoId = RepositoryId.create(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
-				
-				model.loadCollaborators(repoId);
-				model.loadIssues(repoId);
-				model.loadLabels(repoId);
-				model.loadMilestones(repoId);
 				
 				columns.loadIssues();
 			});
