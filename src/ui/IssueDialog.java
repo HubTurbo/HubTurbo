@@ -37,14 +37,14 @@ public class IssueDialog implements Dialog<String> {
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
 	Stage parentStage;
-	Model logic;
+	Model model;
 	TurboIssue issue;
 
 	CompletableFuture<String> response;
 
-	public IssueDialog(Stage parentStage, Model logic, TurboIssue issue) {
+	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
 		this.parentStage = parentStage;
-		this.logic = logic;
+		this.model = model;
 		this.issue = issue;
 
 		response = new CompletableFuture<>();
@@ -141,7 +141,7 @@ public class IssueDialog implements Dialog<String> {
 		}
 		assigneeBox.getChildren().add(label);
 		
-		List<TurboCollaborator> allAssignees = logic.getCollaboratorManager().getCollaborators();
+		List<TurboCollaborator> allAssignees = model.getCollaborators();
 		
 		assigneeBox.setOnMouseClicked((e) -> {
 			
@@ -196,7 +196,7 @@ public class IssueDialog implements Dialog<String> {
 			labelBox.getChildren().add(noLabels);
 		}
 		
-		List<TurboLabel> allLabels = logic.getLabelManager().getLabels();
+		List<TurboLabel> allLabels = model.getLabels();
 		
 		labelBox.setOnMouseClicked((e) -> {
 			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
@@ -244,7 +244,7 @@ public class IssueDialog implements Dialog<String> {
 		}
 		milestoneBox.getChildren().add(label);
 		
-		List<TurboMilestone> allMilestones = logic.getMilestoneManager().getMilestones();
+		List<TurboMilestone> allMilestones = model.getMilestones();
 		
 		milestoneBox.setOnMouseClicked((e) -> {
 			
