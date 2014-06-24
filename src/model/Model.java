@@ -186,4 +186,13 @@ public class Model {
 		}
 	}
 	
+	public void updateIssue(TurboIssue issue) {
+		Issue ghIssue = issue.toGhIssue();
+		try {
+			issueService.editIssue(repoId, ghIssue);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
 }
