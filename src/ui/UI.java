@@ -32,6 +32,7 @@ import command.GetLabelsCommand;
 import command.GetMilestonesCommand;
 import command.GetCollaboratorsCommand;
 import model.Model;
+import model.TurboIssue;
 
 public class UI extends Application {
 
@@ -168,6 +169,15 @@ public class UI extends Application {
 
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
+		newIssue.setOnAction(e -> {
+			TurboIssue createdIssue = new TurboIssue("", "");
+			(new IssueDialog(mainStage, model, createdIssue)).show().thenApply(
+					response -> {
+						model.getIssues().add(createdIssue);
+						columns.refresh();
+						return true;
+					});
+		});
 		issues.getItems().addAll(newIssue);
 
 		Menu labels = new Menu("Labels");
