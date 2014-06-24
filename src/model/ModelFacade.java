@@ -12,7 +12,7 @@ public class ModelFacade {
 	private IRepositoryIdProvider repoId = null;
 	private IssueManager issueManager = new IssueManager();
 	private AuthenticationManager authManager = new AuthenticationManager(client);
-	private MilestoneManager milestoneManager = new MilestoneManager(client);
+	private MilestoneManager milestoneManager = new MilestoneManager();
 	private LabelManager labelManager = new LabelManager();
 	private CollaboratorManager colManager = new CollaboratorManager(client);
 	
@@ -36,8 +36,8 @@ public class ModelFacade {
 		return this.labelManager;
 	}
 	
-	public List<TurboMilestone> getMilestones() {
-		return milestoneManager.getAllMilestones(repoId);
+	public MilestoneManager getMilestoneManager() {
+		return this.milestoneManager;
 	}
 	
 	public List<TurboCollaborator> getCollaborators() {
