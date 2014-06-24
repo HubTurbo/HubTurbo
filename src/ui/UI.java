@@ -181,7 +181,8 @@ public class UI extends Application {
 		issues.getItems().addAll(newIssue);
 
 		Menu labels = new Menu("Labels");
-		MenuItem newLabel = new MenuItem("New Label");
+		MenuItem newLabel = new MenuItem("Manage labels...");
+		
 		labels.getItems().addAll(newLabel);
 
 		Menu view = new Menu("View");
