@@ -27,10 +27,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import command.GetIssuesCommand;
-import command.GetLabelsCommand;
-import command.GetMilestonesCommand;
-import command.GetCollaboratorsCommand;
 import model.Model;
 import model.TurboIssue;
 
@@ -43,7 +39,7 @@ public class UI extends Application {
 
 	private Stage mainStage;
 	private ColumnControl columns;
-	private Model model = new Model();
+	private Model model;
 	private GitHubClient client;
 
 	public static void main(String[] args) {
@@ -52,6 +48,10 @@ public class UI extends Application {
 
 	@Override
 	public void start(Stage stage) {
+		
+		client = new GitHubClient();
+		model = new Model(client);
+
 		mainStage = stage;
 
 		Scene scene = new Scene(createRoot(), 800, 600);
@@ -121,10 +121,10 @@ public class UI extends Application {
 				IRepositoryIdProvider repoId = RepositoryId.create(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
-				new GetIssuesCommand(client, repoId, model.getIssues()).execute();
-				new GetLabelsCommand(client, repoId, model.getLabels()).execute();
-				new GetCollaboratorsCommand(client, repoId, model.getCollaborators()).execute();
-				new GetMilestonesCommand(client, repoId, model.getMilestones()).execute();
+				model.loadCollaborators(repoId);
+				model.loadIssues(repoId);
+				model.loadLabels(repoId);
+				model.loadMilestones(repoId);
 				
 				columns.loadIssues();
 			});
@@ -207,7 +207,6 @@ public class UI extends Application {
 	}
 	
 	public boolean login(String userId, String password) {
-		client = new GitHubClient();
 		client.setCredentials(userId, password);
 		try {
 			GitHubRequest request = new GitHubRequest();
