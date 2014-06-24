@@ -31,9 +31,9 @@ import command.GetIssuesCommand;
 import command.GetLabelsCommand;
 import command.GetMilestonesCommand;
 import command.GetCollaboratorsCommand;
-import model.ModelFacade;
+import model.Model;
 
-public class Demo extends Application {
+public class UI extends Application {
 
 	public static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
 	public static final String STYLE_BORDERS_FADED = "-fx-border-color: #B2B1AE; -fx-border-width: 1px; -fx-border-radius: 3;";
@@ -42,7 +42,7 @@ public class Demo extends Application {
 
 	private Stage mainStage;
 	private ColumnControl columns;
-	private ModelFacade logic = new ModelFacade();
+	private Model model = new Model();
 	private GitHubClient client;
 
 	public static void main(String[] args) {
@@ -67,7 +67,7 @@ public class Demo extends Application {
 		
 	private Parent createRoot() {
 
-		columns = new ColumnControl(mainStage, logic);
+		columns = new ColumnControl(mainStage, model);
 		
 		BorderPane root = new BorderPane();
 		root.setCenter(columns);
@@ -120,12 +120,12 @@ public class Demo extends Application {
 				IRepositoryIdProvider repoId = RepositoryId.create(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
-				new GetIssuesCommand(client, repoId, logic.getIssueManager().getIssues()).execute();
-				new GetLabelsCommand(client, repoId, logic.getLabelManager().getLabels()).execute();
-				new GetCollaboratorsCommand(client, repoId, logic.getCollaboratorManager().getCollaborators()).execute();
-				new GetMilestonesCommand(client, repoId, logic.getMilestoneManager().getMilestones()).execute();
+				new GetIssuesCommand(client, repoId, model.getIssueManager().getIssues()).execute();
+				new GetLabelsCommand(client, repoId, model.getLabelManager().getLabels()).execute();
+				new GetCollaboratorsCommand(client, repoId, model.getCollaboratorManager().getCollaborators()).execute();
+				new GetMilestonesCommand(client, repoId, model.getMilestoneManager().getMilestones()).execute();
 				
-				columns.loadIssues(logic.getIssueManager().getIssues());
+				columns.loadIssues(model.getIssueManager().getIssues());
 			});
 
 			HBox buttons = new HBox(10);

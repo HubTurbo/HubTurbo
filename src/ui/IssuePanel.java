@@ -14,13 +14,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import model.ModelFacade;
+import model.Model;
 import model.TurboIssue;
 
 public class IssuePanel extends VBox {
 
 	private final Stage mainStage;
-	private final ModelFacade logic;
+	private final Model model;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -28,9 +28,9 @@ public class IssuePanel extends VBox {
 	
 	private Predicate<TurboIssue> predicate;
 
-	public IssuePanel(Stage mainStage, ModelFacade logic) {
+	public IssuePanel(Stage mainStage, Model model) {
 		this.mainStage = mainStage;
-		this.logic = logic;
+		this.model = model;
 
 		getChildren().add(createFilterBox());
 		
@@ -47,7 +47,7 @@ public class IssuePanel extends VBox {
 		HBox box = new HBox();
 		Label label = new Label("<no filter>");
 		box.setOnMouseClicked((e) -> {
-			(new FilterDialog(mainStage, logic)).show().thenApply(
+			(new FilterDialog(mainStage, model)).show().thenApply(
 					filter -> {
 						this.filter(filter);
 						label.setText(filter.toString());
@@ -62,7 +62,7 @@ public class IssuePanel extends VBox {
 		setPrefWidth(400);
 		setVgrow(listView, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
-		setStyle(Demo.STYLE_BORDERS);
+		setStyle(UI.STYLE_BORDERS);
 	}
 
 	public void filter(Filter filter) {
@@ -79,7 +79,7 @@ public class IssuePanel extends VBox {
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new CustomListCell(mainStage, logic, that);
+				return new CustomListCell(mainStage, model, that);
 			}
 		});
 		

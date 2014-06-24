@@ -19,7 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.ModelFacade;
+import model.Model;
 import model.TurboCollaborator;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -37,12 +37,12 @@ public class IssueDialog implements Dialog<String> {
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
 	Stage parentStage;
-	ModelFacade logic;
+	Model logic;
 	TurboIssue issue;
 
 	CompletableFuture<String> response;
 
-	public IssueDialog(Stage parentStage, ModelFacade logic, TurboIssue issue) {
+	public IssueDialog(Stage parentStage, Model logic, TurboIssue issue) {
 		this.parentStage = parentStage;
 		this.logic = logic;
 		this.issue = issue;
@@ -129,12 +129,12 @@ public class IssueDialog implements Dialog<String> {
 	private Parent createAssigneeBox(Stage stage) {
 		
 		final HBox assigneeBox = new HBox();
-		assigneeBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		assigneeBox.setStyle(UI.STYLE_BORDERS_FADED);
 		
 		Label label;
 		if (issue.getAssignee() == null) {
 			label = new Label("Assignee");
-			label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
 		} else {
 			label = new Label(issue.getAssignee().getGithubName());
 			label.setStyle("-fx-padding: 5 5 5 5;");
@@ -176,7 +176,7 @@ public class IssueDialog implements Dialog<String> {
 								
 								// Again, no data binding
 								label.setText("Assignee");
-								label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+								label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
 
 								issue.setAssignee(null);
 							}
@@ -188,11 +188,11 @@ public class IssueDialog implements Dialog<String> {
 
 	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels());
-		labelBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		labelBox.setStyle(UI.STYLE_BORDERS_FADED);
 		
 		if (issue.getLabels().size() == 0) {
 			Label noLabels = new Label("Labels");
-			noLabels.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+			noLabels.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
 			labelBox.getChildren().add(noLabels);
 		}
 		
@@ -232,12 +232,12 @@ public class IssueDialog implements Dialog<String> {
 	private Parent createMilestoneBox(Stage stage) {
 		
 		final HBox milestoneBox = new HBox();
-		milestoneBox.setStyle(Demo.STYLE_BORDERS_FADED);
+		milestoneBox.setStyle(UI.STYLE_BORDERS_FADED);
 		
 		Label label;
 		if (issue.getMilestone() == null) {
 			label = new Label("Milestone");
-			label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
 		} else {
 			label = new Label(issue.getMilestone().getTitle());
 			label.setStyle("-fx-padding: 5 5 5 5;");
@@ -279,7 +279,7 @@ public class IssueDialog implements Dialog<String> {
 								
 								// Again, no data binding
 								label.setText("Milestone");
-								label.setStyle(Demo.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+								label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
 
 								issue.setMilestone(null);
 							}

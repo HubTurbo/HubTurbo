@@ -18,16 +18,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.ModelFacade;
+import model.Model;
 
 public class FilterDialog implements Dialog<Filter> {
 
 	private final Stage parentStage;
-	private final ModelFacade logic;
+	private final Model logic;
 
 	private final CompletableFuture<Filter> response;
 
-	public FilterDialog(Stage parentStage, ModelFacade logic) {
+	public FilterDialog(Stage parentStage, Model logic) {
 		this.parentStage = parentStage;
 		this.logic = logic;
 		
