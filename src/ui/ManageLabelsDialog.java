@@ -7,10 +7,12 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
@@ -40,7 +42,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		
-		Scene scene = new Scene(layout, 300, 400);
+		Scene scene = new Scene(layout, 330, 400);
 
 		Stage stage = new Stage();
 		stage.setTitle("Manage labels");
@@ -48,7 +50,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 		Platform.runLater(() -> stage.requestFocus());
 
-		layout.getChildren().addAll(createTreeView());
+		TreeView<String> treeView = createTreeView();
+		layout.getChildren().addAll(treeView, createButtons(treeView.getRoot(), stage));
 
 		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
@@ -59,7 +62,27 @@ public class ManageLabelsDialog implements Dialog<String> {
 		stage.show();
 	}
 
-	private Node createTreeView() {
+	private Node createButtons(TreeItem<String> root, Stage stage) {
+		VBox container = new VBox();
+		container.setSpacing(5);
+		
+		Button newGroup = new Button("New Group");
+		newGroup.setOnAction(e -> {
+			root.getChildren().add(new TreeItem<String>("New group"));
+			// TODO trigger an edit on that node
+		});
+		
+		Button close = new Button("Close");
+		close.setOnAction(e -> {
+			stage.close();
+		});
+		
+		container.getChildren().addAll(newGroup, close);
+		
+		return container;
+	}
+
+	private TreeView<String> createTreeView() {
 		
 		final TreeItem<String> treeRoot = new TreeItem<>("Groups");
 
