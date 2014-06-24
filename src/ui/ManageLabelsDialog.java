@@ -1,13 +1,18 @@
 package ui;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.Model;
 
 public class ManageLabelsDialog implements Dialog<String> {
@@ -55,6 +60,33 @@ public class ManageLabelsDialog implements Dialog<String> {
 	}
 
 	private Node createTreeView() {
-		return null;
+		
+		final TreeItem<String> treeRoot = new TreeItem<>("Groups");
+
+		TreeItem<String> status = new TreeItem<>("Status");
+
+		treeRoot.getChildren().addAll(
+				Arrays.asList(status));
+
+		status.getChildren().addAll(
+				Arrays.asList(new TreeItem<String>("NotStarted"),
+						new TreeItem<String>("Done")));
+
+		final TreeView<String> treeView = new TreeView<>();
+		treeView.setRoot(treeRoot);
+		treeView.setShowRoot(true);
+		treeRoot.setExpanded(true);
+		treeView.setPrefWidth(180);
+
+		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
+
+		treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+			@Override
+			public TreeCell<String> call(TreeView<String> stringTreeView) {
+				return new ManageLabelsTreeCell<String>(parentStage);
+			}
+		});
+
+		return treeView;
 	}
 }

@@ -181,9 +181,16 @@ public class UI extends Application {
 		issues.getItems().addAll(newIssue);
 
 		Menu labels = new Menu("Labels");
-		MenuItem newLabel = new MenuItem("Manage labels...");
+		MenuItem manageLabels = new MenuItem("Manage labels...");
+		manageLabels.setOnAction(e -> {
+			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
+					response -> {
+						System.out.println("done");
+						return true;
+					});
+		});
 		
-		labels.getItems().addAll(newLabel);
+		labels.getItems().addAll(manageLabels);
 
 		Menu view = new Menu("View");
 		Menu columnsMenu = new Menu("Change number of columns....");
