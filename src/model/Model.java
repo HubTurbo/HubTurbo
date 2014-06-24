@@ -186,21 +186,29 @@ public class Model {
 		}
 	}
 	
-	public void updateIssue(TurboIssue issue) {
-		Issue editedIssue = issue.toGhIssue();
+	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
+		Issue original = orignalIssue.toGhIssue();
+		Issue edited = editedIssue.toGhIssue();
 		
 		try {
-			Issue ghIssue = issueService.getIssue(repoId, issue.getId());
-			ghIssue.setTitle(editedIssue.getTitle());
-			ghIssue.setBody(editedIssue.getBody());
-			ghIssue.setAssignee(editedIssue.getAssignee());
-			ghIssue.setState(editedIssue.getState());
-			ghIssue.setMilestone(editedIssue.getMilestone());
-			ghIssue.setLabels(editedIssue.getLabels());
-			issueService.editIssue(repoId, ghIssue);
+			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
+			
+			String originalTitle = original.getTitle();
+			String editedTitle = edited.getTitle();
+			// TODO test this
+			if (!editedTitle.equals(originalTitle)) {
+				latest.setTitle(edited.getTitle());
+			}
+			latest.setBody(edited.getBody());
+			latest.setAssignee(edited.getAssignee());
+			latest.setState(edited.getState());
+			latest.setMilestone(edited.getMilestone());
+			latest.setLabels(edited.getLabels());
+			issueService.editIssue(repoId, latest);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
+
 }
