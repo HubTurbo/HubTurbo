@@ -1,5 +1,7 @@
 package ui;
 
+import utils.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +66,10 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 		TextField searchField = new TextField();
 		searchField.setPromptText("Search");
-
+		searchField.textProperty().addListener((e) -> {
+			objects.setPredicate((o) -> o.contains(searchField.getText()));
+		});
+		
 		CheckListView<String> checkListView = new CheckListView<>(objects);
 		checkListView.getSelectionModel()
 				.setSelectionMode(SelectionMode.SINGLE);
@@ -150,8 +155,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		Button close = new Button("Close");
 		VBox.setMargin(close, new Insets(5));
 		close.setOnAction((e) -> {
-			response.complete(checkListView.getCheckModel()
-					.getSelectedIndices());
+			completeResponse(searchField, checkListView);
 			stage.hide();
 		});
 
@@ -165,8 +169,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		stage.setScene(scene);
 
 		stage.setOnCloseRequest((e) -> {
-			response.complete(checkListView.getCheckModel()
-					.getSelectedIndices());
+			completeResponse(searchField, checkListView);
 		});
 
 		Platform.runLater(() -> stage.requestFocus());
@@ -178,6 +181,24 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		// stage.setY(parentStage.getY());
 
 		stage.show();
+	}
+
+	private void completeResponse(TextField searchField, CheckListView<String> checkListView) {
+
+		// Get source indices
+		// Iterative because index required
+		ArrayList<Integer> sourceIndices = new ArrayList<>();
+		for (int i=0; i<objects.size(); i++) {
+			sourceIndices.add(objects.getSourceIndex(i));
+		}
+		
+		// Get only the selected indices and unpair them
+		ArrayList<Integer> onlyRequiredIndices = new ArrayList<>(checkListView.getCheckModel().getSelectedIndices()
+				.stream()
+				.map((i) -> sourceIndices.get(i))
+				.collect(Collectors.toList()));
+
+		response.complete(onlyRequiredIndices);
 	}
 
 	List<Integer> initialCheckedState = new ArrayList<>();
