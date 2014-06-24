@@ -74,7 +74,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 		final TreeView<String> treeView = new TreeView<>();
 		treeView.setRoot(treeRoot);
-		treeView.setShowRoot(true);
+		treeView.setShowRoot(false);
 		treeRoot.setExpanded(true);
 		treeView.setPrefWidth(180);
 

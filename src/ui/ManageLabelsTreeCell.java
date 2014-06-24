@@ -29,24 +29,24 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
 	}
 
 	private MenuItem[] createContextMenu() {
-		MenuItem group = new MenuItem("this is a group");
+		MenuItem group = new MenuItem("this is a label");
 		group.setOnAction((event) -> {
-			System.out.println("this is a group");
+			System.out.println("this is a label");
 		});
 		return new MenuItem[] {group};
 	}
 
 	private MenuItem[] createTopLevelContextMenu() {
-		MenuItem label = new MenuItem("this is a label");
+		MenuItem label = new MenuItem("this is a group");
 		label.setOnAction((event) -> {
-			System.out.println("this is a label");
+			System.out.println("this is a group");
 		});
 		return new MenuItem[] {label};
 	}
 
 	private boolean isGroupItem(TreeItem<String> treeItem) {
 		assert treeItem != null;
-		return treeItem.getParent() != null && treeItem.getParent().getParent() == null;
+		return treeItem.getParent() != null && treeItem.getParent().getValue().equals("Groups");
 	}
 
 	private ContextMenu getContextMenuForItem(TreeItem<String> treeItem) {
