@@ -7,20 +7,20 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import model.ModelFacade;
+import model.Model;
 import model.TurboIssue;
 
 public class ColumnControl extends HBox {
 
 	private final Stage stage;
-	private final ModelFacade logic;
+	private final Model model;
 
 	// TODO remove this once caching is done logic-side
 	ObservableList<TurboIssue> issues = null;
 
-	public ColumnControl(Stage stage, ModelFacade logic) {
+	public ColumnControl(Stage stage, Model model) {
 		this.stage = stage;
-		this.logic = logic;
+		this.model = model;
 				
 		addColumn();
 		addSampleIssues();
@@ -37,7 +37,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public ColumnControl addColumn() {
-		IssuePanel panel = new IssuePanel(stage, logic);
+		IssuePanel panel = new IssuePanel(stage, model);
 		getChildren().add(panel);
 //		if (issues != null) panel.setItems(issues); // TODO change once caching is done
 		

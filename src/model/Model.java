@@ -1,6 +1,6 @@
 package model;
 
-public class ModelFacade {
+public class Model {
 	
 	private IssueManager issueManager = new IssueManager();
 	private MilestoneManager milestoneManager = new MilestoneManager();

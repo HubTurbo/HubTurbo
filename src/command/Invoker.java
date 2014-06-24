@@ -2,9 +2,9 @@ package command;
 
 import java.util.Queue;
 
-import model.ModelFacade;
+import model.Model;
 
 public class Invoker {
-	private ModelFacade model = new ModelFacade();
+	private Model model = new Model();
 	private Queue<Command> commandQueue;
 }
