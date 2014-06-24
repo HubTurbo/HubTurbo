@@ -167,6 +167,7 @@ public class UI extends Application {
 			createdIssue = model.createIssue(createdIssue);
 			(new IssueDialog(mainStage, model, createdIssue)).show().thenApply(
 					response -> {
+						// Required for some reason
 						columns.refresh();
 						return true;
 					});

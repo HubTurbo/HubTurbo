@@ -81,7 +81,10 @@ public class CustomListCell extends ListCell<TurboIssue> {
 
 	private void onDoubleClick(TurboIssue issue) {
 		(new IssueDialog(mainStage, model, issue)).show().thenApply(
-				newIssue -> {
+				response -> {
+					if (response.equals("ok")) {
+						model.updateIssue(issue);
+					}
 					return true;
 				});
 	}
