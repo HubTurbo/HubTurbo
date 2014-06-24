@@ -125,7 +125,7 @@ public class UI extends Application {
 				new GetCollaboratorsCommand(client, repoId, model.getCollaborators()).execute();
 				new GetMilestonesCommand(client, repoId, model.getMilestones()).execute();
 				
-				columns.loadIssues(model.getIssues());
+				columns.loadIssues();
 			});
 
 			HBox buttons = new HBox(10);

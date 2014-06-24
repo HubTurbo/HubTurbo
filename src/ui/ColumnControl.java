@@ -15,9 +15,6 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final Model model;
 
-	// TODO remove this once caching is done logic-side
-	ObservableList<TurboIssue> issues = null;
-
 	public ColumnControl(Stage stage, Model model) {
 		this.stage = stage;
 		this.model = model;
@@ -26,20 +23,17 @@ public class ColumnControl extends HBox {
 		addSampleIssues();
 	}
 	
-	public void loadIssues(List<TurboIssue> issues) {
-		// TODO remove this once caching is done logic-side
-		if (this.issues == null) this.issues = FXCollections.observableArrayList(issues);
-
+	public void loadIssues() {
 		for (Node node : getChildren()) {
 			IssuePanel panel = (IssuePanel) node;
-			panel.setItems(this.issues);
+			panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		}
 	}
 
 	public ColumnControl addColumn() {
 		IssuePanel panel = new IssuePanel(stage, model);
 		getChildren().add(panel);
-//		if (issues != null) panel.setItems(issues); // TODO change once caching is done
+		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		
 		return this;
 	}
