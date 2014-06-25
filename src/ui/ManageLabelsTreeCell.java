@@ -71,6 +71,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
         }
         setText(null);
         setGraphic(textField);
+        textField.setText(getItem().getValue());
         textField.selectAll();
         textField.requestFocus();
     }
@@ -116,18 +117,33 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 
 	private MenuItem[] createGroupContextMenu() {
+				
+		MenuItem group = new MenuItem("Edit Group");
+		group.setOnAction((event) -> {
+			getTreeView().edit(getTreeItem());
+		});
+
 		MenuItem label = new MenuItem("New Label");
 		label.setOnAction((event) -> {
 			
-			TurboLabel newLabel = new TurboLabel("New Label");
+			TurboLabel newLabel = new TurboLabel("new-label");
 			String groupName = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME) ? null : getTreeItem().getValue().getValue();
 			newLabel.setGroup(groupName);
 			newLabel = model.createLabel(newLabel);
 			
 			((TurboLabelGroup) getTreeItem().getValue()).addLabel(newLabel);
 			getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(newLabel));
+			
+			getTreeItem().setExpanded(true);
 		});
-		return new MenuItem[] {label};
+		
+		boolean isUngrouped = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME);
+
+		if (isUngrouped) {
+			return new MenuItem[] {label};
+		} else {
+			return new MenuItem[] {group, label};
+		}
 	}
 
 	private boolean isGroupItem(TreeItem<LabelTreeItem> treeItem) {

@@ -77,7 +77,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
-			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("New group"));
+			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("new-group"));
 			treeView.getRoot().getChildren().add(item);
 
 			Platform.runLater(() -> {
@@ -148,7 +148,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(group);
 			treeRoot.getChildren().add(groupItem);
 			
-			for (TurboLabel l : labels.get(group)) {
+			for (TurboLabel l : labels.get(group.getValue())) {
 				group.addLabel(l);
 				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 				groupItem.getChildren().add(labelItem);
