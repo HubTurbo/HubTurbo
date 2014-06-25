@@ -38,9 +38,11 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
 			@Override
 			public void changed(
 					ObservableValue<? extends Boolean> stringProperty,
-					Boolean oldValue, Boolean newValue) {
-				System.out.println(oldValue);
-				System.out.println(newValue);
+					Boolean previouslyFocused, Boolean currentlyFocused) {
+				assert previouslyFocused != currentlyFocused;
+				if (!currentlyFocused) {
+					commitEdit(textField.getText());
+				}
 			}
 		});
     }
