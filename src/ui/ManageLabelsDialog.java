@@ -58,10 +58,6 @@ public class ManageLabelsDialog implements Dialog<String> {
 		TreeView<LabelTreeItem> treeView = createTreeView();
 		layout.getChildren().addAll(treeView, createButtons(treeView, stage));
 
-		stage.setOnCloseRequest(e -> {
-			// TODO model.updateLabels
-			stage.close();
-		});
 		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
 
@@ -89,11 +85,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		
 		Button close = new Button("Close");
 		close.setOnAction(e -> {
-			// TODO model.updateLabels
 			stage.close();
-			for (TurboLabel l : model.getLabels()) {
-				System.out.println(l);
-			}
 		});
 		
 		container.getChildren().addAll(newGroup, close);
