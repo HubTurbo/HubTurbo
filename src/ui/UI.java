@@ -120,6 +120,8 @@ public class UI extends Application {
 				dialogStage.hide();
 				
 				columns.loadIssues();
+				
+				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
 			});
 
 			HBox buttons = new HBox(10);
