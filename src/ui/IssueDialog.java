@@ -6,12 +6,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -68,7 +71,17 @@ public class IssueDialog implements Dialog<String> {
 				(observable, oldValue, newValue) -> {
 					issue.setTitle(newValue);
 				});
-		title.getChildren().addAll(issueId, issueTitle);
+		
+		CheckBox closedCheckBox = new CheckBox("Closed");
+		closedCheckBox.setSelected(!issue.getOpen());
+		closedCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+	        public void changed(ObservableValue<? extends Boolean> ov,
+	            Boolean oldValue, Boolean newValue) {
+	        	issue.setOpen(!newValue);
+	        }
+	    });
+		
+		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
 
 		TextArea issueDesc = new TextArea(issue.getDescription());
 		issueDesc.setPrefRowCount(5);

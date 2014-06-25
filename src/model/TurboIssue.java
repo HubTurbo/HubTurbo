@@ -35,7 +35,7 @@ public class TurboIssue implements Listable {
 	public TurboIssue(TurboIssue other) {
 		setTitle(other.getTitle());
 		setDescription(other.getDescription());
-		setState(other.getState());
+		setOpen(other.getOpen());
 		setId(other.getId());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
 		setAssignee(other.getAssignee());
@@ -47,7 +47,7 @@ public class TurboIssue implements Listable {
 		
 		setTitle(issue.getTitle());
 		setDescription(issue.getBody());
-		setState(new Boolean(issue.getState().equals("open")));
+		setOpen(new Boolean(issue.getState().equals("open")));
 		setId(issue.getNumber());
 		
 		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
@@ -71,7 +71,7 @@ public class TurboIssue implements Listable {
 		Issue ghIssue = new Issue();
 		ghIssue.setTitle(getTitle());
 		ghIssue.setBody(getDescription());
-		ghIssue.setState(getState() ? "open" : "closed");
+		ghIssue.setState(getOpen() ? "open" : "closed");
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhUser());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
@@ -94,9 +94,9 @@ public class TurboIssue implements Listable {
     public StringProperty descriptionProperty() {return description;}
     
     private BooleanProperty state = new SimpleBooleanProperty();
-    public final Boolean getState() {return state.get();}
-    public final void setState(Boolean value) {state.set(value);}
-    public BooleanProperty stateProperty() {return state;}
+    public final Boolean getOpen() {return state.get();}
+    public final void setOpen(Boolean value) {state.set(value);}
+    public BooleanProperty openProperty() {return state;}
 
     private IntegerProperty id = new SimpleIntegerProperty();
     public final int getId() {return id.get();}

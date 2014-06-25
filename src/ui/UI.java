@@ -128,8 +128,9 @@ public class UI extends Application {
 							if (username.isEmpty()) username = line;
 							else password = line;
 						}
+						System.out.println("Logged in using credentials.txt");
 					} catch (Exception e1) {
-						System.out.println("Failed to find credentials.txt");
+						System.out.println("Failed to find or open credentials.txt");
 					}
 				}
 				login(username, password);
