@@ -249,5 +249,25 @@ public class Model {
 			e.printStackTrace();
 		} 
 	}
+	
+	public void updateLabel(TurboLabel editedLabel) {
+		Label ghLabel = editedLabel.toGhLabel();
+		try {
+			labelService.editLabel(repoId, ghLabel);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateMilestone(TurboMilestone editedMilestone) {
+		Milestone ghMilestone = editedMilestone.toGhMilestone();
+		try {
+			milestoneService.editMilestone(repoId, ghMilestone);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

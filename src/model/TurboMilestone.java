@@ -33,11 +33,31 @@ public class TurboMilestone implements Listable {
 	public String getTitle() {
 		return title;
 	}
-
+	
 	public void setTitle(String name) {
 		this.title = name;
 	}
-	
+
+	public String getState() {
+		return state;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Date getDueOn() {
+		return dueOn;
+	}
+
+	public void setDueOn(Date dueOn) {
+		this.dueOn = dueOn;
+	}
+
 	public int getNumber() {
 		return number;
 	}
