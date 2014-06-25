@@ -153,8 +153,7 @@ public class UI extends Application {
 		Menu projects = new Menu("Projects");
 		MenuItem login = new MenuItem("Login");
 		initLoginForm(login);
-		MenuItem config = new MenuItem("Configuration");
-		projects.getItems().addAll(login, config);
+		projects.getItems().addAll(login);
 
 		Menu milestones = new Menu("Milestones");
 		MenuItem newMilestone = new MenuItem("New Milestone");

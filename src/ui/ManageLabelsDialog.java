@@ -53,7 +53,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		Platform.runLater(() -> stage.requestFocus());
 
 		TreeView<LabelTreeItem> treeView = createTreeView();
-		layout.getChildren().addAll(treeView, createButtons(treeView, treeView.getRoot(), stage));
+		layout.getChildren().addAll(treeView, createButtons(treeView, stage));
 
 		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
@@ -64,15 +64,20 @@ public class ManageLabelsDialog implements Dialog<String> {
 		stage.show();
 	}
 
-	private Node createButtons(TreeView<LabelTreeItem> treeView, TreeItem<LabelTreeItem> root, Stage stage) {
+	private Node createButtons(TreeView<LabelTreeItem> treeView, Stage stage) {
 		VBox container = new VBox();
 		container.setSpacing(5);
 		
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
 			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("New group"));
-			root.getChildren().add(item);
-			treeView.edit(item);
+			treeView.getRoot().getChildren().add(item);
+
+			Platform.runLater(() -> {
+				treeView.requestFocus();
+				// This does not work for some reason
+				treeView.edit(item);
+			});
 		});
 		
 		Button close = new Button("Close");
