@@ -11,4 +11,7 @@ public class TurboLabelGroup implements LabelTreeItem {
 	public String getValue() {
 		return name;
 	}
+	public void setValue(String value) {
+		this.name = value;
+	}
 }

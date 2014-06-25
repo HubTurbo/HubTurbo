@@ -12,7 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-public class ManageLabelsTreeCell<T> extends TreeCell<String> {
+public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	
 //	private final Stage mainStage;
 	
@@ -23,12 +23,13 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
     private TextField textField;
     
     private void createTextField() {
-        textField = new TextField(getItem());
+        textField = new TextField(getItem().getValue());
         textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent t) {
                 if (t.getCode() == KeyCode.ENTER) {
-                    commitEdit(textField.getText());
+                	getItem().setValue(textField.getText());
+                    commitEdit(getItem());
                 } else if (t.getCode() == KeyCode.ESCAPE) {
                     cancelEdit();
                 }
@@ -41,7 +42,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
 					Boolean previouslyFocused, Boolean currentlyFocused) {
 				assert previouslyFocused != currentlyFocused;
 				if (!currentlyFocused) {
-					commitEdit(textField.getText());
+                	getItem().setValue(textField.getText());
+                    commitEdit(getItem());
 				}
 			}
 		});
@@ -50,7 +52,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText(getItem());
+        setText(getItem().getValue());
         setGraphic(getTreeItem().getGraphic());
     }
     
@@ -68,7 +70,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
     }
     
 	@Override
-	protected void updateItem(String itemText, boolean empty) {
+	protected void updateItem(LabelTreeItem itemText, boolean empty) {
 		super.updateItem(itemText, empty);
 		
 		if (empty || itemText == null) {
@@ -77,12 +79,12 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
 		} else {
 			if (isEditing()) {
                 if (textField != null) {
-                    textField.setText(getItem());
+                    textField.setText(getItem().getValue());
                 }
                 setText(null);
                 setGraphic(textField);
             } else {
-                setText(getItem());
+                setText(getItem().getValue());
                 setGraphic(getTreeItem().getGraphic());
     			setContextMenu(getContextMenuForItem(getTreeItem()));
             }
@@ -109,12 +111,12 @@ public class ManageLabelsTreeCell<T> extends TreeCell<String> {
 		return new MenuItem[] {label};
 	}
 
-	private boolean isGroupItem(TreeItem<String> treeItem) {
+	private boolean isGroupItem(TreeItem<LabelTreeItem> treeItem) {
 		assert treeItem != null;
 		return treeItem.getParent() != null && treeItem.getParent().getValue().equals("Groups");
 	}
 
-	private ContextMenu getContextMenuForItem(TreeItem<String> treeItem) {
+	private ContextMenu getContextMenuForItem(TreeItem<LabelTreeItem> treeItem) {
 		if (isGroupItem(treeItem)) {
 			return new ContextMenu(createTopLevelContextMenu());
 		} else {

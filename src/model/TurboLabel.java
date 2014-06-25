@@ -105,5 +105,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	public String getValue() {
 		return getName();
 	}
+	public void setValue(String value) {
+		setName(value);
+	}
 
 }

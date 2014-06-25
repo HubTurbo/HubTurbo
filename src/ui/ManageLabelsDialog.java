@@ -5,16 +5,17 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.Model;
 import model.TurboLabel;
 
@@ -52,7 +53,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		Platform.runLater(() -> stage.requestFocus());
 
 		TreeView<LabelTreeItem> treeView = createTreeView();
-		layout.getChildren().addAll(treeView, createButtons(treeView.getRoot(), stage));
+		layout.getChildren().addAll(treeView, createButtons(treeView, treeView.getRoot(), stage));
 
 		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
@@ -63,22 +64,23 @@ public class ManageLabelsDialog implements Dialog<String> {
 		stage.show();
 	}
 
-	private Node createButtons(TreeItem<LabelTreeItem> root, Stage stage) {
+	private Node createButtons(TreeView<LabelTreeItem> treeView, TreeItem<LabelTreeItem> root, Stage stage) {
 		VBox container = new VBox();
 		container.setSpacing(5);
 		
-//		Button newGroup = new Button("New Group");
-//		newGroup.setOnAction(e -> {
-//			root.getChildren().add(new TreeItem<String>("New group"));
-//			// TODO trigger an edit on that node
-//		});
+		Button newGroup = new Button("New Group");
+		newGroup.setOnAction(e -> {
+			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("New group"));
+			root.getChildren().add(item);
+			treeView.edit(item);
+		});
 		
 		Button close = new Button("Close");
 		close.setOnAction(e -> {
 			stage.close();
 		});
 		
-//		container.getChildren().addAll(newGroup, close);
+		container.getChildren().addAll(newGroup, close);
 		
 		return container;
 	}
@@ -98,28 +100,33 @@ public class ManageLabelsDialog implements Dialog<String> {
 		treeRoot.setExpanded(true);
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
 
-//		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
-//			@Override
-//			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-//				return new ManageLabelsTreeCell<LabelTreeItem>(parentStage);
-//			}
-//		});
+		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
+			@Override
+			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
+				return new ManageLabelsTreeCell<LabelTreeItem>(parentStage);
+			}
+		});
 
 		return treeView;
 	}
 
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
 		
-		ObservableList<TurboLabel> allLabels = model.getLabels();
-		
+		// Hash all labels by group
 		HashMap<String, ArrayList<TurboLabel>> labels = new HashMap<>();
-		for (TurboLabel l : allLabels) {
-			if (labels.get(l.getGroup()) == null) {
-				labels.put(l.getGroup(), new ArrayList<TurboLabel>());
+		ArrayList<TurboLabel> ungrouped = new ArrayList<>();
+		for (TurboLabel l : model.getLabels()) {
+			if (l.getGroup() == null) {
+				ungrouped.add(l);
+			} else {
+				if (labels.get(l.getGroup()) == null) {
+					labels.put(l.getGroup(), new ArrayList<TurboLabel>());
+				}
+				labels.get(l.getGroup()).add(l);
 			}
-			labels.get(l.getGroup()).add(l);
 		}
 		
+		// Add labels with a group into the tree
 		for (String group : labels.keySet()) {
 			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(new TurboLabelGroup(group));
 			treeRoot.getChildren().add(groupItem);
@@ -128,6 +135,15 @@ public class ManageLabelsDialog implements Dialog<String> {
 				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 				groupItem.getChildren().add(labelItem);
 			}
+		}
+		
+		// Do the same for ungrouped labels
+		TreeItem<LabelTreeItem> ungroupedItem = new TreeItem<>(new TurboLabelGroup("<Ungrouped>"));
+		treeRoot.getChildren().add(ungroupedItem);
+
+		for (TurboLabel l : ungrouped) {
+			TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
+			ungroupedItem.getChildren().add(labelItem);
 		}
 	}
 }
