@@ -21,6 +21,7 @@ import model.TurboLabel;
 
 public class ManageLabelsDialog implements Dialog<String> {
 
+	public static final String UNGROUPED_NAME = "<Ungrouped>";
 	public static final String ROOT_NAME = "root";
 	
 	Stage parentStage;
@@ -90,6 +91,9 @@ public class ManageLabelsDialog implements Dialog<String> {
 		close.setOnAction(e -> {
 			// TODO model.updateLabels
 			stage.close();
+			for (TurboLabel l : model.getLabels()) {
+				System.out.println(l);
+			}
 		});
 		
 		container.getChildren().addAll(newGroup, close);
@@ -115,7 +119,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
 			@Override
 			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-				return new ManageLabelsTreeCell<LabelTreeItem>(parentStage);
+				return new ManageLabelsTreeCell<LabelTreeItem>(model);
 			}
 		});
 
@@ -152,7 +156,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		}
 		
 		// Do the same for ungrouped labels
-		TurboLabelGroup ungroupedGroup = new TurboLabelGroup("<Ungrouped>");
+		TurboLabelGroup ungroupedGroup = new TurboLabelGroup(UNGROUPED_NAME);
 		TreeItem<LabelTreeItem> ungroupedItem = new TreeItem<>(ungroupedGroup);
 		treeRoot.getChildren().add(ungroupedItem);
 

@@ -97,7 +97,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		}
 	}
 
-	private MenuItem[] createContextMenu() {
+	private MenuItem[] createLabelContextMenu() {
 		MenuItem edit = new MenuItem("Edit Label");
 		edit.setOnAction((event) -> {
 			getTreeView().edit(getTreeItem());
@@ -115,24 +115,31 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		return new MenuItem[] {edit, delete};
 	}
 
-	private MenuItem[] createTopLevelContextMenu() {
+	private MenuItem[] createGroupContextMenu() {
 		MenuItem label = new MenuItem("New Label");
 		label.setOnAction((event) -> {
-			System.out.println("this is a group");
+			
+			TurboLabel newLabel = new TurboLabel("New Label");
+			String groupName = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME) ? null : getTreeItem().getValue().getValue();
+			newLabel.setGroup(groupName);
+			newLabel = model.createLabel(newLabel);
+			
+			((TurboLabelGroup) getTreeItem().getValue()).addLabel(newLabel);
+			getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(newLabel));
 		});
 		return new MenuItem[] {label};
 	}
 
 	private boolean isGroupItem(TreeItem<LabelTreeItem> treeItem) {
 		assert treeItem != null;
-		return treeItem.getParent() != null && treeItem.getParent().getValue().equals(ManageLabelsDialog.ROOT_NAME);
+		return treeItem.getParent() != null && treeItem.getParent().getValue().getValue().equals(ManageLabelsDialog.ROOT_NAME);
 	}
 
 	private ContextMenu getContextMenuForItem(TreeItem<LabelTreeItem> treeItem) {
 		if (isGroupItem(treeItem)) {
-			return new ContextMenu(createTopLevelContextMenu());
+			return new ContextMenu(createGroupContextMenu());
 		} else {
-			return new ContextMenu(createContextMenu());
+			return new ContextMenu(createLabelContextMenu());
 		}
 	}
 }
