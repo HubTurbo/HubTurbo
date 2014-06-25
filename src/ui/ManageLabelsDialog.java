@@ -1,21 +1,22 @@
 package ui;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import model.Model;
+import model.TurboLabel;
 
 public class ManageLabelsDialog implements Dialog<String> {
 
@@ -50,7 +51,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 		Platform.runLater(() -> stage.requestFocus());
 
-		TreeView<String> treeView = createTreeView();
+		TreeView<LabelTreeItem> treeView = createTreeView();
 		layout.getChildren().addAll(treeView, createButtons(treeView.getRoot(), stage));
 
 		stage.initOwner(parentStage);
@@ -62,55 +63,71 @@ public class ManageLabelsDialog implements Dialog<String> {
 		stage.show();
 	}
 
-	private Node createButtons(TreeItem<String> root, Stage stage) {
+	private Node createButtons(TreeItem<LabelTreeItem> root, Stage stage) {
 		VBox container = new VBox();
 		container.setSpacing(5);
 		
-		Button newGroup = new Button("New Group");
-		newGroup.setOnAction(e -> {
-			root.getChildren().add(new TreeItem<String>("New group"));
-			// TODO trigger an edit on that node
-		});
+//		Button newGroup = new Button("New Group");
+//		newGroup.setOnAction(e -> {
+//			root.getChildren().add(new TreeItem<String>("New group"));
+//			// TODO trigger an edit on that node
+//		});
 		
 		Button close = new Button("Close");
 		close.setOnAction(e -> {
 			stage.close();
 		});
 		
-		container.getChildren().addAll(newGroup, close);
+//		container.getChildren().addAll(newGroup, close);
 		
 		return container;
 	}
 
-	private TreeView<String> createTreeView() {
+	private TreeView<LabelTreeItem> createTreeView() {
 		
-		final TreeItem<String> treeRoot = new TreeItem<>("Groups");
-		treeRoot.setExpanded(true);
+		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup("Groups"));
 		
-		TreeItem<String> status = new TreeItem<>("Status");
+		populateTree(treeRoot);
 
-		treeRoot.getChildren().addAll(
-				Arrays.asList(status));
-
-		status.getChildren().addAll(
-				Arrays.asList(new TreeItem<String>("NotStarted"),
-						new TreeItem<String>("Done")));
-
-		final TreeView<String> treeView = new TreeView<>();
+		final TreeView<LabelTreeItem> treeView = new TreeView<>();
 		treeView.setRoot(treeRoot);
 		treeView.setShowRoot(false);
 		treeView.setPrefWidth(180);
 		treeView.setEditable(true);
 
+		treeRoot.setExpanded(true);
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
 
-		treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-			@Override
-			public TreeCell<String> call(TreeView<String> stringTreeView) {
-				return new ManageLabelsTreeCell<String>(parentStage);
-			}
-		});
+//		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
+//			@Override
+//			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
+//				return new ManageLabelsTreeCell<LabelTreeItem>(parentStage);
+//			}
+//		});
 
 		return treeView;
+	}
+
+	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
+		
+		ObservableList<TurboLabel> allLabels = model.getLabels();
+		
+		HashMap<String, ArrayList<TurboLabel>> labels = new HashMap<>();
+		for (TurboLabel l : allLabels) {
+			if (labels.get(l.getGroup()) == null) {
+				labels.put(l.getGroup(), new ArrayList<TurboLabel>());
+			}
+			labels.get(l.getGroup()).add(l);
+		}
+		
+		for (String group : labels.keySet()) {
+			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(new TurboLabelGroup(group));
+			treeRoot.getChildren().add(groupItem);
+			
+			for (TurboLabel l : labels.get(group)) {
+				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
+				groupItem.getChildren().add(labelItem);
+			}
+		}
 	}
 }
