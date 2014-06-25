@@ -126,7 +126,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		MenuItem label = new MenuItem("New Label");
 		label.setOnAction((event) -> {
 			
-			TurboLabel newLabel = new TurboLabel("new-label");
+			TurboLabel newLabel = new TurboLabel("new-label" + ManageLabelsDialog.getUniqueId());
 			String groupName = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME) ? null : getTreeItem().getValue().getValue();
 			newLabel.setGroup(groupName);
 			newLabel = model.createLabel(newLabel);

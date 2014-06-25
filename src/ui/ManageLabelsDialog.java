@@ -70,14 +70,14 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 		stage.show();
 	}
-
+	
 	private Node createButtons(TreeView<LabelTreeItem> treeView, Stage stage) {
 		VBox container = new VBox();
 		container.setSpacing(5);
 		
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
-			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("new-group"));
+			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("new-group" + getUniqueId()));
 			treeView.getRoot().getChildren().add(item);
 
 			Platform.runLater(() -> {
@@ -165,5 +165,10 @@ public class ManageLabelsDialog implements Dialog<String> {
 			TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 			ungroupedItem.getChildren().add(labelItem);
 		}
+	}
+	
+	private static int index = 1;
+	public static String getUniqueId() {
+		return Integer.toString(index++);
 	}
 }
