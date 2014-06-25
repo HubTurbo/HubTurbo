@@ -1,5 +1,7 @@
 package ui;
 
+import model.Model;
+import model.TurboLabel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -10,14 +12,13 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
+
+	private final Model model;
 	
-//	private final Stage mainStage;
-	
-	public ManageLabelsTreeCell(Stage main) {
-//		this.mainStage = main;
+	public ManageLabelsTreeCell(Model model) {
+		this.model = model;
 	}
 	
     private TextField textField;
@@ -97,15 +98,21 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 
 	private MenuItem[] createContextMenu() {
-		MenuItem group = new MenuItem("this is a label");
-		group.setOnAction((event) -> {
-			System.out.println("this is a label");
-		});
 		MenuItem edit = new MenuItem("Edit Label");
 		edit.setOnAction((event) -> {
 			getTreeView().edit(getTreeItem());
 		});
-		return new MenuItem[] {group, edit};
+		MenuItem delete = new MenuItem("Delete Label");
+		delete.setOnAction((event) -> {
+			model.deleteLabel((TurboLabel) getItem());
+			for (TreeItem<LabelTreeItem> lti : getTreeItem().getParent().getChildren()) {
+				if (lti.getValue().getValue().equals(getItem().getValue())) {
+					getTreeItem().getParent().getChildren().remove(lti);
+					break;
+				}
+			}
+		});
+		return new MenuItem[] {edit, delete};
 	}
 
 	private MenuItem[] createTopLevelContextMenu() {

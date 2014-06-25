@@ -27,4 +27,9 @@ public class TurboLabelGroup implements LabelTreeItem {
 			label.setGroup(value);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "TurboLabelGroup [name=" + name + ", labels=" + labels + "]";
+	}
 }
