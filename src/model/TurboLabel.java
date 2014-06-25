@@ -33,7 +33,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	
 	public Label toGhLabel() {
 		Label ghLabel = new Label();
-		String groupAppended = getGroup() + "." + getName();
+		String groupPrefix = getGroup() == null ? "" : getGroup() + ".";
+		String groupAppended = groupPrefix + getName();
 		ghLabel.setName(groupAppended);
 		ghLabel.setColor(getColour());
 		return ghLabel;
