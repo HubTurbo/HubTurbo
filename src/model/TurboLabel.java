@@ -8,7 +8,9 @@ import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Label;
 
-public class TurboLabel implements Listable {
+import ui.LabelTreeItem;
+
+public class TurboLabel implements Listable, LabelTreeItem {
 	
 	public TurboLabel(String name) {
 		setName(name);
@@ -98,6 +100,10 @@ public class TurboLabel implements Listable {
 	@Override
 	public String toString() {
 		return getGroup() + "/" + getName() + "/" + getColour();
+	}
+	
+	public String getValue() {
+		return getName();
 	}
 
 }
