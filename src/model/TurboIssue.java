@@ -2,7 +2,9 @@ package model;
 
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -31,17 +33,13 @@ public class TurboIssue implements Listable {
 	
 	// Copy constructor
 	public TurboIssue(TurboIssue other) {
-		other.cloneInto(this);
-	}
-	
-	public TurboIssue cloneInto(TurboIssue other) {
 		setTitle(other.getTitle());
 		setDescription(other.getDescription());
+		setState(other.getState());
 		setId(other.getId());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
-		return other;
 	}
 	
 	public TurboIssue(Issue issue) {
@@ -49,6 +47,7 @@ public class TurboIssue implements Listable {
 		
 		setTitle(issue.getTitle());
 		setDescription(issue.getBody());
+		setState(new Boolean(issue.getState().equals("open")));
 		setId(issue.getNumber());
 		
 		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
@@ -72,6 +71,7 @@ public class TurboIssue implements Listable {
 		Issue ghIssue = new Issue();
 		ghIssue.setTitle(getTitle());
 		ghIssue.setBody(getDescription());
+		ghIssue.setState(getState() ? "open" : "closed");
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhUser());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
@@ -92,6 +92,11 @@ public class TurboIssue implements Listable {
     public final String getDescription() {return description.get();}
     public final void setDescription(String value) {description.set(value);}
     public StringProperty descriptionProperty() {return description;}
+    
+    private BooleanProperty state = new SimpleBooleanProperty();
+    public final Boolean getState() {return state.get();}
+    public final void setState(Boolean value) {state.set(value);}
+    public BooleanProperty stateProperty() {return state;}
 
     private IntegerProperty id = new SimpleIntegerProperty();
     public final int getId() {return id.get();}
@@ -102,10 +107,13 @@ public class TurboIssue implements Listable {
 		return labels;
 	}
 	public void setLabels(ObservableList<TurboLabel> labels) {
-		if (labels != this.labels) {
+		if (this.labels == null) {
+			this.labels = labels;
+		} else if (labels != this.labels) {
 			this.labels.clear();
 			this.labels.addAll(labels);
 		}
+		
 	}
 	public TurboCollaborator getAssignee() {
 		return assignee;

@@ -114,7 +114,7 @@ public class Model {
 	
 	private boolean loadMilestones(){
 		try {		
-			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, Model.MILESTONES_ALL);
+			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, MILESTONES_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
 				milestones.add(new TurboMilestone(ghMilestone));
 			}
@@ -171,6 +171,7 @@ public class Model {
 	public void deleteLabel(TurboLabel label) {
 		try {
 			labelService.deleteLabel(repoId, label.getName());
+			labels.remove(label);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -180,6 +181,7 @@ public class Model {
 	public void deleteMilestone(TurboMilestone milestone) {
 		try {
 			milestoneService.deleteMilestone(repoId, milestone.getNumber());
+			milestones.remove(milestone);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
