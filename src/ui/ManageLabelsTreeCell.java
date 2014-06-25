@@ -53,7 +53,15 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     public void commitEdit() {
     	super.commitEdit(getItem());
     	getItem().setValue(textField.getText());
-    	model.updateLabel((TurboLabel) getItem());
+    	if (getItem() instanceof TurboLabel) {
+        	model.updateLabel((TurboLabel) getItem());
+    	} else if (getItem() instanceof TurboLabelGroup) {
+    		for (TurboLabel l : ((TurboLabelGroup) getItem()).getLabels()) {
+        		model.updateLabel(l);
+    		}
+    	} else {
+    		assert false;
+    	}
     }
     
     @Override

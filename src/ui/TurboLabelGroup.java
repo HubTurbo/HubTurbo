@@ -32,4 +32,8 @@ public class TurboLabelGroup implements LabelTreeItem {
 	public String toString() {
 		return "TurboLabelGroup [name=" + name + ", labels=" + labels + "]";
 	}
+
+	public ArrayList<TurboLabel> getLabels() {
+		return new ArrayList<TurboLabel>(labels);
+	}
 }
