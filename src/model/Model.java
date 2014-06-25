@@ -191,21 +191,40 @@ public class Model {
 	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
 		Issue original = orignalIssue.toGhIssue();
 		Issue edited = editedIssue.toGhIssue();
-		
 		try {
 			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
 			
 			String originalTitle = original.getTitle();
 			String editedTitle = edited.getTitle();
-			// TODO test this
-			if (!editedTitle.equals(originalTitle)) {
-				latest.setTitle(edited.getTitle());
+			if (!editedTitle.equals(originalTitle)) {latest.setTitle(editedTitle);}
+			
+			String originalBody = original.getBody();
+			String editedBody = edited.getBody();
+			if (!editedBody.equals(originalBody)) {latest.setBody(editedBody);}
+			
+			String originalAssignee = original.getAssignee().getLogin();
+			String editedAssignee = edited.getAssignee().getLogin();
+			if (!editedAssignee.equals(originalAssignee)) {latest.setAssignee(edited.getAssignee());}
+			
+			String originalState = original.getState();
+			String editedState = edited.getState();
+			if (!editedState.equals(originalState)) {latest.setState(editedState);}
+			
+			int originalMilestone = original.getMilestone().getNumber();
+			int editedMilestone = edited.getMilestone().getNumber();
+			if (editedMilestone != originalMilestone) {latest.setMilestone(edited.getMilestone());}
+			
+			List<Label> originalLabels = original.getLabels();
+			List<Label> editedLabels = edited.getLabels();
+			boolean isSameLabels = true;
+			for (Label editedLabel : editedLabels) {
+				if (originalLabels.contains(editedLabel)) {
+					isSameLabels = false;
+					break;
+				}
 			}
-			latest.setBody(edited.getBody());
-			latest.setAssignee(edited.getAssignee());
-			latest.setState(edited.getState());
-			latest.setMilestone(edited.getMilestone());
-			latest.setLabels(edited.getLabels());
+			if (!isSameLabels) {latest.setLabels(editedLabels);}
+
 			issueService.editIssue(repoId, latest);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
