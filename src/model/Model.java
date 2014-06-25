@@ -202,23 +202,42 @@ public class Model {
 			String editedBody = edited.getBody();
 			if (!editedBody.equals(originalBody)) {latest.setBody(editedBody);}
 			
-			String originalAssignee = original.getAssignee().getLogin();
-			String editedAssignee = edited.getAssignee().getLogin();
-			if (!editedAssignee.equals(originalAssignee)) {latest.setAssignee(edited.getAssignee());}
+			User originalAssignee = original.getAssignee();
+			User editedAssignee = edited.getAssignee();
+			String originalALogin = (originalAssignee != null) ? originalAssignee.getLogin() : "";
+			String editedALogin = (editedAssignee != null) ? editedAssignee.getLogin() : "";
+			if (!editedALogin.equals(originalALogin)) {
+				// this check is for cleared assignee
+				if (editedAssignee == null) {
+					latest.setAssignee(new User());
+				} else {
+					latest.setAssignee(editedAssignee);
+				}
+			}
 			
 			String originalState = original.getState();
 			String editedState = edited.getState();
 			if (!editedState.equals(originalState)) {latest.setState(editedState);}
 			
-			int originalMilestone = original.getMilestone().getNumber();
-			int editedMilestone = edited.getMilestone().getNumber();
-			if (editedMilestone != originalMilestone) {latest.setMilestone(edited.getMilestone());}
+			
+			Milestone originalMilestone = original.getMilestone();
+			Milestone editedMilestone = edited.getMilestone();
+			int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
+			int editedMNumber = (editedMilestone != null) ? editedMilestone.getNumber() : 0;
+			if (editedMNumber != originalMNumber) {
+				// this check is for cleared milestone
+				if (editedMilestone == null) {
+					latest.setMilestone(new Milestone());
+				} else {
+					latest.setMilestone(editedMilestone);
+				}
+			}
 			
 			List<Label> originalLabels = original.getLabels();
 			List<Label> editedLabels = edited.getLabels();
 			boolean isSameLabels = true;
 			for (Label editedLabel : editedLabels) {
-				if (originalLabels.contains(editedLabel)) {
+				if (!originalLabels.contains(editedLabel)) {
 					isSameLabels = false;
 					break;
 				}
@@ -226,6 +245,7 @@ public class Model {
 			if (!isSameLabels) {latest.setLabels(editedLabels);}
 
 			issueService.editIssue(repoId, latest);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
