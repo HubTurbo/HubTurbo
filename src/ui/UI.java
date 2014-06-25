@@ -115,8 +115,8 @@ public class UI extends Application {
 
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
-				model.setRepoId(repoOwnerField.getText(), repoNameField.getText());
 				login(usernameField.getText(), passwordField.getText());
+				model.setRepoId(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
 				columns.loadIssues();
