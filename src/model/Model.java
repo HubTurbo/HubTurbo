@@ -2,7 +2,9 @@ package model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +134,6 @@ public class Model {
 		try {
 			createdIssue = issueService.createIssue(repoId, ghIssue);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		TurboIssue returnedIssue = new TurboIssue(createdIssue);
@@ -146,9 +147,8 @@ public class Model {
 		try {
 			createdLabel = labelService.createLabel(repoId, ghLabel);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		TurboLabel returnedLabel = new TurboLabel(createdLabel);
 		labels.add(returnedLabel);
 		return returnedLabel;
@@ -160,7 +160,6 @@ public class Model {
 		try {
 			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
@@ -170,10 +169,9 @@ public class Model {
 	
 	public void deleteLabel(TurboLabel label) {
 		try {
-			labelService.deleteLabel(repoId, label.getName());
+			labelService.deleteLabel(repoId, URLEncoder.encode(label.getName(), "ISO-8859-1"));
 			labels.remove(label);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -183,7 +181,6 @@ public class Model {
 			milestoneService.deleteMilestone(repoId, milestone.getNumber());
 			milestones.remove(milestone);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
