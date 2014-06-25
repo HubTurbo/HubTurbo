@@ -1,5 +1,7 @@
 package ui;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -98,14 +100,14 @@ public class UI extends Application {
 			TextField repoNameField = new TextField("issues");
 			grid.add(repoNameField, 3, 0);
 
-			Label username = new Label("Username:");
-			grid.add(username, 0, 1);
+			Label usernameLabel = new Label("Username:");
+			grid.add(usernameLabel, 0, 1);
 
 			TextField usernameField = new TextField();
 			grid.add(usernameField, 1, 1, 3, 1);
 
-			Label password = new Label("Password:");
-			grid.add(password, 0, 2);
+			Label passwordLabel = new Label("Password:");
+			grid.add(passwordLabel, 0, 2);
 
 			PasswordField passwordField = new PasswordField();
 			grid.add(passwordField, 1, 2, 3, 1);
@@ -115,7 +117,22 @@ public class UI extends Application {
 
 			Button loginButton = new Button("Sign in");
 			loginButton.setOnAction((ev) -> {
-				login(usernameField.getText(), passwordField.getText());
+				String username = usernameField.getText();
+				String password = passwordField.getText();
+				if (username.isEmpty() && password.isEmpty()) {
+					BufferedReader reader;
+					try {
+						reader = new BufferedReader(new FileReader("credentials.txt"));
+						String line = null;
+						while ((line = reader.readLine()) != null) {
+							if (username.isEmpty()) username = line;
+							else password = line;
+						}
+					} catch (Exception e1) {
+						System.out.println("Failed to find credentials.txt");
+					}
+				}
+				login(username, password);
 				model.setRepoId(repoOwnerField.getText(), repoNameField.getText());
 				dialogStage.hide();
 				
