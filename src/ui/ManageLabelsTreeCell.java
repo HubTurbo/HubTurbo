@@ -28,8 +28,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
             @Override
             public void handle(KeyEvent t) {
                 if (t.getCode() == KeyCode.ENTER) {
-                	getItem().setValue(textField.getText());
-                    commitEdit(getItem());
+                    commitEdit();
                 } else if (t.getCode() == KeyCode.ESCAPE) {
                     cancelEdit();
                 }
@@ -42,11 +41,17 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 					Boolean previouslyFocused, Boolean currentlyFocused) {
 				assert previouslyFocused != currentlyFocused;
 				if (!currentlyFocused) {
-                	getItem().setValue(textField.getText());
-                    commitEdit(getItem());
+                    commitEdit();
 				}
 			}
 		});
+    }
+    
+    // This is NOT an overridden method.
+    // The overridden one is, however, called in here.
+    public void commitEdit() {
+    	super.commitEdit(getItem());
+    	getItem().setValue(textField.getText());
     }
     
     @Override
@@ -104,7 +109,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 
 	private MenuItem[] createTopLevelContextMenu() {
-		MenuItem label = new MenuItem("this is a group");
+		MenuItem label = new MenuItem("New Label");
 		label.setOnAction((event) -> {
 			System.out.println("this is a group");
 		});
