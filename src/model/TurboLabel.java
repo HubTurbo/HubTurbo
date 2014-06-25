@@ -20,7 +20,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	public TurboLabel(Label label) {
 		assert label != null;
 		
-		String[] tokens = label.getName().split(".");
+		String[] tokens = label.getName().split("\\.");
 		
 		if (tokens.length > 1) {
 			setGroup(tokens[0]);
