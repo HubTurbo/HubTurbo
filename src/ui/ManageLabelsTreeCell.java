@@ -118,7 +118,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private boolean isGroupItem(TreeItem<LabelTreeItem> treeItem) {
 		assert treeItem != null;
-		return treeItem.getParent() != null && treeItem.getParent().getValue().equals("Groups");
+		return treeItem.getParent() != null && treeItem.getParent().getValue().equals(ManageLabelsDialog.ROOT_NAME);
 	}
 
 	private ContextMenu getContextMenuForItem(TreeItem<LabelTreeItem> treeItem) {

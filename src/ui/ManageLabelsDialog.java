@@ -21,6 +21,8 @@ import model.TurboLabel;
 
 public class ManageLabelsDialog implements Dialog<String> {
 
+	public static final String ROOT_NAME = "root";
+	
 	Stage parentStage;
 	Model model;
 
@@ -97,7 +99,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 	private TreeView<LabelTreeItem> createTreeView() {
 		
-		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup("Groups"));
+		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup(ROOT_NAME));
 		
 		populateTree(treeRoot);
 
@@ -137,21 +139,25 @@ public class ManageLabelsDialog implements Dialog<String> {
 		}
 		
 		// Add labels with a group into the tree
-		for (String group : labels.keySet()) {
-			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(new TurboLabelGroup(group));
+		for (String groupName : labels.keySet()) {
+			TurboLabelGroup group = new TurboLabelGroup(groupName);
+			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(group);
 			treeRoot.getChildren().add(groupItem);
 			
 			for (TurboLabel l : labels.get(group)) {
+				group.addLabel(l);
 				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 				groupItem.getChildren().add(labelItem);
 			}
 		}
 		
 		// Do the same for ungrouped labels
-		TreeItem<LabelTreeItem> ungroupedItem = new TreeItem<>(new TurboLabelGroup("<Ungrouped>"));
+		TurboLabelGroup ungroupedGroup = new TurboLabelGroup("<Ungrouped>");
+		TreeItem<LabelTreeItem> ungroupedItem = new TreeItem<>(ungroupedGroup);
 		treeRoot.getChildren().add(ungroupedItem);
 
 		for (TurboLabel l : ungrouped) {
+			ungroupedGroup.addLabel(l);
 			TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 			ungroupedItem.getChildren().add(labelItem);
 		}
