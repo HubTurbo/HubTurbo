@@ -93,7 +93,6 @@ public class ManageMilestonesDialog implements Dialog<String> {
 		Button create = new Button("Create Milestone");
 		create.setOnAction(e -> {
 			model.createMilestone(new TurboMilestone(NEW_MILESTONE_NAME));
-			refresh();
 		});
 
 		Button close = new Button("Close");

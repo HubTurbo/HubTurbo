@@ -58,6 +58,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
     	super.commitEdit(getItem());
     	getItem().setTitle(textField.getText());
     	model.updateMilestone(getItem());
+    	parentDialog.refresh();
     }
     
     @Override
@@ -112,7 +113,6 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
 			startEdit();
-			parentDialog.refresh();
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
