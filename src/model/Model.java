@@ -174,9 +174,8 @@ public class Model {
 	}
 	
 	public void deleteLabel(TurboLabel label) {
-		Label ghLabel = label.toGhLabel();
 		try {
-			labelService.deleteLabel(repoId, URLEncoder.encode(ghLabel.getName(), "ISO-8859-1"));
+			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), "ISO-8859-1"));
 			labels.remove(label);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -259,7 +258,7 @@ public class Model {
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhLabel();
 		try {
-			labelService.editLabel(repoId, ghLabel, labelName);
+			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, "ISO-8859-1"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
