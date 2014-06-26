@@ -28,10 +28,10 @@ public class Model {
 	public static final String MILESTONES_OPEN = "open";
 	public static final String MILESTONES_CLOSED = "closed";
 	
-	private ObservableList<TurboCollaborator> collaborators;
-	private ObservableList<TurboIssue> issues;
-	private ObservableList<TurboLabel> labels;
-	private ObservableList<TurboMilestone> milestones;
+	private ObservableList<TurboCollaborator> collaborators = FXCollections.observableArrayList();
+	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
 	private IRepositoryIdProvider repoId;
 	
@@ -72,11 +72,7 @@ public class Model {
 	}
 	
 	private boolean loadCollaborators() {
-		if (collaborators == null) {
-			collaborators = FXCollections.observableArrayList();
-		} else {
-			collaborators.clear();
-		}
+		collaborators.clear();	
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
 			for(User ghCollaborator : ghCollaborators) {
@@ -91,11 +87,7 @@ public class Model {
 	}
 	
 	private boolean loadIssues() {
-		if (issues == null) {
-			issues = FXCollections.observableArrayList();
-		} else {
-			issues.clear();
-		}
+		issues.clear();
 		Map<String, String> filters = new HashMap<String, String>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
@@ -113,11 +105,7 @@ public class Model {
 	}
 	
 	private boolean loadLabels(){
-		if (labels == null) {
-			labels = FXCollections.observableArrayList();
-		} else {
-			labels.clear();
-		}
+		labels.clear();
 		try {
 			List<Label> ghLabels = labelService.getLabels(repoId);
 			for (Label ghLabel : ghLabels) {
@@ -132,11 +120,7 @@ public class Model {
 	}
 	
 	private boolean loadMilestones(){
-		if (milestones == null) {
-			milestones = FXCollections.observableArrayList();
-		} else {
-			milestones.clear();
-		}
+		milestones.clear();
 		try {		
 			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, MILESTONES_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
