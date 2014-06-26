@@ -2,6 +2,7 @@ package ui;
 
 import java.util.ArrayList;
 
+import model.Model;
 import model.TurboLabel;
 
 public class TurboLabelGroup implements LabelTreeItem {

@@ -1,5 +1,8 @@
 package ui;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import model.Model;
 import model.TurboLabel;
 import javafx.beans.value.ChangeListener;
@@ -52,14 +55,27 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     // The overridden one is, however, called in here.
     public void commitEdit() {
     	super.commitEdit(getItem());
-    	getItem().setValue(textField.getText());
     	if (getItem() instanceof TurboLabel) {
-        	model.updateLabel((TurboLabel) getItem());
-    	} else if (getItem() instanceof TurboLabelGroup) {
-    		for (TurboLabel l : ((TurboLabelGroup) getItem()).getLabels()) {
-        		model.updateLabel(l);
+    		TurboLabel label = (TurboLabel) getItem();
+    		String oldName = label.getValue();
+        	label.setValue(textField.getText());
+        	model.updateLabel(label, oldName);
+    	}
+    	else if (getItem() instanceof TurboLabelGroup) {
+    		TurboLabelGroup group = (TurboLabelGroup) getItem();
+    		
+    		// Get all the old names
+    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.getValue()).collect(Collectors.toList()));
+
+    		// Update every label using TurboLabelGroup::setValue
+    		group.setValue(textField.getText());
+
+    		// Trigger updates on all the labels
+    		for (int i=0; i<oldNames.size(); i++) {
+    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
     		}
-    	} else {
+    	}
+    	else {
     		assert false;
     	}
     }
