@@ -1,13 +1,13 @@
 package model;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -20,6 +20,8 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.LabelService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+
+import util.LabelServiceFixed;
 
 public class Model {
 	
@@ -36,13 +38,13 @@ public class Model {
 	
 	private CollaboratorService collabService;
 	private IssueService issueService;
-	private LabelService labelService;
+	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
 
 	public Model(GitHubClient ghClient) {
 		this.collabService = new CollaboratorService(ghClient);
 		this.issueService = new IssueService(ghClient);
-		this.labelService = new LabelService(ghClient);
+		this.labelService = new LabelServiceFixed(ghClient);
 		this.milestoneService = new MilestoneService(ghClient);
 	}
 
@@ -250,10 +252,10 @@ public class Model {
 		} 
 	}
 	
-	public void updateLabel(TurboLabel editedLabel) {
+	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhLabel();
 		try {
-			labelService.editLabel(repoId, ghLabel);
+			labelService.editLabel(repoId, ghLabel, labelName);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
