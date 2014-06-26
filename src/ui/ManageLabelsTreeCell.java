@@ -59,11 +59,12 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     		TurboLabel label = (TurboLabel) getItem();
     		String oldName = label.getValue();
         	label.setValue(textField.getText());
+
         	model.updateLabel(label, oldName);
     	}
     	else if (getItem() instanceof TurboLabelGroup) {
     		TurboLabelGroup group = (TurboLabelGroup) getItem();
-    		
+
     		// Get all the old names
     		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.getValue()).collect(Collectors.toList()));
 
@@ -151,20 +152,26 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		MenuItem label = new MenuItem("New Label");
 		label.setOnAction((event) -> {
 			
+			// Create a new label
 			TurboLabel newLabel = new TurboLabel("new-label" + ManageLabelsDialog.getUniqueId());
-			String groupName = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME) ? null : getTreeItem().getValue().getValue();
+			
+			// Set its group value to null if it's being created under the <Ungrouped> group
+			String groupName = getTreeItem().getValue().getValue();
+			if (groupName.equals(ManageLabelsDialog.UNGROUPED_NAME)) groupName = null;
 			newLabel.setGroup(groupName);
+			
 			newLabel = model.createLabel(newLabel);
 			
+			// Make sure this TurboLabelGroup has a reference to the new label
 			((TurboLabelGroup) getTreeItem().getValue()).addLabel(newLabel);
 			getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(newLabel));
 			
 			getTreeItem().setExpanded(true);
 		});
 		
-		boolean isUngrouped = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME);
+		boolean isUngroupedHeading = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME);
 
-		if (isUngrouped) {
+		if (isUngroupedHeading) {
 			return new MenuItem[] {label};
 		} else {
 			return new MenuItem[] {group, label};

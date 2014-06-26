@@ -2,7 +2,6 @@ package ui;
 
 import java.util.ArrayList;
 
-import model.Model;
 import model.TurboLabel;
 
 public class TurboLabelGroup implements LabelTreeItem {
@@ -16,7 +15,11 @@ public class TurboLabelGroup implements LabelTreeItem {
 	
 	public void addLabel(TurboLabel label) {
 		labels.add(label);
-		label.setGroup(name);
+		if (name.equals(ManageLabelsDialog.UNGROUPED_NAME)) {
+			label.setGroup(null);
+		} else {
+			label.setGroup(name);
+		}
 	}
 	
 	public String getValue() {
@@ -24,6 +27,11 @@ public class TurboLabelGroup implements LabelTreeItem {
 	}
 	public void setValue(String value) {
 		this.name = value;
+
+		if (this.name.equals(ManageLabelsDialog.UNGROUPED_NAME)) {
+			value = null;
+		}
+		
 		for (TurboLabel label : labels) {
 			label.setGroup(value);
 		}

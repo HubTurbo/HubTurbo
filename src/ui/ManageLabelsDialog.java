@@ -125,7 +125,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 		HashMap<String, ArrayList<TurboLabel>> labels = new HashMap<>();
 		ArrayList<TurboLabel> ungrouped = new ArrayList<>();
 		for (TurboLabel l : model.getLabels()) {
-			if (l.getGroup() == null) {
+			if (l.getGroup() == null || l.getGroup().equals(UNGROUPED_NAME)) {
+				l.setGroup(null);
 				ungrouped.add(l);
 			} else {
 				if (labels.get(l.getGroup()) == null) {
@@ -134,7 +135,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 				labels.get(l.getGroup()).add(l);
 			}
 		}
-		
+				
 		// Add labels with a group into the tree
 		for (String groupName : labels.keySet()) {
 			TurboLabelGroup group = new TurboLabelGroup(groupName);
