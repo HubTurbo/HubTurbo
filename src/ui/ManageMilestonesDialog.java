@@ -6,7 +6,6 @@ import model.Model;
 import model.TurboMilestone;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -40,11 +39,11 @@ public class ManageMilestonesDialog implements Dialog<String> {
 
 	private void showDialog() {
 
-		VBox layout = new VBox();
+		HBox layout = new HBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		
-		Scene scene = new Scene(layout, 330, 400);
+		Scene scene = new Scene(layout, 420, 400);
 
 		Stage stage = new Stage();
 		stage.setTitle("Manage milestones");
@@ -71,7 +70,7 @@ public class ManageMilestonesDialog implements Dialog<String> {
 		listView.setCellFactory(new Callback<ListView<TurboMilestone>, ListCell<TurboMilestone>>() {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
-				return new ManageMilestonesListCell(stage, model);
+				return new ManageMilestonesListCell(model);
 			}
 		});
 		
@@ -79,12 +78,15 @@ public class ManageMilestonesDialog implements Dialog<String> {
 	}
 
 	private Node createButtons(Stage stage) {
+		Button create = new Button("Create Milestone");
+		create.setOnAction(e -> System.out.println("create milestone"));
+
 		Button close = new Button("Close");
 		close.setOnAction(e -> stage.close());
 
-		HBox container = new HBox();
-		container.setAlignment(Pos.CENTER_RIGHT);
-		container.getChildren().add(close);
+		VBox container = new VBox();
+		container.setSpacing(5);
+		container.getChildren().addAll(create, close);
 		
 		return container;
 	}
