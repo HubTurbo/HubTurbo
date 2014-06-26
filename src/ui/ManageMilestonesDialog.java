@@ -18,7 +18,7 @@ import javafx.util.Callback;
 
 public class ManageMilestonesDialog implements Dialog<String> {
 
-	private static final String NEW_MILESTONE_NAME = "new-milestone";
+	private static final String NEW_MILESTONE_NAME = "newmilestone";
 	
 	private final Stage parentStage;
 	private final Model model;
