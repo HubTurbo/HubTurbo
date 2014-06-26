@@ -41,7 +41,8 @@ public class UI extends Application {
 	private ColumnControl columns;
 	private Model model;
 	private GitHubClient client;
-
+	private String repoOwner, repoName;
+	
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -79,8 +80,8 @@ public class UI extends Application {
 
 	private void initLoginForm(MenuItem login) {
 		login.setOnAction((e) -> {
-			Stage dialogStage = new Stage();
-			dialogStage.setTitle("GitHub Login");
+			Stage stage = new Stage();
+			stage.setTitle("GitHub Login");
 
 			GridPane grid = new GridPane();
 			grid.setAlignment(Pos.CENTER);
@@ -88,8 +89,8 @@ public class UI extends Application {
 			grid.setVgap(10);
 			grid.setPadding(new Insets(25, 25, 25, 25));
 
-			Label repoName = new Label("Repository:");
-			grid.add(repoName, 0, 0);
+			Label repoNameLabel = new Label("Repository:");
+			grid.add(repoNameLabel, 0, 0);
 
 			TextField repoOwnerField = new TextField("dariusf");
 			grid.add(repoOwnerField, 1, 0);
@@ -133,13 +134,16 @@ public class UI extends Application {
 						System.out.println("Failed to find or open credentials.txt");
 					}
 				}
-				login(username, password);
-				model.setRepoId(repoOwnerField.getText(), repoNameField.getText());
-				dialogStage.hide();
 				
+				login(username, password);
+				repoOwner = repoOwnerField.getText();
+				repoName = repoNameField.getText();
+				
+				loadDataIntoModel();
 				columns.loadIssues();
 				
 				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
+				stage.hide();
 			});
 
 			HBox buttons = new HBox(10);
@@ -148,16 +152,20 @@ public class UI extends Application {
 			grid.add(buttons, 3, 3);
 
 			Scene scene = new Scene(grid, 320, 200);
-			dialogStage.setScene(scene);
+			stage.setScene(scene);
 
-			dialogStage.initOwner(mainStage);
-			dialogStage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(mainStage);
+			stage.initModality(Modality.APPLICATION_MODAL);
 
-			dialogStage.setX(mainStage.getX());
-			dialogStage.setY(mainStage.getY());
+			stage.setX(mainStage.getX());
+			stage.setY(mainStage.getY());
 
-			dialogStage.show();
+			stage.show();
 		});
+	}
+
+	private void loadDataIntoModel() {
+		model.setRepoId(repoOwner, repoName);
 	}
 
 //	private void setUpHotkeys(Scene scene) {
@@ -211,8 +219,16 @@ public class UI extends Application {
 		labels.getItems().addAll(manageLabels);
 
 		Menu view = new Menu("View");
+
+		MenuItem refresh = new MenuItem("Refresh");
+		refresh.setOnAction((e) -> {
+			loadDataIntoModel();
+			columns.refresh(); // In case
+		});
+		refresh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+
 		Menu columnsMenu = new Menu("Change number of columns....");
-		view.getItems().addAll(columnsMenu);
+		view.getItems().addAll(refresh, columnsMenu);
 
 		final ToggleGroup numberOfCols = new ToggleGroup();
 		for (int i = 1; i <= 9; i++) {
