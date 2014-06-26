@@ -162,6 +162,6 @@ public class ManageLabelsDialog implements Dialog<String> {
 	}
 
 	public static String getUniqueId() {
-		return UUID.randomUUID().toString();
+		return UUID.randomUUID().toString().replaceAll("-", "");
 	}
 }
