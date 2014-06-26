@@ -148,11 +148,16 @@ public class ManageLabelsDialog implements Dialog<String> {
 			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(group);
 			treeRoot.getChildren().add(groupItem);
 			
+			boolean exclusive = true;
 			for (TurboLabel l : labels.get(group.getValue())) {
 				group.addLabel(l);
 				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 				groupItem.getChildren().add(labelItem);
+				exclusive = exclusive && l.isExclusive();
 			}
+			
+			// Set exclusivity status
+			group.setExclusive(exclusive);
 		}
 		
 		// Do the same for ungrouped labels
