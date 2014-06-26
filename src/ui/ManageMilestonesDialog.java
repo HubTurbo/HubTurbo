@@ -82,6 +82,7 @@ public class ManageMilestonesDialog implements Dialog<String> {
 	private Node createListView(Stage stage) {
 		listView = new ListView<>();
 		listView.setItems(model.getMilestones());
+		listView.setEditable(true);
 		
 		refresh();
 				
