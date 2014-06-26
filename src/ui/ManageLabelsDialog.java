@@ -28,7 +28,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 	private final Stage parentStage;
 	private final Model model;
 
-	CompletableFuture<String> response;
+	private CompletableFuture<String> response;
 
 	public ManageLabelsDialog(Stage parentStage, Model model) {
 		this.parentStage = parentStage;

@@ -23,7 +23,7 @@ public class ManageMilestonesDialog implements Dialog<String> {
 	private final Stage parentStage;
 	private final Model model;
 	
-	CompletableFuture<String> response;
+	private CompletableFuture<String> response;
 	
 	private ListView<TurboMilestone> listView;
 

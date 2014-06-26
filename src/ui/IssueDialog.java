@@ -39,11 +39,11 @@ public class IssueDialog implements Dialog<String> {
 	public static final String STYLE_YELLOW = "-fx-background-color: #FFFA73;";
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 
-	Stage parentStage;
-	Model model;
-	TurboIssue issue;
+	private Stage parentStage;
+	private Model model;
+	private TurboIssue issue;
 
-	CompletableFuture<String> response;
+	private CompletableFuture<String> response;
 
 	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
 		this.parentStage = parentStage;

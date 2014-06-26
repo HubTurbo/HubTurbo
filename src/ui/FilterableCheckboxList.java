@@ -24,23 +24,23 @@ import model.Listable;
 
 public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
-	Stage parentStage;
-	FilteredList<String> objects;
+	private final Stage parentStage;
+	private FilteredList<String> objects;
 
-	CompletableFuture<List<Integer>> response;
+	private CompletableFuture<List<Integer>> response;
 	
 	// State variables
 	
-	int previouslyChecked = -1;
-	int previousState = 0;
+	private int previouslyChecked = -1;
+	private int previousState = 0;
 	
 	// Disables the callback to prevent an infinite loop (since
 	// updating the check state updates the check state)
-	boolean disabled = false;
+	private boolean disabled = false;
 	
 	// Also disables the callback. Throttles its activation
 	// to once per change
-	boolean oneActivation = false;
+	private boolean oneActivation = false;
 
 	public FilterableCheckboxList(Stage parentStage,
 			ObservableList<Listable> objects) {
