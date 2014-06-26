@@ -239,10 +239,14 @@ public class Model {
 			List<Label> originalLabels = original.getLabels();
 			List<Label> editedLabels = edited.getLabels();
 			boolean isSameLabels = true;
-			for (Label editedLabel : editedLabels) {
-				if (!originalLabels.contains(editedLabel)) {
-					isSameLabels = false;
-					break;
+			if (originalLabels.size() != editedLabels.size()) {
+				isSameLabels = false;
+			} else {
+				for (Label originalLabel : originalLabels) {
+					if (!editedLabels.contains(originalLabel)) {
+						isSameLabels = false;
+						break;
+					}
 				}
 			}
 			if (!isSameLabels) {latest.setLabels(editedLabels);}
