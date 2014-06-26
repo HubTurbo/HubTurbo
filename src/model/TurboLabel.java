@@ -68,7 +68,11 @@ public class TurboLabel implements Listable, LabelTreeItem {
 
     private StringProperty name = new SimpleStringProperty();
     public final String getName() {return name.get();}
-    public final void setName(String value) {name.set(value);}
+    public final void setName(String value) {
+    	assert value != "";
+    	assert value != null;
+    	name.set(value);
+    	}
     public StringProperty nameProperty() {return name;}
 	
     private StringProperty colour = new SimpleStringProperty();
