@@ -55,9 +55,10 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     // The overridden one is, however, called in here.
     public void commitEdit() {
     	super.commitEdit(getItem());
+    	
     	if (getItem() instanceof TurboLabel) {
     		TurboLabel label = (TurboLabel) getItem();
-    		String oldName = label.getValue();
+    		String oldName = label.toGhName();
         	label.setValue(textField.getText());
 
         	model.updateLabel(label, oldName);
@@ -66,7 +67,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     		TurboLabelGroup group = (TurboLabelGroup) getItem();
 
     		// Get all the old names
-    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.getValue()).collect(Collectors.toList()));
+    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
 
     		// Update every label using TurboLabelGroup::setValue
     		group.setValue(textField.getText());
