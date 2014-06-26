@@ -19,10 +19,13 @@ import javafx.util.Callback;
 public class ManageMilestonesDialog implements Dialog<String> {
 
 	private static final String NEW_MILESTONE_NAME = "new-milestone";
+	
 	private final Stage parentStage;
 	private final Model model;
 	
 	CompletableFuture<String> response;
+	
+	private ListView<TurboMilestone> listView;
 
 	public ManageMilestonesDialog(Stage stage, Model model) {
 		this.parentStage = stage;
@@ -62,19 +65,26 @@ public class ManageMilestonesDialog implements Dialog<String> {
 
 		stage.show();
 	}
-
-	private Node createListView(Stage stage) {
-		ListView<TurboMilestone> listView = new ListView<>();
+	
+	public void refresh() {
 		
-		listView.setItems(model.getMilestones());
+		ManageMilestonesDialog that = this;
 		
 		listView.setCellFactory(new Callback<ListView<TurboMilestone>, ListCell<TurboMilestone>>() {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
-				return new ManageMilestonesListCell(model);
+				return new ManageMilestonesListCell(model, that);
 			}
 		});
+
+	}
+
+	private Node createListView(Stage stage) {
+		listView = new ListView<>();
+		listView.setItems(model.getMilestones());
 		
+		refresh();
+				
 		return listView;
 	}
 

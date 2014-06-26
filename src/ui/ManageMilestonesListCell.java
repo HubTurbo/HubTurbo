@@ -12,10 +12,12 @@ import model.TurboMilestone;
 
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private final Model model;
+	private final ManageMilestonesDialog parentDialog;
 	
-	public ManageMilestonesListCell(Model model) {
+	public ManageMilestonesListCell(Model model, ManageMilestonesDialog parentDialog) {
 		super();
 		this.model = model;
+		this.parentDialog = parentDialog;
 	}
 
 	@Override
@@ -52,6 +54,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
 			model.deleteMilestone(milestone);
+			parentDialog.refresh();
 		});
 		
 		return new ContextMenu(new MenuItem[] {edit, delete});
