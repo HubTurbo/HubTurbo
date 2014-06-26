@@ -49,6 +49,9 @@ public class TurboLabelGroup implements LabelTreeItem {
 
 	public void setExclusive(boolean ex) {
 		exclusive = ex;
+		for (TurboLabel label : labels) {
+			label.setExclusive(ex);
+		}
 	}
 
 	public boolean getExclusive() {

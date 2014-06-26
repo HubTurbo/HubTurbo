@@ -15,13 +15,16 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private final Model model;
+	private final Stage stage;
 	
-	public ManageLabelsTreeCell(Model model) {
+	public ManageLabelsTreeCell(Stage stage, Model model) {
 		this.model = model;
+		this.stage = stage;
 	}
 	
     private TextField textField;
@@ -56,6 +59,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     public void commitEdit() {
     	super.commitEdit(getItem());
     	
+		getTreeView().setEditable(false);
+
     	if (getItem() instanceof TurboLabel) {
     		TurboLabel label = (TurboLabel) getItem();
     		String oldName = label.toGhName();
@@ -63,20 +68,20 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
         	model.updateLabel(label, oldName);
     	}
-    	else if (getItem() instanceof TurboLabelGroup) {
-    		TurboLabelGroup group = (TurboLabelGroup) getItem();
-
-    		// Get all the old names
-    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
-
-    		// Update every label using TurboLabelGroup::setValue
-    		group.setValue(textField.getText());
-
-    		// Trigger updates on all the labels
-    		for (int i=0; i<oldNames.size(); i++) {
-    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
-    		}
-    	}
+//    	else if (getItem() instanceof TurboLabelGroup) {
+//    		TurboLabelGroup group = (TurboLabelGroup) getItem();
+//
+//    		// Get all the old names
+//    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
+//
+//    		// Update every label using TurboLabelGroup::setValue
+//    		group.setValue(textField.getText());
+//
+//    		// Trigger updates on all the labels
+//    		for (int i=0; i<oldNames.size(); i++) {
+//    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
+//    		}
+//    	}
     	else {
     		assert false;
     	}
@@ -128,6 +133,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	private MenuItem[] createLabelContextMenu() {
 		MenuItem edit = new MenuItem("Edit Label");
 		edit.setOnAction((event) -> {
+			getTreeView().setEditable(true);
 			getTreeView().edit(getTreeItem());
 		});
 		MenuItem delete = new MenuItem("Delete Label");
@@ -145,9 +151,35 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private MenuItem[] createGroupContextMenu() {
 				
-		MenuItem group = new MenuItem("Edit Group");
-		group.setOnAction((event) -> {
-			getTreeView().edit(getTreeItem());
+		MenuItem groupMenuItem = new MenuItem("Edit Group");
+		groupMenuItem.setOnAction((event) -> {
+//			getTreeView().edit(getTreeItem());
+			
+			TurboLabelGroup group = (TurboLabelGroup) getItem();
+			
+			(new GroupDialog(stage, group.getValue(), group.getExclusive())).show().thenApply(response -> {
+
+	    		// Get all the old names
+	    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
+
+	    		// Update every label using TurboLabelGroup::setValue
+	    		group.setValue(response.getValue());
+	    		group.setExclusive(response.getExclusive());
+
+	    		// Trigger updates on all the labels
+	    		for (int i=0; i<oldNames.size(); i++) {
+	    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
+	    		}
+	    		
+	    		// Manually update the treeview, since there is no binding
+	    		TreeItem<LabelTreeItem> item = getTreeItem();
+	    		TreeItem<LabelTreeItem> parent = item.getParent();
+	    		parent.getChildren().remove(item);
+	    		parent.getChildren().add(item);
+	    		
+				return true;
+			});
+
 		});
 
 		MenuItem label = new MenuItem("New Label");
@@ -175,7 +207,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		if (isUngroupedHeading) {
 			return new MenuItem[] {label};
 		} else {
-			return new MenuItem[] {group, label};
+			return new MenuItem[] {groupMenuItem, label};
 		}
 	}
 

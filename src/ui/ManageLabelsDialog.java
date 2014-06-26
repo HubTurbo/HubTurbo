@@ -56,7 +56,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 
 		Platform.runLater(() -> stage.requestFocus());
 
-		TreeView<LabelTreeItem> treeView = createTreeView();
+		TreeView<LabelTreeItem> treeView = createTreeView(stage);
 		layout.getChildren().addAll(treeView, createButtons(treeView, stage));
 
 		stage.initOwner(parentStage);
@@ -101,7 +101,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		return container;
 	}
 
-	private TreeView<LabelTreeItem> createTreeView() {
+	private TreeView<LabelTreeItem> createTreeView(Stage stage) {
 		
 		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup(ROOT_NAME));
 		
@@ -111,7 +111,6 @@ public class ManageLabelsDialog implements Dialog<String> {
 		treeView.setRoot(treeRoot);
 		treeView.setShowRoot(false);
 		treeView.setPrefWidth(180);
-		treeView.setEditable(true);
 
 		treeRoot.setExpanded(true);
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
@@ -119,7 +118,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
 			@Override
 			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-				return new ManageLabelsTreeCell<LabelTreeItem>(model);
+				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model);
 			}
 		});
 
