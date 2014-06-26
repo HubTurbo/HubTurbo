@@ -41,17 +41,17 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 
 		setGraphic(everything);
 		
-		setContextMenu(createContextMenu());
+		setContextMenu(createContextMenu(milestone));
 	}
 
-	private ContextMenu createContextMenu() {
+	private ContextMenu createContextMenu(TurboMilestone milestone) {
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
 			System.out.println("edit milestone");
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
-			System.out.println("delete milestone");
+			model.deleteMilestone(milestone);
 		});
 		
 		return new ContextMenu(new MenuItem[] {edit, delete});

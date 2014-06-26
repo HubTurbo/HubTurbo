@@ -18,6 +18,7 @@ import javafx.util.Callback;
 
 public class ManageMilestonesDialog implements Dialog<String> {
 
+	private static final String NEW_MILESTONE_NAME = "new-milestone";
 	private final Stage parentStage;
 	private final Model model;
 	
@@ -79,7 +80,9 @@ public class ManageMilestonesDialog implements Dialog<String> {
 
 	private Node createButtons(Stage stage) {
 		Button create = new Button("Create Milestone");
-		create.setOnAction(e -> System.out.println("create milestone"));
+		create.setOnAction(e -> {
+			model.createMilestone(new TurboMilestone(NEW_MILESTONE_NAME));
+		});
 
 		Button close = new Button("Close");
 		close.setOnAction(e -> stage.close());

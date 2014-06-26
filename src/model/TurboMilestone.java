@@ -13,6 +13,10 @@ public class TurboMilestone implements Listable {
 	private String description;
 	private Date dueOn;
 	
+	public TurboMilestone(String title) {
+		setTitle(title);
+	}
+	
 	public TurboMilestone(Milestone milestone) {
 		assert milestone != null;
 		setTitle(milestone.getTitle());
