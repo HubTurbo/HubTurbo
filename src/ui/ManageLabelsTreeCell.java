@@ -145,7 +145,9 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			
 			TurboLabelGroup group = (TurboLabelGroup) getItem();
 			
-			(new GroupDialog(stage, group.getValue(), group.getExclusive())).show().thenApply(response -> {
+			(new GroupDialog(stage, group.getValue(), group.getExclusive()))
+			.setExclusiveCheckboxVisible(false)
+			.show().thenApply(response -> {
 				
 				assert response.getValue() != null;
 				if (response.getValue().isEmpty()) {

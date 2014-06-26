@@ -22,6 +22,8 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 
 	private String generatedName;
 	private boolean exclusive;
+	
+	private boolean showExclusiveCheckbox = true;
 
 	public GroupDialog(Stage parentStage, String generatedName, boolean exclusive) {
 		this.parentStage = parentStage;
@@ -29,6 +31,11 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 		this.exclusive = exclusive;
 
 		response = new CompletableFuture<>();
+	}
+	
+	public GroupDialog setExclusiveCheckboxVisible(boolean visible) {
+		showExclusiveCheckbox = visible;
+		return this;
 	}
 	
 	public CompletableFuture<TurboLabelGroup> show() {
@@ -54,11 +61,13 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 		buttonContainer.getChildren().add(close);
 		HBox.setHgrow(buttonContainer, Priority.ALWAYS);
 		
-		CheckBox exclusivityCheckbox = new CheckBox("Exclusive");
-		exclusivityCheckbox.setSelected(exclusive);
+		CheckBox checkbox = new CheckBox("Exclusive");
+		checkbox.setSelected(exclusive);
+		checkbox.setDisable(!showExclusiveCheckbox);
+				
 		HBox checkBoxContainer = new HBox();
 		checkBoxContainer.setAlignment(Pos.CENTER_LEFT);
-		checkBoxContainer.getChildren().add(exclusivityCheckbox);
+		checkBoxContainer.getChildren().add(checkbox);
 		HBox.setHgrow(checkBoxContainer, Priority.ALWAYS);
 		
 		HBox bottomContainer = new HBox();
@@ -72,13 +81,13 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 		stage.setTitle("New Group");
 		stage.setScene(scene);
 		stage.setOnCloseRequest(e -> {
-			respond(groupNameField.getText(), exclusivityCheckbox.isSelected());
+			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
 		});
 		stage.initOwner(parentStage);
 //		 secondStage.initModality(Modality.APPLICATION_MODAL);
 
 		close.setOnAction(e -> {
-			respond(groupNameField.getText(), exclusivityCheckbox.isSelected());
+			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
 			stage.close();
 		});
 

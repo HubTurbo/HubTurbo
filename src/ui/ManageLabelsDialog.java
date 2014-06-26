@@ -75,7 +75,9 @@ public class ManageLabelsDialog implements Dialog<String> {
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
 			
-			(new GroupDialog(stage, "newgroup" + getUniqueId(), false)).show().thenApply(response -> {
+			(new GroupDialog(stage, "newgroup" + getUniqueId(), false))
+			.setExclusiveCheckboxVisible(true)
+			.show().thenApply(response -> {
 
 				assert response.getValue() != null;
 				if (response.getValue().isEmpty()) {
