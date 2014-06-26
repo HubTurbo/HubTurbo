@@ -22,13 +22,13 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		
 		String labelName = label.getName();
 		String[] tokens = null;
-		if (labelName.contains("\\.")) {
+		if (labelName.contains(".")) {
 			tokens = labelName.split("\\.");
 			setGroup(tokens[0]);
 			setName(tokens[1]);
 			setExclusive(true);
-		} else if (labelName.contains("\\-")) {
-			tokens = labelName.split("\\-");
+		} else if (labelName.contains("-")) {
+			tokens = labelName.split("-");
 			setGroup(tokens[0]);
 			setName(tokens[1]);
 			setExclusive(false);
