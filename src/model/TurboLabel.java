@@ -33,11 +33,15 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	
 	public Label toGhLabel() {
 		Label ghLabel = new Label();
-		String groupPrefix = getGroup() == null ? "" : getGroup() + ".";
-		String groupAppended = groupPrefix + getName();
-		ghLabel.setName(groupAppended);
+		ghLabel.setName(toGhName());
 		ghLabel.setColor(getColour());
 		return ghLabel;
+	}
+	
+	public String toGhName() {
+		String groupPrefix = getGroup() == null ? "" : getGroup() + ".";
+		String groupAppended = groupPrefix + getName();
+		return groupAppended;
 	}
 	
 	public static List<Label> toGhLabels(List<TurboLabel> turboLabels) {
