@@ -61,30 +61,18 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
     	
 		getTreeView().setEditable(false);
 
-    	if (getItem() instanceof TurboLabel) {
-    		TurboLabel label = (TurboLabel) getItem();
-    		String oldName = label.toGhName();
-        	label.setValue(textField.getText());
+		assert textField.getText() != null;
+    	if (textField.getText().isEmpty()) {
+    		cancelEdit();
+    		return;
+    	}
 
-        	model.updateLabel(label, oldName);
-    	}
-//    	else if (getItem() instanceof TurboLabelGroup) {
-//    		TurboLabelGroup group = (TurboLabelGroup) getItem();
-//
-//    		// Get all the old names
-//    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
-//
-//    		// Update every label using TurboLabelGroup::setValue
-//    		group.setValue(textField.getText());
-//
-//    		// Trigger updates on all the labels
-//    		for (int i=0; i<oldNames.size(); i++) {
-//    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
-//    		}
-//    	}
-    	else {
-    		assert false;
-    	}
+		assert getItem() instanceof TurboLabel;
+		TurboLabel label = (TurboLabel) getItem();
+		String oldName = label.toGhName();
+    	label.setValue(textField.getText());
+
+    	model.updateLabel(label, oldName);
     }
     
     @Override
@@ -158,6 +146,11 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			TurboLabelGroup group = (TurboLabelGroup) getItem();
 			
 			(new GroupDialog(stage, group.getValue(), group.getExclusive())).show().thenApply(response -> {
+				
+				assert response.getValue() != null;
+				if (response.getValue().isEmpty()) {
+					return false;
+				}
 
 	    		// Get all the old names
 	    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));

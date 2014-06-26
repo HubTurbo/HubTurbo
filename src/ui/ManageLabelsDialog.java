@@ -77,14 +77,13 @@ public class ManageLabelsDialog implements Dialog<String> {
 			
 			(new GroupDialog(stage, "newgroup" + getUniqueId(), false)).show().thenApply(response -> {
 
+				assert response.getValue() != null;
+				if (response.getValue().isEmpty()) {
+					return false;
+				}
+
 				TreeItem<LabelTreeItem> item = new TreeItem<>(response);
 				treeView.getRoot().getChildren().add(item);
-
-				Platform.runLater(() -> {
-					treeView.requestFocus();
-					// This does not work for some reason
-					treeView.edit(item);
-				});
 
 				return true;
 			});
