@@ -8,6 +8,7 @@ public class TurboLabelGroup implements LabelTreeItem {
 	
 	private String name;
 	private ArrayList<TurboLabel> labels = new ArrayList<>();
+	private boolean exclusive = false;
 	
 	public TurboLabelGroup(String name) {
 		this.name = name;
@@ -44,5 +45,13 @@ public class TurboLabelGroup implements LabelTreeItem {
 
 	public ArrayList<TurboLabel> getLabels() {
 		return new ArrayList<TurboLabel>(labels);
+	}
+
+	public void setExclusive(boolean ex) {
+		exclusive = ex;
+	}
+
+	public boolean getExclusive() {
+		return exclusive;
 	}
 }
