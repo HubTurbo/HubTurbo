@@ -20,14 +20,22 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	public TurboLabel(Label label) {
 		assert label != null;
 		
-		String[] tokens = label.getName().split("\\.");
-		
-		if (tokens.length > 1) {
+		String labelName = label.getName();
+		String[] tokens = null;
+		if (labelName.contains("\\.")) {
+			tokens = labelName.split("\\.");
 			setGroup(tokens[0]);
 			setName(tokens[1]);
+			setExclusive(true);
+		} else if (labelName.contains("\\-")) {
+			tokens = labelName.split("\\-");
+			setGroup(tokens[0]);
+			setName(tokens[1]);
+			setExclusive(false);
 		} else {
-			setName(label.getName());
+			setName(labelName);
 		}
+
 		setColour(label.getColor());
 	}
 	
@@ -39,7 +47,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	}
 	
 	public String toGhName() {
-		String groupPrefix = getGroup() == null ? "" : getGroup() + ".";
+		String groupDelimiter = isExclusive ? "." : "-";
+		String groupPrefix = getGroup() == null ? "" : getGroup() + groupDelimiter;
 		String groupAppended = groupPrefix + getName();
 		return groupAppended;
 	}
@@ -71,6 +80,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
     public final String getGroup() {return group.get();}
     public final void setGroup(String value) {group.set(value);}
     public StringProperty groupProperty() {return group;}
+    
+	private boolean isExclusive; // exclusive: "." non-exclusive: "-"
 
 	@Override
 	public String getListName() {
@@ -112,6 +123,16 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	}
 	public void setValue(String value) {
 		setName(value);
+	}
+
+	public boolean isExclusive() {
+		return isExclusive;
+	}
+
+	public void setExclusive(boolean isExclusive) {
+		if (getGroup() != null) {
+			this.isExclusive = isExclusive;
+		}
 	}
 
 }
