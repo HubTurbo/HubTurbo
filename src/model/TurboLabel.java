@@ -60,7 +60,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		
 		for (TurboLabel turboLabel : turboLabels) {
 			Label label = new Label();
-			label.setName(turboLabel.getName());
+			label.setName(turboLabel.toGhName());
 			ghLabels.add(label);
 		}
 		return ghLabels;
