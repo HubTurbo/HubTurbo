@@ -2,6 +2,7 @@ package ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
@@ -158,9 +159,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 			ungroupedItem.getChildren().add(labelItem);
 		}
 	}
-	
-	private static int index = 1;
+
 	public static String getUniqueId() {
-		return Integer.toString(index++);
+		return UUID.randomUUID().toString();
 	}
 }
