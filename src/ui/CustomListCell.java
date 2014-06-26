@@ -66,6 +66,8 @@ public class CustomListCell extends ListCell<TurboIssue> {
 
 		setGraphic(everything);
 
+		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
+
 		registerEvents(issue);
 	}
 
