@@ -2,10 +2,12 @@ package model;
 
 import java.util.Date;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
-	private String title;
 	private int number;
 	private String state;
 	private String description;
@@ -13,7 +15,7 @@ public class TurboMilestone implements Listable {
 	
 	public TurboMilestone(Milestone milestone) {
 		assert milestone != null;
-		this.title = milestone.getTitle();
+		setTitle(milestone.getTitle());
 		this.number = milestone.getNumber();
 		this.state = milestone.getState();
 		this.description = milestone.getDescription();
@@ -22,7 +24,7 @@ public class TurboMilestone implements Listable {
 	
 	public Milestone toGhMilestone() {
 		Milestone ghMilestone = new Milestone();
-		ghMilestone.setTitle(title);
+		ghMilestone.setTitle(getTitle());
 		ghMilestone.setNumber(number);
 		ghMilestone.setState(state);
 		ghMilestone.setDescription(description);
@@ -30,13 +32,10 @@ public class TurboMilestone implements Listable {
 		return ghMilestone;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-	
-	public void setTitle(String name) {
-		this.title = name;
-	}
+	private StringProperty title = new SimpleStringProperty();
+    public final String getTitle() {return title.get();}
+    public final void setTitle(String value) {title.set(value);}
+    public StringProperty titleProperty() {return title;}
 
 	public String getState() {
 		return state;
