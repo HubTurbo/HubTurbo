@@ -176,9 +176,15 @@ public class UI extends Application {
 		projects.getItems().addAll(login);
 
 		Menu milestones = new Menu("Milestones");
-		MenuItem newMilestone = new MenuItem("New Milestone");
-		milestones.getItems().addAll(newMilestone);
-
+		MenuItem manageMilestones = new MenuItem("Manage milestones...");
+		milestones.getItems().addAll(manageMilestones);
+		manageMilestones.setOnAction(e -> {
+			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
+					response -> {
+						return true;
+					});
+		});
+		
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
 		newIssue.setOnAction(e -> {
@@ -198,7 +204,6 @@ public class UI extends Application {
 		manageLabels.setOnAction(e -> {
 			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
 					response -> {
-						System.out.println("done");
 						return true;
 					});
 		});

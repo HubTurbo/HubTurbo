@@ -24,8 +24,8 @@ public class ManageLabelsDialog implements Dialog<String> {
 	public static final String UNGROUPED_NAME = "<Ungrouped>";
 	public static final String ROOT_NAME = "root";
 	
-	Stage parentStage;
-	Model model;
+	private final Stage parentStage;
+	private final Model model;
 
 	CompletableFuture<String> response;
 

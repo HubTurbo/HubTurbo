@@ -21,10 +21,10 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	private final Stage mainStage;
 	private final Model model;
 	
-	public CustomListCell(Stage mainStage, Model logic, IssuePanel parent) {
+	public CustomListCell(Stage mainStage, Model model, IssuePanel parent) {
 		super();
 		this.mainStage = mainStage;
-		this.model = logic;
+		this.model = model;
 	}
 
 	@Override
