@@ -51,7 +51,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		Scene scene = new Scene(layout, 330, 400);
 
 		Stage stage = new Stage();
-		stage.setTitle("Manage labels");
+		stage.setTitle("Manage Labels");
 		stage.setScene(scene);
 
 		Platform.runLater(() -> stage.requestFocus());
@@ -74,14 +74,21 @@ public class ManageLabelsDialog implements Dialog<String> {
 		
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
-			TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("newgroup" + getUniqueId()));
-			treeView.getRoot().getChildren().add(item);
+			
+			(new GroupDialog(stage, "newgroup" + getUniqueId(), false)).show().thenApply(response -> {
 
-			Platform.runLater(() -> {
-				treeView.requestFocus();
-				// This does not work for some reason
-				treeView.edit(item);
+				TreeItem<LabelTreeItem> item = new TreeItem<>(new TurboLabelGroup("newgroup" + getUniqueId()));
+				treeView.getRoot().getChildren().add(item);
+
+				Platform.runLater(() -> {
+					treeView.requestFocus();
+					// This does not work for some reason
+					treeView.edit(item);
+				});
+
+				return true;
 			});
+			
 		});
 		
 		Button close = new Button("Close");

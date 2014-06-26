@@ -50,7 +50,7 @@ public class ManageMilestonesDialog implements Dialog<String> {
 		Scene scene = new Scene(layout, 420, 400);
 
 		Stage stage = new Stage();
-		stage.setTitle("Manage milestones");
+		stage.setTitle("Manage Milestones");
 		stage.setScene(scene);
 
 		Platform.runLater(() -> stage.requestFocus());
