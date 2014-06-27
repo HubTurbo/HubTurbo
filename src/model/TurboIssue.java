@@ -19,6 +19,8 @@ public class TurboIssue implements Listable {
 	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
 	
+	private List<Integer> parents;
+	
 	public TurboIssue(String title, String desc) {
 		assert title != null;
 		assert desc != null;
@@ -53,6 +55,8 @@ public class TurboIssue implements Listable {
 		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue);
+		
+		
 	}
 	
 	private ObservableList<TurboLabel> translateLabels(Issue issue) {
@@ -127,6 +131,18 @@ public class TurboIssue implements Listable {
 	public void setMilestone(TurboMilestone milestone) {
 		this.milestone = milestone;
 	}
+	
+	public List<Integer> getParents() {
+		return parents;
+	}
+
+	public void addParent(int issueId) {
+		parents.add(new Integer(issueId));
+	}
+	
+	public void removeParent(int issueId) {
+		parents.remove(new Integer(issueId));
+	}
 
 	@Override
 	public String getListName() {
@@ -157,6 +173,5 @@ public class TurboIssue implements Listable {
 			return false;
 		return true;
 	}
-	
 
 }
