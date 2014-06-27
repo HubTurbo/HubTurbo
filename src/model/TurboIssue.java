@@ -91,9 +91,6 @@ public class TurboIssue implements Listable {
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
 		parents = FXCollections.observableArrayList();
-//		TurboLabel tl = new TurboLabel();
-//		tl.setName("feature");
-//		labels.add(tl);
 	}
 	
 	// Copy constructor
@@ -122,7 +119,6 @@ public class TurboIssue implements Listable {
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue.getLabels());
 		this.parents = extractParents(issue.getBody());
-		
 	}
 
 	public Issue toGhResource() {
@@ -132,21 +128,7 @@ public class TurboIssue implements Listable {
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhResource());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhResource());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
-		
-		String parentsMd = METADATA_HEADER_PARENT;
-		Iterator<Integer> parentsItr = parents.iterator();
-		while (parentsItr.hasNext()) {
-			parentsMd = parentsMd + "#" + parentsItr.next();
-			if (parentsItr.hasNext()) {
-				parentsMd = parentsMd + ", ";
-			}
-		}
-		StringBuilder body = new StringBuilder();
-		body.append(parentsMd + "\n");
-		body.append(METADATA_SEPERATOR + "\n");
-		body.append(getDescription());
-		ghIssue.setBody(body.toString());
-		
+		ghIssue.setBody(buildBody());
 		return ghIssue;
 	}
 	
@@ -193,6 +175,23 @@ public class TurboIssue implements Listable {
 			}
 		}
 		return -1;
+	}
+	
+	private String buildBody() {
+		String parentsMd = METADATA_HEADER_PARENT;
+		Iterator<Integer> parentsItr = parents.iterator();
+		while (parentsItr.hasNext()) {
+			parentsMd = parentsMd + "#" + parentsItr.next();
+			if (parentsItr.hasNext()) {
+				parentsMd = parentsMd + ", ";
+			}
+		}
+		
+		StringBuilder body = new StringBuilder();
+		body.append(parentsMd + "\n");
+		body.append(METADATA_SEPERATOR + "\n");
+		body.append(getDescription());
+		return body.toString();
 	}
 
 	/*
