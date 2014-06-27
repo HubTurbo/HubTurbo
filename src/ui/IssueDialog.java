@@ -168,66 +168,6 @@ public class IssueDialog implements Dialog<String> {
 		return buttons;
 	}
 
-	private Parent createAssigneeBox(Stage stage) {
-		
-		final HBox assigneeBox = new HBox();
-		assigneeBox.setStyle(UI.STYLE_BORDERS_FADED);
-		
-		Label label;
-		if (issue.getAssignee() == null) {
-			label = new Label("Assignee");
-			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-		} else {
-			label = new Label(issue.getAssignee().getGithubName());
-			label.setStyle("-fx-padding: 5 5 5 5;");
-		}
-		assigneeBox.getChildren().add(label);
-		
-		List<TurboCollaborator> allAssignees = model.getCollaborators();
-		
-		assigneeBox.setOnMouseClicked((e) -> {
-			
-			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
-			if (issue.getAssignee() != null) {
-				int existingIndex = -1;
-				for (int i=0; i<allAssignees.size(); i++) {
-					if (allAssignees.get(i).equals(issue.getAssignee())) {
-						existingIndex = i;
-					}
-				}
-				assert existingIndex != -1;
-				existingIndices.add(existingIndex);
-			}
-			
-			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(allAssignees)))
-					.setWindowTitle("Choose assignee")
-					.setMultipleSelection(false)
-					.setInitialCheckedState(existingIndices)
-					.show()
-					.thenApply((response) -> {
-							boolean wasAnythingSelected = response.size() > 0;
-							if (wasAnythingSelected) {
-								TurboCollaborator assignee = allAssignees.get(response.get(0));
-								
-								// We don't have data binding for this box; set it manually
-								label.setText(assignee.getGithubName());
-								
-								issue.setAssignee(assignee);
-							} else {
-								
-								// Again, no data binding
-								label.setText("Assignee");
-								label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-
-								issue.setAssignee(null);
-							}
-							return true;
-						});
-		});
-		return assigneeBox;
-	}
-
 	private Parent createParentsBox(Stage stage) {
 		final HBox parentsBox = new HBox();
 		parentsBox.setStyle(UI.STYLE_BORDERS_FADED);
@@ -268,7 +208,7 @@ public class IssueDialog implements Dialog<String> {
 
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(allIssues)))
-					.setWindowTitle("Choose parents")
+					.setWindowTitle("Choose Parents")
 					.setMultipleSelection(true)
 					.setInitialCheckedState(indicesForExistingParents)
 					.show()
@@ -336,7 +276,7 @@ public class IssueDialog implements Dialog<String> {
 
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(allLabels)))
-					.setWindowTitle("Choose labels")
+					.setWindowTitle("Choose Labels")
 					.setMultipleSelection(true)
 					.setInitialCheckedState(indicesForExistingLabels)
 					.show()
@@ -353,21 +293,44 @@ public class IssueDialog implements Dialog<String> {
 		return labelBox;
 	}
 
+	private Parent createAssigneeBox(Stage stage) {
+		
+		final ListableDisplayBox assigneeBox = new ListableDisplayBox("Assignee", issue.getAssignee());
+		List<TurboCollaborator> allAssignees = model.getCollaborators();
+		
+		assigneeBox.setOnMouseClicked((e) -> {
+			
+			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
+			if (issue.getAssignee() != null) {
+				int existingIndex = -1;
+				for (int i=0; i<allAssignees.size(); i++) {
+					if (allAssignees.get(i).equals(issue.getAssignee())) {
+						existingIndex = i;
+					}
+				}
+				assert existingIndex != -1;
+				existingIndices.add(existingIndex);
+			}
+			
+			(new FilterableCheckboxList(stage, FXCollections
+					.observableArrayList(allAssignees)))
+					.setWindowTitle("Choose Assignee")
+					.setMultipleSelection(false)
+					.setInitialCheckedState(existingIndices)
+					.show()
+					.thenApply((response) -> {
+							TurboCollaborator assignee = response.size() > 0 ? allAssignees.get(response.get(0)) : null;
+							assigneeBox.setListableItem(assignee);
+							issue.setAssignee(assignee);
+							return true;
+						});
+		});
+		return assigneeBox;
+	}
+
 	private Parent createMilestoneBox(Stage stage) {
 		
-		final HBox milestoneBox = new HBox();
-		milestoneBox.setStyle(UI.STYLE_BORDERS_FADED);
-		
-		Label label;
-		if (issue.getMilestone() == null) {
-			label = new Label("Milestone");
-			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-		} else {
-			label = new Label(issue.getMilestone().getTitle());
-			label.setStyle("-fx-padding: 5 5 5 5;");
-		}
-		milestoneBox.getChildren().add(label);
-		
+		final ListableDisplayBox milestoneBox = new ListableDisplayBox("Milestone", issue.getMilestone());
 		List<TurboMilestone> allMilestones = model.getMilestones();
 		
 		milestoneBox.setOnMouseClicked((e) -> {
@@ -386,27 +349,14 @@ public class IssueDialog implements Dialog<String> {
 			
 			(new FilterableCheckboxList(stage, FXCollections
 					.observableArrayList(allMilestones)))
-					.setWindowTitle("Choose milestone")
+					.setWindowTitle("Choose Milestone")
 					.setMultipleSelection(false)
 					.setInitialCheckedState(existingIndices)
 					.show()
 					.thenApply((response) -> {
-							boolean wasAnythingSelected = response.size() > 0;
-							if (wasAnythingSelected) {
-								TurboMilestone milestone = allMilestones.get(response.get(0));
-								
-								// We don't have data binding for this box; set it manually
-								label.setText(milestone.getTitle());
-								
-								issue.setMilestone(milestone);
-							} else {
-								
-								// Again, no data binding
-								label.setText("Milestone");
-								label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-
-								issue.setMilestone(null);
-							}
+							TurboMilestone milestone = response.size() > 0 ? allMilestones.get(response.get(0)) : null;
+							milestoneBox.setListableItem(milestone);
+							issue.setMilestone(milestone);
 							return true;
 						});
 		});

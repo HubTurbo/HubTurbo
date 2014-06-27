@@ -11,7 +11,7 @@ import model.TurboLabel;
 
 public class LabelDisplayBox extends FlowPane {
 
-	ObservableList<TurboLabel> labels; // cange back to priate
+	private ObservableList<TurboLabel> labels;
 
 	public LabelDisplayBox() {
 		this(FXCollections.observableArrayList());
