@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -15,6 +16,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
 public class TurboIssue implements Listable {
+	
 	private ObservableList<TurboLabel> labels;
 	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
@@ -56,7 +58,6 @@ public class TurboIssue implements Listable {
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue);
 		
-		
 	}
 	
 	private ObservableList<TurboLabel> translateLabels(Issue issue) {
@@ -74,11 +75,25 @@ public class TurboIssue implements Listable {
 	public Issue toGhIssue() {
 		Issue ghIssue = new Issue();
 		ghIssue.setTitle(getTitle());
-		ghIssue.setBody(getDescription());
 		ghIssue.setState(getOpen() ? "open" : "closed");
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhUser());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
+		
+		String parentsMd = "*Parent(s): ";
+		Iterator<Integer> parentsItr = parents.iterator();
+		while (parentsItr.hasNext()) {
+			parentsMd = parentsMd + "#" + parentsItr.next();
+			if (parentsItr.hasNext()) {
+				parentsMd = parentsMd + ", ";
+			}
+		}
+		StringBuilder body = new StringBuilder();
+		body.append(parentsMd + "\n");
+		body.append("<hr>\n");
+		body.append(getDescription());
+		ghIssue.setBody(body.toString());
+		
 		return ghIssue;
 	}
 	
