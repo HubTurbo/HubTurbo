@@ -58,7 +58,34 @@ public class IssueDialog implements Dialog<String> {
 		return response;
 	}
 
-	private Parent left() {
+	private void showDialog() {
+	
+		HBox layout = new HBox();
+		layout.setPadding(new Insets(15));
+		layout.setSpacing(MIDDLE_SPACING);
+	
+		Scene scene = new Scene(layout, parentStage.getWidth(),
+				parentStage.getHeight() * HEIGHT_FACTOR);
+	
+		Stage stage = new Stage();
+		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
+		stage.setScene(scene);
+	
+		Platform.runLater(() -> stage.requestFocus());
+	
+		layout.getChildren().addAll(left(stage), right(stage));
+	
+		stage.initOwner(parentStage);
+		// secondStage.initModality(Modality.APPLICATION_MODAL);
+	
+		stage.setX(parentStage.getX());
+		stage.setY(parentStage.getY() + parentStage.getHeight()
+				* (1 - HEIGHT_FACTOR));
+	
+		stage.show();
+	}
+
+	private Parent left(Stage stage) {
 
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
@@ -83,6 +110,8 @@ public class IssueDialog implements Dialog<String> {
 		
 		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
 
+		Parent parentsBox = createParentsBox(stage);
+		
 		TextArea issueDesc = new TextArea(issue.getDescription());
 		issueDesc.setPrefRowCount(5);
 		issueDesc.setPrefColumnCount(42);
@@ -94,7 +123,7 @@ public class IssueDialog implements Dialog<String> {
 
 		VBox left = new VBox();
 		left.setSpacing(ELEMENT_SPACING);
-		left.getChildren().addAll(title, issueDesc);
+		left.getChildren().addAll(title, parentsBox, issueDesc);
 
 		return left;
 
@@ -199,6 +228,88 @@ public class IssueDialog implements Dialog<String> {
 		return assigneeBox;
 	}
 
+	private Parent createParentsBox(Stage stage) {
+		final HBox parentsBox = new HBox();
+		parentsBox.setStyle(UI.STYLE_BORDERS_FADED);
+		
+		Label label;
+		assert issue.getParents() != null : "Issue parents should not be null";
+		if (issue.getParents().size() == 0) {
+			label = new Label("Parents");
+			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+		} else {
+			label = new Label();
+			
+			StringBuilder parentSB = new StringBuilder();
+			for (Integer p : issue.getParents()) {
+				parentSB.append("#" + p);
+				parentSB.append(", ");
+			}
+			if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
+			
+			label.setText(parentSB.toString());
+			label.setStyle("-fx-padding: 5 5 5 5;");
+		}
+		parentsBox.getChildren().add(label);
+		
+		List<TurboIssue> allIssues = model.getIssues();
+		
+		parentsBox.setOnMouseClicked((e) -> {
+			List<Integer> indicesForExistingParents = issue.getParents().stream()
+					.map((parent) -> {
+						for (int i = 0; i < allIssues.size(); i++) {
+							if (allIssues.get(i).getId() == parent) {
+								return i;
+							}
+						}
+						assert false;
+						return -1;
+					}).collect(Collectors.toList());
+
+			(new FilterableCheckboxList(stage, FXCollections
+					.observableArrayList(allIssues)))
+					.setWindowTitle("Choose parents")
+					.setMultipleSelection(true)
+					.setInitialCheckedState(indicesForExistingParents)
+					.show()
+					.thenApply(
+							(List<Integer> response) -> {
+								
+								boolean wasAnythingSelected = response.size() > 0;
+								if (wasAnythingSelected) {
+									List<Integer> parents = response.stream()
+											.map((i) -> allIssues.get(i).getId())
+											.collect(Collectors.toList());
+									
+									
+									// We don't have data binding for this box; set it manually
+									StringBuilder parentSB = new StringBuilder();
+									for (Integer p : parents) {
+										parentSB.append("#" + p);
+										parentSB.append(", ");
+									}
+									if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
+									
+									label.setText(parentSB.toString());
+									label.setStyle("-fx-padding: 5 5 5 5;");
+
+									issue.setParents(FXCollections
+											.observableArrayList(parents));
+								} else {
+									// Again, no data binding
+									label.setText("Parents");
+									label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+
+									issue.setParents(FXCollections.observableArrayList());
+								}
+								
+
+								return true;
+							});
+		});
+		return parentsBox;
+	}
+	
 	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels());
 		labelBox.setStyle(UI.STYLE_BORDERS_FADED);
@@ -300,32 +411,5 @@ public class IssueDialog implements Dialog<String> {
 						});
 		});
 		return milestoneBox;
-	}
-
-	private void showDialog() {
-
-		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
-		layout.setSpacing(MIDDLE_SPACING);
-
-		Scene scene = new Scene(layout, parentStage.getWidth(),
-				parentStage.getHeight() * HEIGHT_FACTOR);
-
-		Stage stage = new Stage();
-		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
-		stage.setScene(scene);
-
-		Platform.runLater(() -> stage.requestFocus());
-
-		layout.getChildren().addAll(left(), right(stage));
-
-		stage.initOwner(parentStage);
-		// secondStage.initModality(Modality.APPLICATION_MODAL);
-
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY() + parentStage.getHeight()
-				* (1 - HEIGHT_FACTOR));
-
-		stage.show();
 	}
 }
