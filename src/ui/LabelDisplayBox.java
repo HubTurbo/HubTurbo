@@ -33,8 +33,7 @@ public class LabelDisplayBox extends FlowPane {
 
 		labels.addListener(new ListChangeListener<TurboLabel>() {
 			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends TurboLabel> arg0) {
+			public void onChanged(ListChangeListener.Change<? extends TurboLabel> arg0) {
 				populateWithLabels();
 			}
 		});

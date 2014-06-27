@@ -169,29 +169,7 @@ public class IssueDialog implements Dialog<String> {
 	}
 
 	private Parent createParentsBox(Stage stage) {
-		final HBox parentsBox = new HBox();
-		parentsBox.setStyle(UI.STYLE_BORDERS_FADED);
-		
-		Label label;
-		assert issue.getParents() != null : "Issue parents should not be null";
-		if (issue.getParents().size() == 0) {
-			label = new Label("Parents");
-			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-		} else {
-			label = new Label();
-			
-			StringBuilder parentSB = new StringBuilder();
-			for (Integer p : issue.getParents()) {
-				parentSB.append("#" + p);
-				parentSB.append(", ");
-			}
-			if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
-			
-			label.setText(parentSB.toString());
-			label.setStyle("-fx-padding: 5 5 5 5;");
-		}
-		parentsBox.getChildren().add(label);
-		
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox("Parents", issue.getParents());
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
@@ -220,26 +198,8 @@ public class IssueDialog implements Dialog<String> {
 									List<Integer> parents = response.stream()
 											.map((i) -> allIssues.get(i).getId())
 											.collect(Collectors.toList());
-									
-									
-									// We don't have data binding for this box; set it manually
-									StringBuilder parentSB = new StringBuilder();
-									for (Integer p : parents) {
-										parentSB.append("#" + p);
-										parentSB.append(", ");
-									}
-									if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
-									
-									label.setText(parentSB.toString());
-									label.setStyle("-fx-padding: 5 5 5 5;");
-
-									issue.setParents(FXCollections
-											.observableArrayList(parents));
+									issue.setParents(FXCollections.observableArrayList(parents));
 								} else {
-									// Again, no data binding
-									label.setText("Parents");
-									label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-
 									issue.setParents(FXCollections.observableArrayList());
 								}
 								
