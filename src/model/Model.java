@@ -24,9 +24,10 @@ import util.LabelServiceFixed;
 
 public class Model {
 	
-	public static final String MILESTONES_ALL = "all";
-	public static final String MILESTONES_OPEN = "open";
-	public static final String MILESTONES_CLOSED = "closed";
+	private static final String CHARSET = "ISO-8859-1";
+	public static final String STATE_ALL = "all";
+	public static final String STATE_OPEN = "open";
+	public static final String STATE_CLOSED = "closed";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -112,7 +113,7 @@ public class Model {
 	
 	public void deleteLabel(TurboLabel label) {
 		try {
-			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), "ISO-8859-1"));
+			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), CHARSET));
 			labels.remove(label);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -150,7 +151,7 @@ public class Model {
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhResource();
 		try {
-			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, "ISO-8859-1"));
+			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, CHARSET));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -250,8 +251,8 @@ public class Model {
 	private boolean loadIssues() {
 		issues.clear();
 		Map<String, String> filters = new HashMap<String, String>();
-		filters.put(IssueService.FIELD_FILTER, "all");
-		filters.put(IssueService.FILTER_STATE, "all");
+		filters.put(IssueService.FIELD_FILTER, STATE_ALL);
+		filters.put(IssueService.FILTER_STATE, STATE_ALL);
 		try {		
 			List<Issue> ghIssues = issueService.getIssues(repoId, filters);
 			for (Issue ghIssue : ghIssues) {
@@ -283,7 +284,7 @@ public class Model {
 	private boolean loadMilestones(){
 		milestones.clear();
 		try {		
-			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, MILESTONES_ALL);
+			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
 				milestones.add(new TurboMilestone(ghMilestone));
 			}
