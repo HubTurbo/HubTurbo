@@ -23,7 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboCollaborator;
+import model.TurboUser;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -248,7 +248,7 @@ public class IssueDialog implements Dialog<String> {
 	private Parent createAssigneeBox(Stage stage) {
 		
 		final ListableDisplayBox assigneeBox = new ListableDisplayBox("Assignee", issue.getAssignee());
-		List<TurboCollaborator> allAssignees = model.getCollaborators();
+		List<TurboUser> allAssignees = model.getCollaborators();
 		
 		assigneeBox.setOnMouseClicked((e) -> {
 			
@@ -271,7 +271,7 @@ public class IssueDialog implements Dialog<String> {
 					.setInitialCheckedState(existingIndices)
 					.show()
 					.thenApply((response) -> {
-							TurboCollaborator assignee = response.size() > 0 ? allAssignees.get(response.get(0)) : null;
+							TurboUser assignee = response.size() > 0 ? allAssignees.get(response.get(0)) : null;
 							assigneeBox.setListableItem(assignee);
 							issue.setAssignee(assignee);
 							return true;

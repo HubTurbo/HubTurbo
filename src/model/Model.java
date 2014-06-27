@@ -28,7 +28,7 @@ public class Model {
 	public static final String MILESTONES_OPEN = "open";
 	public static final String MILESTONES_CLOSED = "closed";
 	
-	private ObservableList<TurboCollaborator> collaborators = FXCollections.observableArrayList();
+	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
@@ -59,7 +59,7 @@ public class Model {
 		return issues;
 	}
 	
-	public ObservableList<TurboCollaborator> getCollaborators() {
+	public ObservableList<TurboUser> getCollaborators() {
 		return collaborators;
 	}
 
@@ -76,7 +76,7 @@ public class Model {
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
 			for(User ghCollaborator : ghCollaborators) {
-				collaborators.add(new TurboCollaborator(ghCollaborator));
+				collaborators.add(new TurboUser(ghCollaborator));
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -135,7 +135,7 @@ public class Model {
 	}
 	
 	public TurboIssue createIssue(TurboIssue newIssue) {
-		Issue ghIssue = newIssue.toGhIssue();
+		Issue ghIssue = newIssue.toGhResource();
 		Issue createdIssue = null;
 		try {
 			createdIssue = issueService.createIssue(repoId, ghIssue);
@@ -148,7 +148,7 @@ public class Model {
 	}
 	
 	public TurboLabel createLabel(TurboLabel newLabel) {
-		Label ghLabel = newLabel.toGhLabel();
+		Label ghLabel = newLabel.toGhResource();
 		Label createdLabel = null;
 		try {
 			createdLabel = labelService.createLabel(repoId, ghLabel);
@@ -161,7 +161,7 @@ public class Model {
 	}
 	
 	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
-		Milestone ghMilestone = newMilestone.toGhMilestone();
+		Milestone ghMilestone = newMilestone.toGhResource();
 		Milestone createdMilestone = null;
 		try {
 			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
@@ -192,8 +192,8 @@ public class Model {
 	}
 	
 	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
-		Issue original = orignalIssue.toGhIssue();
-		Issue edited = editedIssue.toGhIssue();
+		Issue original = orignalIssue.toGhResource();
+		Issue edited = editedIssue.toGhResource();
 		try {
 			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
 			
@@ -260,7 +260,7 @@ public class Model {
 	}
 	
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
-		Label ghLabel = editedLabel.toGhLabel();
+		Label ghLabel = editedLabel.toGhResource();
 		try {
 			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, "ISO-8859-1"));
 		} catch (IOException e) {
@@ -270,7 +270,7 @@ public class Model {
 	}
 	
 	public void updateMilestone(TurboMilestone editedMilestone) {
-		Milestone ghMilestone = editedMilestone.toGhMilestone();
+		Milestone ghMilestone = editedMilestone.toGhResource();
 		try {
 			milestoneService.editMilestone(repoId, ghMilestone);
 		} catch (IOException e) {

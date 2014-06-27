@@ -12,6 +12,42 @@ import ui.LabelTreeItem;
 
 public class TurboLabel implements Listable, LabelTreeItem {
 	
+	/*
+	 * Attributes, Getters & Setters
+	 */
+	
+	public String getValue() {return getName();}
+	public void setValue(String value) {setName(value);}
+	
+	private StringProperty name = new SimpleStringProperty();
+    public final String getName() {return name.get();}
+    public final void setName(String value) {
+    	assert value != "";
+    	assert value != null;
+    	name.set(value);
+    	}
+    public StringProperty nameProperty() {return name;}
+	
+    private StringProperty colour = new SimpleStringProperty();
+    public final String getColour() {return colour.get();}
+    public final void setColour(String value) {colour.set(value);}
+    public StringProperty colourProperty() {return colour;}
+    
+    private StringProperty group = new SimpleStringProperty();
+    public final String getGroup() {return group.get();}
+    public final void setGroup(String value) {group.set(value);}
+    public StringProperty groupProperty() {return group;}
+    
+	private boolean isExclusive; // exclusive: "." non-exclusive: "-"
+	public boolean isExclusive() {return isExclusive;}
+	public void setExclusive(boolean isExclusive) {
+		if (getGroup() != null) this.isExclusive = isExclusive;
+	}
+	
+	/*
+	 * Constructors and Public Methods
+	 */
+	
 	public TurboLabel(String name) {
 		setName(name);
 		setColour("000000");
@@ -39,7 +75,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		setColour(label.getColor());
 	}
 	
-	public Label toGhLabel() {
+	public Label toGhResource() {
 		Label ghLabel = new Label();
 		ghLabel.setName(toGhName());
 		ghLabel.setColor(getColour());
@@ -65,27 +101,10 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		}
 		return ghLabels;
 	}
-
-    private StringProperty name = new SimpleStringProperty();
-    public final String getName() {return name.get();}
-    public final void setName(String value) {
-    	assert value != "";
-    	assert value != null;
-    	name.set(value);
-    	}
-    public StringProperty nameProperty() {return name;}
 	
-    private StringProperty colour = new SimpleStringProperty();
-    public final String getColour() {return colour.get();}
-    public final void setColour(String value) {colour.set(value);}
-    public StringProperty colourProperty() {return colour;}
-    
-    private StringProperty group = new SimpleStringProperty();
-    public final String getGroup() {return group.get();}
-    public final void setGroup(String value) {group.set(value);}
-    public StringProperty groupProperty() {return group;}
-    
-	private boolean isExclusive; // exclusive: "." non-exclusive: "-"
+	/*
+	 * Overriden Methods
+	 */
 
 	@Override
 	public String getListName() {
@@ -122,21 +141,4 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return getGroup() + "/" + getName() + "/" + getColour();
 	}
 	
-	public String getValue() {
-		return getName();
-	}
-	public void setValue(String value) {
-		setName(value);
-	}
-
-	public boolean isExclusive() {
-		return isExclusive;
-	}
-
-	public void setExclusive(boolean isExclusive) {
-		if (getGroup() != null) {
-			this.isExclusive = isExclusive;
-		}
-	}
-
 }

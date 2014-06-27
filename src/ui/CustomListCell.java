@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboCollaborator;
+import model.TurboUser;
 import model.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
@@ -50,7 +50,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		HBox assignee = new HBox();
 		assignee.setSpacing(3);
 		Text assignedToLabel = new Text("Assigned to:");
-		TurboCollaborator collaborator = issue.getAssignee();
+		TurboUser collaborator = issue.getAssignee();
 		Text assigneeName = new Text(collaborator == null ? "none"
 				: collaborator.getGithubName());
 		assignee.getChildren().addAll(assignedToLabel, assigneeName);

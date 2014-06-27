@@ -8,10 +8,33 @@ import javafx.beans.property.StringProperty;
 import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
+	
+	/*
+	 * Attributes, Getters & Setters
+	 */
+	
 	private int number;
+	public int getNumber() {return number;}
+	
+	private StringProperty title = new SimpleStringProperty();
+    public final String getTitle() {return title.get();}
+    public final void setTitle(String value) {title.set(value);}
+    public StringProperty titleProperty() {return title;}
+	
 	private String state;
+	public String getState() {return state;}
+	
 	private String description;
+	public String getDescription() {return description;}
+	public void setDescription(String description) {this.description = description;}
+	
 	private Date dueOn;
+	public Date getDueOn() {return dueOn;}
+	public void setDueOn(Date dueOn) {this.dueOn = dueOn;}
+	
+	/*
+	 * Constructors and Public Methods
+	 */
 	
 	public TurboMilestone(String title) {
 		setTitle(title);
@@ -26,7 +49,7 @@ public class TurboMilestone implements Listable {
 		this.dueOn = milestone.getDueOn();
 	}
 	
-	public Milestone toGhMilestone() {
+	public Milestone toGhResource() {
 		Milestone ghMilestone = new Milestone();
 		ghMilestone.setTitle(getTitle());
 		ghMilestone.setNumber(number);
@@ -35,36 +58,11 @@ public class TurboMilestone implements Listable {
 		ghMilestone.setDueOn(dueOn);
 		return ghMilestone;
 	}
-
-	private StringProperty title = new SimpleStringProperty();
-    public final String getTitle() {return title.get();}
-    public final void setTitle(String value) {title.set(value);}
-    public StringProperty titleProperty() {return title;}
-
-	public String getState() {
-		return state;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Date getDueOn() {
-		return dueOn;
-	}
-
-	public void setDueOn(Date dueOn) {
-		this.dueOn = dueOn;
-	}
-
-	public int getNumber() {
-		return number;
-	}
 	
+	/*
+	 * Overridden Methods
+	 */
+
 	@Override
 	public String getListName() {
 		return getTitle();

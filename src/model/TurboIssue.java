@@ -17,15 +17,71 @@ import org.eclipse.egit.github.core.Label;
 
 public class TurboIssue implements Listable {
 	
+	private static final String STATE_CLOSED = "closed";
+	private static final String STATE_OPEN = "open";
+	private static final String REGEX_REPLACE_DESC = "^[^<>]*<hr>";
+	private static final String REGEX_SPLIT_PARENT = "(,\\s+)?#";
+	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
-
 	private static final String METADATA_SEPERATOR = "<hr>";
 	
-	private ObservableList<TurboLabel> labels;
-	private TurboCollaborator assignee;
+	/*
+	 * Attributes, Getters & Setters
+	 */
+	
+	private IntegerProperty id = new SimpleIntegerProperty();
+    public final int getId() {return id.get();}
+    private final void setId(int value) {id.set(value);}
+    public IntegerProperty idProperty() {return id;}
+	
+	private StringProperty title = new SimpleStringProperty();
+    public final String getTitle() {return title.get();}
+    public final void setTitle(String value) {title.set(value);}
+    public StringProperty titleProperty() {return title;}
+	
+    private StringProperty description = new SimpleStringProperty();
+    public final String getDescription() {return description.get();}
+    public final void setDescription(String value) {description.set(value);}
+    public StringProperty descriptionProperty() {return description;}
+    
+    private BooleanProperty state = new SimpleBooleanProperty();
+    public final Boolean getOpen() {return state.get();}
+    public final void setOpen(Boolean value) {state.set(value);}
+    public BooleanProperty openProperty() {return state;}
+    
+    private TurboUser assignee;
+    public TurboUser getAssignee() {return assignee;}
+	public void setAssignee(TurboUser assignee) {this.assignee = assignee;}
+	
 	private TurboMilestone milestone;
+	public TurboMilestone getMilestone() {return milestone;}
+	public void setMilestone(TurboMilestone milestone) {this.milestone = milestone;}
+	
+	private ObservableList<TurboLabel> labels;
+	public ObservableList<TurboLabel> getLabels() {return labels;}
+	public void setLabels(ObservableList<TurboLabel> labels) {
+		if (this.labels == null) {
+			this.labels = labels;
+		} else if (labels != this.labels) {
+			this.labels.clear();
+			this.labels.addAll(labels);
+		}	
+	}
 	
 	private ObservableList<Integer> parents;
+	public ObservableList<Integer> getParents() {return parents;}
+	public void setParents(ObservableList<Integer> parents) {
+		if (this.parents == null) {
+			this.parents = parents;
+		} else if (parents != this.parents) {
+			this.parents.clear();
+			this.parents.addAll(parents);
+		}	
+	}
+
+	/*
+	 * Constructors & Public Methods
+	 */
 	
 	public TurboIssue(String title, String desc) {
 		assert title != null;
@@ -42,6 +98,8 @@ public class TurboIssue implements Listable {
 	
 	// Copy constructor
 	public TurboIssue(TurboIssue other) {
+		assert other != null;
+		
 		setTitle(other.getTitle());
 		setDescription(other.getDescription());
 		setOpen(other.getOpen());
@@ -56,67 +114,23 @@ public class TurboIssue implements Listable {
 		assert issue != null;
 		
 		setTitle(issue.getTitle());
-		setOpen(new Boolean(issue.getState().equals("open")));
+		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
 		setId(issue.getNumber());
+		setDescription(extractDescription(issue.getBody()));
 		
-		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
+		this.assignee = issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee());
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
-		this.labels = translateLabels(issue);
-		this.parents = translateParents(issue);
+		this.labels = translateLabels(issue.getLabels());
+		this.parents = extractParents(issue.getBody());
 		
-		String body = issue.getBody();
-		String[] lines = body.split("(\\r?\\n)+");
-		int seperatorLineIndex = getSeperatorIndex(lines);
-		for (int i = 0; i < seperatorLineIndex; i++) {
-			String line = lines[i];
-			if (line.startsWith(METADATA_HEADER_PARENT)) {
-				String value = line.replace(METADATA_HEADER_PARENT, "");
-				String[] valueTokens = value.split("(,\\s+)?#");
-				System.out.println("valueTokens: " + valueTokens);
-				for (int j = 0; j < valueTokens.length; j++) {
-					if (valueTokens[j].trim().isEmpty()) continue;
-					parents.add(Integer.parseInt(valueTokens[j]));
-				}
-				System.out.println("parents: " + parents);
-			}
-		}
-		String description = body.replaceAll("^[^<>]*<hr>", "").trim();
-		System.out.println("description: " + description);
-		setDescription(description);
-	}
-	
-	private int getSeperatorIndex(String[] lines) {
-		for (int i = 0; i < lines.length; i++) {
-			if (lines[i].equals(METADATA_SEPERATOR)) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
-	private ObservableList<Integer> translateParents(Issue issue) {
-		// TODO to be implemented
-		return FXCollections.observableArrayList();
-	}
-
-	private ObservableList<TurboLabel> translateLabels(Issue issue) {
-		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
-		
-		if (issue.getLabels() == null) return turboLabels;
-		
-		List<Label> labels = issue.getLabels();
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
-		}
-		return turboLabels;
-	}
-	
-	public Issue toGhIssue() {
+	public Issue toGhResource() {
 		Issue ghIssue = new Issue();
 		ghIssue.setTitle(getTitle());
-		ghIssue.setState(getOpen() ? "open" : "closed");
-		if (assignee != null) ghIssue.setAssignee(assignee.toGhUser());
-		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
+		ghIssue.setState(getOpen() ? STATE_OPEN : STATE_CLOSED);
+		if (assignee != null) ghIssue.setAssignee(assignee.toGhResource());
+		if (milestone != null) ghIssue.setMilestone(milestone.toGhResource());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
 		
 		String parentsMd = METADATA_HEADER_PARENT;
@@ -136,74 +150,58 @@ public class TurboIssue implements Listable {
 		return ghIssue;
 	}
 	
+	/*
+	 * Private Methods
+	 */
+	
+	private String extractDescription(String issueBody) {
+		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
+		return description;
+	}
+	
+	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
+		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
+		if (labels == null) return turboLabels;
+		for (Label label : labels) {
+			turboLabels.add(new TurboLabel(label));
+		}
+		return turboLabels;
+	}
+
+	private ObservableList<Integer> extractParents(String body) {
+		ObservableList<Integer> parents = FXCollections.observableArrayList();
+		String[] lines = body.split(REGEX_SPLIT_LINES);
+		int seperatorLineIndex = getSeperatorIndex(lines);
+		for (int i = 0; i < seperatorLineIndex; i++) {
+			String line = lines[i];
+			if (line.startsWith(METADATA_HEADER_PARENT)) {
+				String value = line.replace(METADATA_HEADER_PARENT, "");
+				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
+				for (int j = 0; j < valueTokens.length; j++) {
+					if (valueTokens[j].trim().isEmpty()) continue;
+					parents.add(Integer.parseInt(valueTokens[j]));
+				}
+			}
+		}
+		return parents;
+	}
+	
+	private int getSeperatorIndex(String[] lines) {
+		for (int i = 0; i < lines.length; i++) {
+			if (lines[i].equals(METADATA_SEPERATOR)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * Overridden Methods
+	 */
+	
 	@Override
 	public String toString() {
 		return "Issue " + getTitle();
-	}
-
-	private StringProperty title = new SimpleStringProperty();
-    public final String getTitle() {return title.get();}
-    public final void setTitle(String value) {title.set(value);}
-    public StringProperty titleProperty() {return title;}
-	
-    private StringProperty description = new SimpleStringProperty();
-    public final String getDescription() {return description.get();}
-    public final void setDescription(String value) {description.set(value);}
-    public StringProperty descriptionProperty() {return description;}
-    
-    private BooleanProperty state = new SimpleBooleanProperty();
-    public final Boolean getOpen() {return state.get();}
-    public final void setOpen(Boolean value) {state.set(value);}
-    public BooleanProperty openProperty() {return state;}
-
-    private IntegerProperty id = new SimpleIntegerProperty();
-    public final int getId() {return id.get();}
-    private final void setId(int value) {id.set(value);}
-    public IntegerProperty idProperty() {return id;}
-    
-	public ObservableList<TurboLabel> getLabels() {
-		return labels;
-	}
-	public void setLabels(ObservableList<TurboLabel> labels) {
-		if (this.labels == null) {
-			this.labels = labels;
-		} else if (labels != this.labels) {
-			this.labels.clear();
-			this.labels.addAll(labels);
-		}
-	}
-	public TurboCollaborator getAssignee() {
-		return assignee;
-	}
-	public void setAssignee(TurboCollaborator assignee) {
-		this.assignee = assignee;
-	}
-	public TurboMilestone getMilestone() {
-		return milestone;
-	}
-	public void setMilestone(TurboMilestone milestone) {
-		this.milestone = milestone;
-	}
-	
-	public ObservableList<Integer> getParents() {
-		return parents;
-	}
-
-	public void setParents(ObservableList<Integer> parents) {
-		if (this.parents == null) {
-			this.parents = parents;
-		} else if (parents != this.parents) {
-			this.parents.clear();
-			this.parents.addAll(parents);
-		}
-	}
-
-	public void addParent(int issueId) {
-		parents.add(new Integer(issueId));
-	}
-	
-	public void removeParent(int issueId) {
-		parents.remove(new Integer(issueId));
 	}
 
 	@Override
