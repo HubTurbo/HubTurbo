@@ -47,7 +47,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		Text parentName = new Text("parent");
 		parentName.setStyle(STYLE_PARENT_NAME);
 
-		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels());
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
 		HBox assignee = new HBox();
 		assignee.setSpacing(3);

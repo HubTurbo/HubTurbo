@@ -251,15 +251,7 @@ public class IssueDialog implements Dialog<String> {
 	}
 	
 	private LabelDisplayBox createLabelBox(Stage stage) {
-		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels());
-		labelBox.setStyle(UI.STYLE_BORDERS_FADED);
-		
-		if (issue.getLabels().size() == 0) {
-			Label noLabels = new Label("Labels");
-			noLabels.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
-			labelBox.getChildren().add(noLabels);
-		}
-		
+		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true);
 		List<TurboLabel> allLabels = model.getLabels();
 		
 		labelBox.setOnMouseClicked((e) -> {

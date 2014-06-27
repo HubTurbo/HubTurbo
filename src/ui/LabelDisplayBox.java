@@ -12,17 +12,22 @@ import model.TurboLabel;
 public class LabelDisplayBox extends FlowPane {
 
 	private ObservableList<TurboLabel> labels;
-
+	private boolean displayWhenEmpty;
+	
 	public LabelDisplayBox() {
-		this(FXCollections.observableArrayList());
+		this(FXCollections.observableArrayList(), false);
 	}
 
-	public LabelDisplayBox(ObservableList<TurboLabel> labels) {
+	public LabelDisplayBox(ObservableList<TurboLabel> labels, boolean displayWhenEmpty) {
 		this.labels = labels;
+		this.displayWhenEmpty = displayWhenEmpty;
 		setup();
 	}
 
 	private void setup() {
+		if (displayWhenEmpty) {
+			setStyle(UI.STYLE_BORDERS_FADED);
+		}
 		setHgap(3);
 		setVgap(3);
 
@@ -44,6 +49,16 @@ public class LabelDisplayBox extends FlowPane {
 	
 	private void populateWithLabels() {
 		getChildren().clear();
+		
+		if (displayWhenEmpty && labels.size() == 0) {
+			
+			Label noLabels = new Label("Labels");
+			noLabels.setStyle(UI.STYLE_FADED + "-fx-padding: 5;");
+			getChildren().add(noLabels);
+
+			return;
+		}
+		
 		for (TurboLabel label : labels) {
 			Label labelText = new Label(label.getName());
 			labelText.setStyle(getStyleFor(label));
@@ -63,7 +78,7 @@ public class LabelDisplayBox extends FlowPane {
 		String colour = label.getColour();
 		String style = "-fx-background-color: #"
 				+ colour
-				+ "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 3;";
+				+ "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;";
 		return style;
 	}
 }
