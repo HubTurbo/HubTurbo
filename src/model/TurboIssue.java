@@ -17,6 +17,10 @@ import org.eclipse.egit.github.core.Label;
 
 public class TurboIssue implements Listable {
 	
+	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
+
+	private static final String METADATA_SEPERATOR = "<hr>";
+	
 	private ObservableList<TurboLabel> labels;
 	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
@@ -52,7 +56,6 @@ public class TurboIssue implements Listable {
 		assert issue != null;
 		
 		setTitle(issue.getTitle());
-		setDescription(issue.getBody());
 		setOpen(new Boolean(issue.getState().equals("open")));
 		setId(issue.getNumber());
 		
@@ -60,8 +63,37 @@ public class TurboIssue implements Listable {
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue);
 		this.parents = translateParents(issue);
+		
+		String body = issue.getBody();
+		String[] lines = body.split("(\\r?\\n)+");
+		int seperatorLineIndex = getSeperatorIndex(lines);
+		for (int i = 0; i < seperatorLineIndex; i++) {
+			String line = lines[i];
+			if (line.startsWith(METADATA_HEADER_PARENT)) {
+				String value = line.replace(METADATA_HEADER_PARENT, "");
+				String[] valueTokens = value.split("(,\\s+)?#");
+				System.out.println("valueTokens: " + valueTokens);
+				for (int j = 0; j < valueTokens.length; j++) {
+					if (valueTokens[j].trim().isEmpty()) continue;
+					parents.add(Integer.parseInt(valueTokens[j]));
+				}
+				System.out.println("parents: " + parents);
+			}
+		}
+		String description = body.replaceAll("^[^<>]*<hr>", "").trim();
+		System.out.println("description: " + description);
+		setDescription(description);
 	}
 	
+	private int getSeperatorIndex(String[] lines) {
+		for (int i = 0; i < lines.length; i++) {
+			if (lines[i].equals(METADATA_SEPERATOR)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	private ObservableList<Integer> translateParents(Issue issue) {
 		// TODO to be implemented
 		return FXCollections.observableArrayList();
@@ -87,7 +119,7 @@ public class TurboIssue implements Listable {
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhMilestone());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
 		
-		String parentsMd = "*Parent(s): ";
+		String parentsMd = METADATA_HEADER_PARENT;
 		Iterator<Integer> parentsItr = parents.iterator();
 		while (parentsItr.hasNext()) {
 			parentsMd = parentsMd + "#" + parentsItr.next();
@@ -97,7 +129,7 @@ public class TurboIssue implements Listable {
 		}
 		StringBuilder body = new StringBuilder();
 		body.append(parentsMd + "\n");
-		body.append("<hr>\n");
+		body.append(METADATA_SEPERATOR + "\n");
 		body.append(getDescription());
 		ghIssue.setBody(body.toString());
 		
