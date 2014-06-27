@@ -21,7 +21,7 @@ public class TurboIssue implements Listable {
 	private TurboCollaborator assignee;
 	private TurboMilestone milestone;
 	
-	private List<Integer> parents;
+	private ObservableList<Integer> parents;
 	
 	public TurboIssue(String title, String desc) {
 		assert title != null;
@@ -30,6 +30,7 @@ public class TurboIssue implements Listable {
 		setTitle(title);
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
+		parents = FXCollections.observableArrayList();
 //		TurboLabel tl = new TurboLabel();
 //		tl.setName("feature");
 //		labels.add(tl);
@@ -44,6 +45,7 @@ public class TurboIssue implements Listable {
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
+		setParents(FXCollections.observableArrayList(other.getParents()));
 	}
 	
 	public TurboIssue(Issue issue) {
@@ -57,9 +59,14 @@ public class TurboIssue implements Listable {
 		this.assignee = issue.getAssignee() == null ? null : new TurboCollaborator(issue.getAssignee());
 		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
 		this.labels = translateLabels(issue);
-		
+		this.parents = translateParents(issue);
 	}
 	
+	private ObservableList<Integer> translateParents(Issue issue) {
+		// TODO to be implemented
+		return FXCollections.observableArrayList();
+	}
+
 	private ObservableList<TurboLabel> translateLabels(Issue issue) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		
@@ -147,8 +154,12 @@ public class TurboIssue implements Listable {
 		this.milestone = milestone;
 	}
 	
-	public List<Integer> getParents() {
+	public ObservableList<Integer> getParents() {
 		return parents;
+	}
+
+	public void setParents(ObservableList<Integer> parents) {
+		this.parents = parents;
 	}
 
 	public void addParent(int issueId) {
