@@ -171,7 +171,6 @@ public class TurboIssue implements Listable {
 			this.labels.clear();
 			this.labels.addAll(labels);
 		}
-		
 	}
 	public TurboCollaborator getAssignee() {
 		return assignee;
@@ -191,7 +190,12 @@ public class TurboIssue implements Listable {
 	}
 
 	public void setParents(ObservableList<Integer> parents) {
-		this.parents = parents;
+		if (this.parents == null) {
+			this.parents = parents;
+		} else if (parents != this.parents) {
+			this.parents.clear();
+			this.parents.addAll(parents);
+		}
 	}
 
 	public void addParent(int issueId) {
