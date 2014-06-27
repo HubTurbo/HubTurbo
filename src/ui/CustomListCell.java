@@ -15,7 +15,6 @@ import model.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
-	private static final String STYLE_PARENT_NAME = "-fx-font-size: 11px;";
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	private final Stage mainStage;
@@ -44,8 +43,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 			}
 		});
 
-		Text parentName = new Text("parent");
-		parentName.setStyle(STYLE_PARENT_NAME);
+		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
 
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
@@ -60,7 +58,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		VBox everything = new VBox();
 		everything.setSpacing(2);
 		everything.getChildren()
-				.addAll(issueName, parentName, labels, assignee);
+				.addAll(issueName, parents, labels, assignee);
 		// everything.getChildren().stream().forEach((node) ->
 		// node.setStyle(Demo.STYLE_BORDERS));
 

@@ -7,17 +7,19 @@ import javafx.scene.layout.HBox;
 
 public class ParentIssuesDisplayBox extends HBox {
 	
-	private String defaultText;
 	private ObservableList<Integer> issueNumbers = null;
+	private boolean displayWhenEmpty;
 	
-	public ParentIssuesDisplayBox(String defaultText, ObservableList<Integer> items) {
-		this.defaultText = defaultText;
+	public ParentIssuesDisplayBox(ObservableList<Integer> items, boolean displayWhenEmpty) {
 		setListableItems(items);
+		this.displayWhenEmpty = displayWhenEmpty;
 		setup();
 	}
 	
 	private void setup() {
-		setStyle(UI.STYLE_BORDERS_FADED);
+		if (displayWhenEmpty) {
+			setStyle(UI.STYLE_BORDERS_FADED);
+		}
 	}
 
 	private void setListableItems(ObservableList<Integer> issueNumbers) {
@@ -35,8 +37,8 @@ public class ParentIssuesDisplayBox extends HBox {
 	
 	private void update() {
 		Label label;
-		if (issueNumbers.size() == 0) {
-			label = new Label(defaultText);
+		if (displayWhenEmpty && issueNumbers.size() == 0) {
+			label = new Label("Parents");
 			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5;");
 		} else {
 			StringBuilder parentSB = new StringBuilder();

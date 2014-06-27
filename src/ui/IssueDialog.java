@@ -169,7 +169,7 @@ public class IssueDialog implements Dialog<String> {
 	}
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox("Parents", issue.getParents());
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParents(), true);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
