@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
@@ -34,9 +35,9 @@ public class IssueUpdateService {
 		this.client = client;
 	}
 	
-	public ArrayList<Issue> getUpdatedIssues(String repoOwner, String repoName){
+	public ArrayList<Issue> getUpdatedIssues(IRepositoryIdProvider repoId){
 		try {
-			GitHubRequest request = createUpdatedIssuesRequest(repoOwner, repoName);
+			GitHubRequest request = createUpdatedIssuesRequest(repoId);
 			HttpURLConnection connection = createUpdatedIssuesConnection(request);
 			updateLastCheckTime();
 			updateLastETag(connection);
@@ -65,9 +66,9 @@ public class IssueUpdateService {
 	}
 	
 	
-	private GitHubRequest createUpdatedIssuesRequest(String repoOwner, String repoName){
+	private GitHubRequest createUpdatedIssuesRequest(IRepositoryIdProvider repoId){
 		GitHubRequest request = new GitHubRequest();
-		String path = HOST_API + SEGMENT_REPOS + "/" + repoOwner + "/" + repoName + SEGMENT_ISSUES;
+		String path = HOST_API + SEGMENT_REPOS + "/" + repoId.generateId() + SEGMENT_ISSUES;
 		request.setUri(path);
 		request.setParams(createUpdatedIssuesParams());
 		request.setResponseContentType(CONTENT_TYPE_JSON);

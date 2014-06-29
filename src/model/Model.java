@@ -55,6 +55,10 @@ public class Model {
 		loadLabels();
 		loadMilestones();
 	}
+	
+	public IRepositoryIdProvider getRepoId(){
+		return repoId;
+	}
 
 	public ObservableList<TurboIssue> getIssues() {
 		return issues;
@@ -85,7 +89,21 @@ public class Model {
 		return returnedIssue;
 	}
 	
-	public void updateCachedIssue(Issue issue){
+	public void updateCachedIssues(List<Issue> issueList){
+		if(issueList.size() == 0){
+			return;
+		}
+		
+		for(Issue issue: issueList){
+			updateCachedIssue(issue);
+		}
+		//TODO: for now just reload collaborators, labels and milestones
+		loadCollaborators();
+		loadLabels();
+		loadMilestones();
+	}
+	
+	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
 		int index = getIndexOfIssue(issue.getId());
 		issues.set(index, newCached);
