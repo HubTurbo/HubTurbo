@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.application.Platform;
+
 import org.eclipse.egit.github.core.Issue;
 
 import model.Model;
@@ -21,7 +23,12 @@ public class ModelUpdater {
 	
 	private void updateModelIssues(){
 		List<Issue> updatedIssues = issueUpdateService.getUpdatedIssues(model.getRepoId());
-		model.updateCachedIssues(updatedIssues);
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	model.updateCachedIssues(updatedIssues);
+	        }
+	   });
 	}
 	
 	public void startModelUpdate(){
