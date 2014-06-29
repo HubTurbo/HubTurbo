@@ -41,10 +41,12 @@ public class IssueUpdateService {
 			HttpURLConnection connection = createUpdatedIssuesConnection(request);
 			updateLastCheckTime();
 			updateLastETag(connection);
-			if(connection.getResponseCode() == NO_UPDATE_RESPONSE_CODE){
-				return new ArrayList<Issue>();
-			}else{
+			int responseCode = connection.getResponseCode();
+			System.out.println(responseCode);
+			if(!client.isError(responseCode) && responseCode != NO_UPDATE_RESPONSE_CODE){
 				return (ArrayList<Issue>)client.getBody(request, client.getStream(connection));
+			}else{
+				return new ArrayList<Issue>();
 			}
 			
 		} catch (IOException e) {
@@ -61,7 +63,9 @@ public class IssueUpdateService {
 	
 	private HttpURLConnection createUpdatedIssuesConnection(GitHubRequest request) throws IOException{
 		HttpURLConnection connection = client.createConnection(request);
-		connection.addRequestProperty("If-None-Match", lastETag);
+		if(lastETag != null){
+			connection.setRequestProperty("If-None-Match", lastETag);
+		}
 		return connection;
 	}
 	

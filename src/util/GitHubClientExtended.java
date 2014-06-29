@@ -26,4 +26,8 @@ public class GitHubClientExtended extends GitHubClient{
 			throws IOException {
 		return super.getBody(request, stream);
 	}
+	
+	protected boolean isError(final int code) {
+		return super.isError(code);
+	}
 }

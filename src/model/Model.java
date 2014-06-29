@@ -106,7 +106,10 @@ public class Model {
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
 		int index = getIndexOfIssue(issue.getId());
-		issues.set(index, newCached);
+		if(index != -1){
+			issues.set(index, newCached);
+		}
+		issues.add(newCached);
 	}
 	
 	public TurboLabel createLabel(TurboLabel newLabel) {
