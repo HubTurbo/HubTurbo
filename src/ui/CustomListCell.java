@@ -10,12 +10,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboCollaborator;
+import model.TurboUser;
 import model.TurboIssue;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
-	private static final String STYLE_PARENT_NAME = "-fx-font-size: 11px;";
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	private final Stage mainStage;
@@ -44,15 +43,14 @@ public class CustomListCell extends ListCell<TurboIssue> {
 			}
 		});
 
-		Text parentName = new Text("parent");
-		parentName.setStyle(STYLE_PARENT_NAME);
+		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
 
-		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels());
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
 		HBox assignee = new HBox();
 		assignee.setSpacing(3);
 		Text assignedToLabel = new Text("Assigned to:");
-		TurboCollaborator collaborator = issue.getAssignee();
+		TurboUser collaborator = issue.getAssignee();
 		Text assigneeName = new Text(collaborator == null ? "none"
 				: collaborator.getGithubName());
 		assignee.getChildren().addAll(assignedToLabel, assigneeName);
@@ -60,7 +58,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		VBox everything = new VBox();
 		everything.setSpacing(2);
 		everything.getChildren()
-				.addAll(issueName, parentName, labels, assignee);
+				.addAll(issueName, parents, labels, assignee);
 		// everything.getChildren().stream().forEach((node) ->
 		// node.setStyle(Demo.STYLE_BORDERS));
 

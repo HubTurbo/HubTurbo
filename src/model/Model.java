@@ -24,11 +24,12 @@ import util.LabelServiceFixed;
 
 public class Model {
 	
-	public static final String MILESTONES_ALL = "all";
-	public static final String MILESTONES_OPEN = "open";
-	public static final String MILESTONES_CLOSED = "closed";
+	private static final String CHARSET = "ISO-8859-1";
+	public static final String STATE_ALL = "all";
+	public static final String STATE_OPEN = "open";
+	public static final String STATE_CLOSED = "closed";
 	
-	private ObservableList<TurboCollaborator> collaborators = FXCollections.observableArrayList();
+	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
@@ -59,7 +60,7 @@ public class Model {
 		return issues;
 	}
 	
-	public ObservableList<TurboCollaborator> getCollaborators() {
+	public ObservableList<TurboUser> getCollaborators() {
 		return collaborators;
 	}
 
@@ -71,12 +72,173 @@ public class Model {
 		return milestones;
 	}
 	
+	public TurboIssue createIssue(TurboIssue newIssue) {
+		Issue ghIssue = newIssue.toGhResource();
+		Issue createdIssue = null;
+		try {
+			createdIssue = issueService.createIssue(repoId, ghIssue);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		TurboIssue returnedIssue = new TurboIssue(createdIssue);
+		issues.add(returnedIssue);
+		return returnedIssue;
+	}
+	
+	public TurboLabel createLabel(TurboLabel newLabel) {
+		Label ghLabel = newLabel.toGhResource();
+		Label createdLabel = null;
+		try {
+			createdLabel = labelService.createLabel(repoId, ghLabel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		TurboLabel returnedLabel = new TurboLabel(createdLabel);
+		labels.add(returnedLabel);
+		return returnedLabel;
+	}
+	
+	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
+		Milestone ghMilestone = newMilestone.toGhResource();
+		Milestone createdMilestone = null;
+		try {
+			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
+		milestones.add(returnedMilestone);
+		return returnedMilestone;
+	}
+	
+	public void deleteLabel(TurboLabel label) {
+		try {
+			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), CHARSET));
+			labels.remove(label);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteMilestone(TurboMilestone milestone) {
+		try {
+			milestoneService.deleteMilestone(repoId, milestone.getNumber());
+			milestones.remove(milestone);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
+		Issue original = orignalIssue.toGhResource();
+		Issue edited = editedIssue.toGhResource();
+		try {
+			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
+			mergeTitle(original, edited, latest);
+			mergeBody(original, edited, latest);
+			mergeAssignee(original, edited, latest);
+			mergeState(original, edited, latest);
+			mergeMilestone(original, edited, latest);
+			mergeLabels(original, edited, latest);
+			issueService.editIssue(repoId, latest);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+	
+	public void updateLabel(TurboLabel editedLabel, String labelName) {
+		Label ghLabel = editedLabel.toGhResource();
+		try {
+			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, CHARSET));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateMilestone(TurboMilestone editedMilestone) {
+		Milestone ghMilestone = editedMilestone.toGhResource();
+		try {
+			milestoneService.editMilestone(repoId, ghMilestone);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void mergeLabels(Issue original, Issue edited, Issue latest) {
+		List<Label> originalLabels = original.getLabels();
+		List<Label> editedLabels = edited.getLabels();
+		boolean isSameLabels = true;
+		if (originalLabels.size() != editedLabels.size()) {
+			isSameLabels = false;
+		} else {
+			for (Label originalLabel : originalLabels) {
+				if (!editedLabels.contains(originalLabel)) {
+					isSameLabels = false;
+					break;
+				}
+			}
+		}
+		if (!isSameLabels) {latest.setLabels(editedLabels);}
+	}
+
+	private void mergeMilestone(Issue original, Issue edited, Issue latest) {
+		Milestone originalMilestone = original.getMilestone();
+		Milestone editedMilestone = edited.getMilestone();
+		int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
+		int editedMNumber = (editedMilestone != null) ? editedMilestone.getNumber() : 0;
+		if (editedMNumber != originalMNumber) {
+			// this check is for cleared milestone
+			if (editedMilestone == null) {
+				latest.setMilestone(new Milestone());
+			} else {
+				latest.setMilestone(editedMilestone);
+			}
+		}
+	}
+
+	private void mergeState(Issue original, Issue edited, Issue latest) {
+		String originalState = original.getState();
+		String editedState = edited.getState();
+		if (!editedState.equals(originalState)) {latest.setState(editedState);}
+	}
+
+	private void mergeAssignee(Issue original, Issue edited, Issue latest) {
+		User originalAssignee = original.getAssignee();
+		User editedAssignee = edited.getAssignee();
+		String originalALogin = (originalAssignee != null) ? originalAssignee.getLogin() : "";
+		String editedALogin = (editedAssignee != null) ? editedAssignee.getLogin() : "";
+		if (!editedALogin.equals(originalALogin)) {
+			// this check is for cleared assignee
+			if (editedAssignee == null) {
+				latest.setAssignee(new User());
+			} else {
+				latest.setAssignee(editedAssignee);
+			}
+		}
+	}
+
+	private void mergeBody(Issue original, Issue edited, Issue latest) {
+		String originalBody = original.getBody();
+		String editedBody = edited.getBody();
+		if (!editedBody.equals(originalBody)) {latest.setBody(editedBody);}
+	}
+
+	private void mergeTitle(Issue original, Issue edited, Issue latest) {
+		String originalTitle = original.getTitle();
+		String editedTitle = edited.getTitle();
+		if (!editedTitle.equals(originalTitle)) {latest.setTitle(editedTitle);}
+	}
+	
 	private boolean loadCollaborators() {
 		collaborators.clear();	
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
 			for(User ghCollaborator : ghCollaborators) {
-				collaborators.add(new TurboCollaborator(ghCollaborator));
+				collaborators.add(new TurboUser(ghCollaborator));
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -89,8 +251,8 @@ public class Model {
 	private boolean loadIssues() {
 		issues.clear();
 		Map<String, String> filters = new HashMap<String, String>();
-		filters.put(IssueService.FIELD_FILTER, "all");
-		filters.put(IssueService.FILTER_STATE, "all");
+		filters.put(IssueService.FIELD_FILTER, STATE_ALL);
+		filters.put(IssueService.FILTER_STATE, STATE_ALL);
 		try {		
 			List<Issue> ghIssues = issueService.getIssues(repoId, filters);
 			for (Issue ghIssue : ghIssues) {
@@ -122,7 +284,7 @@ public class Model {
 	private boolean loadMilestones(){
 		milestones.clear();
 		try {		
-			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, MILESTONES_ALL);
+			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
 			for (Milestone ghMilestone : ghMilestones) {
 				milestones.add(new TurboMilestone(ghMilestone));
 			}
@@ -134,149 +296,4 @@ public class Model {
 		return true;
 	}
 	
-	public TurboIssue createIssue(TurboIssue newIssue) {
-		Issue ghIssue = newIssue.toGhIssue();
-		Issue createdIssue = null;
-		try {
-			createdIssue = issueService.createIssue(repoId, ghIssue);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		TurboIssue returnedIssue = new TurboIssue(createdIssue);
-		issues.add(returnedIssue);
-		return returnedIssue;
-	}
-	
-	public TurboLabel createLabel(TurboLabel newLabel) {
-		Label ghLabel = newLabel.toGhLabel();
-		Label createdLabel = null;
-		try {
-			createdLabel = labelService.createLabel(repoId, ghLabel);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		TurboLabel returnedLabel = new TurboLabel(createdLabel);
-		labels.add(returnedLabel);
-		return returnedLabel;
-	}
-	
-	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
-		Milestone ghMilestone = newMilestone.toGhMilestone();
-		Milestone createdMilestone = null;
-		try {
-			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
-		milestones.add(returnedMilestone);
-		return returnedMilestone;
-	}
-	
-	public void deleteLabel(TurboLabel label) {
-		try {
-			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), "ISO-8859-1"));
-			labels.remove(label);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void deleteMilestone(TurboMilestone milestone) {
-		try {
-			milestoneService.deleteMilestone(repoId, milestone.getNumber());
-			milestones.remove(milestone);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
-		Issue original = orignalIssue.toGhIssue();
-		Issue edited = editedIssue.toGhIssue();
-		try {
-			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
-			
-			String originalTitle = original.getTitle();
-			String editedTitle = edited.getTitle();
-			if (!editedTitle.equals(originalTitle)) {latest.setTitle(editedTitle);}
-			
-			String originalBody = original.getBody();
-			String editedBody = edited.getBody();
-			if (!editedBody.equals(originalBody)) {latest.setBody(editedBody);}
-			
-			User originalAssignee = original.getAssignee();
-			User editedAssignee = edited.getAssignee();
-			String originalALogin = (originalAssignee != null) ? originalAssignee.getLogin() : "";
-			String editedALogin = (editedAssignee != null) ? editedAssignee.getLogin() : "";
-			if (!editedALogin.equals(originalALogin)) {
-				// this check is for cleared assignee
-				if (editedAssignee == null) {
-					latest.setAssignee(new User());
-				} else {
-					latest.setAssignee(editedAssignee);
-				}
-			}
-			
-			String originalState = original.getState();
-			String editedState = edited.getState();
-			if (!editedState.equals(originalState)) {latest.setState(editedState);}
-			
-			
-			Milestone originalMilestone = original.getMilestone();
-			Milestone editedMilestone = edited.getMilestone();
-			int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
-			int editedMNumber = (editedMilestone != null) ? editedMilestone.getNumber() : 0;
-			if (editedMNumber != originalMNumber) {
-				// this check is for cleared milestone
-				if (editedMilestone == null) {
-					latest.setMilestone(new Milestone());
-				} else {
-					latest.setMilestone(editedMilestone);
-				}
-			}
-			
-			List<Label> originalLabels = original.getLabels();
-			List<Label> editedLabels = edited.getLabels();
-			boolean isSameLabels = true;
-			if (originalLabels.size() != editedLabels.size()) {
-				isSameLabels = false;
-			} else {
-				for (Label originalLabel : originalLabels) {
-					if (!editedLabels.contains(originalLabel)) {
-						isSameLabels = false;
-						break;
-					}
-				}
-			}
-			if (!isSameLabels) {latest.setLabels(editedLabels);}
-
-			issueService.editIssue(repoId, latest);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-	}
-	
-	public void updateLabel(TurboLabel editedLabel, String labelName) {
-		Label ghLabel = editedLabel.toGhLabel();
-		try {
-			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, "ISO-8859-1"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void updateMilestone(TurboMilestone editedMilestone) {
-		Milestone ghMilestone = editedMilestone.toGhMilestone();
-		try {
-			milestoneService.editMilestone(repoId, ghMilestone);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 }

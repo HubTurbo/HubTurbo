@@ -2,36 +2,41 @@ package model;
 
 import org.eclipse.egit.github.core.User;
 
-public class TurboCollaborator implements Listable {
-	private String githubName;
-	private String realName;
+public class TurboUser implements Listable {
 	
-	public TurboCollaborator(User user) {
+	/*
+	 * Attributes, Getters & Setters
+	 */
+	
+	private String githubName;
+	public String getGithubName() {return githubName;}
+	public void setGithubName(String githubName) {this.githubName = githubName;}
+	
+	private String realName;
+	public String getRealName() {return realName;}
+	public void setRealName(String realName) {this.realName = realName;}
+	
+	/*
+	 * Constructors and Public Methods
+	 */
+	
+	public TurboUser(User user) {
 		assert user != null;
 
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
 	}
 	
-	public User toGhUser() {
+	public User toGhResource() {
 		User ghUser = new User();
 		ghUser.setLogin(githubName);
 		return ghUser;
 	}
 	
-	public String getGithubName() {
-		return githubName;
-	}
-	public void setGithubName(String githubName) {
-		this.githubName = githubName;
-	}
-	public String getRealName() {
-		return realName;
-	}
-	public void setRealName(String realName) {
-		this.realName = realName;
-	}
-
+	/*
+	 * Overriden Methods
+	 */
+	
 	@Override
 	public String getListName() {
 		return getGithubName();
@@ -54,7 +59,7 @@ public class TurboCollaborator implements Listable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TurboCollaborator other = (TurboCollaborator) obj;
+		TurboUser other = (TurboUser) obj;
 		if (githubName == null) {
 			if (other.githubName != null)
 				return false;
