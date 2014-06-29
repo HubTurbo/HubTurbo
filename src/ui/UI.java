@@ -7,6 +7,8 @@ import java.io.IOException;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
+import util.GitHubClientExtended;
+import util.ModelUpdater;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,8 +42,9 @@ public class UI extends Application {
 	private Stage mainStage;
 	private ColumnControl columns;
 	private Model model;
-	private GitHubClient client;
+	private GitHubClientExtended client;
 	private String repoOwner, repoName;
+	private ModelUpdater modelUpdater;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -50,7 +53,7 @@ public class UI extends Application {
 	@Override
 	public void start(Stage stage) {
 		
-		client = new GitHubClient();
+		client = new GitHubClientExtended();
 		model = new Model(client);
 
 		mainStage = stage;
@@ -141,6 +144,7 @@ public class UI extends Application {
 				
 				loadDataIntoModel();
 				columns.loadIssues();
+				setupModelUpdate();
 				
 				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
 				stage.hide();
@@ -166,6 +170,11 @@ public class UI extends Application {
 
 	private void loadDataIntoModel() {
 		model.setRepoId(repoOwner, repoName);
+	}
+	
+	private void setupModelUpdate(){
+		modelUpdater = new ModelUpdater(client, model);
+		modelUpdater.startModelUpdate();
 	}
 
 //	private void setUpHotkeys(Scene scene) {

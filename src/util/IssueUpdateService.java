@@ -68,7 +68,7 @@ public class IssueUpdateService {
 	
 	private GitHubRequest createUpdatedIssuesRequest(IRepositoryIdProvider repoId){
 		GitHubRequest request = new GitHubRequest();
-		String path = HOST_API + SEGMENT_REPOS + "/" + repoId.generateId() + SEGMENT_ISSUES;
+		String path = SEGMENT_REPOS + "/" + repoId.generateId() + SEGMENT_ISSUES;
 		request.setUri(path);
 		request.setParams(createUpdatedIssuesParams());
 		request.setResponseContentType(CONTENT_TYPE_JSON);
