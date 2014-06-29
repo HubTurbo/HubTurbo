@@ -22,8 +22,6 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 public class IssueUpdateService {
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
 	
-	private int pollRate = 60000; //poll rate in ms
-	
 	private String lastETag;
 	
 	private GitHubClientExtended client;
@@ -35,11 +33,6 @@ public class IssueUpdateService {
 		updateLastCheckTime();
 		this.client = client;
 	}
-	
-	public int getPollRate(){
-		return pollRate;
-	}
-	
 	
 	public ArrayList<Issue> getUpdatedIssues(String repoOwner, String repoName){
 		try {
