@@ -20,6 +20,8 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
+import com.google.gson.reflect.TypeToken;
+
 public class IssueUpdateService {
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
 	
@@ -77,7 +79,7 @@ public class IssueUpdateService {
 		request.setParams(createUpdatedIssuesParams());
 		request.setResponseContentType(CONTENT_TYPE_JSON);
 		request.setType(Issue.class);
-		request.setArrayType(ArrayList.class);
+		request.setArrayType(new TypeToken<ArrayList<Issue>>(){}.getType());
 		return request;
 	}
 	

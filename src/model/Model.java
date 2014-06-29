@@ -108,8 +108,9 @@ public class Model {
 		int index = getIndexOfIssue(issue.getId());
 		if(index != -1){
 			issues.set(index, newCached);
+		}else{
+			issues.add(newCached);
 		}
-		issues.add(newCached);
 	}
 	
 	public TurboLabel createLabel(TurboLabel newLabel) {
