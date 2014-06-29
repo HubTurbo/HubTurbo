@@ -105,7 +105,7 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
-		int index = getIndexOfIssue(issue.getId());
+		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
 			issues.set(index, newCached);
 		}else{
@@ -198,7 +198,7 @@ public class Model {
 	
 	private int getIndexOfIssue(long id){
 		for(int i = 0; i < issues.size(); i++){
-			if(issues.get(i).getId() == id){
+			if(((TurboIssue)(issues.get(i))).getId() == id){
 				return i;
 			}
 		}
