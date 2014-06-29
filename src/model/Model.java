@@ -85,6 +85,12 @@ public class Model {
 		return returnedIssue;
 	}
 	
+	public void updateCachedIssue(Issue issue){
+		TurboIssue newCached = new TurboIssue(issue);
+		int index = getIndexOfIssue(issue.getId());
+		issues.set(index, newCached);
+	}
+	
 	public TurboLabel createLabel(TurboLabel newLabel) {
 		Label ghLabel = newLabel.toGhResource();
 		Label createdLabel = null;
@@ -166,6 +172,15 @@ public class Model {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private int getIndexOfIssue(long id){
+		for(int i = 0; i < issues.size(); i++){
+			if(issues.get(i).getId() == id){
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private void mergeLabels(Issue original, Issue edited, Issue latest) {
