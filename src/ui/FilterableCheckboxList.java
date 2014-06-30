@@ -9,14 +9,12 @@ import org.controlsfx.control.CheckListView;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -29,19 +27,6 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 	private CompletableFuture<List<Integer>> response;
 	
-	// State variables
-	
-	private int previouslyChecked = -1;
-	private int previousState = 0;
-	
-	// Disables the callback to prevent an infinite loop (since
-	// updating the check state updates the check state)
-	private boolean disabled = false;
-	
-	// Also disables the callback. Throttles its activation
-	// to once per change
-	private boolean oneActivation = false;
-
 	public FilterableCheckboxList(Stage parentStage,
 			ObservableList<Listable> objects) {
 		this.parentStage = parentStage;
@@ -60,92 +45,16 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 	}
 
 	private void showDialog() {
-
-//		TextField searchField = new TextField();
-//		searchField.setPromptText("Search");
-//		searchField.textProperty().addListener((e) -> {
-//			objects.setPredicate((o) -> o.contains(searchField.getText()));
-//		});
 		
-		CheckListView<String> checkListView = new CheckListView<>(objects);
-		checkListView.getSelectionModel()
-				.setSelectionMode(SelectionMode.SINGLE);
+		CheckListView<String> checkListView = multipleSelection ? new CheckListView<>(objects) : new SingleCheckListView<>(objects);
 
+		if (!multipleSelection && initialCheckedState.size() > 1) {
+			initialCheckedState = new ArrayList<Integer>(initialCheckedState.get(0));
+		}
 		initialCheckedState.forEach((i) -> checkListView.getCheckModel()
 				.select(i));
-
-		if (!multipleSelection) {
-			assert initialCheckedState.size() == 1
-					|| initialCheckedState.size() == 0;
-			if (initialCheckedState.size() == 1) {
-				previousState = 1;
-				previouslyChecked = initialCheckedState.get(0);
-			}
-		}
 		
 		// getSelectionModel().getSelectedItems() can also have a listener
-
-		/**
-		 * A small state machine to get around API oddities.
-		 * 
-		 * The goal is to implement the `multipleSelection` flag, which when
-		 * false allows only a single checkbox to be checked.
-		 * 
-		 * Basically there are 4 states which a given pair of checkboxes can be in:
-		 * 00, 01, 10, 11. This is exhaustive because we only need a second checked box
-		 * to reduce the state back to 01 or 10. State 11 technically doesn't exist
-		 * because we transition as soon as we enter it. Transitions: 1 bit at a time.
-		 * 
-		 * previousState and previouslyChecked are used to track this information.
-		 * c.wasAdded() || c.wasRemoved(), disabled, and oneActivation are for throttling
-		 * the execution of the callback in various ways.
-		 */
-		
-		checkListView.getCheckModel().getSelectedItems()
-				.addListener(new ListChangeListener<String>() {
-					@Override
-					public void onChanged(
-							ListChangeListener.Change<? extends String> c) {
-
-						while (c.next()) {
-							if (!multipleSelection
-									&& (c.wasAdded() || c.wasRemoved())
-									&& !disabled && !oneActivation) {
-								List<Integer> currentlyChecked = checkListView
-										.getCheckModel().getSelectedIndices();
-								oneActivation = true;
-
-								if (currentlyChecked.size() == 1) {
-									assert previousState != 1;
-									previouslyChecked = currentlyChecked.get(0);
-									previousState = 1;
-								} else if (currentlyChecked.size() == 2) {
-									assert previousState == 1;
-									assert previouslyChecked != -1;
-
-									// There is no state 2: it is always skipped
-									previousState = 1;
-
-									int newlyChecked = previouslyChecked == currentlyChecked
-											.get(0) ? currentlyChecked.get(1)
-											: currentlyChecked.get(0);
-
-									previouslyChecked = newlyChecked;
-									disabled = true;
-									checkListView.getCheckModel()
-											.clearAndSelect(newlyChecked);
-									disabled = false;
-								} else {
-									assert currentlyChecked.size() == 0;
-									assert previousState == 1;
-									previousState = 0;
-									previouslyChecked = -1;
-								}
-							}
-						}
-						oneActivation = false;
-					}
-				});
 
 		Stage stage = new Stage();
 
@@ -153,13 +62,11 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		VBox.setMargin(close, new Insets(5));
 		close.setOnAction((e) -> {
 			completeResponse(checkListView);
-//			completeResponse(searchField, checkListView);
 			stage.hide();
 		});
 
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
-//		layout.getChildren().addAll(searchField, checkListView, close);
 		layout.getChildren().addAll(checkListView, close);
 		layout.setSpacing(5);
 		layout.setPadding(new Insets(5));
@@ -171,7 +78,6 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 		stage.setOnCloseRequest((e) -> {
 			completeResponse(checkListView);
-//			completeResponse(searchField, checkListView);
 		});
 
 		Platform.runLater(() -> stage.requestFocus());
@@ -184,24 +90,6 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 		stage.show();
 	}
-
-//	private void completeResponse(TextField searchField, CheckListView<String> checkListView) {
-//
-//		// Get source indices
-//		// Iterative because index required
-//		ArrayList<Integer> sourceIndices = new ArrayList<>();
-//		for (int i=0; i<objects.size(); i++) {
-//			sourceIndices.add(objects.getSourceIndex(i));
-//		}
-//		
-//		// Get only the selected indices and unpair them
-//		ArrayList<Integer> onlyRequiredIndices = new ArrayList<>(checkListView.getCheckModel().getSelectedIndices()
-//				.stream()
-//				.map((i) -> sourceIndices.get(i))
-//				.collect(Collectors.toList()));
-//
-//		response.complete(onlyRequiredIndices);
-//	}
 
 	private void completeResponse(CheckListView<String> checkListView) {
 		response.complete(checkListView.getCheckModel().getSelectedIndices());
