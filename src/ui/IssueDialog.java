@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -238,7 +239,7 @@ public class IssueDialog implements Dialog<String> {
 	
 	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true);
-		List<TurboLabel> allLabels = model.getLabels();
+		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());
 		
 		labelBox.setOnMouseClicked((e) -> {
 			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
@@ -252,21 +253,29 @@ public class IssueDialog implements Dialog<String> {
 						return -1;
 					}).collect(Collectors.toList());
 
-			(new CheckboxListDialog(stage, FXCollections
-					.observableArrayList(allLabels)))
-					.setWindowTitle("Choose Labels")
-					.setMultipleSelection(true)
-					.setInitialCheckedState(indicesForExistingLabels)
-					.show()
-					.thenApply(
-							(List<Integer> response) -> {
-								List<TurboLabel> labels = response.stream()
-										.map((i) -> allLabels.get(i))
-										.collect(Collectors.toList());
-								issue.setLabels(FXCollections
-										.observableArrayList(labels));
-								return true;
-							});
+			// TODO INITAL CHECKED STATE
+			
+			(new LabelCheckboxListDialog(stage, allLabels)).show().thenApply(
+					(List<TurboLabel> response) -> {
+						issue.setLabels(FXCollections.observableArrayList(response));
+						return true;
+					});
+			
+//			(new CheckboxListDialog(stage, FXCollections
+//					.observableArrayList(allLabels)))
+//					.setWindowTitle("Choose Labels")
+//					.setMultipleSelection(true)
+//					.setInitialCheckedState(indicesForExistingLabels)
+//					.show()
+//					.thenApply(
+//							(List<Integer> response) -> {
+//								List<TurboLabel> labels = response.stream()
+//										.map((i) -> allLabels.get(i))
+//										.collect(Collectors.toList());
+//								issue.setLabels(FXCollections
+//										.observableArrayList(labels));
+//								return true;
+//							});
 		});
 		return labelBox;
 	}
