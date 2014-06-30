@@ -148,6 +148,7 @@ public class TurboIssue implements Listable {
 	 */
 	
 	private String extractDescription(String issueBody) {
+		if (issueBody == null) return "";
 		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 		return description;
 	}
@@ -161,9 +162,10 @@ public class TurboIssue implements Listable {
 		return turboLabels;
 	}
 
-	private ObservableList<Integer> extractParents(String body) {
+	private ObservableList<Integer> extractParents(String issueBody) {
 		ObservableList<Integer> parents = FXCollections.observableArrayList();
-		String[] lines = body.split(REGEX_SPLIT_LINES);
+		if (issueBody == null) return parents;
+		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
 		int seperatorLineIndex = getSeperatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
 			String line = lines[i];
@@ -172,7 +174,7 @@ public class TurboIssue implements Listable {
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
 					if (valueTokens[j].trim().isEmpty()) continue;
-					parents.add(Integer.parseInt(valueTokens[j]));
+					parents.add(Integer.parseInt(valueTokens[j].trim()));
 				}
 			}
 		}
