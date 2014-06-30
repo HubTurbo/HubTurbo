@@ -7,13 +7,27 @@ import model.TurboLabel;
 public class TurboLabelGroup implements LabelTreeItem {
 	
 	private String name;
-	private ArrayList<TurboLabel> labels = new ArrayList<>();
+	private ArrayList<TurboLabel> labels;
 	private boolean exclusive = false;
 	
 	public TurboLabelGroup(String name) {
 		this.name = name;
+		this.labels = new ArrayList<>();
 	}
-	
+		
+	public TurboLabelGroup(ArrayList<TurboLabel> labels) {
+		this.name = "unnamed";
+		this.labels = labels;
+
+		// determine if exclusive or not
+		// a group is only exclusive if all labels inside it are
+		// if a single label is not exclusive, the group is also not
+		exclusive = true;
+		for (TurboLabel label : labels) {
+			exclusive = exclusive && label.isExclusive();
+		}
+	}
+
 	public void addLabel(TurboLabel label) {
 		labels.add(label);
 		if (name.equals(ManageLabelsDialog.UNGROUPED_NAME)) {
@@ -21,6 +35,14 @@ public class TurboLabelGroup implements LabelTreeItem {
 		} else {
 			label.setGroup(name);
 		}
+	}
+	
+	public String getName() {
+		return getValue();
+	}
+	
+	public void setName(String name) {
+		setValue(name);
 	}
 	
 	public String getValue() {
@@ -54,7 +76,7 @@ public class TurboLabelGroup implements LabelTreeItem {
 		}
 	}
 
-	public boolean getExclusive() {
+	public boolean isExclusive() {
 		return exclusive;
 	}
 }
