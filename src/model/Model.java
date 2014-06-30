@@ -161,16 +161,20 @@ public class Model {
 	public void updateIssue(TurboIssue orignalIssue, TurboIssue editedIssue) {
 		Issue original = orignalIssue.toGhResource();
 		Issue edited = editedIssue.toGhResource();
+		StringBuilder changeLog = new StringBuilder();
 		try {
-			Issue latest = issueService.getIssue(repoId, editedIssue.getId());
+			int issueId = editedIssue.getId();
+			Issue latest = issueService.getIssue(repoId, issueId);
 			mergeTitle(original, edited, latest);
 			mergeBody(original, edited, latest);
 			mergeAssignee(original, edited, latest);
 			mergeState(original, edited, latest);
 			mergeMilestone(original, edited, latest);
-			mergeLabels(original, edited, latest);
+			mergeLabels(original, edited, latest, changeLog);
+			if(changeLog.length() > 0){
+				issueService.createComment(repoId, ""+issueId, changeLog.toString());
+			}
 			issueService.editIssue(repoId, latest);
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -206,10 +210,10 @@ public class Model {
 		return -1;
 	}
 
-	private void mergeLabels(Issue original, Issue edited, Issue latest) {
+	private void mergeLabels(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
-		boolean isSameLabels = checkAndLogLabelChange(latest.getNumber(), originalLabels, editedLabels);
+		boolean isSameLabels = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
 		if (!isSameLabels) {latest.setLabels(editedLabels);}
 	}
 
@@ -217,34 +221,24 @@ public class Model {
 	 * Logs the changes made to the issue's labels as a comment for the issue
 	 * @return true if changes have been made to the issue's labels, false otherwise
 	 * */
-	private boolean checkAndLogLabelChange(int issueId, List<Label> original, List<Label> edited){
+	private boolean checkAndLogLabelChange(List<Label> original, List<Label> edited, StringBuilder changeLog){
 		HashSet<Label> removed = new HashSet<Label>(original);
 		HashSet<Label> added = new HashSet<Label>(edited);
 		removed.removeAll(edited);
 		added.removeAll(original);
 		boolean changed = !(removed.size() == 0 && added.size() == 0);
 		if(changed){
-			logLabelChange(issueId, removed, added);
+			logLabelChange(removed, added, changeLog);
 		}
 		return changed;
 	}
 	
-	private void logLabelChange(int issueId, HashSet<Label> removed, HashSet<Label> added){
-		String changeLog = "";
+	private void logLabelChange(HashSet<Label> removed, HashSet<Label> added, StringBuilder changeLog){
 		if(added.size() > 0){
-			changeLog += "Added labels: " + added.toString();
+			changeLog.append("Added labels: " + added.toString() + "\n");
 		}
 		if(removed.size() > 0){
-			if(!changeLog.isEmpty()){
-				changeLog += "\n";
-			}
-			changeLog += "Removed labels: " + removed.toString();
-		}
-		try {
-			issueService.createComment(repoId, ""+issueId, changeLog);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			changeLog.append("Removed labels: " + removed.toString() + "\n");
 		}
 	}
 	
