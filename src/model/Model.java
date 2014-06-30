@@ -108,7 +108,7 @@ public class Model {
 		TurboIssue newCached = new TurboIssue(issue);
 		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
-			issues.set(index, newCached);
+			updateIssueAtIndex(index, newCached);
 		}else{
 			issues.add(0, newCached);
 		}
@@ -202,7 +202,12 @@ public class Model {
 		}
 	}
 	
-	private int getIndexOfIssue(long id){
+	private void updateIssueAtIndex(int index, TurboIssue newIssue){
+		TurboIssue issue = issues.get(index);
+		issue.copyValues(newIssue);
+	}
+	
+	private int getIndexOfIssue(int id){
 		for(int i = 0; i < issues.size(); i++){
 			if(((TurboIssue)(issues.get(i))).getId() == id){
 				return i;
