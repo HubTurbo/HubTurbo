@@ -175,6 +175,7 @@ public class Model {
 				issueService.createComment(repoId, ""+issueId, changeLog.toString());
 			}
 			issueService.editIssue(repoId, latest);
+			updateCachedIssue(latest);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -213,8 +214,8 @@ public class Model {
 	private void mergeLabels(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
-		boolean isSameLabels = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
-		if (!isSameLabels) {
+		boolean changed = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
+		if (changed) {
 			latest.setLabels(editedLabels);
 		}
 	}

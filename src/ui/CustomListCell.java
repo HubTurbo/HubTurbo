@@ -80,11 +80,11 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
-		TurboIssue copy = new TurboIssue(issue);
-		(new IssueDialog(mainStage, model, issue)).show().thenApply(
+		TurboIssue modifiedIssue = new TurboIssue(issue);
+		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
 				response -> {
 					if (response.equals("ok")) {
-						model.updateIssue(copy, issue);
+						model.updateIssue(issue, modifiedIssue);
 					}
 					return true;
 				});
