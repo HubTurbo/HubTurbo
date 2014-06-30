@@ -84,7 +84,7 @@ public class IssueUpdateService {
 	private Map<String, String> createUpdatedIssuesParams(){
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("since", getFormattedDate(lastCheckTime));
-		params.put("filter", "all");
+		params.put("state", "all");
 		return params;
 	}
 	
