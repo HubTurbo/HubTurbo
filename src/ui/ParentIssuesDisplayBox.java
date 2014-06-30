@@ -20,6 +20,7 @@ public class ParentIssuesDisplayBox extends HBox {
 		if (displayWhenEmpty) {
 			setStyle(UI.STYLE_BORDERS_FADED);
 		}
+		update();
 	}
 
 	private void setListableItems(ObservableList<Integer> issueNumbers) {

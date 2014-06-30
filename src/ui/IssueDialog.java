@@ -36,7 +36,7 @@ import model.TurboUser;
 
 public class IssueDialog implements Dialog<String> {
 
-	private static final double HEIGHT_FACTOR = 0.3;
+	private static final double HEIGHT_FACTOR = 0.35;
 
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
@@ -116,12 +116,11 @@ public class IssueDialog implements Dialog<String> {
 	    });
 		
 		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
-
-		Parent parentsBox = createParentsBox(stage);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
-		issueDesc.setPrefRowCount(5);
+		issueDesc.setPrefRowCount(8);
 		issueDesc.setPrefColumnCount(42);
+		issueDesc.setWrapText(true);
 		issueDesc.setPromptText("Description");
 		issueDesc.textProperty().addListener(
 				(observable, oldValue, newValue) -> {
@@ -130,7 +129,7 @@ public class IssueDialog implements Dialog<String> {
 
 		VBox left = new VBox();
 		left.setSpacing(ELEMENT_SPACING);
-		left.getChildren().addAll(title, parentsBox, issueDesc);
+		left.getChildren().addAll(title, issueDesc);
 
 		return left;
 
@@ -138,16 +137,16 @@ public class IssueDialog implements Dialog<String> {
 
 	private Parent right(Stage stage) {
 
-		Parent milestoneField = createMilestoneBox(stage);
-		Parent labelBox = createLabelBox(stage);
-		Parent assigneeField = createAssigneeBox(stage);
-		
+		Parent parents = createParentsBox(stage);
+		Parent milestone = createMilestoneBox(stage);
+		Parent labels = createLabelBox(stage);
+		Parent assignee = createAssigneeBox(stage);
+
 		HBox buttons = createButtons(stage);
 
 		VBox right = new VBox();
 		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(milestoneField, labelBox, assigneeField,
-				buttons);
+		right.getChildren().addAll(parents, milestone, labels, assignee, buttons);
 
 		return right;
 	}
