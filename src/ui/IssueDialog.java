@@ -260,22 +260,6 @@ public class IssueDialog implements Dialog<String> {
 						issue.setLabels(FXCollections.observableArrayList(response));
 						return true;
 					});
-			
-//			(new CheckboxListDialog(stage, FXCollections
-//					.observableArrayList(allLabels)))
-//					.setWindowTitle("Choose Labels")
-//					.setMultipleSelection(true)
-//					.setInitialCheckedState(indicesForExistingLabels)
-//					.show()
-//					.thenApply(
-//							(List<Integer> response) -> {
-//								List<TurboLabel> labels = response.stream()
-//										.map((i) -> allLabels.get(i))
-//										.collect(Collectors.toList());
-//								issue.setLabels(FXCollections
-//										.observableArrayList(labels));
-//								return true;
-//							});
 		});
 		return labelBox;
 	}

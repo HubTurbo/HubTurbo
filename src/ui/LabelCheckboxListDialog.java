@@ -13,10 +13,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -24,6 +26,11 @@ import model.TurboLabel;
 
 public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 
+	private static final double WINDOW_WIDTH = 250;
+	private static final double WINDOW_HEIGHT = 370;
+	
+	private static final int ROW_HEIGHT = 30;
+	
 	private Stage parentStage;
 	private CompletableFuture<List<TurboLabel>> response;
 
@@ -44,17 +51,12 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 	}
 
 	private void showDialog() {
-
-//		CheckListView<String> checkListView = new SingleCheckListView<>();
 		
 		HashMap<String, ArrayList<TurboLabel>> groups = ManageLabelsDialog.groupLabels(labels);
-				
-//		layout.setAlignment(Pos.CENTER_RIGHT);
-//		layout.setSpacing(5);
-//		layout.setPadding(new Insets(5));
-
 
 		VBox layout = new VBox();
+		layout.setSpacing(4);
+		
 		for (String groupName : groups.keySet()) {
 			List<String> labelNames = groups.get(groupName).stream().map(l -> l.getValue()).collect(Collectors.toList());
 			
@@ -65,17 +67,24 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 					: new CheckListView<>(FXCollections.observableArrayList(labelNames));
 
 			control.setUserData(groups.get(groupName));
+			control.setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
+			control.setPrefWidth(WINDOW_WIDTH - 29);
 			controls.add(control);
 			
-			// TODO add some kind of title label
-			layout.getChildren().add(control);
+			Label name = new Label(groupName);
+			
+			layout.getChildren().addAll(name, control);
 		}
-//		layout.getChildren().addAll(checkListView);
-		
-		setupLayout(layout);
+
+		ScrollPane sp = new ScrollPane();
+		sp.setHbarPolicy(ScrollBarPolicy.NEVER);
+		sp.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		sp.setContent(layout);
+		VBox.setVgrow(sp, Priority.ALWAYS);
+		setupLayout(sp);
 	}
 
-	private void setupLayout(VBox layout) {
+	private void setupLayout(ScrollPane content) {
 		Stage stage = new Stage();
 
 		Button close = new Button("Close");
@@ -85,12 +94,13 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 			stage.hide();
 		});
 		
+		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
 		layout.setSpacing(5);
 		layout.setPadding(new Insets(5));
-		layout.getChildren().add(close);
+		layout.getChildren().addAll(content, close);
 
-		Scene scene = new Scene(layout, 400, 300);
+		Scene scene = new Scene(layout, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 		stage.setTitle("Choose Labels");
 		stage.setScene(scene);
