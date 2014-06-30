@@ -2,6 +2,7 @@ package ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -126,23 +127,30 @@ public class ManageLabelsDialog implements Dialog<String> {
 		return treeView;
 	}
 
+	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels) {
+		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
+		for (TurboLabel l : labels) {
+			String groupName = l.getGroup() == null ? UNGROUPED_NAME : l.getGroup();
+
+			if (groups.get(groupName) == null) {
+				groups.put(groupName, new ArrayList<TurboLabel>());
+			}
+			groups.get(groupName).add(l);
+		}
+		return groups;
+	}
+
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
 		
-		// Hash all labels by group
-		HashMap<String, ArrayList<TurboLabel>> labels = new HashMap<>();
-		ArrayList<TurboLabel> ungrouped = new ArrayList<>();
 		for (TurboLabel l : model.getLabels()) {
-			if (l.getGroup() == null || l.getGroup().equals(UNGROUPED_NAME)) {
-				l.setGroup(null);
-				ungrouped.add(l);
-			} else {
-				if (labels.get(l.getGroup()) == null) {
-					labels.put(l.getGroup(), new ArrayList<TurboLabel>());
-				}
-				labels.get(l.getGroup()).add(l);
-			}
+			assert l.getGroup() == null || !l.getGroup().equals(UNGROUPED_NAME);
 		}
-				
+	
+		// Hash all labels by group
+		HashMap<String, ArrayList<TurboLabel>> labels = groupLabels(model.getLabels());
+		ArrayList<TurboLabel> ungrouped = labels.get(UNGROUPED_NAME);
+		labels.remove(UNGROUPED_NAME);
+
 		// Add labels with a group into the tree
 		for (String groupName : labels.keySet()) {
 			TurboLabelGroup group = new TurboLabelGroup(groupName);
