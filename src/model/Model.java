@@ -30,6 +30,9 @@ public class Model {
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
 	
+	private static final String LABELS_REMOVED_TAG = "removed";
+	private static final String LABELS_ADDED_TAG = "added";
+	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
@@ -108,7 +111,8 @@ public class Model {
 		TurboIssue newCached = new TurboIssue(issue);
 		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
-			updateIssueAtIndex(index, newCached);
+//			updateIssueAtIndex(index, newCached);
+			issues.set(index, newCached);
 		}else{
 			issues.add(0, newCached);
 		}
@@ -219,9 +223,12 @@ public class Model {
 	private void mergeLabels(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
-		boolean changed = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
-		if (changed) {
-			latest.setLabels(editedLabels);
+		HashMap<String, HashSet<Label>> changeSet = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
+		if (changeSet.size() > 0) {
+			List<Label> latestLabels = latest.getLabels();
+			latestLabels.removeAll(changeSet.get(LABELS_REMOVED_TAG));
+			latestLabels.addAll(changeSet.get(LABELS_ADDED_TAG));
+			latest.setLabels(latestLabels);
 		}
 	}
 
@@ -229,7 +236,7 @@ public class Model {
 	 * Logs the changes made to the issue's labels as a comment for the issue
 	 * @return true if changes have been made to the issue's labels, false otherwise
 	 * */
-	private boolean checkAndLogLabelChange(List<Label> original, List<Label> edited, StringBuilder changeLog){
+	private HashMap<String, HashSet<Label>> checkAndLogLabelChange(List<Label> original, List<Label> edited, StringBuilder changeLog){
 		HashSet<Label> removed = new HashSet<Label>(original);
 		HashSet<Label> added = new HashSet<Label>(edited);
 		removed.removeAll(edited);
@@ -238,7 +245,10 @@ public class Model {
 		if(changed){
 			logLabelChange(removed, added, changeLog);
 		}
-		return changed;
+		HashMap<String, HashSet<Label>> changeSet = new HashMap<String, HashSet<Label>>();
+		changeSet.put(LABELS_ADDED_TAG, added);
+		changeSet.put(LABELS_REMOVED_TAG, removed);
+		return changeSet;
 	}
 	
 	private void logLabelChange(HashSet<Label> removed, HashSet<Label> added, StringBuilder changeLog){
