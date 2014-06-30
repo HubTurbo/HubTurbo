@@ -109,7 +109,7 @@ public class Model {
 		if(index != -1){
 			issues.set(index, newCached);
 		}else{
-			issues.add(newCached);
+			issues.add(0, newCached);
 		}
 	}
 	
