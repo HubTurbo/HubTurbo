@@ -168,7 +168,7 @@ public class Model {
 			mergeTitle(original, edited, latest);
 			mergeBody(original, edited, latest);
 			mergeAssignee(original, edited, latest);
-			mergeState(original, edited, latest);
+			mergeState(original, edited, latest, changeLog);
 			mergeMilestone(original, edited, latest, changeLog);
 			mergeLabels(original, edited, latest, changeLog);
 			if(changeLog.length() > 0){
@@ -259,13 +259,20 @@ public class Model {
 	}
 
 	private void logMilestoneChange(Milestone editedMilestone, StringBuilder changeLog){
-		changeLog.append("Changed milestone to: "+ editedMilestone.getDescription() + "\n");
+		changeLog.append("Changed milestone to: "+ editedMilestone.getTitle() + "\n");
 	}
 	
-	private void mergeState(Issue original, Issue edited, Issue latest) {
+	private void mergeState(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		String originalState = original.getState();
 		String editedState = edited.getState();
-		if (!editedState.equals(originalState)) {latest.setState(editedState);}
+		if (!editedState.equals(originalState)) {
+			latest.setState(editedState);
+			logStateChange(editedState, changeLog);
+		}
+	}
+	
+	private void logStateChange(String editedState, StringBuilder changeLog){
+		changeLog.append("Changed issue state to: " + editedState + "\n");
 	}
 
 	private void mergeAssignee(Issue original, Issue edited, Issue latest) {
