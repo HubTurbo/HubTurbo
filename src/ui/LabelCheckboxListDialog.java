@@ -33,6 +33,7 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 	
 	private Stage parentStage;
 	private CompletableFuture<List<TurboLabel>> response;
+	private ArrayList<TurboLabel> initialChecked;
 
 	private ObservableList<TurboLabel> labels;
 	private ArrayList<CheckListView<String>> controls = new ArrayList<>();
@@ -65,14 +66,24 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 			CheckListView<String> control =
 					isExclusive ? new SingleCheckListView<String>(FXCollections.observableArrayList(labelNames))
 					: new CheckListView<>(FXCollections.observableArrayList(labelNames));
-
+					
 			control.setUserData(groups.get(groupName));
 			control.setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
 			control.setPrefWidth(WINDOW_WIDTH - 29);
 			controls.add(control);
+
+			// deal with initially checked items
+			int selected = 0;
+			for (int i=0; i<groups.get(groupName).size(); i++) {
+				if (initialChecked.contains(groups.get(groupName).get(i))) {
+					control.getCheckModel().select(i);
+					selected++;
+				}
+			}
+			assert !isExclusive || selected == 1 || selected == 0;
 			
+			// layout
 			Label name = new Label(groupName);
-			
 			layout.getChildren().addAll(name, control);
 		}
 
@@ -128,5 +139,10 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 			result.addAll(clv.getCheckModel().getSelectedIndices().stream().map(i -> labels.get(i)).collect(Collectors.toList()));
 		}
 		response.complete(result);
+	}
+
+	public LabelCheckboxListDialog setInitialChecked(List<TurboLabel> initialChecked) {
+		this.initialChecked = new ArrayList<>(initialChecked);
+		return this;
 	}
 }

@@ -242,20 +242,9 @@ public class IssueDialog implements Dialog<String> {
 		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());
 		
 		labelBox.setOnMouseClicked((e) -> {
-			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
-					.map((label) -> {
-						for (int i = 0; i < allLabels.size(); i++) {
-							if (allLabels.get(i).equals(label)) {
-								return i;
-							}
-						}
-						assert false;
-						return -1;
-					}).collect(Collectors.toList());
-
-			// TODO INITAL CHECKED STATE
-			
-			(new LabelCheckboxListDialog(stage, allLabels)).show().thenApply(
+			(new LabelCheckboxListDialog(stage, allLabels))
+				.setInitialChecked(issue.getLabels())
+				.show().thenApply(
 					(List<TurboLabel> response) -> {
 						issue.setLabels(FXCollections.observableArrayList(response));
 						return true;
