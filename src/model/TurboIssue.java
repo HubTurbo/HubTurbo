@@ -101,15 +101,7 @@ public class TurboIssue implements Listable {
 	public TurboIssue(TurboIssue other) {
 		assert other != null;
 		
-		setHtmlUrl(other.getHtmlUrl());
-		setTitle(other.getTitle());
-		setOpen(other.getOpen());
-		setId(other.getId());
-		setDescription(other.getDescription());
-		setAssignee(other.getAssignee());
-		setMilestone(other.getMilestone());
-		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParents(FXCollections.observableArrayList(other.getParents()));	
+		copyValues(other);	
 	}
 	
 	public TurboIssue(Issue issue) {
@@ -135,6 +127,20 @@ public class TurboIssue implements Listable {
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
 		ghIssue.setBody(buildBody());
 		return ghIssue;
+	}
+	
+	public void copyValues(TurboIssue other) {
+		assert other != null;
+		
+		setHtmlUrl(other.getHtmlUrl());
+		setTitle(other.getTitle());
+		setOpen(other.getOpen());
+		setId(other.getId());
+		setDescription(other.getDescription());
+		setAssignee(other.getAssignee());
+		setMilestone(other.getMilestone());
+		setLabels(FXCollections.observableArrayList(other.getLabels()));
+		setParents(FXCollections.observableArrayList(other.getParents()));	
 	}
 	
 	/*

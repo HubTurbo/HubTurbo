@@ -85,6 +85,8 @@ public class CustomListCell extends ListCell<TurboIssue> {
 				response -> {
 					if (response.equals("ok")) {
 						model.updateIssue(copy, issue);
+					} else if (response.equals("cancel")) {
+						issue.copyValues(copy);
 					}
 					return true;
 				});
