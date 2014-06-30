@@ -103,13 +103,13 @@ public class UI extends Application {
 			Label repoNameLabel = new Label("Repository:");
 			grid.add(repoNameLabel, 0, 0);
 
-			TextField repoOwnerField = new TextField("dariusf");
+			TextField repoOwnerField = new TextField("HubTurbo");
 			grid.add(repoOwnerField, 1, 0);
 
 			Label slash = new Label("/");
 			grid.add(slash, 2, 0);
 
-			TextField repoNameField = new TextField("issues");
+			TextField repoNameField = new TextField("HubTurbo");
 			grid.add(repoNameField, 3, 0);
 
 			Label usernameLabel = new Label("Username:");
@@ -220,9 +220,10 @@ public class UI extends Application {
 		MenuItem newIssue = new MenuItem("New Issue");
 		newIssue.setOnAction(e -> {
 			TurboIssue createdIssue = new TurboIssue("New issue", "");
-			createdIssue = model.createIssue(createdIssue);
 			(new IssueDialog(mainStage, model, createdIssue)).show().thenApply(
 					response -> {
+						model.createIssue(createdIssue);
+
 						// Required for some reason
 						columns.refresh();
 						return true;
