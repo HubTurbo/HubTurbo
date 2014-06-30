@@ -167,7 +167,7 @@ public class Model {
 			Issue latest = issueService.getIssue(repoId, issueId);
 			mergeTitle(original, edited, latest);
 			mergeBody(original, edited, latest);
-			mergeAssignee(original, edited, latest);
+			mergeAssignee(original, edited, latest, changeLog);
 			mergeState(original, edited, latest, changeLog);
 			mergeMilestone(original, edited, latest, changeLog);
 			mergeLabels(original, edited, latest, changeLog);
@@ -214,7 +214,9 @@ public class Model {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
 		boolean isSameLabels = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
-		if (!isSameLabels) {latest.setLabels(editedLabels);}
+		if (!isSameLabels) {
+			latest.setLabels(editedLabels);
+		}
 	}
 
 	/**
@@ -275,7 +277,7 @@ public class Model {
 		changeLog.append("Changed issue state to: " + editedState + "\n");
 	}
 
-	private void mergeAssignee(Issue original, Issue edited, Issue latest) {
+	private void mergeAssignee(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		User originalAssignee = original.getAssignee();
 		User editedAssignee = edited.getAssignee();
 		String originalALogin = (originalAssignee != null) ? originalAssignee.getLogin() : "";
@@ -283,11 +285,15 @@ public class Model {
 		if (!editedALogin.equals(originalALogin)) {
 			// this check is for cleared assignee
 			if (editedAssignee == null) {
-				latest.setAssignee(new User());
-			} else {
-				latest.setAssignee(editedAssignee);
-			}
+				editedAssignee = new User();
+			} 
+			latest.setAssignee(editedAssignee);
+			logAssigneeChange(editedAssignee, changeLog);
 		}
+	}
+	
+	private void logAssigneeChange(User assignee, StringBuilder changeLog){
+		changeLog.append("Changed issue assignee to: "+ assignee.getLogin() + "\n");
 	}
 
 	private void mergeBody(Issue original, Issue edited, Issue latest) {
