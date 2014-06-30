@@ -3,6 +3,7 @@ package model;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class Model {
 	private IssueService issueService;
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
-
+	
 	public Model(GitHubClient ghClient) {
 		this.collabService = new CollaboratorService(ghClient);
 		this.issueService = new IssueService(ghClient);
@@ -222,6 +223,26 @@ public class Model {
 		if (!isSameLabels) {latest.setLabels(editedLabels);}
 	}
 
+	/**
+	 * Logs the changes made to the issue's labels as a comment for the issue
+	 * @return true if changes have been made to the issue's labels, false otherwise
+	 * */
+	private boolean checkAndLogLabelChange(List<Label> original, List<Label> edited){
+		HashSet<Label> removed = new HashSet<Label>(original);
+		HashSet<Label> added = new HashSet<Label>(edited);
+		removed.removeAll(edited);
+		added.removeAll(original);
+		
+		return removed.size() == 0 && added.size() == 0;
+	}
+	
+	private void logLabelChange(HashSet<Label> removed, HashSet<Label> added){
+		String changeLog = "Added labels: %1s\n"
+						 + "Removed labels: %2s";
+		String comment = String.format(changeLog, added.toString(), removed.toString());
+//		issueService.createComment(repoId, comment);
+	}
+	
 	private void mergeMilestone(Issue original, Issue edited, Issue latest) {
 		Milestone originalMilestone = original.getMilestone();
 		Milestone editedMilestone = edited.getMilestone();

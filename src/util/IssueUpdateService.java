@@ -1,7 +1,5 @@
 package util;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.HOST_API;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_EVENTS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
