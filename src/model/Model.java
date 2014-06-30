@@ -229,7 +229,7 @@ public class Model {
 		HashSet<Label> added = new HashSet<Label>(edited);
 		removed.removeAll(edited);
 		added.removeAll(original);
-		boolean changed = !(removed.size() == 0 && added.size() == 0);
+		boolean changed = removed.size() != 0 || added.size() != 0;
 		if(changed){
 			logLabelChange(removed, added, changeLog);
 		}

@@ -97,6 +97,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		for (TurboLabel turboLabel : turboLabels) {
 			Label label = new Label();
 			label.setName(turboLabel.toGhName());
+			label.setColor(turboLabel.getColour());
 			ghLabels.add(label);
 		}
 		return ghLabels;
