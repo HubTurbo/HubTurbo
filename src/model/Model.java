@@ -169,7 +169,7 @@ public class Model {
 			mergeBody(original, edited, latest);
 			mergeAssignee(original, edited, latest);
 			mergeState(original, edited, latest);
-			mergeMilestone(original, edited, latest);
+			mergeMilestone(original, edited, latest, changeLog);
 			mergeLabels(original, edited, latest, changeLog);
 			if(changeLog.length() > 0){
 				issueService.createComment(repoId, ""+issueId, changeLog.toString());
@@ -242,7 +242,7 @@ public class Model {
 		}
 	}
 	
-	private void mergeMilestone(Issue original, Issue edited, Issue latest) {
+	private void mergeMilestone(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		Milestone originalMilestone = original.getMilestone();
 		Milestone editedMilestone = edited.getMilestone();
 		int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
@@ -250,13 +250,18 @@ public class Model {
 		if (editedMNumber != originalMNumber) {
 			// this check is for cleared milestone
 			if (editedMilestone == null) {
-				latest.setMilestone(new Milestone());
-			} else {
-				latest.setMilestone(editedMilestone);
+				editedMilestone = new Milestone();
+				
 			}
+			latest.setMilestone(editedMilestone);
+			logMilestoneChange(editedMilestone, changeLog);
 		}
 	}
 
+	private void logMilestoneChange(Milestone editedMilestone, StringBuilder changeLog){
+		changeLog.append("Changed milestone to: "+ editedMilestone.getDescription() + "\n");
+	}
+	
 	private void mergeState(Issue original, Issue edited, Issue latest) {
 		String originalState = original.getState();
 		String editedState = edited.getState();
