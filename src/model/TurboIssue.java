@@ -101,15 +101,7 @@ public class TurboIssue implements Listable {
 	public TurboIssue(TurboIssue other) {
 		assert other != null;
 		
-		setHtmlUrl(other.getHtmlUrl());
-		setTitle(other.getTitle());
-		setOpen(other.getOpen());
-		setId(other.getId());
-		setDescription(other.getDescription());
-		setAssignee(other.getAssignee());
-		setMilestone(other.getMilestone());
-		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParents(FXCollections.observableArrayList(other.getParents()));	
+		copyValues(other);	
 	}
 	
 	public TurboIssue(Issue issue) {
@@ -137,11 +129,26 @@ public class TurboIssue implements Listable {
 		return ghIssue;
 	}
 	
+	public void copyValues(TurboIssue other) {
+		assert other != null;
+		
+		setHtmlUrl(other.getHtmlUrl());
+		setTitle(other.getTitle());
+		setOpen(other.getOpen());
+		setId(other.getId());
+		setDescription(other.getDescription());
+		setAssignee(other.getAssignee());
+		setMilestone(other.getMilestone());
+		setLabels(FXCollections.observableArrayList(other.getLabels()));
+		setParents(FXCollections.observableArrayList(other.getParents()));	
+	}
+	
 	/*
 	 * Private Methods
 	 */
 	
 	private String extractDescription(String issueBody) {
+		if (issueBody == null) return "";
 		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 		return description;
 	}
@@ -155,9 +162,10 @@ public class TurboIssue implements Listable {
 		return turboLabels;
 	}
 
-	private ObservableList<Integer> extractParents(String body) {
+	private ObservableList<Integer> extractParents(String issueBody) {
 		ObservableList<Integer> parents = FXCollections.observableArrayList();
-		String[] lines = body.split(REGEX_SPLIT_LINES);
+		if (issueBody == null) return parents;
+		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
 		int seperatorLineIndex = getSeperatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
 			String line = lines[i];
@@ -166,7 +174,7 @@ public class TurboIssue implements Listable {
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
 					if (valueTokens[j].trim().isEmpty()) continue;
-					parents.add(Integer.parseInt(valueTokens[j]));
+					parents.add(Integer.parseInt(valueTokens[j].trim()));
 				}
 			}
 		}

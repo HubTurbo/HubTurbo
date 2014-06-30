@@ -145,7 +145,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			
 			TurboLabelGroup group = (TurboLabelGroup) getItem();
 			
-			(new GroupDialog(stage, group.getValue(), group.getExclusive()))
+			(new GroupDialog(stage, group.getValue(), group.isExclusive()))
 			.setExclusiveCheckboxVisible(false)
 			.show().thenApply(response -> {
 				
@@ -159,7 +159,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	    		// Update every label using TurboLabelGroup::setValue
 	    		group.setValue(response.getValue());
-	    		group.setExclusive(response.getExclusive());
+	    		group.setExclusive(response.isExclusive());
 
 	    		// Trigger updates on all the labels
 	    		for (int i=0; i<oldNames.size(); i++) {

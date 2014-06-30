@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -25,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
@@ -35,7 +37,7 @@ import model.TurboUser;
 
 public class IssueDialog implements Dialog<String> {
 
-	private static final double HEIGHT_FACTOR = 0.3;
+	private static final double HEIGHT_FACTOR = 0.35;
 
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
@@ -56,6 +58,7 @@ public class IssueDialog implements Dialog<String> {
 		this.issue = issue;
 
 		response = new CompletableFuture<>();
+		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
 	public CompletableFuture<String> show() {
@@ -114,12 +117,11 @@ public class IssueDialog implements Dialog<String> {
 	    });
 		
 		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
-
-		Parent parentsBox = createParentsBox(stage);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
-		issueDesc.setPrefRowCount(5);
+		issueDesc.setPrefRowCount(8);
 		issueDesc.setPrefColumnCount(42);
+		issueDesc.setWrapText(true);
 		issueDesc.setPromptText("Description");
 		issueDesc.textProperty().addListener(
 				(observable, oldValue, newValue) -> {
@@ -128,7 +130,7 @@ public class IssueDialog implements Dialog<String> {
 
 		VBox left = new VBox();
 		left.setSpacing(ELEMENT_SPACING);
-		left.getChildren().addAll(title, parentsBox, issueDesc);
+		left.getChildren().addAll(title, issueDesc);
 
 		return left;
 
@@ -136,16 +138,16 @@ public class IssueDialog implements Dialog<String> {
 
 	private Parent right(Stage stage) {
 
-		Parent milestoneField = createMilestoneBox(stage);
-		Parent labelBox = createLabelBox(stage);
-		Parent assigneeField = createAssigneeBox(stage);
-		
+		Parent parents = createParentsBox(stage);
+		Parent milestone = createMilestoneBox(stage);
+		Parent labels = createLabelBox(stage);
+		Parent assignee = createAssigneeBox(stage);
+
 		HBox buttons = createButtons(stage);
 
 		VBox right = new VBox();
 		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(milestoneField, labelBox, assigneeField,
-				buttons);
+		right.getChildren().addAll(parents, milestone, labels, assignee, buttons);
 
 		return right;
 	}
@@ -170,7 +172,8 @@ public class IssueDialog implements Dialog<String> {
 		});
 		
 		Button toGh = new Button();
-		toGh.setText("GitHub");
+		toGh.setStyle("-fx-font-family: github-octicons; -fx-font-size: 20px; -fx-background-color: transparent; -fx-padding: 0 0 0 0;");
+		toGh.setText("G");
 		toGh.setOnMouseClicked((MouseEvent e) -> {
 			try {
 		        Desktop desktop = Desktop.getDesktop();
@@ -208,7 +211,7 @@ public class IssueDialog implements Dialog<String> {
 						return -1;
 					}).collect(Collectors.toList());
 
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allIssues)))
 					.setWindowTitle("Choose Parents")
 					.setMultipleSelection(true)
@@ -236,35 +239,16 @@ public class IssueDialog implements Dialog<String> {
 	
 	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true);
-		List<TurboLabel> allLabels = model.getLabels();
+		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());
 		
 		labelBox.setOnMouseClicked((e) -> {
-			List<Integer> indicesForExistingLabels = issue.getLabels().stream()
-					.map((label) -> {
-						for (int i = 0; i < allLabels.size(); i++) {
-							if (allLabels.get(i).equals(label)) {
-								return i;
-							}
-						}
-						assert false;
-						return -1;
-					}).collect(Collectors.toList());
-
-			(new FilterableCheckboxList(stage, FXCollections
-					.observableArrayList(allLabels)))
-					.setWindowTitle("Choose Labels")
-					.setMultipleSelection(true)
-					.setInitialCheckedState(indicesForExistingLabels)
-					.show()
-					.thenApply(
-							(List<Integer> response) -> {
-								List<TurboLabel> labels = response.stream()
-										.map((i) -> allLabels.get(i))
-										.collect(Collectors.toList());
-								issue.setLabels(FXCollections
-										.observableArrayList(labels));
-								return true;
-							});
+			(new LabelCheckboxListDialog(stage, allLabels))
+				.setInitialChecked(issue.getLabels())
+				.show().thenApply(
+					(List<TurboLabel> response) -> {
+						issue.setLabels(FXCollections.observableArrayList(response));
+						return true;
+					});
 		});
 		return labelBox;
 	}
@@ -288,7 +272,7 @@ public class IssueDialog implements Dialog<String> {
 				existingIndices.add(existingIndex);
 			}
 			
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allAssignees)))
 					.setWindowTitle("Choose Assignee")
 					.setMultipleSelection(false)
@@ -323,7 +307,7 @@ public class IssueDialog implements Dialog<String> {
 				existingIndices.add(existingIndex);
 			}
 			
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allMilestones)))
 					.setWindowTitle("Choose Milestone")
 					.setMultipleSelection(false)
