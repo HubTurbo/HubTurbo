@@ -209,17 +209,7 @@ public class Model {
 	private void mergeLabels(Issue original, Issue edited, Issue latest) {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
-		boolean isSameLabels = true;
-		if (originalLabels.size() != editedLabels.size()) {
-			isSameLabels = false;
-		} else {
-			for (Label originalLabel : originalLabels) {
-				if (!editedLabels.contains(originalLabel)) {
-					isSameLabels = false;
-					break;
-				}
-			}
-		}
+		boolean isSameLabels = checkAndLogLabelChange(latest.getNumber(), originalLabels, editedLabels);
 		if (!isSameLabels) {latest.setLabels(editedLabels);}
 	}
 
@@ -227,20 +217,35 @@ public class Model {
 	 * Logs the changes made to the issue's labels as a comment for the issue
 	 * @return true if changes have been made to the issue's labels, false otherwise
 	 * */
-	private boolean checkAndLogLabelChange(List<Label> original, List<Label> edited){
+	private boolean checkAndLogLabelChange(int issueId, List<Label> original, List<Label> edited){
 		HashSet<Label> removed = new HashSet<Label>(original);
 		HashSet<Label> added = new HashSet<Label>(edited);
 		removed.removeAll(edited);
 		added.removeAll(original);
-		
-		return removed.size() == 0 && added.size() == 0;
+		boolean changed = !(removed.size() == 0 && added.size() == 0);
+		if(changed){
+			logLabelChange(issueId, removed, added);
+		}
+		return changed;
 	}
 	
-	private void logLabelChange(HashSet<Label> removed, HashSet<Label> added){
-		String changeLog = "Added labels: %1s\n"
-						 + "Removed labels: %2s";
-		String comment = String.format(changeLog, added.toString(), removed.toString());
-//		issueService.createComment(repoId, comment);
+	private void logLabelChange(int issueId, HashSet<Label> removed, HashSet<Label> added){
+		String changeLog = "";
+		if(added.size() > 0){
+			changeLog += "Added labels: " + added.toString();
+		}
+		if(removed.size() > 0){
+			if(!changeLog.isEmpty()){
+				changeLog += "\n";
+			}
+			changeLog += "Removed labels: " + removed.toString();
+		}
+		try {
+			issueService.createComment(repoId, ""+issueId, changeLog);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void mergeMilestone(Issue original, Issue edited, Issue latest) {
