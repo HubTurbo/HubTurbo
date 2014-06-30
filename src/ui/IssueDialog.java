@@ -1,5 +1,9 @@
 package ui;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,10 +27,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboUser;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
+import model.TurboUser;
+
 
 public class IssueDialog implements Dialog<String> {
 
@@ -148,6 +153,7 @@ public class IssueDialog implements Dialog<String> {
 	private HBox createButtons(Stage stage) {
 		HBox buttons = new HBox();
 		buttons.setAlignment(Pos.BASELINE_RIGHT);
+		buttons.setSpacing(8);
 
 		Button cancel = new Button();
 		cancel.setText("Cancel");
@@ -162,9 +168,27 @@ public class IssueDialog implements Dialog<String> {
 			response.complete("ok");
 			stage.close();
 		});
-		HBox.setMargin(ok, new Insets(0, 12, 0, 0)); // top right bottom left
+		
+		Button toGh = new Button();
+		toGh.setText("GitHub");
+		toGh.setOnMouseClicked((MouseEvent e) -> {
+			try {
+		        Desktop desktop = Desktop.getDesktop();
+		        if (Desktop.isDesktopSupported()
+		                && desktop.isSupported(Desktop.Action.BROWSE)) {
+		            URI uri = new URI(issue.getHtmlUrl());
+		            desktop.browse(uri);
+		        }
+		    } catch (IOException ex) {
+		        ex.printStackTrace();
+		    } catch (URISyntaxException ex) {
+		        ex.printStackTrace();
+		    }
+			response.complete("gh");
+			stage.close();
+		});
 
-		buttons.getChildren().addAll(ok, cancel);
+		buttons.getChildren().addAll(toGh, ok, cancel);
 		return buttons;
 	}
 

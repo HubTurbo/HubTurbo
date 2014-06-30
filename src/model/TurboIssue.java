@@ -57,6 +57,10 @@ public class TurboIssue implements Listable {
 	public TurboMilestone getMilestone() {return milestone;}
 	public void setMilestone(TurboMilestone milestone) {this.milestone = milestone;}
 	
+	private String htmlUrl;
+    public String getHtmlUrl() {return htmlUrl;}
+	private void setHtmlUrl(String htmlUrl) {this.htmlUrl = htmlUrl;}
+	
 	private ObservableList<TurboLabel> labels;
 	public ObservableList<TurboLabel> getLabels() {return labels;}
 	public void setLabels(ObservableList<TurboLabel> labels) {
@@ -97,28 +101,29 @@ public class TurboIssue implements Listable {
 	public TurboIssue(TurboIssue other) {
 		assert other != null;
 		
+		setHtmlUrl(other.getHtmlUrl());
 		setTitle(other.getTitle());
-		setDescription(other.getDescription());
 		setOpen(other.getOpen());
 		setId(other.getId());
-		setLabels(FXCollections.observableArrayList(other.getLabels()));
+		setDescription(other.getDescription());
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
-		setParents(FXCollections.observableArrayList(other.getParents()));
+		setLabels(FXCollections.observableArrayList(other.getLabels()));
+		setParents(FXCollections.observableArrayList(other.getParents()));	
 	}
 	
 	public TurboIssue(Issue issue) {
 		assert issue != null;
 		
+		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
 		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
 		setId(issue.getNumber());
 		setDescription(extractDescription(issue.getBody()));
-		
-		this.assignee = issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee());
-		this.milestone = issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone());
-		this.labels = translateLabels(issue.getLabels());
-		this.parents = extractParents(issue.getBody());
+		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
+		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
+		setLabels(translateLabels(issue.getLabels()));
+		setParents(extractParents(issue.getBody()));
 	}
 
 	public Issue toGhResource() {
