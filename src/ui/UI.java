@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
 import util.GitHubClientExtended;
@@ -45,35 +44,44 @@ public class UI extends Application {
 	private GitHubClientExtended client;
 	private String repoOwner, repoName;
 	private ModelUpdater modelUpdater;
-	
+
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
 
 	@Override
 	public void start(Stage stage) {
-		
+
 		client = new GitHubClientExtended();
 		model = new Model(client);
 
 		mainStage = stage;
 
 		Scene scene = new Scene(createRoot(), 800, 600);
-//		setUpHotkeys(scene);
+		// setUpHotkeys(scene);
 
+		setupStage(stage, scene);
+	}
+
+	private void setupStage(Stage stage, Scene scene) {
 		stage.setTitle("HubTurbo");
 		stage.setMinWidth(800);
 		stage.setMinHeight(600);
 		stage.setScene(scene);
 		stage.show();
+		stage.setOnCloseRequest(e -> {
+			if (modelUpdater != null) {
+				modelUpdater.stopModelUpdate();
+			}
+		});
 	}
-	
+
 	// Node definitions
-		
+
 	private Parent createRoot() {
 
 		columns = new ColumnControl(mainStage, model);
-		
+
 		BorderPane root = new BorderPane();
 		root.setCenter(columns);
 		root.setTop(createMenuBar());
@@ -126,27 +134,33 @@ public class UI extends Application {
 				if (username.isEmpty() && password.isEmpty()) {
 					BufferedReader reader;
 					try {
-						reader = new BufferedReader(new FileReader("credentials.txt"));
+						reader = new BufferedReader(new FileReader(
+								"credentials.txt"));
 						String line = null;
 						while ((line = reader.readLine()) != null) {
-							if (username.isEmpty()) username = line;
-							else password = line;
+							if (username.isEmpty())
+								username = line;
+							else
+								password = line;
 						}
 						System.out.println("Logged in using credentials.txt");
 					} catch (Exception e1) {
-						System.out.println("Failed to find or open credentials.txt");
+						System.out
+								.println("Failed to find or open credentials.txt");
 					}
 				}
-				
+
 				login(username, password);
 				repoOwner = repoOwnerField.getText();
 				repoName = repoNameField.getText();
-				
+
 				loadDataIntoModel();
 				columns.loadIssues();
 				setupModelUpdate();
-				
-				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
+
+				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests()
+						+ " requests remaining out of "
+						+ client.getRequestLimit() + ")");
 				stage.hide();
 			});
 
@@ -171,18 +185,18 @@ public class UI extends Application {
 	private void loadDataIntoModel() {
 		model.setRepoId(repoOwner, repoName);
 	}
-	
-	private void setupModelUpdate(){
+
+	private void setupModelUpdate() {
 		modelUpdater = new ModelUpdater(client, model);
 		modelUpdater.startModelUpdate();
 	}
 
-//	private void setUpHotkeys(Scene scene) {
-//		scene.getAccelerators().put(
-//				new KeyCodeCombination(KeyCode.DIGIT1,
-//						KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
-//				(Runnable) () -> changePanelCount(1));
-//	}
+	// private void setUpHotkeys(Scene scene) {
+	// scene.getAccelerators().put(
+	// new KeyCodeCombination(KeyCode.DIGIT1,
+	// KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN),
+	// (Runnable) () -> changePanelCount(1));
+	// }
 
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar();
@@ -201,7 +215,7 @@ public class UI extends Application {
 						return true;
 					});
 		});
-		
+
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
 		newIssue.setOnAction(e -> {
@@ -224,7 +238,7 @@ public class UI extends Application {
 						return true;
 					});
 		});
-		
+
 		labels.getItems().addAll(manageLabels);
 
 		Menu view = new Menu("View");
@@ -244,10 +258,12 @@ public class UI extends Application {
 			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
 			item.setToggleGroup(numberOfCols);
 			columnsMenu.getItems().add(item);
-			
+
 			final int j = i;
 			item.setOnAction((e) -> columns.setColumnCount(j));
-			item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf("DIGIT" + Integer.toString(j)), KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN));
+			item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf("DIGIT"
+					+ Integer.toString(j)), KeyCombination.SHIFT_DOWN,
+					KeyCombination.ALT_DOWN));
 
 			if (i == 1)
 				item.setSelected(true);
@@ -256,7 +272,7 @@ public class UI extends Application {
 		menuBar.getMenus().addAll(projects, milestones, issues, labels, view);
 		return menuBar;
 	}
-	
+
 	public boolean login(String userId, String password) {
 		client.setCredentials(userId, password);
 		try {
