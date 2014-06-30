@@ -269,12 +269,7 @@ public class Model {
 		String editedState = edited.getState();
 		if (!editedState.equals(originalState)) {
 			latest.setState(editedState);
-			logStateChange(editedState, changeLog);
 		}
-	}
-	
-	private void logStateChange(String editedState, StringBuilder changeLog){
-		changeLog.append("Changed issue state to: " + editedState + "\n");
 	}
 
 	private void mergeAssignee(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
