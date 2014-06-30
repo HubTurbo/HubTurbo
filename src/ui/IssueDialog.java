@@ -210,7 +210,7 @@ public class IssueDialog implements Dialog<String> {
 						return -1;
 					}).collect(Collectors.toList());
 
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allIssues)))
 					.setWindowTitle("Choose Parents")
 					.setMultipleSelection(true)
@@ -252,7 +252,7 @@ public class IssueDialog implements Dialog<String> {
 						return -1;
 					}).collect(Collectors.toList());
 
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allLabels)))
 					.setWindowTitle("Choose Labels")
 					.setMultipleSelection(true)
@@ -290,7 +290,7 @@ public class IssueDialog implements Dialog<String> {
 				existingIndices.add(existingIndex);
 			}
 			
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allAssignees)))
 					.setWindowTitle("Choose Assignee")
 					.setMultipleSelection(false)
@@ -325,7 +325,7 @@ public class IssueDialog implements Dialog<String> {
 				existingIndices.add(existingIndex);
 			}
 			
-			(new FilterableCheckboxList(stage, FXCollections
+			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allMilestones)))
 					.setWindowTitle("Choose Milestone")
 					.setMultipleSelection(false)

@@ -10,7 +10,6 @@ import org.controlsfx.control.CheckListView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,21 +19,21 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Listable;
 
-public class FilterableCheckboxList implements Dialog<List<Integer>> {
+public class CheckboxListDialog implements Dialog<List<Integer>> {
 
 	private final Stage parentStage;
-	private FilteredList<String> objects;
+	private ObservableList<String> objectNames;
 
 	private CompletableFuture<List<Integer>> response;
 	
-	public FilterableCheckboxList(Stage parentStage,
-			ObservableList<Listable> objects) {
+	public CheckboxListDialog(Stage parentStage, ObservableList<Listable> objects) {
 		this.parentStage = parentStage;
 		ObservableList<String> stringRepresentations = FXCollections
 				.observableArrayList(objects.stream()
 						.map((obj) -> obj.getListName())
 						.collect(Collectors.toList()));
-		this.objects = new FilteredList<>(stringRepresentations, p -> true);
+
+		this.objectNames = stringRepresentations;
 
 		response = new CompletableFuture<>();
 	}
@@ -46,7 +45,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 
 	private void showDialog() {
 		
-		CheckListView<String> checkListView = multipleSelection ? new CheckListView<>(objects) : new SingleCheckListView<>(objects);
+		CheckListView<String> checkListView = multipleSelection ? new CheckListView<>(objectNames) : new SingleCheckListView<>(objectNames);
 
 		if (!multipleSelection && initialCheckedState.size() > 1) {
 			initialCheckedState = new ArrayList<Integer>(initialCheckedState.get(0));
@@ -101,7 +100,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		return initialCheckedState;
 	}
 
-	public FilterableCheckboxList setInitialCheckedState(
+	public CheckboxListDialog setInitialCheckedState(
 			List<Integer> initialCheckedState) {
 		this.initialCheckedState = initialCheckedState;
 		return this;
@@ -113,7 +112,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		return windowTitle;
 	}
 
-	public FilterableCheckboxList setWindowTitle(String windowTitle) {
+	public CheckboxListDialog setWindowTitle(String windowTitle) {
 		this.windowTitle = windowTitle;
 		return this;
 	}
@@ -124,7 +123,7 @@ public class FilterableCheckboxList implements Dialog<List<Integer>> {
 		return multipleSelection;
 	}
 
-	public FilterableCheckboxList setMultipleSelection(boolean multipleSelection) {
+	public CheckboxListDialog setMultipleSelection(boolean multipleSelection) {
 		this.multipleSelection = multipleSelection;
 		return this;
 	}
