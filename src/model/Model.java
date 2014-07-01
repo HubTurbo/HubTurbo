@@ -30,8 +30,8 @@ public class Model {
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
 	
-	private static final String LABELS_REMOVED_TAG = "removed";
-	private static final String LABELS_ADDED_TAG = "added";
+	private static final String REMOVED_TAG = "removed";
+	private static final String ADDED_TAG = "added";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -223,35 +223,35 @@ public class Model {
 	private void mergeLabels(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
 		List<Label> originalLabels = original.getLabels();
 		List<Label> editedLabels = edited.getLabels();
-		HashMap<String, HashSet<Label>> changeSet = checkAndLogLabelChange(originalLabels, editedLabels, changeLog);
-		if (changeSet.size() > 0) {
-			List<Label> latestLabels = latest.getLabels();
-			latestLabels.removeAll(changeSet.get(LABELS_REMOVED_TAG));
-			for(Label label: changeSet.get(LABELS_ADDED_TAG)){
-				if(!latestLabels.contains(label)){
-					latestLabels.add(label);
-				}
+		HashMap<String, HashSet<Label>> changeSet = getChangesToList(originalLabels, editedLabels);
+		List<Label> latestLabels = latest.getLabels();
+		HashSet<Label> removed = changeSet.get(REMOVED_TAG);
+		HashSet<Label> added = changeSet.get(ADDED_TAG);
+		latestLabels.removeAll(removed);
+		for(Label label: added){
+			if(!latestLabels.contains(label)){
+				latestLabels.add(label);
 			}
-			latest.setLabels(latestLabels);
 		}
+		logLabelChange(removed, added, changeLog);
+		latest.setLabels(latestLabels);
 	}
 
 	/**
-	 * Logs the changes made to the issue's labels as a comment for the issue
-	 * @return true if changes have been made to the issue's labels, false otherwise
+	 * Gets the changes made to the a list of items
+	 * @return HashMap the a list of items removed from the original list
+	 * 			and a list of items added to the original list
 	 * */
-	private HashMap<String, HashSet<Label>> checkAndLogLabelChange(List<Label> original, List<Label> edited, StringBuilder changeLog){
-		HashSet<Label> removed = new HashSet<Label>(original);
-		HashSet<Label> added = new HashSet<Label>(edited);
+	private <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
+		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
+		HashSet<T> removed = new HashSet<T>(original);
+		HashSet<T> added = new HashSet<T>(edited);
 		removed.removeAll(edited);
 		added.removeAll(original);
-		boolean changed = removed.size() != 0 || added.size() != 0;
-		if(changed){
-			logLabelChange(removed, added, changeLog);
-		}
-		HashMap<String, HashSet<Label>> changeSet = new HashMap<String, HashSet<Label>>();
-		changeSet.put(LABELS_ADDED_TAG, added);
-		changeSet.put(LABELS_REMOVED_TAG, removed);
+		
+		changeSet.put(REMOVED_TAG, removed);
+		changeSet.put(ADDED_TAG, added);
+		
 		return changeSet;
 	}
 	
@@ -273,7 +273,6 @@ public class Model {
 			// this check is for cleared milestone
 			if (editedMilestone == null) {
 				editedMilestone = new Milestone();
-				
 			}
 			latest.setMilestone(editedMilestone);
 			logMilestoneChange(editedMilestone, changeLog);
@@ -314,13 +313,17 @@ public class Model {
 	private void mergeBody(Issue original, Issue edited, Issue latest) {
 		String originalBody = original.getBody();
 		String editedBody = edited.getBody();
-		if (!editedBody.equals(originalBody)) {latest.setBody(editedBody);}
+		if (!editedBody.equals(originalBody)) {
+			latest.setBody(editedBody);
+		}
 	}
 
 	private void mergeTitle(Issue original, Issue edited, Issue latest) {
 		String originalTitle = original.getTitle();
 		String editedTitle = edited.getTitle();
-		if (!editedTitle.equals(originalTitle)) {latest.setTitle(editedTitle);}
+		if (!editedTitle.equals(originalTitle)) {
+			latest.setTitle(editedTitle);
+		}
 	}
 	
 	private boolean loadCollaborators() {
