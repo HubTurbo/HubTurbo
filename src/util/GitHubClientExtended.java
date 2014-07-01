@@ -17,6 +17,12 @@ public class GitHubClientExtended extends GitHubClient{
 		return connection;
 	}
 	
+	
+	public HttpURLConnection createPut(String uri) throws IOException {
+		return super.createPut(uri);
+	}
+
+	
 	public InputStream getStream(HttpURLConnection request)
 			throws IOException {
 		return super.getStream(request);
@@ -29,5 +35,15 @@ public class GitHubClientExtended extends GitHubClient{
 	
 	protected boolean isError(final int code) {
 		return super.isError(code);
+	}
+	
+	protected boolean isOk(final int code) {
+		return super.isOk(code);
+	}
+
+	
+	public void sendParams(HttpURLConnection request, Object params)
+			throws IOException {
+		super.sendParams(request, params);
 	}
 }
