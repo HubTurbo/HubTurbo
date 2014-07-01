@@ -3,6 +3,7 @@ package util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.lang.reflect.Type;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -45,5 +46,21 @@ public class GitHubClientExtended extends GitHubClient{
 	public void sendParams(HttpURLConnection request, Object params)
 			throws IOException {
 		super.sendParams(request, params);
+	}
+	
+	public <V> V sendJson(final HttpURLConnection request,
+			final Object params, final Type type) throws IOException {
+		sendParams(request, params);
+		final int code = request.getResponseCode();
+		updateRateLimits(request);
+		if (isOk(code))
+			if (type != null)
+				return parseJson(getStream(request), type);
+			else
+				return null;
+		if (isEmpty(code))
+			return null;
+		throw createException(getStream(request), code,
+				request.getResponseMessage());
 	}
 }

@@ -2,12 +2,13 @@ package util;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
@@ -16,62 +17,54 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 public class IssueServiceExtended extends IssueService{
 	private GitHubClientExtended ghClient;
 	
-	public static final String BODY_TAG = "issue[body]";
+	public static final String ISSUE_DATE = "date";
+	public static final String ISSUE_CONTENTS = "issue";
 	
 	public IssueServiceExtended(GitHubClientExtended client){
 		super(client);
 		this.ghClient = client;
 	}
 	
-	public boolean editIssueDescription(IRepositoryIdProvider repository, int issueId, String oldDesc, String newDesc){
+	public HashMap<String, Object> getIssueData(IRepositoryIdProvider repository, int issueId) throws IOException{
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		GitHubResponse response = getIssueResponse(repository.generateId(), issueId + "");
+		String dateModified = response.getHeader("Date");
+		result.put(ISSUE_DATE, dateModified);
+		result.put(ISSUE_CONTENTS, (Issue) response.getBody());
+		return result;
+	}
+	private GitHubResponse getIssueResponse(String repoId, String issueNumber)
+			throws IOException {
+		if (issueNumber == null)
+			throw new IllegalArgumentException("Issue number cannot be null"); //$NON-NLS-1$
+		if (issueNumber.length() == 0)
+			throw new IllegalArgumentException("Issue number cannot be empty"); //$NON-NLS-1$
+
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_ISSUES);
+		uri.append('/').append(issueNumber);
+		GitHubRequest request = createRequest();
+		request.setUri(uri);
+		request.setType(Issue.class);
+		return client.get(request);
+	}
+	
+	public Issue editIssue(IRepositoryIdProvider repository, Issue issue, String dateModified) throws IOException {
+		if (issue == null)
+			throw new IllegalArgumentException("Issue cannot be null"); //$NON-NLS-1$
+
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(repository.generateId());
 		uri.append(SEGMENT_ISSUES);
-		uri.append('/').append(issueId);
-		try {
-			HttpURLConnection connection = ghClient.createPost(uri.toString());
-			String hash = generateIssueBodyHash(oldDesc);
-			
-			if(hash != null){
-				connection.setRequestProperty("X-Body-Version", hash);
-			}
-			
-			ghClient.sendParams(connection, createIssueDescriptionMap(newDesc));
-			
-			int responseCode = connection.getResponseCode();
+		uri.append('/').append(issue.getNumber());
+		HttpURLConnection connection = ghClient.createPost(uri.toString());
+		connection.setRequestProperty("If-Unmodified-Since", dateModified);
+		Map<Object, Object> params = createIssueMap(issue, false);
+		String state = issue.getState();
+		if (state != null)
+			params.put(FILTER_STATE, state);
+		return ghClient.sendJson(connection, params, Issue.class);
+	}
 
-			return ghClient.isOk(responseCode);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	protected Map<Object, Object> createIssueDescriptionMap(String desc){
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(FIELD_BODY, desc);
-		return params;
-	}
-	
-	private String generateIssueBodyHash(String body){
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(body.getBytes());
-			 
-	        byte byteData[] = md.digest();
-	 
-	        StringBuffer sb = new StringBuffer();
-	        for (int i = 0; i < byteData.length; i++) {
-	        	sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-	        }
-	 
-	        return sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return null;
-	}
-	
 }

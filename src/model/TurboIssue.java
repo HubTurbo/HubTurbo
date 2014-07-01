@@ -189,20 +189,18 @@ public class TurboIssue implements Listable {
 	
 	/**
 	 * Modifies @param latest to contain the merged changes of this TurboIssue object and @param latest wrt @param edited
-	 * @return StringBuilder containing a log of changes between this TurboIssue object and @param original
+	 * Stores change log in @param changeLog
+	 * @return true if issue description has been merged, false otherwise
 	 * */
-	protected StringBuilder mergeIssues(TurboIssue original, TurboIssue latest, boolean overwriteDesc){
-		StringBuilder changeLog = new StringBuilder();
+	protected boolean mergeIssues(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
 		mergeTitle(original, latest, changeLog);
-		if(overwriteDesc){
-			mergeDescription(original, latest, changeLog);
-		}		
+		boolean fullMerge = mergeDescription(original, latest, changeLog);		
 		mergeParents(original, latest, changeLog);
 		mergeLabels(original, latest, changeLog);
 		mergeAssignee(original, latest, changeLog);
 		mergeMilestone(original, latest, changeLog);
 		mergeOpen(original, latest);
-		return changeLog;
+		return fullMerge;
 	}
 	
 	private void mergeLabels(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
@@ -298,14 +296,22 @@ public class TurboIssue implements Listable {
 		changeLog.append("Changed issue assignee to: "+ assignee.getGithubName() + "\n");
 	}
 
-	private void mergeDescription(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
+	/**
+	 * Merges changes to description only if the description in the latest version has not been updated. 
+	 * Returns false if the description in @param latest has been modified
+	 * */
+	private boolean mergeDescription(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
 		String originalDesc = original.getDescription();
 		String editedDesc = this.getDescription();
-		
+		String latestDesc = latest.getDescription();
+		if(!latestDesc.equals(originalDesc)){
+			return false;
+		}
 		if (!editedDesc.equals(originalDesc)) {
 			latest.setDescription(editedDesc);
 			changeLog.append("Edited description");
 		}
+		return true;
 	}
 	
 	private void mergeParents(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
