@@ -1,0 +1,31 @@
+package filter;
+
+public class Negation implements Expression {
+	private Expression expr;
+
+	public Negation(Expression expr) {
+		this.expr = expr;
+	}
+
+	@Override
+	public String toString() {
+		return "~" + expr;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Negation other = (Negation) obj;
+		if (expr == null) {
+			if (other.expr != null)
+				return false;
+		} else if (!expr.equals(other.expr))
+			return false;
+		return true;
+	}
+}
