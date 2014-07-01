@@ -42,4 +42,13 @@ public class Tests {
 		assertEquals(Parser.parse("a(b) ~c(d)"), new Conjunction(new Predicate("a", "b"), new Negation(new Predicate("c", "d"))));
 	}
 
+	@Test
+	public void grouping() {
+		assertEquals(Parser.parse("(a(b) or c(d)) and e(f)"),
+				new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+		assertEquals(Parser.parse("(a(b) or c(d)) e(f)"),
+				new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+		assertEquals(Parser.parse("e(f) ~(a(b) or c(d))"),
+				new Conjunction(new Predicate("e", "f"), new Negation(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")))));
+	}
 }
