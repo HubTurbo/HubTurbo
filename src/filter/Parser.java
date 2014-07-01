@@ -7,13 +7,13 @@ public class Parser {
 	public static void main(String[] args) {
 //		System.out.println(Parser.parse("e(f) (a(b) or c(d))"));
 //		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
-		System.out.println(Parser.parse("    a   (   b   )   "));
+//		System.out.println(Parser.parse("    a   (   b   )   "));
 	}
 	
 	private Parser(ArrayList<Token> input) {
 		this.input = input;
 	}
-	public static Expression parse(String input) {
+	public static FilterExpression parse(String input) {
 		if (input == null || input.isEmpty()) return null;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
 	}
@@ -37,13 +37,13 @@ public class Parser {
 		return input.get(position);
 	}
 		
-	private Expression parseExpression(int precedence) {
+	private FilterExpression parseExpression(int precedence) {
 		Token token = consume();
 		assert token.getType() != TokenType.EOF;
 		
 		// Prefix
 		
-		Expression left;
+		FilterExpression left;
 		
 		switch (token.getType()) {
 		case LBRACKET:
@@ -105,7 +105,7 @@ public class Parser {
 		}
 	}
 
-	private Expression parsePredicate(Token token) {
+	private FilterExpression parsePredicate(Token token) {
 		String name = token.getValue();
 		consume(TokenType.LBRACKET);
 		String content = consume().getValue();
@@ -113,21 +113,21 @@ public class Parser {
 		return new Predicate(name, content);
 	}
 	
-	private Expression parseGroup(Token token) {
-		Expression expr = parseExpression(0);
+	private FilterExpression parseGroup(Token token) {
+		FilterExpression expr = parseExpression(0);
 		consume(TokenType.RBRACKET);
 		return expr;
 	}
 	
-	private Expression parseDisjunction(Expression left, Token token) {
+	private FilterExpression parseDisjunction(FilterExpression left, Token token) {
 		return new Disjunction(left, parseExpression(Precedence.DISJUNCTION));
 	}
 
-	private Expression parseConjunction(Expression left, Token token) {
+	private FilterExpression parseConjunction(FilterExpression left, Token token) {
 		return new Conjunction(left, parseExpression(Precedence.CONJUNCTION));
 	}
 	
-	private Expression parseNegation(Token token) {
+	private FilterExpression parseNegation(Token token) {
 		return new Negation(parseExpression(Precedence.PREFIX));
 	}
 }

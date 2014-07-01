@@ -2,6 +2,8 @@ package ui;
 
 import java.util.function.Predicate;
 
+import filter.FilterExpression;
+import filter.Parser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,6 +30,8 @@ public class IssuePanel extends VBox {
 	
 	private Predicate<TurboIssue> predicate;
 
+	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+
 	public IssuePanel(Stage mainStage, Model model) {
 		this.mainStage = mainStage;
 		this.model = model;
@@ -48,9 +52,25 @@ public class IssuePanel extends VBox {
 		Label label = new Label("<no filter>");
 		box.setOnMouseClicked((e) -> {
 			(new FilterDialog(mainStage, model)).show().thenApply(
-					filter -> {
-						this.filter(filter);
-						label.setText(filter.toString());
+					filterCode -> {
+						if (filterCode.isEmpty()) {
+							label.setText("<no filter>");
+							this.filter(EMPTY_PREDICATE);
+						} else {
+				        	try {
+				        		FilterExpression filter = Parser.parse(filterCode);
+				        		if (filter != null) {
+									label.setText(filter.toString());
+				                	this.filter(filter);
+				        		} else {
+									label.setText("<no filter>");
+				                	this.filter(EMPTY_PREDICATE);
+				        		}
+				        	} catch (RuntimeException ex){
+				            	label.setText("Parse error in filter");
+				            	this.filter(EMPTY_PREDICATE);
+				        	}
+						}
 						return true;
 					});
 		});
@@ -65,7 +85,7 @@ public class IssuePanel extends VBox {
 		setStyle(UI.STYLE_BORDERS);
 	}
 
-	public void filter(Filter filter) {
+	public void filter(FilterExpression filter) {
 		predicate = filter::isSatisfiedBy;
 		refreshItems();
 	}

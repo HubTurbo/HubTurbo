@@ -15,13 +15,14 @@ import com.google.gson.GsonBuilder;
 
 public class ConfigFileHandler {
 
+	private static final String CHARSET = "UTF-8";
 	private static final String FILE_CONFIG = "config.json";
 	
-	Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	
-	public void saveConfig(UserConfigurations config) {
+	public static void saveConfig(UserConfigurations config) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG) , "UTF-8");
+			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG) , CHARSET);
 			gson.toJson(config, UserConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
@@ -36,10 +37,10 @@ public class ConfigFileHandler {
 		}
 	}
 	
-	public UserConfigurations loadConfig() {
+	public static UserConfigurations loadConfig() {
 		UserConfigurations config = null;
 		try {
-			Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG), "UTF-8");
+			Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG), CHARSET);
 			config = gson.fromJson(reader, UserConfigurations.class);
 			reader.close();
 		} catch (UnsupportedEncodingException e) {

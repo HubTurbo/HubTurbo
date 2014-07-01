@@ -1,17 +1,24 @@
 package ui;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
-import model.TurboUser;
 import model.TurboIssue;
+import model.TurboUser;
 
 public class CustomListCell extends ListCell<TurboIssue> {
 
@@ -24,6 +31,8 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		super();
 		this.mainStage = mainStage;
 		this.model = model;
+		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
+
 	}
 
 	@Override
@@ -31,7 +40,29 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		super.updateItem(issue, empty);
 		if (issue == null)
 			return;
-
+		
+		HBox buttonBox = new HBox();
+		Label ghIcon = new Label();
+		ghIcon.setStyle("-fx-font-family: github-octicons; -fx-font-size: 22px; -fx-background-color: transparent; -fx-padding: 0 5 0 0;");
+		ghIcon.setText("G");
+		buttonBox.getChildren().addAll(ghIcon);
+		buttonBox.setOnMouseClicked((MouseEvent e) -> {
+			if (issue.getHtmlUrl() != null) {
+				try {
+			        Desktop desktop = Desktop.getDesktop();
+			        if (Desktop.isDesktopSupported()
+			                && desktop.isSupported(Desktop.Action.BROWSE)) {
+			            URI uri = new URI(issue.getHtmlUrl());
+			            desktop.browse(uri);
+			        }
+			    } catch (IOException ex) {
+			        ex.printStackTrace();
+			    } catch (URISyntaxException ex) {
+			        ex.printStackTrace();
+			    }	
+			}
+		});
+		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueName.setStyle(STYLE_ISSUE_NAME);
 		issue.titleProperty().addListener(new ChangeListener<String>() {
@@ -42,9 +73,12 @@ public class CustomListCell extends ListCell<TurboIssue> {
 				issueName.setText("#" + issue.getId() + " " + newValue);
 			}
 		});
+		
+		HBox titleBox = new HBox();
+		titleBox.getChildren().addAll(buttonBox, issueName);
 
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
-
+		
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
 		HBox assignee = new HBox();
@@ -58,7 +92,7 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		VBox everything = new VBox();
 		everything.setSpacing(2);
 		everything.getChildren()
-				.addAll(issueName, parents, labels, assignee);
+				.addAll(titleBox, parents, labels, assignee);
 		// everything.getChildren().stream().forEach((node) ->
 		// node.setStyle(Demo.STYLE_BORDERS));
 

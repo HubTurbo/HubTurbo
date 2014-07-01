@@ -4,27 +4,27 @@ import java.util.Collections;
 import java.util.List;
 
 public class UserConfigurations {
-	private List<String> openStatuses;
+	private static List<String> openStatuses;
 	public List<String> getOpenStatuses() {
 		return Collections.unmodifiableList(openStatuses);
 	}
 	
-	private List<String> inheritedLabels;
-	public List<String> getInheritedLabels() {
-		return Collections.unmodifiableList(inheritedLabels);
+	private static List<String> excludedLabels;
+	public List<String> getExcludedLabels() {
+		return Collections.unmodifiableList(excludedLabels);
 	}
 	
-	public UserConfigurations(List<String> openStatuses, List<String> inheritedLabels) {
-		this.openStatuses = openStatuses;
-		this.inheritedLabels = inheritedLabels;
+	public UserConfigurations(List<String> openStatuses, List<String> excludedLabels) {
+		UserConfigurations.openStatuses = openStatuses;
+		UserConfigurations.excludedLabels = excludedLabels;
 	}
-	
-	public boolean isOpenStatus(String status) {
+
+	public static boolean isOpenStatus(String status) {
 		return openStatuses.contains(status);
 	}
 	
-	public boolean isInheritedLabel(String label) {
-		return openStatuses.contains(label);
+	public static boolean isExcludedLabel(String label) {
+		return excludedLabels.contains(label);
 	}
 	
 }

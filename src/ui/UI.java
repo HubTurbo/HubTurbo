@@ -219,14 +219,11 @@ public class UI extends Application {
 		Menu issues = new Menu("Issues");
 		MenuItem newIssue = new MenuItem("New Issue");
 		newIssue.setOnAction(e -> {
-			TurboIssue issue = model.createIssue(new TurboIssue("New issue", ""));
-			TurboIssue copy = new TurboIssue(issue);
+			TurboIssue issue = new TurboIssue("New issue", "");
 			(new IssueDialog(mainStage, model, issue)).show().thenApply(
 					response -> {
 						if (response.equals("ok")) {
-							model.updateIssue(copy, issue);
-						} else if (response.equals("cancel")) {
-							issue.copyValues(copy);
+							model.createIssue(issue);
 						}
 						// Required for some reason
 						columns.refresh();
