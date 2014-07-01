@@ -36,6 +36,10 @@ public class TurboMilestone implements Listable {
 	 * Constructors and Public Methods
 	 */
 	
+	public TurboMilestone(){
+		super();
+	}
+	
 	public TurboMilestone(String title) {
 		setTitle(title);
 	}

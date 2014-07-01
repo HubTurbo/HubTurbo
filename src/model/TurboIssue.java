@@ -1,5 +1,7 @@
 package model;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
+
 public class TurboIssue implements Listable {
 	
 	private static final String STATE_CLOSED = "closed";
@@ -24,42 +27,80 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_SEPERATOR = "<hr>";
+	private static final String REMOVED_TAG = "removed";
+	private static final String ADDED_TAG = "added";
 	
 	/*
 	 * Attributes, Getters & Setters
 	 */
 	
 	private IntegerProperty id = new SimpleIntegerProperty();
-    public final int getId() {return id.get();}
-    private final void setId(int value) {id.set(value);}
-    public IntegerProperty idProperty() {return id;}
+    public final int getId() {
+    	return id.get();
+    }
+    private final void setId(int value) {
+    	id.set(value);
+    }
+    public IntegerProperty idProperty() {
+    	return id;
+    }
 	
 	private StringProperty title = new SimpleStringProperty();
-    public final String getTitle() {return title.get();}
-    public final void setTitle(String value) {title.set(value);}
-    public StringProperty titleProperty() {return title;}
+    public final String getTitle() {
+    	return title.get();
+    }
+    public final void setTitle(String value) {
+    	title.set(value);
+    }
+    public StringProperty titleProperty() {
+    	return title;
+    }
 	
     private StringProperty description = new SimpleStringProperty();
-    public final String getDescription() {return description.get();}
-    public final void setDescription(String value) {description.set(value);}
-    public StringProperty descriptionProperty() {return description;}
+    public final String getDescription() {
+    	return description.get();
+    }
+    public final void setDescription(String value) {
+    	description.set(value);
+    }
+    public StringProperty descriptionProperty() {
+    	return description;
+    }
     
     private BooleanProperty state = new SimpleBooleanProperty();
-    public final Boolean getOpen() {return state.get();}
-    public final void setOpen(Boolean value) {state.set(value);}
-    public BooleanProperty openProperty() {return state;}
+    public final Boolean getOpen() {
+    	return state.get();
+    }
+    public final void setOpen(Boolean value) {
+    	state.set(value);
+    }
+    public BooleanProperty openProperty() {
+    	return state;
+    }
     
     private TurboUser assignee;
-    public TurboUser getAssignee() {return assignee;}
-	public void setAssignee(TurboUser assignee) {this.assignee = assignee;}
+    public TurboUser getAssignee() {
+    	return assignee;
+    }
+	public void setAssignee(TurboUser assignee) {
+		this.assignee = assignee;
+	}
 	
 	private TurboMilestone milestone;
-	public TurboMilestone getMilestone() {return milestone;}
-	public void setMilestone(TurboMilestone milestone) {this.milestone = milestone;}
+	public TurboMilestone getMilestone() {
+		return milestone;
+	}
+	public void setMilestone(TurboMilestone milestone) {
+		this.milestone = milestone;
+	}
 	
 	private String htmlUrl;
-    public String getHtmlUrl() {return htmlUrl;}
-	private void setHtmlUrl(String htmlUrl) {this.htmlUrl = htmlUrl;}
+    public String getHtmlUrl() {
+    	return htmlUrl;
+    }
+	private void setHtmlUrl(String htmlUrl) {
+		this.htmlUrl = htmlUrl;
+	}
 	
 	private ObservableList<TurboLabel> labels;
 	public ObservableList<TurboLabel> getLabels() {return labels;}
@@ -120,6 +161,7 @@ public class TurboIssue implements Listable {
 
 	public Issue toGhResource() {
 		Issue ghIssue = new Issue();
+		ghIssue.setNumber(getId());
 		ghIssue.setTitle(getTitle());
 		ghIssue.setState(getOpen() ? STATE_OPEN : STATE_CLOSED);
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhResource());
@@ -141,6 +183,148 @@ public class TurboIssue implements Listable {
 		setMilestone(other.getMilestone());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
 		setParents(FXCollections.observableArrayList(other.getParents()));	
+	}
+	
+	/**
+	 * Modifies @param latest to contain the merged changes of this TurboIssue object and @param latest wrt @param edited
+	 * @return StringBuilder containing a log of changes between this TurboIssue object and @param original
+	 * */
+	protected StringBuilder mergeIssues(TurboIssue original, TurboIssue latest){
+		StringBuilder changeLog = new StringBuilder();
+		mergeTitle(original, latest);
+		mergeDescription(original, latest);
+		mergeParents(original, latest);
+		mergeLabels(original, latest, changeLog);
+		mergeAssignee(original, latest, changeLog);
+		mergeMilestone(original, latest, changeLog);
+		mergeOpen(original, latest);
+		return changeLog;
+	}
+	
+	private void mergeLabels(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
+		ObservableList<TurboLabel> originalLabels = original.getLabels();
+		ObservableList<TurboLabel> editedLabels = this.getLabels();
+		HashMap<String, HashSet<TurboLabel>> changeSet = getChangesToList(originalLabels, editedLabels);
+		ObservableList<TurboLabel> latestLabels = latest.getLabels();
+		HashSet<TurboLabel> removed = changeSet.get(REMOVED_TAG);
+		HashSet<TurboLabel> added = changeSet.get(ADDED_TAG);
+		latestLabels.removeAll(removed);
+		for(TurboLabel label: added){
+			if(!latestLabels.contains(label)){
+				latestLabels.add(label);
+			}
+		}
+		logLabelChange(removed, added, changeLog);
+		latest.setLabels(latestLabels);
+	}
+
+	/**
+	 * Gets the changes made to the a list of items
+	 * @return HashMap the a list of items removed from the original list
+	 * 			and a list of items added to the original list
+	 * */
+	private <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
+		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
+		HashSet<T> removed = new HashSet<T>(original);
+		HashSet<T> added = new HashSet<T>(edited);
+		removed.removeAll(edited);
+		added.removeAll(original);
+		
+		changeSet.put(REMOVED_TAG, removed);
+		changeSet.put(ADDED_TAG, added);
+		
+		return changeSet;
+	}
+	
+	private void logLabelChange(HashSet<TurboLabel> removed, HashSet<TurboLabel> added, StringBuilder changeLog){
+		if(added.size() > 0){
+			changeLog.append("Added labels: " + added.toString() + "\n");
+		}
+		if(removed.size() > 0){
+			changeLog.append("Removed labels: " + removed.toString() + "\n");
+		}
+	}
+	
+	private void mergeMilestone(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
+		TurboMilestone originalMilestone = original.getMilestone();
+		TurboMilestone editedMilestone = this.getMilestone();
+		int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
+		int editedMNumber = (editedMilestone != null) ? editedMilestone.getNumber() : 0;
+		if (editedMNumber != originalMNumber) {
+			// this check is for cleared milestone
+			if (editedMilestone == null) {
+				editedMilestone = new TurboMilestone();
+			}
+			latest.setMilestone(editedMilestone);
+			logMilestoneChange(editedMilestone, changeLog);
+		}
+	}
+
+	private void logMilestoneChange(TurboMilestone editedMilestone, StringBuilder changeLog){
+		changeLog.append("Changed milestone to: "+ editedMilestone.getTitle() + "\n");
+	}
+	
+	private void mergeOpen(TurboIssue original, TurboIssue latest) {
+		Boolean originalState = original.getOpen();
+		Boolean editedState = this.getOpen();
+		if (!editedState.equals(originalState)) {
+			latest.setOpen(editedState);
+		}
+	}
+
+	private void mergeAssignee(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
+		TurboUser originalAssignee = original.getAssignee();
+		TurboUser editedAssignee = this.getAssignee();
+		// this check is for cleared assignee
+		if(originalAssignee == null){
+			originalAssignee = new TurboUser();
+		}
+		if (editedAssignee == null) {
+			editedAssignee = new TurboUser();
+		} 
+		if (!originalAssignee.equals(editedAssignee)) {
+			latest.setAssignee(editedAssignee);
+			logAssigneeChange(editedAssignee, changeLog);
+		}
+	}
+	
+	private void logAssigneeChange(TurboUser assignee, StringBuilder changeLog){
+		changeLog.append("Changed issue assignee to: "+ assignee.getGithubName() + "\n");
+	}
+
+	private void mergeDescription(TurboIssue original, TurboIssue latest) {
+		String originalDesc = original.getDescription();
+		String editedDesc = this.getDescription();
+		
+		if (!editedDesc.equals(originalDesc)) {
+			latest.setDescription(editedDesc);
+		}
+	}
+	
+	private void mergeParents(TurboIssue original, TurboIssue latest){
+		ObservableList<Integer> originalParents = original.getParents();
+		ObservableList<Integer> editedParents = this.getParents();
+		
+		HashMap<String, HashSet<Integer>> changeSet = getChangesToList(originalParents, editedParents);
+		ObservableList<Integer> latestParents = latest.getParents();
+		HashSet<Integer> removed = changeSet.get(REMOVED_TAG);
+		HashSet<Integer> added = changeSet.get(ADDED_TAG);
+		latestParents.removeAll(removed);
+		for(Integer label: added){
+			if(!latestParents.contains(label)){
+				latestParents.add(label);
+			}
+		}
+		latest.setParents(latestParents);
+		//TODO: log changes
+	}
+
+	private void mergeTitle(TurboIssue original, TurboIssue latest) {
+		String originalTitle = original.getTitle();
+		String editedTitle = this.getTitle();
+		if (!editedTitle.equals(originalTitle)) {
+			latest.setTitle(editedTitle);
+		}
 	}
 	
 	/*

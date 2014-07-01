@@ -20,6 +20,10 @@ public class TurboUser implements Listable {
 	 * Constructors and Public Methods
 	 */
 	
+	public TurboUser(){
+		super();
+	}
+	
 	public TurboUser(User user) {
 		assert user != null;
 
