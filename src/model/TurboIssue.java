@@ -191,10 +191,12 @@ public class TurboIssue implements Listable {
 	 * Modifies @param latest to contain the merged changes of this TurboIssue object and @param latest wrt @param edited
 	 * @return StringBuilder containing a log of changes between this TurboIssue object and @param original
 	 * */
-	protected StringBuilder mergeIssues(TurboIssue original, TurboIssue latest){
+	protected StringBuilder mergeIssues(TurboIssue original, TurboIssue latest, boolean overwriteDesc){
 		StringBuilder changeLog = new StringBuilder();
 		mergeTitle(original, latest, changeLog);
-		mergeDescription(original, latest, changeLog);
+		if(overwriteDesc){
+			mergeDescription(original, latest, changeLog);
+		}		
 		mergeParents(original, latest, changeLog);
 		mergeLabels(original, latest, changeLog);
 		mergeAssignee(original, latest, changeLog);

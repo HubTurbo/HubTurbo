@@ -20,6 +20,8 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import util.GitHubClientExtended;
+import util.IssueServiceExtended;
 import util.LabelServiceFixed;
 
 public class Model {
@@ -37,13 +39,13 @@ public class Model {
 	private IRepositoryIdProvider repoId;
 	
 	private CollaboratorService collabService;
-	private IssueService issueService;
+	private IssueServiceExtended issueService;
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
 	
-	public Model(GitHubClient ghClient) {
+	public Model(GitHubClientExtended ghClient) {
 		this.collabService = new CollaboratorService(ghClient);
-		this.issueService = new IssueService(ghClient);
+		this.issueService = new IssueServiceExtended(ghClient);
 		this.labelService = new LabelServiceFixed(ghClient);
 		this.milestoneService = new MilestoneService(ghClient);
 	}
@@ -160,8 +162,19 @@ public class Model {
 	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
 		try {
 			int issueId = editedIssue.getId();
+			
+			
+			boolean descUpdated = updateIssueDescription(originalIssue, editedIssue.getDescription());
+			//TODO: display error if description update failed
+			if(!descUpdated){
+				System.out.println("description edit clash occured");
+			}else{
+				System.out.println(originalIssue.getDescription());
+			}
+			
 			TurboIssue latestIssue = new TurboIssue(issueService.getIssue(repoId, issueId));
-			StringBuilder changeLog = editedIssue.mergeIssues(originalIssue, latestIssue);
+			
+			StringBuilder changeLog = editedIssue.mergeIssues(originalIssue, latestIssue, false);
 			if(changeLog.length() > 0){
 				issueService.createComment(repoId, ""+issueId, changeLog.toString());
 			}
@@ -172,6 +185,24 @@ public class Model {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+	}
+	
+	public boolean updateIssueDescription(TurboIssue issue, String desc){
+		String oldDesc = issue.getDescription();
+		boolean success = true;
+		if(desc != null && !oldDesc.equals(desc)){
+			success = issueService.editIssueDescription(repoId, issue.getId(), oldDesc, desc);
+			if(success){
+				issue.setDescription(desc);
+				try {
+					issueService.createComment(repoId, ""+issue.getId(), "Edited description");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return success;
 	}
 	
 	public void updateLabel(TurboLabel editedLabel, String labelName) {

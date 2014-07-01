@@ -18,8 +18,8 @@ public class GitHubClientExtended extends GitHubClient{
 	}
 	
 	
-	public HttpURLConnection createPut(String uri) throws IOException {
-		return super.createPut(uri);
+	public HttpURLConnection createPost(String uri) throws IOException {
+		return super.createPost(uri);
 	}
 
 	
