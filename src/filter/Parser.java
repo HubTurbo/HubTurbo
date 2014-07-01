@@ -7,6 +7,7 @@ public class Parser {
 	public static void main(String[] args) {
 //		System.out.println(Parser.parse("e(f) (a(b) or c(d))"));
 //		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
+		System.out.println(Parser.parse("    a   (   b   )   "));
 	}
 	
 	private Parser(ArrayList<Token> input) {

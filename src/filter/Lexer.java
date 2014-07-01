@@ -36,7 +36,10 @@ public class Lexer {
 
 		if (SKIP_WHITESPACE) {
 			Matcher matcher = NO_WHITESPACE.matcher(input).region(position, input.length());
-			matcher.find();
+			boolean found = matcher.find();
+			if (!found) {
+				return new Token(TokenType.EOF, "", position);
+			}
 			position = matcher.start();
 		}
 		
@@ -56,8 +59,11 @@ public class Lexer {
 	public ArrayList<Token> lex() {
 		ArrayList<Token> result = new ArrayList<>();
 		
-		while (position < input.length()) {
-			result.add(nextToken());
+		Token previous = null;
+		while (position < input.length()
+				&& (previous == null || previous.getType() != TokenType.EOF)) {
+			previous = nextToken();
+			result.add(previous);
 		}
 		result.add(nextToken()); // EOF
 
