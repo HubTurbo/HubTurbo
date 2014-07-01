@@ -227,7 +227,11 @@ public class Model {
 		if (changeSet.size() > 0) {
 			List<Label> latestLabels = latest.getLabels();
 			latestLabels.removeAll(changeSet.get(LABELS_REMOVED_TAG));
-			latestLabels.addAll(changeSet.get(LABELS_ADDED_TAG));
+			for(Label label: changeSet.get(LABELS_ADDED_TAG)){
+				if(!latestLabels.contains(label)){
+					latestLabels.add(label);
+				}
+			}
 			latest.setLabels(latestLabels);
 		}
 	}
