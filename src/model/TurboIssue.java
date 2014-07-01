@@ -193,8 +193,8 @@ public class TurboIssue implements Listable {
 	 * */
 	protected StringBuilder mergeIssues(TurboIssue original, TurboIssue latest){
 		StringBuilder changeLog = new StringBuilder();
-		mergeTitle(original, latest);
-		mergeDescription(original, latest);
+		mergeTitle(original, latest, changeLog);
+		mergeDescription(original, latest, changeLog);
 		mergeParents(original, latest, changeLog);
 		mergeLabels(original, latest, changeLog);
 		mergeAssignee(original, latest, changeLog);
@@ -296,12 +296,13 @@ public class TurboIssue implements Listable {
 		changeLog.append("Changed issue assignee to: "+ assignee.getGithubName() + "\n");
 	}
 
-	private void mergeDescription(TurboIssue original, TurboIssue latest) {
+	private void mergeDescription(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
 		String originalDesc = original.getDescription();
 		String editedDesc = this.getDescription();
 		
 		if (!editedDesc.equals(originalDesc)) {
 			latest.setDescription(editedDesc);
+			changeLog.append("Edited description");
 		}
 	}
 	
@@ -332,11 +333,12 @@ public class TurboIssue implements Listable {
 		}
 	}
 
-	private void mergeTitle(TurboIssue original, TurboIssue latest) {
+	private void mergeTitle(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
 		String originalTitle = original.getTitle();
 		String editedTitle = this.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
+			changeLog.append("Edited title \n");
 		}
 	}
 	
