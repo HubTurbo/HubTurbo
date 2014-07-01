@@ -11,6 +11,11 @@ public class Predicate implements FilterExpression {
 		this.name = name;
 		this.content = content;
 	}
+	
+	public Predicate() {
+		this.name = null;
+		this.content = null;
+	}
 
 	@Override
 	public String toString() {
@@ -40,6 +45,8 @@ public class Predicate implements FilterExpression {
 	}
 	
 	public boolean isSatisfiedBy(TurboIssue issue) {
+		if (name == null && content == null) return true;
+		
 		switch (name) {
 		case "title":
 			return issue.getTitle().toLowerCase().contains(content.toLowerCase());

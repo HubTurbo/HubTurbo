@@ -1,8 +1,6 @@
 package ui;
 
 import java.util.concurrent.CompletableFuture;
-import filter.FilterExpression;
-import filter.Parser;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,12 +15,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 
-public class FilterDialog implements Dialog<FilterExpression> {
-
+public class FilterDialog implements Dialog<String> {
+	
 	private final Stage parentStage;
 //	private final Model logic;
 
-	private final CompletableFuture<FilterExpression> response;
+	private final CompletableFuture<String> response;
 
 	public FilterDialog(Stage parentStage, Model logic) {
 		this.parentStage = parentStage;
@@ -31,14 +29,14 @@ public class FilterDialog implements Dialog<FilterExpression> {
 		response = new CompletableFuture<>();
 	}
 
-	public CompletableFuture<FilterExpression> show() {
+	public CompletableFuture<String> show() {
 		showDialog();
 		return response;
 	}
 
 	private Node createRoot(Stage stage) {
 		
-		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2)");
+		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2))");
 		explanatory.setWrapText(true);
 		
         TextField field = new TextField();
@@ -48,7 +46,7 @@ public class FilterDialog implements Dialog<FilterExpression> {
         HBox buttonContainer = new HBox();
         Button close = new Button("Filter");
         close.setOnAction((e) -> {
-        	response.complete(Parser.parse(field.getText()));
+        	response.complete(field.getText());
         	stage.close();
         });
         buttonContainer.setAlignment(Pos.CENTER_RIGHT);
