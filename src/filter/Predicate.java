@@ -2,7 +2,7 @@ package filter;
 
 import model.TurboIssue;
 
-public class Predicate implements Expression {
+public class Predicate implements FilterExpression {
 	private String name;
 	private String content;
 
@@ -41,7 +41,7 @@ public class Predicate implements Expression {
 	public boolean isSatisfiedBy(TurboIssue issue) {
 		switch (name) {
 		case "title":
-			return issue.getTitle().contains(content);
+			return issue.getTitle().toLowerCase().contains(content.toLowerCase());
 		default:
 			return false;
 		}

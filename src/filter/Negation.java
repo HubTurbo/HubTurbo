@@ -2,10 +2,10 @@ package filter;
 
 import model.TurboIssue;
 
-public class Negation implements Expression {
-	private Expression expr;
+public class Negation implements FilterExpression {
+	private FilterExpression expr;
 
-	public Negation(Expression expr) {
+	public Negation(FilterExpression expr) {
 		this.expr = expr;
 	}
 

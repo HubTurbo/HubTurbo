@@ -2,6 +2,7 @@ package ui;
 
 import java.util.function.Predicate;
 
+import filter.FilterExpression;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -65,7 +66,7 @@ public class IssuePanel extends VBox {
 		setStyle(UI.STYLE_BORDERS);
 	}
 
-	public void filter(Filter filter) {
+	public void filter(FilterExpression filter) {
 		predicate = filter::isSatisfiedBy;
 		refreshItems();
 	}

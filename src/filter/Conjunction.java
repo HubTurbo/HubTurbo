@@ -2,11 +2,11 @@ package filter;
 
 import model.TurboIssue;
 
-public class Conjunction implements Expression {
-	private Expression left;
-	private Expression right;
+public class Conjunction implements FilterExpression {
+	private FilterExpression left;
+	private FilterExpression right;
 
-	public Conjunction(Expression left, Expression right) {
+	public Conjunction(FilterExpression left, FilterExpression right) {
 		this.left = left;
 		this.right = right;
 	}

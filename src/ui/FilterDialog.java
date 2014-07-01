@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.controlsfx.control.textfield.TextFields;
 
+import filter.FilterExpression;
+import filter.Parser;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,12 +22,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 
-public class FilterDialog implements Dialog<Filter> {
+public class FilterDialog implements Dialog<FilterExpression> {
 
 	private final Stage parentStage;
 	private final Model logic;
 
-	private final CompletableFuture<Filter> response;
+	private final CompletableFuture<FilterExpression> response;
 
 	public FilterDialog(Stage parentStage, Model logic) {
 		this.parentStage = parentStage;
@@ -34,7 +36,7 @@ public class FilterDialog implements Dialog<Filter> {
 		response = new CompletableFuture<>();
 	}
 
-	public CompletableFuture<Filter> show() {
+	public CompletableFuture<FilterExpression> show() {
 		showDialog();
 		return response;
 	}
@@ -46,7 +48,7 @@ public class FilterDialog implements Dialog<Filter> {
                  
         Button close = new Button("Close");
         close.setOnAction((e) -> {
-        	response.complete(parse(field.getText()));
+        	response.complete(Parser.parse(field.getText()));
         	stage.close();
         });
         
@@ -80,45 +82,6 @@ public class FilterDialog implements Dialog<Filter> {
 		for (String keyword : new ArrayList<String>(keywords)) {
 			keywords.add("-" + keyword);
 		}
-	}
-
-	private Filter parse(String text) {
-		Filter result = new Filter();
-		String[] words = text.split("\\s+");
-		
-		for (int i=0; i<words.length; i++) {
-			if (isKeyword(words[i])) {
-				boolean negated = words[i].startsWith("-");
-				String keyword = negated ? words[i].substring(1, words[i].length()-1) : words[i].substring(0, words[i].length()-1);
-				
-				i++;
-				
-				while (i < words.length && !isKeyword(words[i])) {
-					if (keyword.equals("milestone")) {
-						if (negated) {
-							result = result.exceptUnderMilestone(words[i]);
-						} else {
-							result = result.underMilestone(words[i]);
-						}
-					} else if (keyword.equals("title")) {
-						if (negated) {
-							result = result.exceptWithTitle(words[i]);
-						} else {
-							result = result.withTitle(words[i]);
-						}
-					} else {
-						System.out.println("Warning: unrecognised filter keyword " + keyword);
-					}
-					i++;
-				}
-				
-			}
-		}
-		return result;
-	}
-
-	private boolean isKeyword(String word) {
-		return word.startsWith("-") || word.endsWith(":");
 	}
 
 	private void showDialog() {
