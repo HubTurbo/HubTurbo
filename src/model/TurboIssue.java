@@ -103,7 +103,9 @@ public class TurboIssue implements Listable {
 	}
 	
 	private ObservableList<TurboLabel> labels;
-	public ObservableList<TurboLabel> getLabels() {return labels;}
+	public ObservableList<TurboLabel> getLabels() {
+		return labels;
+	}
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if (this.labels == null) {
 			this.labels = labels;
@@ -208,7 +210,9 @@ public class TurboIssue implements Listable {
 		ObservableList<TurboLabel> latestLabels = latest.getLabels();
 		HashSet<TurboLabel> removed = changeSet.get(REMOVED_TAG);
 		HashSet<TurboLabel> added = changeSet.get(ADDED_TAG);
+		
 		latestLabels.removeAll(removed);
+	
 		for(TurboLabel label: added){
 			if(!latestLabels.contains(label)){
 				latestLabels.add(label);

@@ -116,7 +116,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((name == null) ? 0 : toGhName().hashCode());
 		return result;
 	}
 
@@ -130,11 +130,9 @@ public class TurboLabel implements Listable, LabelTreeItem {
 			return false;
 		TurboLabel other = (TurboLabel) obj;
 		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!getName().equals(other.getName()))
-			return false;
-		return true;
+			return other.name == null;
+		}
+		return this.toGhName().equals(other.toGhName());
 	}
 
 	@Override
