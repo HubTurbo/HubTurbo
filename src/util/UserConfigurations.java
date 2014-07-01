@@ -9,22 +9,22 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(openStatuses);
 	}
 	
-	private List<String> inheritedLabels;
-	public List<String> getInheritedLabels() {
-		return Collections.unmodifiableList(inheritedLabels);
+	private List<String> excludedLabels;
+	public List<String> getExcludedLabels() {
+		return Collections.unmodifiableList(excludedLabels);
 	}
 	
-	public UserConfigurations(List<String> openStatuses, List<String> inheritedLabels) {
+	public UserConfigurations(List<String> openStatuses, List<String> excludedLabels) {
 		this.openStatuses = openStatuses;
-		this.inheritedLabels = inheritedLabels;
+		this.excludedLabels = excludedLabels;
 	}
-	
-	public boolean isOpenStatus(String status) {
+
+	boolean isOpenStatus(String status) {
 		return openStatuses.contains(status);
 	}
 	
-	public boolean isInheritedLabel(String label) {
-		return openStatuses.contains(label);
+	boolean isExcludedLabel(String label) {
+		return excludedLabels.contains(label);
 	}
 	
 }
