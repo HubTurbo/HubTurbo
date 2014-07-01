@@ -195,7 +195,7 @@ public class TurboIssue implements Listable {
 		StringBuilder changeLog = new StringBuilder();
 		mergeTitle(original, latest);
 		mergeDescription(original, latest);
-		mergeParents(original, latest);
+		mergeParents(original, latest, changeLog);
 		mergeLabels(original, latest, changeLog);
 		mergeAssignee(original, latest, changeLog);
 		mergeMilestone(original, latest, changeLog);
@@ -305,7 +305,7 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
-	private void mergeParents(TurboIssue original, TurboIssue latest){
+	private void mergeParents(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
 		ObservableList<Integer> originalParents = original.getParents();
 		ObservableList<Integer> editedParents = this.getParents();
 		
@@ -320,7 +320,16 @@ public class TurboIssue implements Listable {
 			}
 		}
 		latest.setParents(latestParents);
-		//TODO: log changes
+		logParentChange(removed, added, changeLog);
+	}
+	
+	private void logParentChange(HashSet<Integer> removed, HashSet<Integer> added, StringBuilder changeLog){
+		if(added.size() > 0){
+			changeLog.append("Added Parents: " + added.toString() + "\n");
+		}
+		if(removed.size() > 0){
+			changeLog.append("Removed Parents: " + removed.toString() + "\n");
+		}
 	}
 
 	private void mergeTitle(TurboIssue original, TurboIssue latest) {

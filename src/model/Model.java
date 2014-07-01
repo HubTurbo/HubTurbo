@@ -30,9 +30,6 @@ public class Model {
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
 	
-	private static final String REMOVED_TAG = "removed";
-	private static final String ADDED_TAG = "added";
-	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
@@ -212,112 +209,6 @@ public class Model {
 		}
 		return -1;
 	}
-
-//	private void mergeLabels(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
-//		List<Label> originalLabels = original.getLabels();
-//		List<Label> editedLabels = edited.getLabels();
-//		HashMap<String, HashSet<Label>> changeSet = getChangesToList(originalLabels, editedLabels);
-//		List<Label> latestLabels = latest.getLabels();
-//		HashSet<Label> removed = changeSet.get(REMOVED_TAG);
-//		HashSet<Label> added = changeSet.get(ADDED_TAG);
-//		latestLabels.removeAll(removed);
-//		for(Label label: added){
-//			if(!latestLabels.contains(label)){
-//				latestLabels.add(label);
-//			}
-//		}
-//		logLabelChange(removed, added, changeLog);
-//		latest.setLabels(latestLabels);
-//	}
-//
-//	/**
-//	 * Gets the changes made to the a list of items
-//	 * @return HashMap the a list of items removed from the original list
-//	 * 			and a list of items added to the original list
-//	 * */
-//	private <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
-//		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
-//		HashSet<T> removed = new HashSet<T>(original);
-//		HashSet<T> added = new HashSet<T>(edited);
-//		removed.removeAll(edited);
-//		added.removeAll(original);
-//		
-//		changeSet.put(REMOVED_TAG, removed);
-//		changeSet.put(ADDED_TAG, added);
-//		
-//		return changeSet;
-//	}
-//	
-//	private void logLabelChange(HashSet<Label> removed, HashSet<Label> added, StringBuilder changeLog){
-//		if(added.size() > 0){
-//			changeLog.append("Added labels: " + added.toString() + "\n");
-//		}
-//		if(removed.size() > 0){
-//			changeLog.append("Removed labels: " + removed.toString() + "\n");
-//		}
-//	}
-//	
-//	private void mergeMilestone(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
-//		Milestone originalMilestone = original.getMilestone();
-//		Milestone editedMilestone = edited.getMilestone();
-//		int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
-//		int editedMNumber = (editedMilestone != null) ? editedMilestone.getNumber() : 0;
-//		if (editedMNumber != originalMNumber) {
-//			// this check is for cleared milestone
-//			if (editedMilestone == null) {
-//				editedMilestone = new Milestone();
-//			}
-//			latest.setMilestone(editedMilestone);
-//			logMilestoneChange(editedMilestone, changeLog);
-//		}
-//	}
-//
-//	private void logMilestoneChange(Milestone editedMilestone, StringBuilder changeLog){
-//		changeLog.append("Changed milestone to: "+ editedMilestone.getTitle() + "\n");
-//	}
-//	
-//	private void mergeState(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
-//		String originalState = original.getState();
-//		String editedState = edited.getState();
-//		if (!editedState.equals(originalState)) {
-//			latest.setState(editedState);
-//		}
-//	}
-//
-//	private void mergeAssignee(Issue original, Issue edited, Issue latest, StringBuilder changeLog) {
-//		User originalAssignee = original.getAssignee();
-//		User editedAssignee = edited.getAssignee();
-//		String originalALogin = (originalAssignee != null) ? originalAssignee.getLogin() : "";
-//		String editedALogin = (editedAssignee != null) ? editedAssignee.getLogin() : "";
-//		if (!editedALogin.equals(originalALogin)) {
-//			// this check is for cleared assignee
-//			if (editedAssignee == null) {
-//				editedAssignee = new User();
-//			} 
-//			latest.setAssignee(editedAssignee);
-//			logAssigneeChange(editedAssignee, changeLog);
-//		}
-//	}
-//	
-//	private void logAssigneeChange(User assignee, StringBuilder changeLog){
-//		changeLog.append("Changed issue assignee to: "+ assignee.getLogin() + "\n");
-//	}
-//
-//	private void mergeBody(Issue original, Issue edited, Issue latest) {
-//		String originalBody = original.getBody();
-//		String editedBody = edited.getBody();
-//		if (!editedBody.equals(originalBody)) {
-//			latest.setBody(editedBody);
-//		}
-//	}
-//
-//	private void mergeTitle(Issue original, Issue edited, Issue latest) {
-//		String originalTitle = original.getTitle();
-//		String editedTitle = edited.getTitle();
-//		if (!editedTitle.equals(originalTitle)) {
-//			latest.setTitle(editedTitle);
-//		}
-//	}
 	
 	private boolean loadCollaborators() {
 		collaborators.clear();	
