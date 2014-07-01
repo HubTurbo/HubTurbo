@@ -1,5 +1,7 @@
 package filter;
 
+import model.TurboIssue;
+
 public class Disjunction implements Expression {
 	private Expression left;
 	private Expression right;
@@ -35,4 +37,9 @@ public class Disjunction implements Expression {
 			return false;
 		return true;
 	}
+	
+	public boolean isSatisfiedBy(TurboIssue issue) {
+		return left.isSatisfiedBy(issue) || right.isSatisfiedBy(issue);
+	}
+
 }

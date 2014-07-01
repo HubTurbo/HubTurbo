@@ -1,5 +1,7 @@
 package filter;
 
+import model.TurboIssue;
+
 public class Conjunction implements Expression {
 	private Expression left;
 	private Expression right;
@@ -34,5 +36,9 @@ public class Conjunction implements Expression {
 		} else if (!right.equals(other.right))
 			return false;
 		return true;
+	}
+
+	public boolean isSatisfiedBy(TurboIssue issue) {
+		return left.isSatisfiedBy(issue) && right.isSatisfiedBy(issue);
 	}
 }

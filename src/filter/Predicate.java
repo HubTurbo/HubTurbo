@@ -1,5 +1,7 @@
 package filter;
 
+import model.TurboIssue;
+
 public class Predicate implements Expression {
 	private String name;
 	private String content;
@@ -34,5 +36,14 @@ public class Predicate implements Expression {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	public boolean isSatisfiedBy(TurboIssue issue) {
+		switch (name) {
+		case "title":
+			return issue.getTitle().contains(content);
+		default:
+			return false;
+		}
 	}
 }

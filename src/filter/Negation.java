@@ -1,5 +1,7 @@
 package filter;
 
+import model.TurboIssue;
+
 public class Negation implements Expression {
 	private Expression expr;
 
@@ -27,5 +29,9 @@ public class Negation implements Expression {
 		} else if (!expr.equals(other.expr))
 			return false;
 		return true;
+	}
+	
+	public boolean isSatisfiedBy(TurboIssue issue) {
+		return !expr.isSatisfiedBy(issue);
 	}
 }
