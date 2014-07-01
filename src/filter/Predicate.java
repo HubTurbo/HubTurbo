@@ -1,6 +1,7 @@
 package filter;
 
 import model.TurboIssue;
+import model.TurboLabel;
 
 public class Predicate implements FilterExpression {
 	private String name;
@@ -42,6 +43,26 @@ public class Predicate implements FilterExpression {
 		switch (name) {
 		case "title":
 			return issue.getTitle().toLowerCase().contains(content.toLowerCase());
+		case "milestone":
+			return issue.getMilestone().getTitle().toLowerCase().contains(content.toLowerCase());
+		case "parent":
+			content = content.toLowerCase();
+			if (content.startsWith("#")) {
+				return issue.getParents().contains(Integer.parseInt(content.substring(1)));
+			} else if (Character.isDigit(content.charAt(0))) {
+				return issue.getParents().contains(Integer.parseInt(content));
+			} else {
+				// search parent name instead
+				return false;
+			}
+//		case "child":
+		case "label":
+			for (TurboLabel l : issue.getLabels()) {
+				if (l.getName().toLowerCase().contains(content.toLowerCase())) {
+					return true;
+				}
+			}
+			return false;
 		default:
 			return false;
 		}

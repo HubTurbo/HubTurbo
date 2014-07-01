@@ -92,7 +92,7 @@ public class FilterDialog implements Dialog<FilterExpression> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 
-		Scene scene = new Scene(layout, 530, 180);
+		Scene scene = new Scene(layout, 530, 200);
 
 		Stage stage = new Stage();
 		stage.setTitle("Filter");
