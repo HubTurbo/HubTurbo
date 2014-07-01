@@ -78,9 +78,6 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		titleBox.getChildren().addAll(buttonBox, issueName);
 
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
-		parents.setOnMouseClicked((MouseEvent e) -> {
-			System.out.println("Parents clicked!");
-		});
 		
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
