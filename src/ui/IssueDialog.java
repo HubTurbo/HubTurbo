@@ -175,18 +175,20 @@ public class IssueDialog implements Dialog<String> {
 		toGh.setStyle("-fx-font-family: github-octicons; -fx-font-size: 20px; -fx-background-color: transparent; -fx-padding: 0 0 0 0;");
 		toGh.setText("G");
 		toGh.setOnMouseClicked((MouseEvent e) -> {
-			try {
-		        Desktop desktop = Desktop.getDesktop();
-		        if (Desktop.isDesktopSupported()
-		                && desktop.isSupported(Desktop.Action.BROWSE)) {
-		            URI uri = new URI(issue.getHtmlUrl());
-		            desktop.browse(uri);
-		        }
-		    } catch (IOException ex) {
-		        ex.printStackTrace();
-		    } catch (URISyntaxException ex) {
-		        ex.printStackTrace();
-		    }
+			if (issue.getHtmlUrl() != null) {
+				try {
+			        Desktop desktop = Desktop.getDesktop();
+			        if (Desktop.isDesktopSupported()
+			                && desktop.isSupported(Desktop.Action.BROWSE)) {
+			            URI uri = new URI(issue.getHtmlUrl());
+			            desktop.browse(uri);
+			        }
+			    } catch (IOException ex) {
+			        ex.printStackTrace();
+			    } catch (URISyntaxException ex) {
+			        ex.printStackTrace();
+			    }	
+			}
 			response.complete("gh");
 			stage.close();
 		});

@@ -4,26 +4,26 @@ import java.util.Collections;
 import java.util.List;
 
 public class UserConfigurations {
-	private List<String> openStatuses;
+	private static List<String> openStatuses;
 	public List<String> getOpenStatuses() {
 		return Collections.unmodifiableList(openStatuses);
 	}
 	
-	private List<String> excludedLabels;
+	private static List<String> excludedLabels;
 	public List<String> getExcludedLabels() {
 		return Collections.unmodifiableList(excludedLabels);
 	}
 	
 	public UserConfigurations(List<String> openStatuses, List<String> excludedLabels) {
-		this.openStatuses = openStatuses;
-		this.excludedLabels = excludedLabels;
+		UserConfigurations.openStatuses = openStatuses;
+		UserConfigurations.excludedLabels = excludedLabels;
 	}
 
-	boolean isOpenStatus(String status) {
+	public static boolean isOpenStatus(String status) {
 		return openStatuses.contains(status);
 	}
 	
-	boolean isExcludedLabel(String label) {
+	public static boolean isExcludedLabel(String label) {
 		return excludedLabels.contains(label);
 	}
 	
