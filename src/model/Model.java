@@ -15,11 +15,13 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import util.DialogMessage;
+import util.GitHubClientExtended;
+import util.IssueServiceExtended;
 import util.LabelServiceFixed;
 
 public class Model {
@@ -37,13 +39,13 @@ public class Model {
 	private IRepositoryIdProvider repoId;
 	
 	private CollaboratorService collabService;
-	private IssueService issueService;
+	private IssueServiceExtended issueService;
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
 	
-	public Model(GitHubClient ghClient) {
+	public Model(GitHubClientExtended ghClient) {
 		this.collabService = new CollaboratorService(ghClient);
-		this.issueService = new IssueService(ghClient);
+		this.issueService = new IssueServiceExtended(ghClient);
 		this.labelService = new LabelServiceFixed(ghClient);
 		this.milestoneService = new MilestoneService(ghClient);
 	}
@@ -160,19 +162,29 @@ public class Model {
 	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
 		try {
 			int issueId = editedIssue.getId();
-			TurboIssue latestIssue = new TurboIssue(issueService.getIssue(repoId, issueId));
-			StringBuilder changeLog = editedIssue.mergeIssues(originalIssue, latestIssue);
+			StringBuilder changeLog = new StringBuilder();
+			HashMap<String, Object> issueQuery =  issueService.getIssueData(repoId, issueId);
+			String dateModified = (String) issueQuery.get(IssueServiceExtended.ISSUE_DATE);
+			TurboIssue latestIssue = new TurboIssue((Issue)issueQuery.get(IssueServiceExtended.ISSUE_CONTENTS));
+			
+			boolean descUpdated = editedIssue.mergeIssues(originalIssue, latestIssue, changeLog);
+			//TODO: inform user when description update failed
+			Issue latest = latestIssue.toGhResource();
+			issueService.editIssue(repoId, latest, dateModified);
 			if(changeLog.length() > 0){
 				issueService.createComment(repoId, ""+issueId, changeLog.toString());
 			}
-			Issue latest = latestIssue.toGhResource();
-			issueService.editIssue(repoId, latest);
 			updateCachedIssue(latest);
+			if(!descUpdated){
+				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
+						+ "Please refresh and enter your descripton again.");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
+	
 	
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhResource();
