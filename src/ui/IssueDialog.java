@@ -1,9 +1,5 @@
 package ui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +22,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
@@ -58,7 +53,6 @@ public class IssueDialog implements Dialog<String> {
 		this.issue = issue;
 
 		response = new CompletableFuture<>();
-		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
 	public CompletableFuture<String> show() {
@@ -170,30 +164,8 @@ public class IssueDialog implements Dialog<String> {
 			response.complete("ok");
 			stage.close();
 		});
-		
-		Button toGh = new Button();
-		toGh.setStyle("-fx-font-family: github-octicons; -fx-font-size: 20px; -fx-background-color: transparent; -fx-padding: 0 0 0 0;");
-		toGh.setText("G");
-		toGh.setOnMouseClicked((MouseEvent e) -> {
-			if (issue.getHtmlUrl() != null) {
-				try {
-			        Desktop desktop = Desktop.getDesktop();
-			        if (Desktop.isDesktopSupported()
-			                && desktop.isSupported(Desktop.Action.BROWSE)) {
-			            URI uri = new URI(issue.getHtmlUrl());
-			            desktop.browse(uri);
-			        }
-			    } catch (IOException ex) {
-			        ex.printStackTrace();
-			    } catch (URISyntaxException ex) {
-			        ex.printStackTrace();
-			    }	
-			}
-			response.complete("gh");
-			stage.close();
-		});
 
-		buttons.getChildren().addAll(toGh, ok, cancel);
+		buttons.getChildren().addAll(ok, cancel);
 		return buttons;
 	}
 
