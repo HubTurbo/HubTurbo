@@ -12,7 +12,10 @@ public class Lexer {
 	private final Pattern NO_WHITESPACE = Pattern.compile("\\S");
 	
 	private List<Rule> rules = Arrays.asList(
-			new Rule("[~A-Za-z0-9][0-9A-Za-z.]*", TokenType.SYMBOL),
+			new Rule("and|&&?", TokenType.AND),
+			new Rule("or|\\|\\|?", TokenType.OR),
+			new Rule("~|!", TokenType.NEGATE),
+			new Rule("[A-Za-z0-9][0-9A-Za-z.]*", TokenType.SYMBOL),
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET)
 		);
@@ -26,6 +29,10 @@ public class Lexer {
 	}
 
 	private Token nextToken() {
+		
+		if (position >= input.length()) {
+			return new Token(TokenType.EOF, "", position);
+		}
 
 		if (SKIP_WHITESPACE) {
 			Matcher matcher = NO_WHITESPACE.matcher(input).region(position, input.length());
@@ -38,7 +45,6 @@ public class Lexer {
 
 			if (matcher.lookingAt()) {
 				String match = matcher.group();
-				System.out.println(match);
 				position += match.length();
 
 				return new Token(r.getTokenType(), match, matcher.start());
@@ -53,6 +59,7 @@ public class Lexer {
 		while (position < input.length()) {
 			result.add(nextToken());
 		}
+		result.add(nextToken()); // EOF
 
 		return result;
 	}
