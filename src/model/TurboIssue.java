@@ -191,17 +191,20 @@ public class TurboIssue implements Listable {
 	}
 	
 	private String buildBody() {
-		String parentsMd = METADATA_HEADER_PARENT;
-		Iterator<Integer> parentsItr = parents.iterator();
-		while (parentsItr.hasNext()) {
-			parentsMd = parentsMd + "#" + parentsItr.next();
-			if (parentsItr.hasNext()) {
-				parentsMd = parentsMd + ", ";
+		StringBuilder body = new StringBuilder();
+		
+		if (!parents.isEmpty()) {
+			String parentsMd = METADATA_HEADER_PARENT;
+			Iterator<Integer> parentsItr = parents.iterator();
+			while (parentsItr.hasNext()) {
+				parentsMd = parentsMd + "#" + parentsItr.next();
+				if (parentsItr.hasNext()) {
+					parentsMd = parentsMd + ", ";
+				}
 			}
+			body.append(parentsMd + "\n");
 		}
 		
-		StringBuilder body = new StringBuilder();
-		body.append(parentsMd + "\n");
 		body.append(METADATA_SEPERATOR + "\n");
 		body.append(getDescription());
 		return body.toString();
