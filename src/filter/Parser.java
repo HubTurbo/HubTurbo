@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class Parser {
 
 	public static void main(String[] args) {
-		System.out.println(Parser.parse("title(one) or parent(issue) ~milestone(0.1)"));
-		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
+		System.out.println(Parser.parse("a(b) c(d)"));
+//		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
 	}
 	
 	private Parser(ArrayList<Token> input) {
@@ -24,7 +24,7 @@ public class Parser {
 		if (input.get(position).getType() == type) {
 			return input.get(position++);
 		} else {
-			throw new RuntimeException("invalid token " + input.get(position) + " where " + type + " expected");
+			throw new RuntimeException("Invalid token " + input.get(position) + " where " + type + " expected");
 		}
 	}
 	
@@ -91,6 +91,9 @@ public class Parser {
 	private int getInfixPrecedence() {
 		switch (lookAhead().getType()) {
 		case AND:
+		case SYMBOL:
+		case LBRACKET:
+			// Implicit conjunction
 			return Precedence.CONJUNCTION;
 		case OR:
 			return Precedence.DISJUNCTION;
