@@ -190,7 +190,7 @@ public class TurboIssue implements Listable {
 	/**
 	 * Modifies @param latest to contain the merged changes of this TurboIssue object and @param latest wrt @param edited
 	 * Stores change log in @param changeLog
-	 * @return true if issue description has been merged, false otherwise
+	 * @return true if issue description has been successfully merged, false otherwise
 	 * */
 	protected boolean mergeIssues(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
 		mergeTitle(original, latest, changeLog);
@@ -298,16 +298,16 @@ public class TurboIssue implements Listable {
 
 	/**
 	 * Merges changes to description only if the description in the latest version has not been updated. 
-	 * Returns false if the description in @param latest has been modified
+	 * Returns false if description was not merged because the issue's description has been modified in @param latest
 	 * */
 	private boolean mergeDescription(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
 		String originalDesc = original.getDescription();
 		String editedDesc = this.getDescription();
 		String latestDesc = latest.getDescription();
-		if(!latestDesc.equals(originalDesc)){
-			return false;
-		}
 		if (!editedDesc.equals(originalDesc)) {
+			if(!latestDesc.equals(originalDesc)){
+				return false;
+			}
 			latest.setDescription(editedDesc);
 			changeLog.append("Edited description");
 		}

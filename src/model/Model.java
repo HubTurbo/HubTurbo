@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import util.DialogMessage;
 import util.GitHubClientExtended;
 import util.IssueServiceExtended;
 import util.LabelServiceFixed;
@@ -174,6 +175,10 @@ public class Model {
 				issueService.createComment(repoId, ""+issueId, changeLog.toString());
 			}
 			updateCachedIssue(latest);
+			if(!descUpdated){
+				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
+						+ "Please refresh and enter your descripton again.");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
