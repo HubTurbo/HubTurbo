@@ -149,6 +149,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 		// Hash all labels by group
 		HashMap<String, ArrayList<TurboLabel>> labels = groupLabels(model.getLabels());
 		ArrayList<TurboLabel> ungrouped = labels.get(UNGROUPED_NAME);
+		if (ungrouped == null) ungrouped = new ArrayList<>();
 		labels.remove(UNGROUPED_NAME);
 
 		// Add labels with a group into the tree
