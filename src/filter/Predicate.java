@@ -51,6 +51,7 @@ public class Predicate implements FilterExpression {
 		case "title":
 			return issue.getTitle().toLowerCase().contains(content.toLowerCase());
 		case "milestone":
+			if (issue.getMilestone() == null) return false;
 			return issue.getMilestone().getTitle().toLowerCase().contains(content.toLowerCase());
 		case "parent":
 			content = content.toLowerCase();
@@ -70,6 +71,10 @@ public class Predicate implements FilterExpression {
 				}
 			}
 			return false;
+		case "assignee":
+			if (issue.getAssignee() == null) return false;
+			return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
+					|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
 		default:
 			return false;
 		}
