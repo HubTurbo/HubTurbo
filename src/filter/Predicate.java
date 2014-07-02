@@ -75,6 +75,14 @@ public class Predicate implements FilterExpression {
 			if (issue.getAssignee() == null) return false;
 			return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
 					|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
+		case "state":
+			if (content.toLowerCase().contains("open")) {
+				return issue.getOpen();
+			} else if (content.toLowerCase().contains("closed")) {
+				return !issue.getOpen();
+			} else {
+				return false;
+			}
 		default:
 			return false;
 		}
