@@ -187,8 +187,16 @@ public class UI extends Application {
 	}
 
 	private void setupModelUpdate() {
+		removeExistingModelUpdater();
 		modelUpdater = new ModelUpdater(client, model);
 		modelUpdater.startModelUpdate();
+	}
+	
+	private void removeExistingModelUpdater(){
+		if(modelUpdater != null){
+			modelUpdater.stopModelUpdate();
+			modelUpdater = null;
+		}
 	}
 
 	// private void setUpHotkeys(Scene scene) {
