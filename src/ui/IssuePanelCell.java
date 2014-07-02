@@ -51,7 +51,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueName.setStyle(STYLE_ISSUE_NAME);
+		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
 		issue.titleProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
