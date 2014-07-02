@@ -171,11 +171,11 @@ public class IssueDialog implements Dialog<String> {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParents(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParentNumbers(), true);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
-			List<Integer> indicesForExistingParents = issue.getParents().stream()
+			List<Integer> indicesForExistingParents = issue.getParentNumbers().stream()
 					.map((parent) -> {
 						for (int i = 0; i < allIssues.size(); i++) {
 							if (allIssues.get(i).getId() == parent) {
@@ -200,9 +200,9 @@ public class IssueDialog implements Dialog<String> {
 									List<Integer> parents = response.stream()
 											.map((i) -> allIssues.get(i).getId())
 											.collect(Collectors.toList());
-									issue.setParents(FXCollections.observableArrayList(parents));
+									issue.setParentNumbers(FXCollections.observableArrayList(parents));
 								} else {
-									issue.setParents(FXCollections.observableArrayList());
+									issue.setParentNumbers(FXCollections.observableArrayList());
 								}
 								
 
