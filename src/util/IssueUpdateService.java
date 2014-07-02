@@ -14,9 +14,11 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
+import com.google.gson.reflect.TypeToken;
+
 public class IssueUpdateService extends UpdateService<Issue>{	
 	
-	Date lastCheckTime;
+	protected Date lastCheckTime;
 	
 	
 	public IssueUpdateService(GitHubClientExtended client){
@@ -34,7 +36,8 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	
 	private void updateLastCheckTime(){
 		lastCheckTime = new Date();
-	}	
+	}
+	
 	private String getFormattedDate(Date date){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
@@ -53,6 +56,8 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
 		GitHubRequest request = super.createUpdatedRequest(repoId);
 		request.setParams(createUpdatedIssuesParams());
+		request.setType(new TypeToken<Issue>(){}.getType());
+		request.setArrayType(new TypeToken<ArrayList<Issue>>(){}.getType());
 		return request;
 	}
 

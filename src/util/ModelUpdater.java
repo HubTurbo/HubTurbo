@@ -23,7 +23,7 @@ public class ModelUpdater {
 	}
 	
 	private void updateModelIssues(){
-		List<Issue> updatedIssues = issueUpdateService.getUpdatedIssues(model.getRepoId());
+		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());
 		WeakReference<Model> modelRef = new WeakReference<Model>(model);
 		Platform.runLater(new Runnable() {
 	        @Override
