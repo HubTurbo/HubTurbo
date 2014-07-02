@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.function.Predicate;
 
 import filter.FilterExpression;
@@ -97,13 +98,13 @@ public class IssuePanel extends VBox {
 	public void refreshItems() {
 		filteredList = new FilteredList<TurboIssue>(issues, predicate);
 		
-		IssuePanel that = this;
+		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
 		
 		// Set the cell factory every time - this forces the list view to update
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new CustomListCell(mainStage, model, that);
+				return new CustomListCell(mainStage, model, that.get());
 			}
 		});
 		
