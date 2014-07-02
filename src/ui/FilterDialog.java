@@ -22,14 +22,13 @@ public class FilterDialog implements Dialog<String> {
 //	private final Model logic;
 
 	private final CompletableFuture<String> response;
-	private String initial = "";
-
-	public FilterDialog(Stage parentStage, Model logic, String initial) {
+	private String input = "";
+	
+	public FilterDialog(Stage parentStage, Model logic, String input) {
 		this.parentStage = parentStage;
 //		this.logic = logic;
-		
-		this.initial = initial;
-		
+		this.input = input;
+
 		response = new CompletableFuture<>();
 	}
 
@@ -43,7 +42,7 @@ public class FilterDialog implements Dialog<String> {
 		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2))");
 		explanatory.setWrapText(true);
 		
-        TextField field = new TextField(initial);
+        TextField field = new TextField(input);
         HBox.setHgrow(field, Priority.ALWAYS);
 //        setupAutocompletion(field);
 

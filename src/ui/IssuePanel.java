@@ -31,6 +31,7 @@ public class IssuePanel extends VBox {
 	private FilteredList<TurboIssue> filteredList;
 	
 	private Predicate<TurboIssue> predicate;
+	private String filterInput = "";
 
 	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
 
@@ -53,14 +54,15 @@ public class IssuePanel extends VBox {
 		HBox box = new HBox();
 		Label label = new Label(NO_FILTER);
 		box.setOnMouseClicked((e) -> {
-			(new FilterDialog(mainStage, model, label.getText().equals(NO_FILTER) ? "" : label.getText())).show().thenApply(
-					filterCode -> {
-						if (filterCode.isEmpty()) {
+			(new FilterDialog(mainStage, model, filterInput)).show().thenApply(
+					filterString -> {
+						filterInput = filterString;
+						if (filterString.isEmpty()) {
 							label.setText(NO_FILTER);
 							this.filter(EMPTY_PREDICATE);
 						} else {
 				        	try {
-				        		FilterExpression filter = Parser.parse(filterCode);
+				        		FilterExpression filter = Parser.parse(filterString);
 				        		if (filter != null) {
 									label.setText(filter.toString());
 				                	this.filter(filter);
@@ -69,7 +71,7 @@ public class IssuePanel extends VBox {
 				                	this.filter(EMPTY_PREDICATE);
 				        		}
 				        	} catch (ParseException ex){
-				            	label.setText("Parse error in filter: " + ex + " " + ex.getMessage());
+				            	label.setText("Parse error in filter: " + ex);
 				            	this.filter(EMPTY_PREDICATE);
 				        	}
 						}
