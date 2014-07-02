@@ -47,6 +47,26 @@ public class MenuControl extends MenuBar {
 		this.columns = columns;
 		
 		createMenuItems(mainStage, model, columns);
+		disableMenuItemsRequiringLogin();
+	}
+	
+	MenuItem manageMilestonesMenuItem;
+	MenuItem newIssueMenuItem;
+	MenuItem manageLabelsMenuItem;
+	MenuItem refreshMenuItem;
+	
+	private void disableMenuItemsRequiringLogin() {
+		manageMilestonesMenuItem.setDisable(true);
+		newIssueMenuItem.setDisable(true);
+		manageLabelsMenuItem.setDisable(true);
+		refreshMenuItem.setDisable(true);
+	}
+	
+	private void enableMenuItemsRequiringLogin() {
+		manageMilestonesMenuItem.setDisable(false);
+		newIssueMenuItem.setDisable(false);
+		manageLabelsMenuItem.setDisable(false);
+		refreshMenuItem.setDisable(false);
 	}
 
 	private void createMenuItems(Stage mainStage, Model model, ColumnControl columns) {
@@ -56,9 +76,9 @@ public class MenuControl extends MenuBar {
 		projects.getItems().addAll(login);
 
 		Menu milestones = new Menu("Milestones");
-		MenuItem manageMilestones = new MenuItem("Manage milestones...");
-		milestones.getItems().addAll(manageMilestones);
-		manageMilestones.setOnAction(e -> {
+		manageMilestonesMenuItem = new MenuItem("Manage milestones...");
+		milestones.getItems().addAll(manageMilestonesMenuItem);
+		manageMilestonesMenuItem.setOnAction(e -> {
 			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
 					response -> {
 						return true;
@@ -66,8 +86,8 @@ public class MenuControl extends MenuBar {
 		});
 
 		Menu issues = new Menu("Issues");
-		MenuItem newIssue = new MenuItem("New Issue");
-		newIssue.setOnAction(e -> {
+		newIssueMenuItem = new MenuItem("New Issue");
+		newIssueMenuItem.setOnAction(e -> {
 			TurboIssue issue = new TurboIssue("New issue", "");
 			(new IssueDialog(mainStage, model, issue)).show().thenApply(
 					response -> {
@@ -79,30 +99,30 @@ public class MenuControl extends MenuBar {
 						return true;
 					});
 		});
-		issues.getItems().addAll(newIssue);
+		issues.getItems().addAll(newIssueMenuItem);
 
 		Menu labels = new Menu("Labels");
-		MenuItem manageLabels = new MenuItem("Manage labels...");
-		manageLabels.setOnAction(e -> {
+		manageLabelsMenuItem = new MenuItem("Manage labels...");
+		manageLabelsMenuItem.setOnAction(e -> {
 			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
 					response -> {
 						return true;
 					});
 		});
 
-		labels.getItems().addAll(manageLabels);
+		labels.getItems().addAll(manageLabelsMenuItem);
 
 		Menu view = new Menu("View");
 
-		MenuItem refresh = new MenuItem("Refresh");
-		refresh.setOnAction((e) -> {
+		refreshMenuItem = new MenuItem("Refresh");
+		refreshMenuItem.setOnAction((e) -> {
 			loadDataIntoModel();
 			columns.refresh(); // In case
 		});
-		refresh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
 		Menu columnsMenu = new Menu("Change number of columns....");
-		view.getItems().addAll(refresh, columnsMenu);
+		view.getItems().addAll(refreshMenuItem, columnsMenu);
 
 		final ToggleGroup numberOfCols = new ToggleGroup();
 		for (int i = 1; i <= 9; i++) {
@@ -179,8 +199,7 @@ public class MenuControl extends MenuBar {
 						}
 						System.out.println("Logged in using credentials.txt");
 					} catch (Exception e1) {
-						System.out
-								.println("Failed to find or open credentials.txt");
+						System.out.println("Failed to find or open credentials.txt");
 					}
 				}
 
@@ -195,9 +214,8 @@ public class MenuControl extends MenuBar {
 				}
 				setupModelUpdate();
 
-				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests()
-						+ " requests remaining out of "
-						+ client.getRequestLimit() + ")");
+				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
+				enableMenuItemsRequiringLogin();
 				stage.hide();
 			});
 
