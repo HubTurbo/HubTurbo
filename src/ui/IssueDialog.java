@@ -169,6 +169,7 @@ public class IssueDialog implements Dialog<String> {
 		return buttons;
 	}
 
+
 	private Parent createParentsBox(Stage stage) {
 		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParents(), true);
 		List<TurboIssue> allIssues = model.getIssues();
