@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -57,27 +58,48 @@ public class Model {
 	public void setRepoId(String owner, String name) {
 		repoId = RepositoryId.create(owner, name);
 		loadIssues();
-		processAllIssueParents();
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
 	}
-	
-	private void processAllIssueParents() {
-		for (TurboIssue issue : issues) {
-			processIssueParents(issue);
-		}
-	}
 
-	private void processIssueParents(TurboIssue issue) {
-		List<TurboIssue> parents = new ArrayList<TurboIssue>();
-		for (Integer parentNumber : issue.getParentNumbers()) {
-			int parentIndex = getIndexOfIssue(parentNumber);
-			if (parentIndex != -1) {
-				parents.add(issues.get(parentIndex));
+	public void processInheritedLabels(TurboIssue issue, List<Integer> originalParents) {
+		List<Integer> editedParents = issue.getParents();
+		HashMap<String, HashSet<Integer>> changeSet = issue.getChangesToList(originalParents, editedParents);
+		HashSet<Integer> removed = changeSet.get(TurboIssue.REMOVED_TAG);
+		HashSet<Integer> added = changeSet.get(TurboIssue.ADDED_TAG);
+		ObservableList<TurboLabel> issueLabels = issue.getLabels();
+		
+		for (Integer removedParentId : removed) {
+			int removedParentIndex = getIndexOfIssue(removedParentId);
+			TurboIssue removedParent = issues.get(removedParentIndex);
+			for (TurboLabel label : removedParent.getLabels()) {
+				boolean toBeRemoved = true;
+				// Loop to check if other parents have the label to be removed
+				for (Integer editedParentId : editedParents) {
+					int editedParentIndex = getIndexOfIssue(editedParentId);
+					TurboIssue editedParent = issues.get(editedParentIndex);
+					if (editedParent.getLabels().contains(label)) {
+						toBeRemoved = false;
+						break;
+					}
+				}
+				if (toBeRemoved) {
+					issueLabels.remove(label);
+				}
 			}
 		}
-		issue.setParents(parents);
+		
+		for (Integer addedParentId : added) {
+			int addedParentIndex = getIndexOfIssue(addedParentId);
+			TurboIssue addedParent = issues.get(addedParentIndex);
+			for(TurboLabel label : addedParent.getLabels()){
+				if(!issueLabels.contains(label)){
+					issueLabels.add(label);
+				}
+			}
+		}
+
 	}
 
 	public IRepositoryIdProvider getRepoId(){
@@ -129,7 +151,6 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
-		processIssueParents(newCached);
 		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
 			issues.set(index, newCached);

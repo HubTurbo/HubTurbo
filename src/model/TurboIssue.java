@@ -27,8 +27,8 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_SEPERATOR = "<hr>";
-	private static final String REMOVED_TAG = "removed";
-	private static final String ADDED_TAG = "added";
+	public static final String REMOVED_TAG = "removed";
+	public static final String ADDED_TAG = "added";
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -113,25 +113,14 @@ public class TurboIssue implements Listable {
 		}	
 	}
 	
-	private ObservableList<Integer> parentNumbers;
-	public ObservableList<Integer> getParentNumbers() {return parentNumbers;}
-	public void setParentNumbers(ObservableList<Integer> parentNumbers) {
-		if (this.parentNumbers == null) {
-			this.parentNumbers = parentNumbers;
-		} else if (parentNumbers != this.parentNumbers) {
-			this.parentNumbers.clear();
-			this.parentNumbers.addAll(parentNumbers);
-		}
-	}
-	
-	private List<TurboIssue> parents;
-	public List<TurboIssue> getParents() {return parents;}
-	public void setParents(List<TurboIssue> parents) {
-		if (this.parents == null) {
-			this.parents = parents;
-		} else if (parents != this.parents) {
-			this.parents.clear();
-			this.parents.addAll(parents);
+	private ObservableList<Integer> parent;
+	public ObservableList<Integer> getParents() {return parent;}
+	public void setParents(ObservableList<Integer> parentNumbers) {
+		if (this.parent == null) {
+			this.parent = parentNumbers;
+		} else if (parentNumbers != this.parent) {
+			this.parent.clear();
+			this.parent.addAll(parentNumbers);
 		}
 	}
 
@@ -168,7 +157,7 @@ public class TurboIssue implements Listable {
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
-		setParentNumbers(extractParentNumbers(issue.getBody()));
+		setParents(extractParentNumbers(issue.getBody()));
 	}
 
 	public Issue toGhResource() {
@@ -194,7 +183,7 @@ public class TurboIssue implements Listable {
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParentNumbers(FXCollections.observableArrayList(other.getParentNumbers()));
+		setParents(FXCollections.observableArrayList(other.getParents()));
 		setParents(other.getParents());
 	}
 	
@@ -238,7 +227,7 @@ public class TurboIssue implements Listable {
 	 * @return HashMap the a list of items removed from the original list
 	 * 			and a list of items added to the original list
 	 * */
-	private <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
+	protected <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
 		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
 		HashSet<T> removed = new HashSet<T>(original);
 		HashSet<T> added = new HashSet<T>(edited);
@@ -326,11 +315,11 @@ public class TurboIssue implements Listable {
 	}
 	
 	private void mergeParents(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
-		ObservableList<Integer> originalParents = original.getParentNumbers();
-		ObservableList<Integer> editedParents = this.getParentNumbers();
+		ObservableList<Integer> originalParents = original.getParents();
+		ObservableList<Integer> editedParents = this.getParents();
 		
 		HashMap<String, HashSet<Integer>> changeSet = getChangesToList(originalParents, editedParents);
-		ObservableList<Integer> latestParents = latest.getParentNumbers();
+		ObservableList<Integer> latestParents = latest.getParents();
 		HashSet<Integer> removed = changeSet.get(REMOVED_TAG);
 		HashSet<Integer> added = changeSet.get(ADDED_TAG);
 		latestParents.removeAll(removed);
@@ -339,7 +328,7 @@ public class TurboIssue implements Listable {
 				latestParents.add(label);
 			}
 		}
-		latest.setParentNumbers(latestParents);
+		latest.setParents(latestParents);
 		logParentChange(removed, added, changeLog);
 	}
 	
@@ -411,9 +400,9 @@ public class TurboIssue implements Listable {
 	private String buildBody() {
 		StringBuilder body = new StringBuilder();
 		
-		if (!parentNumbers.isEmpty()) {
+		if (!parent.isEmpty()) {
 			String parentsMd = METADATA_HEADER_PARENT;
-			Iterator<Integer> parentsItr = parentNumbers.iterator();
+			Iterator<Integer> parentsItr = parent.iterator();
 			while (parentsItr.hasNext()) {
 				parentsMd = parentsMd + "#" + parentsItr.next();
 				if (parentsItr.hasNext()) {

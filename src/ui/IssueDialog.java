@@ -171,11 +171,12 @@ public class IssueDialog implements Dialog<String> {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParentNumbers(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParents(), true);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
-			List<Integer> indicesForExistingParents = issue.getParentNumbers().stream()
+			List<Integer> originalParents = new ArrayList<Integer>(issue.getParents());
+			List<Integer> indicesForExistingParents = originalParents.stream()
 					.map((parent) -> {
 						for (int i = 0; i < allIssues.size(); i++) {
 							if (allIssues.get(i).getId() == parent) {
@@ -200,9 +201,10 @@ public class IssueDialog implements Dialog<String> {
 									List<Integer> parents = response.stream()
 											.map((i) -> allIssues.get(i).getId())
 											.collect(Collectors.toList());
-									issue.setParentNumbers(FXCollections.observableArrayList(parents));
+									issue.setParents(FXCollections.observableArrayList(parents));
+									model.processInheritedLabels(issue, originalParents);
 								} else {
-									issue.setParentNumbers(FXCollections.observableArrayList());
+									issue.setParents(FXCollections.observableArrayList());
 								}
 								
 
@@ -211,7 +213,7 @@ public class IssueDialog implements Dialog<String> {
 		});
 		return parentsBox;
 	}
-	
+
 	private LabelDisplayBox createLabelBox(Stage stage) {
 		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true);
 		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());

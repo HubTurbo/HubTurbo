@@ -56,9 +56,9 @@ public class Predicate implements FilterExpression {
 		case "parent":
 			content = content.toLowerCase();
 			if (content.startsWith("#")) {
-				return issue.getParentNumbers().contains(Integer.parseInt(content.substring(1)));
+				return issue.getParents().contains(Integer.parseInt(content.substring(1)));
 			} else if (Character.isDigit(content.charAt(0))) {
-				return issue.getParentNumbers().contains(Integer.parseInt(content));
+				return issue.getParents().contains(Integer.parseInt(content));
 			} else {
 				// search parent name instead
 				return false;

@@ -64,7 +64,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		HBox titleBox = new HBox();
 		titleBox.getChildren().addAll(buttonBox, issueName);
 
-		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentNumbers(), false);
+		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
 		
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
