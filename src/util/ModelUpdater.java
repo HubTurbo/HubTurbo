@@ -1,5 +1,6 @@
 package util;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,10 +24,14 @@ public class ModelUpdater {
 	
 	private void updateModelIssues(){
 		List<Issue> updatedIssues = issueUpdateService.getUpdatedIssues(model.getRepoId());
+		WeakReference<Model> modelRef = new WeakReference<Model>(model);
 		Platform.runLater(new Runnable() {
 	        @Override
 	        public void run() {
-	        	model.updateCachedIssues(updatedIssues);
+	        	Model model = modelRef.get();
+	        	if(model != null){
+	        		model.updateCachedIssues(updatedIssues);
+	        	}
 	        }
 	   });
 	}
