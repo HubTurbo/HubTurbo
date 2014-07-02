@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 
 import model.Model;
@@ -68,12 +69,12 @@ public class ManageMilestonesDialog implements Dialog<String> {
 	
 	public void refresh() {
 		
-		ManageMilestonesDialog that = this;
+		WeakReference<ManageMilestonesDialog> that = new WeakReference<ManageMilestonesDialog>(this);
 		
 		listView.setCellFactory(new Callback<ListView<TurboMilestone>, ListCell<TurboMilestone>>() {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
-				return new ManageMilestonesListCell(model, that);
+				return new ManageMilestonesListCell(model, that.get());
 			}
 		});
 
