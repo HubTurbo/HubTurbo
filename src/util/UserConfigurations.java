@@ -14,7 +14,7 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(excludedLabels);
 	}
 	
-	public UserConfigurations(List<String> openStatuses, List<String> excludedLabels) {
+	UserConfigurations(List<String> openStatuses, List<String> excludedLabels) {
 		UserConfigurations.openStatuses = openStatuses;
 		UserConfigurations.excludedLabels = excludedLabels;
 	}

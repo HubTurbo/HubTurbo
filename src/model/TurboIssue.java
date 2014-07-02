@@ -123,7 +123,7 @@ public class TurboIssue implements Listable {
 		} else if (parents != this.parents) {
 			this.parents.clear();
 			this.parents.addAll(parents);
-		}	
+		}
 	}
 
 	/*
