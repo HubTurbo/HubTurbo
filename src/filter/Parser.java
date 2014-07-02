@@ -21,7 +21,7 @@ public class Parser {
 	private ArrayList<Token> input;
 	private int position = 0;
 	
-	public Token consume(TokenType type) {
+	private Token consume(TokenType type) {
 		if (input.get(position).getType() == type) {
 			return input.get(position++);
 		} else {
@@ -29,11 +29,11 @@ public class Parser {
 		}
 	}
 	
-	public Token consume() {
+	private Token consume() {
 		return input.get(position++);
 	}
 
-	public Token lookAhead() {
+	private Token lookAhead() {
 		return input.get(position);
 	}
 		

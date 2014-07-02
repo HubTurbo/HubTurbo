@@ -37,10 +37,13 @@ public class ParentIssuesDisplayBox extends HBox {
 	}
 	
 	private void update() {
+		getChildren().clear();
+
 		Label label;
 		if (displayWhenEmpty && issueNumbers.size() == 0) {
 			label = new Label("Parents");
 			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5;");
+			getChildren().add(label);
 		} else {
 			StringBuilder parentSB = new StringBuilder();
 			for (Integer p : issueNumbers) {
@@ -48,11 +51,13 @@ public class ParentIssuesDisplayBox extends HBox {
 				parentSB.append(", ");
 			}
 			if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
-			label = new Label(parentSB.toString());
-			label.setStyle("-fx-padding: 5;");
+
+			if (displayWhenEmpty || (!displayWhenEmpty && !parentSB.toString().isEmpty())) {
+				label = new Label(parentSB.toString());
+				label.setStyle("-fx-padding: 5;");
+				getChildren().add(label);
+			}
 		}
-		getChildren().clear();
-		getChildren().add(label);
 	}
 	
 }

@@ -38,7 +38,7 @@ public class TurboIssue implements Listable {
     public final int getId() {
     	return id.get();
     }
-    private final void setId(int value) {
+    public final void setId(int value) {
     	id.set(value);
     }
     public IntegerProperty idProperty() {
@@ -103,9 +103,7 @@ public class TurboIssue implements Listable {
 	}
 	
 	private ObservableList<TurboLabel> labels;
-	public ObservableList<TurboLabel> getLabels() {
-		return labels;
-	}
+	public ObservableList<TurboLabel> getLabels() {return labels;}
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if (this.labels == null) {
 			this.labels = labels;
@@ -115,15 +113,26 @@ public class TurboIssue implements Listable {
 		}	
 	}
 	
-	private ObservableList<Integer> parents;
-	public ObservableList<Integer> getParents() {return parents;}
-	public void setParents(ObservableList<Integer> parents) {
+	private ObservableList<Integer> parentNumbers;
+	public ObservableList<Integer> getParentNumbers() {return parentNumbers;}
+	public void setParentNumbers(ObservableList<Integer> parentNumbers) {
+		if (this.parentNumbers == null) {
+			this.parentNumbers = parentNumbers;
+		} else if (parentNumbers != this.parentNumbers) {
+			this.parentNumbers.clear();
+			this.parentNumbers.addAll(parentNumbers);
+		}
+	}
+	
+	private List<TurboIssue> parents;
+	public List<TurboIssue> getParents() {return parents;}
+	public void setParents(List<TurboIssue> parents) {
 		if (this.parents == null) {
 			this.parents = parents;
 		} else if (parents != this.parents) {
 			this.parents.clear();
 			this.parents.addAll(parents);
-		}	
+		}
 	}
 
 	/*
@@ -137,7 +146,8 @@ public class TurboIssue implements Listable {
 		setTitle(title);
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
-		parents = FXCollections.observableArrayList();
+		parentNumbers = FXCollections.observableArrayList();
+		setOpen(true);
 	}
 	
 	// Copy constructor
@@ -158,7 +168,7 @@ public class TurboIssue implements Listable {
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
-		setParents(extractParents(issue.getBody()));
+		setParentNumbers(extractParentNumbers(issue.getBody()));
 	}
 
 	public Issue toGhResource() {
@@ -184,7 +194,8 @@ public class TurboIssue implements Listable {
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParents(FXCollections.observableArrayList(other.getParents()));	
+		setParentNumbers(FXCollections.observableArrayList(other.getParentNumbers()));
+		setParents(other.getParents());
 	}
 	
 	/**
@@ -315,11 +326,11 @@ public class TurboIssue implements Listable {
 	}
 	
 	private void mergeParents(TurboIssue original, TurboIssue latest, StringBuilder changeLog){
-		ObservableList<Integer> originalParents = original.getParents();
-		ObservableList<Integer> editedParents = this.getParents();
+		ObservableList<Integer> originalParents = original.getParentNumbers();
+		ObservableList<Integer> editedParents = this.getParentNumbers();
 		
 		HashMap<String, HashSet<Integer>> changeSet = getChangesToList(originalParents, editedParents);
-		ObservableList<Integer> latestParents = latest.getParents();
+		ObservableList<Integer> latestParents = latest.getParentNumbers();
 		HashSet<Integer> removed = changeSet.get(REMOVED_TAG);
 		HashSet<Integer> added = changeSet.get(ADDED_TAG);
 		latestParents.removeAll(removed);
@@ -328,7 +339,7 @@ public class TurboIssue implements Listable {
 				latestParents.add(label);
 			}
 		}
-		latest.setParents(latestParents);
+		latest.setParentNumbers(latestParents);
 		logParentChange(removed, added, changeLog);
 	}
 	
@@ -369,7 +380,7 @@ public class TurboIssue implements Listable {
 		return turboLabels;
 	}
 
-	private ObservableList<Integer> extractParents(String issueBody) {
+	private ObservableList<Integer> extractParentNumbers(String issueBody) {
 		ObservableList<Integer> parents = FXCollections.observableArrayList();
 		if (issueBody == null) return parents;
 		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
@@ -400,9 +411,9 @@ public class TurboIssue implements Listable {
 	private String buildBody() {
 		StringBuilder body = new StringBuilder();
 		
-		if (!parents.isEmpty()) {
+		if (!parentNumbers.isEmpty()) {
 			String parentsMd = METADATA_HEADER_PARENT;
-			Iterator<Integer> parentsItr = parents.iterator();
+			Iterator<Integer> parentsItr = parentNumbers.iterator();
 			while (parentsItr.hasNext()) {
 				parentsMd = parentsMd + "#" + parentsItr.next();
 				if (parentsItr.hasNext()) {

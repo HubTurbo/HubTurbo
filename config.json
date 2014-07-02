@@ -1,0 +1,10 @@
+{
+  "openStatuses": [
+    "new",
+    "accepted",
+    "started"
+  ],
+  "excludedLabels": [
+    "invalid"
+  ]
+}

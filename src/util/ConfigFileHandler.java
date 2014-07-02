@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Modifier;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,7 +19,10 @@ public class ConfigFileHandler {
 	private static final String CHARSET = "UTF-8";
 	private static final String FILE_CONFIG = "config.json";
 	
-	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private static Gson gson = new GsonBuilder()
+								.setPrettyPrinting()
+								.excludeFieldsWithModifiers(Modifier.TRANSIENT)
+								.create();
 	
 	public static void saveConfig(UserConfigurations config) {
 		try {

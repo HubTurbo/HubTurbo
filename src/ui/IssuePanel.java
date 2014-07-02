@@ -8,6 +8,7 @@ import filter.Parser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -54,6 +55,7 @@ public class IssuePanel extends VBox {
 	private Node createFilterBox() {
 		HBox box = new HBox();
 		Label label = new Label(NO_FILTER);
+		label.setPadding(new Insets(3));
 		box.setOnMouseClicked((e) -> {
 			(new FilterDialog(mainStage, model, filterInput)).show().thenApply(
 					filterString -> {
@@ -104,7 +106,7 @@ public class IssuePanel extends VBox {
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new CustomListCell(mainStage, model, that.get());
+				return new IssuePanelCell(mainStage, model, that.get());
 			}
 		});
 		

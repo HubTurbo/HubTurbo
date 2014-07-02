@@ -20,14 +20,14 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboUser;
 
-public class CustomListCell extends ListCell<TurboIssue> {
+public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
 
 	private final Stage mainStage;
 	private final Model model;
 	
-	public CustomListCell(Stage mainStage, Model model, IssuePanel parent) {
+	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent) {
 		super();
 		this.mainStage = mainStage;
 		this.model = model;
@@ -47,13 +47,11 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		ghIcon.setText("G");
 		buttonBox.getChildren().addAll(ghIcon);
 		buttonBox.setOnMouseClicked((MouseEvent e) -> {
-			if (issue.getHtmlUrl() != null) {
-				browse(issue.getHtmlUrl());
-			}
+			browse(issue.getHtmlUrl());
 		});
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueName.setStyle(STYLE_ISSUE_NAME);
+		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
 		issue.titleProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
@@ -66,24 +64,24 @@ public class CustomListCell extends ListCell<TurboIssue> {
 		HBox titleBox = new HBox();
 		titleBox.getChildren().addAll(buttonBox, issueName);
 
-		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
+		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentNumbers(), false);
 		
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
 
-		HBox assignee = new HBox();
-		assignee.setSpacing(3);
-		Text assignedToLabel = new Text("Assigned to:");
-		TurboUser collaborator = issue.getAssignee();
-		Text assigneeName = new Text(collaborator == null ? "none"
-				: collaborator.getGithubName());
-		assignee.getChildren().addAll(assignedToLabel, assigneeName);
+		TurboUser assignee = issue.getAssignee();
+		HBox assigneeBox = new HBox();
+		if (assignee != null) {
+			assigneeBox.setSpacing(3);
+			Text assignedToLabel = new Text("Assigned to:");
+			Text assigneeName = new Text(assignee.getGithubName());
+			assigneeBox.getChildren().addAll(assignedToLabel, assigneeName);
+		}
 
 		VBox everything = new VBox();
 		everything.setSpacing(2);
-		everything.getChildren()
-				.addAll(titleBox, parents, labels, assignee);
-		// everything.getChildren().stream().forEach((node) ->
-		// node.setStyle(Demo.STYLE_BORDERS));
+		everything.getChildren().addAll(titleBox, parents);
+		if (assignee != null) everything.getChildren().add(assigneeBox);
+		everything.getChildren().add(labels);
 
 		setGraphic(everything);
 
@@ -93,6 +91,8 @@ public class CustomListCell extends ListCell<TurboIssue> {
 	}
 	
 	private void browse(String htmlUrl) {
+		
+		if (htmlUrl == null || htmlUrl.isEmpty()) return;
 
 		final String osName = System.getProperty("os.name");
 		

@@ -2,6 +2,7 @@ package model;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,12 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import util.ConfigFileHandler;
 import util.DialogMessage;
 import util.GitHubClientExtended;
 import util.IssueServiceExtended;
 import util.LabelServiceFixed;
+import util.UserConfigurations;
 
 public class Model {
 	
@@ -37,6 +40,7 @@ public class Model {
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
 	private IRepositoryIdProvider repoId;
+	private UserConfigurations config = ConfigFileHandler.loadConfig();
 	
 	private CollaboratorService collabService;
 	private IssueServiceExtended issueService;
@@ -52,12 +56,30 @@ public class Model {
 	
 	public void setRepoId(String owner, String name) {
 		repoId = RepositoryId.create(owner, name);
-		loadCollaborators();
 		loadIssues();
+		processAllIssueParents();
+		loadCollaborators();
 		loadLabels();
 		loadMilestones();
 	}
 	
+	private void processAllIssueParents() {
+		for (TurboIssue issue : issues) {
+			processIssueParents(issue);
+		}
+	}
+
+	private void processIssueParents(TurboIssue issue) {
+		List<TurboIssue> parents = new ArrayList<TurboIssue>();
+		for (Integer parentNumber : issue.getParentNumbers()) {
+			int parentIndex = getIndexOfIssue(parentNumber);
+			if (parentIndex != -1) {
+				parents.add(issues.get(parentIndex));
+			}
+		}
+		issue.setParents(parents);
+	}
+
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;
 	}
@@ -107,6 +129,7 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
+		processIssueParents(newCached);
 		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
 			issues.set(index, newCached);
@@ -245,6 +268,7 @@ public class Model {
 			e.printStackTrace();
 			return false;
 		}
+		
 		return true;
 	}
 	
