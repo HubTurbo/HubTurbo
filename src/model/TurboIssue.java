@@ -147,6 +147,7 @@ public class TurboIssue implements Listable {
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
 		parentNumbers = FXCollections.observableArrayList();
+		setOpen(true);
 	}
 	
 	// Copy constructor
