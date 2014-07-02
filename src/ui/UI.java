@@ -247,8 +247,10 @@ public class UI extends Application {
 
 		MenuItem refresh = new MenuItem("Refresh");
 		refresh.setOnAction((e) -> {
+			modelUpdater.stopModelUpdate();
 			loadDataIntoModel();
 			columns.refresh(); // In case
+			modelUpdater.startModelUpdate();
 		});
 		refresh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
