@@ -57,25 +57,27 @@ public class Model {
 	public void setRepoId(String owner, String name) {
 		repoId = RepositoryId.create(owner, name);
 		loadIssues();
-		processIssueParents();
+		processAllIssueParents();
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
 	}
 	
-	private void processIssueParents() {
+	private void processAllIssueParents() {
 		for (TurboIssue issue : issues) {
-			List<TurboIssue> parents = new ArrayList<TurboIssue>();
-			for (Integer parentNumber : issue.getParentNumbers()) {
-				TurboIssue searchStub = new TurboIssue("stub", "stub");
-				searchStub.setId(parentNumber);
-				int parentIndex = issues.indexOf(searchStub);
-				if (parentIndex != -1) {
-					parents.add(issues.get(parentIndex));
-				}
-			}
-			issue.setParents(parents);
+			processIssueParents(issue);
 		}
+	}
+
+	private void processIssueParents(TurboIssue issue) {
+		List<TurboIssue> parents = new ArrayList<TurboIssue>();
+		for (Integer parentNumber : issue.getParentNumbers()) {
+			int parentIndex = getIndexOfIssue(parentNumber);
+			if (parentIndex != -1) {
+				parents.add(issues.get(parentIndex));
+			}
+		}
+		issue.setParents(parents);
 	}
 
 	public IRepositoryIdProvider getRepoId(){
@@ -127,6 +129,7 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
+		processIssueParents(newCached);
 		int index = getIndexOfIssue(issue.getNumber());
 		if(index != -1){
 			issues.set(index, newCached);
