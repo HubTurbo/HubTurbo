@@ -8,18 +8,34 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import model.Model;
 
 public class ModelUpdater {
 	private Model model;
 	private IssueUpdateService issueUpdateService;
+	private CollaboratorUpdateService collaboratorUpdateService;
+	private LabelUpdateService labelUpdateService;
+	private MilestoneUpdateService milestoneUpdateService;
 	private long pollInterval = 60000; //time between polls in ms
 	private Timer pollTimer;
 	
 	public ModelUpdater(GitHubClientExtended client, Model model){
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client);
+		this.collaboratorUpdateService = new CollaboratorUpdateService(client);
+		this.labelUpdateService = new LabelUpdateService(client);
+		this.milestoneUpdateService = new MilestoneUpdateService(client);
+	}
+	
+	private void updateModel(){
+		updateModelIssues();
+		updateModelCollaborators();
+		updateModelLabels();
+		updateModelMilestones();
 	}
 	
 	private void updateModelIssues(){
@@ -36,6 +52,27 @@ public class ModelUpdater {
 	   });
 	}
 	
+	private void updateModelCollaborators(){
+		List<User> collaborators = collaboratorUpdateService.getUpdatedItems(model.getRepoId());
+		if(collaborators.size() > 0){
+			model.updateCachedCollaborators(collaborators);
+		}
+	}
+	
+	private void updateModelLabels(){
+		List<Label> labels = labelUpdateService.getUpdatedItems(model.getRepoId());
+		if(labels.size() > 0){
+			model.updateCachedLabels(labels);
+		}
+	}
+	
+	private void updateModelMilestones(){
+		List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(model.getRepoId());
+		if(milestones.size() > 0){
+			model.updateCachedMilestones(milestones);
+		}
+	}
+	
 	public void startModelUpdate(){
 		if(pollTimer != null){
 			stopModelUpdate();
@@ -44,7 +81,7 @@ public class ModelUpdater {
 		TimerTask pollTask = new TimerTask(){
 			@Override
 			public void run() {
-				updateModelIssues();
+				updateModel();
 			}
 		};
 		pollTimer.scheduleAtFixedRate(pollTask, 0, pollInterval);

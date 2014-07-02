@@ -143,10 +143,7 @@ public class Model {
 		for(Issue issue: issueList){
 			updateCachedIssue(issue);
 		}
-		//TODO: for now just reload collaborators, labels and milestones
-		loadCollaborators();
-		loadLabels();
-		loadMilestones();
+
 	}
 	
 	private void updateCachedIssue(Issue issue){
@@ -259,19 +256,23 @@ public class Model {
 		return -1;
 	}
 	
-	private boolean loadCollaborators() {
-		collaborators.clear();	
+	private boolean loadCollaborators() {	
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
-			for(User ghCollaborator : ghCollaborators) {
-				collaborators.add(new TurboUser(ghCollaborator));
-			}
+			updateCachedCollaborators(ghCollaborators);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
 		return true;
+	}
+	
+	public void updateCachedCollaborators(List<User> ghCollaborators){
+		collaborators.clear();
+		for(User ghCollaborator : ghCollaborators) {
+			collaborators.add(new TurboUser(ghCollaborator));
+		}
 	}
 	
 	private boolean loadIssues() {
@@ -294,12 +295,9 @@ public class Model {
 	}
 	
 	private boolean loadLabels(){
-		labels.clear();
 		try {
 			List<Label> ghLabels = labelService.getLabels(repoId);
-			for (Label ghLabel : ghLabels) {
-				labels.add(new TurboLabel(ghLabel));
-			}
+			updateCachedLabels(ghLabels);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -308,19 +306,30 @@ public class Model {
 		return true;
 	}
 	
+	public void updateCachedLabels(List<Label> ghLabels){
+		labels.clear();
+		for (Label ghLabel : ghLabels) {
+			labels.add(new TurboLabel(ghLabel));
+		}
+	}
+	
 	private boolean loadMilestones(){
-		milestones.clear();
 		try {		
 			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
-			for (Milestone ghMilestone : ghMilestones) {
-				milestones.add(new TurboMilestone(ghMilestone));
-			}
+			updateCachedMilestones(ghMilestones);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
 		return true;
+	}
+	
+	public void updateCachedMilestones(List<Milestone> ghMilestones){
+		milestones.clear();
+		for (Milestone ghMilestone : ghMilestones) {
+			milestones.add(new TurboMilestone(ghMilestone));
+		}
 	}
 	
 }

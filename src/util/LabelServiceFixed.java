@@ -4,8 +4,10 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABEL
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.IOException;
+
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
 
@@ -13,6 +15,10 @@ public class LabelServiceFixed extends LabelService {
 	
 	public LabelServiceFixed() {
 		super();
+	}
+	
+	public LabelServiceFixed(GitHubClient client) {
+		super(client);
 	}
 
 	/**
