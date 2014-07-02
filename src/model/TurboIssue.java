@@ -113,14 +113,14 @@ public class TurboIssue implements Listable {
 		}	
 	}
 	
-	private ObservableList<Integer> parent;
-	public ObservableList<Integer> getParents() {return parent;}
+	private ObservableList<Integer> parents;
+	public ObservableList<Integer> getParents() {return parents;}
 	public void setParents(ObservableList<Integer> parentNumbers) {
-		if (this.parent == null) {
-			this.parent = parentNumbers;
-		} else if (parentNumbers != this.parent) {
-			this.parent.clear();
-			this.parent.addAll(parentNumbers);
+		if (this.parents == null) {
+			this.parents = parentNumbers;
+		} else if (parentNumbers != this.parents) {
+			this.parents.clear();
+			this.parents.addAll(parentNumbers);
 		}
 	}
 
@@ -135,7 +135,7 @@ public class TurboIssue implements Listable {
 		setTitle(title);
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
-		parentNumbers = FXCollections.observableArrayList();
+		parents = FXCollections.observableArrayList();
 		setOpen(true);
 	}
 	
@@ -400,9 +400,9 @@ public class TurboIssue implements Listable {
 	private String buildBody() {
 		StringBuilder body = new StringBuilder();
 		
-		if (!parent.isEmpty()) {
+		if (!parents.isEmpty()) {
 			String parentsMd = METADATA_HEADER_PARENT;
-			Iterator<Integer> parentsItr = parent.iterator();
+			Iterator<Integer> parentsItr = parents.iterator();
 			while (parentsItr.hasNext()) {
 				parentsMd = parentsMd + "#" + parentsItr.next();
 				if (parentsItr.hasNext()) {
