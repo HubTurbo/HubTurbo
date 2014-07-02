@@ -309,7 +309,7 @@ public class TurboIssue implements Listable {
 				return false;
 			}
 			latest.setDescription(editedDesc);
-			changeLog.append("Edited description");
+			changeLog.append("Edited description. \n");
 		}
 		return true;
 	}
