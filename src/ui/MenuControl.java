@@ -116,8 +116,10 @@ public class MenuControl extends MenuBar {
 
 		refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
+			modelUpdater.stopModelUpdate();
 			loadDataIntoModel();
 			columns.refresh(); // In case
+			modelUpdater.startModelUpdate();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
