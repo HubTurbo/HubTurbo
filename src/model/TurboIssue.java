@@ -110,6 +110,14 @@ public class TurboIssue implements Listable {
 		if (this.labels == null) {
 			this.labels = labels;
 		} else if (labels != this.labels) {
+			for (TurboLabel currentLabel : labels){
+				if (currentLabel.getName().equalsIgnoreCase("wontfix") || 
+					 currentLabel.getName().equalsIgnoreCase("duplicate") ||
+					 currentLabel.getName().equalsIgnoreCase("invalid") ) {
+					this.setOpen(false);
+					break;
+				}
+			}
 			this.labels.clear();
 			this.labels.addAll(labels);
 		}	
