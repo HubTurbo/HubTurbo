@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import filter.ParseException;
 
 public class IssuePanel extends VBox {
 
@@ -67,8 +68,8 @@ public class IssuePanel extends VBox {
 									label.setText(NO_FILTER);
 				                	this.filter(EMPTY_PREDICATE);
 				        		}
-				        	} catch (RuntimeException ex){
-				            	label.setText("Parse error in filter");
+				        	} catch (ParseException ex){
+				            	label.setText("Parse error in filter: " + ex + " " + ex.getMessage());
 				            	this.filter(EMPTY_PREDICATE);
 				        	}
 						}

@@ -7,7 +7,7 @@ public class Parser {
 	public static void main(String[] args) {
 //		System.out.println(Parser.parse("e(f) (a(b) or c(d))"));
 //		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
-//		System.out.println(Parser.parse("    a   (   b   )   "));
+//		System.out.println(Parser.parse("assignee(dar)"));
 	}
 	
 	private Parser(ArrayList<Token> input) {
@@ -25,7 +25,7 @@ public class Parser {
 		if (input.get(position).getType() == type) {
 			return input.get(position++);
 		} else {
-			throw new RuntimeException("Invalid token " + input.get(position) + " where " + type + " expected");
+			throw new ParseException("Invalid token " + input.get(position) + " where " + type + " expected");
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class Parser {
 			left = parsePredicate(token);
 			break;
 		default:
-			throw new RuntimeException("Invalid prefix token " + token);
+			throw new ParseException("Invalid prefix token " + token);
 		}
 		
 		token = lookAhead();
@@ -82,7 +82,7 @@ public class Parser {
 				left = parseConjunction(left, token);
 				break;
 			default:
-				throw new RuntimeException("Invalid infix token " + token);
+				throw new ParseException("Invalid infix token " + token);
 			}
 		}
 		
