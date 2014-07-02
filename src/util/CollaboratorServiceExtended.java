@@ -16,9 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COLLABORATORS;
 
-public class CollaboratorServiceExtended extends CollaboratorService{
-	public static final int NO_UPDATE_RESPONSE_CODE = 304;
-	
+public class CollaboratorServiceExtended extends CollaboratorService{	
 	public static final String COLLABORATOR_ETAG = "etag";
 	public static final String COLLABORATOR_CONTENTS = "collaborator";
 	public static final String COLLABORATOR_RESPONSE = "response";
@@ -41,7 +39,7 @@ public class CollaboratorServiceExtended extends CollaboratorService{
 		int responseCode = connection.getResponseCode();
 		result.put(COLLABORATOR_RESPONSE, responseCode);
 		
-		if(responseCode != NO_UPDATE_RESPONSE_CODE && !ghClient.isError(responseCode)){
+		if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE && !ghClient.isError(responseCode)){
 			List<User> collaborators = (List<User>)ghClient.getBody(request, ghClient.getStream(connection));
 			result.put(COLLABORATOR_CONTENTS, collaborators);
 		}
@@ -56,7 +54,6 @@ public class CollaboratorServiceExtended extends CollaboratorService{
 		uri.append(SEGMENT_COLLABORATORS);
 		GitHubRequest request = createRequest();
 		request.setUri(uri);
-		request.setType(User.class);
 		request.setType(new TypeToken<List<User>>() {
 		}.getType());
 		return request;

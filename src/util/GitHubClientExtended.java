@@ -9,6 +9,8 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
 public class GitHubClientExtended extends GitHubClient{
+	public static final int NO_UPDATE_RESPONSE_CODE = 304;
+	
 	public GitHubClientExtended(){
 		
 	}
