@@ -116,10 +116,7 @@ public class MenuControl extends MenuBar {
 
 		refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
-			modelUpdater.stopModelUpdate();
-			loadDataIntoModel();
-			columns.refresh(); // In case
-			modelUpdater.startModelUpdate();
+			handleRefresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
@@ -240,6 +237,11 @@ public class MenuControl extends MenuBar {
 	}
 	
 
+	private void handleRefresh(){
+		modelUpdater.stopModelUpdate();
+		modelUpdater.startModelUpdate();
+	}
+	
 	private void loadDataIntoModel() {
 		model.setRepoId(repoOwner, repoName);
 	}
