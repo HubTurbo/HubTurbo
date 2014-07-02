@@ -21,6 +21,7 @@ import model.TurboIssue;
 
 public class IssuePanel extends VBox {
 
+	private static final String NO_FILTER = "<no filter>";
 	private final Stage mainStage;
 	private final Model model;
 	
@@ -49,12 +50,12 @@ public class IssuePanel extends VBox {
 
 	private Node createFilterBox() {
 		HBox box = new HBox();
-		Label label = new Label("<no filter>");
+		Label label = new Label(NO_FILTER);
 		box.setOnMouseClicked((e) -> {
-			(new FilterDialog(mainStage, model)).show().thenApply(
+			(new FilterDialog(mainStage, model, label.getText().equals(NO_FILTER) ? "" : label.getText())).show().thenApply(
 					filterCode -> {
 						if (filterCode.isEmpty()) {
-							label.setText("<no filter>");
+							label.setText(NO_FILTER);
 							this.filter(EMPTY_PREDICATE);
 						} else {
 				        	try {
@@ -63,7 +64,7 @@ public class IssuePanel extends VBox {
 									label.setText(filter.toString());
 				                	this.filter(filter);
 				        		} else {
-									label.setText("<no filter>");
+									label.setText(NO_FILTER);
 				                	this.filter(EMPTY_PREDICATE);
 				        		}
 				        	} catch (RuntimeException ex){

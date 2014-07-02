@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.concurrent.CompletableFuture;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,10 +22,13 @@ public class FilterDialog implements Dialog<String> {
 //	private final Model logic;
 
 	private final CompletableFuture<String> response;
+	private String initial = "";
 
-	public FilterDialog(Stage parentStage, Model logic) {
+	public FilterDialog(Stage parentStage, Model logic, String initial) {
 		this.parentStage = parentStage;
 //		this.logic = logic;
+		
+		this.initial = initial;
 		
 		response = new CompletableFuture<>();
 	}
@@ -39,7 +43,7 @@ public class FilterDialog implements Dialog<String> {
 		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2))");
 		explanatory.setWrapText(true);
 		
-        TextField field = new TextField();
+        TextField field = new TextField(initial);
         HBox.setHgrow(field, Priority.ALWAYS);
 //        setupAutocompletion(field);
 
