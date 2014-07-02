@@ -47,7 +47,7 @@ public class IssueServiceExtended extends IssueService{
 		GitHubRequest request = createRequest();
 		request.setUri(uri);
 		request.setType(Issue.class);
-		return client.get(request);
+		return ghClient.get(request);
 	}
 	
 	public Issue editIssue(IRepositoryIdProvider repository, Issue issue, String dateModified) throws IOException {
