@@ -24,7 +24,12 @@ public class UserConfigurations {
 	}
 	
 	public static boolean isExcludedLabel(String label) {
-		return excludedLabels.contains(label);
+		for (String excluded : excludedLabels) {
+			if (label.contains(excluded)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

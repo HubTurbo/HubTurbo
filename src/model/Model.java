@@ -84,7 +84,8 @@ public class Model {
 						break;
 					}
 				}
-				if (toBeRemoved) {
+				if (toBeRemoved &&
+						!UserConfigurations.isExcludedLabel(label.toGhName())) {
 					issueLabels.remove(label);
 				}
 			}
@@ -94,7 +95,8 @@ public class Model {
 			int addedParentIndex = getIndexOfIssue(addedParentId);
 			TurboIssue addedParent = issues.get(addedParentIndex);
 			for(TurboLabel label : addedParent.getLabels()){
-				if(!issueLabels.contains(label)){
+				if(!issueLabels.contains(label) &&
+						!UserConfigurations.isExcludedLabel(label.toGhName())){
 					issueLabels.add(label);
 				}
 			}

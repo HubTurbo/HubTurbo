@@ -5,6 +5,7 @@
     "started"
   ],
   "excludedLabels": [
-    "invalid"
+    "status.",
+    "type-"
   ]
 }
