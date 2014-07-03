@@ -4,11 +4,14 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -32,7 +35,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		this.mainStage = mainStage;
 		this.model = model;
 		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
-
 	}
 
 	@Override
@@ -86,8 +88,30 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setGraphic(everything);
 
 		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
+		
+		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 
 		registerEvents(issue);
+	}
+	
+	private MenuItem[] createGroupContextMenu(TurboIssue issue) {
+		MenuItem childMenuItem = new MenuItem("Create Child Issue");
+		childMenuItem.setOnAction((event) -> {
+			TurboIssue childIssue = new TurboIssue("New child issue", "");
+			childIssue.getParents().add(issue.getId());
+			model.processInheritedLabels(childIssue, new ArrayList<Integer>());
+			(new IssueDialog(mainStage, model, childIssue)).show().thenApply(
+					response -> {
+						if (response.equals("ok")) {
+							model.createIssue(childIssue);
+						}
+						// TODO: Required for some reason
+						//columns.refresh();
+						return true;
+					});
+
+		});
+		return new MenuItem[] {childMenuItem};
 	}
 	
 	private void browse(String htmlUrl) {
