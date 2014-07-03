@@ -8,6 +8,7 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 
 import util.GitHubClientExtended;
 import util.ModelUpdater;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -147,8 +148,8 @@ public class MenuControl extends MenuBar {
 
 	private void initLoginForm(MenuItem login) {
 		login.setOnAction((e) -> {
-			Stage stage = new Stage();
-			stage.setTitle("GitHub Login");
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("GitHub Login");
 
 			NotificationPane notificationPane = new NotificationPane();
 			
@@ -186,46 +187,7 @@ public class MenuControl extends MenuBar {
 			repoNameField.setMaxWidth(80);
 
 			Button loginButton = new Button("Sign in");
-			loginButton.setOnAction((ev) -> {
-				String username = usernameField.getText();
-				String password = passwordField.getText();
-				
-				if (username.isEmpty() && password.isEmpty()) {
-					BufferedReader reader;
-					try {
-						reader = new BufferedReader(new FileReader(
-								"credentials.txt"));
-						String line = null;
-						while ((line = reader.readLine()) != null) {
-							if (username.isEmpty())
-								username = line;
-							else
-								password = line;
-						}
-						System.out.println("Logged in using credentials.txt");
-					} catch (Exception e1) {
-						System.out.println("Failed to find or open credentials.txt");
-					}
-				}
-
-				boolean success = login(username, password);
-				if (!success) {
-//			        notificationPane.getActions().addAll(new AbstractAction("Retry") {
-//			            @Override public void handle(ActionEvent ae) {
-//			            	System.out.println("clicked button");
-//			            	notificationPane.hide();
-//			            }
-//			        });
-			        
-					notificationPane.setText("Failed to log in. Please try again.");
-					notificationPane.show();
-					
-				} else {
-					initialiseModel(repoOwnerField.getText(), repoNameField.getText());
-					
-					stage.hide();
-				}
-			});
+			loginButton.setOnAction(ev -> onLoginClick(repoOwnerField.getText(), repoNameField.getText(), usernameField.getText(), passwordField.getText(), notificationPane, dialogStage));
 
 			HBox buttons = new HBox(10);
 			buttons.setAlignment(Pos.BOTTOM_RIGHT);
@@ -235,16 +197,56 @@ public class MenuControl extends MenuBar {
 			notificationPane.setContent(grid);
 
 			Scene scene = new Scene(notificationPane, 320, 200);
-			stage.setScene(scene);
+			dialogStage.setScene(scene);
 
-			stage.initOwner(mainStage);
-			stage.initModality(Modality.APPLICATION_MODAL);
+			dialogStage.initOwner(mainStage);
+			dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-			stage.setX(mainStage.getX());
-			stage.setY(mainStage.getY());
+			dialogStage.setX(mainStage.getX());
+			dialogStage.setY(mainStage.getY());
 
-			stage.show();
+			dialogStage.show();
 		});
+	}
+	
+	private void onLoginClick(String owner, String repo, String username, String password, NotificationPane notificationPane, Stage dialogStage) {
+		
+		if (username.isEmpty() && password.isEmpty()) {
+			BufferedReader reader;
+			try {
+				reader = new BufferedReader(new FileReader(
+						"credentials.txt"));
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					if (username.isEmpty())
+						username = line;
+					else
+						password = line;
+				}
+				System.out.println("Logged in using credentials.txt");
+			} catch (Exception e) {
+				System.out.println("Failed to find or open credentials.txt");
+			}
+		}
+
+		boolean success = login(username, password);
+		
+		if (!success) {
+//		        notificationPane.getActions().addAll(new AbstractAction("Retry") {
+//		            @Override public void handle(ActionEvent ae) {
+//		            	System.out.println("clicked button");
+//		            	notificationPane.hide();
+//		            }
+//		        });
+	        
+			notificationPane.setText("Failed to log in. Please try again.");
+			notificationPane.show();
+			
+		} else {
+			initialiseModel(owner, repo);
+			
+			dialogStage.hide();
+		}
 	}
 	
 	private void initialiseModel(String owner, String repoName) {
