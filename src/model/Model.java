@@ -223,7 +223,6 @@ public class Model {
 						+ "Please refresh and enter your descripton again.");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
@@ -234,7 +233,6 @@ public class Model {
 		try {
 			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, CHARSET));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -244,7 +242,6 @@ public class Model {
 		try {
 			milestoneService.editMilestone(repoId, ghMilestone);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -263,7 +260,6 @@ public class Model {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
 			updateCachedCollaborators(ghCollaborators);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -284,9 +280,15 @@ public class Model {
 		filters.put(IssueService.FILTER_STATE, STATE_ALL);
 		try {		
 			List<Issue> ghIssues = issueService.getIssues(repoId, filters);
+			
+			// Add the issues to a temporary list to prevent a quadratic number
+			// of updates to subscribers of the ObservableList
+			ArrayList<TurboIssue> buffer = new ArrayList<>();
 			for (Issue ghIssue : ghIssues) {
-				issues.add(new TurboIssue(ghIssue));
+				buffer.add(new TurboIssue(ghIssue));
 			}
+			// Add them all at once, so this hopefully propagates only one change
+			issues.addAll(buffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -301,7 +303,6 @@ public class Model {
 			List<Label> ghLabels = labelService.getLabels(repoId);
 			updateCachedLabels(ghLabels);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -310,9 +311,12 @@ public class Model {
 	
 	public void updateCachedLabels(List<Label> ghLabels){
 		labels.clear();
+		// See loadIssues for why this buffer list is needed
+		ArrayList<TurboLabel> buffer = new ArrayList<>();
 		for (Label ghLabel : ghLabels) {
-			labels.add(new TurboLabel(ghLabel));
+			buffer.add(new TurboLabel(ghLabel));
 		}
+		labels.addAll(buffer);
 	}
 	
 	private boolean loadMilestones(){
@@ -320,7 +324,6 @@ public class Model {
 			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
 			updateCachedMilestones(ghMilestones);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -329,9 +332,12 @@ public class Model {
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
 		milestones.clear();
+		// See loadIssues for why this buffer list is needed
+		ArrayList<TurboMilestone> buffer = new ArrayList<>();
 		for (Milestone ghMilestone : ghMilestones) {
-			milestones.add(new TurboMilestone(ghMilestone));
+			buffer.add(new TurboMilestone(ghMilestone));
 		}
+		milestones.addAll(buffer);
 	}
 	
 }
