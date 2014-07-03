@@ -1,5 +1,7 @@
 package ui;
 
+import java.lang.ref.WeakReference;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -31,10 +33,11 @@ public class LabelDisplayBox extends FlowPane {
 		setHgap(3);
 		setVgap(3);
 
+		WeakReference<LabelDisplayBox> that = new WeakReference<LabelDisplayBox>(this);
 		labels.addListener(new ListChangeListener<TurboLabel>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends TurboLabel> arg0) {
-				populateWithLabels();
+				that.get().populateWithLabels();
 			}
 		});
 		populateWithLabels();
@@ -66,7 +69,7 @@ public class LabelDisplayBox extends FlowPane {
 				public void changed(
 						ObservableValue<? extends String> stringProperty,
 						String oldValue, String newValue) {
-					labelText.setText(newValue);
+					labelText.setText(newValue);//TODO:
 				}
 			});
 			getChildren().add(labelText);

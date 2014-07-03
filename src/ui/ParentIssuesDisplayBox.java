@@ -1,5 +1,7 @@
 package ui;
 
+import java.lang.ref.WeakReference;
+
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
@@ -25,11 +27,11 @@ public class ParentIssuesDisplayBox extends HBox {
 
 	private void setListableItems(ObservableList<Integer> issueNumbers) {
 		this.issueNumbers = issueNumbers;
-		
+		WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
 		issueNumbers.addListener(new ListChangeListener<Integer>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
-				update();
+				that.get().update();
 			}
 		});
 		
