@@ -53,12 +53,14 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
+		
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
 		issue.titleProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
 					ObservableValue<? extends String> stringProperty,
 					String oldValue, String newValue) {
-				issueName.setText("#" + issue.getId() + " " + newValue);
+				issueName.setText("#" + issueRef.get().getId() + " " + newValue);
 			}
 		});
 		
