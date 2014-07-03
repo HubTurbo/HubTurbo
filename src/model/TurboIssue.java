@@ -17,6 +17,8 @@ import javafx.collections.ObservableList;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
+import util.UserConfigurations;
+
 
 public class TurboIssue implements Listable {
 	
@@ -27,8 +29,8 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_SEPERATOR = "<hr>";
-	private static final String REMOVED_TAG = "removed";
-	private static final String ADDED_TAG = "added";
+	public static final String REMOVED_TAG = "removed";
+	public static final String ADDED_TAG = "added";
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -38,7 +40,7 @@ public class TurboIssue implements Listable {
     public final int getId() {
     	return id.get();
     }
-    private final void setId(int value) {
+    public final void setId(int value) {
     	id.set(value);
     }
     public IntegerProperty idProperty() {
@@ -103,18 +105,13 @@ public class TurboIssue implements Listable {
 	}
 	
 	private ObservableList<TurboLabel> labels;
-	public ObservableList<TurboLabel> getLabels() {
-		return labels;
-	}
+	public ObservableList<TurboLabel> getLabels() {return labels;}
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if (this.labels == null) {
 			this.labels = labels;
 		} else if (labels != this.labels) {
-			this.setOpen(true);
-			for (TurboLabel currentLabel : labels){
-				if (currentLabel.getName().equalsIgnoreCase("wontfix") || 
-					 currentLabel.getName().equalsIgnoreCase("duplicate") ||
-					 currentLabel.getName().equalsIgnoreCase("invalid") ) {
+			for (TurboLabel currentLabel : labels) {
+				if (UserConfigurations.isclosedStatusLabel(currentLabel.getName())) {
 					this.setOpen(false);
 					break;
 				}
@@ -126,13 +123,13 @@ public class TurboIssue implements Listable {
 	
 	private ObservableList<Integer> parents;
 	public ObservableList<Integer> getParents() {return parents;}
-	public void setParents(ObservableList<Integer> parents) {
+	public void setParents(ObservableList<Integer> parentNumbers) {
 		if (this.parents == null) {
-			this.parents = parents;
-		} else if (parents != this.parents) {
+			this.parents = parentNumbers;
+		} else if (parentNumbers != this.parents) {
 			this.parents.clear();
-			this.parents.addAll(parents);
-		}	
+			this.parents.addAll(parentNumbers);
+		}
 	}
 
 	/*
@@ -147,6 +144,7 @@ public class TurboIssue implements Listable {
 		setDescription(desc);
 		labels = FXCollections.observableArrayList();
 		parents = FXCollections.observableArrayList();
+		setOpen(true);
 	}
 	
 	// Copy constructor
@@ -167,7 +165,7 @@ public class TurboIssue implements Listable {
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
-		setParents(extractParents(issue.getBody()));
+		setParents(extractParentNumbers(issue.getBody()));
 	}
 
 	public Issue toGhResource() {
@@ -193,7 +191,8 @@ public class TurboIssue implements Listable {
 		setAssignee(other.getAssignee());
 		setMilestone(other.getMilestone());
 		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParents(FXCollections.observableArrayList(other.getParents()));	
+		setParents(FXCollections.observableArrayList(other.getParents()));
+		setParents(other.getParents());
 	}
 	
 	/**
@@ -236,7 +235,7 @@ public class TurboIssue implements Listable {
 	 * @return HashMap the a list of items removed from the original list
 	 * 			and a list of items added to the original list
 	 * */
-	private <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
+	protected <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
 		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
 		HashSet<T> removed = new HashSet<T>(original);
 		HashSet<T> added = new HashSet<T>(edited);
@@ -318,7 +317,7 @@ public class TurboIssue implements Listable {
 				return false;
 			}
 			latest.setDescription(editedDesc);
-			changeLog.append("Edited description");
+			changeLog.append("Edited description. \n");
 		}
 		return true;
 	}
@@ -378,7 +377,7 @@ public class TurboIssue implements Listable {
 		return turboLabels;
 	}
 
-	private ObservableList<Integer> extractParents(String issueBody) {
+	private ObservableList<Integer> extractParentNumbers(String issueBody) {
 		ObservableList<Integer> parents = FXCollections.observableArrayList();
 		if (issueBody == null) return parents;
 		String[] lines = issueBody.split(REGEX_SPLIT_LINES);

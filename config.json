@@ -1,0 +1,16 @@
+{
+  "openStatuses": [
+    "new",
+    "accepted",
+    "started"
+  ],
+  "excludedLabels": [
+    "status.",
+    "type-"
+  ],
+  "closedStatusLabels": [
+    "wontfix",
+    "duplicate",
+    "invalid"
+  ]
+}
