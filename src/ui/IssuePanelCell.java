@@ -2,6 +2,7 @@ package ui;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -157,10 +158,11 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 
 	private void registerEvents(TurboIssue issue) {
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
 		setOnMouseClicked((MouseEvent mouseEvent) -> {
 			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
 				if (mouseEvent.getClickCount() == 2) {
-					onDoubleClick(issue);
+					onDoubleClick(issueRef.get());
 				}
 			}
 		});
