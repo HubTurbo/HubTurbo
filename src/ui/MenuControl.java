@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
 import util.GitHubClientExtended;
@@ -28,6 +29,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import org.controlsfx.control.NotificationPane;
 
 public class MenuControl extends MenuBar {
 
@@ -147,6 +150,8 @@ public class MenuControl extends MenuBar {
 			Stage stage = new Stage();
 			stage.setTitle("GitHub Login");
 
+			NotificationPane notificationPane = new NotificationPane();
+			
 			GridPane grid = new GridPane();
 			grid.setAlignment(Pos.CENTER);
 			grid.setHgap(10);
@@ -184,6 +189,7 @@ public class MenuControl extends MenuBar {
 			loginButton.setOnAction((ev) -> {
 				String username = usernameField.getText();
 				String password = passwordField.getText();
+				
 				if (username.isEmpty() && password.isEmpty()) {
 					BufferedReader reader;
 					try {
@@ -202,28 +208,33 @@ public class MenuControl extends MenuBar {
 					}
 				}
 
-				login(username, password);
-				repoOwner = repoOwnerField.getText();
-				repoName = repoNameField.getText();
-
-				loadDataIntoModel();
-				columns.loadIssues();
-				if (modelUpdater != null) {
-					modelUpdater.stopModelUpdate();
+				boolean success = login(username, password);
+				if (!success) {
+//			        notificationPane.getActions().addAll(new AbstractAction("Retry") {
+//			            @Override public void handle(ActionEvent ae) {
+//			            	System.out.println("clicked button");
+//			            	notificationPane.hide();
+//			            }
+//			        });
+			        
+					notificationPane.setText("Failed to log in. Please try again.");
+					notificationPane.show();
+					
+				} else {
+					initialiseModel(repoOwnerField.getText(), repoNameField.getText());
+					
+					stage.hide();
 				}
-				setupModelUpdate();
-
-				mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
-				enableMenuItemsRequiringLogin();
-				stage.hide();
 			});
 
 			HBox buttons = new HBox(10);
 			buttons.setAlignment(Pos.BOTTOM_RIGHT);
 			buttons.getChildren().add(loginButton);
 			grid.add(buttons, 3, 3);
+			
+			notificationPane.setContent(grid);
 
-			Scene scene = new Scene(grid, 320, 200);
+			Scene scene = new Scene(notificationPane, 320, 200);
 			stage.setScene(scene);
 
 			stage.initOwner(mainStage);
@@ -234,6 +245,21 @@ public class MenuControl extends MenuBar {
 
 			stage.show();
 		});
+	}
+	
+	private void initialiseModel(String owner, String repoName) {
+		this.repoOwner = owner;
+		this.repoName = repoName;
+
+		loadDataIntoModel();
+		columns.loadIssues();
+		if (modelUpdater != null) {
+			modelUpdater.stopModelUpdate();
+		}
+		setupModelUpdate();
+
+		mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
+		enableMenuItemsRequiringLogin();
 	}
 	
 
