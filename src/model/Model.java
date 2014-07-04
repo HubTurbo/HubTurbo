@@ -3,11 +3,13 @@ package model;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javafx.animation.Animation.Status;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -301,6 +303,7 @@ public class Model {
 	private boolean loadLabels(){
 		try {
 			List<Label> ghLabels = labelService.getLabels(repoId);
+			standardiseStatusLabels(ghLabels);
 			updateCachedLabels(ghLabels);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -309,6 +312,35 @@ public class Model {
 		return true;
 	}
 	
+	private void standardiseStatusLabels(List<Label> ghLabels) {
+		List<String> standardStatuses =new ArrayList<String>();
+		standardStatuses.add("status.new");
+		standardStatuses.add("status.accepted");
+		standardStatuses.add("status.started");
+		standardStatuses.add("status.fixed");
+		standardStatuses.add("status.verified");
+		standardStatuses.add("status.invalid");
+		standardStatuses.add("status.duplicate");
+		standardStatuses.add("status.wontfix");
+		standardStatuses.add("status.done");
+		List<String> projectLabels = new ArrayList<String>();
+		for (Label label : ghLabels) {
+			projectLabels.add(label.getName());
+		}
+		standardStatuses.removeAll(projectLabels);
+		for (String standardStatus : standardStatuses) {
+			Label statusLabel = new Label();
+			statusLabel.setName(standardStatus);
+			try {
+				ghLabels.add(labelService.createLabel(repoId, statusLabel));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
 	public void updateCachedLabels(List<Label> ghLabels){
 		labels.clear();
 		// See loadIssues for why this buffer list is needed
