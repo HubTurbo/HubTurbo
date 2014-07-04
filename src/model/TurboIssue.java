@@ -17,6 +17,8 @@ import javafx.collections.ObservableList;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
+import util.UserConfigurations;
+
 
 public class TurboIssue implements Listable {
 	
@@ -108,11 +110,8 @@ public class TurboIssue implements Listable {
 		if (this.labels == null) {
 			this.labels = labels;
 		} else if (labels != this.labels) {
-			this.setOpen(true);
-			for (TurboLabel currentLabel : labels){
-				if (currentLabel.getName().equalsIgnoreCase("wontfix") || 
-					 currentLabel.getName().equalsIgnoreCase("duplicate") ||
-					 currentLabel.getName().equalsIgnoreCase("invalid") ) {
+			for (TurboLabel currentLabel : labels) {
+				if (UserConfigurations.isclosedStatusLabel(currentLabel.getName())) {
 					this.setOpen(false);
 					break;
 				}
