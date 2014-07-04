@@ -106,7 +106,11 @@ public class IssuePanel extends VBox {
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				return new IssuePanelCell(mainStage, model, that.get());
+				if(that.get() != null){
+					return new IssuePanelCell(mainStage, model, that.get());
+				}else{
+					return null;
+				}
 			}
 		});
 		

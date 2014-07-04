@@ -41,7 +41,9 @@ public class ParentIssuesDisplayBox extends HBox {
 			ListChangeListener<Integer> listener = new ListChangeListener<Integer>() {
 				@Override
 				public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
-					that.get().update();
+					if(that.get() != null){
+						that.get().update();
+					}
 				}
 			};
 			listChangeListener = new WeakListChangeListener<Integer>(listener);

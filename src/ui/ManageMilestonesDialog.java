@@ -74,7 +74,11 @@ public class ManageMilestonesDialog implements Dialog<String> {
 		listView.setCellFactory(new Callback<ListView<TurboMilestone>, ListCell<TurboMilestone>>() {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
-				return new ManageMilestonesListCell(model, that.get());
+				if(that.get() != null){
+					return new ManageMilestonesListCell(model, that.get());
+				}else{
+					return null;
+				}
 			}
 		});
 

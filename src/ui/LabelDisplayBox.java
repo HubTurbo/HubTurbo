@@ -37,7 +37,9 @@ public class LabelDisplayBox extends FlowPane {
 		labels.addListener(new ListChangeListener<TurboLabel>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends TurboLabel> arg0) {
-				that.get().populateWithLabels();
+				if(that.get() != null){
+					that.get().populateWithLabels();
+				}
 			}
 		});
 		populateWithLabels();
