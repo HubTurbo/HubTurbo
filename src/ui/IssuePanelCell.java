@@ -79,7 +79,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
 		
-		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false, "");
 
 		TurboUser assignee = issue.getAssignee();
 		HBox assigneeBox = new HBox();

@@ -18,15 +18,17 @@ public class LabelDisplayBox extends FlowPane {
 
 	private ObservableList<TurboLabel> labels;
 	private boolean displayWhenEmpty;
+	private String labelWhenEmpty;
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
 	
 	public LabelDisplayBox() {
-		this(FXCollections.observableArrayList(), false);
+		this(FXCollections.observableArrayList(), false, "");
 	}
 
-	public LabelDisplayBox(ObservableList<TurboLabel> labels, boolean displayWhenEmpty) {
+	public LabelDisplayBox(ObservableList<TurboLabel> labels, boolean displayWhenEmpty, String labelWhenEmpty) {
 		this.labels = labels;
 		this.displayWhenEmpty = displayWhenEmpty;
+		this.labelWhenEmpty = labelWhenEmpty;
 		setup();
 	}
 	
@@ -88,7 +90,7 @@ public class LabelDisplayBox extends FlowPane {
 		
 		if (displayWhenEmpty && labels.size() == 0) {
 			
-			Label noLabels = new Label("Labels");
+			Label noLabels = new Label(labelWhenEmpty);
 			noLabels.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(noLabels);
 
