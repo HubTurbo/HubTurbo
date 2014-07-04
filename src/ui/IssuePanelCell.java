@@ -27,8 +27,6 @@ import model.TurboUser;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
-	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
-
 	private final Stage mainStage;
 	private final Model model;
 	private ChangeListener<String> titleChangeListener;
@@ -64,7 +62,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		HBox buttonBox = new HBox();
 		Label ghIcon = new Label();
-		ghIcon.setStyle("-fx-font-family: github-octicons; -fx-font-size: 22px; -fx-background-color: transparent; -fx-padding: 0 5 0 0;");
+		ghIcon.getStyleClass().add("github-icon");
 		ghIcon.setText("G");
 		buttonBox.getChildren().addAll(ghIcon);
 		buttonBox.setOnMouseClicked((MouseEvent e) -> {
@@ -72,7 +70,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
+		issueName.getStyleClass().add("issue-panel-name");
+		if (!issue.getOpen()) issueName.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueName)));
 
 		HBox titleBox = new HBox();
@@ -99,8 +98,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		setGraphic(everything);
 
-//		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
-		getStyleClass().add("borders");
+		getStyleClass().addAll("borders", "rounded-borders");
 		
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 

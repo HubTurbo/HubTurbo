@@ -13,11 +13,6 @@ import model.Model;
 
 public class UI extends Application {
 
-//	public static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
-//	public static final String STYLE_BORDERS_FADED = "";
-//	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
-//	public static final String STYLE_FADED = "";
-
 	// Main UI elements
 	
 	private Stage mainStage;

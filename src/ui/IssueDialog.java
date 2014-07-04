@@ -40,9 +40,6 @@ public class IssueDialog implements Dialog<String> {
 	private static final int ELEMENT_SPACING = 10;
 	private static final int MIDDLE_SPACING = 20;
 
-	public static final String STYLE_YELLOW = "-fx-background-color: #FFFA73;";
-	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
-
 	private Stage parentStage;
 	private Model model;
 	private TurboIssue issue;
