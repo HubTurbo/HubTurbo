@@ -117,7 +117,7 @@ public class TurboIssue implements Listable {
 		// Note: This is done even if the current status is already closed. This is because we need to ensure
 		//       that there are no closed status labels associated with the issue (to facilitate check below)
 		for (TurboLabel currentLabel : labels) {
-			if (UserConfigurations.isClosedStatusLabel(currentLabel.getName())) {
+			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
 				this.setOpen(false);
 				return;
 			}
@@ -127,7 +127,7 @@ public class TurboIssue implements Listable {
 			// if the status is closed, checks to see if any of the labels are equivalent to open status
 			// if so, auto update status as closed
 			for (TurboLabel currentLabel : labels) {
-				if (UserConfigurations.isOpenStatusLabel(currentLabel.getName())) {
+				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
 					this.setOpen(true);
 					return;
 				}
