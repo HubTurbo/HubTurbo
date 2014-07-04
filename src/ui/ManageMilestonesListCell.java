@@ -1,7 +1,11 @@
 package ui;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
@@ -20,12 +24,31 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	
     private TextField textField;
 	private VBox content;
+	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
     public ManageMilestonesListCell(Model model, ManageMilestonesDialog parentDialog) {
 		super();
 		this.model = model;
 		this.parentDialog = parentDialog;
 	}
+    
+    private ChangeListener<Boolean> createTextFieldListener(){
+    	WeakReference<ManageMilestonesListCell> that = new WeakReference<>(this);
+    	ChangeListener<Boolean> textFieldListener = new ChangeListener<Boolean>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Boolean> stringProperty,
+					Boolean previouslyFocused, Boolean currentlyFocused) {
+				assert previouslyFocused != currentlyFocused;
+				ManageMilestonesListCell thisRef = that.get();
+				if (thisRef != null && !currentlyFocused) {
+                    commitEdit();
+				}
+			}
+		};
+		changeListeners.add(textFieldListener);
+		return textFieldListener;
+    }
     
     private void createTextField() {
         textField = new TextField(getItem().getTitle());
@@ -39,17 +62,8 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
                 }
             }
         });
-        textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends Boolean> stringProperty,
-					Boolean previouslyFocused, Boolean currentlyFocused) {
-				assert previouslyFocused != currentlyFocused;
-				if (!currentlyFocused) {
-                    commitEdit();
-				}
-			}
-		});
+        
+        textField.focusedProperty().addListener(new WeakChangeListener<Boolean>(createTextFieldListener()));
     }
     
     // This is NOT an overridden method.
@@ -82,6 +96,23 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
         textField.requestFocus();
     }
     
+    private ChangeListener<String> createMilestoneTitleListener(TurboMilestone milestone, Text milestoneTitle){
+    	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
+    	ChangeListener<String> listener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> stringProperty,
+					String oldValue, String newValue) {
+				TurboMilestone milestone = milestoneRef.get();
+				if(milestone != null){
+					milestoneTitle.setText(milestone.getTitle());
+				}
+			}
+		};
+		changeListeners.add(listener);
+		return listener;
+    }
+    
 	@Override
 	public void updateItem(TurboMilestone milestone, boolean empty) {
 		super.updateItem(milestone, empty);
@@ -89,14 +120,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 			return;
 
 		Text milestoneTitle = new Text(milestone.getTitle());
-		milestone.titleProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				milestoneTitle.setText(milestone.getTitle());
-			}
-		});
+		milestone.titleProperty().addListener(new WeakChangeListener<String>(createMilestoneTitleListener(milestone, milestoneTitle)));
 
 		VBox everything = new VBox();
 		everything.setSpacing(2);
@@ -110,9 +134,10 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	}
 
 	private ContextMenu createContextMenu(TurboMilestone milestone) {
+		WeakReference<ManageMilestonesListCell> that = new WeakReference<>(this); 
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
-			startEdit();
+			that.get().startEdit();
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
