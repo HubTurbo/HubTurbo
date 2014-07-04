@@ -14,8 +14,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -27,16 +30,17 @@ import model.TurboUser;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
-	private static final String STYLE_ISSUE_NAME = "-fx-font-size: 24px;";
-
 	private final Stage mainStage;
 	private final Model model;
+	private final int parentColumnIndex;
+	
 	private ChangeListener<String> titleChangeListener;
 	
-	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent) {
+	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent, int parentColumnIndex) {
 		super();
 		this.mainStage = mainStage;
 		this.model = model;
+		this.parentColumnIndex = parentColumnIndex;
 		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
@@ -64,7 +68,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		HBox buttonBox = new HBox();
 		Label ghIcon = new Label();
-		ghIcon.setStyle("-fx-font-family: github-octicons; -fx-font-size: 22px; -fx-background-color: transparent; -fx-padding: 0 5 0 0;");
+		ghIcon.getStyleClass().add("github-icon");
 		ghIcon.setText("G");
 		buttonBox.getChildren().addAll(ghIcon);
 		buttonBox.setOnMouseClicked((MouseEvent e) -> {
@@ -72,7 +76,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
+		issueName.getStyleClass().add("issue-panel-name");
+		if (!issue.getOpen()) issueName.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueName)));
 
 		HBox titleBox = new HBox();
@@ -80,7 +85,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
 		
-		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false);
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabels(), false, "");
 
 		TurboUser assignee = issue.getAssignee();
 		HBox assigneeBox = new HBox();
@@ -99,12 +104,32 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		setGraphic(everything);
 
-//		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
-		getStyleClass().add("borders");
+		getStyleClass().addAll("borders", "rounded-borders");
 		
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 
 		registerEvents(issue);
+		
+		
+		setOnDragDetected((event) -> {
+			Dragboard db = startDragAndDrop(TransferMode.ANY);
+			ClipboardContent content = new ClipboardContent();
+			IssuePanelDragData dd = new IssuePanelDragData(parentColumnIndex, issue.getId());
+			content.putString(dd.serialise());
+			System.out.println(dd.serialise());
+			db.setContent(content);
+			event.consume();
+		});
+		
+		setOnDragDone((event) -> {
+
+			if (event.getTransferMode() == TransferMode.MOVE) {
+			}
+
+//			System.out.println("done");
+
+			event.consume();
+		});
 	}
 	
 	private MenuItem[] createGroupContextMenu(TurboIssue issue) {

@@ -40,9 +40,6 @@ public class IssueDialog implements Dialog<String> {
 	private static final int ELEMENT_SPACING = 10;
 	private static final int MIDDLE_SPACING = 20;
 
-	public static final String STYLE_YELLOW = "-fx-background-color: #FFFA73;";
-	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
-
 	private Stage parentStage;
 	private Model model;
 	private TurboIssue issue;
@@ -72,6 +69,7 @@ public class IssueDialog implements Dialog<String> {
 	
 		Scene scene = new Scene(layout, parentStage.getWidth(),
 				parentStage.getHeight() * HEIGHT_FACTOR);
+		UI.applyCSS(scene);
 	
 		Stage stage = new Stage();
 		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
@@ -142,12 +140,12 @@ public class IssueDialog implements Dialog<String> {
 		issueTitle.textProperty().addListener(
 				new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
-		closedCheckBox.setSelected(!issue.getOpen());
-		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
+//		closedCheckBox.setSelected(!issue.getOpen());
+//		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
 		
-		
-		
-		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
+//		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
+		Parent statusBox = createStatusBox(stage);
+		title.getChildren().addAll(issueId, issueTitle, statusBox);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
 		issueDesc.setPrefRowCount(8);
@@ -162,6 +160,39 @@ public class IssueDialog implements Dialog<String> {
 
 		return left;
 
+	}
+	
+	private LabelDisplayBox createStatusBox(Stage stage) {
+		ObservableList<TurboLabel> statusLabel = FXCollections.observableArrayList();
+		for (TurboLabel label : issue.getLabels()) {
+			if (label.getGroup() != null && label.getGroup().equals("status")) {
+				statusLabel.add(label);
+				break;
+			}
+		}
+		final LabelDisplayBox statusBox = new LabelDisplayBox(statusLabel, true, "Status");
+		ObservableList<TurboLabel> allStatuses = FXCollections.observableArrayList();
+		for (TurboLabel label : model.getLabels()) {
+			if (label.getGroup() != null && label.getGroup().equals("status")) {
+				allStatuses.add(label);
+			}
+		}
+		
+		statusBox.setOnMouseClicked((e) -> {
+			(new LabelCheckboxListDialog(stage, allStatuses))
+				.setInitialChecked(issue.getLabels())
+				.show().thenApply(
+					(List<TurboLabel> response) -> {
+						issue.getLabels().removeIf(label -> label.getGroup().equals("status"));
+						issue.getLabels().addAll(FXCollections.observableArrayList(response));
+						issue.setLabels(issue.getLabels());
+						statusLabel.setAll(FXCollections.observableArrayList(response));
+						return true;
+					});
+		});
+		
+		statusBox.setMaxWidth(20);
+		return statusBox;
 	}
 
 	private Parent right(Stage stage) {
@@ -249,7 +280,7 @@ public class IssueDialog implements Dialog<String> {
 	}
 
 	private LabelDisplayBox createLabelBox(Stage stage) {
-		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true);
+		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true, "Labels");
 		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());
 		
 		labelBox.setOnMouseClicked((e) -> {

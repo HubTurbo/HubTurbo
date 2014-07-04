@@ -16,7 +16,7 @@ public class ListableDisplayBox extends HBox {
 	}
 	
 	private void setup() {
-		setStyle(UI.STYLE_BORDERS_FADED);
+		getStyleClass().add("faded-borders");
 	}
 
 	public void setListableItem(Listable item) {
@@ -28,10 +28,10 @@ public class ListableDisplayBox extends HBox {
 		Label label;
 		if (item == null) {
 			label = new Label(defaultText);
-			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5 5 5 5;");
+			label.getStyleClass().addAll("faded", "display-box-padding");
 		} else {
 			label = new Label(item.getListName());
-			label.setStyle("-fx-padding: 5 5 5 5;");
+			label.getStyleClass().addAll("display-box-padding");
 		}
 		getChildren().clear();
 		getChildren().add(label);

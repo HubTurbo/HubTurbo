@@ -3,11 +3,11 @@ package ui;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-public class SingleCheckListItemModel {
+public class BetterCheckListItem {
 	
 	private String contents;
 	
-	public SingleCheckListItemModel(String contents, boolean checked) {
+	public BetterCheckListItem(String contents, boolean checked) {
 		this.contents = contents;
 		setChecked(checked);
 	}

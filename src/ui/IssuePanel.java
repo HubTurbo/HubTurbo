@@ -3,6 +3,7 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.function.Predicate;
 
+import javafx.scene.input.TransferMode;
 import filter.FilterExpression;
 import filter.Parser;
 import javafx.collections.FXCollections;
@@ -13,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.Dragboard;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -25,8 +27,12 @@ import filter.ParseException;
 public class IssuePanel extends VBox {
 
 	private static final String NO_FILTER = "<no filter>";
+	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+
 	private final Stage mainStage;
 	private final Model model;
+	private final ColumnControl parentColumnControl;
+	private final int columnIndex;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -34,12 +40,13 @@ public class IssuePanel extends VBox {
 	
 	private Predicate<TurboIssue> predicate;
 	private String filterInput = "";
+	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
-	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
-
-	public IssuePanel(Stage mainStage, Model model) {
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex) {
 		this.mainStage = mainStage;
 		this.model = model;
+		this.parentColumnControl = parentColumnControl;
+		this.columnIndex = columnIndex;
 
 		getChildren().add(createFilterBox());
 		
@@ -89,11 +96,61 @@ public class IssuePanel extends VBox {
 		setPrefWidth(400);
 		setVgrow(listView, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
-//		setStyle(UI.STYLE_BORDERS);
 		getStyleClass().add("borders");
+		
+		setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+			}
+		});
+
+		setOnDragEntered(e -> {
+//			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+//				setStyle("-fx-background-color: #ff0000;");
+//			}
+			e.consume();
+		});
+
+		setOnDragExited(e -> {
+//			item.setStyle(style);
+//			System.out.println("exited");
+
+			e.consume();
+		});
+		
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				success = true;
+				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
+				
+				System.out.println(dd.getColumnIndex());
+				System.out.println(dd.getIssueIndex());
+				
+				// Find the right issue
+				TurboIssue rightIssue = null;
+				for (TurboIssue i : model.getIssues()) {
+					if (i.getId() == dd.getIssueIndex()) {
+						rightIssue = i;
+					}
+				}
+				assert rightIssue != null;
+				
+				TurboIssue clone = new TurboIssue(rightIssue);
+				currentFilterExpression.applyTo(rightIssue);
+				model.updateIssue(clone, rightIssue);
+				parentColumnControl.refresh();
+//				currentPredicate.applyTo(issue);
+			}
+			e.setDropCompleted(success);
+
+			e.consume();
+		});
 	}
 
 	public void filter(FilterExpression filter) {
+		currentFilterExpression = filter;
 		predicate = filter::isSatisfiedBy;
 		refreshItems();
 	}
@@ -108,8 +165,8 @@ public class IssuePanel extends VBox {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(mainStage, model, that.get());
-				}else{
+					return new IssuePanelCell(mainStage, model, that.get(), columnIndex);
+				} else{
 					return null;
 				}
 			}
@@ -131,5 +188,9 @@ public class IssuePanel extends VBox {
 
 	public ObservableList<TurboIssue> getItems() {
 		return issues;
+	}
+
+	public FilterExpression getCurrentFilterExpression() {
+		return currentFilterExpression;
 	}
 }

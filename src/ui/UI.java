@@ -13,11 +13,6 @@ import model.Model;
 
 public class UI extends Application {
 
-	public static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
-	public static final String STYLE_BORDERS_FADED = "-fx-border-color: #B2B1AE; -fx-border-width: 1px; -fx-border-radius: 3;";
-//	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
-	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
-
 	// Main UI elements
 	
 	private Stage mainStage;
@@ -46,13 +41,14 @@ public class UI extends Application {
 		Scene scene = new Scene(createRoot(), 800, 600);
 
 		setupMainStage(scene);
-		loadCSS(scene);
+		applyCSS(scene);
 	}
 
-	private void loadCSS(Scene scene) {
-		File f = new File("hubturbo.css");
+	private static final String CSS = "file:///" + new File("hubturbo.css").getAbsolutePath().replace("\\", "/");
+
+	public static void applyCSS(Scene scene) {
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
+		scene.getStylesheets().add(CSS);
 	}
 
 	private void setupMainStage(Scene scene) {

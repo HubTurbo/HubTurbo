@@ -3,3 +3,44 @@
 	-fx-border-color: #000000;
 	-fx-border-width: 1px;
 }
+
+.faded-borders {
+	-fx-border-color: #B2B1AE;
+	-fx-border-width: 1px;
+	-fx-border-radius: 3;
+}
+
+.faded {
+	-fx-text-fill: #B2B1AE;
+}
+
+.rounded-borders {
+	-fx-border-radius: 5;
+}
+
+.display-box-padding {
+	-fx-padding: 5;
+}
+
+.dragged-over {
+	-fx-background-color: #FFFA73;
+}
+
+.github-icon {
+	-fx-font-family: github-octicons;
+	-fx-font-size: 22px;
+	-fx-background-color: transparent;
+	-fx-padding: 0 5 0 0;
+}
+
+.issue-panel-name {
+	-fx-font-size: 24px;
+}
+
+.issue-panel-closed {
+	-fx-strikethrough: true;
+}
+
+.labels {
+	-fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;
+}
