@@ -105,7 +105,6 @@ public class LabelDisplayBox extends FlowPane {
 	}
 
 	private String getBackgroundColourStyle(TurboLabel label) {
-		String style = "-fx-background-color: #" + label.getColour() + ";";
-		return style;
+		return "-fx-background-color: #" + label.getColour() + ";";
 	}
 }

@@ -88,4 +88,9 @@ public class Predicate implements FilterExpression {
 			return false;
 		}
 	}
+
+	@Override
+	public boolean canBeAppliedToIssue() {
+		return true;
+	}
 }

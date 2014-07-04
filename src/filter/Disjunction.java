@@ -42,4 +42,8 @@ public class Disjunction implements FilterExpression {
 		return left.isSatisfiedBy(issue) || right.isSatisfiedBy(issue);
 	}
 
+	@Override
+	public boolean canBeAppliedToIssue() {
+		return false;
+	}
 }

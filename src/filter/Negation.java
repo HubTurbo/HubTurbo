@@ -34,4 +34,9 @@ public class Negation implements FilterExpression {
 	public boolean isSatisfiedBy(TurboIssue issue) {
 		return !expr.isSatisfiedBy(issue);
 	}
+
+	@Override
+	public boolean canBeAppliedToIssue() {
+		return false;
+	}
 }

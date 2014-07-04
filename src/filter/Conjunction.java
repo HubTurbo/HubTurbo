@@ -41,4 +41,9 @@ public class Conjunction implements FilterExpression {
 	public boolean isSatisfiedBy(TurboIssue issue) {
 		return left.isSatisfiedBy(issue) && right.isSatisfiedBy(issue);
 	}
+	
+	@Override
+	public boolean canBeAppliedToIssue() {
+		return left.canBeAppliedToIssue() && right.canBeAppliedToIssue();
+	}
 }
