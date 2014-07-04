@@ -48,7 +48,7 @@ public class IssueDialog implements Dialog<String> {
 	private TurboIssue issue;
 
 	private CompletableFuture<String> response;
-	private ArrayList<ChangeListener<?>> changeListeners;
+	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
 	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
 		this.parentStage = parentStage;

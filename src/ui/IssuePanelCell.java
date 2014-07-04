@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -30,6 +31,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private final Stage mainStage;
 	private final Model model;
+	private ArrayList<ChangeListener<String>> changeListeners = new ArrayList<ChangeListener<String>>();
 	
 	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent) {
 		super();
@@ -38,6 +40,22 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
+	private ChangeListener<String> createIssueTitleListener(TurboIssue issue, Text issueName){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<String> titleListener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> stringProperty,
+					String oldValue, String newValue) {
+				TurboIssue issue = issueRef.get();
+				if(issue != null){
+					issueName.setText("#" + issue.getId() + " " + newValue);
+				}
+			}
+		};
+		changeListeners.add(titleListener);
+		return titleListener;
+	}
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
@@ -55,17 +73,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueName.setStyle(STYLE_ISSUE_NAME + "-fx-strikethrough: " + !issue.getOpen() + ";");
-		
-		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		issue.titleProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				issueName.setText("#" + issueRef.get().getId() + " " + newValue);
-			}
-		});
-		
+		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueName)));
+
 		HBox titleBox = new HBox();
 		titleBox.getChildren().addAll(buttonBox, issueName);
 
