@@ -1,5 +1,7 @@
 package ui;
 
+import java.io.File;
+
 import util.GitHubClientExtended;
 import util.ModelUpdater;
 import javafx.application.Application;
@@ -13,7 +15,7 @@ public class UI extends Application {
 
 	public static final String STYLE_YELLOW_BORDERS = "-fx-background-color: #FFFA73; -fx-border-color: #000000; -fx-border-width: 1px;";
 	public static final String STYLE_BORDERS_FADED = "-fx-border-color: #B2B1AE; -fx-border-width: 1px; -fx-border-radius: 3;";
-	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
+//	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
 
 	// Main UI elements
@@ -44,6 +46,13 @@ public class UI extends Application {
 		Scene scene = new Scene(createRoot(), 800, 600);
 
 		setupMainStage(scene);
+		loadCSS(scene);
+	}
+
+	private void loadCSS(Scene scene) {
+		File f = new File("hubturbo.css");
+		scene.getStylesheets().clear();
+		scene.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
 	}
 
 	private void setupMainStage(Scene scene) {

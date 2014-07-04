@@ -87,7 +87,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		setGraphic(everything);
 
-		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
+//		setStyle(UI.STYLE_BORDERS + "-fx-border-radius: 5;");
+		getStyleClass().add("borders");
 		
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 
