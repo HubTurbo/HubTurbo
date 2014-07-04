@@ -16,7 +16,7 @@ public class ListableDisplayBox extends HBox {
 	}
 	
 	private void setup() {
-		setStyle(UI.STYLE_BORDERS_FADED);
+		getStyleClass().add("faded-borders");
 	}
 
 	public void setListableItem(Listable item) {

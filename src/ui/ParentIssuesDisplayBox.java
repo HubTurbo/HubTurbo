@@ -22,7 +22,7 @@ public class ParentIssuesDisplayBox extends HBox {
 	
 	private void setup() {
 		if (displayWhenEmpty) {
-			setStyle(UI.STYLE_BORDERS_FADED);
+			getStyleClass().add("faded-borders");
 		}
 		update();
 	}

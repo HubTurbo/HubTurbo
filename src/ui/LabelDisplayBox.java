@@ -46,7 +46,7 @@ public class LabelDisplayBox extends FlowPane {
 
 	private void setup() {
 		if (displayWhenEmpty) {
-			setStyle(UI.STYLE_BORDERS_FADED);
+			getStyleClass().add("faded-borders");
 		}
 		setHgap(3);
 		setVgap(3);

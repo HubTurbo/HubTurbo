@@ -72,6 +72,7 @@ public class IssueDialog implements Dialog<String> {
 	
 		Scene scene = new Scene(layout, parentStage.getWidth(),
 				parentStage.getHeight() * HEIGHT_FACTOR);
+		UI.applyCSS(scene);
 	
 		Stage stage = new Stage();
 		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());

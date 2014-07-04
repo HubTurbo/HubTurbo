@@ -3,3 +3,9 @@
 	-fx-border-color: #000000;
 	-fx-border-width: 1px;
 }
+
+.faded-borders {
+	-fx-border-color: #B2B1AE;
+	-fx-border-width: 1px;
+	-fx-border-radius: 3;
+}
