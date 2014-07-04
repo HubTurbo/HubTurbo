@@ -46,6 +46,7 @@ public class IssueDialog implements Dialog<String> {
 	private Stage parentStage;
 	private Model model;
 	private TurboIssue issue;
+	private CheckBox closedCheckBox = new CheckBox("Closed");
 
 	private CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
@@ -141,7 +142,6 @@ public class IssueDialog implements Dialog<String> {
 		issueTitle.textProperty().addListener(
 				new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
-		CheckBox closedCheckBox = new CheckBox("Closed");
 		closedCheckBox.setSelected(!issue.getOpen());
 		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
 		
@@ -258,6 +258,7 @@ public class IssueDialog implements Dialog<String> {
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
 						issue.setLabels(FXCollections.observableArrayList(response));
+						closedCheckBox.setSelected(!issue.getOpen());
 						return true;
 					});
 		});
