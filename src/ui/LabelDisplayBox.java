@@ -89,7 +89,7 @@ public class LabelDisplayBox extends FlowPane {
 		if (displayWhenEmpty && labels.size() == 0) {
 			
 			Label noLabels = new Label("Labels");
-			noLabels.setStyle(UI.STYLE_FADED + "-fx-padding: 5;");
+			noLabels.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(noLabels);
 
 			return;

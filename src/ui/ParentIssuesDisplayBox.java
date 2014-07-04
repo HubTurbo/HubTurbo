@@ -58,7 +58,7 @@ public class ParentIssuesDisplayBox extends HBox {
 		Label label;
 		if (displayWhenEmpty && issueNumbers.size() == 0) {
 			label = new Label("Parents");
-			label.setStyle(UI.STYLE_FADED + "-fx-padding: 5;");
+			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
 		} else {
 			StringBuilder parentSB = new StringBuilder();
@@ -70,7 +70,7 @@ public class ParentIssuesDisplayBox extends HBox {
 
 			if (displayWhenEmpty || (!displayWhenEmpty && !parentSB.toString().isEmpty())) {
 				label = new Label(parentSB.toString());
-				label.setStyle("-fx-padding: 5;");
+				label.getStyleClass().addAll("display-box-padding");
 				getChildren().add(label);
 			}
 		}
