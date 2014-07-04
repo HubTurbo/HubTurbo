@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -46,6 +48,7 @@ public class IssueDialog implements Dialog<String> {
 	private TurboIssue issue;
 
 	private CompletableFuture<String> response;
+	private ArrayList<ChangeListener<?>> changeListeners;
 
 	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
 		this.parentStage = parentStage;
@@ -86,7 +89,46 @@ public class IssueDialog implements Dialog<String> {
 	
 		stage.show();
 	}
+	
+	private ChangeListener<String> createIssueTitleChangeListener(){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+			TurboIssue issue = issueRef.get();
+			if(issue != null){
+				issueRef.get().setTitle((String)newValue);
+			}
+		};
+		changeListeners.add(listener);
+		return listener;
+	}
+	
+	private ChangeListener<Boolean> createIssueStateChangeListener(){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
+	        public void changed(ObservableValue<? extends Boolean> ov,
+	            Boolean oldValue, Boolean newValue) {
+	        	TurboIssue issue = issueRef.get();
+	        	if(issue != null){
+	        		issue.setOpen(!newValue);
+	        	}
+	        }
+	    };
+	    changeListeners.add(listener);
+	    return listener;
+	}
 
+	
+	private ChangeListener<String> createIssueDescriptionChangeListener(){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
+			TurboIssue issue = issueRef.get();
+        	if(issue != null){
+        		issue.setDescription((String)newValue);
+        	}
+		};
+		changeListeners.add(listener);
+		return listener;
+	}
 	private Parent left(Stage stage) {
 
 		HBox title = new HBox();
@@ -97,18 +139,11 @@ public class IssueDialog implements Dialog<String> {
 		TextField issueTitle = new TextField(issue.getTitle());
 		issueTitle.setPromptText("Title");
 		issueTitle.textProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					issue.setTitle(newValue);
-				});
+				new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
 		CheckBox closedCheckBox = new CheckBox("Closed");
 		closedCheckBox.setSelected(!issue.getOpen());
-		closedCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-	        public void changed(ObservableValue<? extends Boolean> ov,
-	            Boolean oldValue, Boolean newValue) {
-	        	issue.setOpen(!newValue);
-	        }
-	    });
+		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
 		
 		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
 		
@@ -117,10 +152,7 @@ public class IssueDialog implements Dialog<String> {
 		issueDesc.setPrefColumnCount(42);
 		issueDesc.setWrapText(true);
 		issueDesc.setPromptText("Description");
-		issueDesc.textProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					issue.setDescription(newValue);
-				});
+		issueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
 
 		VBox left = new VBox();
 		left.setSpacing(ELEMENT_SPACING);
