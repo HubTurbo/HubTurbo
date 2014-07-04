@@ -48,8 +48,9 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	
 	@Override
 	public ArrayList<Issue> getUpdatedItems(IRepositoryIdProvider repoId){
+		ArrayList<Issue> updatedItems = super.getUpdatedItems(repoId);
 		updateLastCheckTime();
-		return super.getUpdatedItems(repoId);
+		return updatedItems;
 	}
 	
 	@Override
