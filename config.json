@@ -7,5 +7,16 @@
   "excludedLabels": [
     "status.",
     "type-"
+  ],
+  "openStatusLabels": [
+    "bug",
+    "enhancement",
+    "question"
+  ],
+  "closedStatusLabels": [
+    "status.done",
+    "status.wontfix",
+    "type.invalid",
+    "type.duplicate"
   ]
 }
