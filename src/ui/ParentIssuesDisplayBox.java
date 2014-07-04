@@ -4,12 +4,14 @@ import java.lang.ref.WeakReference;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class ParentIssuesDisplayBox extends HBox {
 	
 	private ObservableList<Integer> issueNumbers = null;
+	private WeakListChangeListener<Integer> listChangeListener;
 	private boolean displayWhenEmpty;
 	
 	public ParentIssuesDisplayBox(ObservableList<Integer> items, boolean displayWhenEmpty) {
@@ -27,15 +29,23 @@ public class ParentIssuesDisplayBox extends HBox {
 
 	private void setListableItems(ObservableList<Integer> issueNumbers) {
 		this.issueNumbers = issueNumbers;
-		WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
-		issueNumbers.addListener(new ListChangeListener<Integer>() {
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
-				that.get().update();
-			}
-		});
+		initialiseChangeListener();
+		issueNumbers.addListener(listChangeListener);
 		
 		update();
+	}
+	
+	private void initialiseChangeListener(){
+		if(this.issueNumbers != null){
+			WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
+			ListChangeListener<Integer> listener = new ListChangeListener<Integer>() {
+				@Override
+				public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
+					that.get().update();
+				}
+			};
+			listChangeListener = new WeakListChangeListener<Integer>(listener);
+		}
 	}
 	
 	private void update() {
