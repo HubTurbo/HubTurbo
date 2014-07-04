@@ -159,7 +159,7 @@ public class MenuControl extends MenuBar {
 						return true;
 					});
 		});
-		return manageLabelsMenuItem;
+		return manageMilestonesMenuItem;
 	}
 
 	private MenuItem createLoginMenuItem() {
