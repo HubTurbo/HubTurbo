@@ -30,11 +30,15 @@ public class ColumnControl extends HBox {
 	}
 
 	public ColumnControl addColumn() {
-		IssuePanel panel = new IssuePanel(stage, model);
+		IssuePanel panel = new IssuePanel(stage, model, this, getChildren().size());
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		
 		return this;
+	}
+
+	public IssuePanel getColumn(int index) {
+		return (IssuePanel) getChildren().get(index);
 	}
 
 	public ColumnControl setColumnCount(int to) {

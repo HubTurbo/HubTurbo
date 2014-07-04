@@ -31,6 +31,8 @@ public class IssuePanel extends VBox {
 
 	private final Stage mainStage;
 	private final Model model;
+	private final ColumnControl parentColumnControl;
+	private final int columnIndex;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -40,9 +42,11 @@ public class IssuePanel extends VBox {
 	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
-	public IssuePanel(Stage mainStage, Model model) {
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex) {
 		this.mainStage = mainStage;
 		this.model = model;
+		this.parentColumnControl = parentColumnControl;
+		this.columnIndex = columnIndex;
 
 		getChildren().add(createFilterBox());
 		
