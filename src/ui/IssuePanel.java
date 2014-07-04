@@ -89,7 +89,8 @@ public class IssuePanel extends VBox {
 		setPrefWidth(400);
 		setVgrow(listView, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
-		setStyle(UI.STYLE_BORDERS);
+//		setStyle(UI.STYLE_BORDERS);
+		getStyleClass().add("borders");
 	}
 
 	public void filter(FilterExpression filter) {

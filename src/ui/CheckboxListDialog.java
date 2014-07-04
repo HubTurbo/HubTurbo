@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.controlsfx.control.CheckListView;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,16 +43,9 @@ public class CheckboxListDialog implements Dialog<List<Integer>> {
 
 	private void showDialog() {
 		
-		CheckListView<String> checkListView = multipleSelection ? new CheckListView<>(objectNames) : new SingleCheckListView<>(objectNames);
-
-		if (!multipleSelection && initialCheckedState.size() > 1) {
-			initialCheckedState = new ArrayList<Integer>(initialCheckedState.get(0));
-		}
-		initialCheckedState.forEach((i) -> checkListView.getCheckModel()
-				.select(i));
+		BetterCheckListView checkListView = new BetterCheckListView(objectNames);
+		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
-		// getSelectionModel().getSelectedItems() can also have a listener
-
 		Stage stage = new Stage();
 
 		Button close = new Button("Close");
@@ -90,8 +81,8 @@ public class CheckboxListDialog implements Dialog<List<Integer>> {
 		stage.show();
 	}
 
-	private void completeResponse(CheckListView<String> checkListView) {
-		response.complete(checkListView.getCheckModel().getSelectedIndices());
+	private void completeResponse(BetterCheckListView checkListView) {
+		response.complete(checkListView.getCheckedIndices());
 	}
 	
 	List<Integer> initialCheckedState = new ArrayList<>();

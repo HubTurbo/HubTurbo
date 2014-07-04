@@ -23,6 +23,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.DialogMessage;
 import util.GitHubClientExtended;
@@ -67,9 +68,9 @@ public class Model {
 
 	public void processInheritedLabels(TurboIssue issue, List<Integer> originalParents) {
 		List<Integer> editedParents = issue.getParents();
-		HashMap<String, HashSet<Integer>> changeSet = issue.getChangesToList(originalParents, editedParents);
-		HashSet<Integer> removed = changeSet.get(TurboIssue.REMOVED_TAG);
-		HashSet<Integer> added = changeSet.get(TurboIssue.ADDED_TAG);
+		HashMap<String, HashSet<Integer>> changeSet = CollectionUtilities.getChangesToList(originalParents, editedParents);
+		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
+		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		ObservableList<TurboLabel> issueLabels = issue.getLabels();
 		
 		for (Integer removedParentId : removed) {

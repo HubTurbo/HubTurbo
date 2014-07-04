@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.controlsfx.control.CheckListView;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,7 +34,7 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 	private ArrayList<TurboLabel> initialChecked;
 
 	private ObservableList<TurboLabel> labels;
-	private ArrayList<CheckListView<String>> controls = new ArrayList<>();
+	private ArrayList<BetterCheckListView> controls = new ArrayList<>();
 	
 	public LabelCheckboxListDialog(Stage parentStage, ObservableList<TurboLabel> labels) {
 		this.labels = labels;
@@ -63,20 +61,18 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 			
 			boolean isExclusive = new TurboLabelGroup(groups.get(groupName)).isExclusive();
 			
-			CheckListView<String> control =
-					isExclusive ? new SingleCheckListView<String>(FXCollections.observableArrayList(labelNames))
-					: new CheckListView<>(FXCollections.observableArrayList(labelNames));
-					
-			control.setUserData(groups.get(groupName));
+			BetterCheckListView control = new BetterCheckListView(FXCollections.observableArrayList(labelNames));
+			if (isExclusive) control.setSingleSelection(true);
 			control.setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
 			control.setPrefWidth(WINDOW_WIDTH - 29);
-			controls.add(control);
+			control.setUserData(groups.get(groupName));
+			controls.add(control);	
 
 			// deal with initially checked items
 			int selected = 0;
 			for (int i=0; i<groups.get(groupName).size(); i++) {
 				if (initialChecked.contains(groups.get(groupName).get(i))) {
-					control.getCheckModel().select(i);
+					control.setChecked(i, true);
 					selected++;
 				}
 			}
@@ -131,12 +127,15 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 		stage.show();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void completeResponse() {
 		ArrayList<TurboLabel> result = new ArrayList<>();
-		for (CheckListView<String> clv : controls) {
-			@SuppressWarnings("unchecked")
+		for (BetterCheckListView clv : controls) {
 			ArrayList<TurboLabel> labels = ((ArrayList<TurboLabel>) clv.getUserData());
-			result.addAll(clv.getCheckModel().getSelectedIndices().stream().map(i -> labels.get(i)).collect(Collectors.toList()));
+//			boolean isExclusive = new TurboLabelGroup(labels).isExclusive();
+
+			result.addAll(clv.getCheckedIndices().stream().map(i -> labels.get(i)).collect(Collectors.toList()));
+			
 		}
 		response.complete(result);
 	}

@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
+import util.CollectionUtilities;
 import util.UserConfigurations;
 
 
@@ -29,8 +30,6 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_SEPERATOR = "<hr>";
-	public static final String REMOVED_TAG = "removed";
-	public static final String ADDED_TAG = "added";
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -224,10 +223,10 @@ public class TurboIssue implements Listable {
 	private void mergeLabels(TurboIssue original, TurboIssue latest, StringBuilder changeLog) {
 		ObservableList<TurboLabel> originalLabels = original.getLabels();
 		ObservableList<TurboLabel> editedLabels = this.getLabels();
-		HashMap<String, HashSet<TurboLabel>> changeSet = getChangesToList(originalLabels, editedLabels);
+		HashMap<String, HashSet<TurboLabel>> changeSet = CollectionUtilities.getChangesToList(originalLabels, editedLabels);
 		ObservableList<TurboLabel> latestLabels = latest.getLabels();
-		HashSet<TurboLabel> removed = changeSet.get(REMOVED_TAG);
-		HashSet<TurboLabel> added = changeSet.get(ADDED_TAG);
+		HashSet<TurboLabel> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
+		HashSet<TurboLabel> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		
 		latestLabels.removeAll(removed);
 	
@@ -238,24 +237,6 @@ public class TurboIssue implements Listable {
 		}
 		logLabelChange(removed, added, changeLog);
 		latest.setLabels(latestLabels);
-	}
-
-	/**
-	 * Gets the changes made to the a list of items
-	 * @return HashMap the a list of items removed from the original list
-	 * 			and a list of items added to the original list
-	 * */
-	protected <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
-		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
-		HashSet<T> removed = new HashSet<T>(original);
-		HashSet<T> added = new HashSet<T>(edited);
-		removed.removeAll(edited);
-		added.removeAll(original);
-		
-		changeSet.put(REMOVED_TAG, removed);
-		changeSet.put(ADDED_TAG, added);
-		
-		return changeSet;
 	}
 	
 	private void logLabelChange(HashSet<TurboLabel> removed, HashSet<TurboLabel> added, StringBuilder changeLog){
@@ -336,10 +317,10 @@ public class TurboIssue implements Listable {
 		ObservableList<Integer> originalParents = original.getParents();
 		ObservableList<Integer> editedParents = this.getParents();
 		
-		HashMap<String, HashSet<Integer>> changeSet = getChangesToList(originalParents, editedParents);
+		HashMap<String, HashSet<Integer>> changeSet = CollectionUtilities.getChangesToList(originalParents, editedParents);
 		ObservableList<Integer> latestParents = latest.getParents();
-		HashSet<Integer> removed = changeSet.get(REMOVED_TAG);
-		HashSet<Integer> added = changeSet.get(ADDED_TAG);
+		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
+		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		latestParents.removeAll(removed);
 		for(Integer label: added){
 			if(!latestParents.contains(label)){
