@@ -14,8 +14,9 @@
     "question"
   ],
   "closedStatusLabels": [
-    "wontfix",
-    "duplicate",
-    "invalid"
+    "status.done",
+    "status.wontfix",
+    "type.invalid",
+    "type.duplicate"
   ]
 }
