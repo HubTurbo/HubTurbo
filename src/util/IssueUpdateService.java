@@ -18,13 +18,13 @@ import com.google.gson.reflect.TypeToken;
 
 public class IssueUpdateService extends UpdateService<Issue>{	
 	
-	protected Date lastCheckTime;
+	
 	
 	
 	public IssueUpdateService(GitHubClientExtended client){
 		super(client);
 		apiSuffix = SEGMENT_ISSUES;
-		updateLastCheckTime();
+		lastCheckTime = new Date();
 	}
 	
 	private Map<String, String> createUpdatedIssuesParams(){
@@ -32,10 +32,6 @@ public class IssueUpdateService extends UpdateService<Issue>{
 		params.put("since", getFormattedDate(lastCheckTime));
 		params.put("state", "all");
 		return params;
-	}
-	
-	private void updateLastCheckTime(){
-		lastCheckTime = new Date();
 	}
 	
 	private String getFormattedDate(Date date){
@@ -49,7 +45,6 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	@Override
 	public ArrayList<Issue> getUpdatedItems(IRepositoryIdProvider repoId){
 		ArrayList<Issue> updatedItems = super.getUpdatedItems(repoId);
-		updateLastCheckTime();
 		return updatedItems;
 	}
 	
