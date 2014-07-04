@@ -145,6 +145,8 @@ public class IssueDialog implements Dialog<String> {
 		closedCheckBox.setSelected(!issue.getOpen());
 		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
 		
+		
+		
 		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());

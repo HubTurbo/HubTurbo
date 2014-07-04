@@ -1,22 +1,19 @@
 {
-  "openStatuses": [
-    "new",
-    "accepted",
-    "started"
-  ],
   "excludedLabels": [
     "status.",
     "type-"
   ],
   "openStatusLabels": [
-    "bug",
-    "enhancement",
-    "question"
+    "status.new",
+    "status.accepted",
+    "status.started"
   ],
   "closedStatusLabels": [
-    "status.done",
+    "status.fixed",
+    "status.verified",
+    "status.invalid",
+    "status.duplicate",
     "status.wontfix",
-    "type.invalid",
-    "type.duplicate"
+    "status.done"
   ]
 }
