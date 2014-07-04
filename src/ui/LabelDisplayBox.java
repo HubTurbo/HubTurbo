@@ -97,17 +97,15 @@ public class LabelDisplayBox extends FlowPane {
 		
 		for (TurboLabel label : labels) {
 			Label labelText = new Label(label.getName());
-			labelText.setStyle(getStyleFor(label));
+			labelText.getStyleClass().add("labels");
+			labelText.setStyle(getBackgroundColourStyle(label));
 			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
 			getChildren().add(labelText);
 		}
 	}
 
-	private String getStyleFor(TurboLabel label) {
-		String colour = label.getColour();
-		String style = "-fx-background-color: #"
-				+ colour
-				+ "; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;";
+	private String getBackgroundColourStyle(TurboLabel label) {
+		String style = "-fx-background-color: #" + label.getColour() + ";";
 		return style;
 	}
 }

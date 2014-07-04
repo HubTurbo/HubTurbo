@@ -40,3 +40,7 @@
 .issue-panel-closed {
 	-fx-strikethrough: true;
 }
+
+.labels {
+	-fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;
+}
