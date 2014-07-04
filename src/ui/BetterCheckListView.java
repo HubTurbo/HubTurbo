@@ -16,12 +16,12 @@ import javafx.util.Callback;
 
 public class BetterCheckListView extends VBox {
 	
-	private ObservableList<SingleCheckListItemModel> items;
-	private ListView<SingleCheckListItemModel> listView;
+	private ObservableList<BetterCheckListItem> items;
+	private ListView<BetterCheckListItem> listView;
 	
 	public BetterCheckListView(ObservableList<String> items) {
 		
-		this.listView = new ListView<SingleCheckListItemModel>();
+		this.listView = new ListView<BetterCheckListItem>();
 		getChildren().add(listView);
 		setItems(items);
 	}
@@ -39,18 +39,18 @@ public class BetterCheckListView extends VBox {
 		// It's assumed that we won't need to observe this list in the
 		// long term, so we don't use the same list object
 		
-		ObservableList<SingleCheckListItemModel> newItems = FXCollections.observableArrayList();
+		ObservableList<BetterCheckListItem> newItems = FXCollections.observableArrayList();
 		WeakReference<BetterCheckListView> that = new WeakReference<>(this);
 		
 		for (int i=0; i<items.size(); i++) {
 			final int j = i;
-			SingleCheckListItemModel item = new SingleCheckListItemModel(items.get(i), false);
+			BetterCheckListItem item = new BetterCheckListItem(items.get(i), false);
 			item.checkedProperty().addListener(new WeakChangeListener<Boolean>(new ChangeListener<Boolean>() {
 		        public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
 		        	if (!disabled) {
 			        	if (singleSelection) {
 			        		disabled = true;
-			        		for (SingleCheckListItemModel item : that.get().items) {
+			        		for (BetterCheckListItem item : that.get().items) {
 			        			item.setChecked(false);
 			        		}
 			        		that.get().items.get(j).setChecked(true);
@@ -84,9 +84,9 @@ public class BetterCheckListView extends VBox {
 	}
 
 	private void refresh() {
-		listView.setCellFactory(CheckBoxListCell.forListView(new Callback<SingleCheckListItemModel, ObservableValue<Boolean>>() {
+		listView.setCellFactory(CheckBoxListCell.forListView(new Callback<BetterCheckListItem, ObservableValue<Boolean>>() {
 			@Override
-			public ObservableValue<Boolean> call(SingleCheckListItemModel item) {
+			public ObservableValue<Boolean> call(BetterCheckListItem item) {
 				return item.checkedProperty();
 			}
 		}));
