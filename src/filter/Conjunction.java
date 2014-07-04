@@ -46,4 +46,10 @@ public class Conjunction implements FilterExpression {
 	public boolean canBeAppliedToIssue() {
 		return left.canBeAppliedToIssue() && right.canBeAppliedToIssue();
 	}
+
+	@Override
+	public void applyTo(TurboIssue issue) {
+		left.applyTo(issue);
+		right.applyTo(issue);
+	}
 }

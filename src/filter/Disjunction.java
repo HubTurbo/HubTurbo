@@ -46,4 +46,9 @@ public class Disjunction implements FilterExpression {
 	public boolean canBeAppliedToIssue() {
 		return false;
 	}
+
+	@Override
+	public void applyTo(TurboIssue issue) {
+		assert false;
+	}
 }

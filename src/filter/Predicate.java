@@ -1,5 +1,6 @@
 package filter;
 
+import javafx.collections.FXCollections;
 import model.TurboIssue;
 import model.TurboLabel;
 
@@ -89,6 +90,54 @@ public class Predicate implements FilterExpression {
 		}
 	}
 
+	@Override
+	public void applyTo(TurboIssue issue) {
+		assert !(name == null && content == null);
+		
+		switch (name) {
+		case "title":
+			issue.setTitle(content);
+			break;
+		case "milestone":
+//			issue.setMilestone(conte);
+			break;
+		case "parent":
+			content = content.toLowerCase();
+			if (content.startsWith("#")) {
+				issue.setParents(FXCollections.observableArrayList(Integer.parseInt(content.substring(1))));
+			} else if (Character.isDigit(content.charAt(0))) {
+				issue.setParents(FXCollections.observableArrayList(Integer.parseInt(content)));
+			} else {
+				// apply parents by name
+			}
+			break;
+//		case "child":
+		case "label":
+//			for (TurboLabel l : issue.getLabels()) {
+//				if (l.getName().toLowerCase().contains(content.toLowerCase())) {
+//					return true;
+//				}
+//			}
+//			return false;
+			break;
+		case "assignee":
+//			if (issue.getAssignee() == null) return false;
+//			return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
+//					|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
+			break;
+		case "state":
+		case "status":
+			if (content.toLowerCase().contains("open")) {
+				issue.setOpen(true);
+			} else if (content.toLowerCase().contains("closed")) {
+				issue.setOpen(false);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
 	@Override
 	public boolean canBeAppliedToIssue() {
 		return true;
