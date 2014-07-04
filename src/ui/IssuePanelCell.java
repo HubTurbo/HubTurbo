@@ -31,7 +31,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private final Stage mainStage;
 	private final Model model;
-	private ArrayList<ChangeListener<String>> changeListeners = new ArrayList<ChangeListener<String>>();
+	private ChangeListener<String> titleChangeListener;
 	
 	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent) {
 		super();
@@ -42,7 +42,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private ChangeListener<String> createIssueTitleListener(TurboIssue issue, Text issueName){
 		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		ChangeListener<String> titleListener = new ChangeListener<String>() {
+		titleChangeListener = new ChangeListener<String>() {
 			@Override
 			public void changed(
 					ObservableValue<? extends String> stringProperty,
@@ -53,8 +53,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				}
 			}
 		};
-		changeListeners.add(titleListener);
-		return titleListener;
+		
+		return titleChangeListener;
 	}
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
