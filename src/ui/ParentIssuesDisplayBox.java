@@ -36,6 +36,9 @@ public class ParentIssuesDisplayBox extends HBox {
 	}
 	
 	private void initialiseChangeListener(){
+		if(listChangeListener != null){
+			listChangeListener = null;
+		}
 		if(this.issueNumbers != null){
 			WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
 			listChangeListener = new ListChangeListener<Integer>() {

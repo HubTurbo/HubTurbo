@@ -56,9 +56,14 @@ public class LabelDisplayBox extends FlowPane {
 	}
 
 	public LabelDisplayBox setLabels(ObservableList<TurboLabel> labels) {
+		clearChangeListeners();
 		this.labels = labels;
 		populateWithLabels();
 		return this;
+	}
+	
+	private void clearChangeListeners(){
+		changeListeners.clear();
 	}
 	
 	private ChangeListener<String> createLabelNameListener(Label labelText){
