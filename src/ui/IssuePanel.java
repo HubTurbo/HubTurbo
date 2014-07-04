@@ -99,48 +99,49 @@ public class IssuePanel extends VBox {
 		getStyleClass().add("borders");
 		
 		setOnDragOver(e -> {
-//			if (e.getGestureSource() != item && e.getDragboard().hasString()) {
-//				e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-//			}
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+			}
 		});
 
 		setOnDragEntered(e -> {
-//			if (e.getGestureSource() != item && e.getDragboard().hasString()) {
-//				item.setStyle(STYLE_YELLOW_BORDERS);
+//			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+//				setStyle("-fx-background-color: #ff0000;");
 //			}
-
 			e.consume();
 		});
 
 		setOnDragExited(e -> {
 //			item.setStyle(style);
+//			System.out.println("exited");
 
 			e.consume();
 		});
-
+		
 		setOnDragDropped(e -> {
 			Dragboard db = e.getDragboard();
 			boolean success = false;
 			if (db.hasString()) {
 				success = true;
-
+				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
+				
+				System.out.println(dd.getColumnIndex());
+				System.out.println(dd.getIssueIndex());
+				
+				// Find the right issue
+				TurboIssue rightIssue = null;
+				for (TurboIssue i : model.getIssues()) {
+					if (i.getId() == dd.getIssueIndex()) {
+						rightIssue = i;
+					}
+				}
+				assert rightIssue != null;
+				
+				TurboIssue clone = new TurboIssue(rightIssue);
+				currentFilterExpression.applyTo(rightIssue);
+				model.updateIssue(clone, rightIssue);
+				parentColumnControl.refresh();
 //				currentPredicate.applyTo(issue);
-
-//				DragData dd = DragData.deserialize(db.getString());
-//
-//				if (dd.source == DragSource.PANEL_MILESTONES) {
-//					text.setText(text.getText() + "\n" + "added item "
-//							+ dd.index);
-//				} else if (dd.source == DragSource.TREE_ISSUES) {
-//					text.setText(text.getText() + "\n" + "added issue "
-//							+ dd.text);
-//				} else if (dd.source == DragSource.TREE_LABELS) {
-//					text.setText(text.getText() + "\n" + "added label "
-//							+ dd.text);
-//				} else if (dd.source == DragSource.TREE_CONTRIBUTORS) {
-//					text.setText(text.getText() + "\n" + "added contributors "
-//							+ dd.text);
-//				}
 			}
 			e.setDropCompleted(success);
 
@@ -164,7 +165,7 @@ public class IssuePanel extends VBox {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(mainStage, model, that.get());
+					return new IssuePanelCell(mainStage, model, that.get(), columnIndex);
 				} else{
 					return null;
 				}

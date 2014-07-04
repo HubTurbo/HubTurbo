@@ -32,12 +32,15 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private final Stage mainStage;
 	private final Model model;
+	private final int parentColumnIndex;
+	
 	private ChangeListener<String> titleChangeListener;
 	
-	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent) {
+	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent, int parentColumnIndex) {
 		super();
 		this.mainStage = mainStage;
 		this.model = model;
+		this.parentColumnIndex = parentColumnIndex;
 		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
@@ -109,39 +112,21 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		
 		setOnDragDetected((event) -> {
-//			TreeItem<String> treeItem = getTreeItem();
-
 			Dragboard db = startDragAndDrop(TransferMode.ANY);
 			ClipboardContent content = new ClipboardContent();
-//			DragSource sourceType = DragSource.PANEL_ISSUES;
-//
-//			switch (getType(treeItem)) {
-//			case ISSUE:
-//				sourceType = DragSource.TREE_ISSUES;
-//				break;
-//			case MILESTONE:
-//				sourceType = DragSource.TREE_MILESTONES;
-//				break;
-//			case CONTRIBUTOR:
-//				sourceType = DragSource.TREE_CONTRIBUTORS;
-//				break;
-//			case LABEL:
-//				sourceType = DragSource.TREE_LABELS;
-//				break;
-//			}
-//			DragData dd = new DragData(sourceType);
-//			dd.text = treeItem.getValue();
-			content.putString("hi");
-
+			IssuePanelDragData dd = new IssuePanelDragData(parentColumnIndex, issue.getId());
+			content.putString(dd.serialise());
+			System.out.println(dd.serialise());
 			db.setContent(content);
-
 			event.consume();
 		});
-
+		
 		setOnDragDone((event) -> {
 
 			if (event.getTransferMode() == TransferMode.MOVE) {
 			}
+
+//			System.out.println("done");
 
 			event.consume();
 		});
