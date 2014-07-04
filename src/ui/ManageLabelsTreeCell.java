@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import model.Model;
 import model.TurboLabel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -21,6 +23,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private final Model model;
 	private final Stage stage;
+	private ChangeListener<Boolean> textFieldListener;
 	
 	public ManageLabelsTreeCell(Stage stage, Model model) {
 		this.model = model;
@@ -28,6 +31,22 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 	
     private TextField textField;
+    
+    private void initialiseTextFieldListener(){
+    	WeakReference<ManageLabelsTreeCell<T>> that = new WeakReference<ManageLabelsTreeCell<T>>(this);
+    	textFieldListener = new ChangeListener<Boolean>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends Boolean> stringProperty,
+					Boolean previouslyFocused, Boolean currentlyFocused) {
+				assert previouslyFocused != currentlyFocused;
+				ManageLabelsTreeCell<T> thisRef = that.get();
+				if (thisRef != null && !currentlyFocused) {
+                    thisRef.commitEdit();
+				}
+			}
+		};
+    }
     
     private void createTextField() {
         textField = new TextField(getItem().getValue());
@@ -41,17 +60,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
                 }
             }
         });
-        textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends Boolean> stringProperty,
-					Boolean previouslyFocused, Boolean currentlyFocused) {
-				assert previouslyFocused != currentlyFocused;
-				if (!currentlyFocused) {
-                    commitEdit();
-				}
-			}
-		});
+        initialiseTextFieldListener();
+        textField.focusedProperty().addListener(new WeakChangeListener<Boolean>(textFieldListener));
     }
     
     // This is NOT an overridden method.
