@@ -17,7 +17,7 @@ public class SingleCheckListItemModel {
 	}
 	
     private BooleanProperty checked = new SimpleBooleanProperty();
-    public final Boolean getChecked() {
+    public final Boolean isChecked() {
     	return checked.get();
     }
     public final void setChecked(Boolean value) {
