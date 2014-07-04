@@ -11,7 +11,7 @@ import javafx.scene.layout.HBox;
 public class ParentIssuesDisplayBox extends HBox {
 	
 	private ObservableList<Integer> issueNumbers = null;
-	private WeakListChangeListener<Integer> listChangeListener;
+	private ListChangeListener<Integer> listChangeListener;
 	private boolean displayWhenEmpty;
 	
 	public ParentIssuesDisplayBox(ObservableList<Integer> items, boolean displayWhenEmpty) {
@@ -30,7 +30,7 @@ public class ParentIssuesDisplayBox extends HBox {
 	private void setListableItems(ObservableList<Integer> issueNumbers) {
 		this.issueNumbers = issueNumbers;
 		initialiseChangeListener();
-		issueNumbers.addListener(listChangeListener);
+		issueNumbers.addListener(new WeakListChangeListener<Integer>(listChangeListener));
 		
 		update();
 	}
@@ -38,7 +38,7 @@ public class ParentIssuesDisplayBox extends HBox {
 	private void initialiseChangeListener(){
 		if(this.issueNumbers != null){
 			WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
-			ListChangeListener<Integer> listener = new ListChangeListener<Integer>() {
+			listChangeListener = new ListChangeListener<Integer>() {
 				@Override
 				public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
 					if(that.get() != null){
@@ -46,7 +46,6 @@ public class ParentIssuesDisplayBox extends HBox {
 					}
 				}
 			};
-			listChangeListener = new WeakListChangeListener<Integer>(listener);
 		}
 	}
 	
