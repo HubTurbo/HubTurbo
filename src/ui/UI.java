@@ -16,14 +16,17 @@ public class UI extends Application {
 	public static final String STYLE_BORDERS = "-fx-border-color: #000000; -fx-border-width: 1px;";
 	public static final String STYLE_FADED = "-fx-text-fill: #B2B1AE;";
 
-	private Stage mainStage;
+	// Main UI elements
 	
+	private Stage mainStage;
+
 	private ColumnControl columns;
 	private MenuControl menu;
 	
+	// Other components
+	
 	private Model model;
 	private GitHubClientExtended client;
-
 	private ModelUpdater modelUpdater;
 
 	public static void main(String[] args) {
@@ -39,25 +42,22 @@ public class UI extends Application {
 		mainStage = stage;
 
 		Scene scene = new Scene(createRoot(), 800, 600);
-		// setUpHotkeys(scene);
 
-		setupStage(stage, scene);
+		setupMainStage(scene);
 	}
 
-	private void setupStage(Stage stage, Scene scene) {
-		stage.setTitle("HubTurbo");
-		stage.setMinWidth(800);
-		stage.setMinHeight(600);
-		stage.setScene(scene);
-		stage.show();
-		stage.setOnCloseRequest(e -> {
+	private void setupMainStage(Scene scene) {
+		mainStage.setTitle("HubTurbo");
+		mainStage.setMinWidth(800);
+		mainStage.setMinHeight(600);
+		mainStage.setScene(scene);
+		mainStage.show();
+		mainStage.setOnCloseRequest(e -> {
 			if (modelUpdater != null) {
 				modelUpdater.stopModelUpdate();
 			}
 		});
 	}
-
-	// Node definitions
 
 	private Parent createRoot() {
 

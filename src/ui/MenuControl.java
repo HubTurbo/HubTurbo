@@ -8,7 +8,6 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 
 import util.GitHubClientExtended;
 import util.ModelUpdater;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -35,11 +34,14 @@ import org.controlsfx.control.NotificationPane;
 
 public class MenuControl extends MenuBar {
 
-	private String repoOwner, repoName;
-	private Stage mainStage;
-	private Model model;
-	private ColumnControl columns;
 	private UI ui;
+
+	private Stage mainStage;
+	private ColumnControl columns;
+	
+	private String repoOwner, repoName;
+	
+	private Model model;
 	private GitHubClientExtended client;
 	private ModelUpdater modelUpdater;
 
@@ -75,58 +77,25 @@ public class MenuControl extends MenuBar {
 
 	private void createMenuItems(Stage mainStage, Model model, ColumnControl columns) {
 		Menu projects = new Menu("Projects");
-		MenuItem login = new MenuItem("Login");
-		initLoginForm(login);
-		projects.getItems().addAll(login);
+		projects.getItems().addAll(createLoginMenuItem());
 
 		Menu milestones = new Menu("Milestones");
-		manageMilestonesMenuItem = new MenuItem("Manage milestones...");
-		milestones.getItems().addAll(manageMilestonesMenuItem);
-		manageMilestonesMenuItem.setOnAction(e -> {
-			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
-					response -> {
-						return true;
-					});
-		});
+		milestones.getItems().addAll(createManageMilestonesMenuItem(mainStage, model));
 
 		Menu issues = new Menu("Issues");
-		newIssueMenuItem = new MenuItem("New Issue");
-		newIssueMenuItem.setOnAction(e -> {
-			TurboIssue issue = new TurboIssue("New issue", "");
-			(new IssueDialog(mainStage, model, issue)).show().thenApply(
-					response -> {
-						if (response.equals("ok")) {
-							model.createIssue(issue);
-						}
-						// Required for some reason
-						columns.refresh();
-						return true;
-					});
-		});
-		issues.getItems().addAll(newIssueMenuItem);
+		issues.getItems().addAll(createNewIssueMenuItem(mainStage, model, columns));
 
 		Menu labels = new Menu("Labels");
-		manageLabelsMenuItem = new MenuItem("Manage labels...");
-		manageLabelsMenuItem.setOnAction(e -> {
-			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
-					response -> {
-						return true;
-					});
-		});
-
-		labels.getItems().addAll(manageLabelsMenuItem);
+		labels.getItems().addAll(createManageLabelsMenuItem(mainStage, model));
 
 		Menu view = new Menu("View");
+		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem(columns));
 
-		refreshMenuItem = new MenuItem("Refresh");
-		refreshMenuItem.setOnAction((e) -> {
-			handleRefresh();
-		});
-		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+		getMenus().addAll(projects, milestones, issues, labels, view);
+	}
 
+	private Menu createColumnsMenuItem(ColumnControl columns) {
 		Menu columnsMenu = new Menu("Change number of columns....");
-		view.getItems().addAll(refreshMenuItem, columnsMenu);
-
 		final ToggleGroup numberOfCols = new ToggleGroup();
 		for (int i = 1; i <= 9; i++) {
 			RadioMenuItem item = new RadioMenuItem(Integer.toString(i));
@@ -142,11 +111,59 @@ public class MenuControl extends MenuBar {
 			if (i == 1)
 				item.setSelected(true);
 		}
-
-		getMenus().addAll(projects, milestones, issues, labels, view);
+		return columnsMenu;
 	}
 
-	private void initLoginForm(MenuItem login) {
+	private MenuItem createRefreshMenuItem() {
+		refreshMenuItem = new MenuItem("Refresh");
+		refreshMenuItem.setOnAction((e) -> {
+			handleRefresh();
+		});
+		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+		return refreshMenuItem;
+	}
+
+	private MenuItem createManageLabelsMenuItem(Stage mainStage, Model model) {
+		manageLabelsMenuItem = new MenuItem("Manage labels...");
+		manageLabelsMenuItem.setOnAction(e -> {
+			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
+					response -> {
+						return true;
+					});
+		});
+		return manageLabelsMenuItem;
+	}
+
+	private MenuItem createNewIssueMenuItem(Stage mainStage, Model model, ColumnControl columns) {
+		newIssueMenuItem = new MenuItem("New Issue");
+		newIssueMenuItem.setOnAction(e -> {
+			TurboIssue issue = new TurboIssue("New issue", "");
+			(new IssueDialog(mainStage, model, issue)).show().thenApply(
+					response -> {
+						if (response.equals("ok")) {
+							model.createIssue(issue);
+						}
+						// Required for some reason
+						columns.refresh();
+						return true;
+					});
+		});
+		return newIssueMenuItem;
+	}
+
+	private MenuItem createManageMilestonesMenuItem(Stage mainStage, Model model) {
+		manageMilestonesMenuItem = new MenuItem("Manage milestones...");
+		manageMilestonesMenuItem.setOnAction(e -> {
+			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
+					response -> {
+						return true;
+					});
+		});
+		return manageLabelsMenuItem;
+	}
+
+	private MenuItem createLoginMenuItem() {
+		MenuItem login = new MenuItem("Login");
 		login.setOnAction((e) -> {
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("GitHub Login");
@@ -207,6 +224,8 @@ public class MenuControl extends MenuBar {
 
 			dialogStage.show();
 		});
+		
+		return login;
 	}
 	
 	private void onLoginClick(String owner, String repo, String username, String password, NotificationPane notificationPane, Stage dialogStage) {
