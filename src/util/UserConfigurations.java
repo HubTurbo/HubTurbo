@@ -14,14 +14,21 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(excludedLabels);
 	}
 	
+	private static List<String> openStatusLabels;
+	public List<String> getOpenStatusLabels() {
+		return Collections.unmodifiableList(openStatusLabels);
+	}
+	
 	private static List<String> closedStatusLabels;
-	public List<String> getclosedStatusLabels() {
+	public List<String> getClosedStatusLabels() {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
 	
-	UserConfigurations(List<String> openStatuses, List<String> excludedLabels, List<String> closedStatusLabels) {
+	UserConfigurations(List<String> openStatuses, List<String> excludedLabels, 
+			List<String> openStatusLabels, List<String> closedStatusLabels) {
 		UserConfigurations.openStatuses = openStatuses;
 		UserConfigurations.excludedLabels = excludedLabels;
+		UserConfigurations.openStatusLabels = openStatusLabels;
 		UserConfigurations.closedStatusLabels = closedStatusLabels;
 	}
 
@@ -38,7 +45,16 @@ public class UserConfigurations {
 		return false;
 	}
 
-	public static boolean isclosedStatusLabel(String label) {
+	public static boolean isOpenStatusLabel(String label) {
+		for (String openLabel : openStatusLabels) {
+			if (label.equalsIgnoreCase(openLabel)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isClosedStatusLabel(String label) {
 		for (String closedLabel : closedStatusLabels) {
 			if (label.equalsIgnoreCase(closedLabel)) {
 				return true;
