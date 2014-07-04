@@ -14,8 +14,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -103,6 +106,45 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 
 		registerEvents(issue);
+		
+		
+		setOnDragDetected((event) -> {
+//			TreeItem<String> treeItem = getTreeItem();
+
+			Dragboard db = startDragAndDrop(TransferMode.ANY);
+			ClipboardContent content = new ClipboardContent();
+//			DragSource sourceType = DragSource.PANEL_ISSUES;
+//
+//			switch (getType(treeItem)) {
+//			case ISSUE:
+//				sourceType = DragSource.TREE_ISSUES;
+//				break;
+//			case MILESTONE:
+//				sourceType = DragSource.TREE_MILESTONES;
+//				break;
+//			case CONTRIBUTOR:
+//				sourceType = DragSource.TREE_CONTRIBUTORS;
+//				break;
+//			case LABEL:
+//				sourceType = DragSource.TREE_LABELS;
+//				break;
+//			}
+//			DragData dd = new DragData(sourceType);
+//			dd.text = treeItem.getValue();
+			content.putString("hi");
+
+			db.setContent(content);
+
+			event.consume();
+		});
+
+		setOnDragDone((event) -> {
+
+			if (event.getTransferMode() == TransferMode.MOVE) {
+			}
+
+			event.consume();
+		});
 	}
 	
 	private MenuItem[] createGroupContextMenu(TurboIssue issue) {

@@ -3,6 +3,7 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.function.Predicate;
 
+import javafx.scene.input.TransferMode;
 import filter.FilterExpression;
 import filter.Parser;
 import javafx.collections.FXCollections;
@@ -13,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.Dragboard;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -25,6 +27,8 @@ import filter.ParseException;
 public class IssuePanel extends VBox {
 
 	private static final String NO_FILTER = "<no filter>";
+	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+
 	private final Stage mainStage;
 	private final Model model;
 	
@@ -34,8 +38,7 @@ public class IssuePanel extends VBox {
 	
 	private Predicate<TurboIssue> predicate;
 	private String filterInput = "";
-
-	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
 	public IssuePanel(Stage mainStage, Model model) {
 		this.mainStage = mainStage;
@@ -90,9 +93,59 @@ public class IssuePanel extends VBox {
 		setVgrow(listView, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
 		getStyleClass().add("borders");
+		
+		setOnDragOver(e -> {
+//			if (e.getGestureSource() != item && e.getDragboard().hasString()) {
+//				e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+//			}
+		});
+
+		setOnDragEntered(e -> {
+//			if (e.getGestureSource() != item && e.getDragboard().hasString()) {
+//				item.setStyle(STYLE_YELLOW_BORDERS);
+//			}
+
+			e.consume();
+		});
+
+		setOnDragExited(e -> {
+//			item.setStyle(style);
+
+			e.consume();
+		});
+
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				success = true;
+
+//				currentPredicate.applyTo(issue);
+
+//				DragData dd = DragData.deserialize(db.getString());
+//
+//				if (dd.source == DragSource.PANEL_MILESTONES) {
+//					text.setText(text.getText() + "\n" + "added item "
+//							+ dd.index);
+//				} else if (dd.source == DragSource.TREE_ISSUES) {
+//					text.setText(text.getText() + "\n" + "added issue "
+//							+ dd.text);
+//				} else if (dd.source == DragSource.TREE_LABELS) {
+//					text.setText(text.getText() + "\n" + "added label "
+//							+ dd.text);
+//				} else if (dd.source == DragSource.TREE_CONTRIBUTORS) {
+//					text.setText(text.getText() + "\n" + "added contributors "
+//							+ dd.text);
+//				}
+			}
+			e.setDropCompleted(success);
+
+			e.consume();
+		});
 	}
 
 	public void filter(FilterExpression filter) {
+		currentFilterExpression = filter;
 		predicate = filter::isSatisfiedBy;
 		refreshItems();
 	}
@@ -108,7 +161,7 @@ public class IssuePanel extends VBox {
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
 					return new IssuePanelCell(mainStage, model, that.get());
-				}else{
+				} else{
 					return null;
 				}
 			}
@@ -130,5 +183,9 @@ public class IssuePanel extends VBox {
 
 	public ObservableList<TurboIssue> getItems() {
 		return issues;
+	}
+
+	public FilterExpression getCurrentFilterExpression() {
+		return currentFilterExpression;
 	}
 }
