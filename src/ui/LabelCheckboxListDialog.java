@@ -7,12 +7,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.CheckListView;
+import org.hamcrest.core.IsEqual;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -36,7 +38,7 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 	private ArrayList<TurboLabel> initialChecked;
 
 	private ObservableList<TurboLabel> labels;
-	private ArrayList<CheckListView<String>> controls = new ArrayList<>();
+	private ArrayList<Node> controls = new ArrayList<>();
 	
 	public LabelCheckboxListDialog(Stage parentStage, ObservableList<TurboLabel> labels) {
 		this.labels = labels;
@@ -51,6 +53,7 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 		return response;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void showDialog() {
 		
 		HashMap<String, ArrayList<TurboLabel>> groups = ManageLabelsDialog.groupLabels(labels);
@@ -63,20 +66,33 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 			
 			boolean isExclusive = new TurboLabelGroup(groups.get(groupName)).isExclusive();
 			
-			CheckListView<String> control =
-					isExclusive ? new SingleCheckListView<String>(FXCollections.observableArrayList(labelNames))
-					: new CheckListView<>(FXCollections.observableArrayList(labelNames));
-					
+			Node control;
+			if (isExclusive) {
+				control = new SingleCheckListView(FXCollections.observableArrayList(labelNames));
+
+				((SingleCheckListView) control).setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
+				((SingleCheckListView) control).setPrefWidth(WINDOW_WIDTH - 29);
+			}
+			else {
+				control = new CheckListView<String>(FXCollections.observableArrayList(labelNames));
+
+				((CheckListView<String>) control).setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
+				((CheckListView<String>) control).setPrefWidth(WINDOW_WIDTH - 29);
+				
+			}
 			control.setUserData(groups.get(groupName));
-			control.setPrefHeight(labelNames.size() * ROW_HEIGHT + 2);
-			control.setPrefWidth(WINDOW_WIDTH - 29);
-			controls.add(control);
+			controls.add(control);	
 
 			// deal with initially checked items
 			int selected = 0;
 			for (int i=0; i<groups.get(groupName).size(); i++) {
 				if (initialChecked.contains(groups.get(groupName).get(i))) {
-					control.getCheckModel().select(i);
+					if (isExclusive) {
+//						control.getCheckModel().select(i);
+					}
+					else {
+						((CheckListView<String>) control).getCheckModel().select(i);
+					}
 					selected++;
 				}
 			}
@@ -131,12 +147,19 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 		stage.show();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void completeResponse() {
 		ArrayList<TurboLabel> result = new ArrayList<>();
-		for (CheckListView<String> clv : controls) {
-			@SuppressWarnings("unchecked")
+		for (Node clv : controls) {
 			ArrayList<TurboLabel> labels = ((ArrayList<TurboLabel>) clv.getUserData());
-			result.addAll(clv.getCheckModel().getSelectedIndices().stream().map(i -> labels.get(i)).collect(Collectors.toList()));
+			boolean isExclusive = new TurboLabelGroup(labels).isExclusive();
+
+			if (isExclusive) {
+
+			} else {
+				result.addAll(((CheckListView<String>) clv).getCheckModel().getSelectedIndices().stream().map(i -> labels.get(i)).collect(Collectors.toList()));
+			}
+			
 		}
 		response.complete(result);
 	}
