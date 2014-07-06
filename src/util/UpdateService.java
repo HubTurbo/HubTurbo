@@ -50,16 +50,18 @@ public class UpdateService<T> {
 	
 	public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
 		try {
+			
 			GitHubRequest request = createUpdatedRequest(repoId);
 			HttpURLConnection connection = createUpdatedConnection(request);
-			updateLastETag(connection);
-			updateLastCheckTime(connection);
 			int responseCode = connection.getResponseCode();
 			System.out.println(responseCode);
-			if(!client.isError(responseCode) && responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
-				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
-			}else{
+			if(client.isError(responseCode)){
 				return new ArrayList<T>();
+			}
+			updateLastETag(connection);
+			updateLastCheckTime(connection);
+			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
 			}
 			
 		} catch (IOException e) {
