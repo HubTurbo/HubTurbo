@@ -32,24 +32,20 @@ public class ModelUpdater {
 	}
 	
 	private void updateModel(){
-		updateModelIssues();
-		updateModelCollaborators();
-		updateModelLabels();
-		updateModelMilestones();
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	updateModelIssues();
+	    		updateModelCollaborators();
+	    		updateModelLabels();
+	    		updateModelMilestones();
+	        }
+	   });
 	}
 	
 	private void updateModelIssues(){
 		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());
-		WeakReference<Model> modelRef = new WeakReference<Model>(model);
-		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	Model model = modelRef.get();
-	        	if(model != null){
-	        		model.updateCachedIssues(updatedIssues);
-	        	}
-	        }
-	   });
+		model.updateCachedIssues(updatedIssues);
 	}
 	
 	private void updateModelCollaborators(){
