@@ -152,7 +152,9 @@ public class Model {
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue);
 		int index = getIndexOfIssue(issue.getNumber());
+		//TODO:
 		if(index != -1){
+			//Currently object is replaced because we do not want the issue object held by the IssueDialog to be updated as it complicates the issue update concurrency handling
 			issues.set(index, newCached);
 		}else{
 			issues.add(0, newCached);
@@ -256,6 +258,17 @@ public class Model {
 		return -1;
 	}
 	
+	@SuppressWarnings("unchecked")
+	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") ObservableList list){
+		int index = list.indexOf(updated);
+		if(index != -1){
+			Listable old = (Listable)list.get(index);
+			old.copyValues(updated);
+		}else{
+			list.add(updated);
+		}
+	}
+	
 	private boolean loadCollaborators() {	
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
@@ -268,14 +281,9 @@ public class Model {
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
-		//TODO:
-		collaborators.clear();
 		for(User ghCollaborator : ghCollaborators) {
-			collaborators.add(new TurboUser(ghCollaborator));
+			updateCachedListItem(new TurboUser(ghCollaborator), collaborators);
 		}
-	}
-	
-	private void updateCachedCollaborator(TurboUser updated){
 	}
 	
 	private void setCachedCollaborators(List<User> ghCollaborators){
@@ -359,14 +367,9 @@ public class Model {
 	}
 
 	public void updateCachedLabels(List<Label> ghLabels){
-		//TODO:
-		labels.clear();
-		// See loadIssues for why this buffer list is needed
-		ArrayList<TurboLabel> buffer = new ArrayList<>();
 		for (Label ghLabel : ghLabels) {
-			buffer.add(new TurboLabel(ghLabel));
+			updateCachedListItem(new TurboLabel(ghLabel), labels);
 		}
-		labels.addAll(buffer);
 	}
 	
 	private void setCachedLabels(List<Label> ghLabels){
@@ -391,14 +394,9 @@ public class Model {
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
-		//TODO:
-		milestones.clear();
-		// See loadIssues for why this buffer list is needed
-		ArrayList<TurboMilestone> buffer = new ArrayList<>();
 		for (Milestone ghMilestone : ghMilestones) {
-			buffer.add(new TurboMilestone(ghMilestone));
+			updateCachedListItem(new TurboMilestone(ghMilestone), milestones);
 		}
-		milestones.addAll(buffer);
 	}
 	
 	private void setCachedMilestones(List<Milestone> ghMilestones){
