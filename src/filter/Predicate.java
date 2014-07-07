@@ -102,7 +102,7 @@ public class Predicate implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue) throws PredicateApplicationException {
+	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
 		assert !(name == null && content == null);
 		
 		switch (name) {

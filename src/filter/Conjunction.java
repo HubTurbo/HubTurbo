@@ -59,9 +59,9 @@ public class Conjunction implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue) throws PredicateApplicationException {
-		left.applyTo(issue);
-		right.applyTo(issue);
+	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+		left.applyTo(issue, model);
+		right.applyTo(issue, model);
 	}
 
 	@Override

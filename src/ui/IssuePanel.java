@@ -141,7 +141,7 @@ public class IssuePanel extends VBox {
 					try {
 						if (currentFilterExpression.canBeAppliedToIssue()) {
 							TurboIssue clone = new TurboIssue(rightIssue);
-							currentFilterExpression.applyTo(rightIssue);
+							currentFilterExpression.applyTo(rightIssue, model);
 							model.updateIssue(clone, rightIssue);
 							parentColumnControl.refresh();
 						} else {
