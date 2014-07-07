@@ -90,6 +90,9 @@ public class ManageLabelsDialog implements Dialog<String> {
 				treeView.getRoot().getChildren().add(item);
 
 				return true;
+			}).exceptionally(ex -> {
+				ex.printStackTrace();
+				return false;
 			});
 			
 		});

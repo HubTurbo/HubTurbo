@@ -129,7 +129,11 @@ public class MenuControl extends MenuBar {
 			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
 					response -> {
 						return true;
-					});
+					})
+				.exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
+				});
 		});
 		return manageLabelsMenuItem;
 	}
@@ -146,6 +150,10 @@ public class MenuControl extends MenuBar {
 						// Required for some reason
 						columns.refresh();
 						return true;
+					})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
 					});
 		});
 		return newIssueMenuItem;
@@ -157,6 +165,10 @@ public class MenuControl extends MenuBar {
 			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
 					response -> {
 						return true;
+					})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
 					});
 		});
 		return manageMilestonesMenuItem;

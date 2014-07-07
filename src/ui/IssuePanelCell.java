@@ -140,7 +140,11 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 							model.createIssue(childIssue);
 						}
 						return true;
-					});
+					})
+				.exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
+				});
 
 		});
 		return new MenuItem[] {childMenuItem};
@@ -231,6 +235,9 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 						model.updateIssue(issue, modifiedIssue);
 					}
 					return true;
+				}).exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
 				});
 	}
 }

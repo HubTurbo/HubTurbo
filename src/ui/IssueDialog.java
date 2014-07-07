@@ -189,6 +189,9 @@ public class IssueDialog implements Dialog<String> {
 						issue.setLabels(issue.getLabels());
 						statusLabel.setAll(FXCollections.observableArrayList(response));
 						return true;
+					}).exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
 					});
 		});
 		
@@ -259,21 +262,24 @@ public class IssueDialog implements Dialog<String> {
 					.setMultipleSelection(true)
 					.setInitialCheckedState(indicesForExistingParents)
 					.show()
-					.thenApply(
-							(List<Integer> response) -> {
-								
-								boolean wasAnythingSelected = response.size() > 0;
-								if (wasAnythingSelected) {
-									List<Integer> parents = response.stream()
-											.map((i) -> allIssues.get(i).getId())
-											.collect(Collectors.toList());
-									issue.setParents(FXCollections.observableArrayList(parents));
-									model.processInheritedLabels(issue, originalParents);
-								} else {
-									issue.setParents(FXCollections.observableArrayList());
-								}
-								return true;
-							});
+					.thenApply((List<Integer> response) -> {
+						
+						boolean wasAnythingSelected = response.size() > 0;
+						if (wasAnythingSelected) {
+							List<Integer> parents = response.stream()
+									.map((i) -> allIssues.get(i).getId())
+									.collect(Collectors.toList());
+							issue.setParents(FXCollections.observableArrayList(parents));
+							model.processInheritedLabels(issue, originalParents);
+						} else {
+							issue.setParents(FXCollections.observableArrayList());
+						}
+						return true;
+					})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
+					});
 		});
 		return parentsBox;
 	}
@@ -303,7 +309,11 @@ public class IssueDialog implements Dialog<String> {
 						issue.getLabels().addAll(FXCollections.observableArrayList(response));
 						nonStatusLabels.setAll(FXCollections.observableArrayList(response));
 						return true;
-					});
+					})
+				.exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
+				});
 		});
 		return labelBox;
 	}
@@ -338,7 +348,11 @@ public class IssueDialog implements Dialog<String> {
 							assigneeBox.setListableItem(assignee);
 							issue.setAssignee(assignee);
 							return true;
-						});
+						})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
+					});
 		});
 		return assigneeBox;
 	}
@@ -373,7 +387,11 @@ public class IssueDialog implements Dialog<String> {
 							milestoneBox.setListableItem(milestone);
 							issue.setMilestone(milestone);
 							return true;
-						});
+						})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
+					});
 		});
 		return milestoneBox;
 	}

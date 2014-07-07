@@ -88,7 +88,11 @@ public class IssuePanel extends VBox {
 				        	}
 						}
 						return true;
-					});
+					})
+				.exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
+				});
 		});
 		box.getChildren().add(label);
 		return box;

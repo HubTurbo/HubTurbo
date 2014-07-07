@@ -183,8 +183,11 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	    		parent.getChildren().add(item);
 	    		
 				return true;
+			})
+			.exceptionally(ex -> {
+				ex.printStackTrace();
+				return false;
 			});
-
 		});
 
 		MenuItem label = new MenuItem("New Label");
