@@ -2,6 +2,7 @@ package filter;
 
 import java.util.List;
 
+import model.Model;
 import model.TurboIssue;
 
 public interface FilterExpression {
@@ -9,7 +10,7 @@ public interface FilterExpression {
 	// A predicate that determines if an issue satisfies this filter
 	// expression. If it satisfies, it is shown in the issue panel.
 	
-	public boolean isSatisfiedBy(TurboIssue issue);
+	public boolean isSatisfiedBy(TurboIssue issue, Model model);
 	
 	// Filter expressions may only be applied if they contain no ambiguity
 	// => they must contain only conjunctions or predicates. Disjunctions

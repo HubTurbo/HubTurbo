@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javafx.collections.FXCollections;
+import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 
@@ -49,7 +50,7 @@ public class Predicate implements FilterExpression {
 		return true;
 	}
 	
-	public boolean isSatisfiedBy(TurboIssue issue) {
+	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
 		if (name == null && content == null) return true;
 		
 		switch (name) {

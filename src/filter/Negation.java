@@ -2,6 +2,7 @@ package filter;
 
 import java.util.List;
 
+import model.Model;
 import model.TurboIssue;
 
 public class Negation implements FilterExpression {
@@ -33,8 +34,8 @@ public class Negation implements FilterExpression {
 		return true;
 	}
 	
-	public boolean isSatisfiedBy(TurboIssue issue) {
-		return !expr.isSatisfiedBy(issue);
+	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+		return !expr.isSatisfiedBy(issue, model);
 	}
 
 	@Override

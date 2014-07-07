@@ -1,6 +1,7 @@
 package ui;
 
 import java.lang.ref.WeakReference;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import javafx.scene.input.TransferMode;
@@ -156,10 +157,14 @@ public class IssuePanel extends VBox {
 			e.consume();
 		});
 	}
-
+	
 	public void filter(FilterExpression filter) {
 		currentFilterExpression = filter;
-		predicate = filter::isSatisfiedBy;
+
+		// This cast utilises a functional interface
+		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
+		predicate = i -> temp.apply(i, model);
+		
 		refreshItems();
 	}
 	

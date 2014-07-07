@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import model.Model;
 import model.TurboIssue;
 
 public class Conjunction implements FilterExpression {
@@ -42,8 +43,8 @@ public class Conjunction implements FilterExpression {
 		return true;
 	}
 
-	public boolean isSatisfiedBy(TurboIssue issue) {
-		return left.isSatisfiedBy(issue) && right.isSatisfiedBy(issue);
+	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+		return left.isSatisfiedBy(issue, model) && right.isSatisfiedBy(issue, model);
 	}
 	
 	private boolean containsDuplicatePredicateNames() {
