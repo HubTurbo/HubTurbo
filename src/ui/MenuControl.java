@@ -299,6 +299,7 @@ public class MenuControl extends MenuBar {
 	private void handleRefresh(){
 		modelUpdater.stopModelUpdate();
 		modelUpdater.startModelUpdate();
+		columns.refresh();
 	}
 	
 	private void loadDataIntoModel() {
