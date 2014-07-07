@@ -1,5 +1,6 @@
 package model;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,20 +35,25 @@ public class TurboIssue implements Listable {
 	/*
 	 * Attributes, Getters & Setters
 	 */
-	
-	private ObservableList<TurboLabel> allLabels;
-	public ObservableList<TurboLabel> getAllLabels(){
-		return allLabels;
-	}
-	
-	private ObservableList<TurboMilestone> allMilestones;
-	public ObservableList<TurboMilestone> getAllMilestones(){
-		return allMilestones;
-	}
-	
-	private ObservableList<TurboUser> allCollaborators;
-	public ObservableList<TurboUser> getAllCollaborators(){
-		return allCollaborators;
+//	
+//	private ObservableList<TurboLabel> allLabels;
+//	public ObservableList<TurboLabel> getAllLabels(){
+//		return allLabels;
+//	}
+//	
+//	private ObservableList<TurboMilestone> allMilestones;
+//	public ObservableList<TurboMilestone> getAllMilestones(){
+//		return allMilestones;
+//	}
+//	
+//	private ObservableList<TurboUser> allCollaborators;
+//	public ObservableList<TurboUser> getAllCollaborators(){
+//		return allCollaborators;
+//	}
+//	
+	private WeakReference<Model> model;
+	private WeakReference<Model> getModel(){
+		return model;
 	}
 	
 	
@@ -123,13 +129,14 @@ public class TurboIssue implements Listable {
 	public ObservableList<TurboLabel> getLabels() {return labels;}
 	
 	private TurboLabel getLabelReference(TurboLabel label){
+		List<TurboLabel> allLabels = model.get().getLabels();
 		int index = allLabels.indexOf(label);
 		assert index != -1;
-		System.out.println(index);
 		return allLabels.get(index);
 	}
 	
 	private TurboMilestone getMilestoneReference(TurboMilestone milestone){
+		List<TurboMilestone> allMilestones = model.get().getMilestones();
 		int index = allMilestones.indexOf(milestone);
 		if(index != -1){
 			return allMilestones.get(index);
@@ -139,6 +146,7 @@ public class TurboIssue implements Listable {
 	}
 	
 	private TurboUser getCollaboratorReference(TurboUser user){
+		List<TurboUser> allCollaborators = model.get().getCollaborators();
 		int index = allCollaborators.indexOf(user);
 		if(index != -1){
 			return allCollaborators.get(index);
@@ -196,9 +204,7 @@ public class TurboIssue implements Listable {
 		assert title != null;
 		assert desc != null;
 		assert model != null;
-		allLabels = model.getLabels();
-		allMilestones = model.getMilestones();
-		allCollaborators = model.getCollaborators();
+		this.model = new WeakReference<Model>(model);
 		
 		setTitle(title);
 		setDescription(desc);
@@ -214,9 +220,7 @@ public class TurboIssue implements Listable {
 	public TurboIssue(Issue issue, Model model) {
 		assert issue != null;
 		assert model != null;
-		allLabels = model.getLabels();
-		allMilestones = model.getMilestones();
-		allCollaborators = model.getCollaborators();
+		this.model = new WeakReference<Model>(model);
 		
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
@@ -245,9 +249,7 @@ public class TurboIssue implements Listable {
 		assert other != null;
 		if(other.getClass() == TurboIssue.class){
 			TurboIssue obj = (TurboIssue)other;
-			allLabels = obj.getAllLabels();
-			allMilestones = obj.getAllMilestones();
-			allCollaborators = obj.getAllCollaborators();
+			model = obj.getModel();
 			
 			setHtmlUrl(obj.getHtmlUrl());
 			setTitle(obj.getTitle());
