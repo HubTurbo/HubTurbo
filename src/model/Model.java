@@ -3,13 +3,11 @@ package model;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javafx.animation.Animation.Status;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -261,7 +259,7 @@ public class Model {
 	private boolean loadCollaborators() {	
 		try {
 			List<User> ghCollaborators = collabService.getCollaborators(repoId);
-			updateCachedCollaborators(ghCollaborators);
+			setCachedCollaborators(ghCollaborators);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -270,6 +268,17 @@ public class Model {
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
+		//TODO:
+		collaborators.clear();
+		for(User ghCollaborator : ghCollaborators) {
+			collaborators.add(new TurboUser(ghCollaborator));
+		}
+	}
+	
+	private void updateCachedCollaborator(TurboUser updated){
+	}
+	
+	private void setCachedCollaborators(List<User> ghCollaborators){
 		collaborators.clear();
 		for(User ghCollaborator : ghCollaborators) {
 			collaborators.add(new TurboUser(ghCollaborator));
@@ -305,7 +314,7 @@ public class Model {
 		try {
 			List<Label> ghLabels = labelService.getLabels(repoId);
 			standardiseStatusLabels(ghLabels);
-			updateCachedLabels(ghLabels);
+			setCachedLabels(ghLabels);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -350,6 +359,17 @@ public class Model {
 	}
 
 	public void updateCachedLabels(List<Label> ghLabels){
+		//TODO:
+		labels.clear();
+		// See loadIssues for why this buffer list is needed
+		ArrayList<TurboLabel> buffer = new ArrayList<>();
+		for (Label ghLabel : ghLabels) {
+			buffer.add(new TurboLabel(ghLabel));
+		}
+		labels.addAll(buffer);
+	}
+	
+	private void setCachedLabels(List<Label> ghLabels){
 		labels.clear();
 		// See loadIssues for why this buffer list is needed
 		ArrayList<TurboLabel> buffer = new ArrayList<>();
@@ -362,7 +382,7 @@ public class Model {
 	private boolean loadMilestones(){
 		try {		
 			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
-			updateCachedMilestones(ghMilestones);
+			setCachedMilestones(ghMilestones);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -371,6 +391,7 @@ public class Model {
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
+		//TODO:
 		milestones.clear();
 		// See loadIssues for why this buffer list is needed
 		ArrayList<TurboMilestone> buffer = new ArrayList<>();
@@ -380,4 +401,13 @@ public class Model {
 		milestones.addAll(buffer);
 	}
 	
+	private void setCachedMilestones(List<Milestone> ghMilestones){
+		milestones.clear();
+		// See loadIssues for why this buffer list is needed
+		ArrayList<TurboMilestone> buffer = new ArrayList<>();
+		for (Milestone ghMilestone : ghMilestones) {
+			buffer.add(new TurboMilestone(ghMilestone));
+		}
+		milestones.addAll(buffer);
+	}
 }
