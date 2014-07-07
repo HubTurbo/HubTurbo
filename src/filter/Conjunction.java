@@ -1,6 +1,7 @@
 package filter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import model.TurboIssue;
@@ -45,9 +46,15 @@ public class Conjunction implements FilterExpression {
 		return left.isSatisfiedBy(issue) && right.isSatisfiedBy(issue);
 	}
 	
+	private boolean containsDuplicatePredicateNames() {
+		List<String> predicateNames = getPredicateNames();
+		HashSet<String> noDuplicates = new HashSet<>(predicateNames);
+		return noDuplicates.size() != predicateNames.size();
+	}
+	
 	@Override
 	public boolean canBeAppliedToIssue() {
-		return left.canBeAppliedToIssue() && right.canBeAppliedToIssue();
+		return !containsDuplicatePredicateNames() && left.canBeAppliedToIssue() && right.canBeAppliedToIssue();
 	}
 
 	@Override
