@@ -189,19 +189,21 @@ public class TurboIssue implements Listable {
 		return ghIssue;
 	}
 	
-	public void copyValues(TurboIssue other) {
+	public void copyValues(Object other) {
 		assert other != null;
-		
-		setHtmlUrl(other.getHtmlUrl());
-		setTitle(other.getTitle());
-		setOpen(other.getOpen());
-		setId(other.getId());
-		setDescription(other.getDescription());
-		setAssignee(other.getAssignee());
-		setMilestone(other.getMilestone());
-		setLabels(FXCollections.observableArrayList(other.getLabels()));
-		setParents(FXCollections.observableArrayList(other.getParents()));
-		setParents(other.getParents());
+		if(other.getClass() == TurboIssue.class){
+			TurboIssue obj = (TurboIssue)other;
+			setHtmlUrl(obj.getHtmlUrl());
+			setTitle(obj.getTitle());
+			setOpen(obj.getOpen());
+			setId(obj.getId());
+			setDescription(obj.getDescription());
+			setAssignee(obj.getAssignee());
+			setMilestone(obj.getMilestone());
+			setLabels(FXCollections.observableArrayList(obj.getLabels()));
+			setParents(FXCollections.observableArrayList(obj.getParents()));
+			setParents(obj.getParents());
+		}
 	}
 	
 	/**

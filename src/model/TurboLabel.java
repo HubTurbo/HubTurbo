@@ -75,6 +75,16 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		setColour(label.getColor());
 	}
 	
+	public void copyValues(Object other){
+		if(other.getClass() == TurboLabel.class){
+			TurboLabel obj = (TurboLabel)other;
+			setName(obj.getName());
+			setColour(obj.getColour());
+			setGroup(obj.getGroup());
+			setExclusive(obj.isExclusive);
+		}
+	}
+	
 	public Label toGhResource() {
 		Label ghLabel = new Label();
 		ghLabel.setName(toGhName());

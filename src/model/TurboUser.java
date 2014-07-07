@@ -37,6 +37,14 @@ public class TurboUser implements Listable {
 		return ghUser;
 	}
 	
+	public void copyValues(Object other){
+		if(other.getClass() == TurboUser.class){
+			TurboUser obj = (TurboUser)other;
+			setGithubName(obj.getGithubName());
+			setRealName(obj.getRealName());
+		}
+	}
+	
 	/*
 	 * Overriden Methods
 	 */

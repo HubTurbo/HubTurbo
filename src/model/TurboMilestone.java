@@ -63,6 +63,16 @@ public class TurboMilestone implements Listable {
 		return ghMilestone;
 	}
 	
+	public void copyValues(Object other){
+		if(other.getClass() == TurboMilestone.class){
+			TurboMilestone obj = (TurboMilestone)other;
+			setTitle(obj.getTitle());
+			this.state = obj.getState();
+			this.description = obj.getDescription();
+			this.dueOn = obj.getDueOn();
+		}
+	}
+	
 	/*
 	 * Overridden Methods
 	 */
