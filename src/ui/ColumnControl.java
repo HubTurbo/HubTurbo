@@ -1,5 +1,7 @@
 package ui;
 
+import org.controlsfx.control.NotificationPane;
+
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -10,12 +12,19 @@ public class ColumnControl extends HBox {
 
 	private final Stage stage;
 	private final Model model;
+	private final NotificationPane notificationPane;
 
-	public ColumnControl(Stage stage, Model model) {
+	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane) {
 		this.stage = stage;
 		this.model = model;
-				
+		this.notificationPane = notificationPane;
+
 		addColumn();
+	}
+	
+	public void displayMessage(String message) {
+		notificationPane.setText(message);
+		notificationPane.show();
 	}
 	
 	public void refresh() {

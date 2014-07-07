@@ -2,6 +2,8 @@ package ui;
 
 import java.io.File;
 
+import org.controlsfx.control.NotificationPane;
+
 import util.GitHubClientExtended;
 import util.ModelUpdater;
 import javafx.application.Application;
@@ -19,6 +21,7 @@ public class UI extends Application {
 
 	private ColumnControl columns;
 	private MenuControl menu;
+	private NotificationPane notificationPane;
 	
 	// Other components
 	
@@ -66,11 +69,14 @@ public class UI extends Application {
 
 	private Parent createRoot() {
 
-		columns = new ColumnControl(mainStage, model);
+		notificationPane = new NotificationPane();
+		columns = new ColumnControl(mainStage, model, notificationPane);
+		notificationPane.setContent(columns);
+
 		menu = new MenuControl(mainStage, model, client, columns, this);
 
 		BorderPane root = new BorderPane();
-		root.setCenter(columns);
+		root.setCenter(notificationPane);
 		root.setTop(menu);
 
 		return root;

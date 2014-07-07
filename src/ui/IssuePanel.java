@@ -147,7 +147,7 @@ public class IssuePanel extends VBox {
 							throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
 						}
 					} catch (PredicateApplicationException ex) {
-						System.out.println(ex);
+						parentColumnControl.displayMessage(ex.getMessage());
 					}
 				}
 			}
