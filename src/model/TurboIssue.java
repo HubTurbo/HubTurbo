@@ -147,6 +147,10 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
+	public void addLabel(TurboLabel label){
+		labels.add(getLabelReference(label));
+	}
+	
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if(this.labels == labels){
 			return;

@@ -141,7 +141,7 @@ public class Predicate implements FilterExpression {
 			if (labels.size() > 1) {
 				throw new PredicateApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
 			} else {
-				issue.getLabels().add(labels.get(0));
+				issue.addLabel(labels.get(0));
 			}
 			break;
 		case "assignee":
