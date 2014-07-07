@@ -201,6 +201,9 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			if (groupName.equals(ManageLabelsDialog.UNGROUPED_NAME)) groupName = null;
 			newLabel.setGroup(groupName);
 			
+			// Set its exclusivity
+			newLabel.setExclusive(((TurboLabelGroup) getTreeItem().getValue()).isExclusive());
+			
 			newLabel = model.createLabel(newLabel);
 			
 			// Make sure this TurboLabelGroup has a reference to the new label
