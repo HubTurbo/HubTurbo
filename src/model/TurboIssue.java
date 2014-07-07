@@ -100,7 +100,7 @@ public class TurboIssue implements Listable {
     	return assignee;
     }
 	public void setAssignee(TurboUser assignee) {
-		this.assignee = assignee;
+		this.assignee = getCollaboratorReference(assignee);
 	}
 	
 	private TurboMilestone milestone;
@@ -108,7 +108,7 @@ public class TurboIssue implements Listable {
 		return milestone;
 	}
 	public void setMilestone(TurboMilestone milestone) {
-		this.milestone = milestone;
+		this.milestone = getMilestoneReference(milestone);
 	}
 	
 	private String htmlUrl;
@@ -119,14 +119,37 @@ public class TurboIssue implements Listable {
 		this.htmlUrl = htmlUrl;
 	}
 	
-	private ObservableList<TurboLabel> labels;
+	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	public ObservableList<TurboLabel> getLabels() {return labels;}
+	
+	private TurboLabel getLabelReference(TurboLabel label){
+		int index = allLabels.indexOf(label);
+		assert index != -1;
+		return allLabels.get(index);
+	}
+	
+	private TurboMilestone getMilestoneReference(TurboMilestone milestone){
+		int index = allMilestones.indexOf(milestone);
+		if(index != -1){
+			return allMilestones.get(index);
+		}else{
+			return milestone;
+		}
+	}
+	
+	private TurboUser getCollaboratorReference(TurboUser user){
+		int index = allCollaborators.indexOf(user);
+		if(index != -1){
+			return allCollaborators.get(index);
+		}else{
+			return user;
+		}
+	}
+	
 	public void setLabels(ObservableList<TurboLabel> labels) {
-		if (this.labels == null) {
-			this.labels = labels;
-		} else if (labels != this.labels) {
-			this.labels.clear();
-			this.labels.addAll(labels);
+		this.labels.clear();
+		for(TurboLabel label : labels){
+			this.labels.add(getLabelReference(label));
 		}
 		// Auto update status as closed if any labels are equivalent to closed status
 		for (TurboLabel currentLabel : labels) {
@@ -146,7 +169,7 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
-	private ObservableList<Integer> parents;
+	private ObservableList<Integer> parents = FXCollections.observableArrayList();
 	public ObservableList<Integer> getParents() {return parents;}
 	public void setParents(ObservableList<Integer> parentNumbers) {
 		if (this.parents == null) {
@@ -171,8 +194,6 @@ public class TurboIssue implements Listable {
 		
 		setTitle(title);
 		setDescription(desc);
-		labels = FXCollections.observableArrayList();
-		parents = FXCollections.observableArrayList();
 		setOpen(true);
 	}
 	

@@ -58,10 +58,10 @@ public class Model {
 	
 	public void setRepoId(String owner, String name) {
 		repoId = RepositoryId.create(owner, name);
-		loadIssues();
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
+		loadIssues();
 	}
 
 	public void processInheritedLabels(TurboIssue issue, List<Integer> originalParents) {
