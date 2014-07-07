@@ -183,7 +183,8 @@ public class IssueDialog implements Dialog<String> {
 				.setInitialChecked(issue.getLabels())
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
-						issue.getLabels().removeIf(label -> label.getGroup().equals("status"));
+						System.out.println(response);
+						issue.getLabels().removeIf(label -> label.getGroup() != null && label.getGroup().equals("status"));
 						issue.getLabels().addAll(FXCollections.observableArrayList(response));
 						issue.setLabels(issue.getLabels());
 						statusLabel.setAll(FXCollections.observableArrayList(response));
@@ -271,8 +272,6 @@ public class IssueDialog implements Dialog<String> {
 								} else {
 									issue.setParents(FXCollections.observableArrayList());
 								}
-								
-
 								return true;
 							});
 		});
@@ -280,16 +279,29 @@ public class IssueDialog implements Dialog<String> {
 	}
 
 	private LabelDisplayBox createLabelBox(Stage stage) {
-		final LabelDisplayBox labelBox = new LabelDisplayBox(issue.getLabels(), true, "Labels");
-		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList(model.getLabels());
+		ObservableList<TurboLabel> nonStatusLabels = FXCollections.observableArrayList();
+		for (TurboLabel label : issue.getLabels()) {
+			if (label.getGroup() == null || !label.getGroup().equals("status")) {
+				nonStatusLabels.add(label);
+			}
+		}
+		
+		final LabelDisplayBox labelBox = new LabelDisplayBox(nonStatusLabels, true, "Labels");
+		ObservableList<TurboLabel> allLabels = FXCollections.observableArrayList();
+		for (TurboLabel label : model.getLabels()) {
+			if (label.getGroup() == null || !label.getGroup().equals("status")) {
+				allLabels.add(label);
+			}
+		}
 		
 		labelBox.setOnMouseClicked((e) -> {
 			(new LabelCheckboxListDialog(stage, allLabels))
 				.setInitialChecked(issue.getLabels())
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
-						issue.setLabels(FXCollections.observableArrayList(response));
-						closedCheckBox.setSelected(!issue.getOpen());
+						issue.getLabels().removeIf(label -> label.getGroup() == null || !label.getGroup().equals("status"));
+						issue.getLabels().addAll(FXCollections.observableArrayList(response));
+						nonStatusLabels.setAll(FXCollections.observableArrayList(response));
 						return true;
 					});
 		});

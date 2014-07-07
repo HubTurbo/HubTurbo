@@ -333,8 +333,8 @@ public class Model {
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
 			if (standardStatus.endsWith("new") ||
-					standardStatus.endsWith("accepted") ||
-					standardStatus.endsWith("started")) {
+				standardStatus.endsWith("accepted") ||
+				standardStatus.endsWith("started")) {
 				statusLabel.setColor("009800");
 			} else {
 				statusLabel.setColor("0052cc");
