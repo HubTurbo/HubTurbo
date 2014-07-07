@@ -105,16 +105,17 @@ public class IssuePanel extends VBox {
 		});
 
 		setOnDragEntered(e -> {
-//			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-//				setStyle("-fx-background-color: #ff0000;");
-//			}
+			if (e.getDragboard().hasString()) {
+				IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
+				if (dd.getColumnIndex() != columnIndex) {
+					getStyleClass().add("dragged-over");
+				}
+			}
 			e.consume();
 		});
 
 		setOnDragExited(e -> {
-//			item.setStyle(style);
-//			System.out.println("exited");
-
+			getStyleClass().remove("dragged-over");
 			e.consume();
 		});
 		
@@ -124,10 +125,7 @@ public class IssuePanel extends VBox {
 			if (db.hasString()) {
 				success = true;
 				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
-				
-				System.out.println(dd.getColumnIndex());
-				System.out.println(dd.getIssueIndex());
-				
+								
 				// Find the right issue
 				TurboIssue rightIssue = null;
 				for (TurboIssue i : model.getIssues()) {
@@ -137,11 +135,13 @@ public class IssuePanel extends VBox {
 				}
 				assert rightIssue != null;
 				
-				TurboIssue clone = new TurboIssue(rightIssue);
-				currentFilterExpression.applyTo(rightIssue);
-				model.updateIssue(clone, rightIssue);
-				parentColumnControl.refresh();
-//				currentPredicate.applyTo(issue);
+				if (currentFilterExpression != EMPTY_PREDICATE) {
+					TurboIssue clone = new TurboIssue(rightIssue);
+					currentFilterExpression.applyTo(rightIssue);
+					model.updateIssue(clone, rightIssue);
+					parentColumnControl.refresh();
+//					currentPredicate.applyTo(issue);
+				}
 			}
 			e.setDropCompleted(success);
 

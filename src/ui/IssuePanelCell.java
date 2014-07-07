@@ -116,7 +116,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			ClipboardContent content = new ClipboardContent();
 			IssuePanelDragData dd = new IssuePanelDragData(parentColumnIndex, issue.getId());
 			content.putString(dd.serialise());
-			System.out.println(dd.serialise());
 			db.setContent(content);
 			event.consume();
 		});
