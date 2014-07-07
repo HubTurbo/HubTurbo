@@ -100,7 +100,7 @@ public class IssuePanel extends VBox {
 		
 		setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-				e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+				e.acceptTransferModes(TransferMode.MOVE);
 			}
 		});
 
@@ -126,7 +126,7 @@ public class IssuePanel extends VBox {
 				success = true;
 				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
 								
-				// Find the right issue
+				// Find the right issue from its ID
 				TurboIssue rightIssue = null;
 				for (TurboIssue i : model.getIssues()) {
 					if (i.getId() == dd.getIssueIndex()) {
@@ -135,12 +135,11 @@ public class IssuePanel extends VBox {
 				}
 				assert rightIssue != null;
 				
-				if (currentFilterExpression != EMPTY_PREDICATE) {
+				if (currentFilterExpression != EMPTY_PREDICATE && currentFilterExpression.canBeAppliedToIssue()) {
 					TurboIssue clone = new TurboIssue(rightIssue);
 					currentFilterExpression.applyTo(rightIssue);
 					model.updateIssue(clone, rightIssue);
 					parentColumnControl.refresh();
-//					currentPredicate.applyTo(issue);
 				}
 			}
 			e.setDropCompleted(success);

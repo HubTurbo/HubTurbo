@@ -112,7 +112,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		
 		setOnDragDetected((event) -> {
-			Dragboard db = startDragAndDrop(TransferMode.ANY);
+			Dragboard db = startDragAndDrop(TransferMode.MOVE);
 			ClipboardContent content = new ClipboardContent();
 			IssuePanelDragData dd = new IssuePanelDragData(parentColumnIndex, issue.getId());
 			content.putString(dd.serialise());
@@ -121,12 +121,9 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		setOnDragDone((event) -> {
-
-			if (event.getTransferMode() == TransferMode.MOVE) {
-			}
-
+//			if (event.getTransferMode() == TransferMode.MOVE) {
+//			}
 //			System.out.println("done");
-
 			event.consume();
 		});
 	}
