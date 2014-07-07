@@ -183,7 +183,6 @@ public class IssueDialog implements Dialog<String> {
 				.setInitialChecked(issue.getLabels())
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
-						System.out.println(response);
 						issue.getLabels().removeIf(label -> label.getGroup() != null && label.getGroup().equals("status"));
 						issue.getLabels().addAll(FXCollections.observableArrayList(response));
 						issue.setLabels(issue.getLabels());
