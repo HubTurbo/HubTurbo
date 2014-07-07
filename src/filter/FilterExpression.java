@@ -21,7 +21,7 @@ public interface FilterExpression {
 	// an issue. This should be invoked for disjunctions and negations
 	// (i.e. call the above method to check first).
 	
-	public void applyTo(TurboIssue issue);
+	public void applyTo(TurboIssue issue) throws PredicateApplicationException;
 	
 	// Walks the tree of predicates to get all the names that appear.
 	

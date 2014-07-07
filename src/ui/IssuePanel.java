@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import javafx.scene.input.TransferMode;
 import filter.FilterExpression;
 import filter.Parser;
+import filter.PredicateApplicationException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -135,11 +136,19 @@ public class IssuePanel extends VBox {
 				}
 				assert rightIssue != null;
 				
-				if (currentFilterExpression != EMPTY_PREDICATE && currentFilterExpression.canBeAppliedToIssue()) {
-					TurboIssue clone = new TurboIssue(rightIssue);
-					currentFilterExpression.applyTo(rightIssue);
-					model.updateIssue(clone, rightIssue);
-					parentColumnControl.refresh();
+				if (currentFilterExpression != EMPTY_PREDICATE) {
+					try {
+						if (currentFilterExpression.canBeAppliedToIssue()) {
+							TurboIssue clone = new TurboIssue(rightIssue);
+							currentFilterExpression.applyTo(rightIssue);
+							model.updateIssue(clone, rightIssue);
+							parentColumnControl.refresh();
+						} else {
+							throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
+						}
+					} catch (PredicateApplicationException ex) {
+						System.out.println(ex);
+					}
 				}
 			}
 			e.setDropCompleted(success);

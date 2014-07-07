@@ -43,7 +43,7 @@ public class Negation implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue) {
+	public void applyTo(TurboIssue issue) throws PredicateApplicationException {
 		assert false;
 	}
 	
