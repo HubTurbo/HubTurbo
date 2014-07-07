@@ -19,8 +19,12 @@ public class BetterCheckListView extends VBox {
 	private ObservableList<BetterCheckListItem> items;
 	private ListView<BetterCheckListItem> listView;
 	
+	private ArrayList<WeakChangeListener<Boolean>> listeners;
+	
 	public BetterCheckListView(ObservableList<String> items) {
 		
+		listeners = new ArrayList<>();
+
 		this.listView = new ListView<BetterCheckListItem>();
 		getChildren().add(listView);
 		setItems(items);
@@ -39,13 +43,16 @@ public class BetterCheckListView extends VBox {
 		// It's assumed that we won't need to observe this list in the
 		// long term, so we don't use the same list object
 		
+		// Old listeners can be garbage collected
+		listeners.clear();
+		
 		ObservableList<BetterCheckListItem> newItems = FXCollections.observableArrayList();
 		WeakReference<BetterCheckListView> that = new WeakReference<>(this);
 		
 		for (int i=0; i<items.size(); i++) {
 			final int j = i;
 			BetterCheckListItem item = new BetterCheckListItem(items.get(i), false);
-			item.checkedProperty().addListener(new WeakChangeListener<Boolean>(new ChangeListener<Boolean>() {
+			WeakChangeListener<Boolean> listener = new WeakChangeListener<Boolean>(new ChangeListener<Boolean>() {
 		        public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
 		        	if (!disabled) {
 			        	if (singleSelection) {
@@ -58,7 +65,13 @@ public class BetterCheckListView extends VBox {
 			        	}
 		        	}
 	        	}
-		    }));
+		    });
+			item.checkedProperty().addListener(listener);
+			
+			// Retain a reference to this listener, so it doesn't get
+			// garbage collected prematurely
+			listeners.add(listener);
+			
 			newItems.add(item);
 		}
 		this.items = newItems;
