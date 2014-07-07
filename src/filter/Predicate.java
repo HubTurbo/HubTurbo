@@ -3,6 +3,7 @@ package filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import model.Model;
@@ -66,7 +67,12 @@ public class Predicate implements FilterExpression {
 			} else if (Character.isDigit(content.charAt(0))) {
 				return issue.getParents().contains(Integer.parseInt(content));
 			} else {
-				// search parent name instead
+				List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> issue.getParents().contains(i.getId())).collect(Collectors.toList());
+				for (int i=0; i<actualParentInstances.size(); i++) {
+					if (actualParentInstances.get(i).getTitle().toLowerCase().contains(content)) {
+						return true;
+					}
+				}
 				return false;
 			}
 //		case "child":
