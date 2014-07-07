@@ -1,5 +1,7 @@
 package filter;
 
+import java.util.List;
+
 import model.TurboIssue;
 
 public interface FilterExpression {
@@ -20,4 +22,8 @@ public interface FilterExpression {
 	// (i.e. call the above method to check first).
 	
 	public void applyTo(TurboIssue issue);
+	
+	// Walks the tree of predicates to get all the names that appear.
+	
+	public List<String> getPredicateNames();
 }

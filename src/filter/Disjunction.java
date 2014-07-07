@@ -1,5 +1,8 @@
 package filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.TurboIssue;
 
 public class Disjunction implements FilterExpression {
@@ -50,5 +53,13 @@ public class Disjunction implements FilterExpression {
 	@Override
 	public void applyTo(TurboIssue issue) {
 		assert false;
+	}
+	
+	@Override
+	public List<String> getPredicateNames() {
+		ArrayList<String> list = new ArrayList<>();
+		list.addAll(left.getPredicateNames());
+		list.addAll(right.getPredicateNames());
+		return list;
 	}
 }

@@ -1,5 +1,8 @@
 package filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.TurboIssue;
 
 public class Conjunction implements FilterExpression {
@@ -51,5 +54,13 @@ public class Conjunction implements FilterExpression {
 	public void applyTo(TurboIssue issue) {
 		left.applyTo(issue);
 		right.applyTo(issue);
+	}
+
+	@Override
+	public List<String> getPredicateNames() {
+		ArrayList<String> list = new ArrayList<>();
+		list.addAll(left.getPredicateNames());
+		list.addAll(right.getPredicateNames());
+		return list;
 	}
 }

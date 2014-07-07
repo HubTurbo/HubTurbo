@@ -1,5 +1,7 @@
 package filter;
 
+import java.util.List;
+
 import model.TurboIssue;
 
 public class Negation implements FilterExpression {
@@ -43,5 +45,10 @@ public class Negation implements FilterExpression {
 	@Override
 	public void applyTo(TurboIssue issue) {
 		assert false;
+	}
+	
+	@Override
+	public List<String> getPredicateNames() {
+		return expr.getPredicateNames();
 	}
 }

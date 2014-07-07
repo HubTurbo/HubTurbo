@@ -1,5 +1,9 @@
 package filter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -141,5 +145,10 @@ public class Predicate implements FilterExpression {
 	@Override
 	public boolean canBeAppliedToIssue() {
 		return true;
+	}
+	
+	@Override
+	public List<String> getPredicateNames() {
+		return new ArrayList<String>(Arrays.asList(content));
 	}
 }
