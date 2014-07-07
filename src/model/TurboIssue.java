@@ -35,6 +35,22 @@ public class TurboIssue implements Listable {
 	 * Attributes, Getters & Setters
 	 */
 	
+	private ObservableList<TurboLabel> allLabels;
+	public ObservableList<TurboLabel> getAllLabels(){
+		return allLabels;
+	}
+	
+	private ObservableList<TurboMilestone> allMilestones;
+	public ObservableList<TurboMilestone> getAllMilestones(){
+		return allMilestones;
+	}
+	
+	private ObservableList<TurboUser> allCollaborators;
+	public ObservableList<TurboUser> getAllCollaborators(){
+		return allCollaborators;
+	}
+	
+	
 	private IntegerProperty id = new SimpleIntegerProperty();
     public final int getId() {
     	return id.get();
@@ -145,9 +161,13 @@ public class TurboIssue implements Listable {
 	 * Constructors & Public Methods
 	 */
 	
-	public TurboIssue(String title, String desc) {
+	public TurboIssue(String title, String desc, Model model) {
 		assert title != null;
 		assert desc != null;
+		assert model != null;
+		allLabels = model.getLabels();
+		allMilestones = model.getMilestones();
+		allCollaborators = model.getCollaborators();
 		
 		setTitle(title);
 		setDescription(desc);
@@ -159,12 +179,15 @@ public class TurboIssue implements Listable {
 	// Copy constructor
 	public TurboIssue(TurboIssue other) {
 		assert other != null;
-		
 		copyValues(other);	
 	}
 	
-	public TurboIssue(Issue issue) {
+	public TurboIssue(Issue issue, Model model) {
 		assert issue != null;
+		assert model != null;
+		allLabels = model.getLabels();
+		allMilestones = model.getMilestones();
+		allCollaborators = model.getCollaborators();
 		
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
@@ -193,6 +216,10 @@ public class TurboIssue implements Listable {
 		assert other != null;
 		if(other.getClass() == TurboIssue.class){
 			TurboIssue obj = (TurboIssue)other;
+			allLabels = obj.getAllLabels();
+			allMilestones = obj.getAllMilestones();
+			allCollaborators = obj.getAllCollaborators();
+			
 			setHtmlUrl(obj.getHtmlUrl());
 			setTitle(obj.getTitle());
 			setOpen(obj.getOpen());

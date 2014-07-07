@@ -133,7 +133,7 @@ public class Model {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-		TurboIssue returnedIssue = new TurboIssue(createdIssue);
+		TurboIssue returnedIssue = new TurboIssue(createdIssue, this);
 		issues.add(returnedIssue);
 		return returnedIssue;
 	}
@@ -150,7 +150,7 @@ public class Model {
 	}
 	
 	private void updateCachedIssue(Issue issue){
-		TurboIssue newCached = new TurboIssue(issue);
+		TurboIssue newCached = new TurboIssue(issue, this);
 		int index = getIndexOfIssue(issue.getNumber());
 		//TODO:
 		if(index != -1){
@@ -211,7 +211,7 @@ public class Model {
 			StringBuilder changeLog = new StringBuilder();
 			HashMap<String, Object> issueQuery =  issueService.getIssueData(repoId, issueId);
 			String dateModified = (String) issueQuery.get(IssueServiceExtended.ISSUE_DATE);
-			TurboIssue latestIssue = new TurboIssue((Issue)issueQuery.get(IssueServiceExtended.ISSUE_CONTENTS));
+			TurboIssue latestIssue = new TurboIssue((Issue)issueQuery.get(IssueServiceExtended.ISSUE_CONTENTS), this);
 			
 			boolean descUpdated = editedIssue.mergeIssues(originalIssue, latestIssue, changeLog);
 			//TODO: inform user when description update failed
@@ -305,7 +305,7 @@ public class Model {
 			// of updates to subscribers of the ObservableList
 			ArrayList<TurboIssue> buffer = new ArrayList<>();
 			for (Issue ghIssue : ghIssues) {
-				buffer.add(new TurboIssue(ghIssue));
+				buffer.add(new TurboIssue(ghIssue, this));
 			}
 			// Add them all at once, so this hopefully propagates only one change
 			issues.addAll(buffer);

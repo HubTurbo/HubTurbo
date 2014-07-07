@@ -131,7 +131,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	private MenuItem[] createGroupContextMenu(TurboIssue issue) {
 		MenuItem childMenuItem = new MenuItem("Create Child Issue");
 		childMenuItem.setOnAction((event) -> {
-			TurboIssue childIssue = new TurboIssue("New child issue", "");
+			TurboIssue childIssue = new TurboIssue("New child issue", "", model);
 			childIssue.getParents().add(issue.getId());
 			model.processInheritedLabels(childIssue, new ArrayList<Integer>());
 			(new IssueDialog(mainStage, model, childIssue)).show().thenApply(
