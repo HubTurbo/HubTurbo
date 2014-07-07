@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
 
 public class Predicate implements FilterExpression {
 	private String name;
@@ -75,7 +77,6 @@ public class Predicate implements FilterExpression {
 				}
 				return false;
 			}
-//		case "child":
 		case "label":
 			for (TurboLabel l : issue.getLabels()) {
 				if (l.getName().toLowerCase().contains(content.toLowerCase())) {
@@ -110,7 +111,13 @@ public class Predicate implements FilterExpression {
 			issue.setTitle(content);
 			break;
 		case "milestone":
-//			issue.setMilestone(conte);
+			// Find milestones containing the partial title
+			List<TurboMilestone> milestones = model.getMilestones().stream().filter(m -> m.getTitle().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+			if (milestones.size() > 1) {
+				throw new PredicateApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
+			} else {
+				issue.setMilestone(milestones.get(0));
+			}
 			break;
 		case "parent":
 			content = content.toLowerCase();
@@ -119,22 +126,32 @@ public class Predicate implements FilterExpression {
 			} else if (Character.isDigit(content.charAt(0))) {
 				issue.setParents(FXCollections.observableArrayList(Integer.parseInt(content)));
 			} else {
-				// apply parents by name
+				// Find parents containing the partial title
+				List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+				if (parents.size() > 1) {
+					throw new PredicateApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
+				} else {
+					issue.getParents().add(parents.get(0).getId());
+				}
 			}
 			break;
-//		case "child":
 		case "label":
-//			for (TurboLabel l : issue.getLabels()) {
-//				if (l.getName().toLowerCase().contains(content.toLowerCase())) {
-//					return true;
-//				}
-//			}
-//			return false;
+			// Find labels containing the partial title
+			List<TurboLabel> labels = model.getLabels().stream().filter(l -> l.getName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+			if (labels.size() > 1) {
+				throw new PredicateApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
+			} else {
+				issue.getLabels().add(labels.get(0));
+			}
 			break;
 		case "assignee":
-//			if (issue.getAssignee() == null) return false;
-//			return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
-//					|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
+			// Find assignees containing the partial title
+			List<TurboUser> assignees = model.getCollaborators().stream().filter(c -> c.getGithubName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+			if (assignees.size() > 1) {
+				throw new PredicateApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
+			} else {
+				issue.setAssignee(assignees.get(0));
+			}
 			break;
 		case "state":
 		case "status":
