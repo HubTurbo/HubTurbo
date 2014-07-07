@@ -125,6 +125,7 @@ public class TurboIssue implements Listable {
 	private TurboLabel getLabelReference(TurboLabel label){
 		int index = allLabels.indexOf(label);
 		assert index != -1;
+		System.out.println(index);
 		return allLabels.get(index);
 	}
 	
@@ -147,6 +148,9 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void setLabels(ObservableList<TurboLabel> labels) {
+		if(this.labels == labels){
+			return;
+		}
 		this.labels.clear();
 		for(TurboLabel label : labels){
 			this.labels.add(getLabelReference(label));
@@ -279,7 +283,6 @@ public class TurboIssue implements Listable {
 		HashSet<TurboLabel> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		
 		latestLabels.removeAll(removed);
-	
 		for(TurboLabel label: added){
 			if(!latestLabels.contains(label)){
 				latestLabels.add(label);
@@ -291,9 +294,11 @@ public class TurboIssue implements Listable {
 	
 	private void logLabelChange(HashSet<TurboLabel> removed, HashSet<TurboLabel> added, StringBuilder changeLog){
 		if(added.size() > 0){
+			System.out.println("Added labels: " + added.toString());
 			changeLog.append("Added labels: " + added.toString() + "\n");
 		}
 		if(removed.size() > 0){
+			System.out.println("Removed labels: " + removed.toString());
 			changeLog.append("Removed labels: " + removed.toString() + "\n");
 		}
 	}
