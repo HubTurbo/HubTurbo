@@ -191,7 +191,7 @@ public class IssueDialog implements Dialog<String> {
 					});
 		});
 		
-		statusBox.setMaxWidth(20);
+		statusBox.setMaxWidth(0);
 		return statusBox;
 	}
 

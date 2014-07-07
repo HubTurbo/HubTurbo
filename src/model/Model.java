@@ -332,6 +332,13 @@ public class Model {
 		for (String standardStatus : standardStatuses) {
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
+			if (standardStatus.endsWith("new") ||
+					standardStatus.endsWith("accepted") ||
+					standardStatus.endsWith("started")) {
+				statusLabel.setColor("009800");
+			} else {
+				statusLabel.setColor("0052cc");
+			}
 			try {
 				ghLabels.add(labelService.createLabel(repoId, statusLabel));
 			} catch (IOException e) {

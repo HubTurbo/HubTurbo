@@ -143,8 +143,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 						if (response.equals("ok")) {
 							model.createIssue(childIssue);
 						}
-						// TODO: Required for some reason
-						//columns.refresh();
 						return true;
 					});
 
