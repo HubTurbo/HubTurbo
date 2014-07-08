@@ -14,7 +14,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class GroupDialog implements Dialog<TurboLabelGroup> {
+public class EditGroupDialog implements Dialog<TurboLabelGroup> {
 	
 	private final Stage parentStage;
 
@@ -25,15 +25,15 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 	
 	private boolean showExclusiveCheckbox = true;
 
-	public GroupDialog(Stage parentStage, String generatedName, boolean exclusive) {
+	public EditGroupDialog(Stage parentStage, TurboLabelGroup group) {
 		this.parentStage = parentStage;
-		this.generatedName = generatedName;
-		this.exclusive = exclusive;
+		this.generatedName = group.getValue();
+		this.exclusive = group.isExclusive();
 
 		response = new CompletableFuture<>();
 	}
 	
-	public GroupDialog setExclusiveCheckboxVisible(boolean visible) {
+	public EditGroupDialog setExclusiveCheckboxEnabled(boolean visible) {
 		showExclusiveCheckbox = visible;
 		return this;
 	}
@@ -80,9 +80,8 @@ public class GroupDialog implements Dialog<TurboLabelGroup> {
 
 		stage.setTitle("New Group");
 		stage.setScene(scene);
-		stage.setOnCloseRequest(e -> {
-			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
-		});
+//		stage.setOnCloseRequest(e -> {
+//		});
 		stage.initOwner(parentStage);
 //		 secondStage.initModality(Modality.APPLICATION_MODAL);
 
