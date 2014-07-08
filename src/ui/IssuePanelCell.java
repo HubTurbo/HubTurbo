@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -96,11 +97,15 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			assigneeBox.getChildren().addAll(assignedToLabel, assigneeName);
 		}
 
+		HBox bottom = new HBox();
+		bottom.setSpacing(5);
+		bottom.setAlignment(Pos.CENTER_LEFT);
+		if (assignee != null) bottom.getChildren().add(assigneeBox);
+		bottom.getChildren().add(labels);
+
 		VBox everything = new VBox();
 		everything.setSpacing(2);
-		everything.getChildren().addAll(titleBox, parents);
-		if (assignee != null) everything.getChildren().add(assigneeBox);
-		everything.getChildren().add(labels);
+		everything.getChildren().addAll(titleBox, parents, bottom);
 
 		setGraphic(everything);
 
