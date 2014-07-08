@@ -19,7 +19,7 @@ public class BetterCheckListView extends VBox {
 	private ObservableList<BetterCheckListItem> items;
 	private ListView<BetterCheckListItem> listView;
 	
-	private ArrayList<WeakChangeListener<Boolean>> listeners;
+	private ArrayList<ChangeListener<Boolean>> listeners;
 	
 	public BetterCheckListView(ObservableList<String> items) {
 		
@@ -52,7 +52,7 @@ public class BetterCheckListView extends VBox {
 		for (int i=0; i<items.size(); i++) {
 			final int j = i;
 			BetterCheckListItem item = new BetterCheckListItem(items.get(i), false);
-			WeakChangeListener<Boolean> listener = new WeakChangeListener<Boolean>(new ChangeListener<Boolean>() {
+			ChangeListener<Boolean> strongListener = new ChangeListener<Boolean>() {
 		        public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
 		        	if (!disabled) {
 			        	if (singleSelection) {
@@ -65,12 +65,13 @@ public class BetterCheckListView extends VBox {
 			        	}
 		        	}
 	        	}
-		    });
-			item.checkedProperty().addListener(listener);
+		    };
+			WeakChangeListener<Boolean> weakListener = new WeakChangeListener<Boolean>(strongListener);
+			item.checkedProperty().addListener(weakListener);
 			
 			// Retain a reference to this listener, so it doesn't get
 			// garbage collected prematurely
-			listeners.add(listener);
+			listeners.add(strongListener);
 			
 			newItems.add(item);
 		}

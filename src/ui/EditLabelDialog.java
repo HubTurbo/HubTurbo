@@ -1,12 +1,9 @@
 package ui;
 
-import java.util.concurrent.CompletableFuture;
-
 import model.TurboLabel;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
@@ -16,26 +13,18 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class EditLabelDialog implements Dialog<TurboLabel> {
-	
-	private final Stage parentStage;
-
-	private CompletableFuture<TurboLabel> response;
+public class EditLabelDialog extends Dialog2<TurboLabel> {
 
 	private TurboLabel originalLabel;
 
 	public EditLabelDialog(Stage parentStage, TurboLabel originalLabel) {
-		this.parentStage = parentStage;
+		super(parentStage);
 		this.originalLabel = originalLabel;
-
-		response = new CompletableFuture<>();
+		
+		setTitle("Edit Label");
+		setSize(330, 125);
 	}
 		
-	public CompletableFuture<TurboLabel> show() {
-		showDialog();
-		return response;
-	}
-
 	private static String toRGBCode(Color color) {
         return String.format( "#%02X%02X%02X",
             (int)( color.getRed() * 255 ),
@@ -43,18 +32,13 @@ public class EditLabelDialog implements Dialog<TurboLabel> {
             (int)( color.getBlue() * 255 ) );
     }
 	
-	private void showDialog() {
+	@Override
+	protected Parent content() {
 
 		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		
-		Scene scene = new Scene(layout, 330, 120);
-
-		Stage stage = new Stage();
-
-		Platform.runLater(() -> stage.requestFocus());
-				
 		TextField labelNameField = new TextField();
 		labelNameField.setText(originalLabel.getName());
 
@@ -68,29 +52,19 @@ public class EditLabelDialog implements Dialog<TurboLabel> {
 
 		layout.getChildren().addAll(labelNameField, colourPicker, buttonContainer);
 
-		stage.setTitle("Edit Label");
-		stage.setScene(scene);
-//		stage.setOnCloseRequest(e -> {
-//		});
-		stage.initOwner(parentStage);
-//		 secondStage.initModality(Modality.APPLICATION_MODAL);
-
 		close.setOnAction(e -> {
 			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
-			stage.close();
+			close();
 		});
 
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY());
-
-		stage.show();
+		return layout;
 	}
-
+	
 	private void respond(String name, String rgbCode) {
 		TurboLabel label = new TurboLabel("doesn't matter");
 		label.copyValues(originalLabel);
 		label.setName(name);
 		label.setColour(rgbCode.substring(1));
-		response.complete(label);
+		completeResponse(label);
 	}
 }

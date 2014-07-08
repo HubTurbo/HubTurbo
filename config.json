@@ -1,12 +1,12 @@
 {
   "excludedLabels": [
-    "status.",
-    "type-"
+    "status."
   ],
   "openStatusLabels": [
     "status.new",
     "status.accepted",
-    "status.started"
+    "status.started",
+    "status.reopened"
   ],
   "closedStatusLabels": [
     "status.fixed",
