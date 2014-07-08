@@ -35,22 +35,7 @@ public class TurboIssue implements Listable {
 	/*
 	 * Attributes, Getters & Setters
 	 */
-//	
-//	private ObservableList<TurboLabel> allLabels;
-//	public ObservableList<TurboLabel> getAllLabels(){
-//		return allLabels;
-//	}
-//	
-//	private ObservableList<TurboMilestone> allMilestones;
-//	public ObservableList<TurboMilestone> getAllMilestones(){
-//		return allMilestones;
-//	}
-//	
-//	private ObservableList<TurboUser> allCollaborators;
-//	public ObservableList<TurboUser> getAllCollaborators(){
-//		return allCollaborators;
-//	}
-//	
+
 	private WeakReference<Model> model;
 	private WeakReference<Model> getModel(){
 		return model;
@@ -126,7 +111,9 @@ public class TurboIssue implements Listable {
 	}
 	
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
-	public ObservableList<TurboLabel> getLabels() {return labels;}
+	public ObservableList<TurboLabel> getLabels() {
+		return labels;
+	}
 	
 	private TurboLabel getLabelReference(TurboLabel label){
 		List<TurboLabel> allLabels = model.get().getLabels();
@@ -160,10 +147,7 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void setLabels(ObservableList<TurboLabel> labels) {
-		if(this.labels == labels){
-			return;
-		}
-		this.labels.clear();
+		this.labels = FXCollections.observableArrayList();
 		for(TurboLabel label : labels){
 			this.labels.add(getLabelReference(label));
 		}
