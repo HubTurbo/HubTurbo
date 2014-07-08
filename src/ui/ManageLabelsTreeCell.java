@@ -131,8 +131,19 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	private MenuItem[] createLabelContextMenu() {
 		MenuItem edit = new MenuItem("Edit Label");
 		edit.setOnAction((event) -> {
-			getTreeView().setEditable(true);
-			getTreeView().edit(getTreeItem());
+//			getTreeView().setEditable(true);
+//			getTreeView().edit(getTreeItem());
+			assert getItem() instanceof TurboLabel;
+			TurboLabel original = (TurboLabel) getItem();
+			String oldName = original.toGhName();
+
+			(new EditLabelDialog(stage, original)).show().thenApply(response -> {
+		    	model.updateLabel(response, oldName);
+				return true;
+			}).exceptionally(e -> {
+				e.printStackTrace();
+				return false;
+			});
 		});
 		MenuItem delete = new MenuItem("Delete Label");
 		delete.setOnAction((event) -> {
