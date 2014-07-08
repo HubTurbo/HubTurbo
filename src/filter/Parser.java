@@ -7,7 +7,8 @@ public class Parser {
 	public static void main(String[] args) {
 //		System.out.println(Parser.parse("e(f) (a(b) or c(d))"));
 //		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
-//		System.out.println(Parser.parse("assignee(dar)"));
+//		FilterExpression p = Parser.parse("assignee:dar ius(one)");
+//		System.out.println(p);
 	}
 	
 	private Parser(ArrayList<Token> input) {
@@ -107,9 +108,27 @@ public class Parser {
 
 	private FilterExpression parsePredicate(Token token) {
 		String name = token.getValue();
-		consume(TokenType.LBRACKET);
-		String content = consume().getValue();
-		consume(TokenType.RBRACKET);
+		String content;
+		
+		// Predicates look like the following:
+
+		// symbol(content with spaces)
+		// symbol: contentWithoutSpaces
+
+		// As symbols are lexed with spaces, a lexer hack which groups colon
+		// tokens together with their space-less content is used to recognise
+		// the second case. The content is then extracted from the token here,
+		// in the parsing stage.
+		
+		if (lookAhead().getType() == TokenType.COLON_SYMBOL) {
+			String colonPlusContent = consume(TokenType.COLON_SYMBOL).getValue();
+			content = colonPlusContent.substring(1).trim();
+		}
+		else {
+			consume(TokenType.LBRACKET);
+			content = consume().getValue();
+			consume(TokenType.RBRACKET);
+		}
 		return new Predicate(name, content);
 	}
 	

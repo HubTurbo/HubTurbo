@@ -17,7 +17,8 @@ public class Lexer {
 			new Rule("~|!|-", TokenType.NEGATE),
 			new Rule("[A-Za-z0-9][A-Za-z0-9 ]*[A-Za-z0-9]|[A-Za-z0-9]", TokenType.SYMBOL),
 			new Rule("\\(", TokenType.LBRACKET),
-			new Rule("\\)", TokenType.RBRACKET)
+			new Rule("\\)", TokenType.RBRACKET),
+			new Rule(": *[A-Za-z0-9]+", TokenType.COLON_SYMBOL)
 		);
 
 	private String input;

@@ -57,4 +57,13 @@ public class Tests {
 		assertEquals(Parser.parse("e(f) ~(a(b) or c(d))"),
 				new Conjunction(new Predicate("e", "f"), new Negation(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")))));
 	}
+	
+	@Test
+	public void colon() {
+		assertEquals(Parser.parse("assignee:darius"),
+				new Predicate("assignee", "darius"));
+		assertEquals(Parser.parse("assignee:dar ius(one)"),
+				new Conjunction(new Predicate("assignee", "dar"), new Predicate("ius", "one")));
+		
+	}
 }
