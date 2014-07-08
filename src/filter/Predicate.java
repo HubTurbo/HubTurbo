@@ -131,7 +131,7 @@ public class Predicate implements FilterExpression {
 				if (parents.size() > 1) {
 					throw new PredicateApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
 				} else {
-					issue.getParents().add(parents.get(0).getId());
+					issue.addParent(parents.get(0).getId());
 				}
 			}
 			break;

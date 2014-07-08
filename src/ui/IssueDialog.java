@@ -240,11 +240,11 @@ public class IssueDialog implements Dialog<String> {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParents(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParentsReference(), true);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
-			List<Integer> originalParents = new ArrayList<Integer>(issue.getParents());
+			List<Integer> originalParents = issue.getParents();
 			List<Integer> indicesForExistingParents = originalParents.stream()
 					.map((parent) -> {
 						for (int i = 0; i < allIssues.size(); i++) {

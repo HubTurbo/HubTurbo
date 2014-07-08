@@ -84,7 +84,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		HBox titleBox = new HBox();
 		titleBox.getChildren().addAll(buttonBox, issueName);
 
-		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParents(), false);
+		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentsReference(), false);
 		
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabelsReference(), false, "");
 
@@ -137,7 +137,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		MenuItem childMenuItem = new MenuItem("Create Child Issue");
 		childMenuItem.setOnAction((event) -> {
 			TurboIssue childIssue = new TurboIssue("New child issue", "", model);
-			childIssue.getParents().add(issue.getId());
+			childIssue.addParent(issue.getId());
 			model.processInheritedLabels(childIssue, new ArrayList<Integer>());
 			(new IssueDialog(mainStage, model, childIssue)).show().thenApply(
 					response -> {

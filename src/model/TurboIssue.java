@@ -189,13 +189,25 @@ public class TurboIssue implements Listable {
 	}
 	
 	private ObservableList<Integer> parents = FXCollections.observableArrayList();
-	public ObservableList<Integer> getParents() {return parents;}
+	public ObservableList<Integer> getParents() {
+		return  FXCollections.observableArrayList(parents);
+	}
+	public ObservableList<Integer> getParentsReference(){
+		return parents;
+	} 
+	
 	public void setParents(ObservableList<Integer> parentNumbers) {
 		if (this.parents == null) {
 			this.parents = parentNumbers;
 		} else if (parentNumbers != this.parents) {
 			this.parents.clear();
 			this.parents.addAll(parentNumbers);
+		}
+	}
+	
+	public void addParent(Integer parentId){
+		if(!parents.contains(parentId)){
+			parents.add(parentId);
 		}
 	}
 
@@ -263,7 +275,6 @@ public class TurboIssue implements Listable {
 			setAssignee(obj.getAssignee());
 			setMilestone(obj.getMilestone());
 			setLabels(obj.getLabels());
-			setParents(FXCollections.observableArrayList(obj.getParents()));
 			setParents(obj.getParents());
 		}
 	}
@@ -387,9 +398,9 @@ public class TurboIssue implements Listable {
 		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		latestParents.removeAll(removed);
-		for(Integer label: added){
-			if(!latestParents.contains(label)){
-				latestParents.add(label);
+		for(Integer parent: added){
+			if(!latestParents.contains(parent)){
+				latestParents.add(parent);
 			}
 		}
 		latest.setParents(latestParents);
