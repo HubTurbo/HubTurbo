@@ -23,7 +23,7 @@ public class EditGroupDialog extends Dialog2<TurboLabelGroup> {
 		this.exclusive = group.isExclusive();
 		
 		setTitle("Edit Group");
-		setSize(330, 120);
+		setSize(330, 90);
 	}
 	
 	public EditGroupDialog setExclusiveCheckboxEnabled(boolean visible) {
