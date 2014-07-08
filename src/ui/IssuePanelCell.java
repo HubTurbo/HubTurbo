@@ -233,11 +233,12 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
+		TurboIssue oldIssue = new TurboIssue(issue);
 		TurboIssue modifiedIssue = new TurboIssue(issue);
 		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
 				response -> {
 					if (response.equals("ok")) {
-						model.updateIssue(issue, modifiedIssue);
+						model.updateIssue(oldIssue, modifiedIssue);
 					}
 					return true;
 				}).exceptionally(ex -> {

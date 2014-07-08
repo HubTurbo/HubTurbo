@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+//import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -43,7 +42,7 @@ public class IssueDialog implements Dialog<String> {
 	private Stage parentStage;
 	private Model model;
 	private TurboIssue issue;
-	private CheckBox closedCheckBox = new CheckBox("Closed");
+//	private CheckBox closedCheckBox = new CheckBox("Closed");
 
 	private CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
@@ -101,20 +100,20 @@ public class IssueDialog implements Dialog<String> {
 		return listener;
 	}
 	
-	private ChangeListener<Boolean> createIssueStateChangeListener(){
-		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
-	        public void changed(ObservableValue<? extends Boolean> ov,
-	            Boolean oldValue, Boolean newValue) {
-	        	TurboIssue issue = issueRef.get();
-	        	if(issue != null){
-	        		issue.setOpen(!newValue);
-	        	}
-	        }
-	    };
-	    changeListeners.add(listener);
-	    return listener;
-	}
+//	private ChangeListener<Boolean> createIssueStateChangeListener(){
+//		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+//		ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
+//	        public void changed(ObservableValue<? extends Boolean> ov,
+//	            Boolean oldValue, Boolean newValue) {
+//	        	TurboIssue issue = issueRef.get();
+//	        	if(issue != null){
+//	        		issue.setOpen(!newValue);
+//	        	}
+//	        }
+//	    };
+//	    changeListeners.add(listener);
+//	    return listener;
+//	}
 
 	
 	private ChangeListener<String> createIssueDescriptionChangeListener(){
