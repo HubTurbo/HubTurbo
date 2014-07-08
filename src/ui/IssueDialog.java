@@ -183,9 +183,10 @@ public class IssueDialog implements Dialog<String> {
 				.setInitialChecked(issue.getLabels())
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
-						issue.getLabels().removeIf(label -> label.getGroup() != null && label.getGroup().equals("status"));
-						issue.getLabels().addAll(FXCollections.observableArrayList(response));
-						issue.setLabels(issue.getLabels());
+						ObservableList<TurboLabel> issueLabels = issue.getLabels();
+						issueLabels.removeIf(label -> label.getGroup() != null && label.getGroup().equals("status"));
+						issueLabels.addAll(FXCollections.observableArrayList(response));
+						issue.setLabels(issueLabels);
 						statusLabel.setAll(FXCollections.observableArrayList(response));
 						return true;
 					}).exceptionally(ex -> {
@@ -304,8 +305,10 @@ public class IssueDialog implements Dialog<String> {
 				.setInitialChecked(issue.getLabels())
 				.show().thenApply(
 					(List<TurboLabel> response) -> {
-						issue.getLabels().removeIf(label -> label.getGroup() == null || !label.getGroup().equals("status"));
-						issue.getLabels().addAll(FXCollections.observableArrayList(response));
+						ObservableList<TurboLabel> issueLabels = issue.getLabels();
+						issueLabels.removeIf(label -> label.getGroup() == null || !label.getGroup().equals("status"));
+						issueLabels.addAll(FXCollections.observableArrayList(response));
+						issue.setLabels(issueLabels);
 						nonStatusLabels.setAll(FXCollections.observableArrayList(response));
 						return true;
 					})
