@@ -1,7 +1,6 @@
 {
   "excludedLabels": [
-    "status.",
-    "type-"
+    "status."
   ],
   "openStatusLabels": [
     "status.new",

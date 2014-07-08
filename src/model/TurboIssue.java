@@ -219,6 +219,7 @@ public class TurboIssue implements Listable {
 
 	public Issue toGhResource() {
 		Issue ghIssue = new Issue();
+		ghIssue.setHtmlUrl(getHtmlUrl());
 		ghIssue.setNumber(getId());
 		ghIssue.setTitle(getTitle());
 		ghIssue.setState(getOpen() ? STATE_OPEN : STATE_CLOSED);
