@@ -49,7 +49,7 @@ public class EditLabelDialog implements Dialog<TurboLabel> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		
-		Scene scene = new Scene(layout, 330, 150);
+		Scene scene = new Scene(layout, 330, 120);
 
 		Stage stage = new Stage();
 
