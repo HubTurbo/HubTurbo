@@ -56,6 +56,13 @@ public abstract class Dialog2<T> {
 		return this;
 	}
 	
+	public Dialog2<T> center() {
+		double x = (parentStage.getWidth() - width) / 2;
+		double y = (parentStage.getHeight() - height) / 2;
+		setPosition(x, -y);
+		return this;
+	}
+
 	// Dialog actions
 
 	public void close() {
