@@ -32,15 +32,10 @@ public class ModelUpdater {
 	}
 	
 	private void updateModel(){
-		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	updateModelIssues();
-	    		updateModelCollaborators();
-	    		updateModelLabels();
-	    		updateModelMilestones();
-	        }
-	   });
+	    updateModelIssues();
+	    updateModelCollaborators();
+	   	updateModelLabels();
+	  	updateModelMilestones();
 	}
 	
 	private void updateModelIssues(){

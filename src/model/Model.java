@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -144,7 +145,12 @@ public class Model {
 		}
 		
 		for(Issue issue: issueList){
-			updateCachedIssue(issue);
+			Platform.runLater(new Runnable() {
+		        @Override
+		        public void run() {
+		        	updateCachedIssue(issue);
+		        }
+		   });
 		}
 
 	}
