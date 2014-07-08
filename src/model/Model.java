@@ -79,6 +79,9 @@ public class Model {
 	private void addInheritedLabels(HashSet<Integer> addedParents, TurboIssue issue){
 		for (Integer addedParentId : addedParents) {
 			TurboIssue addedParent = getIssueWithId(addedParentId);
+			if(addedParent == null){
+				continue;
+			}
 			for(TurboLabel label : addedParent.getLabels()){
 				if(!UserConfigurations.isExcludedLabel(label.toGhName())){
 					issue.addLabel(label);
@@ -91,6 +94,9 @@ public class Model {
 		List<Integer> editedParents = issue.getParents();
 		for (Integer removedParentId : removedParents) {
 			TurboIssue removedParent = getIssueWithId(removedParentId);
+			if(removedParent == null){
+				continue;
+			}
 			for (TurboLabel label : removedParent.getLabels()) {
 				if(UserConfigurations.isExcludedLabel(label.toGhName())){
 					continue;
@@ -163,11 +169,11 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue, this);
-		int index = getIndexOfIssue(issue.getNumber());
-		//TODO:
-		if(index != -1){
-			//Currently object is replaced because we do not want the issue object held by the IssueDialog to be updated as it complicates the issue update concurrency handling
-			issues.set(index, newCached);
+//		int index = getIndexOfIssue(issue.getNumber());
+		TurboIssue tIssue = getIssueWithId(issue.getNumber());
+		if(tIssue != null){
+//			issues.set(index, newCached);
+			tIssue.copyValues(newCached);
 		}else{
 			issues.add(0, newCached);
 		}
