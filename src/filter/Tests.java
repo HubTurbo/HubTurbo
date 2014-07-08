@@ -13,6 +13,7 @@ public class Tests {
 		
 		assertEquals(Parser.parse("a(b)"), new Predicate("a", "b"));
 		assertEquals(Parser.parse("    a   (   b   )   "), new Predicate("a", "b"));
+		assertEquals(Parser.parse("a(dar ius)"), new Predicate("a", "dar ius"));
 		
 		assertEquals(Parser.parse("a(b) or c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 		assertEquals(Parser.parse("a(b) | c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
@@ -24,6 +25,7 @@ public class Tests {
 		assertEquals(Parser.parse("a(b) && c(d)"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 
 		assertEquals(Parser.parse("!a(b)"), new Negation(new Predicate("a", "b")));
+		assertEquals(Parser.parse("-a(b)"), new Negation(new Predicate("a", "b")));
 		assertEquals(Parser.parse("~a(b)"), new Negation(new Predicate("a", "b")));
 	}
 	
