@@ -107,6 +107,29 @@ public class Model {
 		issue.setLabels(issueLabels);
 
 	}
+	
+	private void removeInheritedLabels(HashSet<Integer> removed, TurboIssue issue){
+//		for (Integer removedParentId : removed) {
+//			int removedParentIndex = getIndexOfIssue(removedParentId);
+//			TurboIssue removedParent = issues.get(removedParentIndex);
+//			for (TurboLabel label : removedParent.getLabels()) {
+//				boolean toBeRemoved = true;
+//				// Loop to check if other parents have the label to be removed
+//				for (Integer editedParentId : editedParents) {
+//					int editedParentIndex = getIndexOfIssue(editedParentId);
+//					TurboIssue editedParent = issues.get(editedParentIndex);
+//					if (editedParent.getLabels().contains(label)) {
+//						toBeRemoved = false;
+//						break;
+//					}
+//				}
+//				if (toBeRemoved &&
+//						!UserConfigurations.isExcludedLabel(label.toGhName())) {
+//					issueLabels.remove(label);
+//				}
+//			}
+//		}
+	}
 
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;

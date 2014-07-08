@@ -151,12 +151,17 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
+	public void removeLabel(TurboLabel label){
+		labels.remove(label);
+	}
+	
 	private void addToLabels(TurboLabel label){
 		labels.add(getLabelReference(label));
 	}
 	
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if(this.labels != labels){
+			this.labels.clear();
 			for(TurboLabel label : labels){
 				addToLabels(label);
 			}
