@@ -112,6 +112,9 @@ public class TurboIssue implements Listable {
 	
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	public ObservableList<TurboLabel> getLabels() {
+		return FXCollections.observableArrayList(labels);
+	}
+	public ObservableList<TurboLabel> getLabelsReference() {
 		return labels;
 	}
 	
@@ -143,13 +146,20 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void addLabel(TurboLabel label){
+		if(!labels.contains(label)){
+			addToLabels(label);
+		}
+	}
+	
+	private void addToLabels(TurboLabel label){
 		labels.add(getLabelReference(label));
 	}
 	
 	public void setLabels(ObservableList<TurboLabel> labels) {
-		this.labels = FXCollections.observableArrayList();
-		for(TurboLabel label : labels){
-			this.labels.add(getLabelReference(label));
+		if(this.labels != labels){
+			for(TurboLabel label : labels){
+				addToLabels(label);
+			}
 		}
 		// Auto update status as closed if any labels are equivalent to closed status
 		for (TurboLabel currentLabel : labels) {
@@ -243,7 +253,7 @@ public class TurboIssue implements Listable {
 			setDescription(obj.getDescription());
 			setAssignee(obj.getAssignee());
 			setMilestone(obj.getMilestone());
-			setLabels(FXCollections.observableArrayList(obj.getLabels()));
+			setLabels(obj.getLabels());
 			setParents(FXCollections.observableArrayList(obj.getParents()));
 			setParents(obj.getParents());
 		}

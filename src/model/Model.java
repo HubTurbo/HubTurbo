@@ -103,6 +103,8 @@ public class Model {
 				}
 			}
 		}
+		
+		issue.setLabels(issueLabels);
 
 	}
 
