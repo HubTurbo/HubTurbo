@@ -46,8 +46,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			(new EditLabelDialog(stage, original)).show().thenApply(response -> {
 		    	model.updateLabel(response, oldName);
 		    	
-		    	// The tree view doesn't update automatically for some reason;
-		    	// manually trigger the update
+		    	// The tree view doesn't update automatically because there is;
+		    	// no binding; manually trigger the update
 		    	original.copyValues(response);
 		    	updateItem(original, false);
 		    	
@@ -77,39 +77,38 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			
 			TurboLabelGroup group = (TurboLabelGroup) getItem();
 			
-			(new GroupDialog(stage, group.getValue(), group.isExclusive()))
-			.setExclusiveCheckboxVisible(false)
-			.show().thenApply(response -> {
-				
-				assert response.getValue() != null;
-				if (response.getValue().isEmpty()) {
+			(new EditGroupDialog(stage, group))
+				.setExclusiveCheckboxVisible(false)
+				.show().thenApply(response -> {
+					assert response.getValue() != null;
+					if (response.getValue().isEmpty()) {
+						return false;
+					}
+	
+		    		// Get all the old names
+		    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
+	
+		    		// Update every label using TurboLabelGroup::setValue
+		    		group.setValue(response.getValue());
+		    		group.setExclusive(response.isExclusive());
+	
+		    		// Trigger updates on all the labels
+		    		for (int i=0; i<oldNames.size(); i++) {
+		    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
+		    		}
+		    		
+		    		// Manually update the treeview, since there is no binding
+		    		TreeItem<LabelTreeItem> item = getTreeItem();
+		    		TreeItem<LabelTreeItem> parent = item.getParent();
+		    		parent.getChildren().remove(item);
+		    		parent.getChildren().add(item);
+		    		
+					return true;
+				})
+				.exceptionally(ex -> {
+					ex.printStackTrace();
 					return false;
-				}
-
-	    		// Get all the old names
-	    		ArrayList<String> oldNames = new ArrayList<>(group.getLabels().stream().map(l -> l.toGhName()).collect(Collectors.toList()));
-
-	    		// Update every label using TurboLabelGroup::setValue
-	    		group.setValue(response.getValue());
-	    		group.setExclusive(response.isExclusive());
-
-	    		// Trigger updates on all the labels
-	    		for (int i=0; i<oldNames.size(); i++) {
-	    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
-	    		}
-	    		
-	    		// Manually update the treeview, since there is no binding
-	    		TreeItem<LabelTreeItem> item = getTreeItem();
-	    		TreeItem<LabelTreeItem> parent = item.getParent();
-	    		parent.getChildren().remove(item);
-	    		parent.getChildren().add(item);
-	    		
-				return true;
-			})
-			.exceptionally(ex -> {
-				ex.printStackTrace();
-				return false;
-			});
+				});
 		});
 
 		MenuItem label = new MenuItem("New Label");

@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -77,24 +76,24 @@ public class ManageLabelsDialog implements Dialog<String> {
 		Button newGroup = new Button("New Group");
 		newGroup.setOnAction(e -> {
 			
-			(new GroupDialog(stage, "newgroup" + getUniqueId(), false))
-			.setExclusiveCheckboxVisible(true)
-			.show().thenApply(response -> {
-
-				assert response.getValue() != null;
-				if (response.getValue().isEmpty()) {
+			TurboLabelGroup group = new TurboLabelGroup("newgroup" + getUniqueId());
+			(new EditGroupDialog(stage, group))
+				.setExclusiveCheckboxVisible(true)
+				.show().thenApply(response -> {
+	
+					assert response.getValue() != null;
+					if (response.getValue().isEmpty()) {
+						return false;
+					}
+	
+					TreeItem<LabelTreeItem> item = new TreeItem<>(response);
+					treeView.getRoot().getChildren().add(item);
+	
+					return true;
+				}).exceptionally(ex -> {
+					ex.printStackTrace();
 					return false;
-				}
-
-				TreeItem<LabelTreeItem> item = new TreeItem<>(response);
-				treeView.getRoot().getChildren().add(item);
-
-				return true;
-			}).exceptionally(ex -> {
-				ex.printStackTrace();
-				return false;
-			});
-			
+				});
 		});
 		
 		Button close = new Button("Close");
