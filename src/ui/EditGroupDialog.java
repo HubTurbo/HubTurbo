@@ -1,11 +1,8 @@
 package ui;
 
-import java.util.concurrent.CompletableFuture;
-
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -14,23 +11,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class EditGroupDialog implements Dialog<TurboLabelGroup> {
+public class EditGroupDialog extends Dialog2<TurboLabelGroup> {
 	
-	private final Stage parentStage;
-
-	private CompletableFuture<TurboLabelGroup> response;
-
 	private String generatedName;
 	private boolean exclusive;
-	
 	private boolean showExclusiveCheckbox = true;
 
 	public EditGroupDialog(Stage parentStage, TurboLabelGroup group) {
-		this.parentStage = parentStage;
+		super(parentStage);
 		this.generatedName = group.getValue();
 		this.exclusive = group.isExclusive();
-
-		response = new CompletableFuture<>();
+		
+		setTitle("Edit Group");
+		setSize(330, 120);
 	}
 	
 	public EditGroupDialog setExclusiveCheckboxEnabled(boolean visible) {
@@ -38,23 +31,13 @@ public class EditGroupDialog implements Dialog<TurboLabelGroup> {
 		return this;
 	}
 	
-	public CompletableFuture<TurboLabelGroup> show() {
-		showDialog();
-		return response;
-	}
-
-	private void showDialog() {
+	@Override
+	protected Parent content() {
 
 		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
-		
-		Scene scene = new Scene(layout, 330, 90);
-
-		Stage stage = new Stage();
-
-		Platform.runLater(() -> stage.requestFocus());
-		
+				
 		Button close = new Button("Close");
 		HBox buttonContainer = new HBox();
 		buttonContainer.setAlignment(Pos.CENTER_RIGHT);
@@ -76,29 +59,19 @@ public class EditGroupDialog implements Dialog<TurboLabelGroup> {
 		TextField groupNameField = new TextField();
 		groupNameField.setText(generatedName);
 		
-		layout.getChildren().addAll(groupNameField, bottomContainer);
-
-		stage.setTitle("New Group");
-		stage.setScene(scene);
-//		stage.setOnCloseRequest(e -> {
-//		});
-		stage.initOwner(parentStage);
-//		 secondStage.initModality(Modality.APPLICATION_MODAL);
-
 		close.setOnAction(e -> {
 			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
-			stage.close();
+			close();
 		});
 
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY());
-
-		stage.show();
+		layout.getChildren().addAll(groupNameField, bottomContainer);
+		
+		return layout;
 	}
 
 	private void respond(String name, boolean exclusive) {
 		TurboLabelGroup res = new TurboLabelGroup(name);
 		res.setExclusive(exclusive);
-		response.complete(res);
+		completeResponse(res);
 	}
 }
