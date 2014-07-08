@@ -80,9 +80,8 @@ public class EditGroupDialog implements Dialog<TurboLabelGroup> {
 
 		stage.setTitle("New Group");
 		stage.setScene(scene);
-		stage.setOnCloseRequest(e -> {
-			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
-		});
+//		stage.setOnCloseRequest(e -> {
+//		});
 		stage.initOwner(parentStage);
 //		 secondStage.initModality(Modality.APPLICATION_MODAL);
 
