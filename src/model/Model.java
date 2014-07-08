@@ -135,7 +135,7 @@ public class Model {
 			e.printStackTrace();
 		} 
 		TurboIssue returnedIssue = new TurboIssue(createdIssue, this);
-		issues.add(returnedIssue);
+		issues.add(0, returnedIssue);
 		return returnedIssue;
 	}
 	
