@@ -1,6 +1,6 @@
 
 .borders {
-	-fx-border-color: #000000;
+	-fx-border-color: #7f7f7f;
 	-fx-border-width: 1px;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .issue-panel-name {
-	-fx-font-size: 24px;
+	-fx-font-size: 16px;
 }
 
 .issue-panel-closed {
