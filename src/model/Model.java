@@ -70,65 +70,46 @@ public class Model {
 		HashMap<String, HashSet<Integer>> changeSet = CollectionUtilities.getChangesToList(originalParents, editedParents);
 		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
-		ObservableList<TurboLabel> issueLabels = issue.getLabels();
 		
-		for (Integer removedParentId : removed) {
-			int removedParentIndex = getIndexOfIssue(removedParentId);
-			TurboIssue removedParent = issues.get(removedParentIndex);
+		removeInheritedLabels(removed, issue);
+		addInheritedLabels(added, issue);
+
+	}
+	
+	private void addInheritedLabels(HashSet<Integer> addedParents, TurboIssue issue){
+		for (Integer addedParentId : addedParents) {
+			TurboIssue addedParent = getIssueWithId(addedParentId);
+			for(TurboLabel label : addedParent.getLabels()){
+				if(!UserConfigurations.isExcludedLabel(label.toGhName())){
+					issue.addLabel(label);
+				}
+			}
+		}
+	}
+	
+	private void removeInheritedLabels(HashSet<Integer> removedParents, TurboIssue issue){
+		List<Integer> editedParents = issue.getParents();
+		for (Integer removedParentId : removedParents) {
+			TurboIssue removedParent = getIssueWithId(removedParentId);
 			for (TurboLabel label : removedParent.getLabels()) {
+				if(UserConfigurations.isExcludedLabel(label.toGhName())){
+					continue;
+				}
 				boolean toBeRemoved = true;
 				// Loop to check if other parents have the label to be removed
 				for (Integer editedParentId : editedParents) {
-					int editedParentIndex = getIndexOfIssue(editedParentId);
-					TurboIssue editedParent = issues.get(editedParentIndex);
-					if (editedParent.getLabels().contains(label)) {
+					TurboIssue editedParent = getIssueWithId(editedParentId);
+					if (editedParent.hasLabel(label)) {
 						toBeRemoved = false;
 						break;
 					}
 				}
-				if (toBeRemoved &&
-						!UserConfigurations.isExcludedLabel(label.toGhName())) {
-					issueLabels.remove(label);
+				
+				if (toBeRemoved) {
+					issue.removeLabel(label);
 				}
 			}
 		}
-		
-		for (Integer addedParentId : added) {
-			int addedParentIndex = getIndexOfIssue(addedParentId);
-			TurboIssue addedParent = issues.get(addedParentIndex);
-			for(TurboLabel label : addedParent.getLabels()){
-				if(!issueLabels.contains(label) &&
-						!UserConfigurations.isExcludedLabel(label.toGhName())){
-					issueLabels.add(label);
-				}
-			}
-		}
-		
-		issue.setLabels(issueLabels);
-
-	}
-	
-	private void removeInheritedLabels(HashSet<Integer> removed, TurboIssue issue){
-//		for (Integer removedParentId : removed) {
-//			int removedParentIndex = getIndexOfIssue(removedParentId);
-//			TurboIssue removedParent = issues.get(removedParentIndex);
-//			for (TurboLabel label : removedParent.getLabels()) {
-//				boolean toBeRemoved = true;
-//				// Loop to check if other parents have the label to be removed
-//				for (Integer editedParentId : editedParents) {
-//					int editedParentIndex = getIndexOfIssue(editedParentId);
-//					TurboIssue editedParent = issues.get(editedParentIndex);
-//					if (editedParent.getLabels().contains(label)) {
-//						toBeRemoved = false;
-//						break;
-//					}
-//				}
-//				if (toBeRemoved &&
-//						!UserConfigurations.isExcludedLabel(label.toGhName())) {
-//					issueLabels.remove(label);
-//				}
-//			}
-//		}
 	}
 
 	public IRepositoryIdProvider getRepoId(){
@@ -287,6 +268,16 @@ public class Model {
 			}
 		}
 		return -1;
+	}
+	
+	private TurboIssue getIssueWithId(int id){
+		for(int i = 0; i < issues.size(); i++){
+			TurboIssue issue = issues.get(i);
+			if(issue.getId() == id){
+				return issue;
+			}
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -145,6 +145,10 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
+	public boolean hasLabel(TurboLabel label){
+		return labels.contains(label);
+	}
+	
 	public void addLabel(TurboLabel label){
 		if(!labels.contains(label)){
 			addToLabels(label);
