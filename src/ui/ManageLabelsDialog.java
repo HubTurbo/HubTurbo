@@ -78,7 +78,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 			
 			TurboLabelGroup group = new TurboLabelGroup("newgroup" + getUniqueId());
 			(new EditGroupDialog(stage, group))
-				.setExclusiveCheckboxVisible(true)
+				.setExclusiveCheckboxEnabled(true)
 				.show().thenApply(response -> {
 	
 					assert response.getValue() != null;

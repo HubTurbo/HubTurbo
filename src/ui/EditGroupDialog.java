@@ -33,7 +33,7 @@ public class EditGroupDialog implements Dialog<TurboLabelGroup> {
 		response = new CompletableFuture<>();
 	}
 	
-	public EditGroupDialog setExclusiveCheckboxVisible(boolean visible) {
+	public EditGroupDialog setExclusiveCheckboxEnabled(boolean visible) {
 		showExclusiveCheckbox = visible;
 		return this;
 	}

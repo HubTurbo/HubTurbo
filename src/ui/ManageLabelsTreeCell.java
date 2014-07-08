@@ -35,27 +35,31 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			setContextMenu(getContextMenuForItem(getTreeItem()));
 		}
 	}
+	
+	private void triggerLabelEdit(TurboLabel label) {
+		String oldName = label.toGhName();
+
+		(new EditLabelDialog(stage, label)).show().thenApply(response -> {
+	    	model.updateLabel(response, oldName);
+	    	
+	    	// The tree view doesn't update automatically because there is;
+	    	// no binding; manually trigger the update
+	    	label.copyValues(response);
+	    	updateItem(label, false);
+	    	
+			return true;
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return false;
+		});
+	}
 
 	private MenuItem[] createLabelContextMenu() {
 		MenuItem edit = new MenuItem("Edit Label");
 		edit.setOnAction((event) -> {
 			assert getItem() instanceof TurboLabel;
 			TurboLabel original = (TurboLabel) getItem();
-			String oldName = original.toGhName();
-
-			(new EditLabelDialog(stage, original)).show().thenApply(response -> {
-		    	model.updateLabel(response, oldName);
-		    	
-		    	// The tree view doesn't update automatically because there is;
-		    	// no binding; manually trigger the update
-		    	original.copyValues(response);
-		    	updateItem(original, false);
-		    	
-				return true;
-			}).exceptionally(e -> {
-				e.printStackTrace();
-				return false;
-			});
+			triggerLabelEdit(original);
 		});
 		MenuItem delete = new MenuItem("Delete Label");
 		delete.setOnAction((event) -> {
@@ -78,7 +82,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			TurboLabelGroup group = (TurboLabelGroup) getItem();
 			
 			(new EditGroupDialog(stage, group))
-				.setExclusiveCheckboxVisible(false)
+				.setExclusiveCheckboxEnabled(false)
 				.show().thenApply(response -> {
 					assert response.getValue() != null;
 					if (response.getValue().isEmpty()) {
@@ -132,6 +136,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(newLabel));
 			
 			getTreeItem().setExpanded(true);
+			
+			triggerLabelEdit(newLabel);
 		});
 		
 		boolean isUngroupedHeading = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME);
