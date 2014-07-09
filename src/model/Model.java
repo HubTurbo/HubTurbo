@@ -286,8 +286,18 @@ public class Model {
 		return null;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void updateCachedList(List list, List newList){
+		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
+		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
+		list.removeAll(removed);
+		for(Object item: newList){
+			updateCachedListItem((Listable)item, list);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
-	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") ObservableList list){
+	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") List list){
 		int index = list.indexOf(updated);
 		if(index != -1){
 			Listable old = (Listable)list.get(index);
@@ -309,9 +319,12 @@ public class Model {
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
+		ArrayList<Listable> newCollaborators = new ArrayList<Listable>();
 		for(User ghCollaborator : ghCollaborators) {
-			updateCachedListItem(new TurboUser(ghCollaborator), collaborators);
+//			updateCachedListItem(new TurboUser(ghCollaborator), collaborators);
+			newCollaborators.add(new TurboUser(ghCollaborator));
 		}
+		updateCachedList(collaborators, newCollaborators);
 	}
 	
 	private void setCachedCollaborators(List<User> ghCollaborators){
@@ -395,9 +408,12 @@ public class Model {
 	}
 
 	public void updateCachedLabels(List<Label> ghLabels){
+		ArrayList<TurboLabel> newLabels = new ArrayList<TurboLabel>();
 		for (Label ghLabel : ghLabels) {
-			updateCachedListItem(new TurboLabel(ghLabel), labels);
+//			updateCachedListItem(new TurboLabel(ghLabel), labels);
+			newLabels.add(new TurboLabel(ghLabel));
 		}
+		updateCachedList(labels, newLabels);
 	}
 	
 	private void setCachedLabels(List<Label> ghLabels){
@@ -422,9 +438,12 @@ public class Model {
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
+		ArrayList<TurboMilestone> newMilestones = new ArrayList<TurboMilestone>();
 		for (Milestone ghMilestone : ghMilestones) {
-			updateCachedListItem(new TurboMilestone(ghMilestone), milestones);
+//			updateCachedListItem(new TurboMilestone(ghMilestone), milestones);
+			newMilestones.add(new TurboMilestone(ghMilestone));
 		}
+		updateCachedList(milestones, newMilestones);
 	}
 	
 	private void setCachedMilestones(List<Milestone> ghMilestones){
