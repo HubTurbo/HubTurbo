@@ -4,14 +4,12 @@ import java.io.File;
 
 import org.controlsfx.control.NotificationPane;
 
-import service.GitHubClientExtended;
-import util.ModelUpdater;
+import service.ServiceManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import model.Model;
 
 public class UI extends Application {
 
@@ -25,9 +23,9 @@ public class UI extends Application {
 	
 	// Other components
 	
-	private Model model;
-	private GitHubClientExtended client;
-	private ModelUpdater modelUpdater;
+//	private Model model;
+//	private GitHubClientExtended client;
+//	private ModelUpdater modelUpdater;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -36,8 +34,8 @@ public class UI extends Application {
 	@Override
 	public void start(Stage stage) {
 
-		client = new GitHubClientExtended();
-		model = new Model(client);
+//		client = new GitHubClientExtended();
+//		model = new Model(client);
 
 		mainStage = stage;
 
@@ -61,19 +59,20 @@ public class UI extends Application {
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
-			if (modelUpdater != null) {
-				modelUpdater.stopModelUpdate();
-			}
+//			if (modelUpdater != null) {
+//				modelUpdater.stopModelUpdate();
+//			}
+			ServiceManager.getInstance().stopModelUpdate();
 		});
 	}
 
 	private Parent createRoot() {
 
 		notificationPane = new NotificationPane();
-		columns = new ColumnControl(mainStage, model, notificationPane);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane);
 		notificationPane.setContent(columns);
 
-		menu = new MenuControl(mainStage, model, client, columns, this);
+		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
 
 		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
@@ -82,8 +81,8 @@ public class UI extends Application {
 		return root;
 	}
 	
-	public void setModelUpdater(ModelUpdater mu) {
-		modelUpdater = mu;
-	}
+//	public void setModelUpdater(ModelUpdater mu) {
+//		modelUpdater = mu;
+//	}
 
 }

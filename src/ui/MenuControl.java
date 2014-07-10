@@ -2,12 +2,8 @@ package ui;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 
-import org.eclipse.egit.github.core.client.GitHubRequest;
-
-import service.GitHubClientExtended;
-import util.ModelUpdater;
+import service.ServiceManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -42,13 +38,10 @@ public class MenuControl extends MenuBar {
 	private String repoOwner, repoName;
 	
 	private Model model;
-	private GitHubClientExtended client;
-	private ModelUpdater modelUpdater;
 
-	public MenuControl(Stage mainStage, Model model, GitHubClientExtended client, ColumnControl columns, UI ui) {
+	public MenuControl(Stage mainStage, Model model, ColumnControl columns, UI ui) {
 		this.mainStage = mainStage;
 		this.model = model;
-		this.client = client;
 		this.ui = ui;
 		this.columns = columns;
 		
@@ -259,7 +252,7 @@ public class MenuControl extends MenuBar {
 			}
 		}
 
-		boolean success = login(username, password);
+		boolean success = ServiceManager.getInstance().login(username, password);
 		
 		if (!success) {
 //		        notificationPane.getActions().addAll(new AbstractAction("Retry") {
@@ -283,32 +276,17 @@ public class MenuControl extends MenuBar {
 		this.repoOwner = owner;
 		this.repoName = repoName;
 
-		loadDataIntoModel();
+		ServiceManager.getInstance().setupRepository(repoOwner, repoName);
 		columns.loadIssues();
-		if (modelUpdater != null) {
-			modelUpdater.stopModelUpdate();
-		}
-		setupModelUpdate();
 
-		mainStage.setTitle("HubTurbo (" + client.getRemainingRequests() + " requests remaining out of " + client.getRequestLimit() + ")");
+		mainStage.setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");
 		enableMenuItemsRequiringLogin();
 	}
 	
 
 	private void handleRefresh(){
-		modelUpdater.stopModelUpdate();
-		modelUpdater.startModelUpdate();
+		ServiceManager.getInstance().restartModelUpdate();
 		columns.refresh();
-	}
-	
-	private void loadDataIntoModel() {
-		model.setRepoId(repoOwner, repoName);
-	}
-
-	private void setupModelUpdate() {
-		modelUpdater = new ModelUpdater(client, model);
-		ui.setModelUpdater(modelUpdater);
-		modelUpdater.startModelUpdate();
 	}
 
 	// private void setUpHotkeys(Scene scene) {
@@ -318,16 +296,5 @@ public class MenuControl extends MenuBar {
 	// (Runnable) () -> changePanelCount(1));
 	// }
 
-	private boolean login(String userId, String password) {
-		client.setCredentials(userId, password);
-		try {
-			GitHubRequest request = new GitHubRequest();
-			request.setUri("/");
-			client.get(request);
-		} catch (IOException e) {
-			// Login failed
-			return false;
-		}
-		return true;
-	}
+
 }

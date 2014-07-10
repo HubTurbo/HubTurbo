@@ -2,7 +2,6 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,10 @@ public class ServiceManager {
 		return repoId;
 	}
 	
+	public Model getModel(){
+		return model;
+	}
+	
 	public void setupAndStartModelUpdate() {
 		if(modelUpdater != null){
 			stopModelUpdate();
@@ -96,6 +99,15 @@ public class ServiceManager {
 		repoId = RepositoryId.create(owner, name);
 		//TODO:
 		model.loadComponents();
+		setupAndStartModelUpdate();
+	}
+	
+	public int getRemainingRequests(){
+		return githubClient.getRemainingRequests();
+	}
+	
+	public int getRequestLimit(){
+		return githubClient.getRequestLimit();
 	}
 	
 	/**
@@ -140,7 +152,7 @@ public class ServiceManager {
 	
 	public Milestone createMilestone(Milestone milestone) throws IOException{
 		if(repoId != null){
-			milestoneService.createMilestone(repoId, milestone);
+			return milestoneService.createMilestone(repoId, milestone);
 		}
 		return null;
 	}
@@ -178,14 +190,14 @@ public class ServiceManager {
 			Map<String, String> filters = new HashMap<String, String>();
 			filters.put(IssueService.FIELD_FILTER, STATE_ALL);
 			filters.put(IssueService.FILTER_STATE, STATE_ALL);
-			issueService.getIssues(repoId, filters);
+			return issueService.getIssues(repoId, filters);
 		}
 		return new ArrayList<Issue>();
 	}
 	
 	public Issue createIssue(Issue issue) throws IOException{
 		if(repoId != null){
-			issueService.createIssue(repoId, issue);
+			return issueService.createIssue(repoId, issue);
 		}
 		return null;
 	}
@@ -195,6 +207,14 @@ public class ServiceManager {
 			return issueService.getIssueData(repoId, issueId);
 		}
 		return new HashMap<String, Object>();
+	}
+	
+	public String getDateFromIssueData(HashMap<String, Object> issueData){
+		return (String)issueData.get(IssueServiceExtended.ISSUE_DATE);
+	}
+	
+	public Issue getIssueFromIssueData(HashMap<String, Object> issueData){
+		return (Issue)issueData.get(IssueServiceExtended.ISSUE_CONTENTS);
 	}
 	
 	public void editIssue(Issue latest, String dateModified) throws IOException{

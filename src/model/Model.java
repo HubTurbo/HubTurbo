@@ -16,8 +16,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import service.GitHubClientExtended;
-import service.IssueServiceExtended;
+//import service.IssueServiceExtended;
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
@@ -37,28 +36,10 @@ public class Model {
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
 
-//	private IRepositoryIdProvider repoId;
 	private UserConfigurations config = ConfigFileHandler.loadConfig();
-	
-//	private CollaboratorService collabService;
-//	private IssueServiceExtended issueService;
-//	private LabelServiceFixed labelService;
-//	private MilestoneService milestoneService;
 	
 	public Model(){
 		
-	}
-	
-	public Model(GitHubClientExtended ghClient) {
-//		this.collabService = new CollaboratorService(ghClient);
-//		this.issueService = new IssueServiceExtended(ghClient);
-//		this.labelService = new LabelServiceFixed(ghClient);
-//		this.milestoneService = new MilestoneService(ghClient);
-	}
-	
-	public void setRepoId(String owner, String name) {
-//		repoId = RepositoryId.create(owner, name);
-		loadComponents();
 	}
 	
 	public void loadComponents(){
@@ -120,10 +101,6 @@ public class Model {
 			}
 		}
 	}
-
-//	public IRepositoryIdProvider getRepoId(){
-//		return repoId;
-//	}
 
 	public ObservableList<TurboIssue> getIssues() {
 		return issues;
@@ -229,8 +206,8 @@ public class Model {
 			int issueId = editedIssue.getId();
 			StringBuilder changeLog = new StringBuilder();
 			HashMap<String, Object> issueQuery =  ServiceManager.getInstance().getIssueData(issueId);
-			String dateModified = (String) issueQuery.get(IssueServiceExtended.ISSUE_DATE);
-			TurboIssue latestIssue = new TurboIssue((Issue)issueQuery.get(IssueServiceExtended.ISSUE_CONTENTS), this);
+			String dateModified = ServiceManager.getInstance().getDateFromIssueData(issueQuery);
+			TurboIssue latestIssue = new TurboIssue(ServiceManager.getInstance().getIssueFromIssueData(issueQuery), this);
 			
 			boolean descUpdated = editedIssue.mergeIssues(originalIssue, latestIssue, changeLog);
 			//TODO: inform user when description update failed
@@ -338,7 +315,6 @@ public class Model {
 		issues.clear();
 		try {		
 			List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
-			
 			// Add the issues to a temporary list to prevent a quadratic number
 			// of updates to subscribers of the ObservableList
 			ArrayList<TurboIssue> buffer = new ArrayList<>();
