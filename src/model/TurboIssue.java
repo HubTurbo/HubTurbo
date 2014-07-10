@@ -421,7 +421,7 @@ public class TurboIssue implements Listable {
 		String editedTitle = this.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-			changeLog.append("Edited title \n");
+			changeLog.append("Title edited [previous: " + originalTitle + "] [new: " + editedTitle + "]\n");
 		}
 	}
 	
