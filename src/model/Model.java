@@ -6,25 +6,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.CollaboratorService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.MilestoneService;
 
 import service.GitHubClientExtended;
 import service.IssueServiceExtended;
-import service.LabelServiceFixed;
+import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.DialogMessage;
@@ -41,28 +35,33 @@ public class Model {
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
+	
 
-	private IRepositoryIdProvider repoId;
+//	private IRepositoryIdProvider repoId;
 	private UserConfigurations config = ConfigFileHandler.loadConfig();
 	
-	private CollaboratorService collabService;
-	private IssueServiceExtended issueService;
-	private LabelServiceFixed labelService;
-	private MilestoneService milestoneService;
+//	private CollaboratorService collabService;
+//	private IssueServiceExtended issueService;
+//	private LabelServiceFixed labelService;
+//	private MilestoneService milestoneService;
 	
 	public Model(){
 		
 	}
 	
 	public Model(GitHubClientExtended ghClient) {
-		this.collabService = new CollaboratorService(ghClient);
-		this.issueService = new IssueServiceExtended(ghClient);
-		this.labelService = new LabelServiceFixed(ghClient);
-		this.milestoneService = new MilestoneService(ghClient);
+//		this.collabService = new CollaboratorService(ghClient);
+//		this.issueService = new IssueServiceExtended(ghClient);
+//		this.labelService = new LabelServiceFixed(ghClient);
+//		this.milestoneService = new MilestoneService(ghClient);
 	}
 	
 	public void setRepoId(String owner, String name) {
-		repoId = RepositoryId.create(owner, name);
+//		repoId = RepositoryId.create(owner, name);
+		loadComponents();
+	}
+	
+	public void loadComponents(){
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
@@ -122,9 +121,9 @@ public class Model {
 		}
 	}
 
-	public IRepositoryIdProvider getRepoId(){
-		return repoId;
-	}
+//	public IRepositoryIdProvider getRepoId(){
+//		return repoId;
+//	}
 
 	public ObservableList<TurboIssue> getIssues() {
 		return issues;
@@ -146,7 +145,7 @@ public class Model {
 		Issue ghIssue = newIssue.toGhResource();
 		Issue createdIssue = null;
 		try {
-			createdIssue = issueService.createIssue(repoId, ghIssue);
+			createdIssue = ServiceManager.getInstance().createIssue(ghIssue);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
@@ -185,7 +184,7 @@ public class Model {
 		Label ghLabel = newLabel.toGhResource();
 		Label createdLabel = null;
 		try {
-			createdLabel = labelService.createLabel(repoId, ghLabel);
+			createdLabel = ServiceManager.getInstance().createLabel(ghLabel);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -198,7 +197,7 @@ public class Model {
 		Milestone ghMilestone = newMilestone.toGhResource();
 		Milestone createdMilestone = null;
 		try {
-			createdMilestone = milestoneService.createMilestone(repoId, ghMilestone);
+			createdMilestone = ServiceManager.getInstance().createMilestone(ghMilestone);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
@@ -209,7 +208,7 @@ public class Model {
 	
 	public void deleteLabel(TurboLabel label) {
 		try {
-			labelService.deleteLabel(repoId, URLEncoder.encode(label.toGhName(), CHARSET));
+			ServiceManager.getInstance().deleteLabel(URLEncoder.encode(label.toGhName(), CHARSET));
 			labels.remove(label);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -218,7 +217,7 @@ public class Model {
 	
 	public void deleteMilestone(TurboMilestone milestone) {
 		try {
-			milestoneService.deleteMilestone(repoId, milestone.getNumber());
+			ServiceManager.getInstance().deleteMilestone(milestone.getNumber());
 			milestones.remove(milestone);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -229,16 +228,16 @@ public class Model {
 		try {
 			int issueId = editedIssue.getId();
 			StringBuilder changeLog = new StringBuilder();
-			HashMap<String, Object> issueQuery =  issueService.getIssueData(repoId, issueId);
+			HashMap<String, Object> issueQuery =  ServiceManager.getInstance().getIssueData(issueId);
 			String dateModified = (String) issueQuery.get(IssueServiceExtended.ISSUE_DATE);
 			TurboIssue latestIssue = new TurboIssue((Issue)issueQuery.get(IssueServiceExtended.ISSUE_CONTENTS), this);
 			
 			boolean descUpdated = editedIssue.mergeIssues(originalIssue, latestIssue, changeLog);
 			//TODO: inform user when description update failed
 			Issue latest = latestIssue.toGhResource();
-			issueService.editIssue(repoId, latest, dateModified);
+			ServiceManager.getInstance().editIssue(latest, dateModified);
 			if(changeLog.length() > 0){
-				issueService.createComment(repoId, ""+issueId, changeLog.toString());
+				ServiceManager.getInstance().createComment(issueId, changeLog.toString());
 			}
 			updateCachedIssue(latest);
 			if(!descUpdated){
@@ -254,7 +253,7 @@ public class Model {
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhResource();
 		try {
-			labelService.editLabel(repoId, ghLabel, URLEncoder.encode(labelName, CHARSET));
+			ServiceManager.getInstance().editLabel(ghLabel, URLEncoder.encode(labelName, CHARSET));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -263,7 +262,7 @@ public class Model {
 	public void updateMilestone(TurboMilestone editedMilestone) {
 		Milestone ghMilestone = editedMilestone.toGhResource();
 		try {
-			milestoneService.editMilestone(repoId, ghMilestone);
+			ServiceManager.getInstance().editMilestone(ghMilestone);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -311,7 +310,7 @@ public class Model {
 	
 	private boolean loadCollaborators() {	
 		try {
-			List<User> ghCollaborators = collabService.getCollaborators(repoId);
+			List<User> ghCollaborators = ServiceManager.getInstance().getCollaborators();
 			setCachedCollaborators(ghCollaborators);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -337,11 +336,8 @@ public class Model {
 	
 	private boolean loadIssues() {
 		issues.clear();
-		Map<String, String> filters = new HashMap<String, String>();
-		filters.put(IssueService.FIELD_FILTER, STATE_ALL);
-		filters.put(IssueService.FILTER_STATE, STATE_ALL);
 		try {		
-			List<Issue> ghIssues = issueService.getIssues(repoId, filters);
+			List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
 			
 			// Add the issues to a temporary list to prevent a quadratic number
 			// of updates to subscribers of the ObservableList
@@ -362,7 +358,7 @@ public class Model {
 	
 	private boolean loadLabels(){
 		try {
-			List<Label> ghLabels = labelService.getLabels(repoId);
+			List<Label> ghLabels = ServiceManager.getInstance().getLabels();
 			standardiseStatusLabels(ghLabels);
 			setCachedLabels(ghLabels);
 		} catch (IOException e) {
@@ -399,7 +395,7 @@ public class Model {
 				statusLabel.setColor("0052cc");
 			}
 			try {
-				ghLabels.add(labelService.createLabel(repoId, statusLabel));
+				ghLabels.add(ServiceManager.getInstance().createLabel(statusLabel));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -428,7 +424,7 @@ public class Model {
 	
 	private boolean loadMilestones(){
 		try {		
-			List<Milestone> ghMilestones = milestoneService.getMilestones(repoId, STATE_ALL);
+			List<Milestone> ghMilestones = ServiceManager.getInstance().getMilestones();
 			setCachedMilestones(ghMilestones);
 		} catch (IOException e) {
 			e.printStackTrace();

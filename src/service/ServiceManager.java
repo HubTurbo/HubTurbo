@@ -48,6 +48,10 @@ public class ServiceManager {
 		model = new Model();
 	}
 
+	public IRepositoryIdProvider getRepoId(){
+		return repoId;
+	}
+	
 	public void setupAndStartModelUpdate() {
 		if(modelUpdater != null){
 			stopModelUpdate();
@@ -91,6 +95,7 @@ public class ServiceManager {
 	public void setupRepository(String owner, String name){
 		repoId = RepositoryId.create(owner, name);
 		//TODO:
+		model.loadComponents();
 	}
 	
 	/**
