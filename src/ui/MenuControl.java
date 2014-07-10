@@ -30,19 +30,16 @@ import org.controlsfx.control.NotificationPane;
 
 public class MenuControl extends MenuBar {
 
-	private UI ui;
+//	private UI ui;
 
 	private Stage mainStage;
 	private ColumnControl columns;
-	
-	private String repoOwner, repoName;
-	
-	private Model model;
+//	private Model model;
 
 	public MenuControl(Stage mainStage, Model model, ColumnControl columns, UI ui) {
 		this.mainStage = mainStage;
-		this.model = model;
-		this.ui = ui;
+//		this.ui = ui;
+//		this.model = model;
 		this.columns = columns;
 		
 		createMenuItems(mainStage, model, columns);
@@ -266,17 +263,14 @@ public class MenuControl extends MenuBar {
 			notificationPane.show();
 			
 		} else {
-			initialiseModel(owner, repo);
+			loadRepository(owner, repo);
 			
 			dialogStage.hide();
 		}
 	}
 	
-	private void initialiseModel(String owner, String repoName) {
-		this.repoOwner = owner;
-		this.repoName = repoName;
-
-		ServiceManager.getInstance().setupRepository(repoOwner, repoName);
+	private void loadRepository(String owner, String repoName) {
+		ServiceManager.getInstance().setupRepository(owner, repoName);
 		columns.loadIssues();
 
 		mainStage.setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");

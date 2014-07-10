@@ -98,7 +98,7 @@ public class ServiceManager {
 	public void setupRepository(String owner, String name){
 		repoId = RepositoryId.create(owner, name);
 		//TODO:
-		model.loadComponents();
+		model.loadComponents(repoId);
 		setupAndStartModelUpdate();
 	}
 	
@@ -225,7 +225,22 @@ public class ServiceManager {
 	
 	public void createComment(int issueId, String comment) throws IOException{
 		if(repoId != null){
-			issueService.createComment(repoId, ""+issueId, comment);
+			issueService.createComment(repoId, Integer.toString(issueId), comment);
 		}
+	}
+	
+	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
+		return labelService.setLabels(repoId, Integer.toString(issueId), labels);
+	}
+	
+	/**
+	 * Adds list of labels to a github issue. Returns all the labels for the issue.
+	 * */
+	public List<Label> addLabelsToIssue(int issueId, List<Label> labels) throws IOException{
+		return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
+	}
+	
+	public void deleteLabelFromIssue(int issueId, Label label) throws IOException{
+		labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
 	}
 }

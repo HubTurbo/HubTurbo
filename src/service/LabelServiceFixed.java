@@ -2,13 +2,17 @@ package service;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
+
+import com.google.gson.reflect.TypeToken;
 
 
 public class LabelServiceFixed extends LabelService {
@@ -20,6 +24,41 @@ public class LabelServiceFixed extends LabelService {
 	public LabelServiceFixed(GitHubClient client) {
 		super(client);
 	}
+	
+	public void deleteLabelFromIssue(IRepositoryIdProvider repository, String issueId, Label label) throws IOException{
+//		Github api format: DELETE /repos/:owner/:repo/issues/:number/labels/:name
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_ISSUES);
+		uri.append('/').append(issueId);
+		uri.append('/').append(label.getName());
+		client.delete(uri.toString());
+	}
+	
+	public List<Label> addLabelsToIssue(IRepositoryIdProvider repository,
+			String issueId, List<Label> labels) throws IOException {
+		String repoId = getId(repository);
+		return addLabelsToIssue(repoId, issueId, labels);
+	}
+	
+	private List<Label> addLabelsToIssue(String id, String issueId, List<Label> labels)
+			throws IOException {
+		if (issueId == null)
+			throw new IllegalArgumentException("Issue id cannot be null"); //$NON-NLS-1$
+		if (issueId.length() == 0)
+			throw new IllegalArgumentException("Issue id cannot be empty"); //$NON-NLS-1$
+
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(id);
+		uri.append(SEGMENT_ISSUES);
+		uri.append('/').append(issueId);
+		uri.append(SEGMENT_LABELS);
+
+		return client.post(uri.toString(), labels, new TypeToken<List<Label>>() {
+		}.getType());
+	}
+
 
 	/**
 	 * 

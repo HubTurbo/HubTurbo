@@ -27,12 +27,13 @@ public class IssueServiceExtended extends IssueService{
 	
 	public HashMap<String, Object> getIssueData(IRepositoryIdProvider repository, int issueId) throws IOException{
 		HashMap<String, Object> result = new HashMap<String, Object>();
-		GitHubResponse response = getIssueResponse(repository.generateId(), issueId + "");
+		GitHubResponse response = getIssueResponse(repository.generateId(), Integer.toString(issueId));
 		String dateModified = response.getHeader("Date");
 		result.put(ISSUE_DATE, dateModified);
 		result.put(ISSUE_CONTENTS, (Issue) response.getBody());
 		return result;
 	}
+	
 	private GitHubResponse getIssueResponse(String repoId, String issueNumber)
 			throws IOException {
 		if (issueNumber == null)

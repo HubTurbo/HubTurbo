@@ -10,7 +10,6 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
-import service.ServiceManager;
 import service.updateservice.CollaboratorUpdateService;
 import service.updateservice.IssueUpdateService;
 import service.updateservice.LabelUpdateService;
@@ -42,26 +41,26 @@ public class ModelUpdater {
 	}
 	
 	private void updateModelIssues(){
-		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(ServiceManager.getInstance().getRepoId());
+		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());
 		model.updateCachedIssues(updatedIssues);
 	}
 	
 	private void updateModelCollaborators(){
-		List<User> collaborators = collaboratorUpdateService.getUpdatedItems(ServiceManager.getInstance().getRepoId());
+		List<User> collaborators = collaboratorUpdateService.getUpdatedItems(model.getRepoId());
 		if(collaborators.size() > 0){
 			model.updateCachedCollaborators(collaborators);
 		}
 	}
 	
 	private void updateModelLabels(){
-		List<Label> labels = labelUpdateService.getUpdatedItems(ServiceManager.getInstance().getRepoId());
+		List<Label> labels = labelUpdateService.getUpdatedItems(model.getRepoId());
 		if(labels.size() > 0){
 			model.updateCachedLabels(labels);
 		}
 	}
 	
 	private void updateModelMilestones(){
-		List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(ServiceManager.getInstance().getRepoId());
+		List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(model.getRepoId());
 		if(milestones.size() > 0){
 			model.updateCachedMilestones(milestones);
 		}

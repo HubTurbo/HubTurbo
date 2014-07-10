@@ -11,10 +11,13 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+
+
 
 //import service.IssueServiceExtended;
 import service.ServiceManager;
@@ -35,6 +38,7 @@ public class Model {
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
+	private IRepositoryIdProvider repoId;
 
 	private UserConfigurations config = ConfigFileHandler.loadConfig();
 	
@@ -42,7 +46,12 @@ public class Model {
 		
 	}
 	
-	public void loadComponents(){
+	public IRepositoryIdProvider getRepoId(){
+		return repoId;
+	}
+	
+	public void loadComponents(IRepositoryIdProvider repoId){
+		this.repoId = repoId;
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
