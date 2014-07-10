@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.controlsfx.control.NotificationPane;
 
-import util.GitHubClientExtended;
+import service.GitHubClientExtended;
 import util.ModelUpdater;
 import javafx.application.Application;
 import javafx.scene.Parent;

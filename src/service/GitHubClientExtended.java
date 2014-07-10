@@ -1,4 +1,4 @@
-package util;
+package service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,11 +36,11 @@ public class GitHubClientExtended extends GitHubClient{
 		return super.getBody(request, stream);
 	}
 	
-	protected boolean isError(final int code) {
+	public boolean isError(final int code) {
 		return super.isError(code);
 	}
 	
-	protected boolean isOk(final int code) {
+	public boolean isOk(final int code) {
 		return super.isOk(code);
 	}
 

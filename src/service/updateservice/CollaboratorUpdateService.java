@@ -1,4 +1,4 @@
-package util;
+package service.updateservice;
 
 
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+
+import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 

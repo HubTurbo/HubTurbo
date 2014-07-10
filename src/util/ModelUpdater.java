@@ -9,6 +9,11 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
+import service.GitHubClientExtended;
+import service.updateservice.CollaboratorUpdateService;
+import service.updateservice.IssueUpdateService;
+import service.updateservice.LabelUpdateService;
+import service.updateservice.MilestoneUpdateService;
 import model.Model;
 
 public class ModelUpdater {

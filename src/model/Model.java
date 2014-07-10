@@ -22,12 +22,12 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import service.GitHubClientExtended;
+import service.IssueServiceExtended;
+import service.LabelServiceFixed;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.DialogMessage;
-import util.GitHubClientExtended;
-import util.IssueServiceExtended;
-import util.LabelServiceFixed;
 import util.UserConfigurations;
 
 public class Model {

@@ -1,4 +1,4 @@
-package util;
+package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
@@ -13,6 +13,8 @@ import java.util.TimeZone;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+
+import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 

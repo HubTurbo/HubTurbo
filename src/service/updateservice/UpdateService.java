@@ -1,4 +1,4 @@
-package util;
+package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
@@ -12,6 +12,8 @@ import java.util.Date;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+
+import service.GitHubClientExtended;
 
 public class UpdateService<T> {
 	protected String apiSuffix;

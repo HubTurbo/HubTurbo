@@ -1,4 +1,4 @@
-package util;
+package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
 
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+
+import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 

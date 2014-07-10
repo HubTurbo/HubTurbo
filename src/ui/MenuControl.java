@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
-import util.GitHubClientExtended;
+import service.GitHubClientExtended;
 import util.ModelUpdater;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
