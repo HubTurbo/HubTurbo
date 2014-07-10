@@ -50,6 +50,10 @@ public class Model {
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
 	
+	public Model(){
+		
+	}
+	
 	public Model(GitHubClientExtended ghClient) {
 		this.collabService = new CollaboratorService(ghClient);
 		this.issueService = new IssueServiceExtended(ghClient);
@@ -169,10 +173,8 @@ public class Model {
 	
 	private void updateCachedIssue(Issue issue){
 		TurboIssue newCached = new TurboIssue(issue, this);
-//		int index = getIndexOfIssue(issue.getNumber());
 		TurboIssue tIssue = getIssueWithId(issue.getNumber());
 		if(tIssue != null){
-//			issues.set(index, newCached);
 			tIssue.copyValues(newCached);
 		}else{
 			issues.add(0, newCached);
@@ -321,7 +323,6 @@ public class Model {
 	public void updateCachedCollaborators(List<User> ghCollaborators){
 		ArrayList<Listable> newCollaborators = new ArrayList<Listable>();
 		for(User ghCollaborator : ghCollaborators) {
-//			updateCachedListItem(new TurboUser(ghCollaborator), collaborators);
 			newCollaborators.add(new TurboUser(ghCollaborator));
 		}
 		updateCachedList(collaborators, newCollaborators);
@@ -410,7 +411,6 @@ public class Model {
 	public void updateCachedLabels(List<Label> ghLabels){
 		ArrayList<TurboLabel> newLabels = new ArrayList<TurboLabel>();
 		for (Label ghLabel : ghLabels) {
-//			updateCachedListItem(new TurboLabel(ghLabel), labels);
 			newLabels.add(new TurboLabel(ghLabel));
 		}
 		updateCachedList(labels, newLabels);
@@ -440,7 +440,6 @@ public class Model {
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
 		ArrayList<TurboMilestone> newMilestones = new ArrayList<TurboMilestone>();
 		for (Milestone ghMilestone : ghMilestones) {
-//			updateCachedListItem(new TurboMilestone(ghMilestone), milestones);
 			newMilestones.add(new TurboMilestone(ghMilestone));
 		}
 		updateCachedList(milestones, newMilestones);

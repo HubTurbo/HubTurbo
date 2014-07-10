@@ -245,8 +245,7 @@ public class MenuControl extends MenuBar {
 		if (username.isEmpty() && password.isEmpty()) {
 			BufferedReader reader;
 			try {
-				reader = new BufferedReader(new FileReader(
-						"credentials.txt"));
+				reader = new BufferedReader(new FileReader("credentials.txt"));
 				String line = null;
 				while ((line = reader.readLine()) != null) {
 					if (username.isEmpty())
