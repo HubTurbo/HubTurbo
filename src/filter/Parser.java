@@ -108,25 +108,28 @@ public class Parser {
 
 	private FilterExpression parsePredicate(Token token) {
 		String name = token.getValue();
-		String content;
+		String content = "";
 		
 		// Predicates look like the following:
 
 		// symbol(content with spaces)
 		// symbol: contentWithoutSpaces
-
-		// As symbols are lexed with spaces, a lexer hack which groups colon
-		// tokens together with their space-less content is used to recognise
-		// the second case. The content is then extracted from the token here,
-		// in the parsing stage.
 		
-		if (lookAhead().getType() == TokenType.COLON_SYMBOL) {
-			String colonPlusContent = consume(TokenType.COLON_SYMBOL).getValue();
-			content = colonPlusContent.substring(1).trim();
+		if (lookAhead().getType() == TokenType.COLON) {
+			consume(TokenType.COLON);
+			
+			// Consume one symbol after the colon
+			content = consume(TokenType.SYMBOL).getValue();
 		}
 		else {
 			consume(TokenType.LBRACKET);
-			content = consume().getValue();
+			
+			// Consume any number of space-delimited symbols
+			while (lookAhead().getType() == TokenType.SYMBOL) {
+				content += consume(TokenType.SYMBOL).getValue() + " ";
+			}
+			content = content.trim();
+			
 			consume(TokenType.RBRACKET);
 		}
 		return new Predicate(name, content);

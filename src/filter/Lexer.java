@@ -15,10 +15,10 @@ public class Lexer {
 			new Rule("and|&&?", TokenType.AND),
 			new Rule("or|\\|\\|?", TokenType.OR),
 			new Rule("~|!|-", TokenType.NEGATE),
-			new Rule("[A-Za-z0-9][A-Za-z0-9 ]*[A-Za-z0-9]|[A-Za-z0-9]", TokenType.SYMBOL),
+			new Rule("[A-Za-z0-9]+", TokenType.SYMBOL),
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),
-			new Rule(": *[A-Za-z0-9]+", TokenType.COLON_SYMBOL)
+			new Rule(":", TokenType.COLON)
 		);
 
 	private String input;
@@ -54,7 +54,7 @@ public class Lexer {
 				return new Token(r.getTokenType(), match, matcher.start());
 			}
 		}
-		throw new IllegalArgumentException("unrecognised token " + input.charAt(position) + " at " + position);
+		throw new IllegalArgumentException("Unrecognised token " + input.charAt(position) + " at " + position);
 	}
 	
 	public ArrayList<Token> lex() {
