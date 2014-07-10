@@ -10,11 +10,22 @@ public class Tests {
 	public void basics() {
 		assertEquals(Parser.parse(null), null);
 		assertEquals(Parser.parse(""), null);
-		
+	}
+	
+	@Test
+	public void predicates() {
 		assertEquals(Parser.parse("a(b)"), new Predicate("a", "b"));
 		assertEquals(Parser.parse("    a   (   b   )   "), new Predicate("a", "b"));
 		assertEquals(Parser.parse("a(dar ius)"), new Predicate("a", "dar ius"));
-		
+
+		try {
+			Parser.parse("c a(b)");
+			fail("c is a predicate without parentheses -- that should fail");
+		} catch (ParseException e) {}
+	}
+	
+	@Test
+	public void operators() {
 		assertEquals(Parser.parse("a(b) or c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 		assertEquals(Parser.parse("a(b) | c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 		assertEquals(Parser.parse("a(b) || c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
@@ -31,10 +42,10 @@ public class Tests {
 	
 	@Test
 	public void associativity() {
-		assertEquals(Parser.parse("a(b) or c(d) or e(f)"),
+		assertEquals(Parser.parse("a:b or c:d or e(f)"),
 				new Disjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
 
-		assertEquals(Parser.parse("a(b) and c(d) and e(f)"),
+		assertEquals(Parser.parse("a(b) and c:d and e(f)"),
 				new Conjunction(new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
 	}
 	
@@ -61,6 +72,8 @@ public class Tests {
 	@Test
 	public void colon() {
 		assertEquals(Parser.parse("assignee:darius"),
+				new Predicate("assignee", "darius"));
+		assertEquals(Parser.parse("assignee:    darius   "),
 				new Predicate("assignee", "darius"));
 		assertEquals(Parser.parse("assignee:dar ius(one)"),
 				new Conjunction(new Predicate("assignee", "dar"), new Predicate("ius", "one")));

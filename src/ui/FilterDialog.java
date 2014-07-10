@@ -3,6 +3,7 @@ package ui;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -45,6 +47,20 @@ public class FilterDialog implements Dialog<String> {
         TextField field = new TextField(input);
         HBox.setHgrow(field, Priority.ALWAYS);
 //        setupAutocompletion(field);
+        
+        field.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        	public void handle(KeyEvent ke) {
+                switch (ke.getCode()) {
+                case ENTER:
+                	response.complete(field.getText());
+                    stage.close();
+                    break;
+                default:
+                    break;
+                }
+            }
+        });
+        
 
         HBox buttonContainer = new HBox();
         Button close = new Button("Filter");

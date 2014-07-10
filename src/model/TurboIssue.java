@@ -326,12 +326,12 @@ public class TurboIssue implements Listable {
 	
 	private void logLabelChange(HashSet<TurboLabel> removed, HashSet<TurboLabel> added, StringBuilder changeLog){
 		if(added.size() > 0){
-			System.out.println("Added labels: " + added.toString());
-			changeLog.append("Added labels: " + added.toString() + "\n");
+			System.out.println("Labels added: " + added.toString());
+			changeLog.append("Labels added: " + added.toString() + "\n");
 		}
 		if(removed.size() > 0){
-			System.out.println("Removed labels: " + removed.toString());
-			changeLog.append("Removed labels: " + removed.toString() + "\n");
+			System.out.println("Labels removed: " + removed.toString());
+			changeLog.append("Labels removed: " + removed.toString() + "\n");
 		}
 	}
 	
@@ -345,13 +345,22 @@ public class TurboIssue implements Listable {
 			if (editedMilestone == null) {
 				editedMilestone = new TurboMilestone();
 			}
+			if (originalMilestone == null) {
+				originalMilestone = new TurboMilestone();
+			}
 			latest.setMilestone(editedMilestone);
-			logMilestoneChange(editedMilestone, changeLog);
+			logMilestoneChange(originalMilestone, editedMilestone, changeLog);
 		}
 	}
 
-	private void logMilestoneChange(TurboMilestone editedMilestone, StringBuilder changeLog){
-		changeLog.append("Changed milestone to: "+ editedMilestone.getTitle() + "\n");
+	private void logMilestoneChange(TurboMilestone originalMilestone, TurboMilestone editedMilestone,StringBuilder changeLog){
+		String originalMilestoneTitle = originalMilestone.getTitle();
+		String editedMilestoneTitle = editedMilestone.getTitle();
+		if (editedMilestoneTitle == null) {
+			changeLog.append("Milestone removed: [previous: " + originalMilestoneTitle + "]");
+		} else {
+			changeLog.append("Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + editedMilestoneTitle + "]\n");
+		}
 	}
 	
 	private void mergeOpen(TurboIssue original, TurboIssue latest) {
@@ -432,7 +441,7 @@ public class TurboIssue implements Listable {
 		String editedTitle = this.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-			changeLog.append("Edited title \n");
+			changeLog.append("Title edited: [previous: " + originalTitle + "] [new: " + editedTitle + "]\n");
 		}
 	}
 	
