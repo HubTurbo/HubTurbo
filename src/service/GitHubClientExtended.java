@@ -3,6 +3,7 @@ package service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.lang.reflect.Type;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -20,7 +21,18 @@ public class GitHubClientExtended extends GitHubClient{
 		return connection;
 	}
 	
+	public HttpURLConnection createGitHubConnection(String path, String method)
+			throws IOException {
+		URL url = new URL("https://github.com/" + path);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestMethod(method);
+		return configureRequest(connection);
+	}
 	
+	public IOException createException(InputStream response, int code,
+			String status){
+		return super.createException(response, code, status);
+	}
 	public HttpURLConnection createPost(String uri) throws IOException {
 		return super.createPost(uri);
 	}
