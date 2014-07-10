@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 
 import util.CollectionUtilities;
 import util.UserConfigurations;
@@ -39,6 +40,14 @@ public class TurboIssue implements Listable {
 	private WeakReference<Model> model;
 	private WeakReference<Model> getModel(){
 		return model;
+	}
+	
+	private PullRequest pullRequest;
+	public PullRequest getPullRequest(){
+		return pullRequest;
+	}
+	public void setPullRequest(PullRequest pr){
+		this.pullRequest = pr;
 	}
 	
 	
@@ -246,6 +255,7 @@ public class TurboIssue implements Listable {
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
 		setParents(extractParentNumbers(issue.getBody()));
+		setPullRequest(issue.getPullRequest());
 	}
 
 	public Issue toGhResource() {
@@ -276,6 +286,7 @@ public class TurboIssue implements Listable {
 			setMilestone(obj.getMilestone());
 			setLabels(obj.getLabels());
 			setParents(obj.getParents());
+			setPullRequest(obj.getPullRequest());
 		}
 	}
 	
