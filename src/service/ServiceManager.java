@@ -255,11 +255,6 @@ public class ServiceManager {
 		HttpURLConnection request = githubClient.createGitHubConnection(addMilestonePath, METHOD_PUT);
 		byte[] data = createMilestoneAddJsonString(issueId, milestone).getBytes(IGitHubConstants.CHARSET_UTF8);
 		sendData(request, data);
-		final int code = request.getResponseCode();
-		if(githubClient.isError(code)){
-			throw githubClient.createException(githubClient.getStream(request), code,
-					request.getResponseMessage());
-		}
 	}
 	
 	public void clearMilestoneFromIssue(int issueId) throws IOException{
@@ -267,6 +262,21 @@ public class ServiceManager {
 		HttpURLConnection request = githubClient.createGitHubConnection(milestonePath, METHOD_PUT);
 		byte[] data = createMilestoneClearJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
 		sendData(request, data);
+	}
+	
+	public void addAssigneeToIssue(int issueId, User user) throws IOException{
+		String assigneePath = repoId.generateId() + "/issues/" + issueId;
+		HttpURLConnection request = githubClient.createGitHubConnection(assigneePath, METHOD_PUT);
+		byte[] data = createAssigneeAddJsonStrong(issueId, user).getBytes(IGitHubConstants.CHARSET_UTF8);
+		sendData(request, data);
+	}
+	
+	public void clearAssigneeFromIssue(int issueId) throws IOException{
+		addAssigneeToIssue(issueId, null);
+	}
+	
+	private void sendData(HttpURLConnection request, byte[] data) throws IOException{
+		writeDataToGithubServer(request, data);
 		final int code = request.getResponseCode();
 		if(githubClient.isError(code)){
 			throw githubClient.createException(githubClient.getStream(request), code,
@@ -274,11 +284,7 @@ public class ServiceManager {
 		}
 	}
 	
-	public void addAssigneeToIssue(int issueId, User user){
-		
-	}
-	
-	private void sendData(HttpURLConnection request, byte[] data) throws IOException{
+	private void writeDataToGithubServer(HttpURLConnection request, byte[] data) throws IOException{
 		request.setDoInput(true);
 		request.setFixedLengthStreamingMode(data.length);
 		BufferedOutputStream output = new BufferedOutputStream(
@@ -292,6 +298,14 @@ public class ServiceManager {
 			} catch (IOException e) {
 			}
 		}
+	}
+	
+	private String createAssigneeAddJsonStrong(int issueId, User user){
+		String jsonString = "{\"issue[assignee]\":\"%1d\"}";
+		if(user == null){
+			String.format(jsonString, "");
+		}
+		return String.format(jsonString, user.getLogin());
 	}
 	
 	private String createMilestoneAddJsonString(int issueId, Milestone milestone){
