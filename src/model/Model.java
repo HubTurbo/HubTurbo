@@ -278,10 +278,16 @@ public class Model {
 	private void updateCachedList(List list, List newList){
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		list.removeAll(removed);
-		for(Object item: newList){
-			updateCachedListItem((Listable)item, list);
-		}
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	list.removeAll(removed);
+	        	for(Object item: newList){
+	    			updateCachedListItem((Listable)item, list);
+	    		}
+	        }
+	   });
+		
 	}
 	
 	@SuppressWarnings("unchecked")
