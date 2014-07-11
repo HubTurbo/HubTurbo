@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,13 @@ public class ServiceManager {
 		return model;
 	}
 	
+	public Date getLastModelUpdateTime(){
+		if(modelUpdater != null){
+			return modelUpdater.getLastUpdateTime();
+		}
+		return null;
+	}
+	
 	public void setupAndStartModelUpdate() {
 		if(modelUpdater != null){
 			stopModelUpdate();
@@ -82,7 +90,7 @@ public class ServiceManager {
 	
 	public void stopModelUpdate(){
 		if(modelUpdater !=  null){
-			modelUpdater.startModelUpdate();
+			modelUpdater.stopModelUpdate();
 		}
 	}
 	

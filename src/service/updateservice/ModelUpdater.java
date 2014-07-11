@@ -1,5 +1,6 @@
 package service.updateservice;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,6 +21,7 @@ public class ModelUpdater {
 	private MilestoneUpdateService milestoneUpdateService;
 	private long pollInterval = 60000; //time between polls in ms
 	private Timer pollTimer;
+	private Date lastUpdateTime = new Date();
 	
 	public ModelUpdater(GitHubClientExtended client, Model model){
 		this.model = model;
@@ -29,11 +31,16 @@ public class ModelUpdater {
 		this.milestoneUpdateService = new MilestoneUpdateService(client);
 	}
 	
+	public Date getLastUpdateTime(){
+		return lastUpdateTime;
+	}
+	
 	private void updateModel(){
 	    updateModelIssues();
 	    updateModelCollaborators();
 	   	updateModelLabels();
 	  	updateModelMilestones();
+	  	lastUpdateTime = issueUpdateService.lastCheckTime;
 	}
 	
 	private void updateModelIssues(){
