@@ -28,7 +28,7 @@ import filter.PredicateApplicationException;
 
 public class IssuePanel extends VBox {
 
-	private static final String NO_FILTER = "<no filter>";
+	private static final String NO_FILTER = "No Filter";
 	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
 
 	private final Stage mainStage;
@@ -50,7 +50,7 @@ public class IssuePanel extends VBox {
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 
-		getChildren().add(createFilterBox());
+		getChildren().add(createTop());
 		
 		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
@@ -61,11 +61,12 @@ public class IssuePanel extends VBox {
 		refreshItems();
 	}
 
-	private Node createFilterBox() {
-		HBox box = new HBox();
+	private Node createTop() {
+		
+		HBox filterBox = new HBox();
 		Label label = new Label(NO_FILTER);
 		label.setPadding(new Insets(3));
-		box.setOnMouseClicked((e) -> {
+		filterBox.setOnMouseClicked((e) -> {
 			(new FilterDialog(mainStage, model, filterInput)).show().thenApply(
 					filterString -> {
 						filterInput = filterString;
@@ -94,14 +95,26 @@ public class IssuePanel extends VBox {
 					return false;
 				});
 		});
-		box.getChildren().add(label);
-		return box;
+		filterBox.getChildren().add(label);
+		
+		Label addIssue = new Label("\u2795");
+		addIssue.setStyle("-fx-font-size: 18pt;");
+		
+		Label closeList = new Label("\u274c");
+		closeList.setStyle("-fx-font-size: 18pt;");
+		
+		HBox topBox = new HBox();
+		topBox.setSpacing(5);
+		topBox.getChildren().addAll(filterBox, addIssue, closeList);
+		
+		return topBox;
 	}
 
 	private void setup() {
+		setPrefWidth(400);
 		setMaxWidth(400);
 		setVgrow(listView, Priority.ALWAYS);
-		HBox.setHgrow(this, Priority.ALWAYS);
+//		HBox.setHgrow(this, Priority.ALWAYS);
 		getStyleClass().add("borders");
 		
 		setOnDragOver(e -> {

@@ -22,7 +22,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
@@ -42,7 +41,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnIndex = parentColumnIndex;
-		Font.loadFont(getClass().getResource("octicons-local.ttf").toExternalForm(), 24);
 	}
 
 	private ChangeListener<String> createIssueTitleListener(TurboIssue issue, Text issueName){
@@ -93,15 +91,19 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		HBox bottom = new HBox();
 		bottom.setSpacing(5);
-		bottom.setAlignment(Pos.CENTER_LEFT);
+		bottom.setAlignment(Pos.BASELINE_LEFT);
 		bottom.getChildren().add(parents);
 		if (assignee != null) bottom.getChildren().add(assigneeBox);
 		
 		VBox everything = new VBox();
+		everything.setMaxWidth(350);
+		
 		everything.setSpacing(5);
 		everything.getChildren().addAll(titleBox, labels, bottom);
 
 		setGraphic(everything);
+		
+		setAlignment(Pos.CENTER);
 
 		getStyleClass().addAll("borders", "rounded-borders");
 		
