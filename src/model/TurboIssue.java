@@ -179,6 +179,10 @@ public class TurboIssue implements Listable {
 				addToLabels(label);
 			}
 		}
+		enforceStateLabels(labels);
+	}
+	
+	private void enforceStateLabels(ObservableList<TurboLabel> labels){
 		// Auto update status as closed if any labels are equivalent to closed status
 		for (TurboLabel currentLabel : labels) {
 			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {

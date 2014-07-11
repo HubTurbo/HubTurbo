@@ -8,7 +8,9 @@ import model.TurboIssue;
 public abstract class TurboIssueCommand {
 	protected TurboIssue issue;
 	protected WeakReference<Model> model;
-	protected boolean isUndoableCommand;
+	protected boolean isUndoableCommand = false;
+	protected boolean isSuccessful = false;
+	protected boolean isUndone = false;
 	
 	public boolean getIsUndoable(){
 		return isUndoableCommand;

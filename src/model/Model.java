@@ -127,6 +127,10 @@ public class Model {
 		return milestones;
 	}
 	
+	public void appendToCachedIssues(TurboIssue issue){
+		issues.add(0, issue);
+	}
+	
 	public TurboIssue createIssue(TurboIssue newIssue) {
 		Issue ghIssue = newIssue.toGhResource();
 		Issue createdIssue = null;
@@ -136,7 +140,7 @@ public class Model {
 			e.printStackTrace();
 		} 
 		TurboIssue returnedIssue = new TurboIssue(createdIssue, this);
-		issues.add(0, returnedIssue);
+		appendToCachedIssues(returnedIssue);
 		return returnedIssue;
 	}
 	

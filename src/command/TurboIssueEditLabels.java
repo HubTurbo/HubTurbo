@@ -10,7 +10,6 @@ import model.TurboLabel;
 public class TurboIssueEditLabels extends TurboIssueCommand{
 	private List<TurboLabel> previousLabels;
 	private List<TurboLabel> newLabels;
-	private boolean isSuccessful;
 	
 	public TurboIssueEditLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
 		this.issue = issue;
