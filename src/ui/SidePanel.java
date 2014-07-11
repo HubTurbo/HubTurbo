@@ -80,7 +80,11 @@ public class SidePanel extends VBox {
 	}
 
 	private Tab createAssgineesTab() {
-		return new Tab();
+		Tab tab = new Tab();
+		tab.setClosable(false);
+		tab.setText("A");
+		tab.setContent(new AssigneeManagementComponent(model).initialise());
+		return tab;
 	}
 
 	private Tab createMilestonesTab() {
