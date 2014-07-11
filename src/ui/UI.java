@@ -24,6 +24,8 @@ public class UI extends Application {
 	private ColumnControl columns;
 	private MenuControl menu;
 	private NotificationPane notificationPane;
+
+	private SidePanel sidePanel;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -71,12 +73,14 @@ public class UI extends Application {
 		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
 		root.setTop(menu);
+		
+		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 
-		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
-		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
+//		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
+//		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
 		
         SplitPane splitPane = new SplitPane();
-		splitPane.getItems().addAll(panel, root);
+		splitPane.getItems().addAll(sidePanel, root);
 		splitPane.setDividerPositions(0.2);
 
 		return splitPane;
