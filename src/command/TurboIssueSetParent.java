@@ -1,6 +1,6 @@
 package command;
 
-public class TurboIssueEditParent extends TurboIssueCommand{
+public class TurboIssueSetParent extends TurboIssueCommand{
 
 	@Override
 	public boolean execute() {
