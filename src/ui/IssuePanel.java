@@ -4,10 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import javafx.scene.input.TransferMode;
-import filter.FilterExpression;
-import filter.Parser;
-import filter.PredicateApplicationException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -17,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -24,7 +21,10 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import filter.FilterExpression;
 import filter.ParseException;
+import filter.Parser;
+import filter.PredicateApplicationException;
 
 public class IssuePanel extends VBox {
 
@@ -99,7 +99,7 @@ public class IssuePanel extends VBox {
 	}
 
 	private void setup() {
-		setPrefWidth(400);
+		setMaxWidth(400);
 		setVgrow(listView, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
 		getStyleClass().add("borders");

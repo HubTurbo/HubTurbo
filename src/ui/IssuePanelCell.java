@@ -67,45 +67,39 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		if (issue == null)
 			return;
 		
-		HBox buttonBox = new HBox();
-		Label ghIcon = new Label();
-		ghIcon.getStyleClass().add("github-icon");
-		ghIcon.setText("G");
-		buttonBox.getChildren().addAll(ghIcon);
-		buttonBox.setOnMouseClicked((MouseEvent e) -> {
-			browse(issue.getHtmlUrl());
-		});
-		
-		Text issueName = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueName.getStyleClass().add("issue-panel-name");
-		if (!issue.getOpen()) issueName.getStyleClass().add("issue-panel-closed");
-		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueName)));
+		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
+		issueTitle.setWrappingWidth(300);
+		issueTitle.getStyleClass().add("issue-panel-name");
+		if (!issue.getOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
+		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
 
 		HBox titleBox = new HBox();
-		titleBox.getChildren().addAll(buttonBox, issueName);
+		titleBox.getChildren().addAll(issueTitle);
+		titleBox.setOnMouseClicked((MouseEvent e) -> {
+			browse(issue.getHtmlUrl());
+		});
+
+		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabelsReference(), false, "");
 
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentsReference(), false);
 		
-		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabelsReference(), false, "");
-
 		TurboUser assignee = issue.getAssignee();
 		HBox assigneeBox = new HBox();
 		if (assignee != null) {
 			assigneeBox.setSpacing(3);
-			Text assignedToLabel = new Text("Assigned to:");
-			Text assigneeName = new Text(assignee.getGithubName());
-			assigneeBox.getChildren().addAll(assignedToLabel, assigneeName);
+			Label assigneeName = new Label(assignee.getGithubName());
+			assigneeBox.getChildren().addAll(assigneeName);
 		}
 
 		HBox bottom = new HBox();
 		bottom.setSpacing(5);
 		bottom.setAlignment(Pos.CENTER_LEFT);
+		bottom.getChildren().add(parents);
 		if (assignee != null) bottom.getChildren().add(assigneeBox);
-		bottom.getChildren().add(labels);
-
+		
 		VBox everything = new VBox();
-		everything.setSpacing(2);
-		everything.getChildren().addAll(titleBox, parents, bottom);
+		everything.setSpacing(5);
+		everything.getChildren().addAll(titleBox, labels, bottom);
 
 		setGraphic(everything);
 
@@ -114,7 +108,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 
 		registerEvents(issue);
-		
 		
 		setOnDragDetected((event) -> {
 			Dragboard db = startDragAndDrop(TransferMode.MOVE);
