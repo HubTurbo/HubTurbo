@@ -17,9 +17,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-
-
-//import service.IssueServiceExtended;
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;

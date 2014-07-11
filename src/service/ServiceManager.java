@@ -10,6 +10,7 @@ import java.util.Map;
 
 import model.Model;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -140,10 +141,11 @@ public class ServiceManager {
 		}
 	}
 	
-	public void editLabel(Label label , String name) throws IOException{
+	public Label editLabel(Label label , String name) throws IOException{
 		if(repoId != null){
-			labelService.editLabel(repoId, label, name);
+			return (Label)labelService.editLabel(repoId, label, name);
 		}
+		return null;
 	}
 	
 	/**
@@ -169,10 +171,11 @@ public class ServiceManager {
 		}
 	}
 	
-	public void editMilestone(Milestone milestone) throws IOException{
+	public Milestone editMilestone(Milestone milestone) throws IOException{
 		if(repoId != null){
-			milestoneService.editMilestone(repoId, milestone);
+			return (Milestone)milestoneService.editMilestone(repoId, milestone);
 		}
+		return null;
 	}
 	
 	
@@ -223,18 +226,40 @@ public class ServiceManager {
 		return (Issue)issueData.get(IssueServiceExtended.ISSUE_CONTENTS);
 	}
 	
-	public void editIssue(Issue latest, String dateModified) throws IOException{
+	public Issue editIssue(Issue latest, String dateModified) throws IOException{
 		if(repoId != null){
-			issueService.editIssue(repoId, latest, dateModified);
+			return (Issue)issueService.editIssue(repoId, latest, dateModified);
+		}
+		return null;
+	}
+	
+	public Comment createComment(int issueId, String comment) throws IOException{
+		if(repoId != null){
+			return (Comment)issueService.createComment(repoId, Integer.toString(issueId), comment);
+		}
+		return null;
+	}
+	
+	public List<Comment> getComments(int issueId) throws IOException{
+		if(repoId != null){
+			return issueService.getComments(repoId, issueId);
+		}
+		return new ArrayList<Comment>();
+	}
+	
+	public void deleteComment(int commentId) throws IOException{
+		if(repoId != null){
+			issueService.deleteComment(repoId, commentId);
 		}
 	}
 	
-	public void createComment(int issueId, String comment) throws IOException{
+	public Comment editComment(Comment comment) throws IOException{
 		if(repoId != null){
-			issueService.createComment(repoId, Integer.toString(issueId), comment);
+			return issueService.editComment(repoId, comment);
 		}
+		return null;
 	}
-		
+	
 	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
 		return labelService.setLabels(repoId, Integer.toString(issueId), labels);
 	}
