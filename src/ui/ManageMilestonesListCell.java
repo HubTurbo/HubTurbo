@@ -20,13 +20,13 @@ import model.TurboMilestone;
 
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private final Model model;
-	private final ManageMilestonesDialog parentDialog;
+	private final MilestoneManagementComponent parentDialog;
 	
     private TextField textField;
 	private VBox content;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-    public ManageMilestonesListCell(Model model, ManageMilestonesDialog parentDialog) {
+    public ManageMilestonesListCell(Model model, MilestoneManagementComponent parentDialog) {
 		super();
 		this.model = model;
 		this.parentDialog = parentDialog;

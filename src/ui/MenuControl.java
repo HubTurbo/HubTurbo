@@ -1,32 +1,17 @@
 package ui;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import service.ServiceManager;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
-import org.controlsfx.control.NotificationPane;
 
 public class MenuControl extends MenuBar {
 
@@ -43,45 +28,45 @@ public class MenuControl extends MenuBar {
 		this.columns = columns;
 		
 		createMenuItems(mainStage, model, columns);
-		disableMenuItemsRequiringLogin();
+//		disableMenuItemsRequiringLogin();
 	}
 	
 	MenuItem manageMilestonesMenuItem;
 	MenuItem newIssueMenuItem;
 	MenuItem manageLabelsMenuItem;
 	MenuItem refreshMenuItem;
+
+//	private void disableMenuItemsRequiringLogin() {
+//		manageMilestonesMenuItem.setDisable(true);
+//		newIssueMenuItem.setDisable(true);
+//		manageLabelsMenuItem.setDisable(true);
+//		refreshMenuItem.setDisable(true);
+//	}
 	
-	private void disableMenuItemsRequiringLogin() {
-		manageMilestonesMenuItem.setDisable(true);
-		newIssueMenuItem.setDisable(true);
-		manageLabelsMenuItem.setDisable(true);
-		refreshMenuItem.setDisable(true);
-	}
-	
-	private void enableMenuItemsRequiringLogin() {
-		manageMilestonesMenuItem.setDisable(false);
-		newIssueMenuItem.setDisable(false);
-		manageLabelsMenuItem.setDisable(false);
-		refreshMenuItem.setDisable(false);
-	}
+//	private void enableMenuItemsRequiringLogin() {
+//		manageMilestonesMenuItem.setDisable(false);
+//		newIssueMenuItem.setDisable(false);
+//		manageLabelsMenuItem.setDisable(false);
+//		refreshMenuItem.setDisable(false);
+//	}
 
 	private void createMenuItems(Stage mainStage, Model model, ColumnControl columns) {
-		Menu projects = new Menu("Projects");
-		projects.getItems().addAll(createLoginMenuItem());
+//		Menu projects = new Menu("Projects");
+//		projects.getItems().addAll(createLoginMenuItem());
 
-		Menu milestones = new Menu("Milestones");
-		milestones.getItems().addAll(createManageMilestonesMenuItem(mainStage, model));
+//		Menu milestones = new Menu("Milestones");
+//		milestones.getItems().addAll(createManageMilestonesMenuItem(mainStage, model));
 
 		Menu issues = new Menu("Issues");
 		issues.getItems().addAll(createNewIssueMenuItem(mainStage, model, columns));
 
-		Menu labels = new Menu("Labels");
-		labels.getItems().addAll(createManageLabelsMenuItem(mainStage, model));
+//		Menu labels = new Menu("Labels");
+//		labels.getItems().addAll(createManageLabelsMenuItem(mainStage, model));
 
 		Menu view = new Menu("View");
 		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem(columns));
 
-		getMenus().addAll(projects, milestones, issues, labels, view);
+		getMenus().addAll(issues, view);
 	}
 
 	private Menu createColumnsMenuItem(ColumnControl columns) {
@@ -149,29 +134,29 @@ public class MenuControl extends MenuBar {
 		return newIssueMenuItem;
 	}
 
-	private MenuItem createManageMilestonesMenuItem(Stage mainStage, Model model) {
-		manageMilestonesMenuItem = new MenuItem("Manage milestones...");
-		manageMilestonesMenuItem.setOnAction(e -> {
-			(new ManageMilestonesDialog(mainStage, model)).show().thenApply(
-					response -> {
-						return true;
-					})
-					.exceptionally(ex -> {
-						ex.printStackTrace();
-						return false;
-					});
-		});
-		return manageMilestonesMenuItem;
-	}
+//	private MenuItem createManageMilestonesMenuItem(Stage mainStage, Model model) {
+//		manageMilestonesMenuItem = new MenuItem("Manage milestones...");
+//		manageMilestonesMenuItem.setOnAction(e -> {
+//			(new MilestoneManagementComponent(mainStage, model)).show().thenApply(
+//					response -> {
+//						return true;
+//					})
+//					.exceptionally(ex -> {
+//						ex.printStackTrace();
+//						return false;
+//					});
+//		});
+//		return manageMilestonesMenuItem;
+//	}
 
-	private MenuItem createLoginMenuItem() {
-		MenuItem login = new MenuItem("Login");
-		login.setOnAction((e) -> {
-
-		});
-		
-		return login;
-	}
+//	private MenuItem createLoginMenuItem() {
+//		MenuItem login = new MenuItem("Login");
+//		login.setOnAction((e) -> {
+//
+//		});
+//		
+//		return login;
+//	}
 	
 		
 
