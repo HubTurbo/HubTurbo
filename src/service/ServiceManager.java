@@ -29,6 +29,7 @@ import service.updateservice.ModelUpdater;
 public class ServiceManager {
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
+	public static final String CHANGELOG_TAG = "[Change Log]\n";
 	
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
@@ -259,6 +260,16 @@ public class ServiceManager {
 	/**
 	 * Methods to work with comments data from github
 	 * */
+	
+	public void logIssueChanges(int issueId, String changes){
+		String changeLog = CHANGELOG_TAG + changes;
+		try {
+			createComment(issueId, changeLog);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public Comment createComment(int issueId, String comment) throws IOException{
 		if(repoId != null){

@@ -3,6 +3,8 @@ package command;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
@@ -28,6 +30,9 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		
 		this.previousLabels = issue.getLabels(); //Is a copy of original list of labels
 		isSuccessful = setLabelsForIssue(newLabels, previousLabels);
+		if(isSuccessful){
+			logLabelsChange(newLabels, previousLabels);
+		}
 		return isSuccessful;
 	}
 	
@@ -49,11 +54,23 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 			return false;
 		}
 	}
-
+	
+	
+	private void logLabelsChange(List<TurboLabel> labels, List<TurboLabel> oldLabels){
+		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities.getChangesToList(oldLabels, labels);
+		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
+		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
+		String changeLog = "Labels added: " + added.toString() + "\n Labels Removed: " + removed.toString();
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+	}
+	
 	@Override
 	public boolean undo() {
 		if(isSuccessful){
 			isUndone = setLabelsForIssue(previousLabels, newLabels);
+		}
+		if(isUndone){
+			logLabelsChange(previousLabels, newLabels);
 		}
 		return isUndone;
 	}
