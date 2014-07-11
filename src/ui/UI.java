@@ -9,6 +9,7 @@ import service.ServiceManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -83,10 +84,15 @@ public class UI extends Application {
 
 		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
 
+		Button addColumn = new Button("\u2795");
+		addColumn.setStyle("-fx-font-size: 14pt;");
+		addColumn.setOnMouseClicked(columns::addColumnEvent);
+
 		BorderPane root = new BorderPane(); // TODO the root doesn't have to be a borderpane once the menu is no longer needed
 		root.setCenter(notificationPane);
 		root.setTop(menu);
-		
+		root.setRight(addColumn);
+
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 
 //		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));

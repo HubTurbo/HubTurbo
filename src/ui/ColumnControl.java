@@ -4,6 +4,7 @@ import org.controlsfx.control.NotificationPane;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -38,6 +39,10 @@ public class ColumnControl extends HBox {
 		}
 	}
 
+	public ColumnControl addColumnEvent(MouseEvent e) {
+		return addColumn();
+	}
+	
 	public ColumnControl addColumn() {
 		IssuePanel panel = new IssuePanel(stage, model, this, getChildren().size());
 		getChildren().add(panel);
