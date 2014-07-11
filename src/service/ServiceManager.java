@@ -234,7 +234,7 @@ public class ServiceManager {
 			issueService.createComment(repoId, Integer.toString(issueId), comment);
 		}
 	}
-	
+		
 	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
 		return labelService.setLabels(repoId, Integer.toString(issueId), labels);
 	}

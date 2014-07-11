@@ -42,6 +42,14 @@ public class TurboIssue implements Listable {
 		return model;
 	}
 	
+	private int numOfComments;
+	public int getNumOfComments(){
+		return numOfComments;
+	}
+	public void setNumOfComments(int num){
+		this.numOfComments = num;
+	}
+	
 	private PullRequest pullRequest;
 	public PullRequest getPullRequest(){
 		return pullRequest;
@@ -260,6 +268,7 @@ public class TurboIssue implements Listable {
 		setLabels(translateLabels(issue.getLabels()));
 		setParents(extractParentNumbers(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
+		setNumOfComments(issue.getComments());
 	}
 
 	public Issue toGhResource() {
@@ -291,6 +300,7 @@ public class TurboIssue implements Listable {
 			setLabels(obj.getLabels());
 			setParents(obj.getParents());
 			setPullRequest(obj.getPullRequest());
+			setNumOfComments(obj.getNumOfComments());
 		}
 	}
 	
