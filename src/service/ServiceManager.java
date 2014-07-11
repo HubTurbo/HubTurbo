@@ -233,6 +233,10 @@ public class ServiceManager {
 		return null;
 	}
 	
+	/**
+	 * Methods to work with comments data from github
+	 * */
+	
 	public Comment createComment(int issueId, String comment) throws IOException{
 		if(repoId != null){
 			return (Comment)issueService.createComment(repoId, Integer.toString(issueId), comment);
@@ -260,6 +264,10 @@ public class ServiceManager {
 		return null;
 	}
 	
+	/**
+	 * Methods to work with issue labels
+	 * */
+	
 	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
 		return labelService.setLabels(repoId, Integer.toString(issueId), labels);
 	}
@@ -274,6 +282,10 @@ public class ServiceManager {
 	public void deleteLabelFromIssue(int issueId, Label label) throws IOException{
 		labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
 	}
+	
+	/**
+	 * Methods to work with issue milestones
+	 **/
 	
 	public void addMilestoneToIssue(int issueId, Milestone milestone) throws IOException{
 		String addMilestonePath = repoId.generateId() + "issues/milestones";
@@ -300,6 +312,9 @@ public class ServiceManager {
 		addAssigneeToIssue(issueId, null);
 	}
 	
+	/**
+	 * Private service methods
+	 * */
 	private void sendData(HttpURLConnection request, byte[] data) throws IOException{
 		writeDataToGithubServer(request, data);
 		final int code = request.getResponseCode();

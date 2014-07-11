@@ -1,8 +1,21 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
+
+import service.ServiceManager;
 
 public class CollectionUtilities {
 	public static final String REMOVED_TAG = "removed";
@@ -24,5 +37,37 @@ public class CollectionUtilities {
 		changeSet.put(ADDED_TAG, added);
 		
 		return changeSet;
+	}
+	
+	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues){
+		ArrayList<TurboIssue> buffer = new ArrayList<>();
+		for (Issue ghIssue : issues) {
+			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel()));
+		}
+		return buffer;
+	}
+	
+	public static ArrayList<TurboLabel> getHubTurboLabelList(List<Label> labels){
+		ArrayList<TurboLabel> buffer = new ArrayList<>();
+		for (Label ghLabel : labels) {
+			buffer.add(new TurboLabel(ghLabel));
+		}
+		return buffer;
+	}
+	
+	public static ArrayList<TurboMilestone> getHubTurboMilestoneList(List<Milestone> milestones){
+		ArrayList<TurboMilestone> buffer = new ArrayList<>();
+		for(Milestone ghMilestone : milestones){
+			buffer.add(new TurboMilestone(ghMilestone));
+		}
+		return buffer;
+	}
+	
+	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users){
+		ArrayList<TurboUser> buffer = new ArrayList<>();
+		for(User ghUser: users){
+			buffer.add(new TurboUser(ghUser));
+		}
+		return buffer;
 	}
 }
