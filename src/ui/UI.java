@@ -1,11 +1,13 @@
 package ui;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -78,6 +80,14 @@ public class UI extends Application {
 		root.setCenter(notificationPane);
 		root.setTop(menu);
 
+		Parent panel = null;
+		try {
+	        panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
+	        root.setLeft(panel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return root;
 	}
 	
