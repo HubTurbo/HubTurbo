@@ -87,7 +87,7 @@ public class SidePanel extends VBox {
 		Tab tab = new Tab();
 		tab.setClosable(false);
 		tab.setText("L");
-		tab.setContent(new ManageLabelsDialog(parentStage, model).initialise());
+		tab.setContent(new LabelManagementComponent(parentStage, model).initialise());
 		return tab;
 	}
 

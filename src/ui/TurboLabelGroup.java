@@ -30,7 +30,7 @@ public class TurboLabelGroup implements LabelTreeItem {
 
 	public void addLabel(TurboLabel label) {
 		labels.add(label);
-		if (name.equals(ManageLabelsDialog.UNGROUPED_NAME)) {
+		if (name.equals(LabelManagementComponent.UNGROUPED_NAME)) {
 			label.setGroup(null);
 		} else {
 			label.setGroup(name);
@@ -51,7 +51,7 @@ public class TurboLabelGroup implements LabelTreeItem {
 	public void setValue(String value) {
 		this.name = value;
 
-		if (this.name.equals(ManageLabelsDialog.UNGROUPED_NAME)) {
+		if (this.name.equals(LabelManagementComponent.UNGROUPED_NAME)) {
 			value = null;
 		}
 		

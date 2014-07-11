@@ -114,17 +114,17 @@ public class MenuControl extends MenuBar {
 	}
 
 	private MenuItem createManageLabelsMenuItem(Stage mainStage, Model model) {
-		manageLabelsMenuItem = new MenuItem("Manage labels...");
-		manageLabelsMenuItem.setOnAction(e -> {
-			(new ManageLabelsDialog(mainStage, model)).show().thenApply(
-					response -> {
-						return true;
-					})
-				.exceptionally(ex -> {
-					ex.printStackTrace();
-					return false;
-				});
-		});
+		manageLabelsMenuItem = new MenuItem("<Removed>");
+//		manageLabelsMenuItem.setOnAction(e -> {
+//			(new LabelManagementComponent(mainStage, model)).show().thenApply(
+//					response -> {
+//						return true;
+//					})
+//				.exceptionally(ex -> {
+//					ex.printStackTrace();
+//					return false;
+//				});
+//		});
 		return manageLabelsMenuItem;
 	}
 

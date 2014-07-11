@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -21,7 +17,7 @@ import javafx.util.Callback;
 import model.Model;
 import model.TurboLabel;
 
-public class ManageLabelsDialog implements Dialog<String> {
+public class LabelManagementComponent {//implements Dialog<String> {
 
 	public static final String UNGROUPED_NAME = "<Ungrouped>";
 	public static final String ROOT_NAME = "root";
@@ -29,19 +25,19 @@ public class ManageLabelsDialog implements Dialog<String> {
 	private final Stage parentStage;
 	private final Model model;
 
-	private CompletableFuture<String> response;
+//	private CompletableFuture<String> response;
 
-	public ManageLabelsDialog(Stage parentStage, Model model) {
+	public LabelManagementComponent(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
 		this.model = model;
 
-		response = new CompletableFuture<>();
+//		response = new CompletableFuture<>();
 	}
 
-	public CompletableFuture<String> show() {
-		showDialog();
-		return response;
-	}
+//	public CompletableFuture<String> show() {
+//		showDialog();
+//		return response;
+//	}
 	
 	public HBox initialise() {
 		HBox layout = new HBox();
@@ -50,32 +46,6 @@ public class ManageLabelsDialog implements Dialog<String> {
 		TreeView<LabelTreeItem> treeView = createTreeView(parentStage);
 		layout.getChildren().addAll(treeView, createButtons(treeView, parentStage));
 		return layout;
-	}
-	
-	private void showDialog() {
-
-		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
-		layout.setSpacing(10);
-		
-		Scene scene = new Scene(layout, 330, 400);
-
-		Stage stage = new Stage();
-		stage.setTitle("Manage Labels");
-		stage.setScene(scene);
-
-		Platform.runLater(() -> stage.requestFocus());
-
-		TreeView<LabelTreeItem> treeView = createTreeView(stage);
-		layout.getChildren().addAll(treeView, createButtons(treeView, stage));
-
-		stage.initOwner(parentStage);
-		// secondStage.initModality(Modality.APPLICATION_MODAL);
-
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY());
-
-		stage.show();
 	}
 	
 	private Node createButtons(TreeView<LabelTreeItem> treeView, Stage stage) {
@@ -105,12 +75,7 @@ public class ManageLabelsDialog implements Dialog<String> {
 				});
 		});
 		
-		Button close = new Button("Close");
-		close.setOnAction(e -> {
-			stage.close();
-		});
-		
-		container.getChildren().addAll(newGroup, close);
+		container.getChildren().addAll(newGroup);
 		
 		return container;
 	}

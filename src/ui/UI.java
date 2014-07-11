@@ -7,11 +7,9 @@ import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -68,9 +66,7 @@ public class UI extends Application {
 
 		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
 
-		// TODO the root doesn't have to be a borderpane any more,
-		// once the menu is no longer needed
-		BorderPane root = new BorderPane();
+		BorderPane root = new BorderPane(); // TODO the root doesn't have to be a borderpane once the menu is no longer needed
 		root.setCenter(notificationPane);
 		root.setTop(menu);
 		
@@ -81,7 +77,7 @@ public class UI extends Application {
 		
         SplitPane splitPane = new SplitPane();
 		splitPane.getItems().addAll(sidePanel, root);
-		splitPane.setDividerPositions(0.2);
+		splitPane.setDividerPositions(0.4);
 
 		return splitPane;
 	}

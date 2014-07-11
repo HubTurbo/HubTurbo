@@ -119,11 +119,11 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		label.setOnAction((event) -> {
 			
 			// Create a new label
-			TurboLabel newLabel = new TurboLabel("newlabel" + ManageLabelsDialog.getUniqueId());
+			TurboLabel newLabel = new TurboLabel("newlabel" + LabelManagementComponent.getUniqueId());
 			
 			// Set its group value to null if it's being created under the <Ungrouped> group
 			String groupName = getTreeItem().getValue().getValue();
-			if (groupName.equals(ManageLabelsDialog.UNGROUPED_NAME)) groupName = null;
+			if (groupName.equals(LabelManagementComponent.UNGROUPED_NAME)) groupName = null;
 			newLabel.setGroup(groupName);
 			
 			// Set its exclusivity
@@ -140,7 +140,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			triggerLabelEdit(newLabel);
 		});
 		
-		boolean isUngroupedHeading = getTreeItem().getValue().getValue().equals(ManageLabelsDialog.UNGROUPED_NAME);
+		boolean isUngroupedHeading = getTreeItem().getValue().getValue().equals(LabelManagementComponent.UNGROUPED_NAME);
 
 		if (isUngroupedHeading) {
 			return new MenuItem[] {label};
@@ -151,7 +151,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private boolean isGroupItem(TreeItem<LabelTreeItem> treeItem) {
 		assert treeItem != null;
-		return treeItem.getParent() != null && treeItem.getParent().getValue().getValue().equals(ManageLabelsDialog.ROOT_NAME);
+		return treeItem.getParent() != null && treeItem.getParent().getValue().getValue().equals(LabelManagementComponent.ROOT_NAME);
 	}
 
 	private ContextMenu getContextMenuForItem(TreeItem<LabelTreeItem> treeItem) {

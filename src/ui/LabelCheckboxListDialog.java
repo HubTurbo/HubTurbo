@@ -51,7 +51,7 @@ public class LabelCheckboxListDialog implements Dialog<List<TurboLabel>> {
 
 	private void showDialog() {
 		
-		HashMap<String, ArrayList<TurboLabel>> groups = ManageLabelsDialog.groupLabels(labels);
+		HashMap<String, ArrayList<TurboLabel>> groups = LabelManagementComponent.groupLabels(labels);
 
 		VBox layout = new VBox();
 		layout.setSpacing(4);
