@@ -17,7 +17,7 @@ import javafx.util.Callback;
 import model.Model;
 import model.TurboLabel;
 
-public class LabelManagementComponent {//implements Dialog<String> {
+public class LabelManagementComponent {
 
 	public static final String UNGROUPED_NAME = "<Ungrouped>";
 	public static final String ROOT_NAME = "root";
@@ -25,20 +25,11 @@ public class LabelManagementComponent {//implements Dialog<String> {
 	private final Stage parentStage;
 	private final Model model;
 
-//	private CompletableFuture<String> response;
-
 	public LabelManagementComponent(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
 		this.model = model;
-
-//		response = new CompletableFuture<>();
 	}
 
-//	public CompletableFuture<String> show() {
-//		showDialog();
-//		return response;
-//	}
-	
 	public HBox initialise() {
 		HBox layout = new HBox();
 		layout.setPadding(new Insets(15));
