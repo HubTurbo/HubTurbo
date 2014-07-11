@@ -45,8 +45,8 @@ public class UI extends Application {
 	private void getUserCredentials() {
 		new LoginDialog(mainStage).show().thenApply(success -> {
 			if (!success) {
-				// Recurse
-				getUserCredentials();
+//				getUserCredentials();
+				mainStage.close();
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
