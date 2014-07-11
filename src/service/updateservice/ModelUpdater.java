@@ -1,4 +1,4 @@
-package util;
+package service.updateservice;
 
 import java.util.List;
 import java.util.Timer;
@@ -10,10 +10,6 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
-import service.updateservice.CollaboratorUpdateService;
-import service.updateservice.IssueUpdateService;
-import service.updateservice.LabelUpdateService;
-import service.updateservice.MilestoneUpdateService;
 import model.Model;
 
 public class ModelUpdater {

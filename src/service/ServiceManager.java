@@ -23,7 +23,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
-import util.ModelUpdater;
+import service.updateservice.ModelUpdater;
 
 public class ServiceManager {
 	protected static final String METHOD_PUT = "PUT";

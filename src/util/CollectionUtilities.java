@@ -70,4 +70,12 @@ public class CollectionUtilities {
 		}
 		return buffer;
 	}
+	
+	public static ArrayList<Label> getGithubLabelList(List<TurboLabel> labels){
+		ArrayList<Label> githubLabels = new ArrayList<Label>();
+		for(TurboLabel label : labels){
+			githubLabels.add(label.toGhResource());
+		}
+		return githubLabels;
+	}
 }

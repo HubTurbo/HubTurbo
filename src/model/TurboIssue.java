@@ -193,7 +193,7 @@ public class TurboIssue implements Listable {
 		labels.add(getLabelReference(label));
 	}
 	
-	public void setLabels(ObservableList<TurboLabel> labels) {
+	public void setLabels(List<TurboLabel> labels) {
 		if(this.labels != labels){
 			clearAllLabels();
 			for(TurboLabel label : labels){
