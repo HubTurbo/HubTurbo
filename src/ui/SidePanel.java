@@ -34,6 +34,10 @@ public class SidePanel extends VBox {
 		changeLayout();
 	}
 
+	public void refresh() {
+		changeLayout();
+	}
+	
 	private void changeLayout() {
 		getChildren().clear();
 		switch (layout) {

@@ -37,10 +37,11 @@ public abstract class Dialog2<T> {
 	}
 
 	// Getters and setters for stage properties
-	// (Only work before show() is called)
+	// (Some only work before show() is called)
 	
 	public Dialog2<T> setTitle(String title) {
 		this.title = title;
+		if (stage != null) stage.setTitle(title);
 		return this;
 	}
 	

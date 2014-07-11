@@ -33,11 +33,29 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		mainStage = stage;
-
+		
 		Scene scene = new Scene(createRoot(), 800, 600);
 
 		setupMainStage(scene);
 		applyCSS(scene);
+		
+		getUserCredentials();
+	}
+	
+	private void getUserCredentials() {
+		new LoginDialog(mainStage).show().thenApply(response -> {
+			if (!response) {
+				// Recurse
+				getUserCredentials();
+			} else {
+				columns.loadIssues();
+				sidePanel.refresh();
+			}
+			return true;
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return false;
+		});
 	}
 
 	private static final String CSS = "file:///" + new File("hubturbo.css").getAbsolutePath().replace("\\", "/");
