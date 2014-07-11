@@ -200,7 +200,6 @@ public class TurboIssue implements Listable {
 				addToLabels(label);
 			}
 		}
-//		enforceStateLabels(labels);
 	}
 	
 	public void clearAllLabels(){

@@ -90,11 +90,11 @@ public class ServiceManager {
 	}
 	
 	public boolean login(String userId, String password){
+		githubClient.setCredentials(userId, password);
 		try {
 			GitHubRequest request = new GitHubRequest();
 			request.setUri("/");
 			githubClient.get(request);
-			githubClient.setCredentials(userId, password);
 		} catch (IOException e) {
 			// Login failed
 			return false;
