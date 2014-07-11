@@ -27,6 +27,7 @@ import util.ModelUpdater;
 
 public class ServiceManager {
 	protected static final String METHOD_PUT = "PUT";
+	protected static final String METHOD_POST = "POST";
 	
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
@@ -233,6 +234,20 @@ public class ServiceManager {
 		return null;
 	}
 	
+	public void closeIssue(int issueId) throws IOException{
+		String statusChangePath = repoId.generateId() + "issue_comments";
+		HttpURLConnection request = githubClient.createGitHubConnection(statusChangePath, METHOD_POST);
+		byte[] data = createIssueStatusOpenJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
+		sendData(request, data);
+	}
+	
+	public void openIssue(int issueId) throws IOException{
+		String statusChangePath = repoId.generateId() + "issue_comments";
+		HttpURLConnection request = githubClient.createGitHubConnection(statusChangePath, METHOD_POST);
+		byte[] data = createIssueStatusCloseJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
+		sendData(request, data);
+	}
+	
 	/**
 	 * Methods to work with comments data from github
 	 * */
@@ -360,6 +375,21 @@ public class ServiceManager {
 				+ "\"issues[]\":\"%1d\","
 				+ "\"milestone\":\"clear\""
 				+ "}";
+		return String.format(jsonString, issueId);
+	}
+	
+	private String createIssueStatusOpenJsonString(int issueId){
+		String jsonString = "{"
+				+ "\"comment_and_open\":\"1\","
+				+ "\"issue\":\"%1d\","
+				+"\"comment[body]\":\"\"}";
+		return String.format(jsonString, issueId);
+	}
+	private String createIssueStatusCloseJsonString(int issueId){
+		String jsonString = "{"
+				+ "\"comment_and_close\":\"1\","
+				+ "\"issue\":\"%1d\","
+				+"\"comment[body]\":\"\"}";
 		return String.format(jsonString, issueId);
 	}
 }
