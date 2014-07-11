@@ -25,10 +25,16 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		ServiceManager service = ServiceManager.getInstance();
+		
 		this.previousLabels = issue.getLabels(); //Is a copy of original list of labels
-		issue.setLabels(newLabels);
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(newLabels);
+		isSuccessful = setLabelsForIssue(newLabels, previousLabels);
+		return isSuccessful;
+	}
+	
+	private boolean setLabelsForIssue(List<TurboLabel>labels, List<TurboLabel> oldLabels){
+		ServiceManager service = ServiceManager.getInstance();
+		issue.setLabels(labels);
+		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(labels);
 		try {
 			service.setLabelsForIssue(issue.getId(), ghLabels);
 			if(issue.getOpen() == true){
@@ -36,22 +42,20 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 			}else{
 				service.closeIssue(issue.getId());
 			}
-			isSuccessful = true;
+			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			issue.setLabels(previousLabels);
-			isSuccessful = false;
+			issue.setLabels(oldLabels);
+			return false;
 		}
-		return isSuccessful;
 	}
 
 	@Override
 	public boolean undo() {
 		if(isSuccessful){
-		//TODO:	
+			isUndone = setLabelsForIssue(previousLabels, newLabels);
 		}
-		return true;
+		return isUndone;
 	}
 
 }
