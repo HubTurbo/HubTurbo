@@ -9,13 +9,29 @@ public class TurboUser implements Listable {
 	 */
 	
 	private String githubName;
-	public String getGithubName() {return githubName;}
-	public void setGithubName(String githubName) {this.githubName = githubName;}
+	public String getGithubName() {
+		return githubName;
+	}
+	
+	public void setGithubName(String githubName) {
+		this.githubName = githubName;
+	}
 	
 	private String realName;
-	public String getRealName() {return realName;}
-	public void setRealName(String realName) {this.realName = realName;}
+	public String getRealName() {
+		return realName;
+	}
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
 	
+	private String avatarUrl;
+	public String getAvatarUrl(){
+		return avatarUrl;
+	}
+	public void setAvatarUrl(String url){
+		avatarUrl = url;
+	}
 	/*
 	 * Constructors and Public Methods
 	 */
@@ -29,6 +45,7 @@ public class TurboUser implements Listable {
 
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
+		this.avatarUrl = user.getAvatarUrl();
 	}
 	
 	public User toGhResource() {
@@ -42,6 +59,7 @@ public class TurboUser implements Listable {
 			TurboUser obj = (TurboUser)other;
 			setGithubName(obj.getGithubName());
 			setRealName(obj.getRealName());
+			setAvatarUrl(obj.getAvatarUrl());
 		}
 	}
 	
