@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -95,17 +96,33 @@ public class IssuePanel extends VBox {
 					return false;
 				});
 		});
+		filterBox.setAlignment(Pos.BASELINE_LEFT);
+		HBox.setHgrow(filterBox, Priority.ALWAYS);
 		filterBox.getChildren().add(label);
 		
+		HBox rightAlignBox = new HBox();
+
 		Label addIssue = new Label("\u2795");
-		addIssue.setStyle("-fx-font-size: 18pt;");
+		addIssue.setStyle("-fx-font-size: 16pt;");
+		addIssue.setOnMouseClicked((e) -> {
+			System.out.println("add clicked!");
+		});
 		
 		Label closeList = new Label("\u274c");
-		closeList.setStyle("-fx-font-size: 18pt;");
+		closeList.setStyle("-fx-font-size: 16pt;");
+		closeList.setOnMouseClicked((e) -> {
+			System.out.println("close clicked!");
+		});
+		
+		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
+		rightAlignBox.setSpacing(5);
+		rightAlignBox.setAlignment(Pos.BASELINE_RIGHT);
+		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
+		rightAlignBox.getChildren().addAll(addIssue, closeList);
 		
 		HBox topBox = new HBox();
 		topBox.setSpacing(5);
-		topBox.getChildren().addAll(filterBox, addIssue, closeList);
+		topBox.getChildren().addAll(filterBox, rightAlignBox);
 		
 		return topBox;
 	}
