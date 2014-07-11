@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -72,6 +73,7 @@ public class UI extends Application {
 		root.setTop(menu);
 
 		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
+		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
 		
         SplitPane splitPane = new SplitPane();
 		splitPane.getItems().addAll(panel, root);

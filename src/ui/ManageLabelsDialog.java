@@ -42,7 +42,16 @@ public class ManageLabelsDialog implements Dialog<String> {
 		showDialog();
 		return response;
 	}
-
+	
+	public HBox initialise() {
+		HBox layout = new HBox();
+		layout.setPadding(new Insets(15));
+		layout.setSpacing(10);
+		TreeView<LabelTreeItem> treeView = createTreeView(parentStage);
+		layout.getChildren().addAll(treeView, createButtons(treeView, parentStage));
+		return layout;
+	}
+	
 	private void showDialog() {
 
 		HBox layout = new HBox();
