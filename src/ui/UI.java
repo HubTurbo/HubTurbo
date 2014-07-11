@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -23,21 +24,12 @@ public class UI extends Application {
 	private MenuControl menu;
 	private NotificationPane notificationPane;
 	
-	// Other components
-	
-//	private Model model;
-//	private GitHubClientExtended client;
-//	private ModelUpdater modelUpdater;
-
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
 
 	@Override
-	public void start(Stage stage) {
-
-//		client = new GitHubClientExtended();
-//		model = new Model(client);
+	public void start(Stage stage) throws IOException {
 
 		mainStage = stage;
 
@@ -61,14 +53,11 @@ public class UI extends Application {
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
-//			if (modelUpdater != null) {
-//				modelUpdater.stopModelUpdate();
-//			}
 			ServiceManager.getInstance().stopModelUpdate();
 		});
 	}
 
-	private Parent createRoot() {
+	private Parent createRoot() throws IOException {
 
 		notificationPane = new NotificationPane();
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane);
@@ -76,23 +65,18 @@ public class UI extends Application {
 
 		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
 
+		// TODO the root doesn't have to be a borderpane any more,
+		// once the menu is no longer needed
 		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
 		root.setTop(menu);
 
-		Parent panel = null;
-		try {
-	        panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
-	        root.setLeft(panel);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
 		
-		return root;
-	}
-	
-//	public void setModelUpdater(ModelUpdater mu) {
-//		modelUpdater = mu;
-//	}
+        SplitPane splitPane = new SplitPane();
+		splitPane.getItems().addAll(panel, root);
+		splitPane.setDividerPositions(0.2);
 
+		return splitPane;
+	}
 }
