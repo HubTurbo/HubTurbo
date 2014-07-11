@@ -15,6 +15,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LoginDialog extends Dialog2<Boolean> {
@@ -33,7 +34,7 @@ public class LoginDialog extends Dialog2<Boolean> {
 
 		setTitle("GitHub Login");
 		setSize(320, 200);
-//		TODO dialogStage.initModality(Modality.APPLICATION_MODAL);
+		setModality(Modality.APPLICATION_MODAL);
 
 		NotificationPane notificationPane = new NotificationPane();
 		

@@ -5,16 +5,18 @@ import java.util.concurrent.CompletableFuture;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public abstract class Dialog2<T> {
 	
 	private final Stage parentStage;
-	private Stage stage;
+	private Stage stage = null;
 	private CompletableFuture<T> response;
 
 	private double x = 0, y = 0, width = 300, height = 400;
 	private String title = "";
+	private Modality modality;
 	
 	public Dialog2(Stage parentStage) {
 		this.parentStage = parentStage;
@@ -28,7 +30,7 @@ public abstract class Dialog2<T> {
 		stage.setTitle(title);
 		stage.setOnCloseRequest(e -> onClose());
 		stage.initOwner(parentStage);
-//		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initModality(modality);
 		stage.setX(parentStage.getX() + x);
 		stage.setY(parentStage.getY() + y);
 		stage.show();
@@ -42,6 +44,11 @@ public abstract class Dialog2<T> {
 	public Dialog2<T> setTitle(String title) {
 		this.title = title;
 		if (stage != null) stage.setTitle(title);
+		return this;
+	}
+	
+	public Dialog2<T> setModality(Modality modality) {
+		this.modality = modality;
 		return this;
 	}
 	

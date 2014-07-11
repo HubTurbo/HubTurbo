@@ -35,7 +35,6 @@ public class UI extends Application {
 		mainStage = stage;
 		
 		Scene scene = new Scene(createRoot(), 800, 600);
-
 		setupMainStage(scene);
 		applyCSS(scene);
 		
@@ -43,8 +42,8 @@ public class UI extends Application {
 	}
 	
 	private void getUserCredentials() {
-		new LoginDialog(mainStage).show().thenApply(response -> {
-			if (!response) {
+		new LoginDialog(mainStage).show().thenApply(success -> {
+			if (!success) {
 				// Recurse
 				getUserCredentials();
 			} else {
