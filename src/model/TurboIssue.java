@@ -167,12 +167,25 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void addLabel(TurboLabel label){
-		if(!labels.contains(label)){
-			addToLabels(label);
+		if(labels.contains(label)){
+			return;
 		}
+		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
+			this.setOpen(false);
+		}else if(UserConfigurations.isOpenStatusLabel(label.toGhName())){
+			this.setOpen(true);
+		}
+		addToLabels(label);
 	}
 	
 	public void removeLabel(TurboLabel label){
+		if(!labels.contains(label)){
+			return;
+		}
+		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
+			//Default status of the issue is open
+			this.setOpen(true);
+		}
 		labels.remove(label);
 	}
 	
@@ -182,32 +195,37 @@ public class TurboIssue implements Listable {
 	
 	public void setLabels(ObservableList<TurboLabel> labels) {
 		if(this.labels != labels){
-			this.labels.clear();
+			clearAllLabels();
 			for(TurboLabel label : labels){
 				addToLabels(label);
 			}
 		}
-		enforceStateLabels(labels);
+//		enforceStateLabels(labels);
 	}
 	
-	private void enforceStateLabels(ObservableList<TurboLabel> labels){
-		// Auto update status as closed if any labels are equivalent to closed status
-		for (TurboLabel currentLabel : labels) {
-			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
-				this.setOpen(false);
-				return;
-			}
-		}
-		// No closed status labels associated with the issue at this point
-		if (!getOpen()) {
-			for (TurboLabel currentLabel : labels) {
-				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
-					this.setOpen(true);
-					return;
-				}
-			}
-		}
+	public void clearAllLabels(){
+		this.labels.clear();
+		this.setOpen(true);
 	}
+	
+//	private void enforceStateLabels(ObservableList<TurboLabel> labels){
+//		// Auto update status as closed if any labels are equivalent to closed status
+//		for (TurboLabel currentLabel : labels) {
+//			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
+//				this.setOpen(false);
+//				return;
+//			}
+//		}
+//		// No closed status labels associated with the issue at this point
+//		if (!getOpen()) {
+//			for (TurboLabel currentLabel : labels) {
+//				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
+//					this.setOpen(true);
+//					return;
+//				}
+//			}
+//		}
+//	}
 	
 	private ObservableList<Integer> parents = FXCollections.observableArrayList();
 	public ObservableList<Integer> getParents() {

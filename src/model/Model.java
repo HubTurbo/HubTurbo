@@ -307,10 +307,7 @@ public class Model {
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
-		ArrayList<Listable> newCollaborators = new ArrayList<Listable>();
-		for(User ghCollaborator : ghCollaborators) {
-			newCollaborators.add(new TurboUser(ghCollaborator));
-		}
+		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 		updateCachedList(collaborators, newCollaborators);
 	}
 	
@@ -327,10 +324,7 @@ public class Model {
 			List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
 			// Add the issues to a temporary list to prevent a quadratic number
 			// of updates to subscribers of the ObservableList
-			ArrayList<TurboIssue> buffer = new ArrayList<>();
-			for (Issue ghIssue : ghIssues) {
-				buffer.add(new TurboIssue(ghIssue, this));
-			}
+			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			// Add them all at once, so this hopefully propagates only one change
 			issues.addAll(buffer);
 		} catch (IOException e) {
@@ -391,20 +385,14 @@ public class Model {
 	}
 
 	public void updateCachedLabels(List<Label> ghLabels){
-		ArrayList<TurboLabel> newLabels = new ArrayList<TurboLabel>();
-		for (Label ghLabel : ghLabels) {
-			newLabels.add(new TurboLabel(ghLabel));
-		}
+		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		updateCachedList(labels, newLabels);
 	}
 	
 	private void setCachedLabels(List<Label> ghLabels){
 		labels.clear();
 		// See loadIssues for why this buffer list is needed
-		ArrayList<TurboLabel> buffer = new ArrayList<>();
-		for (Label ghLabel : ghLabels) {
-			buffer.add(new TurboLabel(ghLabel));
-		}
+		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		labels.addAll(buffer);
 	}
 	
@@ -420,20 +408,14 @@ public class Model {
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
-		ArrayList<TurboMilestone> newMilestones = new ArrayList<TurboMilestone>();
-		for (Milestone ghMilestone : ghMilestones) {
-			newMilestones.add(new TurboMilestone(ghMilestone));
-		}
+		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		updateCachedList(milestones, newMilestones);
 	}
 	
 	private void setCachedMilestones(List<Milestone> ghMilestones){
 		milestones.clear();
 		// See loadIssues for why this buffer list is needed
-		ArrayList<TurboMilestone> buffer = new ArrayList<>();
-		for (Milestone ghMilestone : ghMilestones) {
-			buffer.add(new TurboMilestone(ghMilestone));
-		}
+		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
 	}
 }
