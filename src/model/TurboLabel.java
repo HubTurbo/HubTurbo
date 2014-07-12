@@ -147,7 +147,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 
 	@Override
 	public String toString() {
-		return getGroup() + "/" + getName() + "/" + getColour();
-	}
+        String groupDelimiter = isExclusive ? "." : "-";
+        return getGroup() + groupDelimiter + getName();
+    }
 	
 }
