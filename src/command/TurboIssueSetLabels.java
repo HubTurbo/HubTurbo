@@ -42,11 +42,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(labels);
 		try {
 			service.setLabelsForIssue(issue.getId(), ghLabels);
-			if(issue.getOpen() == true){
-				service.openIssue(issue.getId());
-			}else{
-				service.closeIssue(issue.getId());
-			}
+			updateGithubIssueState();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

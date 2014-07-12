@@ -313,6 +313,12 @@ public class ServiceManager {
 		return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
 	}
 	
+	public void deleteLabelsFromIssue(int issueId, List<Label> labels) throws IOException{
+		for(Label label : labels){
+			deleteLabelFromIssue(issueId, label);
+		}
+	}
+	
 	public void deleteLabelFromIssue(int issueId, Label label) throws IOException{
 		labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
 	}

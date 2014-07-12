@@ -178,15 +178,26 @@ public class TurboIssue implements Listable {
 		addToLabels(label);
 	}
 	
+	public void addLabels(List<TurboLabel> labList){
+		for(TurboLabel label : labList){
+			addLabel(label);
+		}
+	}
+	
 	public void removeLabel(TurboLabel label){
-		if(!labels.contains(label)){
+		if(!labels.remove(label)){
 			return;
 		}
 		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
 			//Default status of the issue is open
 			this.setOpen(true);
 		}
-		labels.remove(label);
+	}
+	
+	public void removeLabels(List<TurboLabel> labList){
+		for(TurboLabel label : labList){
+			removeLabel(label);
+		}
 	}
 	
 	private void addToLabels(TurboLabel label){
