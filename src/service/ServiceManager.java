@@ -1,8 +1,6 @@
 package service;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +17,6 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -46,7 +43,6 @@ public class ServiceManager {
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
-	private int bufferSize = 8192;
 	
 	private ServiceManager(){
 		githubClient = new GitHubClientExtended();
@@ -114,7 +110,6 @@ public class ServiceManager {
 	
 	public void setupRepository(String owner, String name){
 		repoId = RepositoryId.create(owner, name);
-		//TODO:
 		model.loadComponents(repoId);
 		setupAndStartModelUpdate();
 	}

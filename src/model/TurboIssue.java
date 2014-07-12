@@ -308,7 +308,7 @@ public class TurboIssue implements Listable {
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhResource());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhResource());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
-		ghIssue.setBody(buildBody());
+		ghIssue.setBody(buildGithubBody());
 		return ghIssue;
 	}
 	
@@ -534,7 +534,7 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 	
-	private String buildBody() {
+	public String buildGithubBody() {
 		StringBuilder body = new StringBuilder();
 		
 		if (!parents.isEmpty()) {
@@ -553,7 +553,7 @@ public class TurboIssue implements Listable {
 		body.append(getDescription());
 		return body.toString();
 	}
-
+	
 	/*
 	 * Overridden Methods
 	 */
