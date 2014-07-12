@@ -9,6 +9,9 @@ import model.TurboIssue;
 
 public abstract class TurboIssueCommand {
 	protected TurboIssue issue;
+	protected static final String LABELS_ADD_LOG_PREFIX = "Labels added: ";
+	protected static final String LABELS_REMOVE_LOG_PREFIX = "Labels removed: ";
+	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description."; 
 	protected WeakReference<Model> model;
 	protected boolean isUndoableCommand = false;
 	protected boolean isSuccessful = false;

@@ -54,8 +54,14 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities.getChangesToList(oldLabels, labels);
 		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
-		String changeLog = "Labels added: " + added.toString() + "\n Labels Removed: " + removed.toString();
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		StringBuilder changeLog = new StringBuilder();
+		if(added.size() > 0){
+			changeLog.append(LABELS_ADD_LOG_PREFIX + added.toString() + "\n");
+		}
+		if(removed.size() > 0){
+			changeLog.append(LABELS_REMOVE_LOG_PREFIX + removed.toString() + "\n");
+		}
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
 	}
 	
 	@Override

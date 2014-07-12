@@ -19,6 +19,11 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 		}
 	}
 	
+	private void logAssigneeChange(TurboUser assignee){
+		String changeLog = "Changed issue assignee to: " + assignee.getGithubName();
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+	}
+	
 	@Override
 	public boolean execute() {
 		isSuccessful = setIssueAssignee(newAssignee);
@@ -29,9 +34,9 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 		try {
 			ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
 			issue.setAssignee(user);
+			logAssigneeChange(user);
 			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

@@ -24,7 +24,9 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 	private boolean setIssueDescription(String newDesc, String oldDesc){
 		issue.setDescription(newDesc);
 		try {
-			ServiceManager.getInstance().editIssueBody(issue.getId(), issue.buildGithubBody());
+			ServiceManager service = ServiceManager.getInstance();
+			service.editIssueBody(issue.getId(), issue.buildGithubBody());
+			service.logIssueChanges(issue.getId(), DESCRIPTION_CHANGE_LOG);
 			return true;
 		} catch (IOException e) {
 			issue.setDescription(oldDesc);

@@ -20,6 +20,16 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		super(model, issue);
 		this.addedLabels = labels;
 	}
+	
+	private void logAddOperation(boolean added){
+		String changeLog;
+		if(added){
+			changeLog = LABELS_ADD_LOG_PREFIX + addedLabels.toString();
+		}else{
+			changeLog = LABELS_REMOVE_LOG_PREFIX + addedLabels.toString();
+		}
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+	}
 
 	@Override
 	public boolean execute() {
@@ -29,6 +39,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		try {
 			service.addLabelsToIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
+			logAddOperation(true);
 			isSuccessful = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -48,6 +59,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		try {
 			service.deleteLabelsFromIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
+			logAddOperation(false);
 			isUndone = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

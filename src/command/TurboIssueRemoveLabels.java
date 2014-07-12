@@ -21,6 +21,16 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		super(model, issue);
 		this.removedLabels = labels;
 	}
+	
+	private void logRemoveOperation(boolean remove){
+		String changeLog;
+		if(remove){
+			changeLog = LABELS_REMOVE_LOG_PREFIX + removedLabels.toString();
+		}else{
+			changeLog = LABELS_ADD_LOG_PREFIX + removedLabels.toString();
+		}
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+	}
 
 	@Override
 	public boolean execute() {
@@ -30,6 +40,7 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		try {
 			service.deleteLabelsFromIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
+			logRemoveOperation(true);
 			isSuccessful = true;
 		} catch (IOException e) {
 			issue.addLabels(removedLabels);
@@ -48,6 +59,7 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		try {
 			service.addLabelsToIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
+			logRemoveOperation(false);
 			isUndone = true;
 		} catch (IOException e) {
 			issue.removeLabels(removedLabels);
