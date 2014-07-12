@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -21,8 +22,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
@@ -66,14 +70,11 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			return;
 		
 		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueTitle.setWrappingWidth(300);
+		issueTitle.setWrappingWidth(330);
 		issueTitle.getStyleClass().add("issue-panel-name");
 		if (!issue.getOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
-
-		HBox titleBox = new HBox();
-		titleBox.getChildren().addAll(issueTitle);
-		titleBox.setOnMouseClicked((MouseEvent e) -> {
+		issueTitle.setOnMouseClicked((MouseEvent e) -> {
 			browse(issue.getHtmlUrl());
 		});
 
@@ -82,30 +83,35 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentsReference(), false);
 		
 		TurboUser assignee = issue.getAssignee();
-		HBox assigneeBox = new HBox();
+		HBox rightAlignBox = new HBox();
+		rightAlignBox.setAlignment(Pos.BASELINE_RIGHT);
+		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
 		if (assignee != null) {
-			assigneeBox.setSpacing(3);
 			Label assigneeName = new Label(assignee.getGithubName());
-			assigneeBox.getChildren().addAll(assigneeName);
+			assigneeName.getStyleClass().add("display-box-padding");
+			rightAlignBox.getChildren().addAll(assigneeName);
 		}
+
+		HBox leftAlignBox = new HBox();
+		leftAlignBox.setAlignment(Pos.BASELINE_LEFT);
+		HBox.setHgrow(leftAlignBox, Priority.ALWAYS);
+		leftAlignBox.getChildren().add(parents);
 
 		HBox bottom = new HBox();
 		bottom.setSpacing(5);
-		bottom.setAlignment(Pos.BASELINE_LEFT);
-		bottom.getChildren().add(parents);
-		if (assignee != null) bottom.getChildren().add(assigneeBox);
+		bottom.getChildren().add(leftAlignBox);
+		if (assignee != null) bottom.getChildren().add(rightAlignBox);
 		
-		VBox everything = new VBox();
-		everything.setMaxWidth(350);
-		
-		everything.setSpacing(5);
-		everything.getChildren().addAll(titleBox, labels, bottom);
+		VBox issueCard = new VBox();
+		issueCard.setMaxWidth(350);
+		issueCard.getStyleClass().addAll("borders", "rounded-borders");
+		issueCard.setPadding(new Insets(5,5,5,5));
+		issueCard.setSpacing(5);
+		issueCard.getChildren().addAll(issueTitle, labels, bottom);
 
-		setGraphic(everything);
+		setGraphic(issueCard);
 		
 		setAlignment(Pos.CENTER);
-
-		getStyleClass().addAll("borders", "rounded-borders");
 		
 		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
 

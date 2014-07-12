@@ -96,7 +96,7 @@ public class IssuePanel extends VBox {
 					return false;
 				});
 		});
-		filterBox.setAlignment(Pos.BASELINE_LEFT);
+		filterBox.setAlignment(Pos.TOP_LEFT);
 		HBox.setHgrow(filterBox, Priority.ALWAYS);
 		filterBox.getChildren().add(label);
 		
@@ -116,7 +116,7 @@ public class IssuePanel extends VBox {
 		
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
 		rightAlignBox.setSpacing(5);
-		rightAlignBox.setAlignment(Pos.BASELINE_RIGHT);
+		rightAlignBox.setAlignment(Pos.TOP_RIGHT);
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
 		rightAlignBox.getChildren().addAll(addIssue, closeList);
 		
@@ -128,8 +128,8 @@ public class IssuePanel extends VBox {
 	}
 
 	private void setup() {
-		setPrefWidth(400);
-		setMaxWidth(400);
+		setPrefWidth(380);
+		setMaxWidth(380);
 		setVgrow(listView, Priority.ALWAYS);
 //		HBox.setHgrow(this, Priority.ALWAYS);
 		getStyleClass().add("borders");
