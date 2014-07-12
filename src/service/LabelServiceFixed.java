@@ -45,10 +45,12 @@ public class LabelServiceFixed extends LabelService {
 	private List<Label> addLabelsToIssue(String id, String issueId, List<Label> labels)
 			throws IOException {
 		if (issueId == null)
-			throw new IllegalArgumentException("Issue id cannot be null"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Issue id cannot be null");
 		if (issueId.length() == 0)
-			throw new IllegalArgumentException("Issue id cannot be empty"); //$NON-NLS-1$
-
+			throw new IllegalArgumentException("Issue id cannot be empty");
+		
+//		POST /repos/:owner/:repo/issues/:number/labels
+		
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_ISSUES);

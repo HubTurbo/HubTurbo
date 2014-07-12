@@ -221,6 +221,13 @@ public class ServiceManager {
 		return null;
 	}
 	
+	public Issue getIssue(int issueId) throws IOException{
+		if(repoId !=  null){
+			return issueService.getIssue(repoId, issueId);
+		}
+		return null;
+	}
+	
 	public HashMap<String, Object> getIssueData(int issueId) throws IOException{
 		if(repoId != null){
 			return issueService.getIssueData(repoId, issueId);
@@ -258,17 +265,15 @@ public class ServiceManager {
 	}
 	
 	public void closeIssue(int issueId) throws IOException{
-		String statusChangePath = repoId.generateId() + "issue_comments";
-		HttpURLConnection request = githubClient.createGitHubConnection(statusChangePath, METHOD_POST);
-		byte[] data = createIssueStatusOpenJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
-		sendData(request, data);
+		if(repoId != null){
+			issueService.editIssueState(repoId, issueId, false);
+		}
 	}
 	
 	public void openIssue(int issueId) throws IOException{
-		String statusChangePath = repoId.generateId() + "issue_comments";
-		HttpURLConnection request = githubClient.createGitHubConnection(statusChangePath, METHOD_POST);
-		byte[] data = createIssueStatusCloseJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
-		sendData(request, data);
+		if(repoId != null){
+			issueService.editIssueState(repoId, issueId, true);
+		}
 	}
 	
 	/**
@@ -337,98 +342,16 @@ public class ServiceManager {
 		labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
 	}
 	
-	/**
-	 * Methods to work with issue milestones
-	 **/
-	
-	public void addMilestoneToIssue(int issueId, Milestone milestone) throws IOException{
-		String addMilestonePath = repoId.generateId() + "issues/milestones";
-		HttpURLConnection request = githubClient.createGitHubConnection(addMilestonePath, METHOD_PUT);
-		byte[] data = createMilestoneAddJsonString(issueId, milestone).getBytes(IGitHubConstants.CHARSET_UTF8);
-		sendData(request, data);
-	}
-	
-	public void clearMilestoneFromIssue(int issueId) throws IOException{
-		String milestonePath = repoId.generateId() + "issues/milestones";
-		HttpURLConnection request = githubClient.createGitHubConnection(milestonePath, METHOD_PUT);
-		byte[] data = createMilestoneClearJsonString(issueId).getBytes(IGitHubConstants.CHARSET_UTF8);
-		sendData(request, data);
-	}
-	
-	public void addAssigneeToIssue(int issueId, User user) throws IOException{
-		String assigneePath = repoId.generateId() + "/issues/" + issueId;
-		HttpURLConnection request = githubClient.createGitHubConnection(assigneePath, METHOD_PUT);
-		byte[] data = createAssigneeAddJsonStrong(issueId, user).getBytes(IGitHubConstants.CHARSET_UTF8);
-		sendData(request, data);
-	}
-	
-	public void clearAssigneeFromIssue(int issueId) throws IOException{
-		addAssigneeToIssue(issueId, null);
-	}
-	
-	/**
-	 * Private service methods
-	 * */
-	private void sendData(HttpURLConnection request, byte[] data) throws IOException{
-		writeDataToGithubServer(request, data);
-		final int code = request.getResponseCode();
-		if(githubClient.isError(code)){
-			throw githubClient.createException(githubClient.getStream(request), code,
-					request.getResponseMessage());
+	public void setIssueMilestone(int issueId, Milestone milestone) throws IOException{
+		if(repoId != null){
+			issueService.setIssueMilestone(repoId, issueId, milestone);
 		}
 	}
 	
-	private void writeDataToGithubServer(HttpURLConnection request, byte[] data) throws IOException{
-		request.setDoInput(true);
-		request.setFixedLengthStreamingMode(data.length);
-		BufferedOutputStream output = new BufferedOutputStream(
-				request.getOutputStream(), bufferSize);
-		try {
-			output.write(data);
-			output.flush();
-		} finally {
-			try {
-				output.close();
-			} catch (IOException e) {
-			}
+	public void setIssueAssignee(int issueId, User user) throws IOException{
+		if(repoId != null){
+			issueService.setIssueAssignee(repoId, issueId, user);
 		}
 	}
-	
-	private String createAssigneeAddJsonStrong(int issueId, User user){
-		String jsonString = "{\"issue[assignee]\":\"%1d\"}";
-		if(user == null){
-			String.format(jsonString, "");
-		}
-		return String.format(jsonString, user.getLogin());
-	}
-	
-	private String createMilestoneAddJsonString(int issueId, Milestone milestone){
-		String jsonString = "{"
-				+ "\"issues[]\":\"%1d\","
-				+ "\"milestone\":\"%2d\""
-				+ "}";
-		return String.format(jsonString, issueId, milestone.getNumber());
-	}
-	private String createMilestoneClearJsonString(int issueId){
-		String jsonString = "{"
-				+ "\"issues[]\":\"%1d\","
-				+ "\"milestone\":\"clear\""
-				+ "}";
-		return String.format(jsonString, issueId);
-	}
-	
-	private String createIssueStatusOpenJsonString(int issueId){
-		String jsonString = "{"
-				+ "\"comment_and_open\":\"1\","
-				+ "\"issue\":\"%1d\","
-				+"\"comment[body]\":\"\"}";
-		return String.format(jsonString, issueId);
-	}
-	private String createIssueStatusCloseJsonString(int issueId){
-		String jsonString = "{"
-				+ "\"comment_and_close\":\"1\","
-				+ "\"issue\":\"%1d\","
-				+"\"comment[body]\":\"\"}";
-		return String.format(jsonString, issueId);
-	}
+
 }

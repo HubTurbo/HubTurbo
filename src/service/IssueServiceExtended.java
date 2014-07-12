@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -51,6 +53,15 @@ public class IssueServiceExtended extends IssueService{
 		return ghClient.get(request);
 	}
 	
+	private HttpURLConnection createIssuePostConnection(IRepositoryIdProvider repository, int issueId) throws IOException{
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repository.generateId());
+		uri.append(SEGMENT_ISSUES);
+		uri.append('/').append(issueId);
+		HttpURLConnection connection = ghClient.createPost(uri.toString());
+		return connection;
+	}
+	
 	public Issue editIssue(IRepositoryIdProvider repository, Issue issue, String dateModified) throws IOException {
 		if (issue == null)
 			throw new IllegalArgumentException("Issue cannot be null"); //$NON-NLS-1$
@@ -64,15 +75,6 @@ public class IssueServiceExtended extends IssueService{
 		return ghClient.sendJson(connection, params, Issue.class);
 	}
 	
-	private HttpURLConnection createIssuePostConnection(IRepositoryIdProvider repository, int issueId) throws IOException{
-		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-		uri.append('/').append(repository.generateId());
-		uri.append(SEGMENT_ISSUES);
-		uri.append('/').append(issueId);
-		HttpURLConnection connection = ghClient.createPost(uri.toString());
-		return connection;
-	}
-	
 	public Issue editIssueTitle(IRepositoryIdProvider repository, int issueId, String title) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
 		HashMap<Object, Object> data = new HashMap<Object, Object>();
@@ -84,6 +86,41 @@ public class IssueServiceExtended extends IssueService{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
 		HashMap<Object, Object> data = new HashMap<Object, Object>();
 		data.put(FIELD_BODY, body);
+		return ghClient.sendJson(connection, data, Issue.class);
+	}
+	
+	public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean open) throws IOException{
+		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
+		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		String state;
+		if(open){
+			state = STATE_OPEN;
+		}else{
+			state = STATE_CLOSED;
+		}
+		data.put(FILTER_STATE, state);
+		return ghClient.sendJson(connection, data, Issue.class);
+	}
+	
+	public Issue setIssueMilestone(IRepositoryIdProvider repository, int issueId, Milestone milestone) throws IOException{
+		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
+		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		if (milestone != null && milestone.getNumber() > 0) {
+			data.put(FILTER_MILESTONE, Integer.toString(milestone.getNumber()));
+		}else{
+			data.put(FILTER_MILESTONE, ""); 
+		}
+		return ghClient.sendJson(connection, data, Issue.class);
+	}
+	
+	public Issue setIssueAssignee(IRepositoryIdProvider repository, int issueId, User user) throws IOException{
+		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
+		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		if(user != null && user.getLogin() != null){
+			data.put(FILTER_ASSIGNEE, user.getLogin());
+		}else{
+			data.put(FILTER_ASSIGNEE, "");
+		}
 		return ghClient.sendJson(connection, data, Issue.class);
 	}
 

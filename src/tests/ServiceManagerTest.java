@@ -15,6 +15,9 @@ public class ServiceManagerTest {
 	public static String TEST_GH_USERNAME = "testapi";
 	public static String TEST_GH_PASSWORD = "hubAPItest1";
 	public static String TEST_REPO_NAME = "issuetest";
+	public static final String STATE_OPEN = "open"; //$NON-NLS-1$
+	public static final String STATE_CLOSED = "closed"; //$NON-NLS-1$
+
 	
 	private static ServiceManager service;
 	
@@ -51,6 +54,65 @@ public class ServiceManagerTest {
 			service.editIssueTitle(1, "test " + now);
 		} catch (IOException e) {
 			fail();
+		}
+	}
+	
+	@Test
+	public void testModifyIssueDescription(){
+		Date now = new Date();
+		try {
+			//TODO: fully automate this
+			String desc = "desc " + now;
+			service.editIssueBody(1, desc);
+			
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testChangeIssueState(){
+		try {
+			Issue issue = service.getIssue(1);
+			assertTrue(issue != null);
+			if(issue.getState().equals(STATE_OPEN)){
+				closeAndOpenIssue(1);
+			}else{
+				openAndCloseIssue(1);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+	
+	private void openAndCloseIssue(int issueId){
+		try {	
+			testOpenIssue(1);
+			testCloseIssue(1);
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	private void testOpenIssue(int issueId) throws IOException{
+		service.openIssue(1);
+		String newState = service.getIssue(1).getState();
+		assertTrue(newState.equals(STATE_OPEN));
+	}
+	
+	private void testCloseIssue(int issueId) throws IOException{
+		service.closeIssue(1);
+		String newState = service.getIssue(1).getState();
+		assertTrue(newState.equals(STATE_CLOSED));
+	}
+	
+	private void closeAndOpenIssue(int issueId){
+		try {
+			testCloseIssue(1);
+			testOpenIssue(1);
+		} catch (IOException e) {
+			fail(e.getMessage());
 		}
 	}
 }

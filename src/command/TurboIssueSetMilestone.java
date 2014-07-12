@@ -21,7 +21,7 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 
 	public boolean setIssueMilestone(TurboMilestone milestone){
 		try {
-			ServiceManager.getInstance().addMilestoneToIssue(issue.getId(), milestone.toGhResource());
+			ServiceManager.getInstance().setIssueMilestone(issue.getId(), milestone.toGhResource());
 			issue.setMilestone(milestone);
 			return true;
 		} catch (IOException e) {

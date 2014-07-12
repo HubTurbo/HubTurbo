@@ -27,7 +27,7 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	
 	private boolean setIssueAssignee(TurboUser user){
 		try {
-			ServiceManager.getInstance().addAssigneeToIssue(issue.getId(), user.toGhResource());
+			ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
 			issue.setAssignee(user);
 			return true;
 		} catch (IOException e) {
