@@ -1,6 +1,7 @@
 package model;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +18,11 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
+import command.TurboIssueEdit;
+
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
-import util.DialogMessage;
 import util.UserConfigurations;
 
 public class Model {
@@ -145,25 +147,25 @@ public class Model {
 		if(issueList.size() == 0){
 			return;
 		}
-		
+		WeakReference<Model> selfRef = new WeakReference<Model>(this);
 		for(Issue issue: issueList){
 			Platform.runLater(new Runnable() {
 		        @Override
 		        public void run() {
-		        	updateCachedIssue(issue);
+		        	TurboIssue newCached = new TurboIssue(issue, selfRef.get());
+		        	updateCachedIssue(newCached);
 		        }
 		   });
 		}
 
 	}
 	
-	private void updateCachedIssue(Issue issue){
-		TurboIssue newCached = new TurboIssue(issue, this);
-		TurboIssue tIssue = getIssueWithId(issue.getNumber());
+	public void updateCachedIssue(TurboIssue issue){
+		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if(tIssue != null){
-			tIssue.copyValues(newCached);
+			tIssue.copyValues(issue);
 		}else{
-			issues.add(0, newCached);
+			issues.add(0, issue);
 		}
 	}
 	
@@ -212,28 +214,8 @@ public class Model {
 	}
 	
 	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
-		try {
-			int issueId = editedIssue.getId();
-			StringBuilder changeLog = new StringBuilder();
-			HashMap<String, Object> issueQuery =  ServiceManager.getInstance().getIssueData(issueId);
-			String dateModified = ServiceManager.getInstance().getDateFromIssueData(issueQuery);
-			TurboIssue latestIssue = new TurboIssue(ServiceManager.getInstance().getIssueFromIssueData(issueQuery), this);
-			
-			boolean descUpdated = editedIssue.mergeIssues(originalIssue, latestIssue, changeLog);
-			//TODO: inform user when description update failed
-			Issue latest = latestIssue.toGhResource();
-			ServiceManager.getInstance().editIssue(latest, dateModified);
-			if(changeLog.length() > 0){
-				ServiceManager.getInstance().createComment(issueId, changeLog.toString());
-			}
-			updateCachedIssue(latest);
-			if(!descUpdated){
-				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
-						+ "Please refresh and enter your descripton again.");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		TurboIssueEdit command = new TurboIssueEdit(this, originalIssue, editedIssue);
+		command.execute();
 	}
 	
 	
