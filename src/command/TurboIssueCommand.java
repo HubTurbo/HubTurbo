@@ -14,6 +14,11 @@ public abstract class TurboIssueCommand {
 	protected boolean isSuccessful = false;
 	protected boolean isUndone = false;
 	
+	public TurboIssueCommand(Model model, TurboIssue issue){
+		this.issue = issue;
+		this.model = new WeakReference<Model>(model);
+	}
+	
 	public boolean getIsUndoable(){
 		return isUndoableCommand;
 	}

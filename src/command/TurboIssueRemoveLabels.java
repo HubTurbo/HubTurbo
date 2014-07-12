@@ -18,8 +18,7 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	private List<TurboLabel> removedLabels;
 	
 	public TurboIssueRemoveLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
-		this.issue = issue;
-		this.model = new WeakReference<Model>(model);
+		super(model, issue);
 		this.removedLabels = labels;
 	}
 

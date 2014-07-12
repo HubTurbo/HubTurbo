@@ -20,8 +20,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	private List<TurboLabel> newLabels;
 	
 	public TurboIssueSetLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
-		this.issue = issue;
-		this.model = new WeakReference<Model>(model);
+		super(model, issue);
 		this.newLabels = labels;
 	}
 	

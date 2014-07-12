@@ -1,7 +1,6 @@
 package command;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +17,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	private List<TurboLabel> addedLabels;
 	
 	public TurboIssueAddLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
-		this.issue = issue;
-		this.model = new WeakReference<Model>(model);
+		super(model, issue);
 		this.addedLabels = labels;
 	}
 

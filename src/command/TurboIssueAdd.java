@@ -1,7 +1,6 @@
 package command;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 import org.eclipse.egit.github.core.Issue;
 
@@ -12,8 +11,7 @@ import model.TurboIssue;
 public class TurboIssueAdd extends TurboIssueCommand{
 
 	public TurboIssueAdd(Model model, TurboIssue issue){
-		this.issue = issue;
-		this.model = new WeakReference<Model>(model);
+		super(model, issue);
 		this.isUndoableCommand = false;
 	}
 	
