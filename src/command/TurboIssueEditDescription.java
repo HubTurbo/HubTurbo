@@ -4,21 +4,23 @@ import model.Model;
 import model.TurboIssue;
 
 public class TurboIssueEditDescription extends TurboIssueCommand{
-	
+	String newDescription;
+
 	public TurboIssueEditDescription(Model model, TurboIssue issue, String description){
 		super(model, issue);
+		newDescription = description;
 	}
 	
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
+		String oldDescription = issue.getDescription();
+		issue.setDescription(newDescription);
 		return false;
 	}
 
 	@Override
 	public boolean undo() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

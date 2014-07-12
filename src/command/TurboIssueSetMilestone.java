@@ -9,11 +9,14 @@ import model.TurboMilestone;
 
 public class TurboIssueSetMilestone extends TurboIssueCommand{
 	private TurboMilestone previousMilestone;
-	private TurboMilestone newMilestone;
+	private TurboMilestone newMilestone = new TurboMilestone();
 	
 	public TurboIssueSetMilestone(Model model, TurboIssue issue, TurboMilestone milestone){
 		super(model, issue);
-		this.newMilestone = milestone;
+		this.previousMilestone = issue.getMilestone();
+		if(milestone != null){
+			this.newMilestone = milestone;
+		}
 	}
 
 	public boolean setIssueMilestone(TurboMilestone milestone){
@@ -29,7 +32,6 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 
 	@Override
 	public boolean execute() {
-		this.previousMilestone = issue.getMilestone();
 		isSuccessful = setIssueMilestone(newMilestone);
 		return isSuccessful;
 	}

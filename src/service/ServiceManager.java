@@ -243,6 +243,20 @@ public class ServiceManager {
 		return null;
 	}
 	
+	public Issue editIssueTitle(int issueId, String title) throws IOException{
+		if(repoId != null){
+			return issueService.editIssueTitle(repoId, issueId, title);
+		}
+		return null;
+	}
+	
+	public Issue editIssueBody(int issueId, String body) throws IOException{
+		if(repoId != null){
+			return issueService.editIssueBody(repoId, issueId, body);
+		}
+		return null;
+	}
+	
 	public void closeIssue(int issueId) throws IOException{
 		String statusChangePath = repoId.generateId() + "issue_comments";
 		HttpURLConnection request = githubClient.createGitHubConnection(statusChangePath, METHOD_POST);

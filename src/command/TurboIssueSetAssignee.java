@@ -8,18 +8,19 @@ import model.TurboIssue;
 import model.TurboUser;
 
 public class TurboIssueSetAssignee extends TurboIssueCommand{
-	private TurboUser newAssignee;
+	private TurboUser newAssignee = new TurboUser();
 	private TurboUser previousAssignee;
 	
 	public TurboIssueSetAssignee(Model model, TurboIssue issue, TurboUser user){
 		super(model, issue);
-		this.newAssignee = user;
+		this.previousAssignee = issue.getAssignee();
+		if(user != null){
+			this.newAssignee = user;
+		}
 	}
 	
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
-		this.previousAssignee = issue.getAssignee();
 		isSuccessful = setIssueAssignee(newAssignee);
 		return isSuccessful;
 	}

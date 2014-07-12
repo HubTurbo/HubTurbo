@@ -22,12 +22,11 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	public TurboIssueSetLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
 		super(model, issue);
 		this.newLabels = labels;
+		this.previousLabels = issue.getLabels(); //Is a copy of original list of labels
 	}
 	
 	@Override
 	public boolean execute() {
-		
-		this.previousLabels = issue.getLabels(); //Is a copy of original list of labels
 		isSuccessful = setLabelsForIssue(newLabels, previousLabels);
 		if(isSuccessful){
 			logLabelsChange(newLabels, previousLabels);
