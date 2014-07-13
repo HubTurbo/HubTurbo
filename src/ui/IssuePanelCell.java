@@ -23,10 +23,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
@@ -80,7 +78,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabelsReference(), false, "");
 
-		ParentIssuesDisplayBox parents = new ParentIssuesDisplayBox(issue.getParentsReference(), false);
+		IssueIndicatorsDisplayBox indicators = new IssueIndicatorsDisplayBox(issue, false);
 		
 		TurboUser assignee = issue.getAssignee();
 		HBox rightAlignBox = new HBox();
@@ -95,7 +93,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		HBox leftAlignBox = new HBox();
 		leftAlignBox.setAlignment(Pos.BASELINE_LEFT);
 		HBox.setHgrow(leftAlignBox, Priority.ALWAYS);
-		leftAlignBox.getChildren().add(parents);
+		leftAlignBox.getChildren().add(indicators);
 
 		HBox bottom = new HBox();
 		bottom.setSpacing(5);

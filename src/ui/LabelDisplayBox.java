@@ -47,7 +47,7 @@ public class LabelDisplayBox extends FlowPane {
 	}
 
 	private void setup() {
-		setMaxWidth(300);
+		setMaxWidth(330);
 		if (displayWhenEmpty) {
 			getStyleClass().add("faded-borders");
 		}
