@@ -76,15 +76,14 @@ public class UI extends Application {
 
 	private Parent createRoot() throws IOException {
 
+		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		notificationPane = new NotificationPane();
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
 		notificationPane.setContent(columns);
 
 		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
 		root.setRight(new GlobalButtonPanel(columns));
-
-		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 
 //		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
 //		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());

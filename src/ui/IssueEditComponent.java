@@ -3,10 +3,13 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
+import model.Model;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -14,78 +17,58 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-//import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
 
+public class IssueEditComponent extends VBox {
 
-public class IssueDialog implements Dialog<String> {
-
-	private static final double HEIGHT_FACTOR = 0.35;
+	private final TurboIssue issue;
+	private final Model model;
+	private final Stage parentStage;
+	
+	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model) {
+		this.issue = displayedIssue;
+		this.model = model;
+		this.parentStage = parentStage;
+		setup();
+	}
 
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
 	private static final int MIDDLE_SPACING = 20;
 
-	private Stage parentStage;
-	private Model model;
-	private TurboIssue issue;
-//	private CheckBox closedCheckBox = new CheckBox("Closed");
-
-	private CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
-		this.parentStage = parentStage;
-		this.model = model;
-		this.issue = issue;
-
-		response = new CompletableFuture<>();
-	}
-
-	public CompletableFuture<String> show() {
-		showDialog();
-		return response;
-	}
-
-	private void showDialog() {
+	private void setup() {
 	
-		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
-		layout.setSpacing(MIDDLE_SPACING);
+//		HBox layout = new HBox();
+		setPadding(new Insets(15));
+		setSpacing(MIDDLE_SPACING);
 	
-		Scene scene = new Scene(layout, parentStage.getWidth(),
-				parentStage.getHeight() * HEIGHT_FACTOR);
-		UI.applyCSS(scene);
+//		Scene scene = new Scene(layout, parentStage.getWidth(), parentStage.getHeight() * HEIGHT_FACTOR);
+//		UI.applyCSS(scene);
 	
-		Stage stage = new Stage();
-		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
-		stage.setScene(scene);
+//		Stage stage = new Stage();
+//		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
+//		stage.setScene(scene);
 	
-		Platform.runLater(() -> stage.requestFocus());
+//		Platform.runLater(() -> stage.requestFocus());
 	
-		layout.getChildren().addAll(left(stage), right(stage));
+		getChildren().addAll(left(), right());
 	
-		stage.initOwner(parentStage);
+//		stage.initOwner(parentStage);
 		// secondStage.initModality(Modality.APPLICATION_MODAL);
 	
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY() + parentStage.getHeight()
-				* (1 - HEIGHT_FACTOR));
-	
-		stage.show();
+//		stage.setX(parentStage.getX());
+//		stage.setY(parentStage.getY() + parentStage.getHeight()
+//				* (1 - HEIGHT_FACTOR));
+//	
+//		stage.show();
 	}
 	
 	private ChangeListener<String> createIssueTitleChangeListener(){
@@ -126,7 +109,7 @@ public class IssueDialog implements Dialog<String> {
 		changeListeners.add(listener);
 		return listener;
 	}
-	private Parent left(Stage stage) {
+	private Parent left() {
 
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
@@ -142,7 +125,7 @@ public class IssueDialog implements Dialog<String> {
 //		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
 		
 //		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
-		Parent statusBox = createStatusBox(stage);
+		Parent statusBox = createStatusBox(parentStage);
 		title.getChildren().addAll(issueId, issueTitle, statusBox);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
@@ -197,14 +180,14 @@ public class IssueDialog implements Dialog<String> {
 		return statusBox;
 	}
 
-	private Parent right(Stage stage) {
+	private Parent right() {
 
-		Parent parents = createParentsBox(stage);
-		Parent milestone = createMilestoneBox(stage);
-		Parent labels = createLabelBox(stage);
-		Parent assignee = createAssigneeBox(stage);
+		Parent parents = createParentsBox(parentStage);
+		Parent milestone = createMilestoneBox(parentStage);
+		Parent labels = createLabelBox(parentStage);
+		Parent assignee = createAssigneeBox(parentStage);
 
-		HBox buttons = createButtons(stage);
+		HBox buttons = createButtons(parentStage);
 
 		VBox right = new VBox();
 		right.setSpacing(ELEMENT_SPACING);
@@ -220,17 +203,17 @@ public class IssueDialog implements Dialog<String> {
 
 		Button cancel = new Button();
 		cancel.setText("Cancel");
-		cancel.setOnMouseClicked((MouseEvent e) -> {
-			response.complete("cancel");
-			stage.close();
-		});
+//		cancel.setOnMouseClicked((MouseEvent e) -> {
+//			response.complete("cancel");
+//			stage.close();
+//		});
 
 		Button ok = new Button();
 		ok.setText("OK");
-		ok.setOnMouseClicked((MouseEvent e) -> {
-			response.complete("ok");
-			stage.close();
-		});
+//		ok.setOnMouseClicked((MouseEvent e) -> {
+//			response.complete("ok");
+//			stage.close();
+//		});
 
 		buttons.getChildren().addAll(ok, cancel);
 		return buttons;

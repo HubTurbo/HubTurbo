@@ -1,13 +1,13 @@
 package ui;
 
-import model.Model;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import model.Model;
+import model.TurboIssue;
 
 public class SidePanel extends VBox {
 
@@ -29,13 +29,19 @@ public class SidePanel extends VBox {
 		return layout;
 	}
 
-	public void setLayout(Layout layout) {
+	private void setLayout(Layout layout) {
 		this.layout = layout;
 		changeLayout();
 	}
 
 	public void refresh() {
 		changeLayout();
+	}
+	
+	private TurboIssue displayedIssue;
+	public void displayIssue(TurboIssue issue) {
+		displayedIssue = issue;
+		setLayout(Layout.ISSUE);
 	}
 	
 	private void changeLayout() {
@@ -76,7 +82,10 @@ public class SidePanel extends VBox {
 	}
 
 	private Tab createFeedTab() {
-		return new Tab();
+		Tab tab = new Tab();
+		tab.setClosable(false);
+		tab.setText("Feed");
+		return tab;
 	}
 
 	private Tab createAssgineesTab() {
@@ -104,13 +113,11 @@ public class SidePanel extends VBox {
 	}
 
 	private Node historyLayout() {
-		// TODO Auto-generated method stub
-		return null;
+		return new VBox();
 	}
 
 	private Node issueLayout() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IssueEditComponent(displayedIssue, parentStage, model);
 	}
 	
 }

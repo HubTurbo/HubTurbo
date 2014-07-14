@@ -38,6 +38,7 @@ public class IssuePanel extends VBox {
 	private final Model model;
 	private final ColumnControl parentColumnControl;
 	private final int columnIndex;
+	private final SidePanel sidePanel;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -47,11 +48,12 @@ public class IssuePanel extends VBox {
 	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex) {
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
+		this.sidePanel = sidePanel;
 
 		getChildren().add(createTop());
 		
@@ -71,9 +73,9 @@ public class IssuePanel extends VBox {
 		listView.getSelectionModel()
 				.selectedItemProperty()
 				.addListener(
-						new WeakChangeListener<TurboIssue>(listener = (observable, oldValue, newValue) -> {
-							// save the old one?
-							System.out.println(newValue);
+						new WeakChangeListener<TurboIssue>(listener = (observable, previousIssue, currentIssue) -> {
+							// TODO save the old one?
+							sidePanel.displayIssue(currentIssue);
 						}));
 	}
 

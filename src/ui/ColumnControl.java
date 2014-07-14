@@ -14,10 +14,12 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final Model model;
 	private final NotificationPane notificationPane;
+	private final SidePanel sidePanel;
 
-	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane) {
+	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane, SidePanel sidePanel) {
 		this.stage = stage;
 		this.model = model;
+		this.sidePanel = sidePanel;
 		this.notificationPane = notificationPane;
 
 		addColumn();
@@ -44,7 +46,7 @@ public class ColumnControl extends HBox {
 	}
 	
 	public ColumnControl addColumn() {
-		IssuePanel panel = new IssuePanel(stage, model, this, getChildren().size());
+		IssuePanel panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size());
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		
