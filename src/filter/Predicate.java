@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.collections.FXCollections;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -65,11 +64,11 @@ public class Predicate implements FilterExpression {
 		case "parent":
 			content = content.toLowerCase();
 			if (content.startsWith("#")) {
-				return issue.getParents().contains(Integer.parseInt(content.substring(1)));
+				return issue.getParentIssue() == Integer.parseInt(content.substring(1));
 			} else if (Character.isDigit(content.charAt(0))) {
-				return issue.getParents().contains(Integer.parseInt(content));
+				return issue.getParentIssue() == Integer.parseInt(content);
 			} else {
-				List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> issue.getParents().contains(i.getId())).collect(Collectors.toList());
+				List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
 				for (int i=0; i<actualParentInstances.size(); i++) {
 					if (actualParentInstances.get(i).getTitle().toLowerCase().contains(content)) {
 						return true;
@@ -122,16 +121,16 @@ public class Predicate implements FilterExpression {
 		case "parent":
 			content = content.toLowerCase();
 			if (content.startsWith("#")) {
-				issue.setParents(FXCollections.observableArrayList(Integer.parseInt(content.substring(1))));
+				issue.setParentIssue(Integer.parseInt(content.substring(1)));
 			} else if (Character.isDigit(content.charAt(0))) {
-				issue.setParents(FXCollections.observableArrayList(Integer.parseInt(content)));
+				issue.setParentIssue(Integer.parseInt(content));
 			} else {
 				// Find parents containing the partial title
 				List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
 				if (parents.size() > 1) {
 					throw new PredicateApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
 				} else {
-					issue.addParent(parents.get(0).getId());
+					issue.setParentIssue(parents.get(0).getId());
 				}
 			}
 			break;

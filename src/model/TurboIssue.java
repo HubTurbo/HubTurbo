@@ -27,7 +27,7 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_REPLACE_DESC = "^[^<>]*<hr>";
 	private static final String REGEX_SPLIT_PARENT = "(,\\s+)?#";
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
-	private static final String METADATA_HEADER_PARENT = "* Parent(s): ";
+	private static final String METADATA_HEADER_PARENT = "* Parent: #%1d \n";
 	private static final String METADATA_SEPERATOR = "<hr>";
 	
 	/*
@@ -88,6 +88,18 @@ public class TurboIssue implements Listable {
     public StringProperty descriptionProperty() {
     	return description;
     }
+    
+    private IntegerProperty parentIssue = new SimpleIntegerProperty();
+    public int getParentIssue(){
+    	return parentIssue.get();
+    }
+    public final IntegerProperty parentIssueProperty(){
+    	return parentIssue;
+    }
+    public final void setParentIssue(int parent){
+    	parentIssue.set(parent);
+    }
+    
     
     private BooleanProperty state = new SimpleBooleanProperty();
     public final Boolean getOpen() {
@@ -175,27 +187,6 @@ public class TurboIssue implements Listable {
 		addToLabels(label);
 	}
 	
-	
-//	private void enforceStateLabels(ObservableList<TurboLabel> labels){
-//		// Auto update status as closed if any labels are equivalent to closed status
-//		for (TurboLabel currentLabel : labels) {
-//			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
-//				this.setOpen(false);
-//				return;
-//			}
-//		}
-//		// No closed status labels associated with the issue at this point
-//		if (!getOpen()) {
-//			for (TurboLabel currentLabel : labels) {
-//				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
-//					this.setOpen(true);
-//					return;
-//				}
-//			}
-//		}
-//	}
-	
-	
 	public void addLabels(List<TurboLabel> labList){
 		for(TurboLabel label : labList){
 			addLabel(label);
@@ -236,31 +227,6 @@ public class TurboIssue implements Listable {
 		this.setOpen(true);
 	}
 
-	private ObservableList<Integer> parents = FXCollections.observableArrayList();
-	public ObservableList<Integer> getParents() {
-		return  FXCollections.observableArrayList(parents);
-	}
-	public ObservableList<Integer> getParentsReference(){
-		return parents;
-	} 
-	
-	public void setParents(ObservableList<Integer> parentNumbers) {
-		if (this.parents == null) {
-			this.parents = parentNumbers;
-		} else if (parentNumbers != this.parents) {
-			this.parents.clear();
-			if(!parentNumbers.isEmpty()){
-				this.parents.add(parentNumbers.get(0));
-			}
-		}
-	}
-	
-	public void addParent(Integer parentId){
-		//Only single parent for now. This might be extended in future to allow multiple parents
-		this.parents.clear();
-		this.parents.add(parentId);
-	}
-
 	/*
 	 * Constructors & Public Methods
 	 */
@@ -295,7 +261,8 @@ public class TurboIssue implements Listable {
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
-		setParents(extractParentNumbers(issue.getBody()));
+//		setParents(extractParentNumbers(issue.getBody()));
+		setParentIssue(extractIssueParent(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
 		setNumOfComments(issue.getComments());
 	}
@@ -327,7 +294,8 @@ public class TurboIssue implements Listable {
 			setAssignee(obj.getAssignee());
 			setMilestone(obj.getMilestone());
 			setLabels(obj.getLabels());
-			setParents(obj.getParents());
+//			setParents(obj.getParents());
+			setParentIssue(obj.getParentIssue());
 			setPullRequest(obj.getPullRequest());
 			setNumOfComments(obj.getNumOfComments());
 		}
@@ -343,18 +311,10 @@ public class TurboIssue implements Listable {
 		return description;
 	}
 	
-	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
-		if (labels == null) return turboLabels;
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
+	private Integer extractIssueParent(String issueBody) {
+		if (issueBody == null){
+			return  -1;
 		}
-		return turboLabels;
-	}
-
-	private ObservableList<Integer> extractParentNumbers(String issueBody) {
-		ObservableList<Integer> parents = FXCollections.observableArrayList();
-		if (issueBody == null) return parents;
 		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
 		int seperatorLineIndex = getSeperatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
@@ -363,12 +323,22 @@ public class TurboIssue implements Listable {
 				String value = line.replace(METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
-					if (valueTokens[j].trim().isEmpty()) continue;
-					parents.add(Integer.parseInt(valueTokens[j].trim()));
+					if (!valueTokens[j].trim().isEmpty()){
+						return Integer.parseInt(valueTokens[j].trim());
+					}
 				}
 			}
 		}
-		return parents;
+		return -1;
+	}
+	
+	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
+		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
+		if (labels == null) return turboLabels;
+		for (Label label : labels) {
+			turboLabels.add(new TurboLabel(label));
+		}
+		return turboLabels;
 	}
 	
 	private int getSeperatorIndex(String[] lines) {
@@ -382,20 +352,11 @@ public class TurboIssue implements Listable {
 	
 	public String buildGithubBody() {
 		StringBuilder body = new StringBuilder();
-		
-		if (!parents.isEmpty()) {
-			String parentsMd = METADATA_HEADER_PARENT;
-			Iterator<Integer> parentsItr = parents.iterator();
-			while (parentsItr.hasNext()) {
-				parentsMd = parentsMd + "#" + parentsItr.next();
-				if (parentsItr.hasNext()) {
-					parentsMd = parentsMd + ", ";
-				}
-			}
-			body.append(parentsMd + "\n");
+		int parent = this.getParentIssue();
+		if(parent > 0){
+			body.append(String.format(METADATA_HEADER_PARENT, this.getParentIssue()));
+			body.append(METADATA_SEPERATOR + "\n");
 		}
-		
-		body.append(METADATA_SEPERATOR + "\n");
 		body.append(getDescription());
 		return body.toString();
 	}
@@ -438,5 +399,71 @@ public class TurboIssue implements Listable {
 			return false;
 		return true;
 	}
-
+	
+	/**
+	 * Deprecated methods
+	 * */
+//	private ObservableList<Integer> parents = FXCollections.observableArrayList();
+//	public ObservableList<Integer> getParents() {
+//		return  FXCollections.observableArrayList(parents);
+//	}
+//	public ObservableList<Integer> getParentsReference(){
+//		return parents;
+//	} 
+//	
+//	public void setParents(ObservableList<Integer> parentNumbers) {
+//		if (this.parents == null) {
+//			this.parents = parentNumbers;
+//		} else if (parentNumbers != this.parents) {
+//			this.parents.clear();
+//			if(!parentNumbers.isEmpty()){
+//				this.parents.add(parentNumbers.get(0));
+//			}
+//		}
+//	}
+//	
+//	public void addParent(Integer parentId){
+//		//Only single parent for now. This might be extended in future to allow multiple parents
+//		this.parents.clear();
+//		this.parents.add(parentId);
+//	}
+//	
+//	private ObservableList<Integer> extractParentNumbers(String issueBody) {
+//		ObservableList<Integer> parents = FXCollections.observableArrayList();
+//		if (issueBody == null) return parents;
+//		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
+//		int seperatorLineIndex = getSeperatorIndex(lines);
+//		for (int i = 0; i < seperatorLineIndex; i++) {
+//			String line = lines[i];
+//			if (line.startsWith(METADATA_HEADER_PARENT)) {
+//				String value = line.replace(METADATA_HEADER_PARENT, "");
+//				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
+//				for (int j = 0; j < valueTokens.length; j++) {
+//					if (valueTokens[j].trim().isEmpty()) continue;
+//					parents.add(Integer.parseInt(valueTokens[j].trim()));
+//				}
+//			}
+//		}
+//		return parents;
+//	}
+	
+//	public String buildGithubBody() {
+//		StringBuilder body = new StringBuilder();
+//
+//		if (!parents.isEmpty()) {
+//			String parentsMd = METADATA_HEADER_PARENT;
+//			Iterator<Integer> parentsItr = parents.iterator();
+//			while (parentsItr.hasNext()) {
+//				parentsMd = parentsMd + "#" + parentsItr.next();
+//				if (parentsItr.hasNext()) {
+//					parentsMd = parentsMd + ", ";
+//				}
+//			}
+//			body.append(parentsMd + "\n");
+//		}
+//
+//		body.append(METADATA_SEPERATOR + "\n");
+//		body.append(getDescription());
+//		return body.toString();
+//	}
 }

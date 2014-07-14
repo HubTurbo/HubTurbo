@@ -10,8 +10,12 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	public TurboIssueSetParent(Model model, TurboIssue issue, Integer parent){
 		super(model, issue);
 		newParent = parent;
-		
+		previousParent = issue.getParentIssue();
 	}
+	
+//	private boolean setIssueParent(Integer parent){
+//		
+//	}
 	
 	@Override
 	public boolean execute() { 

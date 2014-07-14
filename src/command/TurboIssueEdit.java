@@ -76,7 +76,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	private boolean mergeIssues(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
 		mergeTitle(original, edited, latest, changeLog);
 		boolean fullMerge = mergeDescription(original, edited, latest, changeLog);		
-		mergeParents(original, edited, latest, changeLog);
+		mergeIssueParent(original, edited, latest, changeLog);
 		mergeLabels(original, edited, latest, changeLog);
 		mergeAssignee(original, edited, latest, changeLog);
 		mergeMilestone(original, edited, latest, changeLog);
@@ -187,30 +187,23 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		return true;
 	}
 	
-	private void mergeParents(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
-		ObservableList<Integer> originalParents = original.getParents();
-		ObservableList<Integer> editedParents = edited.getParents();
+	private void mergeIssueParent(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
+		Integer originalParent = original.getParentIssue();
+		Integer editedParent = edited.getParentIssue();
 		
-		HashMap<String, HashSet<Integer>> changeSet = CollectionUtilities.getChangesToList(originalParents, editedParents);
-		ObservableList<Integer> latestParents = latest.getParents();
-		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
-		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
-		latestParents.removeAll(removed);
-		for(Integer parent: added){
-			if(!latestParents.contains(parent)){
-				latestParents.add(parent);
-			}
+		if(originalParent != editedParent){
+			latest.setParentIssue(editedParent);
+			logParentChange(originalParent, editedParent, changeLog);
 		}
-		latest.setParents(latestParents);
-		logParentChange(removed, added, changeLog);
 	}
 	
-	private void logParentChange(HashSet<Integer> removed, HashSet<Integer> added, StringBuilder changeLog){
-		if(added.size() > 0){
-			changeLog.append("Added Parents: " + added.toString() + "\n");
-		}
-		if(removed.size() > 0){
-			changeLog.append("Removed Parents: " + removed.toString() + "\n");
+	private void logParentChange(Integer originalParent, Integer editedParent, StringBuilder changeLog){
+		if(editedParent < 0){
+			changeLog.append(String.format("Removed issue parent: %1d", originalParent));
+		}else if(originalParent > 0){
+			changeLog.append(String.format("Changed Issue parent from %1d to %2d", originalParent, editedParent));
+		}else{
+			changeLog.append(String.format("Set Issue parent to %1d", editedParent));
 		}
 	}
 
