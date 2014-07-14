@@ -11,6 +11,8 @@ import service.GitHubClientExtended;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MilestoneUpdateService extends UpdateService<Milestone>{
 	
@@ -20,9 +22,16 @@ public class MilestoneUpdateService extends UpdateService<Milestone>{
 		apiSuffix = SEGMENT_MILESTONES;
 	}
 	
+	private Map<String, String> createUpdatedMilestonesParams(){
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("state", "all");
+		return params;
+	}
+	
 	@Override
 	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
 		GitHubRequest request = super.createUpdatedRequest(repoId);
+		request.setParams(createUpdatedMilestonesParams());
 		request.setType(new TypeToken<Milestone>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<Milestone>>(){}.getType());
 		return request;
