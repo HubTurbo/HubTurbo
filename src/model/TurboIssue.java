@@ -26,7 +26,8 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_REPLACE_DESC = "^[^<>]*<hr>";
 	private static final String REGEX_SPLIT_PARENT = "(,\\s+)?#";
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
-	private static final String METADATA_HEADER_PARENT = "* Parent: #%1d \n";
+	private static final String METADATA_HEADER_PARENT = "* Parent: ";
+	private static final String METADATA_PARENT = "#%1d \n";
 	private static final String METADATA_SEPERATOR = "<hr>";
 	
 	/*
@@ -260,7 +261,6 @@ public class TurboIssue implements Listable {
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
 		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
 		setLabels(translateLabels(issue.getLabels()));
-//		setParents(extractParentNumbers(issue.getBody()));
 		setParentIssue(extractIssueParent(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
 		setNumOfComments(issue.getComments());
@@ -293,7 +293,6 @@ public class TurboIssue implements Listable {
 			setAssignee(obj.getAssignee());
 			setMilestone(obj.getMilestone());
 			setLabels(obj.getLabels());
-//			setParents(obj.getParents());
 			setParentIssue(obj.getParentIssue());
 			setPullRequest(obj.getPullRequest());
 			setNumOfComments(obj.getNumOfComments());
@@ -318,10 +317,15 @@ public class TurboIssue implements Listable {
 		int seperatorLineIndex = getSeperatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
 			String line = lines[i];
+			if(id.get() == 29){
+				System.out.println(line);
+			}
 			if (line.startsWith(METADATA_HEADER_PARENT)) {
+				System.out.println(line);
 				String value = line.replace(METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
+					System.out.println(valueTokens);
 					if (!valueTokens[j].trim().isEmpty()){
 						return Integer.parseInt(valueTokens[j].trim());
 					}
@@ -353,7 +357,8 @@ public class TurboIssue implements Listable {
 		StringBuilder body = new StringBuilder();
 		int parent = this.getParentIssue();
 		if(parent > 0){
-			body.append(String.format(METADATA_HEADER_PARENT, this.getParentIssue()));
+			String parentData = METADATA_HEADER_PARENT + METADATA_PARENT;
+			body.append(String.format(parentData, this.getParentIssue()));
 			body.append(METADATA_SEPERATOR + "\n");
 		}
 		body.append(getDescription());
