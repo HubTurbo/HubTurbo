@@ -3,7 +3,6 @@ package ui;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -41,26 +39,17 @@ public class FilterDialog implements Dialog<String> {
 
 	private Node createRoot(Stage stage) {
 		
-		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2))");
+		Label explanatory = new Label("Filter issues by writing a series of predicates.\n\ne.g. \"all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2\"\n\nassignee(john) ~status(closed) (milestone(v0.1) or milestone(v0.2))\nassignee:john -status:closed (milestone:v0.1 or milestone:v0.2)");
 		explanatory.setWrapText(true);
 		
         TextField field = new TextField(input);
         HBox.setHgrow(field, Priority.ALWAYS);
 //        setupAutocompletion(field);
         
-        field.setOnKeyPressed(new EventHandler<KeyEvent>() {
-        	public void handle(KeyEvent ke) {
-                switch (ke.getCode()) {
-                case ENTER:
-                	response.complete(field.getText());
-                    stage.close();
-                    break;
-                default:
-                    break;
-                }
-            }
+        field.setOnAction(ke -> {
+        	response.complete(field.getText());
+            stage.close();
         });
-        
 
         HBox buttonContainer = new HBox();
         Button close = new Button("Apply");
@@ -109,7 +98,7 @@ public class FilterDialog implements Dialog<String> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 
-		Scene scene = new Scene(layout, 530, 200);
+		Scene scene = new Scene(layout, 530, 220);
 
 		Stage stage = new Stage();
 		stage.setTitle("Filter");
