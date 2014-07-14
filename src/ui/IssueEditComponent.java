@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -177,7 +178,7 @@ public class IssueEditComponent extends VBox {
 
 		Button done = new Button();
 		done.setText("Done");
-		done.setOnMouseClicked((MouseEvent e) -> {
+		done.setOnMouseClicked(e -> {
 			response.complete("done");
 		});
 
