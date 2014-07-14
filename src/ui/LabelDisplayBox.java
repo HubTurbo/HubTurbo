@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import model.TurboLabel;
@@ -48,6 +49,8 @@ public class LabelDisplayBox extends FlowPane {
 
 	private void setup() {
 		setMaxWidth(330);
+		setPrefHeight(30);
+		setAlignment(Pos.CENTER_LEFT);
 		if (displayWhenEmpty) {
 			getStyleClass().add("faded-borders");
 		}
