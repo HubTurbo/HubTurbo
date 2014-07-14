@@ -6,6 +6,7 @@ import java.io.FileReader;
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -19,6 +20,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LoginDialog extends Dialog2<Boolean> {
+
+	private TextField repoOwnerField;
+	private TextField repoNameField;
+	private TextField usernameField;
+	private PasswordField passwordField;
+	private NotificationPane notificationPane;
 
 	public LoginDialog(Stage parentStage) {
 		super(parentStage);
@@ -36,7 +43,7 @@ public class LoginDialog extends Dialog2<Boolean> {
 		setSize(320, 200);
 		setModality(Modality.APPLICATION_MODAL);
 
-		NotificationPane notificationPane = new NotificationPane();
+		notificationPane = new NotificationPane();
 		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -47,32 +54,36 @@ public class LoginDialog extends Dialog2<Boolean> {
 		Label repoNameLabel = new Label("Repository:");
 		grid.add(repoNameLabel, 0, 0);
 
-		TextField repoOwnerField = new TextField("HubTurbo");
+		repoOwnerField = new TextField("HubTurbo");
+		repoOwnerField.setOnAction(this::login);
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
-		TextField repoNameField = new TextField("HubTurbo");
+		repoNameField = new TextField("HubTurbo");
+		repoNameField.setOnAction(this::login);
 		grid.add(repoNameField, 3, 0);
 
 		Label usernameLabel = new Label("Username:");
 		grid.add(usernameLabel, 0, 1);
 
-		TextField usernameField = new TextField();
+		usernameField = new TextField();
+		usernameField.setOnAction(this::login);
 		grid.add(usernameField, 1, 1, 3, 1);
 
 		Label passwordLabel = new Label("Password:");
 		grid.add(passwordLabel, 0, 2);
 
-		PasswordField passwordField = new PasswordField();
+		passwordField = new PasswordField();
+		passwordField.setOnAction(this::login);
 		grid.add(passwordField, 1, 2, 3, 1);
 
 		repoOwnerField.setMaxWidth(80);
 		repoNameField.setMaxWidth(80);
 
 		Button loginButton = new Button("Sign in");
-		loginButton.setOnAction(ev -> onLoginClick(repoOwnerField.getText(), repoNameField.getText(), usernameField.getText(), passwordField.getText(), notificationPane));
+		loginButton.setOnAction(this::login);
 
 		HBox buttons = new HBox(10);
 		buttons.setAlignment(Pos.BOTTOM_RIGHT);
@@ -85,7 +96,11 @@ public class LoginDialog extends Dialog2<Boolean> {
 	}
 	
 
-	private void onLoginClick(String owner, String repo, String username, String password, NotificationPane notificationPane) {
+	private void login(Event e) {
+		String owner = repoOwnerField.getText();
+		String repo = repoNameField.getText();
+		String username = usernameField.getText();
+		String password = passwordField.getText();
 		
 		if (username.isEmpty() && password.isEmpty()) {
 			BufferedReader reader;
@@ -99,7 +114,7 @@ public class LoginDialog extends Dialog2<Boolean> {
 						password = line;
 				}
 				System.out.println("Logged in using credentials.txt");
-			} catch (Exception e) {
+			} catch (Exception ex) {
 				System.out.println("Failed to find or open credentials.txt");
 			}
 		}
@@ -125,8 +140,5 @@ public class LoginDialog extends Dialog2<Boolean> {
 	
 	private void loadRepository(String owner, String repoName) {
 		ServiceManager.getInstance().setupRepository(owner, repoName);
-
-		setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");
-//		enableMenuItemsRequiringLogin();
 	}
 }
