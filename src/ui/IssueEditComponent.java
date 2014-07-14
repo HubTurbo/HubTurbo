@@ -15,7 +15,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -49,7 +48,7 @@ public class IssueEditComponent extends VBox {
 
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
-	private static final int MIDDLE_SPACING = 20;
+	private static final int MIDDLE_SPACING = 5;
 
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
@@ -90,13 +89,21 @@ public class IssueEditComponent extends VBox {
 		title.setSpacing(TITLE_SPACING);
 
 		Label issueId = new Label("#" + issue.getId());
-		TextField issueTitle = new TextField(issue.getTitle());
+		TextArea issueTitle = new TextArea(issue.getTitle());
 		issueTitle.setPromptText("Title");
-		issueTitle.textProperty().addListener(
-				new WeakChangeListener<String>(createIssueTitleChangeListener()));
+		issueTitle.setPrefRowCount(3);
+		issueTitle.setPrefColumnCount(42);
+		issueTitle.setWrapText(true);
+		issueTitle.textProperty().addListener(new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
 		Parent statusBox = createStatusBox(parentStage);
-		title.getChildren().addAll(issueId, issueTitle, statusBox);
+		
+		VBox topLeft = new VBox();
+		topLeft.setSpacing(5);
+		topLeft.setAlignment(Pos.CENTER_RIGHT);
+		topLeft.getChildren().addAll(issueId, statusBox);
+		
+		title.getChildren().addAll(topLeft, issueTitle);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
 		issueDesc.setPrefRowCount(8);
