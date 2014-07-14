@@ -16,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,14 +30,16 @@ public class IssueEditComponent extends VBox {
 	private final TurboIssue issue;
 	private final Model model;
 	private final Stage parentStage;
+	private ColumnControl columns;
 	
 	private final CompletableFuture<String> response;
 	
-	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model) {
+	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
 		this.response = new CompletableFuture<>();
+		this.columns = columns;
 		setup();
 	}
 	
@@ -173,6 +174,7 @@ public class IssueEditComponent extends VBox {
 		cancel.setText("Cancel");
 		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
+			columns.deselect();
 		});
 
 		Button done = new Button();

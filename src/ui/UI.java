@@ -76,9 +76,10 @@ public class UI extends Application {
 
 	private Parent createRoot() throws IOException {
 
-		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		notificationPane = new NotificationPane();
+		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
+		sidePanel.setColumns(columns);
 		notificationPane.setContent(columns);
 
 		BorderPane root = new BorderPane();

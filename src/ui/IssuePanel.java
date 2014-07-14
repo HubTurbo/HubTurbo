@@ -67,6 +67,10 @@ public class IssuePanel extends VBox {
 		refreshItems();
 	}
 	
+	public void deselect() {
+		listView.getSelectionModel().clearSelection();
+	}
+	
 	@SuppressWarnings("unused")
 	private ChangeListener<TurboIssue> listener;
 	private void setupListView() {

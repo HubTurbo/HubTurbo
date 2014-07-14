@@ -20,6 +20,7 @@ public class SidePanel extends VBox {
 	private Layout layout;
 	private Stage parentStage;
 	private Model model;
+	private ColumnControl columns = null;
 	
 	public SidePanel(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
@@ -27,6 +28,11 @@ public class SidePanel extends VBox {
 		setLayout(Layout.TABS);
 	}
 
+	// Needed due to a circular dependency with ColumnControl
+	public void setColumns(ColumnControl columns) {
+		this.columns = columns;
+	}
+	
 	public Layout getLayout() {
 		return layout;
 	}
@@ -128,9 +134,8 @@ public class SidePanel extends VBox {
 	}
 
 	private Node issueLayout() {
-		IssueEditComponent result = new IssueEditComponent(displayedIssue, parentStage, model);
+		IssueEditComponent result = new IssueEditComponent(displayedIssue, parentStage, model, columns);
 		response = result.getResponse();
 		return result;
 	}
-	
 }

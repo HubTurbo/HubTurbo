@@ -34,6 +34,10 @@ public class ColumnControl extends HBox {
 		getChildren().forEach(child -> ((IssuePanel) child).refreshItems());
 	}
 	
+	public void deselect() {
+		getChildren().forEach(child -> ((IssuePanel) child).deselect());
+	}
+
 	public void loadIssues() {
 		for (Node node : getChildren()) {
 			IssuePanel panel = (IssuePanel) node;
