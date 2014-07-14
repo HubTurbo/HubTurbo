@@ -99,6 +99,12 @@ public class TurboIssue implements Listable {
     public final void setParentIssue(int parent){
     	parentIssue.set(parent);
     }
+    public final TurboIssue parentReference() {
+    	if (getParentIssue() != -1) {
+    		return model.get().getIssueWithId(getParentIssue());
+    	}
+    	return null;
+    }
     
     
     private BooleanProperty state = new SimpleBooleanProperty();

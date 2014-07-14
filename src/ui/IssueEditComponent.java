@@ -201,7 +201,7 @@ public class IssueEditComponent extends VBox {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.parentIssueProperty(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
