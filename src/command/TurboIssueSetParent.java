@@ -10,6 +10,11 @@ import util.CollectionUtilities;
 import model.Model;
 import model.TurboIssue;
 
+/**
+ * Updates issue parent on github. 
+ * Also sets the parent of the given TurboIssue object to the given parent issue number
+ * */
+
 public class TurboIssueSetParent extends TurboIssueCommand{
 	private Integer newParent;
 	private Integer previousParent;

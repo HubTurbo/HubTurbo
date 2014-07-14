@@ -6,6 +6,11 @@ import service.ServiceManager;
 import model.Model;
 import model.TurboIssue;
 
+/**
+ * Updates issue title on github. 
+ * Also sets the title of the given TurboIssue object to the given description String.
+ * */
+
 public class TurboIssueEditTitle extends TurboIssueCommand{
 	
 	private String newTitle;

@@ -12,6 +12,11 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 
+/**
+ * Removes list of labels from issue on github
+ * Also removes given List of labes from given TurboIssue object
+ * */
+
 public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	
 	private List<TurboLabel> removedLabels;

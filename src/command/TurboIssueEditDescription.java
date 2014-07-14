@@ -6,6 +6,12 @@ import service.ServiceManager;
 import model.Model;
 import model.TurboIssue;
 
+
+/**
+ * Updates issue description on github. 
+ * Also sets the description of the given TurboIssue object to the given description String.
+ * */
+
 public class TurboIssueEditDescription extends TurboIssueCommand{
 	String newDescription;
 

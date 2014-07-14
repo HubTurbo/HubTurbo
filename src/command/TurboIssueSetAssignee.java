@@ -7,6 +7,11 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboUser;
 
+/**
+ * Updates issue assignee on github. 
+ * Also sets the assignee of the given TurboIssue object to the given TurboUser object
+ * */
+
 public class TurboIssueSetAssignee extends TurboIssueCommand{
 	private TurboUser newAssignee = new TurboUser();
 	private TurboUser previousAssignee;

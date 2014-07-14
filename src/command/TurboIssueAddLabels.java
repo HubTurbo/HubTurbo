@@ -12,6 +12,10 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 
+/**
+ * Adds given list of labels to the issue on github. Also adds labels to the given TurboIssue object
+ * */
+
 public class TurboIssueAddLabels extends TurboIssueCommand{
 	
 	private List<TurboLabel> addedLabels;

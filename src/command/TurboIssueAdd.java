@@ -8,6 +8,10 @@ import service.ServiceManager;
 import model.Model;
 import model.TurboIssue;
 
+/**
+ * Creates a new github issue on github and updates model with the created issue data
+ * */
+
 public class TurboIssueAdd extends TurboIssueCommand{
 
 	public TurboIssueAdd(Model model, TurboIssue issue){

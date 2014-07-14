@@ -14,6 +14,11 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 
+/**
+ * Sets labels of issue on github
+ * Also sets labels of given TurboIssue object to given list of TurboLabels
+ * */
+
 public class TurboIssueSetLabels extends TurboIssueCommand{
 	private List<TurboLabel> previousLabels;
 	private List<TurboLabel> newLabels;

@@ -7,6 +7,11 @@ import model.Model;
 import model.TurboIssue;
 import model.TurboMilestone;
 
+/**
+ * Updates issue milestone on github. 
+ * Also sets the milestone of the given TurboIssue object to the given TurboMilestone object
+ * */
+
 public class TurboIssueSetMilestone extends TurboIssueCommand{
 	private TurboMilestone previousMilestone;
 	private TurboMilestone newMilestone = new TurboMilestone();
