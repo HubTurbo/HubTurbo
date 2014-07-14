@@ -26,20 +26,19 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		isSuccessful = setLabelsForIssue(newLabels, previousLabels);
-		if(isSuccessful){
-			logLabelsChange(newLabels, previousLabels);
-		}
+		isSuccessful = setLabelsForIssue(previousLabels, newLabels);
 		return isSuccessful;
 	}
 	
-	private boolean setLabelsForIssue(List<TurboLabel>labels, List<TurboLabel> oldLabels){
+	private boolean setLabelsForIssue(List<TurboLabel> oldLabels, List<TurboLabel>updatedLabels){
 		ServiceManager service = ServiceManager.getInstance();
-		issue.setLabels(labels);
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(labels);
+		issue.setLabels(updatedLabels);
+		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(updatedLabels);
 		try {
 			service.setLabelsForIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
+			
+			logLabelsChange(oldLabels, updatedLabels);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -48,8 +47,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		}
 	}
 	
-	
-	private void logLabelsChange(List<TurboLabel> labels, List<TurboLabel> oldLabels){
+	private void logLabelsChange(List<TurboLabel> oldLabels, List<TurboLabel> labels){
 		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities.getChangesToList(oldLabels, labels);
 		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
@@ -66,10 +64,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	@Override
 	public boolean undo() {
 		if(isSuccessful){
-			isUndone = setLabelsForIssue(previousLabels, newLabels);
-		}
-		if(isUndone){
-			logLabelsChange(previousLabels, newLabels);
+			isUndone = setLabelsForIssue(newLabels, previousLabels);
 		}
 		return isUndone;
 	}

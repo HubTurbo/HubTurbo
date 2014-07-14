@@ -20,7 +20,7 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 		previousParent = issue.getParentIssue();
 	}
 	
-	private void logParentChange(Integer parent, Integer oldParent){
+	private void logParentChange(Integer oldParent, Integer parent){
 		String changeLog;
 		if(parent < 0){
 			changeLog = String.format("Removed issue parent: %1d", oldParent);
@@ -32,26 +32,26 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
 	
-	private void setLocalIssueParent(Integer parent, Integer oldParent){
+	private void setLocalIssueParent(Integer oldParent, Integer parent){
 		issue.setParentIssue(parent);
 		processInheritedLabels(oldParent, parent);
 	}
 	
-	private void updateGithubIssueParent(Integer parent, Integer oldParent) throws IOException{
+	private void updateGithubIssueParent(Integer oldParent, Integer parent) throws IOException{
 		ServiceManager service = ServiceManager.getInstance();
 		service.editIssueBody(issue.getId(), issue.buildGithubBody());
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
 		service.setLabelsForIssue(issue.getId(), ghLabels);
 	}
 	
-	private boolean setIssueParent(Integer parent, Integer oldParent){
-		setLocalIssueParent(parent, oldParent);
+	private boolean setIssueParent(Integer oldParent, Integer parent){
+		setLocalIssueParent(oldParent, parent);
 		try {
-			updateGithubIssueParent(parent, oldParent);
-			logParentChange(parent, oldParent);
+			updateGithubIssueParent(oldParent, parent);
+			logParentChange(oldParent, parent);
 			return true;
 		} catch (IOException e) {
-			setLocalIssueParent(oldParent, parent);
+			setLocalIssueParent(parent, oldParent);
 			e.printStackTrace();
 			return false;
 		}
@@ -59,13 +59,13 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		isSuccessful = setIssueParent(newParent, previousParent);
+		isSuccessful = setIssueParent(previousParent, newParent);
 		return isSuccessful;
 	}
 
 	@Override
 	public boolean undo() {
-		isUndone = setIssueParent(previousParent, newParent);
+		isUndone = setIssueParent(newParent, previousParent);
 		return isUndone;
 	}
 

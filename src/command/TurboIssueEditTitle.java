@@ -15,7 +15,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 		this.newTitle = title;
 	}
 	
-	private void logTitleChange(String newTitle, String prevTitle){
+	private void logTitleChange(String prevTitle, String newTitle){
 		String changeLog = ("Title edited: [previous: " + newTitle + "] [new: " + prevTitle + "]\n");
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
@@ -26,7 +26,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 		try {
 			ServiceManager.getInstance().editIssueTitle(issue.getId(), newTitle);
 			issue.setTitle(newTitle);
-			logTitleChange(newTitle, previousTitle);
+			logTitleChange(previousTitle, newTitle);
 			isSuccessful = true;
 		} catch (IOException e) {
 			isSuccessful = false;

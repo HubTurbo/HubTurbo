@@ -17,11 +17,11 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 	@Override
 	public boolean execute() {
 		String oldDescription = issue.getDescription();
-		isSuccessful = setIssueDescription(newDescription, oldDescription);
+		isSuccessful = editIssueDescription(oldDescription, newDescription);
 		return isSuccessful;
 	}
 	
-	private boolean setIssueDescription(String newDesc, String oldDesc){
+	private boolean editIssueDescription(String oldDesc, String newDesc){
 		issue.setDescription(newDesc);
 		try {
 			ServiceManager service = ServiceManager.getInstance();
