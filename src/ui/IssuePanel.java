@@ -79,7 +79,7 @@ public class IssuePanel extends VBox {
 				TurboIssue oldIssue = new TurboIssue(currentIssue);
 				TurboIssue modifiedIssue = new TurboIssue(currentIssue);
 				sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
-					if (r.equals("ok")) {
+					if (r.equals("done")) {
 						System.out.println("was okay");
 						model.updateIssue(oldIssue, modifiedIssue);
 					}
