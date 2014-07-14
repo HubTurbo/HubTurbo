@@ -4,6 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -55,11 +57,24 @@ public class IssuePanel extends VBox {
 		
 		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
+		setupListView();
 		getChildren().add(listView);
 		predicate = p -> true;
 		
 		setup();
 		refreshItems();
+	}
+	
+	@SuppressWarnings("unused")
+	private ChangeListener<TurboIssue> listener;
+	private void setupListView() {
+		listView.getSelectionModel()
+				.selectedItemProperty()
+				.addListener(
+						new WeakChangeListener<TurboIssue>(listener = (observable, oldValue, newValue) -> {
+							// save the old one?
+							System.out.println(newValue);
+						}));
 	}
 
 	private Node createTop() {
