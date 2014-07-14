@@ -148,8 +148,6 @@ public class MenuControl extends MenuBar {
 		
 
 	private void handleRefresh(){
-		ServiceManager.getInstance().restartModelUpdate();
-		columns.refresh();
 	}
 
 	// private void setUpHotkeys(Scene scene) {
