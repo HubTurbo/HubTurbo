@@ -137,7 +137,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		childMenuItem.setOnAction((event) -> {
 			TurboIssue childIssue = new TurboIssue("New child issue", "", model);
 			childIssue.setParentIssue(issue.getId());
-			model.processInheritedLabels(childIssue, new ArrayList<Integer>());
+			model.processInheritedLabels(childIssue, -1);
 			(new IssueDialog(mainStage, model, childIssue)).show().thenApply(
 					response -> {
 						if (response.equals("ok")) {

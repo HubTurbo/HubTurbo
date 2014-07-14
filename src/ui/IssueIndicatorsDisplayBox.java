@@ -92,7 +92,7 @@ public class IssueIndicatorsDisplayBox extends HBox {
 			label = new Label("Parent");
 			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
-		} else {
+		} else if(parentIssue.get() >= 0){
 			String parentString = "#" + parentIssue.get();
 			label = new Label(parentString);
 			label.getStyleClass().addAll("display-box-padding");

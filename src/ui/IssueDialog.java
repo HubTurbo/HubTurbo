@@ -245,7 +245,10 @@ public class IssueDialog implements Dialog<String> {
 			Integer originalParent = issue.getParentIssue();
 			Integer indexForExistingParent = model.getIndexOfIssue(originalParent);
 			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
-			existingIndices.add(indexForExistingParent);
+			if(indexForExistingParent > 0){
+				existingIndices.add(indexForExistingParent);
+			}
+			
 			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allIssues)))
 					.setWindowTitle("Choose Parents")

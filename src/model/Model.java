@@ -66,6 +66,9 @@ public class Model {
 	}
 	
 	private void addInheritedLabel(Integer added, TurboIssue issue){
+		if(added < 0){
+			return;
+		}
 		TurboIssue addedParent = getIssueWithId(added);
 		for(TurboLabel label : addedParent.getLabels()){
 			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
@@ -75,6 +78,9 @@ public class Model {
 	}
 	
 	private void removeInheritedLabel(Integer removed, TurboIssue issue){
+		if(removed < 0){
+			return;
+		}
 		TurboIssue removedParent = getIssueWithId(removed);
 		for (TurboLabel label : removedParent.getLabels()) {
 			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
