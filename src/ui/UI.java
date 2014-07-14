@@ -9,7 +9,6 @@ import service.ServiceManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -21,7 +20,6 @@ public class UI extends Application {
 	private Stage mainStage;
 
 	private ColumnControl columns;
-	private MenuControl menu;
 	private NotificationPane notificationPane;
 
 	private SidePanel sidePanel;
@@ -78,22 +76,14 @@ public class UI extends Application {
 
 	private Parent createRoot() throws IOException {
 
+		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		notificationPane = new NotificationPane();
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
 		notificationPane.setContent(columns);
 
-		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
-
-		Button addColumn = new Button("\u2795");
-		addColumn.setStyle("-fx-font-size: 14pt;");
-		addColumn.setOnMouseClicked(columns::addColumnEvent);
-
-		BorderPane root = new BorderPane(); // TODO the root doesn't have to be a borderpane once the menu is no longer needed
+		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
-		root.setTop(menu);
-		root.setRight(addColumn);
-
-		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
+		root.setRight(new GlobalButtonPanel(columns));
 
 //		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
 //		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());

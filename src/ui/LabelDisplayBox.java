@@ -10,7 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import model.TurboLabel;
 
@@ -31,6 +33,20 @@ public class LabelDisplayBox extends FlowPane {
 		this.labelWhenEmpty = labelWhenEmpty;
 		setup();
 	}
+
+	private void setup() {
+		setMaxWidth(330);
+		setPrefHeight(30);
+		setAlignment(Pos.CENTER_LEFT);
+		if (displayWhenEmpty) {
+			getStyleClass().add("faded-borders");
+		}
+		setHgap(3);
+		setVgap(3);
+
+		labels.addListener(new WeakListChangeListener<TurboLabel>(createLabelsChangeListener()));
+		populateWithLabels();
+	}
 	
 	private ListChangeListener<TurboLabel> createLabelsChangeListener(){
 		WeakReference<LabelDisplayBox> that = new WeakReference<LabelDisplayBox>(this);
@@ -46,27 +62,30 @@ public class LabelDisplayBox extends FlowPane {
 		return listener;
 	}
 
-	private void setup() {
-		setMaxWidth(330);
-		if (displayWhenEmpty) {
-			getStyleClass().add("faded-borders");
+	private void populateWithLabels() {
+		getChildren().clear();
+		
+		if (displayWhenEmpty && labels.size() == 0) {
+			
+			Label noLabels = new Label(labelWhenEmpty);
+			noLabels.getStyleClass().addAll("faded", "display-box-padding");
+			getChildren().add(noLabels);
+
+			return;
 		}
-		setHgap(3);
-		setVgap(3);
-
-		labels.addListener(new WeakListChangeListener<TurboLabel>(createLabelsChangeListener()));
-		populateWithLabels();
-	}
-
-	public LabelDisplayBox setLabels(ObservableList<TurboLabel> labels) {
-		clearChangeListeners();
-		this.labels = labels;
-		populateWithLabels();
-		return this;
-	}
-	
-	private void clearChangeListeners(){
-		changeListeners.clear();
+		
+		for (TurboLabel label : labels) {
+			Label labelText = new Label(label.getName());
+			labelText.getStyleClass().add("labels");
+			labelText.setStyle(getBackgroundColourStyle(label));
+			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
+			if (label.getGroup() != null) {
+				Tooltip groupTooltip = new Tooltip(label.getGroup());
+				label.groupProperty().addListener(new WeakChangeListener<String>(createLabelGroupListener(groupTooltip)));
+				labelText.setTooltip(groupTooltip);
+			}
+			getChildren().add(labelText);
+		}
 	}
 	
 	private ChangeListener<String> createLabelNameListener(Label labelText){
@@ -85,26 +104,33 @@ public class LabelDisplayBox extends FlowPane {
 		changeListeners.add(listener);
 		return listener;
 	}
-	
-	private void populateWithLabels() {
-		getChildren().clear();
-		
-		if (displayWhenEmpty && labels.size() == 0) {
-			
-			Label noLabels = new Label(labelWhenEmpty);
-			noLabels.getStyleClass().addAll("faded", "display-box-padding");
-			getChildren().add(noLabels);
 
-			return;
-		}
-		
-		for (TurboLabel label : labels) {
-			Label labelText = new Label(label.getName());
-			labelText.getStyleClass().add("labels");
-			labelText.setStyle(getBackgroundColourStyle(label));
-			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
-			getChildren().add(labelText);
-		}
+	private ChangeListener<String> createLabelGroupListener(Tooltip groupTooltip) {
+		WeakReference<Tooltip> groupTooltipRef = new WeakReference<Tooltip>(groupTooltip);
+		ChangeListener<String> listener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> stringProperty,
+					String oldValue, String newValue) {
+				Tooltip groupToolTip = groupTooltipRef.get();
+				if(groupToolTip != null){
+					groupToolTip.setText(newValue);
+				}
+			}
+		};
+		changeListeners.add(listener);
+		return listener;
+	}
+	
+	public LabelDisplayBox setLabels(ObservableList<TurboLabel> labels) {
+		clearChangeListeners();
+		this.labels = labels;
+		populateWithLabels();
+		return this;
+	}
+	
+	private void clearChangeListeners(){
+		changeListeners.clear();
 	}
 
 	private String getBackgroundColourStyle(TurboLabel label) {

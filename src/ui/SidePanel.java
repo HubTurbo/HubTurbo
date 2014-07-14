@@ -1,13 +1,15 @@
 package ui;
 
-import model.Model;
+import java.util.concurrent.CompletableFuture;
+
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import model.Model;
+import model.TurboIssue;
 
 public class SidePanel extends VBox {
 
@@ -29,13 +31,28 @@ public class SidePanel extends VBox {
 		return layout;
 	}
 
-	public void setLayout(Layout layout) {
+	private void setLayout(Layout layout) {
 		this.layout = layout;
 		changeLayout();
 	}
 
 	public void refresh() {
 		changeLayout();
+	}
+	
+	private TurboIssue displayedIssue;
+	private CompletableFuture<String> response = null;
+	
+	public CompletableFuture<String> displayIssue(TurboIssue issue) {
+		response = null; // Make sure previous response doesn't remain
+		displayedIssue = issue;
+		setLayout(Layout.ISSUE); // This method sets this.response
+		assert response != null;
+		return response;
+	}
+	
+	public void displayTabs() {
+		setLayout(Layout.TABS);
 	}
 	
 	private void changeLayout() {
@@ -76,7 +93,10 @@ public class SidePanel extends VBox {
 	}
 
 	private Tab createFeedTab() {
-		return new Tab();
+		Tab tab = new Tab();
+		tab.setClosable(false);
+		tab.setText("Feed");
+		return tab;
 	}
 
 	private Tab createAssgineesTab() {
@@ -104,13 +124,13 @@ public class SidePanel extends VBox {
 	}
 
 	private Node historyLayout() {
-		// TODO Auto-generated method stub
-		return null;
+		return new VBox();
 	}
 
 	private Node issueLayout() {
-		// TODO Auto-generated method stub
-		return null;
+		IssueEditComponent result = new IssueEditComponent(displayedIssue, parentStage, model);
+		response = result.getResponse();
+		return result;
 	}
 	
 }

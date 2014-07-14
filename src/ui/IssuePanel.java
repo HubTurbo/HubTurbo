@@ -4,6 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -36,6 +38,7 @@ public class IssuePanel extends VBox {
 	private final Model model;
 	private final ColumnControl parentColumnControl;
 	private final int columnIndex;
+	private final SidePanel sidePanel;
 	
 	private ListView<TurboIssue> listView;
 	private ObservableList<TurboIssue> issues;
@@ -45,21 +48,49 @@ public class IssuePanel extends VBox {
 	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex) {
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
+		this.sidePanel = sidePanel;
 
 		getChildren().add(createTop());
 		
 		issues = FXCollections.observableArrayList();
 		listView = new ListView<>();
+		setupListView();
 		getChildren().add(listView);
 		predicate = p -> true;
 		
 		setup();
 		refreshItems();
+	}
+	
+	@SuppressWarnings("unused")
+	private ChangeListener<TurboIssue> listener;
+	private void setupListView() {
+		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
+			listener = (observable, previousIssue, currentIssue) -> {
+				if (currentIssue == null) return;
+				
+				// TODO save the previous issue?
+				
+				TurboIssue oldIssue = new TurboIssue(currentIssue);
+				TurboIssue modifiedIssue = new TurboIssue(currentIssue);
+				sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
+					if (r.equals("ok")) {
+						System.out.println("was okay");
+						model.updateIssue(oldIssue, modifiedIssue);
+					}
+					parentColumnControl.refresh();
+					sidePanel.displayTabs();
+					return true;
+				}).exceptionally(e -> {
+					e.printStackTrace();
+					return false;
+				});
+			}));
 	}
 
 	private Node createTop() {
@@ -105,13 +136,26 @@ public class IssuePanel extends VBox {
 		Label addIssue = new Label("\u2795");
 		addIssue.setStyle("-fx-font-size: 16pt;");
 		addIssue.setOnMouseClicked((e) -> {
-			System.out.println("add clicked!");
+			TurboIssue issue = new TurboIssue("New issue", "", model);
+			applyCurrentFilterExpressionToIssue(issue, false);
+			
+			sidePanel.displayIssue(issue).thenApply(r -> {
+				if (r.equals("done")) {
+					model.createIssue(issue);
+				}
+				parentColumnControl.refresh();
+				sidePanel.displayTabs();
+				return true;
+			}).exceptionally(ex -> {
+				ex.printStackTrace();
+				return false;
+			});
 		});
 		
 		Label closeList = new Label("\u274c");
 		closeList.setStyle("-fx-font-size: 16pt;");
 		closeList.setOnMouseClicked((e) -> {
-			System.out.println("close clicked!");
+			parentColumnControl.closeColumn(columnIndex);
 		});
 		
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
@@ -170,26 +214,29 @@ public class IssuePanel extends VBox {
 					}
 				}
 				assert rightIssue != null;
-				
-				if (currentFilterExpression != EMPTY_PREDICATE) {
-					try {
-						if (currentFilterExpression.canBeAppliedToIssue()) {
-							TurboIssue clone = new TurboIssue(rightIssue);
-							currentFilterExpression.applyTo(rightIssue, model);
-							model.updateIssue(clone, rightIssue);
-							parentColumnControl.refresh();
-						} else {
-							throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
-						}
-					} catch (PredicateApplicationException ex) {
-						parentColumnControl.displayMessage(ex.getMessage());
-					}
-				}
+				applyCurrentFilterExpressionToIssue(rightIssue, true);
 			}
 			e.setDropCompleted(success);
 
 			e.consume();
 		});
+	}
+	
+	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
+		if (currentFilterExpression != EMPTY_PREDICATE) {
+			try {
+				if (currentFilterExpression.canBeAppliedToIssue()) {
+					TurboIssue clone = new TurboIssue(issue);
+					currentFilterExpression.applyTo(issue, model);
+					if (updateModel) model.updateIssue(clone, issue);
+					parentColumnControl.refresh();
+				} else {
+					throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
+				}
+			} catch (PredicateApplicationException ex) {
+				parentColumnControl.displayMessage(ex.getMessage());
+			}
+		}
 	}
 	
 	public void filter(FilterExpression filter) {

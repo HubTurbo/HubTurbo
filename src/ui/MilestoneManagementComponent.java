@@ -1,6 +1,7 @@
 package ui;
 
 import java.lang.ref.WeakReference;
+
 import model.Model;
 import model.TurboMilestone;
 import javafx.geometry.Insets;
@@ -8,7 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -24,8 +25,8 @@ public class MilestoneManagementComponent {
 		this.model = model;
 	}
 
-	public HBox initialise() {
-		HBox layout = new HBox();
+	public VBox initialise() {
+		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		layout.getChildren().addAll(createListView(), createButtons());
@@ -52,9 +53,10 @@ public class MilestoneManagementComponent {
 		listView = new ListView<>();
 		listView.setItems(model.getMilestones());
 		listView.setEditable(true);
+		VBox.setVgrow(listView, Priority.ALWAYS);
 		
 		refresh();
-				
+
 		return listView;
 	}
 

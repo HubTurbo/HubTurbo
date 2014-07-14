@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -13,9 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-//import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -29,62 +26,36 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
+public class IssueEditComponent extends VBox {
 
-public class IssueDialog implements Dialog<String> {
-
-	private static final double HEIGHT_FACTOR = 0.35;
+	private final TurboIssue issue;
+	private final Model model;
+	private final Stage parentStage;
+	
+	private final CompletableFuture<String> response;
+	
+	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model) {
+		this.issue = displayedIssue;
+		this.model = model;
+		this.parentStage = parentStage;
+		this.response = new CompletableFuture<>();
+		setup();
+	}
+	
+	public CompletableFuture<String> getResponse() {
+		return response;
+	}
 
 	private static final int TITLE_SPACING = 5;
 	private static final int ELEMENT_SPACING = 10;
 	private static final int MIDDLE_SPACING = 20;
 
-	private Stage parentStage;
-	private Model model;
-	private TurboIssue issue;
-//	private CheckBox closedCheckBox = new CheckBox("Closed");
-
-	private CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-	public IssueDialog(Stage parentStage, Model model, TurboIssue issue) {
-		this.parentStage = parentStage;
-		this.model = model;
-		this.issue = issue;
-
-		response = new CompletableFuture<>();
-	}
-
-	public CompletableFuture<String> show() {
-		showDialog();
-		return response;
-	}
-
-	private void showDialog() {
-	
-		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
-		layout.setSpacing(MIDDLE_SPACING);
-	
-		Scene scene = new Scene(layout, parentStage.getWidth(),
-				parentStage.getHeight() * HEIGHT_FACTOR);
-		UI.applyCSS(scene);
-	
-		Stage stage = new Stage();
-		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
-		stage.setScene(scene);
-	
-		Platform.runLater(() -> stage.requestFocus());
-	
-		layout.getChildren().addAll(left(stage), right(stage));
-	
-		stage.initOwner(parentStage);
-		// secondStage.initModality(Modality.APPLICATION_MODAL);
-	
-		stage.setX(parentStage.getX());
-		stage.setY(parentStage.getY() + parentStage.getHeight()
-				* (1 - HEIGHT_FACTOR));
-	
-		stage.show();
+	private void setup() {
+		setPadding(new Insets(15));
+		setSpacing(MIDDLE_SPACING);
+		getChildren().addAll(top(), bottom());
 	}
 	
 	private ChangeListener<String> createIssueTitleChangeListener(){
@@ -99,22 +70,6 @@ public class IssueDialog implements Dialog<String> {
 		return listener;
 	}
 	
-//	private ChangeListener<Boolean> createIssueStateChangeListener(){
-//		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-//		ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
-//	        public void changed(ObservableValue<? extends Boolean> ov,
-//	            Boolean oldValue, Boolean newValue) {
-//	        	TurboIssue issue = issueRef.get();
-//	        	if(issue != null){
-//	        		issue.setOpen(!newValue);
-//	        	}
-//	        }
-//	    };
-//	    changeListeners.add(listener);
-//	    return listener;
-//	}
-
-	
 	private ChangeListener<String> createIssueDescriptionChangeListener(){
 		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
 		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
@@ -126,7 +81,8 @@ public class IssueDialog implements Dialog<String> {
 		changeListeners.add(listener);
 		return listener;
 	}
-	private Parent left(Stage stage) {
+	
+	private Parent top() {
 
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
@@ -138,11 +94,7 @@ public class IssueDialog implements Dialog<String> {
 		issueTitle.textProperty().addListener(
 				new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
-//		closedCheckBox.setSelected(!issue.getOpen());
-//		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
-		
-//		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
-		Parent statusBox = createStatusBox(stage);
+		Parent statusBox = createStatusBox(parentStage);
 		title.getChildren().addAll(issueId, issueTitle, statusBox);
 		
 		TextArea issueDesc = new TextArea(issue.getDescription());
@@ -152,12 +104,11 @@ public class IssueDialog implements Dialog<String> {
 		issueDesc.setPromptText("Description");
 		issueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
 
-		VBox left = new VBox();
-		left.setSpacing(ELEMENT_SPACING);
-		left.getChildren().addAll(title, issueDesc);
+		VBox top = new VBox();
+		top.setSpacing(ELEMENT_SPACING);
+		top.getChildren().addAll(title, issueDesc);
 
-		return left;
-
+		return top;
 	}
 	
 	private LabelDisplayBox createStatusBox(Stage stage) {
@@ -197,20 +148,20 @@ public class IssueDialog implements Dialog<String> {
 		return statusBox;
 	}
 
-	private Parent right(Stage stage) {
+	private Parent bottom() {
 
-		Parent parents = createParentsBox(stage);
-		Parent milestone = createMilestoneBox(stage);
-		Parent labels = createLabelBox(stage);
-		Parent assignee = createAssigneeBox(stage);
+		Parent parents = createParentsBox(parentStage);
+		Parent milestone = createMilestoneBox(parentStage);
+		Parent labels = createLabelBox(parentStage);
+		Parent assignee = createAssigneeBox(parentStage);
 
-		HBox buttons = createButtons(stage);
+		HBox buttons = createButtons(parentStage);
 
-		VBox right = new VBox();
-		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(parents, milestone, labels, assignee, buttons);
+		VBox bottom = new VBox();
+		bottom.setSpacing(ELEMENT_SPACING);
+		bottom.getChildren().addAll(parents, milestone, labels, assignee, buttons);
 
-		return right;
+		return bottom;
 	}
 
 	private HBox createButtons(Stage stage) {
@@ -220,19 +171,17 @@ public class IssueDialog implements Dialog<String> {
 
 		Button cancel = new Button();
 		cancel.setText("Cancel");
-		cancel.setOnMouseClicked((MouseEvent e) -> {
+		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
-			stage.close();
 		});
 
-		Button ok = new Button();
-		ok.setText("OK");
-		ok.setOnMouseClicked((MouseEvent e) -> {
-			response.complete("ok");
-			stage.close();
+		Button done = new Button();
+		done.setText("Done");
+		done.setOnMouseClicked(e -> {
+			response.complete("done");
 		});
 
-		buttons.getChildren().addAll(ok, cancel);
+		buttons.getChildren().addAll(done, cancel);
 		return buttons;
 	}
 
