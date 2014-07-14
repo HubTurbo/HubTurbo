@@ -6,9 +6,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -60,7 +57,7 @@ public class ParentIssuesDisplayBox extends HBox {
 
 		Label label;
 		if (displayWhenEmpty && issueNumber.get() <= 0) {
-			label = new Label("Parents");
+			label = new Label("Parent");
 			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
 		} else {

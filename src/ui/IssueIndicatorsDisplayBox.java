@@ -3,26 +3,24 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import model.TurboIssue;
 
 public class IssueIndicatorsDisplayBox extends HBox {
 	
-	private ObservableList<Integer> parentIssues = null;
+	private IntegerProperty parentIssue = null;
 	private StringProperty milestoneTitle = null;
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
 	private boolean displayWhenEmpty;
 	
 	public IssueIndicatorsDisplayBox(TurboIssue issue, boolean displayWhenEmpty) {
-		this.parentIssues = issue.getParentsReference();
+		this.parentIssue = issue.parentIssueProperty();
 		if (issue.getMilestone() != null) {
 			this.milestoneTitle = issue.getMilestone().titleProperty();
 		}
@@ -37,7 +35,7 @@ public class IssueIndicatorsDisplayBox extends HBox {
 		
 		setSpacing(3);
 		
-		parentIssues.addListener(new WeakListChangeListener<Integer>(createParentsChangeListener()));
+		parentIssue.addListener(new WeakChangeListener<Number>(createParentsChangeListener()));
 		if (this.milestoneTitle != null) {
 			milestoneTitle.addListener(new WeakChangeListener<String>(createMilestoneChangeListener()));
 		}
@@ -60,18 +58,19 @@ public class IssueIndicatorsDisplayBox extends HBox {
 		return changeListener;
 	}
 	
-	private ListChangeListener<Integer> createParentsChangeListener(){
+	private ChangeListener<Number> createParentsChangeListener(){
 		WeakReference<IssueIndicatorsDisplayBox> that = new WeakReference<IssueIndicatorsDisplayBox>(this);
-		ListChangeListener<Integer> listChangeListener = new ListChangeListener<Integer>() {
+		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
 			@Override
-			public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
+			public void changed(ObservableValue<? extends Number> arg0,
+					Number arg1, Number arg2) {
 				if(that.get() != null){
 					that.get().updateIndicators(null);
 				}
 			}
 		};
-		changeListeners.add(listChangeListener);
-		return listChangeListener;
+		changeListeners.add(changeListener);
+		return changeListener;
 	}
 
 	private void updateIndicators(String newMilestoneTitle) {
@@ -89,23 +88,15 @@ public class IssueIndicatorsDisplayBox extends HBox {
 		}
 
 		Label label;
-		if (displayWhenEmpty && parentIssues.size() == 0) {
-			label = new Label("Parents");
+		if (displayWhenEmpty && parentIssue.get() <= 0) {
+			label = new Label("Parent");
 			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
 		} else {
-			StringBuilder parentSB = new StringBuilder();
-			for (Integer p : parentIssues) {
-				parentSB.append("#" + p);
-				parentSB.append(", ");
-			}
-			if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
-
-			if (displayWhenEmpty || (!displayWhenEmpty && !parentSB.toString().isEmpty())) {
-				label = new Label(parentSB.toString());
-				label.getStyleClass().addAll("display-box-padding");
-				getChildren().add(label);
-			}
+			String parentString = "#" + parentIssue.get();
+			label = new Label(parentString);
+			label.getStyleClass().addAll("display-box-padding");
+			getChildren().add(label);
 		}
 		
 		

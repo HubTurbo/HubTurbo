@@ -239,39 +239,29 @@ public class IssueDialog implements Dialog<String> {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.getParentsReference(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.parentIssueProperty(), true);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {
-			List<Integer> originalParents = issue.getParents();
-			List<Integer> indicesForExistingParents = originalParents.stream()
-					.map((parent) -> {
-						for (int i = 0; i < allIssues.size(); i++) {
-							if (allIssues.get(i).getId() == parent) {
-								return i;
-							}
-						}
-						assert false;
-						return -1;
-					}).collect(Collectors.toList());
-
+			Integer originalParent = issue.getParentIssue();
+			Integer indexForExistingParent = model.getIndexOfIssue(originalParent);
+			ArrayList<Integer> existingIndices = new ArrayList<Integer>();
+			existingIndices.add(indexForExistingParent);
 			(new CheckboxListDialog(stage, FXCollections
 					.observableArrayList(allIssues)))
 					.setWindowTitle("Choose Parents")
-					.setMultipleSelection(true)
-					.setInitialCheckedState(indicesForExistingParents)
+					.setMultipleSelection(false)
+					.setInitialCheckedState(existingIndices)
 					.show()
 					.thenApply((List<Integer> response) -> {
 						
 						boolean wasAnythingSelected = response.size() > 0;
 						if (wasAnythingSelected) {
-							List<Integer> parents = response.stream()
-									.map((i) -> allIssues.get(i).getId())
-									.collect(Collectors.toList());
-							issue.setParents(FXCollections.observableArrayList(parents));
+							Integer parent = response.size() > 0 ? allIssues.get(response.get(0)).getId() : null;
+							issue.setParentIssue(parent);
 							model.processInheritedLabels(issue, originalParents);
 						} else {
-							issue.setParents(FXCollections.observableArrayList());
+							issue.setParentIssue(-1);
 						}
 						return true;
 					})

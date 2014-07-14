@@ -237,14 +237,14 @@ public class Model {
 		}
 	}
 
-//	private int getIndexOfIssue(int id){
-//		for(int i = 0; i < issues.size(); i++){
-//			if(((TurboIssue)(issues.get(i))).getId() == id){
-//				return i;
-//			}
-//		}
-//		return -1;
-//	}
+	public int getIndexOfIssue(int id){
+		for(int i = 0; i < issues.size(); i++){
+			if(((TurboIssue)(issues.get(i))).getId() == id){
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	private TurboIssue getIssueWithId(int id){
 		for(int i = 0; i < issues.size(); i++){
