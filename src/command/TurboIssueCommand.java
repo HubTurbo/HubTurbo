@@ -40,14 +40,14 @@ public abstract class TurboIssueCommand {
 		}
 	}
 	
-	public void processInheritedLabels(Integer originalParent, Integer newParent) {
+	protected void processInheritedLabels(Integer originalParent, Integer newParent, TurboIssue issue) {
 		removeInheritedLabel(originalParent, issue);
 		addInheritedLabel(newParent, issue);
 	}
 	
 	private void addInheritedLabel(Integer added, TurboIssue issue){
 		TurboIssue addedParent = model.get().getIssueWithId(added);
-		if(added == null){
+		if(addedParent == null){
 			return;
 		}
 		

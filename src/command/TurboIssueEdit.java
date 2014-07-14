@@ -28,9 +28,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	@Override
 	public boolean execute() {
 		isSuccessful = updateIssue(issue, editedIssue);
-		if(isSuccessful){
-			model.get().updateCachedIssue(editedIssue);
-		}
 		return isSuccessful;
 	}
 	
@@ -54,17 +51,24 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			Issue latest = latestIssue.toGhResource();
 			ServiceManager.getInstance().editIssue(latest, dateModified);
 			
-			if(changeLog.length() > 0){
-				ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
-			}
+			logChanges(changeLog);
+			
 			if(!descUpdated){
 				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
 						+ "Please refresh and enter your descripton again.");
 			}
+			
+			model.get().updateCachedIssue(latestIssue);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return true;
+		}
+	}
+	
+	private void logChanges(StringBuilder changeLog){
+		if(changeLog.length() > 0){
+			ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
 		}
 	}
 	
@@ -75,7 +79,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	 * */
 	private boolean mergeIssues(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
 		mergeTitle(original, edited, latest, changeLog);
-		boolean fullMerge = mergeDescription(original, edited, latest, changeLog);		
+		boolean fullMerge = mergeDescription(original, edited, latest, changeLog);
 		mergeIssueParent(original, edited, latest, changeLog);
 		mergeLabels(original, edited, latest, changeLog);
 		mergeAssignee(original, edited, latest, changeLog);
@@ -193,7 +197,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		
 		if(originalParent != editedParent){
 			latest.setParentIssue(editedParent);
-			processInheritedLabels(originalParent, editedParent);
+			processInheritedLabels(originalParent, editedParent, edited);
 			logParentChange(originalParent, editedParent, changeLog);
 		}
 	}
