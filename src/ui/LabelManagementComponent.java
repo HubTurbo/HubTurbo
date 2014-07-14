@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
@@ -20,7 +19,7 @@ import model.TurboLabel;
 public class LabelManagementComponent {
 
 	public static final String UNGROUPED_NAME = "<Ungrouped>";
-	public static final String ROOT_NAME = "root";
+	public static final String ROOT_NAME = "Labels";
 	
 	private final Stage parentStage;
 	private final Model model;
@@ -35,52 +34,21 @@ public class LabelManagementComponent {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		TreeView<LabelTreeItem> treeView = createTreeView(parentStage);
-		layout.getChildren().addAll(treeView, createButtons(treeView, parentStage));
+		layout.getChildren().addAll(treeView);
 		return layout;
-	}
-	
-	private Node createButtons(TreeView<LabelTreeItem> treeView, Stage stage) {
-		VBox container = new VBox();
-		container.setSpacing(5);
-		
-		Button newGroup = new Button("New Group");
-		newGroup.setOnAction(e -> {
-			
-			TurboLabelGroup group = new TurboLabelGroup("newgroup" + getUniqueId());
-			(new EditGroupDialog(stage, group))
-				.setExclusiveCheckboxEnabled(true)
-				.show().thenApply(response -> {
-	
-					assert response.getValue() != null;
-					if (response.getValue().isEmpty()) {
-						return false;
-					}
-	
-					TreeItem<LabelTreeItem> item = new TreeItem<>(response);
-					treeView.getRoot().getChildren().add(item);
-	
-					return true;
-				}).exceptionally(ex -> {
-					ex.printStackTrace();
-					return false;
-				});
-		});
-		
-		container.getChildren().addAll(newGroup);
-		
-		return container;
 	}
 
 	private TreeView<LabelTreeItem> createTreeView(Stage stage) {
 		
 		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup(ROOT_NAME));
-		
 		populateTree(treeRoot);
 
 		final TreeView<LabelTreeItem> treeView = new TreeView<>();
 		treeView.setRoot(treeRoot);
-		treeView.setShowRoot(false);
-		treeView.setPrefWidth(180);
+		treeView.setShowRoot(true);
+		HBox.setHgrow(treeView, Priority.ALWAYS);
+//		VBox.setVgrow(treeView, Priority.ALWAYS);
+		treeView.setPrefHeight(2000);
 
 		treeRoot.setExpanded(true);
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));

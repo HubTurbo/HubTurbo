@@ -153,12 +153,43 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		assert treeItem != null;
 		return treeItem.getParent() != null && treeItem.getParent().getValue().getValue().equals(LabelManagementComponent.ROOT_NAME);
 	}
-
+	
 	private ContextMenu getContextMenuForItem(TreeItem<LabelTreeItem> treeItem) {
-		if (isGroupItem(treeItem)) {
+		if (isRoot(treeItem)) {
+			return new ContextMenu(createRootContextMenu());
+		} else if (isGroupItem(treeItem)) {
 			return new ContextMenu(createGroupContextMenu());
 		} else {
 			return new ContextMenu(createLabelContextMenu());
 		}
+	}
+
+	private MenuItem[] createRootContextMenu() {
+		MenuItem newGroup = new MenuItem("New Group");
+		newGroup.setOnAction((event) -> {
+			TurboLabelGroup group = new TurboLabelGroup("newgroup" + LabelManagementComponent.getUniqueId());
+			(new EditGroupDialog(stage, group))
+				.setExclusiveCheckboxEnabled(true)
+				.show().thenApply(response -> {
+	
+					assert response.getValue() != null;
+					if (response.getValue().isEmpty()) {
+						return false;
+					}
+	
+					TreeItem<LabelTreeItem> item = new TreeItem<>(response);
+					getTreeView().getRoot().getChildren().add(item);
+	
+					return true;
+				}).exceptionally(ex -> {
+					ex.printStackTrace();
+					return false;
+				});
+		});
+		return new MenuItem[] {newGroup};
+	}
+
+	private boolean isRoot(TreeItem<LabelTreeItem> treeItem) {
+		return treeItem.getParent() == null && treeItem.getValue().getValue().equals(LabelManagementComponent.ROOT_NAME);
 	}
 }
