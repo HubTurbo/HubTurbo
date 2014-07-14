@@ -70,13 +70,27 @@ public class IssuePanel extends VBox {
 	@SuppressWarnings("unused")
 	private ChangeListener<TurboIssue> listener;
 	private void setupListView() {
-		listView.getSelectionModel()
-				.selectedItemProperty()
-				.addListener(
-						new WeakChangeListener<TurboIssue>(listener = (observable, previousIssue, currentIssue) -> {
-							// TODO save the old one?
-							sidePanel.displayIssue(currentIssue);
-						}));
+		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
+			listener = (observable, previousIssue, currentIssue) -> {
+				if (currentIssue == null) return;
+				
+				// TODO save the previous issue?
+				
+				TurboIssue oldIssue = new TurboIssue(currentIssue);
+				TurboIssue modifiedIssue = new TurboIssue(currentIssue);
+				sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
+					if (r.equals("ok")) {
+						System.out.println("was okay");
+						model.updateIssue(oldIssue, modifiedIssue);
+					}
+					parentColumnControl.refresh();
+					sidePanel.displayTabs();
+					return true;
+				}).exceptionally(e -> {
+					e.printStackTrace();
+					return false;
+				});
+			}));
 	}
 
 	private Node createTop() {
@@ -124,19 +138,18 @@ public class IssuePanel extends VBox {
 		addIssue.setOnMouseClicked((e) -> {
 			TurboIssue issue = new TurboIssue("New issue", "", model);
 			applyCurrentFilterExpressionToIssue(issue, false);
-			(new IssueDialog(mainStage, model, issue)).show().thenApply(
-					response -> {
-						if (response.equals("ok")) {
-							model.createIssue(issue);
-						}
-						// Required for some reason
-						parentColumnControl.refresh();
-						return true;
-					})
-					.exceptionally(ex -> {
-						ex.printStackTrace();
-						return false;
-					});
+			
+			sidePanel.displayIssue(issue).thenApply(r -> {
+				if (r.equals("ok")) {
+					model.createIssue(issue);
+				}
+				parentColumnControl.refresh();
+				sidePanel.displayTabs();
+				return true;
+			}).exceptionally(ex -> {
+				ex.printStackTrace();
+				return false;
+			});
 		});
 		
 		Label closeList = new Label("\u274c");

@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.concurrent.CompletableFuture;
+
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -39,9 +41,18 @@ public class SidePanel extends VBox {
 	}
 	
 	private TurboIssue displayedIssue;
-	public void displayIssue(TurboIssue issue) {
+	private CompletableFuture<String> response = null;
+	
+	public CompletableFuture<String> displayIssue(TurboIssue issue) {
+		response = null; // Make sure previous response doesn't remain
 		displayedIssue = issue;
-		setLayout(Layout.ISSUE);
+		setLayout(Layout.ISSUE); // This method sets this.response
+		assert response != null;
+		return response;
+	}
+	
+	public void displayTabs() {
+		setLayout(Layout.TABS);
 	}
 	
 	private void changeLayout() {
@@ -117,7 +128,9 @@ public class SidePanel extends VBox {
 	}
 
 	private Node issueLayout() {
-		return new IssueEditComponent(displayedIssue, parentStage, model);
+		IssueEditComponent result = new IssueEditComponent(displayedIssue, parentStage, model);
+		response = result.getResponse();
+		return result;
 	}
 	
 }

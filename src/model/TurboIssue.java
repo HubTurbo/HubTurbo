@@ -1,6 +1,7 @@
 package model;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -243,7 +244,7 @@ public class TurboIssue implements Listable {
 	public ObservableList<Integer> getParentsReference(){
 		return parents;
 	} 
-	
+
 	public void setParents(ObservableList<Integer> parentNumbers) {
 		if (this.parents == null) {
 			this.parents = parentNumbers;

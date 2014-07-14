@@ -5,20 +5,15 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.MenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -32,16 +27,16 @@ import model.TurboUser;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
-	private final Stage mainStage;
-	private final Model model;
+//	private final Stage mainStage;
+//	private final Model model;
 	private final int parentColumnIndex;
 	
 	private ChangeListener<String> titleChangeListener;
 	
 	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent, int parentColumnIndex) {
 		super();
-		this.mainStage = mainStage;
-		this.model = model;
+//		this.mainStage = mainStage;
+//		this.model = model;
 		this.parentColumnIndex = parentColumnIndex;
 	}
 
@@ -111,8 +106,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		setAlignment(Pos.CENTER);
 		
-		setContextMenu(new ContextMenu(createGroupContextMenu(issue)));
-
 		registerEvents(issue);
 		
 		setOnDragDetected((event) -> {
@@ -127,33 +120,10 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setOnDragDone((event) -> {
 //			if (event.getTransferMode() == TransferMode.MOVE) {
 //			}
-//			System.out.println("done");
 			event.consume();
 		});
 	}
-	
-	private MenuItem[] createGroupContextMenu(TurboIssue issue) {
-		MenuItem childMenuItem = new MenuItem("Create Child Issue");
-		childMenuItem.setOnAction((event) -> {
-			TurboIssue childIssue = new TurboIssue("New child issue", "", model);
-			childIssue.addParent(issue.getId());
-			model.processInheritedLabels(childIssue, new ArrayList<Integer>());
-			(new IssueDialog(mainStage, model, childIssue)).show().thenApply(
-					response -> {
-						if (response.equals("ok")) {
-							model.createIssue(childIssue);
-						}
-						return true;
-					})
-				.exceptionally(ex -> {
-					ex.printStackTrace();
-					return false;
-				});
-
-		});
-		return new MenuItem[] {childMenuItem};
-	}
-	
+		
 	private void browse(String htmlUrl) {
 		
 		if (htmlUrl == null || htmlUrl.isEmpty()) return;
@@ -221,28 +191,28 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 
 	private void registerEvents(TurboIssue issue) {
-		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		setOnMouseClicked((MouseEvent mouseEvent) -> {
-			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-				if (mouseEvent.getClickCount() == 2) {
-					onDoubleClick(issueRef.get());
-				}
-			}
-		});
+//		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+//		setOnMouseClicked((MouseEvent mouseEvent) -> {
+//			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+//				if (mouseEvent.getClickCount() == 2) {
+////					onDoubleClick(issueRef.get());
+//				}
+//			}
+//		});
 	}
 
-	private void onDoubleClick(TurboIssue issue) {
-		TurboIssue oldIssue = new TurboIssue(issue);
-		TurboIssue modifiedIssue = new TurboIssue(issue);
-		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
-				response -> {
-					if (response.equals("ok")) {
-						model.updateIssue(oldIssue, modifiedIssue);
-					}
-					return true;
-				}).exceptionally(ex -> {
-					ex.printStackTrace();
-					return false;
-				});
-	}
+//	private void onDoubleClick(TurboIssue issue) {
+//		TurboIssue oldIssue = new TurboIssue(issue);
+//		TurboIssue modifiedIssue = new TurboIssue(issue);
+//		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
+//				response -> {
+//					if (response.equals("ok")) {
+//						model.updateIssue(oldIssue, modifiedIssue);
+//					}
+//					return true;
+//				}).exceptionally(ex -> {
+//					ex.printStackTrace();
+//					return false;
+//				});
+//	}
 }

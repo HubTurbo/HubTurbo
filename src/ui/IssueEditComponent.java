@@ -3,13 +3,9 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -24,6 +20,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Model;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
 
 public class IssueEditComponent extends VBox {
 
@@ -31,11 +32,18 @@ public class IssueEditComponent extends VBox {
 	private final Model model;
 	private final Stage parentStage;
 	
+	private final CompletableFuture<String> response;
+	
 	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model) {
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
+		this.response = new CompletableFuture<>();
 		setup();
+	}
+	
+	public CompletableFuture<String> getResponse() {
+		return response;
 	}
 
 	private static final int TITLE_SPACING = 5;
@@ -45,30 +53,9 @@ public class IssueEditComponent extends VBox {
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
 	private void setup() {
-	
-//		HBox layout = new HBox();
 		setPadding(new Insets(15));
 		setSpacing(MIDDLE_SPACING);
-	
-//		Scene scene = new Scene(layout, parentStage.getWidth(), parentStage.getHeight() * HEIGHT_FACTOR);
-//		UI.applyCSS(scene);
-	
-//		Stage stage = new Stage();
-//		stage.setTitle("Issue #" + issue.getId() + ": " + issue.getTitle());
-//		stage.setScene(scene);
-	
-//		Platform.runLater(() -> stage.requestFocus());
-	
-		getChildren().addAll(left(), right());
-	
-//		stage.initOwner(parentStage);
-		// secondStage.initModality(Modality.APPLICATION_MODAL);
-	
-//		stage.setX(parentStage.getX());
-//		stage.setY(parentStage.getY() + parentStage.getHeight()
-//				* (1 - HEIGHT_FACTOR));
-//	
-//		stage.show();
+		getChildren().addAll(top(), bottom());
 	}
 	
 	private ChangeListener<String> createIssueTitleChangeListener(){
@@ -83,21 +70,6 @@ public class IssueEditComponent extends VBox {
 		return listener;
 	}
 	
-//	private ChangeListener<Boolean> createIssueStateChangeListener(){
-//		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-//		ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
-//	        public void changed(ObservableValue<? extends Boolean> ov,
-//	            Boolean oldValue, Boolean newValue) {
-//	        	TurboIssue issue = issueRef.get();
-//	        	if(issue != null){
-//	        		issue.setOpen(!newValue);
-//	        	}
-//	        }
-//	    };
-//	    changeListeners.add(listener);
-//	    return listener;
-//	}
-	
 	private ChangeListener<String> createIssueDescriptionChangeListener(){
 		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
 		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
@@ -109,7 +81,8 @@ public class IssueEditComponent extends VBox {
 		changeListeners.add(listener);
 		return listener;
 	}
-	private Parent left() {
+	
+	private Parent top() {
 
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
@@ -121,10 +94,6 @@ public class IssueEditComponent extends VBox {
 		issueTitle.textProperty().addListener(
 				new WeakChangeListener<String>(createIssueTitleChangeListener()));
 		
-//		closedCheckBox.setSelected(!issue.getOpen());
-//		closedCheckBox.selectedProperty().addListener(new WeakChangeListener<Boolean>(createIssueStateChangeListener()));
-		
-//		title.getChildren().addAll(issueId, issueTitle, closedCheckBox);
 		Parent statusBox = createStatusBox(parentStage);
 		title.getChildren().addAll(issueId, issueTitle, statusBox);
 		
@@ -135,12 +104,11 @@ public class IssueEditComponent extends VBox {
 		issueDesc.setPromptText("Description");
 		issueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
 
-		VBox left = new VBox();
-		left.setSpacing(ELEMENT_SPACING);
-		left.getChildren().addAll(title, issueDesc);
+		VBox top = new VBox();
+		top.setSpacing(ELEMENT_SPACING);
+		top.getChildren().addAll(title, issueDesc);
 
-		return left;
-
+		return top;
 	}
 	
 	private LabelDisplayBox createStatusBox(Stage stage) {
@@ -180,7 +148,7 @@ public class IssueEditComponent extends VBox {
 		return statusBox;
 	}
 
-	private Parent right() {
+	private Parent bottom() {
 
 		Parent parents = createParentsBox(parentStage);
 		Parent milestone = createMilestoneBox(parentStage);
@@ -189,11 +157,11 @@ public class IssueEditComponent extends VBox {
 
 		HBox buttons = createButtons(parentStage);
 
-		VBox right = new VBox();
-		right.setSpacing(ELEMENT_SPACING);
-		right.getChildren().addAll(parents, milestone, labels, assignee, buttons);
+		VBox bottom = new VBox();
+		bottom.setSpacing(ELEMENT_SPACING);
+		bottom.getChildren().addAll(parents, milestone, labels, assignee, buttons);
 
-		return right;
+		return bottom;
 	}
 
 	private HBox createButtons(Stage stage) {
@@ -203,17 +171,15 @@ public class IssueEditComponent extends VBox {
 
 		Button cancel = new Button();
 		cancel.setText("Cancel");
-//		cancel.setOnMouseClicked((MouseEvent e) -> {
-//			response.complete("cancel");
-//			stage.close();
-//		});
+		cancel.setOnMouseClicked(e -> {
+			response.complete("cancel");
+		});
 
 		Button ok = new Button();
 		ok.setText("OK");
-//		ok.setOnMouseClicked((MouseEvent e) -> {
-//			response.complete("ok");
-//			stage.close();
-//		});
+		ok.setOnMouseClicked(e -> {
+			response.complete("ok");
+		});
 
 		buttons.getChildren().addAll(ok, cancel);
 		return buttons;
