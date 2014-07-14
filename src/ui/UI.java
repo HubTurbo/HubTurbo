@@ -9,10 +9,8 @@ import service.ServiceManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class UI extends Application {
@@ -22,7 +20,6 @@ public class UI extends Application {
 	private Stage mainStage;
 
 	private ColumnControl columns;
-//	private MenuControl menu;
 	private NotificationPane notificationPane;
 
 	private SidePanel sidePanel;
@@ -83,26 +80,9 @@ public class UI extends Application {
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane);
 		notificationPane.setContent(columns);
 
-//		menu = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
-
-		Button addColumn = new Button("\u2795");
-		addColumn.setStyle("-fx-font-size: 14pt;");
-		addColumn.setOnMouseClicked(columns::addColumnEvent);
-		
-		Button refresh = new Button("F5");
-		refresh.setStyle("-fx-font-size: 12pt;");
-		refresh.setOnMouseClicked(e -> {
-			ServiceManager.getInstance().restartModelUpdate();
-			columns.refresh();
-		});
-		
-		VBox buttons = new VBox();
-		buttons.getChildren().addAll(addColumn, refresh);
-
-		BorderPane root = new BorderPane(); // TODO the root doesn't have to be a borderpane once the menu is no longer needed
+		BorderPane root = new BorderPane();
 		root.setCenter(notificationPane);
-//		root.setTop(menu);
-		root.setRight(buttons);
+		root.setRight(new GlobalButtonPanel(columns));
 
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 
