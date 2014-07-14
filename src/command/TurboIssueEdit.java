@@ -47,7 +47,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			TurboIssue latestIssue = new TurboIssue(ServiceManager.getInstance().getIssueFromIssueData(issueQuery), model.get());
 			
 			boolean descUpdated = mergeIssues(originalIssue, editedIssue, latestIssue, changeLog);
-			//TODO: inform user when description update failed
 			Issue latest = latestIssue.toGhResource();
 			ServiceManager.getInstance().editIssue(latest, dateModified);
 			

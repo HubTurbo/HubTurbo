@@ -171,6 +171,16 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
+	public boolean hasStatusLabel(){
+		for(TurboLabel label : labels){
+			String ghName = label.toGhName();
+			if(UserConfigurations.isClosedStatusLabel(ghName) || UserConfigurations.isOpenStatusLabel(ghName)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean hasLabel(TurboLabel label){
 		return labels.contains(label);
 	}
@@ -223,8 +233,10 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void clearAllLabels(){
+		if(this.hasStatusLabel()){
+			this.setOpen(true);
+		}
 		this.labels.clear();
-		this.setOpen(true);
 	}
 
 	/*

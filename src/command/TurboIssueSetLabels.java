@@ -30,14 +30,16 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		return isSuccessful;
 	}
 	
+	private void setGithubLabelsForIssue(List<Label> ghLabels) throws IOException{
+		ServiceManager.getInstance().setLabelsForIssue(issue.getId(), ghLabels);
+		updateGithubIssueState();
+	}
+	
 	private boolean setLabelsForIssue(List<TurboLabel> oldLabels, List<TurboLabel>updatedLabels){
-		ServiceManager service = ServiceManager.getInstance();
 		issue.setLabels(updatedLabels);
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(updatedLabels);
 		try {
-			service.setLabelsForIssue(issue.getId(), ghLabels);
-			updateGithubIssueState();
-			
+			setGithubLabelsForIssue(ghLabels);
 			logLabelsChange(oldLabels, updatedLabels);
 			return true;
 		} catch (IOException e) {

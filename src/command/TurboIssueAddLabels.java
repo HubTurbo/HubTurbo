@@ -31,18 +31,26 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
 
+	
+	private void addLabelsToIssueInGithub(List<Label> ghLabels) throws IOException{
+		ServiceManager.getInstance().addLabelsToIssue(issue.getId(), ghLabels);
+		updateGithubIssueState();
+	}
+	
+	private void removeLabelsFromIssueInGithub(List<Label> ghLabels) throws IOException{
+		ServiceManager.getInstance().deleteLabelsFromIssue(issue.getId(), ghLabels);
+		updateGithubIssueState();
+	}
+	
 	@Override
 	public boolean execute() {
-		ServiceManager service = ServiceManager.getInstance();
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
 		issue.addLabels(addedLabels);
 		try {
-			service.addLabelsToIssue(issue.getId(), ghLabels);
-			updateGithubIssueState();
+			addLabelsToIssueInGithub(ghLabels);
 			logAddOperation(true);
 			isSuccessful = true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			issue.removeLabels(addedLabels);
 			isSuccessful = false;
 			e.printStackTrace();
@@ -53,16 +61,13 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 
 	@Override
 	public boolean undo() {
-		ServiceManager service = ServiceManager.getInstance();
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
 		issue.removeLabels(addedLabels);
 		try {
-			service.deleteLabelsFromIssue(issue.getId(), ghLabels);
-			updateGithubIssueState();
+			removeLabelsFromIssueInGithub(ghLabels);
 			logAddOperation(false);
 			isUndone = true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			issue.addLabels(addedLabels);
 			e.printStackTrace();
 			isUndone = false;

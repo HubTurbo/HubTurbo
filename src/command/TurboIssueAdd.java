@@ -16,7 +16,6 @@ public class TurboIssueAdd extends TurboIssueCommand{
 	}
 	
 	private TurboIssue createIssueInGithub(TurboIssue newIssue) {
-		Model mod = model.get();
 		Issue ghIssue = newIssue.toGhResource();
 		Issue createdIssue = null;
 		try {
@@ -24,15 +23,19 @@ public class TurboIssueAdd extends TurboIssueCommand{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-		TurboIssue returnedIssue = new TurboIssue(createdIssue, mod);
-		mod.appendToCachedIssues(returnedIssue);
+		TurboIssue returnedIssue = new TurboIssue(createdIssue, model.get());
 		return returnedIssue;
+	}
+	
+	private void addIssueToLocalCache(TurboIssue issue){
+		model.get().appendToCachedIssues(issue);
 	}
 	
 	@Override
 	public boolean execute() {
 		TurboIssue result = createIssueInGithub(issue);
 		if(result != null){
+			addIssueToLocalCache(result);
 			isSuccessful = true;
 		}else{
 			isSuccessful = false;
