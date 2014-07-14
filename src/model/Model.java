@@ -237,14 +237,14 @@ public class Model {
 		}
 	}
 
-	private int getIndexOfIssue(int id){
-		for(int i = 0; i < issues.size(); i++){
-			if(((TurboIssue)(issues.get(i))).getId() == id){
-				return i;
-			}
-		}
-		return -1;
-	}
+//	private int getIndexOfIssue(int id){
+//		for(int i = 0; i < issues.size(); i++){
+//			if(((TurboIssue)(issues.get(i))).getId() == id){
+//				return i;
+//			}
+//		}
+//		return -1;
+//	}
 	
 	private TurboIssue getIssueWithId(int id){
 		for(int i = 0; i < issues.size(); i++){
@@ -379,7 +379,6 @@ public class Model {
 	
 	private void setCachedLabels(List<Label> ghLabels){
 		labels.clear();
-		// See loadIssues for why this buffer list is needed
 		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		labels.addAll(buffer);
 	}
@@ -402,7 +401,6 @@ public class Model {
 	
 	private void setCachedMilestones(List<Milestone> ghMilestones){
 		milestones.clear();
-		// See loadIssues for why this buffer list is needed
 		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
 	}
