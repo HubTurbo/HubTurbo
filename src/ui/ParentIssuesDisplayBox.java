@@ -2,6 +2,10 @@ package ui;
 
 import java.lang.ref.WeakReference;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -10,12 +14,12 @@ import javafx.scene.layout.HBox;
 
 public class ParentIssuesDisplayBox extends HBox {
 	
-	private ObservableList<Integer> issueNumbers = null;
-	private ListChangeListener<Integer> listChangeListener;
+	private IntegerProperty issueNumber = null;
+	private ChangeListener<Number> changeListener;
 	private boolean displayWhenEmpty;
 	
-	public ParentIssuesDisplayBox(ObservableList<Integer> items, boolean displayWhenEmpty) {
-		setListableItems(items);
+	public ParentIssuesDisplayBox(IntegerProperty item, boolean displayWhenEmpty) {
+		setListableItem(item);
 		this.displayWhenEmpty = displayWhenEmpty;
 		setup();
 	}
@@ -27,26 +31,25 @@ public class ParentIssuesDisplayBox extends HBox {
 		update();
 	}
 
-	private void setListableItems(ObservableList<Integer> issueNumbers) {
-		this.issueNumbers = issueNumbers;
+	private void setListableItem(IntegerProperty issueNumber) {
+		this.issueNumber = issueNumber;
 		initialiseChangeListener();
-		issueNumbers.addListener(new WeakListChangeListener<Integer>(listChangeListener));
+		issueNumber.addListener(new WeakChangeListener<Number>(changeListener));
 		
 		update();
 	}
 	
 	private void initialiseChangeListener(){
-		if(listChangeListener != null){
-			listChangeListener = null;
+		if(changeListener != null){
+			changeListener = null;
 		}
-		if(this.issueNumbers != null){
+		if(this.issueNumber != null){
 			WeakReference<ParentIssuesDisplayBox> that = new WeakReference<ParentIssuesDisplayBox>(this);
-			listChangeListener = new ListChangeListener<Integer>() {
+			changeListener = new ChangeListener<Number>() {
 				@Override
-				public void onChanged(ListChangeListener.Change<? extends Integer> arg0) {
-					if(that.get() != null){
-						that.get().update();
-					}
+				public void changed(ObservableValue<? extends Number> arg0,
+						Number arg1, Number arg2) {
+					that.get().update();
 				}
 			};
 		}
@@ -56,23 +59,15 @@ public class ParentIssuesDisplayBox extends HBox {
 		getChildren().clear();
 
 		Label label;
-		if (displayWhenEmpty && issueNumbers.size() == 0) {
+		if (displayWhenEmpty && issueNumber.get() <= 0) {
 			label = new Label("Parents");
 			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
 		} else {
-			StringBuilder parentSB = new StringBuilder();
-			for (Integer p : issueNumbers) {
-				parentSB.append("#" + p);
-				parentSB.append(", ");
-			}
-			if (parentSB.length() != 0) parentSB.delete(parentSB.length()-2, parentSB.length());
-
-			if (displayWhenEmpty || (!displayWhenEmpty && !parentSB.toString().isEmpty())) {
-				label = new Label(parentSB.toString());
-				label.getStyleClass().addAll("display-box-padding");
-				getChildren().add(label);
-			}
+			String parentString = "#" + issueNumber.get();
+			label = new Label(parentString);
+			label.getStyleClass().addAll("display-box-padding");
+			getChildren().add(label);
 		}
 	}
 	
