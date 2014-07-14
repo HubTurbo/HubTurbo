@@ -40,7 +40,7 @@ public abstract class TurboIssueCommand {
 		}
 	}
 	
-	public void processInheritedLabels(Integer newParent, Integer originalParent) {
+	public void processInheritedLabels(Integer originalParent, Integer newParent) {
 		removeInheritedLabel(originalParent, issue);
 		addInheritedLabel(newParent, issue);
 	}

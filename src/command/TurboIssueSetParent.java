@@ -34,7 +34,7 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	
 	private void setLocalIssueParent(Integer parent, Integer oldParent){
 		issue.setParentIssue(parent);
-		processInheritedLabels(parent, oldParent);
+		processInheritedLabels(oldParent, parent);
 	}
 	
 	private void updateGithubIssueParent(Integer parent, Integer oldParent) throws IOException{
