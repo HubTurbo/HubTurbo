@@ -32,6 +32,7 @@ public class CheckboxListDialog extends Dialog2<List<Integer>> {
 	protected Parent content() {
 		
 		BetterCheckListView checkListView = new BetterCheckListView(objectNames);
+		checkListView.setSingleSelection(!multipleSelection);
 		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
 		Button close = new Button("Close");

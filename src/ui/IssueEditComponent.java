@@ -65,7 +65,7 @@ public class IssueEditComponent extends VBox {
 		ChangeListener<String> listener = (observable, oldValue, newValue) -> {
 			TurboIssue issue = issueRef.get();
 			if(issue != null){
-				issueRef.get().setTitle((String)newValue);
+				issueRef.get().setTitle(newValue);
 			}
 		};
 		changeListeners.add(listener);
@@ -77,7 +77,7 @@ public class IssueEditComponent extends VBox {
 		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
 			TurboIssue issue = issueRef.get();
         	if(issue != null){
-        		issue.setDescription((String)newValue);
+        		issue.setDescription(newValue);
         	}
 		};
 		changeListeners.add(listener);
