@@ -42,5 +42,5 @@
 }
 
 .labels {
-	-fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 2 5;
+	-fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;
 }
