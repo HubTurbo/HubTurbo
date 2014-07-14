@@ -54,6 +54,10 @@ public class ColumnControl extends HBox {
 	public IssuePanel getColumn(int index) {
 		return (IssuePanel) getChildren().get(index);
 	}
+	
+	public void closeColumn(int index) {
+		getChildren().remove(index);
+	}
 
 	public ColumnControl setColumnCount(int to) {
 		ObservableList<Node> panels = getChildren();

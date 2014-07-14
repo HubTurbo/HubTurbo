@@ -111,7 +111,7 @@ public class IssuePanel extends VBox {
 		Label closeList = new Label("\u274c");
 		closeList.setStyle("-fx-font-size: 16pt;");
 		closeList.setOnMouseClicked((e) -> {
-			System.out.println("close clicked!");
+			parentColumnControl.closeColumn(columnIndex);
 		});
 		
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
