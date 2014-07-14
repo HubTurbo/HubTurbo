@@ -38,7 +38,7 @@ public class EditGroupDialog extends Dialog2<TurboLabelGroup> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 				
-		Button close = new Button("Close");
+		Button close = new Button("Done");
 		HBox buttonContainer = new HBox();
 		buttonContainer.setAlignment(Pos.CENTER_RIGHT);
 		buttonContainer.getChildren().add(close);

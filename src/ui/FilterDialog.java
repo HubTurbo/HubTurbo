@@ -63,7 +63,7 @@ public class FilterDialog implements Dialog<String> {
         
 
         HBox buttonContainer = new HBox();
-        Button close = new Button("Filter");
+        Button close = new Button("Apply");
         close.setOnAction((e) -> {
         	response.complete(field.getText());
         	stage.close();

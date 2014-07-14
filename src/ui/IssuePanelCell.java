@@ -206,7 +206,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 //		TurboIssue modifiedIssue = new TurboIssue(issue);
 //		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
 //				response -> {
-//					if (response.equals("ok")) {
+//					if (response.equals("done")) {
 //						model.updateIssue(oldIssue, modifiedIssue);
 //					}
 //					return true;

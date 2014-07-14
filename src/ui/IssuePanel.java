@@ -140,7 +140,7 @@ public class IssuePanel extends VBox {
 			applyCurrentFilterExpressionToIssue(issue, false);
 			
 			sidePanel.displayIssue(issue).thenApply(r -> {
-				if (r.equals("ok")) {
+				if (r.equals("done")) {
 					model.createIssue(issue);
 				}
 				parentColumnControl.refresh();

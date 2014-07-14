@@ -44,15 +44,15 @@ public class EditLabelDialog extends Dialog2<TurboLabel> {
 
 		ColorPicker colourPicker =  new ColorPicker(Color.web("#" + originalLabel.getColour()));
 
-		Button close = new Button("Close");
+		Button done = new Button("Done");
 		HBox buttonContainer = new HBox();
 		buttonContainer.setAlignment(Pos.CENTER_RIGHT);
-		buttonContainer.getChildren().add(close);
+		buttonContainer.getChildren().add(done);
 		HBox.setHgrow(buttonContainer, Priority.ALWAYS);
 
 		layout.getChildren().addAll(labelNameField, colourPicker, buttonContainer);
 
-		close.setOnAction(e -> {
+		done.setOnAction(e -> {
 			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
 			close();
 		});

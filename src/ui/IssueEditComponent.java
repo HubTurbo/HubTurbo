@@ -175,13 +175,13 @@ public class IssueEditComponent extends VBox {
 			response.complete("cancel");
 		});
 
-		Button ok = new Button();
-		ok.setText("OK");
-		ok.setOnMouseClicked(e -> {
-			response.complete("ok");
+		Button done = new Button();
+		done.setText("Done");
+		done.setOnMouseClicked((MouseEvent e) -> {
+			response.complete("done");
 		});
 
-		buttons.getChildren().addAll(ok, cancel);
+		buttons.getChildren().addAll(done, cancel);
 		return buttons;
 	}
 
