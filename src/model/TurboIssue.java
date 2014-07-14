@@ -1,7 +1,6 @@
 package model;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;

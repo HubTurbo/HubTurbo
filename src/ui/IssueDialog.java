@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -259,7 +258,7 @@ public class IssueDialog implements Dialog<String> {
 						if (wasAnythingSelected) {
 							Integer parent = response.size() > 0 ? allIssues.get(response.get(0)).getId() : null;
 							issue.setParentIssue(parent);
-							model.processInheritedLabels(issue, originalParents);
+							model.processInheritedLabels(issue, originalParent);
 						} else {
 							issue.setParentIssue(-1);
 						}

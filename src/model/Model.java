@@ -57,55 +57,28 @@ public class Model {
 		loadIssues();
 	}
 
-	public void processInheritedLabels(TurboIssue issue, List<Integer> originalParents) {
-		List<Integer> editedParents = issue.getParents();
-		HashMap<String, HashSet<Integer>> changeSet = CollectionUtilities.getChangesToList(originalParents, editedParents);
-		HashSet<Integer> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
-		HashSet<Integer> added = changeSet.get(CollectionUtilities.ADDED_TAG);
+	public void processInheritedLabels(TurboIssue issue, Integer originalParent) {
+		Integer newParent = issue.getParentIssue();
 		
-		removeInheritedLabels(removed, issue);
-		addInheritedLabels(added, issue);
+		removeInheritedLabel(originalParent, issue);
+		addInheritedLabel(newParent, issue);
 
 	}
 	
-	private void addInheritedLabels(HashSet<Integer> addedParents, TurboIssue issue){
-		for (Integer addedParentId : addedParents) {
-			TurboIssue addedParent = getIssueWithId(addedParentId);
-			if(addedParent == null){
-				continue;
-			}
-			for(TurboLabel label : addedParent.getLabels()){
-				if(!UserConfigurations.isExcludedLabel(label.toGhName())){
-					issue.addLabel(label);
-				}
+	private void addInheritedLabel(Integer added, TurboIssue issue){
+		TurboIssue addedParent = getIssueWithId(added);
+		for(TurboLabel label : addedParent.getLabels()){
+			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
+				issue.addLabel(label);
 			}
 		}
 	}
 	
-	private void removeInheritedLabels(HashSet<Integer> removedParents, TurboIssue issue){
-		List<Integer> editedParents = issue.getParents();
-		for (Integer removedParentId : removedParents) {
-			TurboIssue removedParent = getIssueWithId(removedParentId);
-			if(removedParent == null){
-				continue;
-			}
-			for (TurboLabel label : removedParent.getLabels()) {
-				if(UserConfigurations.isExcludedLabel(label.toGhName())){
-					continue;
-				}
-				boolean toBeRemoved = true;
-				// Loop to check if other parents have the label to be removed
-				for (Integer editedParentId : editedParents) {
-					TurboIssue editedParent = getIssueWithId(editedParentId);
-					if (editedParent.hasLabel(label)) {
-						toBeRemoved = false;
-						break;
-					}
-				}
-				
-				if (toBeRemoved) {
-					issue.removeLabel(label);
-				}
+	private void removeInheritedLabel(Integer removed, TurboIssue issue){
+		TurboIssue removedParent = getIssueWithId(removed);
+		for (TurboLabel label : removedParent.getLabels()) {
+			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
+				issue.removeLabel(label);
 			}
 		}
 	}
