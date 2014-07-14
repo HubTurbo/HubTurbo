@@ -125,8 +125,5 @@ public class LoginDialog extends Dialog2<Boolean> {
 	
 	private void loadRepository(String owner, String repoName) {
 		ServiceManager.getInstance().setupRepository(owner, repoName);
-
-		setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");
-//		enableMenuItemsRequiringLogin();
 	}
 }
