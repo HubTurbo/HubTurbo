@@ -175,6 +175,27 @@ public class TurboIssue implements Listable {
 		addToLabels(label);
 	}
 	
+	
+//	private void enforceStateLabels(ObservableList<TurboLabel> labels){
+//		// Auto update status as closed if any labels are equivalent to closed status
+//		for (TurboLabel currentLabel : labels) {
+//			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
+//				this.setOpen(false);
+//				return;
+//			}
+//		}
+//		// No closed status labels associated with the issue at this point
+//		if (!getOpen()) {
+//			for (TurboLabel currentLabel : labels) {
+//				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
+//					this.setOpen(true);
+//					return;
+//				}
+//			}
+//		}
+//	}
+	
+	
 	public void addLabels(List<TurboLabel> labList){
 		for(TurboLabel label : labList){
 			addLabel(label);
@@ -205,7 +226,7 @@ public class TurboIssue implements Listable {
 		if(this.labels != labels){
 			clearAllLabels();
 			for(TurboLabel label : labels){
-				addToLabels(label);
+				addLabel(label);
 			}
 		}
 	}
@@ -214,26 +235,7 @@ public class TurboIssue implements Listable {
 		this.labels.clear();
 		this.setOpen(true);
 	}
-	
-//	private void enforceStateLabels(ObservableList<TurboLabel> labels){
-//		// Auto update status as closed if any labels are equivalent to closed status
-//		for (TurboLabel currentLabel : labels) {
-//			if (UserConfigurations.isClosedStatusLabel(currentLabel.toGhName())) {
-//				this.setOpen(false);
-//				return;
-//			}
-//		}
-//		// No closed status labels associated with the issue at this point
-//		if (!getOpen()) {
-//			for (TurboLabel currentLabel : labels) {
-//				if (UserConfigurations.isOpenStatusLabel(currentLabel.toGhName())) {
-//					this.setOpen(true);
-//					return;
-//				}
-//			}
-//		}
-//	}
-	
+
 	private ObservableList<Integer> parents = FXCollections.observableArrayList();
 	public ObservableList<Integer> getParents() {
 		return  FXCollections.observableArrayList(parents);
@@ -247,14 +249,16 @@ public class TurboIssue implements Listable {
 			this.parents = parentNumbers;
 		} else if (parentNumbers != this.parents) {
 			this.parents.clear();
-			this.parents.addAll(parentNumbers);
+			if(!parentNumbers.isEmpty()){
+				this.parents.add(parentNumbers.get(0));
+			}
 		}
 	}
 	
 	public void addParent(Integer parentId){
-		if(!parents.contains(parentId)){
-			parents.add(parentId);
-		}
+		//Only single parent for now. This might be extended in future to allow multiple parents
+		this.parents.clear();
+		this.parents.add(parentId);
 	}
 
 	/*
