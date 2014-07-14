@@ -224,7 +224,8 @@ public class IssueEditComponent extends VBox {
 						if (wasAnythingSelected) {
 							Integer parent = response.size() > 0 ? allIssues.get(response.get(0)).getId() : null;
 							issue.setParentIssue(parent);
-							model.processInheritedLabels(issue, originalParent);
+							//TODO:
+//							model.processInheritedLabels(issue, originalParent);
 						} else {
 							issue.setParentIssue(-1);
 						}

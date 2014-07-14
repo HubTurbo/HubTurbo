@@ -193,6 +193,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		
 		if(originalParent != editedParent){
 			latest.setParentIssue(editedParent);
+			processInheritedLabels(editedParent, originalParent);
 			logParentChange(originalParent, editedParent, changeLog);
 		}
 	}

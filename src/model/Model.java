@@ -57,38 +57,6 @@ public class Model {
 		loadIssues();
 	}
 
-	public void processInheritedLabels(TurboIssue issue, Integer originalParent) {
-		Integer newParent = issue.getParentIssue();
-		
-		removeInheritedLabel(originalParent, issue);
-		addInheritedLabel(newParent, issue);
-
-	}
-	
-	private void addInheritedLabel(Integer added, TurboIssue issue){
-		if(added < 0){
-			return;
-		}
-		TurboIssue addedParent = getIssueWithId(added);
-		for(TurboLabel label : addedParent.getLabels()){
-			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
-				issue.addLabel(label);
-			}
-		}
-	}
-	
-	private void removeInheritedLabel(Integer removed, TurboIssue issue){
-		if(removed < 0){
-			return;
-		}
-		TurboIssue removedParent = getIssueWithId(removed);
-		for (TurboLabel label : removedParent.getLabels()) {
-			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
-				issue.removeLabel(label);
-			}
-		}
-	}
-
 	public ObservableList<TurboIssue> getIssues() {
 		return issues;
 	}
@@ -225,13 +193,18 @@ public class Model {
 		return -1;
 	}
 	
-	private TurboIssue getIssueWithId(int id){
+	public TurboIssue getIssueWithId(int id){
+		if(id <= 0){
+			return null;
+		}
+		
 		for(int i = 0; i < issues.size(); i++){
 			TurboIssue issue = issues.get(i);
 			if(issue.getId() == id){
 				return issue;
 			}
 		}
+		
 		return null;
 	}
 	
