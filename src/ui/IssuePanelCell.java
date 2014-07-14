@@ -1,10 +1,6 @@
 package ui;
 
-import java.awt.Desktop;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.net.URISyntaxException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -14,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -67,9 +62,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		issueTitle.getStyleClass().add("issue-panel-name");
 		if (!issue.getOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
-		issueTitle.setOnMouseClicked((MouseEvent e) -> {
-			browse(issue.getHtmlUrl());
-		});
 
 		LabelDisplayBox labels = new LabelDisplayBox(issue.getLabelsReference(), false, "");
 
@@ -122,72 +114,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 //			}
 			event.consume();
 		});
-	}
-
-	private void browse(String htmlUrl) {
-		
-		if (htmlUrl == null || htmlUrl.isEmpty()) return;
-
-		final String osName = System.getProperty("os.name");
-		
-		if (osName.startsWith("Mac OS") || osName.startsWith("Windows")) {
-			browseWithDesktop(htmlUrl);
-		} else {
-			// Assume *nix
-			browseUnix(htmlUrl);
-		}
-	}
-	
-	private void browseWithDesktop(String htmlUrl) {
-		try {
-			if (Desktop.isDesktopSupported()) {
-		        Desktop desktop = Desktop.getDesktop();
-		        if (desktop.isSupported(Desktop.Action.BROWSE)) {
-
-		            URI uri = new URI(htmlUrl);
-		            desktop.browse(uri);
-		        }
-	        }
-	    } catch (IOException ex) {
-	        ex.printStackTrace();
-	    } catch (URISyntaxException ex) {
-	        ex.printStackTrace();
-	    }
-	}
-
-	private void browseUnix(String url) {
-
-		final String[] UNIX_BROWSE_CMDS = new String[] {"google-chrome", "firefox", "www-browser", "opera", "konqueror", "epiphany", "mozilla", "netscape", "w3m", "lynx" };
-		for (final String cmd : UNIX_BROWSE_CMDS) {
-			
-			if (unixCommandExists(cmd)) {
-				try {
-					Runtime.getRuntime().exec(new String[] {cmd, url.toString()});
-				} catch (IOException e) {
-				}
-				return;
-			}
-		}
-	}
-
-	private static boolean unixCommandExists(final String cmd) {
-		Process whichProcess;
-		try {
-			whichProcess = Runtime.getRuntime().exec(new String[] { "which", cmd });
-			boolean finished = false;
-			do {
-				try {
-					whichProcess.waitFor();
-					finished = true;
-				} catch (InterruptedException e) {
-					return false;
-				}
-			} while (!finished);
-
-			return whichProcess.exitValue() == 0;
-		} catch (IOException e1) {
-			return false;
-		}
 	}
 
 	private void registerEvents(TurboIssue issue) {

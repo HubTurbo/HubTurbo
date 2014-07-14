@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import util.Browse;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -89,6 +90,10 @@ public class IssueEditComponent extends VBox {
 		title.setSpacing(TITLE_SPACING);
 
 		Label issueId = new Label("#" + issue.getId());
+		issueId.setOnMouseClicked(e -> {
+			Browse.browse(issue.getHtmlUrl());
+		});
+		
 		TextArea issueTitle = new TextArea(issue.getTitle());
 		issueTitle.setPromptText("Title");
 		issueTitle.setPrefRowCount(3);
