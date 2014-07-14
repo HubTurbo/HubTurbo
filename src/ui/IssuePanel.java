@@ -105,7 +105,21 @@ public class IssuePanel extends VBox {
 		Label addIssue = new Label("\u2795");
 		addIssue.setStyle("-fx-font-size: 16pt;");
 		addIssue.setOnMouseClicked((e) -> {
-			System.out.println("add clicked!");
+			TurboIssue issue = new TurboIssue("New issue", "", model);
+			applyCurrentFilterExpressionToIssue(issue, false);
+			(new IssueDialog(mainStage, model, issue)).show().thenApply(
+					response -> {
+						if (response.equals("ok")) {
+							model.createIssue(issue);
+						}
+						// Required for some reason
+						parentColumnControl.refresh();
+						return true;
+					})
+					.exceptionally(ex -> {
+						ex.printStackTrace();
+						return false;
+					});
 		});
 		
 		Label closeList = new Label("\u274c");
@@ -170,26 +184,29 @@ public class IssuePanel extends VBox {
 					}
 				}
 				assert rightIssue != null;
-				
-				if (currentFilterExpression != EMPTY_PREDICATE) {
-					try {
-						if (currentFilterExpression.canBeAppliedToIssue()) {
-							TurboIssue clone = new TurboIssue(rightIssue);
-							currentFilterExpression.applyTo(rightIssue, model);
-							model.updateIssue(clone, rightIssue);
-							parentColumnControl.refresh();
-						} else {
-							throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
-						}
-					} catch (PredicateApplicationException ex) {
-						parentColumnControl.displayMessage(ex.getMessage());
-					}
-				}
+				applyCurrentFilterExpressionToIssue(rightIssue, true);
 			}
 			e.setDropCompleted(success);
 
 			e.consume();
 		});
+	}
+	
+	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
+		if (currentFilterExpression != EMPTY_PREDICATE) {
+			try {
+				if (currentFilterExpression.canBeAppliedToIssue()) {
+					TurboIssue clone = new TurboIssue(issue);
+					currentFilterExpression.applyTo(issue, model);
+					if (updateModel) model.updateIssue(clone, issue);
+					parentColumnControl.refresh();
+				} else {
+					throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
+				}
+			} catch (PredicateApplicationException ex) {
+				parentColumnControl.displayMessage(ex.getMessage());
+			}
+		}
 	}
 	
 	public void filter(FilterExpression filter) {

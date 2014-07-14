@@ -116,20 +116,7 @@ public class MenuControl extends MenuBar {
 	private MenuItem createNewIssueMenuItem(Stage mainStage, Model model, ColumnControl columns) {
 		newIssueMenuItem = new MenuItem("New Issue");
 		newIssueMenuItem.setOnAction(e -> {
-			TurboIssue issue = new TurboIssue("New issue", "", model);
-			(new IssueDialog(mainStage, model, issue)).show().thenApply(
-					response -> {
-						if (response.equals("ok")) {
-							model.createIssue(issue);
-						}
-						// Required for some reason
-						columns.refresh();
-						return true;
-					})
-					.exceptionally(ex -> {
-						ex.printStackTrace();
-						return false;
-					});
+			
 		});
 		return newIssueMenuItem;
 	}
