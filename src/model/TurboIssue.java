@@ -317,15 +317,11 @@ public class TurboIssue implements Listable {
 		int seperatorLineIndex = getSeperatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
 			String line = lines[i];
-			if(id.get() == 29){
-				System.out.println(line);
-			}
+			
 			if (line.startsWith(METADATA_HEADER_PARENT)) {
-				System.out.println(line);
 				String value = line.replace(METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
-					System.out.println(valueTokens);
 					if (!valueTokens[j].trim().isEmpty()){
 						return Integer.parseInt(valueTokens[j].trim());
 					}
