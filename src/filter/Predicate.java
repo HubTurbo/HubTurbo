@@ -77,9 +77,18 @@ public class Predicate implements FilterExpression {
 				return false;
 			}
 		case "label":
+			content = content.toLowerCase();
+			String group = null;
+			if (content.contains(".")) {
+				int pos = content.indexOf('.');
+				group = content.substring(0, pos);
+				content = content.substring(pos+1);
+			}
 			for (TurboLabel l : issue.getLabels()) {
-				if (l.getName().toLowerCase().contains(content.toLowerCase())) {
-					return true;
+				if (l.getName().toLowerCase().contains(content)) {
+					if (group == null || l.getGroup().toLowerCase().contains(group)) {
+						return true;
+					}
 				}
 			}
 			return false;
