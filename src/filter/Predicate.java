@@ -12,8 +12,8 @@ import model.TurboMilestone;
 import model.TurboUser;
 
 public class Predicate implements FilterExpression {
-	private String name;
-	private String content;
+	private final String name;
+	private final String content;
 
 	public Predicate(String name, String content) {
 		this.name = name;
@@ -61,37 +61,47 @@ public class Predicate implements FilterExpression {
 		case "milestone":
 			if (issue.getMilestone() == null) return false;
 			return issue.getMilestone().getTitle().toLowerCase().contains(content.toLowerCase());
-		case "parent":
-			content = content.toLowerCase();
-			if (content.startsWith("#")) {
-				return issue.getParentIssue() == Integer.parseInt(content.substring(1));
-			} else if (Character.isDigit(content.charAt(0))) {
-				return issue.getParentIssue() == Integer.parseInt(content);
+		case "parent": {
+			String parent = content.toLowerCase();
+			if (parent.startsWith("#")) {
+				return issue.getParentIssue() == Integer.parseInt(parent.substring(1));
+			} else if (Character.isDigit(parent.charAt(0))) {
+				return issue.getParentIssue() == Integer.parseInt(parent);
 			} else {
 				List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
 				for (int i=0; i<actualParentInstances.size(); i++) {
-					if (actualParentInstances.get(i).getTitle().toLowerCase().contains(content)) {
+					if (actualParentInstances.get(i).getTitle().toLowerCase().contains(parent)) {
 						return true;
 					}
 				}
 				return false;
 			}
-		case "label":
-			content = content.toLowerCase();
-			String group = null;
+		}
+		case "label": {
+			String group = "";
+			String labelName = content.toLowerCase();
+			
 			if (content.contains(".")) {
+				if (content.length() == 1) {
+					// It's just a dot
+					return true;
+				}
 				int pos = content.indexOf('.');
 				group = content.substring(0, pos);
-				content = content.substring(pos+1);
+				labelName = content.substring(pos+1);
 			}
+			
+			assert group.isEmpty() != labelName.isEmpty();
+			
 			for (TurboLabel l : issue.getLabels()) {
-				if (l.getName().toLowerCase().contains(content)) {
+				if (labelName == null || l.getName().toLowerCase().contains(labelName)) {
 					if (group == null || l.getGroup().toLowerCase().contains(group)) {
 						return true;
 					}
 				}
 			}
 			return false;
+		}
 		case "assignee":
 			if (issue.getAssignee() == null) return false;
 			return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
@@ -127,15 +137,15 @@ public class Predicate implements FilterExpression {
 				issue.setMilestone(milestones.get(0));
 			}
 			break;
-		case "parent":
-			content = content.toLowerCase();
-			if (content.startsWith("#")) {
-				issue.setParentIssue(Integer.parseInt(content.substring(1)));
-			} else if (Character.isDigit(content.charAt(0))) {
-				issue.setParentIssue(Integer.parseInt(content));
+		case "parent": {
+			String parent = content.toLowerCase();
+			if (parent.startsWith("#")) {
+				issue.setParentIssue(Integer.parseInt(parent.substring(1)));
+			} else if (Character.isDigit(parent.charAt(0))) {
+				issue.setParentIssue(Integer.parseInt(parent));
 			} else {
 				// Find parents containing the partial title
-				List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+				List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(parent.toLowerCase())).collect(Collectors.toList());
 				if (parents.size() > 1) {
 					throw new PredicateApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
 				} else {
@@ -143,6 +153,7 @@ public class Predicate implements FilterExpression {
 				}
 			}
 			break;
+		}
 		case "label":
 			// Find labels containing the partial title
 			List<TurboLabel> labels = model.getLabels().stream().filter(l -> l.getName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
