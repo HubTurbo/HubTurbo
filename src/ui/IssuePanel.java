@@ -282,9 +282,9 @@ public class IssuePanel extends VBox {
 	}
 
 	public void setItems(ObservableList<TurboIssue> issues) {
-		
 		this.issues = issues;
 		this.issues.addListener(new WeakListChangeListener<TurboIssue>(createIssuesListener()));
+		refreshItems();
 	}
 
 	private ListChangeListener<TurboIssue> createIssuesListener() {
