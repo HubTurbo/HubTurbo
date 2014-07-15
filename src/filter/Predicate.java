@@ -42,6 +42,8 @@ public class Predicate implements FilterExpression {
 		case "state":
 		case "status":
 			return stateSatisfies(issue);
+		case "has":
+			return satisfiesHasConditions(issue);
 		default:
 			return false;
 		}
@@ -110,6 +112,21 @@ public class Predicate implements FilterExpression {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	private boolean satisfiesHasConditions(TurboIssue issue) {
+		switch (content) {
+		case "label":
+			return issue.getLabels().size() > 0;
+		case "milestone":
+			return issue.getMilestone() != null;
+		case "assignee":
+			return issue.getAssignee() != null;
+		case "parent":
+			return issue.getParentIssue() != -1;
+		default:
+			return false;
+		}
 	}
 
 	private boolean stateSatisfies(TurboIssue issue) {
