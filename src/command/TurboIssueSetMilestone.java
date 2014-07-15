@@ -24,7 +24,7 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 		}
 	}
 	
-	private void logMilestoneChange(TurboMilestone prevMilestone, TurboMilestone newMilestone){
+	private void logMilestoneChange(TurboMilestone prevMilestone, TurboMilestone newMilestone, boolean logRemarks){
 		String changeLog;
 		String originalMilestoneTitle = prevMilestone.getTitle();
 		String newMilestoneTitle = newMilestone.getTitle();
@@ -33,15 +33,15 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 		} else {
 			changeLog = "Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + newMilestoneTitle + "]\n";
 		}
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 		lastOperationExecuted = changeLog;
+		logChangesInGithub(logRemarks, changeLog);
 	}
 
-	private boolean setIssueMilestone(TurboMilestone prev, TurboMilestone milestone){
+	private boolean setIssueMilestone(TurboMilestone prev, TurboMilestone milestone, boolean logRemarks){
 		try {
 			ServiceManager.getInstance().setIssueMilestone(issue.getId(), milestone.toGhResource());
 			issue.setMilestone(milestone);
-			logMilestoneChange(prev, milestone);
+			logMilestoneChange(prev, milestone, logRemarks);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -51,13 +51,13 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 
 	@Override
 	public boolean execute() {
-		isSuccessful = setIssueMilestone(previousMilestone, newMilestone);
+		isSuccessful = setIssueMilestone(previousMilestone, newMilestone, true);
 		return isSuccessful;
 	}
 
 	@Override
 	public boolean undo() {
-		isUndone = setIssueMilestone(newMilestone, previousMilestone);
+		isUndone = setIssueMilestone(newMilestone, previousMilestone, false);
 		return isUndone;
 	}
 }

@@ -33,7 +33,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 			changeLog = LABELS_REMOVE_LOG_PREFIX + addedLabels.toString() + "\n";
 		}
 		lastOperationExecuted = changeLog;
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		logChangesInGithub(added, changeLog);
 	}
 
 	

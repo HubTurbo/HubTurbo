@@ -33,9 +33,10 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		}else{
 			changeLog = LABELS_ADD_LOG_PREFIX + removedLabels.toString() + "\n";
 		}
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 		lastOperationExecuted = changeLog;
+		logChangesInGithub(remove, changeLog);
 	}
+	
 
 	@Override
 	public boolean execute() {

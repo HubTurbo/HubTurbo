@@ -25,7 +25,7 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 		previousParent = issue.getParentIssue();
 	}
 	
-	private void logParentChange(Integer oldParent, Integer parent){
+	private void logParentChange(Integer oldParent, Integer parent, boolean logRemarks){
 		String changeLog;
 		if(parent < 0){
 			changeLog = String.format("Removed issue parent: %1d\n", oldParent);
@@ -34,8 +34,8 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 		}else{
 			changeLog = String.format("Set Issue parent to %1d\n", parent);
 		}
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 		lastOperationExecuted = changeLog;
+		logChangesInGithub(logRemarks, changeLog);
 	}
 	
 	private void setLocalIssueParent(Integer oldParent, Integer parent){
@@ -50,11 +50,11 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 		service.setLabelsForIssue(issue.getId(), ghLabels);
 	}
 	
-	private boolean setIssueParent(Integer oldParent, Integer parent){
+	private boolean setIssueParent(Integer oldParent, Integer parent, boolean logRemarks){
 		setLocalIssueParent(oldParent, parent);
 		try {
 			updateGithubIssueParent(oldParent, parent);
-			logParentChange(oldParent, parent);
+			logParentChange(oldParent, parent, logRemarks);
 			return true;
 		} catch (IOException e) {
 			setLocalIssueParent(parent, oldParent);
@@ -65,13 +65,13 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		isSuccessful = setIssueParent(previousParent, newParent);
+		isSuccessful = setIssueParent(previousParent, newParent, true);
 		return isSuccessful;
 	}
 
 	@Override
 	public boolean undo() {
-		isUndone = setIssueParent(newParent, previousParent);
+		isUndone = setIssueParent(newParent, previousParent, false);
 		return isUndone;
 	}
 

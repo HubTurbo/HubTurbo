@@ -31,7 +31,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		isSuccessful = setLabelsForIssue(previousLabels, newLabels);
+		isSuccessful = setLabelsForIssue(previousLabels, newLabels, true);
 		return isSuccessful;
 	}
 	
@@ -40,12 +40,12 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		updateGithubIssueState();
 	}
 	
-	private boolean setLabelsForIssue(List<TurboLabel> oldLabels, List<TurboLabel>updatedLabels){
+	private boolean setLabelsForIssue(List<TurboLabel> oldLabels, List<TurboLabel>updatedLabels, boolean logRemarks){
 		issue.setLabels(updatedLabels);
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(updatedLabels);
 		try {
 			setGithubLabelsForIssue(ghLabels);
-			logLabelsChange(oldLabels, updatedLabels);
+			logLabelsChange(oldLabels, updatedLabels, logRemarks);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -54,7 +54,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		}
 	}
 	
-	private void logLabelsChange(List<TurboLabel> oldLabels, List<TurboLabel> labels){
+	private void logLabelsChange(List<TurboLabel> oldLabels, List<TurboLabel> labels, boolean logRemarks){
 		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities.getChangesToList(oldLabels, labels);
 		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
@@ -65,14 +65,14 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		if(removed.size() > 0){
 			changeLog.append(LABELS_REMOVE_LOG_PREFIX + removed.toString() + "\n");
 		}
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
 		lastOperationExecuted = changeLog.toString();
+		logChangesInGithub(logRemarks, lastOperationExecuted);
 	}
 	
 	@Override
 	public boolean undo() {
 		if(isSuccessful){
-			isUndone = setLabelsForIssue(newLabels, previousLabels);
+			isUndone = setLabelsForIssue(newLabels, previousLabels, false);
 		}
 		return isUndone;
 	}

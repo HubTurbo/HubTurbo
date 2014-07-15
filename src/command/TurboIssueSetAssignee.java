@@ -24,23 +24,23 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 		}
 	}
 	
-	private void logAssigneeChange(TurboUser assignee){
+	private void logAssigneeChange(TurboUser assignee, boolean logRemarks){
 		String changeLog = "Changed issue assignee to: " + assignee.getGithubName() + "\n";
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 		lastOperationExecuted = changeLog;
+		logChangesInGithub(logRemarks, changeLog);
 	}
 	
 	@Override
 	public boolean execute() {
-		isSuccessful = setIssueAssignee(newAssignee);
+		isSuccessful = setIssueAssignee(newAssignee, true);
 		return isSuccessful;
 	}
 	
-	private boolean setIssueAssignee(TurboUser user){
+	private boolean setIssueAssignee(TurboUser user, boolean logRemarks){
 		try {
 			ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
 			issue.setAssignee(user);
-			logAssigneeChange(user);
+			logAssigneeChange(user, logRemarks);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -50,7 +50,7 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	
 	@Override
 	public boolean undo() {
-		isUndone = setIssueAssignee(previousAssignee);
+		isUndone = setIssueAssignee(previousAssignee, false);
 		return isUndone;
 	}
 	

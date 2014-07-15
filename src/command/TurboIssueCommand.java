@@ -14,11 +14,14 @@ public abstract class TurboIssueCommand {
 	protected static final String LABELS_ADD_LOG_PREFIX = "Labels added: ";
 	protected static final String LABELS_REMOVE_LOG_PREFIX = "Labels removed: ";
 	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description. \n"; 
+	protected static final String ADDITIONAL_COMMENTS_FORMAT = "\n [Remarks] %1s \n";
+	
 	protected WeakReference<Model> model;
 	protected boolean isUndoableCommand = false;
 	protected boolean isSuccessful = false;
 	protected boolean isUndone = false;
 	protected String lastOperationExecuted = "";
+	protected String loggingRemarks;
 	
 	public TurboIssueCommand(Model model, TurboIssue issue){
 		this.issue = issue;
@@ -32,6 +35,10 @@ public abstract class TurboIssueCommand {
 	public abstract boolean execute();
 	public abstract boolean undo();
 	
+	public void setLoggingRemarks(String remarks){
+		this.loggingRemarks = remarks;
+	}
+	
 	public String getLastOperation(){
 		return lastOperationExecuted;
 	}
@@ -43,6 +50,13 @@ public abstract class TurboIssueCommand {
 		}else{
 			service.closeIssue(issue.getId());
 		}
+	}
+	
+	protected void logChangesInGithub(boolean logAdditionalRemarks, String changeLog){
+		if(logAdditionalRemarks && loggingRemarks != null){
+			changeLog += String.format(ADDITIONAL_COMMENTS_FORMAT, loggingRemarks);
+		}
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
 	
 	protected void processInheritedLabels(Integer originalParent, Integer newParent, TurboIssue issue) {
