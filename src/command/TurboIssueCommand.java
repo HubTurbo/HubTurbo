@@ -53,7 +53,7 @@ public abstract class TurboIssueCommand {
 	}
 	
 	protected void logChangesInGithub(boolean logAdditionalRemarks, String changeLog){
-		if(logAdditionalRemarks && loggingRemarks != null){
+		if(logAdditionalRemarks && loggingRemarks != null && loggingRemarks.length() > 0){
 			changeLog += String.format(ADDITIONAL_COMMENTS_FORMAT, loggingRemarks);
 		}
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
