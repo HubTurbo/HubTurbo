@@ -41,7 +41,7 @@ public class Model {
 	
 	private IRepositoryIdProvider repoId;
 
-	private UserConfigurations config = ConfigFileHandler.loadConfig();
+	private UserConfigurations config = ConfigFileHandler.loadUserConfig();
 	
 	public Model(){
 		
