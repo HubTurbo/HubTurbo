@@ -3,6 +3,7 @@ package ui;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -81,9 +82,35 @@ public class HierarchicalIssuePanel extends Columnable {
 //		setStyle("-fx-background-color: blue;");
 		
 //		System.out.println("rf");
+		
+		// Create all the items
+		
+		int size = issues.size()+1;
+		HierarchicalIssuePanelItem[] items = new HierarchicalIssuePanelItem[size];
+		boolean[] notRootChildren = new boolean[size];
 		for (TurboIssue issue : issues) {
-			stuff.getChildren().add(new HierarchicalIssuePanelItem(issue));
+			items[issue.getId()] = new HierarchicalIssuePanelItem(issue);
 		}
+		
+		// Make another pass. Add those that are children to their parents
+		for (TurboIssue issue : issues) {
+			if (issue.getParentIssue() != -1) {
+				items[issue.getParentIssue()].addChild(items[issue.getId()]);
+				notRootChildren[issue.getId()] = true;
+			}
+		}
+		
+		// Another pass to add root children to the main component
+		for (TurboIssue issue : issues) {
+			if (!notRootChildren[issue.getId()]) {
+				stuff.getChildren().add(items[issue.getId()]);
+			}
+		}
+		
+//		for (TurboIssue issue : issues) {
+			
+//			stuff.getChildren().add(new HierarchicalIssuePanelItem(issue));
+//		}
 		
 		everything.setContent(stuff);
 		getChildren().add(everything);
