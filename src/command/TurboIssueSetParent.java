@@ -28,13 +28,14 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	private void logParentChange(Integer oldParent, Integer parent){
 		String changeLog;
 		if(parent < 0){
-			changeLog = String.format("Removed issue parent: %1d", oldParent);
+			changeLog = String.format("Removed issue parent: %1d\n", oldParent);
 		}else if(oldParent > 0){
-			changeLog = String.format("Changed Issue parent from %1d to %2d", oldParent, parent);
+			changeLog = String.format("Changed Issue parent from %1d to %2d\n", oldParent, parent);
 		}else{
-			changeLog = String.format("Set Issue parent to %1d", parent);
+			changeLog = String.format("Set Issue parent to %1d\n", parent);
 		}
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		lastOperationExecuted = changeLog;
 	}
 	
 	private void setLocalIssueParent(Integer oldParent, Integer parent){

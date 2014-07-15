@@ -29,11 +29,12 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	private void logRemoveOperation(boolean remove){
 		String changeLog;
 		if(remove){
-			changeLog = LABELS_REMOVE_LOG_PREFIX + removedLabels.toString();
+			changeLog = LABELS_REMOVE_LOG_PREFIX + removedLabels.toString() + "\n";
 		}else{
-			changeLog = LABELS_ADD_LOG_PREFIX + removedLabels.toString();
+			changeLog = LABELS_ADD_LOG_PREFIX + removedLabels.toString() + "\n";
 		}
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		lastOperationExecuted = changeLog;
 	}
 
 	@Override

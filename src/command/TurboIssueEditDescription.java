@@ -27,12 +27,17 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 		return isSuccessful;
 	}
 	
+	private void logDescriptionChange(){
+		ServiceManager.getInstance().logIssueChanges(issue.getId(), DESCRIPTION_CHANGE_LOG);
+		lastOperationExecuted = DESCRIPTION_CHANGE_LOG;
+	}
+	
 	private boolean editIssueDescription(String oldDesc, String newDesc){
 		issue.setDescription(newDesc);
-		ServiceManager service = ServiceManager.getInstance();
 		try {
-			service.editIssueBody(issue.getId(), issue.buildGithubBody());
-			service.logIssueChanges(issue.getId(), DESCRIPTION_CHANGE_LOG);
+			ServiceManager.getInstance().editIssueBody(issue.getId(), issue.buildGithubBody());
+			logDescriptionChange();
+			
 			return true;
 		} catch (IOException e) {
 			issue.setDescription(oldDesc);

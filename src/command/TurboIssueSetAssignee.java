@@ -25,8 +25,9 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	}
 	
 	private void logAssigneeChange(TurboUser assignee){
-		String changeLog = "Changed issue assignee to: " + assignee.getGithubName();
+		String changeLog = "Changed issue assignee to: " + assignee.getGithubName() + "\n";
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		lastOperationExecuted = changeLog;
 	}
 	
 	@Override

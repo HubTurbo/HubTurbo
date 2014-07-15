@@ -23,6 +23,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 	private void logTitleChange(String prevTitle, String newTitle){
 		String changeLog = ("Title edited: [previous: " + newTitle + "] [new: " + prevTitle + "]\n");
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		lastOperationExecuted = changeLog;
 	}
 
 	@Override

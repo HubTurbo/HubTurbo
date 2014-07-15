@@ -67,6 +67,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	
 	private void logChanges(StringBuilder changeLog){
 		if(changeLog.length() > 0){
+			lastOperationExecuted = changeLog.toString();
 			ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
 		}
 	}

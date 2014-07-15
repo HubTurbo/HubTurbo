@@ -29,11 +29,12 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 		String originalMilestoneTitle = prevMilestone.getTitle();
 		String newMilestoneTitle = newMilestone.getTitle();
 		if (newMilestoneTitle == null) {
-			changeLog = "Milestone removed: [previous: " + originalMilestoneTitle + "]";
+			changeLog = "Milestone removed: [previous: " + originalMilestoneTitle + "]\n";
 		} else {
-			changeLog = "Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + newMilestoneTitle + "]";
+			changeLog = "Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + newMilestoneTitle + "]\n";
 		}
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
+		lastOperationExecuted = changeLog;
 	}
 
 	private boolean setIssueMilestone(TurboMilestone prev, TurboMilestone milestone){

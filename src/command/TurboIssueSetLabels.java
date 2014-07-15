@@ -66,6 +66,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 			changeLog.append(LABELS_REMOVE_LOG_PREFIX + removed.toString() + "\n");
 		}
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
+		lastOperationExecuted = changeLog.toString();
 	}
 	
 	@Override

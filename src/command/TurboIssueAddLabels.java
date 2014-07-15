@@ -28,10 +28,11 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	private void logAddOperation(boolean added){
 		String changeLog;
 		if(added){
-			changeLog = LABELS_ADD_LOG_PREFIX + addedLabels.toString();
+			changeLog = LABELS_ADD_LOG_PREFIX + addedLabels.toString() + "\n";
 		}else{
-			changeLog = LABELS_REMOVE_LOG_PREFIX + addedLabels.toString();
+			changeLog = LABELS_REMOVE_LOG_PREFIX + addedLabels.toString() + "\n";
 		}
+		lastOperationExecuted = changeLog;
 		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
 

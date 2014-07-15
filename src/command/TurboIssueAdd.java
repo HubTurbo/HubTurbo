@@ -14,6 +14,7 @@ import model.TurboIssue;
 
 public class TurboIssueAdd extends TurboIssueCommand{
 
+	private static String ADD_ISSUE_LOG = "Added issue: #%1d %2s \n";
 	public TurboIssueAdd(Model model, TurboIssue issue){
 		super(model, issue);
 		this.isUndoableCommand = false;
@@ -31,6 +32,10 @@ public class TurboIssueAdd extends TurboIssueCommand{
 		return returnedIssue;
 	}
 	
+	private void logIssueAdd(){
+		lastOperationExecuted = String.format(ADD_ISSUE_LOG, issue.getId(), issue.getTitle());
+	}
+	
 	private void addIssueToLocalCache(TurboIssue issue){
 		model.get().appendToCachedIssues(issue);
 	}
@@ -40,6 +45,7 @@ public class TurboIssueAdd extends TurboIssueCommand{
 		TurboIssue result = createIssueInGithub(issue);
 		if(result != null){
 			addIssueToLocalCache(result);
+			logIssueAdd();
 			isSuccessful = true;
 		}else{
 			isSuccessful = false;
