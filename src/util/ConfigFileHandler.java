@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,7 +25,7 @@ public class ConfigFileHandler {
 								.excludeFieldsWithModifiers(Modifier.TRANSIENT)
 								.create();
 	
-	public static void saveConfig(UserConfigurations config) {
+	private static void saveConfig(UserConfigurations config) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG) , CHARSET);
 			gson.toJson(config, UserConfigurations.class, writer);
@@ -43,20 +44,35 @@ public class ConfigFileHandler {
 	
 	public static UserConfigurations loadConfig() {
 		UserConfigurations config = null;
-		try {
-			Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG), CHARSET);
-			config = gson.fromJson(reader, UserConfigurations.class);
-			reader.close();
-		} catch (UnsupportedEncodingException e) {
-			// from construction of InputStreamReader
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// from construction of FileInputStream;
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO from closing reader
-			e.printStackTrace();
+		File configFile = new File(FILE_CONFIG);
+		if (configFile.exists()) {
+			try {
+				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG), CHARSET);
+				config = gson.fromJson(reader, UserConfigurations.class);
+				reader.close();
+			} catch (UnsupportedEncodingException e) {
+				// from construction of InputStreamReader
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// from construction of FileInputStream;
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO from closing reader
+				e.printStackTrace();
+			}
+		} else {
+			config = new UserConfigurations(Defaults.getDefaultNonInheritedLabels(),
+					Defaults.getDefaultOpenStatusLabels(),
+					Defaults.getDefaultClosedStatusLabels());
+			try {
+				configFile.createNewFile();
+				saveConfig(config);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		
 		return config;
 	}
 	

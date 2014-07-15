@@ -37,6 +37,6 @@ public class Defaults {
 	public static List<String> getDefaultNonInheritedLabels() {
 		List<String> defaultNonInheritedLabels = new ArrayList<String>();
 		defaultNonInheritedLabels.add("status.");
-		return null;
+		return defaultNonInheritedLabels;
 	}
 }

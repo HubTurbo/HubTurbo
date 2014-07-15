@@ -6,7 +6,7 @@ import java.util.List;
 public class UserConfigurations {
 	
 	private static List<String> nonInheritedLabels;
-	public List<String> getExcludedLabels() {
+	public List<String> getNonInheritedLabels() {
 		return Collections.unmodifiableList(nonInheritedLabels);
 	}
 	
@@ -20,27 +20,11 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
 	
-	UserConfigurations(List<String> excludedLabels, 
+	UserConfigurations(List<String> nonInheritedLabels, 
 			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		UserConfigurations.nonInheritedLabels = excludedLabels;
+		UserConfigurations.nonInheritedLabels = nonInheritedLabels;
 		UserConfigurations.openStatusLabels = openStatusLabels;
 		UserConfigurations.closedStatusLabels = closedStatusLabels;
-		boolean isModified = false;
-		if (UserConfigurations.nonInheritedLabels.isEmpty()) {
-			UserConfigurations.nonInheritedLabels.addAll(Defaults.getDefaultNonInheritedLabels());
-			isModified = true;
-		}
-		if (UserConfigurations.openStatusLabels.isEmpty()) {
-			UserConfigurations.openStatusLabels.addAll(Defaults.getDefaultOpenStatusLabels());
-			isModified = true;
-		}
-		if (UserConfigurations.closedStatusLabels.isEmpty()) {
-			UserConfigurations.closedStatusLabels.addAll(Defaults.getDefaultClosedStatusLabels());
-			isModified = true;
-		}
-		if (isModified) {
-			ConfigFileHandler.saveConfig(this);
-		}
 	}
 	
 	public static boolean isNonInheritedLabel(String label) {
