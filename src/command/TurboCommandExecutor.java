@@ -17,12 +17,7 @@ public class TurboCommandExecutor {
 	}
 	
 	public boolean executeCommmand(CommandType command, Model model, TurboIssue issue, Object... args){
-		return executeCommand(command, "", model, issue, args);
-	}
-	
-	public boolean executeCommand(CommandType command, String remarks, Model model, TurboIssue issue, Object...args){
 		TurboIssueCommand issueCommand = createIssueCommand(command, model, issue, args);
-		issueCommand.setLoggingRemarks(remarks);
 		boolean result = issueCommand.execute();
 		if(result){
 			executionLog.add(issueCommand.getLastOperation());
