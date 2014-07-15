@@ -189,7 +189,9 @@ public class TurboIssue implements Listable {
 	}
 	
 	public TurboLabel getStatusLabel(){
-		List<TurboLabel> statusLabel = labels.stream().filter(l -> (UserConfigurations.isStatusLabel(l.toGhName()))).collect(Collectors.toList());
+		List<TurboLabel> statusLabel = labels.stream()
+				.filter(l -> (UserConfigurations.isStatusLabel(l.toGhName())))
+				.collect(Collectors.toList());
 		if(!statusLabel.isEmpty()){
 			return statusLabel.get(0);
 		}else{
@@ -198,7 +200,9 @@ public class TurboIssue implements Listable {
 	}
 	
 	public List<TurboLabel> getNonStatusLabel(){
-		return labels.stream().filter(l -> (!UserConfigurations.isStatusLabel(l.toGhName()))).collect(Collectors.toList());
+		return labels.stream()
+				.filter(l -> (!UserConfigurations.isStatusLabel(l.toGhName())))
+				.collect(Collectors.toList());
 	}
 	
 	public boolean hasLabel(TurboLabel label){
@@ -366,9 +370,11 @@ public class TurboIssue implements Listable {
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		if (labels == null) return turboLabels;
+		
 		for (Label label : labels) {
 			turboLabels.add(new TurboLabel(label));
 		}
+		
 		return turboLabels;
 	}
 	
