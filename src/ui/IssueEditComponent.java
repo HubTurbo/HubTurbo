@@ -26,6 +26,9 @@ import model.TurboUser;
 import util.Browse;
 
 public class IssueEditComponent extends VBox {
+	protected static final int LINE_HEIGHT = 18;
+	protected static final int TITLE_ROW_NUM = 3;
+	protected static final int DESC_ROW_NUM = 8;
 
 	private final TurboIssue issue;
 	private final Model model;
@@ -83,8 +86,17 @@ public class IssueEditComponent extends VBox {
 		return listener;
 	}
 	
-	private Parent top() {
-
+	private TextArea createIssueTitle(){
+		TextArea issueTitle = new TextArea(issue.getTitle());
+		issueTitle.setPromptText("Title");
+		issueTitle.setPrefRowCount(TITLE_ROW_NUM);
+		issueTitle.setPrefColumnCount(42);
+		issueTitle.setWrapText(true);
+		issueTitle.textProperty().addListener(new WeakChangeListener<String>(createIssueTitleChangeListener()));
+		return issueTitle;
+	}
+	
+	private HBox createTopTitle(){
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
 		title.setSpacing(TITLE_SPACING);
@@ -96,12 +108,7 @@ public class IssueEditComponent extends VBox {
 			Browse.browse(issue.getHtmlUrl());
 		});
 		
-		TextArea issueTitle = new TextArea(issue.getTitle());
-		issueTitle.setPromptText("Title");
-		issueTitle.setPrefRowCount(3);
-		issueTitle.setPrefColumnCount(42);
-		issueTitle.setWrapText(true);
-		issueTitle.textProperty().addListener(new WeakChangeListener<String>(createIssueTitleChangeListener()));
+		TextArea issueTitle = createIssueTitle();
 		
 		Parent statusBox = createStatusBox(parentStage);
 		
@@ -110,19 +117,41 @@ public class IssueEditComponent extends VBox {
 		topLeft.setAlignment(Pos.CENTER);
 		topLeft.getChildren().addAll(issueId, statusBox);
 		
-		title.getChildren().addAll(topLeft, issueTitle);
+		int maxTitleHeight = TITLE_ROW_NUM * LINE_HEIGHT;
+		issueTitle.setMaxHeight(maxTitleHeight);
+		title.setMaxHeight(maxTitleHeight);
+		topLeft.setMaxHeight(maxTitleHeight);
 		
+		title.getChildren().addAll(topLeft, issueTitle);
+		return title;
+	}
+	
+	private TextArea createIssueDescription(){
 		TextArea issueDesc = new TextArea(issue.getDescription());
-		issueDesc.setPrefRowCount(8);
+		issueDesc.setPrefRowCount(DESC_ROW_NUM);
 		issueDesc.setPrefColumnCount(42);
 		issueDesc.setWrapText(true);
 		issueDesc.setPromptText("Description");
 		issueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
 
+		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
+		issueDesc.setMaxHeight(maxIssueDescHeight);
+		return issueDesc;
+	}
+	
+	private Parent top() {
+
+		HBox title = createTopTitle();
+		
+		TextArea issueDesc = createIssueDescription();
+
+		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
+		issueDesc.setMaxHeight(maxIssueDescHeight);
+		
 		VBox top = new VBox();
 		top.setSpacing(ELEMENT_SPACING);
 		top.getChildren().addAll(title, issueDesc);
-
+		top.setMaxHeight(maxIssueDescHeight + title.getMaxHeight());
 		return top;
 	}
 	
