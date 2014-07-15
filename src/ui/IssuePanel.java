@@ -7,7 +7,9 @@ import java.util.function.Predicate;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import model.TurboLabel;
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
@@ -47,6 +50,8 @@ public class IssuePanel extends VBox {
 	private Predicate<TurboIssue> predicate;
 	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
+	
+	private ListChangeListener<TurboIssue> listChangeListener;
 
 	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
 		this.mainStage = mainStage;
@@ -177,7 +182,7 @@ public class IssuePanel extends VBox {
 
 	private void setup() {
 		setPrefWidth(380);
-		setMaxWidth(380);
+		setMinWidth(380);
 		setVgrow(listView, Priority.ALWAYS);
 		getStyleClass().add("borders");
 		
@@ -279,8 +284,22 @@ public class IssuePanel extends VBox {
 	public void setItems(ObservableList<TurboIssue> issues) {
 		
 		this.issues = issues;
-		
-		refreshItems();
+		this.issues.addListener(new WeakListChangeListener<TurboIssue>(createIssuesListener()));
+	}
+
+	private ListChangeListener<TurboIssue> createIssuesListener() {
+		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
+		ListChangeListener<TurboIssue> listener = new ListChangeListener<TurboIssue>() {
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends TurboIssue> c) {
+				if(that.get() != null){
+					that.get().refreshItems();
+				}
+			}
+		};
+		listChangeListener = listener;
+		return listener;
 	}
 
 	public ObservableList<TurboIssue> getItems() {
