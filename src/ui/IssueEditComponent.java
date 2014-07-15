@@ -292,8 +292,9 @@ public class IssueEditComponent extends VBox {
 						existingIndex = i;
 					}
 				}
-				assert existingIndex != -1;
-				existingIndices.add(existingIndex);
+				if(existingIndex != -1){
+					existingIndices.add(existingIndex);
+				}
 			}
 			
 			(new CheckboxListDialog(stage, FXCollections
@@ -331,8 +332,9 @@ public class IssueEditComponent extends VBox {
 						existingIndex = i;
 					}
 				}
-				assert existingIndex != -1;
-				existingIndices.add(existingIndex);
+				if(existingIndex != -1){
+					existingIndices.add(existingIndex);
+				}
 			}
 			
 			(new CheckboxListDialog(stage, FXCollections
