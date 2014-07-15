@@ -8,7 +8,7 @@ public class GlobalButtonPanel extends VBox {
 
 	public GlobalButtonPanel(ColumnControl columns) {
 
-		Button addColumn = new Button("\u2795");
+		Button addColumn = new Button("\u271A");
 		addColumn.setStyle("-fx-font-size: 14pt;");
 		addColumn.setOnMouseClicked(columns::addColumnEvent);
 		

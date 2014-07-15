@@ -137,7 +137,7 @@ public class IssuePanel extends VBox {
 		
 		HBox rightAlignBox = new HBox();
 
-		Label addIssue = new Label("\u2795");
+		Label addIssue = new Label("\u271A");
 		addIssue.setStyle("-fx-font-size: 16pt;");
 		addIssue.setOnMouseClicked((e) -> {
 			TurboIssue issue = new TurboIssue("New issue", "", model);
@@ -156,7 +156,7 @@ public class IssuePanel extends VBox {
 			});
 		});
 		
-		Label closeList = new Label("\u274c");
+		Label closeList = new Label("\u2716");
 		closeList.setStyle("-fx-font-size: 16pt;");
 		closeList.setOnMouseClicked((e) -> {
 			parentColumnControl.closeColumn(columnIndex);
