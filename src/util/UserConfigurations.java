@@ -35,6 +35,10 @@ public class UserConfigurations {
 		}
 		return false;
 	}
+	
+	public static boolean isStatusLabel(String label){
+		return isOpenStatusLabel(label) || isClosedStatusLabel(label);
+	}
 
 	public static boolean isOpenStatusLabel(String label) {
 		for (String openLabel : openStatusLabels) {

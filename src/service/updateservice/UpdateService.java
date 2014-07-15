@@ -50,6 +50,7 @@ public class UpdateService<T> {
 		return request;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
 		try {
 			

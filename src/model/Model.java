@@ -22,8 +22,8 @@ import command.TurboIssueEdit;
 
 import service.ServiceManager;
 import util.CollectionUtilities;
-import util.ConfigFileHandler;
-import util.UserConfigurations;
+//import util.ConfigFileHandler;
+//import util.UserConfigurations;
 
 public class Model {
 	
@@ -39,7 +39,7 @@ public class Model {
 	
 	private IRepositoryIdProvider repoId;
 
-	private UserConfigurations config = ConfigFileHandler.loadConfig();
+//	private UserConfigurations config = ConfigFileHandler.loadConfig();
 	
 	public Model(){
 		

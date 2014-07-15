@@ -2,6 +2,7 @@ package model;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -174,11 +175,24 @@ public class TurboIssue implements Listable {
 	public boolean hasStatusLabel(){
 		for(TurboLabel label : labels){
 			String ghName = label.toGhName();
-			if(UserConfigurations.isClosedStatusLabel(ghName) || UserConfigurations.isOpenStatusLabel(ghName)){
+			if(UserConfigurations.isStatusLabel(ghName)){
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public TurboLabel getStatusLabel(){
+		List<TurboLabel> statusLabel = labels.stream().filter(l -> (UserConfigurations.isStatusLabel(l.toGhName()))).collect(Collectors.toList());
+		if(!statusLabel.isEmpty()){
+			return statusLabel.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	public List<TurboLabel> getNonStatusLabel(){
+		return labels.stream().filter(l -> (!UserConfigurations.isStatusLabel(l.toGhName()))).collect(Collectors.toList());
 	}
 	
 	public boolean hasLabel(TurboLabel label){
