@@ -41,9 +41,9 @@ public abstract class Column extends VBox {
 
 	private Predicate<TurboIssue> predicate = p -> true;
 	private String filterInput = "";
-	protected FilterExpression currentFilterExpression = EMPTY_PREDICATE;
-	protected ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	protected FilteredList<TurboIssue> filteredList = null;
+	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
+	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	private FilteredList<TurboIssue> filteredList = null;
 
 	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
 		this.mainStage = mainStage;
@@ -195,6 +195,10 @@ public abstract class Column extends VBox {
 		predicate = i -> temp.apply(i, model);
 		
 		refreshItems();
+	}
+	
+	public FilteredList<TurboIssue> getFilteredList() {
+		return filteredList;
 	}
 	
 	public void setItems(ObservableList<TurboIssue> items) {

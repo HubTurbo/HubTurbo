@@ -37,8 +37,6 @@ public class IssuePanel extends Column {
 		refreshItems();
 	}
 	
-	@SuppressWarnings("unused")
-	private ChangeListener<TurboIssue> listener;
 	@Override
 	public void deselect() {
 		listView.getSelectionModel().clearSelection();
@@ -64,10 +62,11 @@ public class IssuePanel extends Column {
 		// Supposedly this also causes the list view to update - not sure
 		// if it actually does on platforms other than Linux...
 		listView.setItems(null);
-		
-		listView.setItems(filteredList);
+		listView.setItems(getFilteredList());
 	}
 
+	@SuppressWarnings("unused")
+	private ChangeListener<TurboIssue> listener;
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
 		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
