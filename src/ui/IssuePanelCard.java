@@ -83,8 +83,4 @@ public class IssuePanelCard extends VBox {
 		
 		return titleChangeListener;
 	}
-
-	
-	
-	
 }

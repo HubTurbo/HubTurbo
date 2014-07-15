@@ -3,8 +3,8 @@ package ui;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Priority;
@@ -14,9 +14,6 @@ import model.Model;
 import model.TurboIssue;
 
 public class HierarchicalIssuePanel extends Columnable {
-
-//	private static final String NO_FILTER = "No Filter";
-//	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
 
 	private final Stage mainStage;
 	private final Model model;
@@ -46,7 +43,7 @@ public class HierarchicalIssuePanel extends Columnable {
 //		setupListView();
 //		getChildren().add(listView);
 //		predicate = p -> true;
-		
+
 		setup();
 		refreshItems();
 	}
@@ -73,16 +70,10 @@ public class HierarchicalIssuePanel extends Columnable {
 		
 		getChildren().clear();
 		
-		VBox stuff = new VBox();
-//		stuff.setStyle("-fx-background-color: red;");
-//		VBox.setVgrow(stuff, Priority.ALWAYS);
-		ScrollPane everything = new ScrollPane();
-		VBox.setVgrow(everything, Priority.ALWAYS);
-//		everything.setStyle("-fx-background-color: green;");
-//		setStyle("-fx-background-color: blue;");
-		
-//		System.out.println("rf");
-		
+		VBox allContent = new VBox();
+		ScrollPane scrollPane = new ScrollPane();
+		VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
 		// Create all the items
 		
 		int size = issues.size()+1;
@@ -103,17 +94,14 @@ public class HierarchicalIssuePanel extends Columnable {
 		// Another pass to add root children to the main component
 		for (TurboIssue issue : issues) {
 			if (!notRootChildren[issue.getId()]) {
-				stuff.getChildren().add(items[issue.getId()]);
+				allContent.getChildren().add(items[issue.getId()]);
 			}
 		}
 		
-//		for (TurboIssue issue : issues) {
-			
-//			stuff.getChildren().add(new HierarchicalIssuePanelItem(issue));
-//		}
-		
-		everything.setContent(stuff);
-		getChildren().add(everything);
+		scrollPane.setContent(allContent);
+		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+		getChildren().add(scrollPane);
 		
 //		filteredList = new FilteredList<TurboIssue>(issues, predicate);
 		

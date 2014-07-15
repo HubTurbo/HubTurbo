@@ -222,55 +222,55 @@ public class IssuePanel extends Columnable {
 	}
 
 	private void setup() {
-			setPrefWidth(380);
-			setMaxWidth(380);
-			setVgrow(listView, Priority.ALWAYS);
-	//		HBox.setHgrow(this, Priority.ALWAYS);
-			getStyleClass().add("borders");
-			
-			setOnDragOver(e -> {
-				if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-					e.acceptTransferModes(TransferMode.MOVE);
+		setPrefWidth(380);
+		setMaxWidth(380);
+		setVgrow(listView, Priority.ALWAYS);
+//		HBox.setHgrow(this, Priority.ALWAYS);
+		getStyleClass().add("borders");
+		
+		setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				e.acceptTransferModes(TransferMode.MOVE);
+			}
+		});
+
+		setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
+				if (dd.getColumnIndex() != columnIndex) {
+					getStyleClass().add("dragged-over");
 				}
-			});
-	
-			setOnDragEntered(e -> {
-				if (e.getDragboard().hasString()) {
-					IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
-					if (dd.getColumnIndex() != columnIndex) {
-						getStyleClass().add("dragged-over");
+			}
+			e.consume();
+		});
+
+		setOnDragExited(e -> {
+			getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+		
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				success = true;
+				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
+								
+				// Find the right issue from its ID
+				TurboIssue rightIssue = null;
+				for (TurboIssue i : model.getIssues()) {
+					if (i.getId() == dd.getIssueIndex()) {
+						rightIssue = i;
 					}
 				}
-				e.consume();
-			});
-	
-			setOnDragExited(e -> {
-				getStyleClass().remove("dragged-over");
-				e.consume();
-			});
-			
-			setOnDragDropped(e -> {
-				Dragboard db = e.getDragboard();
-				boolean success = false;
-				if (db.hasString()) {
-					success = true;
-					IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
-									
-					// Find the right issue from its ID
-					TurboIssue rightIssue = null;
-					for (TurboIssue i : model.getIssues()) {
-						if (i.getId() == dd.getIssueIndex()) {
-							rightIssue = i;
-						}
-					}
-					assert rightIssue != null;
-					applyCurrentFilterExpressionToIssue(rightIssue, true);
-				}
-				e.setDropCompleted(success);
-	
-				e.consume();
-			});
-		}
+				assert rightIssue != null;
+				applyCurrentFilterExpressionToIssue(rightIssue, true);
+			}
+			e.setDropCompleted(success);
+
+			e.consume();
+		});
+	}
 
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
 		if (currentFilterExpression != EMPTY_PREDICATE) {
