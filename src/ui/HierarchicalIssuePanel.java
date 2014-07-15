@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
-public class HierarchicalIssuePanel extends Columnable {
+public class HierarchicalIssuePanel extends Column {
 
 	private final Stage mainStage;
 	private final Model model;
@@ -30,6 +30,7 @@ public class HierarchicalIssuePanel extends Columnable {
 //	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
 	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
+		super(mainStage, model, parentColumnControl, sidePanel, columnIndex);
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
@@ -38,7 +39,7 @@ public class HierarchicalIssuePanel extends Columnable {
 
 //		getChildren().add(createTop());
 		
-		issues = FXCollections.observableArrayList();
+//		issues = FXCollections.observableArrayList();
 //		listView = new ListView<>();
 //		setupListView();
 //		getChildren().add(listView);

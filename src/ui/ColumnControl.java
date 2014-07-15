@@ -31,16 +31,16 @@ public class ColumnControl extends HBox {
 	}
 	
 	public void refresh() {
-		getChildren().forEach(child -> ((Columnable) child).refreshItems());
+		getChildren().forEach(child -> ((Column) child).refreshItems());
 	}
 	
 	public void deselect() {
-		getChildren().forEach(child -> ((Columnable) child).deselect());
+		getChildren().forEach(child -> ((Column) child).deselect());
 	}
 
 	public void loadIssues() {
 		for (Node node : getChildren()) {
-			Columnable panel = (Columnable) node;
+			Column panel = (Column) node;
 			panel.setItems(model.getIssues());
 		}
 	}
@@ -50,7 +50,8 @@ public class ColumnControl extends HBox {
 	}
 	
 	public ColumnControl addColumn() {
-		Columnable panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size());
+		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size());
+//		Columnable panel = new HierarchicalIssuePanel(stage, model, this, sidePanel, getChildren().size());
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		
