@@ -26,13 +26,7 @@ public class HierarchicalIssuePanel extends Column {
 	
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
-
-//	private FilteredList<TurboIssue> filteredList;
 	
-//	private Predicate<TurboIssue> predicate;
-//	private String filterInput = "";
-//	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
-
 	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 //		this.mainStage = mainStage;
@@ -52,7 +46,6 @@ public class HierarchicalIssuePanel extends Column {
 	
 	@Override
 	public void deselect() {
-		
 		// TODO provide something here
 //		listView.getSelectionModel().clearSelection();
 	}

@@ -56,10 +56,8 @@ public class ColumnControl extends HBox {
 	
 	public ColumnControl addColumn() {
 		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
-//		Columnable panel = new HierarchicalIssuePanel(stage, model, this, sidePanel, getChildren().size());
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
-		
 		return this;
 	}
 
@@ -73,6 +71,17 @@ public class ColumnControl extends HBox {
 		for (Node c : getChildren()) {
 			((Column) c).updateIndex(i++);
 		}
+	}
+	
+	public void toggleColumn(int index) {
+		Column column;
+		if (getChildren().get(index) instanceof HierarchicalIssuePanel) {
+			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
+		} else {
+			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
+		}
+		column.setItems(model.getIssues());
+		getChildren().set(index, column);
 	}
 	
 	public ColumnControl setColumnCount(int to) {
@@ -94,9 +103,5 @@ public class ColumnControl extends HBox {
 		}
 		
 		return this;
-	}
-
-	public void toggleColumn(Column column) {
-		
 	}
 }

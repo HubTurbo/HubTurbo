@@ -1,15 +1,8 @@
 package ui;
 
-import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import command.CommandType;
-import command.TurboCommandExecutor;
-import filter.FilterExpression;
-import filter.ParseException;
-import filter.Parser;
-import filter.PredicateApplicationException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -25,6 +18,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import command.CommandType;
+import command.TurboCommandExecutor;
+
+import filter.FilterExpression;
+import filter.ParseException;
+import filter.Parser;
+import filter.PredicateApplicationException;
 
 public abstract class Column extends VBox {
 	
@@ -124,8 +125,6 @@ public abstract class Column extends VBox {
 		
 		HBox rightAlignBox = new HBox();
 	
-		WeakReference<Column> selfRef = new WeakReference<Column>(this);
-		
 		Label addIssue = new Label("\u271A");
 		addIssue.setStyle("-fx-font-size: 16pt;");
 		addIssue.setOnMouseClicked((e) -> {
@@ -154,7 +153,7 @@ public abstract class Column extends VBox {
 		Label toggleHierarchyMode = new Label("\u27A5");
 		toggleHierarchyMode.setStyle("-fx-font-size: 16pt;");
 		toggleHierarchyMode.setOnMouseClicked((e) -> {
-			parentColumnControl.toggleColumn(selfRef.get());
+			parentColumnControl.toggleColumn(columnIndex);
 		});
 
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
