@@ -127,8 +127,7 @@ public class Predicate implements FilterExpression {
 		
 		switch (name) {
 		case "title":
-			issue.setTitle(content);
-			break;
+			throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
 		case "milestone":
 			// Find milestones containing the partial title
 			List<TurboMilestone> milestones = model.getMilestones().stream().filter(m -> m.getTitle().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
