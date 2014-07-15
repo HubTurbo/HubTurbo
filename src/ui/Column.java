@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -123,7 +124,9 @@ public abstract class Column extends VBox {
 		
 		HBox rightAlignBox = new HBox();
 	
-		Label addIssue = new Label("\u2795");
+		WeakReference<Column> selfRef = new WeakReference<Column>(this);
+		
+		Label addIssue = new Label("\u271A");
 		addIssue.setStyle("-fx-font-size: 16pt;");
 		addIssue.setOnMouseClicked((e) -> {
 			TurboIssue issue = new TurboIssue("New issue", "", model);
@@ -142,10 +145,10 @@ public abstract class Column extends VBox {
 			});
 		});
 		
-		Label closeList = new Label("\u274c");
+		Label closeList = new Label("\u2716");
 		closeList.setStyle("-fx-font-size: 16pt;");
 		closeList.setOnMouseClicked((e) -> {
-			parentColumnControl.closeColumn(columnIndex);
+			parentColumnControl.closeColumn(selfRef.get());
 		});
 		
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));

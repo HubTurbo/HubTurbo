@@ -70,6 +70,10 @@ public class ColumnControl extends HBox {
 	public void closeColumn(int index) {
 		getChildren().remove(index);
 	}
+	
+	public void closeColumn(Column col){
+		getChildren().remove(col);
+	}
 
 	public ColumnControl setColumnCount(int to) {
 		ObservableList<Node> panels = getChildren();
