@@ -165,7 +165,6 @@ public class Predicate implements FilterExpression {
 		for (TurboLabel l : issue.getLabels()) {
 			if (labelName == null || l.getName().toLowerCase().contains(labelName)) {
 				if(l.getGroup() == null){
-					System.out.println(group);
 					return group == null || group == "";
 				}
 				if (group == null || l.getGroup().toLowerCase().contains(group)) {
