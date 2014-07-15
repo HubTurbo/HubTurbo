@@ -179,7 +179,6 @@ public class IssuePanel extends VBox {
 		setPrefWidth(380);
 		setMaxWidth(380);
 		setVgrow(listView, Priority.ALWAYS);
-//		HBox.setHgrow(this, Priority.ALWAYS);
 		getStyleClass().add("borders");
 		
 		setOnDragOver(e -> {

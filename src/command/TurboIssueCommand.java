@@ -52,7 +52,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for(TurboLabel label : addedParent.getLabels()){
-			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
+			if(!UserConfigurations.isNonInheritedLabel(label.toGhName())){
 				issue.addLabel(label);
 			}
 		}
@@ -65,7 +65,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for (TurboLabel label : removedParent.getLabels()) {
-			if(!UserConfigurations.isExcludedLabel(label.toGhName())){
+			if(!UserConfigurations.isNonInheritedLabel(label.toGhName())){
 				issue.removeLabel(label);
 			}
 		}

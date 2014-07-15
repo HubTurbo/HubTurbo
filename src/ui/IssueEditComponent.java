@@ -89,7 +89,8 @@ public class IssueEditComponent extends VBox {
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
 		title.setSpacing(TITLE_SPACING);
-
+		
+		// TODO ALIGNMENT
 		Text issueId = new Text("#" + issue.getId());
 		issueId.setStyle("-fx-font-size: 16pt;");
 		issueId.setOnMouseClicked(e -> {

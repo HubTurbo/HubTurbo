@@ -1,5 +1,5 @@
 {
-  "excludedLabels": [
+  "nonInheritedLabels": [
     "status.",
     "type."
   ],

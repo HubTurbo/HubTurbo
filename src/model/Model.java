@@ -19,10 +19,10 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import command.TurboIssueEdit;
-
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
+import util.Defaults;
 import util.UserConfigurations;
 
 public class Model {
@@ -289,27 +289,19 @@ public class Model {
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
-		List<String> standardStatuses =new ArrayList<String>();
-		standardStatuses.add("status.new");
-		standardStatuses.add("status.accepted");
-		standardStatuses.add("status.started");
-		standardStatuses.add("status.fixed");
-		standardStatuses.add("status.verified");
-		standardStatuses.add("status.invalid");
-		standardStatuses.add("status.duplicate");
-		standardStatuses.add("status.wontfix");
-		standardStatuses.add("status.done");
+		List<String> defaultStatuses = Defaults.getDefaultStatusLabels();
 		List<String> projectLabels = new ArrayList<String>();
 		for (Label label : ghLabels) {
 			projectLabels.add(label.getName());
 		}
-		standardStatuses.removeAll(projectLabels);
-		for (String standardStatus : standardStatuses) {
+		defaultStatuses.removeAll(projectLabels);
+		for (String standardStatus : defaultStatuses) {
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
-			if (standardStatus.endsWith("new") ||
-				standardStatus.endsWith("accepted") ||
-				standardStatus.endsWith("started")) {
+			if (standardStatus.endsWith(".new") ||
+				standardStatus.endsWith(".accepted") ||
+				standardStatus.endsWith(".started") ||
+				standardStatus.endsWith(".reopened")) {
 				statusLabel.setColor("009800");
 			} else {
 				statusLabel.setColor("0052cc");

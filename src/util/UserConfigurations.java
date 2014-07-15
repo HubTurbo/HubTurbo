@@ -5,9 +5,9 @@ import java.util.List;
 
 public class UserConfigurations {
 	
-	private static List<String> excludedLabels;
+	private static List<String> nonInheritedLabels;
 	public List<String> getExcludedLabels() {
-		return Collections.unmodifiableList(excludedLabels);
+		return Collections.unmodifiableList(nonInheritedLabels);
 	}
 	
 	private static List<String> openStatusLabels;
@@ -22,14 +22,30 @@ public class UserConfigurations {
 	
 	UserConfigurations(List<String> excludedLabels, 
 			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		UserConfigurations.excludedLabels = excludedLabels;
+		UserConfigurations.nonInheritedLabels = excludedLabels;
 		UserConfigurations.openStatusLabels = openStatusLabels;
 		UserConfigurations.closedStatusLabels = closedStatusLabels;
+		boolean isModified = false;
+		if (UserConfigurations.nonInheritedLabels.isEmpty()) {
+			UserConfigurations.nonInheritedLabels.addAll(Defaults.getDefaultNonInheritedLabels());
+			isModified = true;
+		}
+		if (UserConfigurations.openStatusLabels.isEmpty()) {
+			UserConfigurations.openStatusLabels.addAll(Defaults.getDefaultOpenStatusLabels());
+			isModified = true;
+		}
+		if (UserConfigurations.closedStatusLabels.isEmpty()) {
+			UserConfigurations.closedStatusLabels.addAll(Defaults.getDefaultClosedStatusLabels());
+			isModified = true;
+		}
+		if (isModified) {
+			ConfigFileHandler.saveConfig(this);
+		}
 	}
 	
-	public static boolean isExcludedLabel(String label) {
-		for (String excluded : excludedLabels) {
-			if (label.contains(excluded)) {
+	public static boolean isNonInheritedLabel(String label) {
+		for (String nonInherited : nonInheritedLabels) {
+			if (label.contains(nonInherited)) {
 				return true;
 			}
 		}
