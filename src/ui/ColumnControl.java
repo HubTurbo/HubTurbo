@@ -63,18 +63,18 @@ public class ColumnControl extends HBox {
 		return this;
 	}
 
-	public IssuePanel getColumn(int index) {
-		return (IssuePanel) getChildren().get(index);
+	public Column getColumn(int index) {
+		return (Column) getChildren().get(index);
 	}
 	
 	public void closeColumn(int index) {
 		getChildren().remove(index);
+		int i = 0;
+		for (Node c : getChildren()) {
+			((Column) c).updateIndex(i++);
+		}
 	}
 	
-	public void closeColumn(Column col){
-		getChildren().remove(col);
-	}
-
 	public ColumnControl setColumnCount(int to) {
 		ObservableList<Node> panels = getChildren();
 		int panelSize = panels.size();
@@ -94,5 +94,9 @@ public class ColumnControl extends HBox {
 		}
 		
 		return this;
+	}
+
+	public void toggleColumn(Column column) {
+		
 	}
 }

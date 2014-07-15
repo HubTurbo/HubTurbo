@@ -39,7 +39,7 @@ public abstract class Column extends VBox {
 	private final Stage mainStage;
 	private final Model model;
 	private final ColumnControl parentColumnControl;
-	private final int columnIndex;
+	private int columnIndex;
 	private final SidePanel sidePanel;
 
 	private Predicate<TurboIssue> predicate = p -> true;
@@ -148,14 +148,20 @@ public abstract class Column extends VBox {
 		Label closeList = new Label("\u2716");
 		closeList.setStyle("-fx-font-size: 16pt;");
 		closeList.setOnMouseClicked((e) -> {
-			parentColumnControl.closeColumn(selfRef.get());
+			parentColumnControl.closeColumn(columnIndex);
 		});
 		
+		Label toggleHierarchyMode = new Label("\u27A5");
+		toggleHierarchyMode.setStyle("-fx-font-size: 16pt;");
+		toggleHierarchyMode.setOnMouseClicked((e) -> {
+			parentColumnControl.toggleColumn(selfRef.get());
+		});
+
 		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
 		rightAlignBox.setSpacing(5);
 		rightAlignBox.setAlignment(Pos.TOP_RIGHT);
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
-		rightAlignBox.getChildren().addAll(addIssue, closeList);
+		rightAlignBox.getChildren().addAll(toggleHierarchyMode, addIssue, closeList);
 		
 		HBox topBox = new HBox();
 		topBox.setSpacing(5);
@@ -236,6 +242,10 @@ public abstract class Column extends VBox {
 				parentColumnControl.displayMessage(ex.getMessage());
 			}
 		}
+	}
+	
+	public void updateIndex(int updated) {
+		columnIndex = updated;
 	}
 
 }
