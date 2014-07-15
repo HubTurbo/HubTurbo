@@ -60,7 +60,7 @@ public class BetterCheckListView extends VBox {
 			        		for (BetterCheckListItem item : that.get().items) {
 			        			item.setChecked(false);
 			        		}
-			        		that.get().items.get(j).setChecked(true);
+			        		that.get().items.get(j).setChecked(newValue);
 			        		disabled = false;
 			        	}
 		        	}
