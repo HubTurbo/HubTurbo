@@ -21,7 +21,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
@@ -32,7 +31,7 @@ import filter.ParseException;
 import filter.Parser;
 import filter.PredicateApplicationException;
 
-public class IssuePanel extends VBox {
+public class IssuePanel extends Columnable {
 
 	private static final String NO_FILTER = "No Filter";
 	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
@@ -72,12 +71,54 @@ public class IssuePanel extends VBox {
 		refreshItems();
 	}
 	
+	@SuppressWarnings("unused")
+	private ChangeListener<TurboIssue> listener;
+	@Override
 	public void deselect() {
 		listView.getSelectionModel().clearSelection();
 	}
+
+	public void filter(FilterExpression filter) {
+		currentFilterExpression = filter;
+
+		// This cast utilises a functional interface
+		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
+		predicate = i -> temp.apply(i, model);
+		
+		refreshItems();
+	}
 	
-	@SuppressWarnings("unused")
-	private ChangeListener<TurboIssue> listener;
+	@Override
+	public void refreshItems() {
+		filteredList = new FilteredList<TurboIssue>(issues, predicate);
+		
+		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
+		
+		// Set the cell factory every time - this forces the list view to update
+		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
+			@Override
+			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
+				if(that.get() != null){
+					return new IssuePanelCell(mainStage, model, that.get(), columnIndex);
+				} else{
+					return null;
+				}
+			}
+		});
+		
+		// Supposedly this also causes the list view to update - not sure
+		// if it actually does on platforms other than Linux...
+		listView.setItems(null);
+		
+		listView.setItems(filteredList);
+	}
+
+	@Override
+	public void setItems(ObservableList<TurboIssue> issues) {
+		this.issues = issues;
+		refreshItems();
+	}
+
 	private void setupListView() {
 		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
 			listener = (observable, previousIssue, currentIssue) -> {
@@ -181,55 +222,56 @@ public class IssuePanel extends VBox {
 	}
 
 	private void setup() {
-		setPrefWidth(380);
-		setMinWidth(380);
-		setVgrow(listView, Priority.ALWAYS);
-		getStyleClass().add("borders");
-		
-		setOnDragOver(e -> {
-			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-				e.acceptTransferModes(TransferMode.MOVE);
-			}
-		});
-
-		setOnDragEntered(e -> {
-			if (e.getDragboard().hasString()) {
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
-				if (dd.getColumnIndex() != columnIndex) {
-					getStyleClass().add("dragged-over");
+			setPrefWidth(380);
+			setMaxWidth(380);
+			setVgrow(listView, Priority.ALWAYS);
+	//		HBox.setHgrow(this, Priority.ALWAYS);
+			getStyleClass().add("borders");
+			
+			setOnDragOver(e -> {
+				if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+					e.acceptTransferModes(TransferMode.MOVE);
 				}
-			}
-			e.consume();
-		});
-
-		setOnDragExited(e -> {
-			getStyleClass().remove("dragged-over");
-			e.consume();
-		});
-		
-		setOnDragDropped(e -> {
-			Dragboard db = e.getDragboard();
-			boolean success = false;
-			if (db.hasString()) {
-				success = true;
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
-								
-				// Find the right issue from its ID
-				TurboIssue rightIssue = null;
-				for (TurboIssue i : model.getIssues()) {
-					if (i.getId() == dd.getIssueIndex()) {
-						rightIssue = i;
+			});
+	
+			setOnDragEntered(e -> {
+				if (e.getDragboard().hasString()) {
+					IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
+					if (dd.getColumnIndex() != columnIndex) {
+						getStyleClass().add("dragged-over");
 					}
 				}
-				assert rightIssue != null;
-				applyCurrentFilterExpressionToIssue(rightIssue, true);
-			}
-			e.setDropCompleted(success);
-
-			e.consume();
-		});
-	}
+				e.consume();
+			});
 	
+			setOnDragExited(e -> {
+				getStyleClass().remove("dragged-over");
+				e.consume();
+			});
+			
+			setOnDragDropped(e -> {
+				Dragboard db = e.getDragboard();
+				boolean success = false;
+				if (db.hasString()) {
+					success = true;
+					IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
+									
+					// Find the right issue from its ID
+					TurboIssue rightIssue = null;
+					for (TurboIssue i : model.getIssues()) {
+						if (i.getId() == dd.getIssueIndex()) {
+							rightIssue = i;
+						}
+					}
+					assert rightIssue != null;
+					applyCurrentFilterExpressionToIssue(rightIssue, true);
+				}
+				e.setDropCompleted(success);
+	
+				e.consume();
+			});
+		}
+
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
 		if (currentFilterExpression != EMPTY_PREDICATE) {
 			try {
@@ -245,68 +287,5 @@ public class IssuePanel extends VBox {
 				parentColumnControl.displayMessage(ex.getMessage());
 			}
 		}
-	}
-	
-	public void filter(FilterExpression filter) {
-		currentFilterExpression = filter;
-
-		// This cast utilises a functional interface
-		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
-		predicate = i -> temp.apply(i, model);
-		
-		refreshItems();
-	}
-	
-	public void refreshItems() {
-		filteredList = new FilteredList<TurboIssue>(issues, predicate);
-		
-		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
-		
-		// Set the cell factory every time - this forces the list view to update
-		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
-			@Override
-			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				if(that.get() != null){
-					return new IssuePanelCell(mainStage, model, that.get(), columnIndex);
-				} else{
-					return null;
-				}
-			}
-		});
-		
-		// Supposedly this also causes the list view to update - not sure
-		// if it actually does on platforms other than Linux...
-		listView.setItems(null);
-		
-		listView.setItems(filteredList);
-	}
-
-	public void setItems(ObservableList<TurboIssue> issues) {
-		this.issues = issues;
-		this.issues.addListener(new WeakListChangeListener<TurboIssue>(createIssuesListener()));
-		refreshItems();
-	}
-
-	private ListChangeListener<TurboIssue> createIssuesListener() {
-		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
-		ListChangeListener<TurboIssue> listener = new ListChangeListener<TurboIssue>() {
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends TurboIssue> c) {
-				if(that.get() != null){
-					that.get().refreshItems();
-				}
-			}
-		};
-		listChangeListener = listener;
-		return listener;
-	}
-
-	public ObservableList<TurboIssue> getItems() {
-		return issues;
-	}
-
-	public FilterExpression getCurrentFilterExpression() {
-		return currentFilterExpression;
 	}
 }
