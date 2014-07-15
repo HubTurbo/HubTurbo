@@ -4,6 +4,9 @@ import java.lang.ref.WeakReference;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import command.TurboCommandExecutor;
+import command.CommandType;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -47,13 +50,15 @@ public class IssuePanel extends VBox {
 	private Predicate<TurboIssue> predicate;
 	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
+	private TurboCommandExecutor dragAndDropExecutor;
 
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
+		this.dragAndDropExecutor = dragAndDropExecutor;
 
 		getChildren().add(createTop());
 		
@@ -231,7 +236,8 @@ public class IssuePanel extends VBox {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
 					TurboIssue clone = new TurboIssue(issue);
 					currentFilterExpression.applyTo(issue, model);
-					if (updateModel) model.updateIssue(clone, issue);
+//					if (updateModel) model.updateIssue(clone, issue);
+					dragAndDropExecutor.executeCommmand(CommandType.EDIT_ISSUE, model, clone, issue);
 					parentColumnControl.refresh();
 				} else {
 					throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
