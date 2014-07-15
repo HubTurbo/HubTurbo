@@ -5,9 +5,7 @@ import java.util.ArrayList;
 public class Parser {
 
 	public static void main(String[] args) {
-//		System.out.println(Parser.parse("e(f) (a(b) or c(d))"));
-//		System.out.println(Parser.parse("(title(one) or parent(issue)) ~milestone(0.1)"));
-//		FilterExpression p = Parser.parse("assignee:dar ius(one)");
+//		FilterExpression p = Parser.parse("~label(pri.)");
 //		System.out.println(p);
 	}
 	
@@ -93,9 +91,8 @@ public class Parser {
 	private int getInfixPrecedence() {
 		switch (lookAhead().getType()) {
 		case AND:
-		case SYMBOL:
+		case SYMBOL: // Implicit conjunction
 		case LBRACKET:
-			// Implicit conjunction
 			return Precedence.CONJUNCTION;
 		case OR:
 			return Precedence.DISJUNCTION;

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import util.Browse;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -14,16 +13,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+import util.Browse;
 
 public class IssueEditComponent extends VBox {
 
@@ -64,7 +65,7 @@ public class IssueEditComponent extends VBox {
 		ChangeListener<String> listener = (observable, oldValue, newValue) -> {
 			TurboIssue issue = issueRef.get();
 			if(issue != null){
-				issueRef.get().setTitle((String)newValue);
+				issueRef.get().setTitle(newValue);
 			}
 		};
 		changeListeners.add(listener);
@@ -76,7 +77,7 @@ public class IssueEditComponent extends VBox {
 		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
 			TurboIssue issue = issueRef.get();
         	if(issue != null){
-        		issue.setDescription((String)newValue);
+        		issue.setDescription(newValue);
         	}
 		};
 		changeListeners.add(listener);
@@ -88,8 +89,10 @@ public class IssueEditComponent extends VBox {
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
 		title.setSpacing(TITLE_SPACING);
-
-		Label issueId = new Label("#" + issue.getId());
+		
+		// TODO ALIGNMENT
+		Text issueId = new Text("#" + issue.getId());
+		issueId.setStyle("-fx-font-size: 16pt;");
 		issueId.setOnMouseClicked(e -> {
 			Browse.browse(issue.getHtmlUrl());
 		});
@@ -105,7 +108,7 @@ public class IssueEditComponent extends VBox {
 		
 		VBox topLeft = new VBox();
 		topLeft.setSpacing(5);
-		topLeft.setAlignment(Pos.CENTER_RIGHT);
+		topLeft.setAlignment(Pos.CENTER);
 		topLeft.getChildren().addAll(issueId, statusBox);
 		
 		title.getChildren().addAll(topLeft, issueTitle);
@@ -201,7 +204,7 @@ public class IssueEditComponent extends VBox {
 
 
 	private Parent createParentsBox(Stage stage) {
-		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue.parentIssueProperty(), true);
+		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue);
 		List<TurboIssue> allIssues = model.getIssues();
 		
 		parentsBox.setOnMouseClicked((e) -> {

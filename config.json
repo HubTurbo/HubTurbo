@@ -1,5 +1,5 @@
 {
-  "excludedLabels": [
+  "nonInheritedLabels": [
     "status.",
     "type."
   ],
@@ -10,6 +10,7 @@
     "status.reopened"
   ],
   "closedStatusLabels": [
+    "status.closed",
     "status.fixed",
     "status.verified",
     "status.invalid",

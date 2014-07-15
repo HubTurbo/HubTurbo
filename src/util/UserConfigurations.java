@@ -5,9 +5,9 @@ import java.util.List;
 
 public class UserConfigurations {
 	
-	private static List<String> excludedLabels;
-	public List<String> getExcludedLabels() {
-		return Collections.unmodifiableList(excludedLabels);
+	private static List<String> nonInheritedLabels;
+	public List<String> getNonInheritedLabels() {
+		return Collections.unmodifiableList(nonInheritedLabels);
 	}
 	
 	private static List<String> openStatusLabels;
@@ -20,16 +20,16 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
 	
-	UserConfigurations(List<String> excludedLabels, 
+	UserConfigurations(List<String> nonInheritedLabels, 
 			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		UserConfigurations.excludedLabels = excludedLabels;
+		UserConfigurations.nonInheritedLabels = nonInheritedLabels;
 		UserConfigurations.openStatusLabels = openStatusLabels;
 		UserConfigurations.closedStatusLabels = closedStatusLabels;
 	}
 	
-	public static boolean isExcludedLabel(String label) {
-		for (String excluded : excludedLabels) {
-			if (label.contains(excluded)) {
+	public static boolean isNonInheritedLabel(String label) {
+		for (String nonInherited : nonInheritedLabels) {
+			if (label.contains(nonInherited)) {
 				return true;
 			}
 		}

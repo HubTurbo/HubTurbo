@@ -8,23 +8,22 @@ import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import model.TurboIssue;
 
 public class ParentIssuesDisplayBox extends HBox {
 	
+	private TurboIssue issue;
 	private IntegerProperty issueNumber = null;
 	private ChangeListener<Number> changeListener;
-	private boolean displayWhenEmpty;
 	
-	public ParentIssuesDisplayBox(IntegerProperty item, boolean displayWhenEmpty) {
-		setListableItem(item);
-		this.displayWhenEmpty = displayWhenEmpty;
+	public ParentIssuesDisplayBox(TurboIssue issue) {
+		this.issue = issue;
+		setListableItem(issue.parentIssueProperty());
 		setup();
 	}
 	
 	private void setup() {
-		if (displayWhenEmpty) {
-			getStyleClass().add("faded-borders");
-		}
+		getStyleClass().add("faded-borders");
 		update();
 	}
 
@@ -56,12 +55,12 @@ public class ParentIssuesDisplayBox extends HBox {
 		getChildren().clear();
 
 		Label label;
-		if (displayWhenEmpty && issueNumber.get() <= 0) {
+		if (issueNumber.get() <= 0) {
 			label = new Label("Parent");
 			label.getStyleClass().addAll("faded", "display-box-padding");
 			getChildren().add(label);
 		} else {
-			String parentString = "#" + issueNumber.get();
+			String parentString = "#" + issueNumber.get() + " " + issue.parentReference().getTitle();
 			label = new Label(parentString);
 			label.getStyleClass().addAll("display-box-padding");
 			getChildren().add(label);
