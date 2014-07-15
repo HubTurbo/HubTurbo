@@ -54,7 +54,7 @@ public class Lexer {
 				return new Token(r.getTokenType(), match, matcher.start());
 			}
 		}
-		throw new IllegalArgumentException("Unrecognised token " + input.charAt(position) + " at " + position);
+		throw new ParseException("Unrecognised token " + input.charAt(position) + " at " + position);
 	}
 	
 	public ArrayList<Token> lex() {
