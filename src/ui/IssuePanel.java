@@ -2,6 +2,8 @@ package ui;
 
 import java.lang.ref.WeakReference;
 
+import command.TurboCommandExecutor;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.control.ListCell;
@@ -22,8 +24,8 @@ public class IssuePanel extends Column {
 
 	private ListView<TurboIssue> listView;
 	
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
-		super(mainStage, model, parentColumnControl, sidePanel, columnIndex);
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;

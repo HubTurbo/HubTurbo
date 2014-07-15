@@ -16,7 +16,7 @@ public class TurboCommandExecutor {
 		executionLog = new ArrayList<String>();
 	}
 	
-	public boolean executeCommmand(CommandType command, Model model, TurboIssue issue, Object... args){
+	public boolean executeCommand(CommandType command, Model model, TurboIssue issue, Object... args){
 		return executeCommand(command, "", model, issue, args);
 	}
 	

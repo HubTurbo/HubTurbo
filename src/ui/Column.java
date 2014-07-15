@@ -3,6 +3,8 @@ package ui;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import command.CommandType;
+import command.TurboCommandExecutor;
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
@@ -44,14 +46,16 @@ public abstract class Column extends VBox {
 	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList = null;
+	private TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
+	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
-
+		this.dragAndDropExecutor = dragAndDropExecutor;
+		
 		getChildren().add(createFilterBox());
 		setup();
 	}
@@ -218,7 +222,9 @@ public abstract class Column extends VBox {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
 					TurboIssue clone = new TurboIssue(issue);
 					currentFilterExpression.applyTo(issue, model);
-					if (updateModel) model.updateIssue(clone, issue);
+					if (updateModel){
+						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE,  model, clone, issue);
+					}
 					parentColumnControl.refresh();
 				} else {
 					throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");

@@ -1,5 +1,7 @@
 package ui;
 
+import command.TurboCommandExecutor;
+
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,8 +31,8 @@ public class HierarchicalIssuePanel extends Column {
 //	private String filterInput = "";
 //	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
 
-	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex) {
-		super(mainStage, model, parentColumnControl, sidePanel, columnIndex);
+	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;

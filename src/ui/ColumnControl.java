@@ -2,6 +2,8 @@ package ui;
 
 import org.controlsfx.control.NotificationPane;
 
+import command.TurboCommandExecutor;
+
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -15,13 +17,16 @@ public class ColumnControl extends HBox {
 	private final Model model;
 	private final NotificationPane notificationPane;
 	private final SidePanel sidePanel;
+	
+	private TurboCommandExecutor dragAndDropExecutor;
 
 	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane, SidePanel sidePanel) {
 		this.stage = stage;
 		this.model = model;
 		this.sidePanel = sidePanel;
 		this.notificationPane = notificationPane;
-
+		this.dragAndDropExecutor = new TurboCommandExecutor();
+		
 		addColumn();
 	}
 	
@@ -50,7 +55,7 @@ public class ColumnControl extends HBox {
 	}
 	
 	public ColumnControl addColumn() {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size());
+		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
 //		Columnable panel = new HierarchicalIssuePanel(stage, model, this, sidePanel, getChildren().size());
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
