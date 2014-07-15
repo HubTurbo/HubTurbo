@@ -213,12 +213,25 @@ public class TurboIssue implements Listable {
 		if(labels.contains(label)){
 			return;
 		}
+		if(label.isExclusive()){
+			removeLabelsWithGroup(label.getGroup());
+		}
 		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
 			this.setOpen(false);
 		}else if(UserConfigurations.isOpenStatusLabel(label.toGhName())){
 			this.setOpen(true);
 		}
 		addToLabels(label);
+	}
+	
+	private void removeLabelsWithGroup(String group){
+		removeLabels(getLabelsWithGroup(group));
+	}
+	
+	private List<TurboLabel> getLabelsWithGroup(String group){
+		return labels.stream()
+				.filter(label -> group.equalsIgnoreCase(label.getGroup()))
+				.collect(Collectors.toList());
 	}
 	
 	public void addLabels(List<TurboLabel> labList){
