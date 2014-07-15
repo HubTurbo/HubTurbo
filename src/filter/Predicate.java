@@ -91,7 +91,8 @@ public class Predicate implements FilterExpression {
 				labelName = content.substring(pos+1);
 			}
 			
-			assert group.isEmpty() != labelName.isEmpty();
+			// Both can't be empty
+			assert !(group.isEmpty() && labelName.isEmpty());
 			
 			for (TurboLabel l : issue.getLabels()) {
 				if (labelName == null || l.getName().toLowerCase().contains(labelName)) {
