@@ -27,7 +27,7 @@ import model.TurboMilestone;
 import model.TurboUser;
 import util.Browse;
 
-public class IssueEditComponent extends HBox {
+public class IssueDisplayPane extends HBox {
 	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
 	protected static final int LINE_HEIGHT = 18;
 	protected static final int TITLE_ROW_NUM = 3;
@@ -43,7 +43,7 @@ public class IssueEditComponent extends HBox {
 	
 	private final CompletableFuture<String> response;
 	
-	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
+	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
@@ -249,7 +249,7 @@ public class IssueEditComponent extends HBox {
 		ToggleButton details = new ToggleButton();
 		details.setText(ISSUE_DETAILS_BTN_TXT);
 		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
-		WeakReference<IssueEditComponent> mainRef = new WeakReference<IssueEditComponent>(this);
+		WeakReference<IssueDisplayPane> mainRef = new WeakReference<IssueDisplayPane>(this);
 		details.setOnAction((ActionEvent e) -> {
 		    boolean selected = ref.get().selectedProperty().get();
 		    System.out.println("Selected: " + selected);

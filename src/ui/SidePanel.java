@@ -134,7 +134,7 @@ public class SidePanel extends VBox {
 	}
 
 	private Node issueLayout() {
-		IssueEditComponent result = new IssueEditComponent(displayedIssue, parentStage, model, columns);
+		IssueDisplayPane result = new IssueDisplayPane(displayedIssue, parentStage, model, columns);
 		response = result.getResponse();
 		return result;
 	}

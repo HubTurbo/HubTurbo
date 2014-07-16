@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.NotificationPane;
@@ -92,10 +93,10 @@ public class UI extends Application {
 //		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
 //		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
 		
-        SplitPane splitPane = new SplitPane();
-		splitPane.getItems().addAll(sidePanel, root);
-		splitPane.setDividerPositions(0.4);
+        HBox sideContainer = new HBox();
+        sideContainer.getChildren().addAll(sidePanel, root);
+//        sideContainer.setDividerPositions(0.4);
 
-		return splitPane;
+		return sideContainer;
 	}
 }
