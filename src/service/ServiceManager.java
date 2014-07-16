@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 
 public class ServiceManager {
@@ -283,6 +284,10 @@ public class ServiceManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public CommentUpdateService getCommentUpdateService(int id, List<Comment> list){
+		return new CommentUpdateService(githubClient, id, list);
 	}
 	
 	public Comment createComment(int issueId, String comment) throws IOException{

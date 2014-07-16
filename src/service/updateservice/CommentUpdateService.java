@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
@@ -18,11 +20,14 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 import com.google.gson.reflect.TypeToken;
 
 import service.GitHubClientExtended;
+import service.ServiceManager;
 
 public class CommentUpdateService extends UpdateService<Comment>{
 	
 	private int issueId;
 	private List<Comment> commentsList;
+	private long pollInterval = 60000; //time between polls in ms
+	private Timer pollTimer;
 	
 	public CommentUpdateService(GitHubClientExtended client, int issueId, List<Comment> list) {
 		super(client);
@@ -77,4 +82,21 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		}
 	}
 	
+	public void startCommentsListUpdate(){
+		stopCommentsListUpdate();
+		pollTimer = new Timer();
+		TimerTask pollTask = new TimerTask(){
+			@Override
+			public void run() {
+				updateCachedComments(ServiceManager.getInstance().getRepoId());
+			}
+		};
+		pollTimer.scheduleAtFixedRate(pollTask, 0, pollInterval);
+	}
+	
+	public void stopCommentsListUpdate(){
+		if(pollTimer != null){
+			pollTimer.cancel();
+		}
+	}
 }
