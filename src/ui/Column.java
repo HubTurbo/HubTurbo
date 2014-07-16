@@ -195,7 +195,7 @@ public abstract class Column extends VBox {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-				filterByString("parent(" + rightIssue.getTitle() + ")");
+				filterByString("parent(#" + rightIssue.getId() + ")");
 			}
 			e.setDropCompleted(success);
 
@@ -239,6 +239,7 @@ public abstract class Column extends VBox {
 	
 	public void filter(FilterExpression filter) {
 		currentFilterExpression = filter;
+		
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
@@ -279,6 +280,10 @@ public abstract class Column extends VBox {
 				parentColumnControl.displayMessage(ex.getMessage());
 			}
 		}
+	}
+	
+	public FilterExpression getCurrentFilterExpression() {
+		return currentFilterExpression;
 	}
 	
 	public void updateIndex(int updated) {

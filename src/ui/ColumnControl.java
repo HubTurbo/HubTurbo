@@ -1,15 +1,17 @@
 package ui;
 
-import org.controlsfx.control.NotificationPane;
-
-import command.TurboCommandExecutor;
-
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+
+import org.controlsfx.control.NotificationPane;
+
+import command.TurboCommandExecutor;
+
+import filter.FilterExpression;
 
 public class ColumnControl extends HBox {
 
@@ -75,12 +77,17 @@ public class ColumnControl extends HBox {
 	
 	public void toggleColumn(int index) {
 		Column column;
-		if (getChildren().get(index) instanceof HierarchicalIssuePanel) {
+		Column current = (Column) getChildren().get(index);
+		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
+		System.out.println(currentFilterExpr);
+		if (current instanceof HierarchicalIssuePanel) {
 			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
 		} else {
 			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
 		}
 		column.setItems(model.getIssues());
+		column.filter(currentFilterExpr);
+		System.out.println(column.getCurrentFilterExpression());
 		getChildren().set(index, column);
 	}
 	
