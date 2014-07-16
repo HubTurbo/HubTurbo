@@ -70,13 +70,16 @@ public abstract class Column extends VBox {
 		
 		setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-				e.acceptTransferModes(TransferMode.MOVE);
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					e.acceptTransferModes(TransferMode.MOVE);
+				}
 			}
 		});
 
 		setOnDragEntered(e -> {
 			if (e.getDragboard().hasString()) {
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
 				if (dd.getColumnIndex() != columnIndex) {
 					getStyleClass().add("dragged-over");
 				}
@@ -94,7 +97,7 @@ public abstract class Column extends VBox {
 			boolean success = false;
 			if (db.hasString()) {
 				success = true;
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
+				DragData dd = DragData.deserialise(db.getString());
 								
 				// Find the right issue from its ID
 				TurboIssue rightIssue = null;
