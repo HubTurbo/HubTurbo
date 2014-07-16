@@ -124,6 +124,7 @@ public class HierarchicalIssuePanel extends Column {
 				assert items.get(issue.getParentIssue()) != null;
 				items.get(issue.getParentIssue()).addChild(items.get(issue.getId()));
 			}
+			items.get(issue.getId()).setExpanded(true);
 		}
 	}
 }
