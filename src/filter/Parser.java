@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class Parser {
 
 	public static void main(String[] args) {
-//		FilterExpression p = Parser.parse("~label(pri.)");
-//		System.out.println(p);
+		FilterExpression p = Parser.parse("milestone(0.4) state(open) or label(urgent)");
+		System.out.println(p);
 	}
 	
 	private Parser(ArrayList<Token> input) {
@@ -58,12 +58,11 @@ public class Parser {
 			throw new ParseException("Invalid prefix token " + token);
 		}
 		
-		token = lookAhead();
-		if (token.getType() == TokenType.EOF) return left;
+		if (lookAhead().getType() == TokenType.EOF) return left;
 
 		// Infix
 		
-		while (precedence < getInfixPrecedence()) {
+		while (precedence < getInfixPrecedence(token = lookAhead())) {
 			switch (token.getType()) {
 			case AND:
 				consume();
@@ -88,8 +87,8 @@ public class Parser {
 		return left;
 	}
 
-	private int getInfixPrecedence() {
-		switch (lookAhead().getType()) {
+	private int getInfixPrecedence(Token token) {
+		switch (token.getType()) {
 		case AND:
 		case SYMBOL: // Implicit conjunction
 		case LBRACKET:
