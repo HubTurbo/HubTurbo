@@ -77,20 +77,24 @@ public class IssuePanel extends Column {
 				
 				// TODO save the previous issue?
 				
-				TurboIssue oldIssue = new TurboIssue(currentIssue);
-				TurboIssue modifiedIssue = new TurboIssue(currentIssue);
-				sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
-					if (r.equals("done")) {
-						System.out.println("was okay");
-						model.updateIssue(oldIssue, modifiedIssue);
-					}
-					parentColumnControl.refresh();
-					sidePanel.displayTabs();
-					return true;
-				}).exceptionally(e -> {
-					e.printStackTrace();
-					return false;
-				});
+				triggerIssueEdit(currentIssue);
 			}));
+	}
+
+	private void triggerIssueEdit(TurboIssue currentIssue) {
+		TurboIssue oldIssue = new TurboIssue(currentIssue);
+		TurboIssue modifiedIssue = new TurboIssue(currentIssue);
+		sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
+			if (r.equals("done")) {
+				System.out.println("was okay");
+				model.updateIssue(oldIssue, modifiedIssue);
+			}
+			parentColumnControl.refresh();
+			sidePanel.displayTabs();
+			return true;
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return false;
+		});
 	}
 }

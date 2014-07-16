@@ -13,16 +13,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends Column {
 
 //	private final Stage mainStage;
 	private final Model model;
-//	private final ColumnControl parentColumnControl;
+	private final ColumnControl parentColumnControl;
 //	private final int columnIndex;
-//	private final SidePanel sidePanel;
+	private final SidePanel sidePanel;
 	
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
@@ -31,9 +30,9 @@ public class HierarchicalIssuePanel extends Column {
 		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 //		this.mainStage = mainStage;
 		this.model = model;
-//		this.parentColumnControl = parentColumnControl;
+		this.parentColumnControl = parentColumnControl;
 //		this.columnIndex = columnIndex;
-//		this.sidePanel = sidePanel;
+		this.sidePanel = sidePanel;
 
 		VBox.setVgrow(scrollPane, Priority.ALWAYS);
 		scrollPane.setContent(content);
@@ -46,8 +45,7 @@ public class HierarchicalIssuePanel extends Column {
 	
 	@Override
 	public void deselect() {
-		// TODO provide something here
-//		listView.getSelectionModel().clearSelection();
+		// Nothing here
 	}
 	
 	@Override
@@ -124,7 +122,28 @@ public class HierarchicalIssuePanel extends Column {
 				assert items.get(issue.getParentIssue()) != null;
 				items.get(issue.getParentIssue()).addChild(items.get(issue.getId()));
 			}
-			items.get(issue.getId()).setExpanded(true);
+			
+			HierarchicalIssuePanelItem item = items.get(issue.getId());
+			item.setExpanded(true);
+			final TurboIssue thisIssue = issue;
+			item.setOnMouseClicked(e -> triggerIssueEdit(thisIssue));
 		}
+	}
+	
+	private void triggerIssueEdit(TurboIssue currentIssue) {
+		TurboIssue oldIssue = new TurboIssue(currentIssue);
+		TurboIssue modifiedIssue = new TurboIssue(currentIssue);
+		sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
+			if (r.equals("done")) {
+				System.out.println("was okay");
+				model.updateIssue(oldIssue, modifiedIssue);
+			}
+			parentColumnControl.refresh();
+			sidePanel.displayTabs();
+			return true;
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return false;
+		});
 	}
 }
