@@ -9,11 +9,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -25,7 +27,8 @@ import model.TurboMilestone;
 import model.TurboUser;
 import util.Browse;
 
-public class IssueEditComponent extends VBox {
+public class IssueEditComponent extends HBox {
+	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
 	protected static final int LINE_HEIGHT = 18;
 	protected static final int TITLE_ROW_NUM = 3;
 	protected static final int DESC_ROW_NUM = 8;
@@ -35,6 +38,9 @@ public class IssueEditComponent extends VBox {
 	private final Stage parentStage;
 	private ColumnControl columns;
 	
+	private IssueDetailsDisplay issueDetailsDisplay;
+	private VBox issueEditDisplay;
+	
 	private final CompletableFuture<String> response;
 	
 	public IssueEditComponent(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
@@ -43,6 +49,8 @@ public class IssueEditComponent extends VBox {
 		this.parentStage = parentStage;
 		this.response = new CompletableFuture<>();
 		this.columns = columns;
+		this.issueEditDisplay = new VBox();
+		this.issueDetailsDisplay = new IssueDetailsDisplay(parentStage);
 		setup();
 	}
 	
@@ -57,9 +65,10 @@ public class IssueEditComponent extends VBox {
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
 	private void setup() {
-		setPadding(new Insets(15));
-		setSpacing(MIDDLE_SPACING);
-		getChildren().addAll(top(), bottom());
+		issueEditDisplay.setPadding(new Insets(15));
+		issueEditDisplay.setSpacing(MIDDLE_SPACING);
+		issueEditDisplay.getChildren().addAll(top(), bottom());
+		this.getChildren().add(issueEditDisplay);
 	}
 	
 	private ChangeListener<String> createIssueTitleChangeListener(){
@@ -201,10 +210,11 @@ public class IssueEditComponent extends VBox {
 		Parent assignee = createAssigneeBox(parentStage);
 
 		HBox buttons = createButtons(parentStage);
+		HBox detailsButton = createIssueDetailsButton();
 
 		VBox bottom = new VBox();
 		bottom.setSpacing(ELEMENT_SPACING);
-		bottom.getChildren().addAll(parents, milestone, labels, assignee, buttons);
+		bottom.getChildren().addAll(parents, milestone, labels, assignee, buttons, detailsButton);
 
 		return bottom;
 	}
@@ -231,6 +241,34 @@ public class IssueEditComponent extends VBox {
 		return buttons;
 	}
 
+	
+	private HBox createIssueDetailsButton(){
+		HBox container = new HBox();
+		container.setAlignment(Pos.BASELINE_RIGHT);
+		
+		ToggleButton details = new ToggleButton();
+		details.setText(ISSUE_DETAILS_BTN_TXT);
+		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
+		WeakReference<IssueEditComponent> mainRef = new WeakReference<IssueEditComponent>(this);
+		details.setOnAction((ActionEvent e) -> {
+		    boolean selected = ref.get().selectedProperty().get();
+		    System.out.println("Selected: " + selected);
+		    mainRef.get().showIssueDetailsDisplay(selected);
+		});
+		
+		container.getChildren().add(details);
+		
+		return container;
+	}
+	
+	protected void showIssueDetailsDisplay(boolean show){
+		if(show){
+			this.getChildren().add(issueDetailsDisplay);
+		}else{
+			this.getChildren().remove(issueDetailsDisplay);
+		}
+	}
+	
 
 	private Parent createParentsBox(Stage stage) {
 		final ParentIssuesDisplayBox parentsBox = new ParentIssuesDisplayBox(issue);
