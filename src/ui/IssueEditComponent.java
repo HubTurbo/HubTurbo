@@ -123,6 +123,7 @@ public class IssueEditComponent extends VBox {
 		topLeft.setMaxHeight(maxTitleHeight);
 		
 		title.getChildren().addAll(topLeft, issueTitle);
+		title.setAlignment(Pos.CENTER);
 		return title;
 	}
 	
