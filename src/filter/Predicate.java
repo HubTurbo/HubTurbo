@@ -12,6 +12,9 @@ import model.TurboMilestone;
 import model.TurboUser;
 
 public class Predicate implements FilterExpression {
+	
+	public static final Predicate EMPTY = new filter.Predicate();
+
 	private final String name;
 	private final String content;
 
@@ -20,15 +23,18 @@ public class Predicate implements FilterExpression {
 		this.content = content;
 	}
 	
-	public Predicate() {
+	private Predicate() {
 		this.name = null;
 		this.content = null;
 	}
 
 	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+		// The empty predicate is satisfied by anything
 		if (name == null && content == null) return true;
 
 		switch (name) {
+		case "id":
+			return idSatisfies(issue);
 		case "title":
 			return titleSatisfies(issue);
 		case "milestone":
@@ -51,11 +57,14 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+		// The empty predicate should not be applied to anything
 		assert !(name == null && content == null);
 		
 		switch (name) {
 		case "title":
 			throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
+		case "id":
+			throw new PredicateApplicationException("Unnecessary filter: id is immutable");
 		case "milestone":
 			applyMilestone(issue, model);
 			break;
@@ -89,7 +98,8 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public String toString() {
-		return name + "(" + content + ")";
+		if (this == EMPTY) return "";
+		else return name + "(" + content + ")";
 	}
 
 	@Override
@@ -112,6 +122,20 @@ public class Predicate implements FilterExpression {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	private int parseIdString(String id) {
+		if (id.startsWith("#")) {
+			return Integer.parseInt(id.substring(1));
+		} else if (Character.isDigit(id.charAt(0))) {
+			return Integer.parseInt(id);
+		} else {
+			return -1;
+		}
+	}
+
+	private boolean idSatisfies(TurboIssue issue) {
+		return issue.getId() == parseIdString(content);
 	}
 
 	private boolean satisfiesHasConditions(TurboIssue issue) {
@@ -177,10 +201,9 @@ public class Predicate implements FilterExpression {
 
 	private boolean parentSatisfies(TurboIssue issue, Model model) {
 		String parent = content.toLowerCase();
-		if (parent.startsWith("#")) {
-			return issue.getParentIssue() == Integer.parseInt(parent.substring(1));
-		} else if (Character.isDigit(parent.charAt(0))) {
-			return issue.getParentIssue() == Integer.parseInt(parent);
+		int index = parseIdString(parent);
+		if (index != -1) {
+			return issue.getParentIssue() == index;
 		} else {
 			List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
 			for (int i=0; i<actualParentInstances.size(); i++) {
@@ -215,10 +238,9 @@ public class Predicate implements FilterExpression {
 	private void applyParent(TurboIssue issue, Model model)
 			throws PredicateApplicationException {
 		String parent = content.toLowerCase();
-		if (parent.startsWith("#")) {
-			issue.setParentIssue(Integer.parseInt(parent.substring(1)));
-		} else if (Character.isDigit(parent.charAt(0))) {
-			issue.setParentIssue(Integer.parseInt(parent));
+		int index = parseIdString(parent);
+		if (index != -1) {
+			issue.setParentIssue(index);
 		} else {
 			// Find parents containing the partial title
 			List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(parent.toLowerCase())).collect(Collectors.toList());

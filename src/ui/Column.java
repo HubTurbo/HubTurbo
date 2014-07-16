@@ -35,7 +35,7 @@ public abstract class Column extends VBox {
 	// displayed -- that is the job of its subclasses.
 	
 	public static final String NO_FILTER = "No Filter";
-	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+	public static final FilterExpression EMPTY = filter.Predicate.EMPTY;
 
 	private final Stage mainStage;
 	private final Model model;
@@ -45,10 +45,11 @@ public abstract class Column extends VBox {
 
 	private Predicate<TurboIssue> predicate = p -> true;
 	private String filterInput = "";
-	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
+	private FilterExpression currentFilterExpression = EMPTY;
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList = null;
 	private TurboCommandExecutor dragAndDropExecutor;
+	private Label filterLabel;
 
 	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		this.mainStage = mainStage;
@@ -70,13 +71,16 @@ public abstract class Column extends VBox {
 		
 		setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-				e.acceptTransferModes(TransferMode.MOVE);
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					e.acceptTransferModes(TransferMode.MOVE);
+				}
 			}
 		});
 
 		setOnDragEntered(e -> {
 			if (e.getDragboard().hasString()) {
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(e.getDragboard().getString());
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
 				if (dd.getColumnIndex() != columnIndex) {
 					getStyleClass().add("dragged-over");
 				}
@@ -92,19 +96,14 @@ public abstract class Column extends VBox {
 		setOnDragDropped(e -> {
 			Dragboard db = e.getDragboard();
 			boolean success = false;
+
 			if (db.hasString()) {
 				success = true;
-				IssuePanelDragData dd = IssuePanelDragData.deserialise(db.getString());
-								
-				// Find the right issue from its ID
-				TurboIssue rightIssue = null;
-				for (TurboIssue i : model.getIssues()) {
-					if (i.getId() == dd.getIssueIndex()) {
-						rightIssue = i;
-					}
+				DragData dd = DragData.deserialise(db.getString());
+				if (dd.getColumnIndex() != columnIndex) {
+					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+					applyCurrentFilterExpressionToIssue(rightIssue, true);
 				}
-				assert rightIssue != null;
-				applyCurrentFilterExpressionToIssue(rightIssue, true);
 			}
 			e.setDropCompleted(success);
 
@@ -115,13 +114,14 @@ public abstract class Column extends VBox {
 	private Node createFilterBox() {
 		HBox filterBox = new HBox();
 
-		Label label = new Label(NO_FILTER);
-		label.setPadding(new Insets(3));
+		filterLabel = new Label(NO_FILTER);
+		filterLabel.setPadding(new Insets(3));
 		
-		filterBox.setOnMouseClicked(e -> onFilterBoxClick(label));
+		filterBox.setOnMouseClicked(e -> onFilterBoxClick());
 		filterBox.setAlignment(Pos.TOP_LEFT);
 		HBox.setHgrow(filterBox, Priority.ALWAYS);
-		filterBox.getChildren().add(label);
+		filterBox.getChildren().add(filterLabel);
+		setupIssueDragEvents(filterBox);
 		
 		HBox rightAlignBox = new HBox();
 	
@@ -169,29 +169,48 @@ public abstract class Column extends VBox {
 		return topBox;
 	}
 	
-	private void onFilterBoxClick(Label label) {
+	private void setupIssueDragEvents(HBox filterBox) {
+		filterBox.setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					e.acceptTransferModes(TransferMode.MOVE);
+				}
+			}
+		});
+
+		filterBox.setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				filterBox.getStyleClass().add("dragged-over");
+			}
+			e.consume();
+		});
+
+		filterBox.setOnDragExited(e -> {
+			filterBox.getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+		
+		filterBox.setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				success = true;
+				DragData dd = DragData.deserialise(db.getString());
+				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+				filterByString("parent(#" + rightIssue.getId() + ")");
+			}
+			e.setDropCompleted(success);
+
+			e.consume();
+		});
+	}
+
+	private void onFilterBoxClick() {
 		(new FilterDialog(mainStage, filterInput))
 			.show()
 			.thenApply(filterString -> {
-				filterInput = filterString;
-				if (filterString.isEmpty()) {
-					label.setText(NO_FILTER);
-					this.filter(EMPTY_PREDICATE);
-				} else {
-					try {
-						FilterExpression filter = Parser.parse(filterString);
-						if (filter != null) {
-							label.setText(filter.toString());
-							this.filter(filter);
-						} else {
-							label.setText(NO_FILTER);
-							this.filter(EMPTY_PREDICATE);
-						}
-					} catch (ParseException ex) {
-						label.setText("Parse error in filter: " + ex);
-						this.filter(EMPTY_PREDICATE);
-					}
-				}
+				filterByString(filterString);
 				return true;
 			}).exceptionally(ex -> {
 				ex.printStackTrace();
@@ -199,8 +218,30 @@ public abstract class Column extends VBox {
 			});
 	}
 	
+	public void filterByString(String filterString) {
+		filterInput = filterString;
+		try {
+			FilterExpression filter = Parser.parse(filterString);
+			if (filter != null) {
+				this.filter(filter);
+			} else {
+				this.filter(EMPTY);
+			}
+		} catch (ParseException ex) {
+			this.filter(EMPTY);
+			// Override the text set in the above method
+			filterLabel.setText("Parse error in filter: " + ex.getMessage());
+		}
+	}
+	
 	public void filter(FilterExpression filter) {
 		currentFilterExpression = filter;
+		
+		if (filter == EMPTY) {
+			filterLabel.setText(NO_FILTER);
+		} else {
+			filterLabel.setText(filter.toString());
+		}
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
@@ -225,7 +266,7 @@ public abstract class Column extends VBox {
 	public abstract void deselect();
 
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
-		if (currentFilterExpression != EMPTY_PREDICATE) {
+		if (currentFilterExpression != EMPTY) {
 			try {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
 					TurboIssue clone = new TurboIssue(issue);
@@ -241,6 +282,10 @@ public abstract class Column extends VBox {
 				parentColumnControl.displayMessage(ex.getMessage());
 			}
 		}
+	}
+	
+	public FilterExpression getCurrentFilterExpression() {
+		return currentFilterExpression;
 	}
 	
 	public void updateIndex(int updated) {

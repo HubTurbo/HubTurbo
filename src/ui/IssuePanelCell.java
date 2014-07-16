@@ -36,7 +36,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setOnDragDetected((event) -> {
 			Dragboard db = startDragAndDrop(TransferMode.MOVE);
 			ClipboardContent content = new ClipboardContent();
-			IssuePanelDragData dd = new IssuePanelDragData(parentColumnIndex, issue.getId());
+			DragData dd = new DragData(DragData.Source.ISSUE_CARD, parentColumnIndex, issue.getId());
 			content.putString(dd.serialise());
 			db.setContent(content);
 			event.consume();

@@ -120,6 +120,7 @@ public class ConfigFileHandler {
 				e.printStackTrace();
 			}
 		}
+		if (config == null) config = new SessionConfigurations();
 		return config;
 	}
 	

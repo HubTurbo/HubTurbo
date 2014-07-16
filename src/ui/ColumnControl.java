@@ -1,8 +1,7 @@
 package ui;
 
-import org.controlsfx.control.NotificationPane;
-
-import command.TurboCommandExecutor;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -10,6 +9,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+
+import org.controlsfx.control.NotificationPane;
+
+import util.ConfigFileHandler;
+import util.SessionConfigurations;
+
+import command.TurboCommandExecutor;
+
+import filter.FilterExpression;
+
 
 public class ColumnControl extends HBox {
 
@@ -19,6 +28,8 @@ public class ColumnControl extends HBox {
 	private final SidePanel sidePanel;
 	
 	private TurboCommandExecutor dragAndDropExecutor;
+	
+	private SessionConfigurations sessionConfig;
 
 	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane, SidePanel sidePanel) {
 		this.stage = stage;
@@ -26,10 +37,20 @@ public class ColumnControl extends HBox {
 		this.sidePanel = sidePanel;
 		this.notificationPane = notificationPane;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
-		
-		addColumn();
+		this.sessionConfig = ConfigFileHandler.loadSessionConfig();
 	}
 	
+	public void resumeColumns() {
+		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
+		if (filters != null && !filters.isEmpty()) {
+			for (String filter : filters) {
+				addColumn().filterByString(filter);
+			}
+		} else {
+			addColumn();
+		}
+	}
+
 	public void displayMessage(String message) {
 		notificationPane.setText(message);
 		notificationPane.show();
@@ -50,15 +71,15 @@ public class ColumnControl extends HBox {
 		}
 	}
 
-	public ColumnControl addColumnEvent(MouseEvent e) {
-		return addColumn();
+	public void addColumnEvent(MouseEvent e) {
+		addColumn();
 	}
 	
-	public ColumnControl addColumn() {
+	public Column addColumn() {
 		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
-		return this;
+		return panel;
 	}
 
 	public Column getColumn(int index) {
@@ -75,12 +96,15 @@ public class ColumnControl extends HBox {
 	
 	public void toggleColumn(int index) {
 		Column column;
-		if (getChildren().get(index) instanceof HierarchicalIssuePanel) {
+		Column current = (Column) getChildren().get(index);
+		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
+		if (current instanceof HierarchicalIssuePanel) {
 			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
 		} else {
 			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
 		}
 		column.setItems(model.getIssues());
+		column.filter(currentFilterExpr);
 		getChildren().set(index, column);
 	}
 	
@@ -103,5 +127,15 @@ public class ColumnControl extends HBox {
 		}
 		
 		return this;
+	}
+
+	public void saveSession() {
+		List<String> sessionFilters = new ArrayList<String>();
+		getChildren().forEach(child -> {
+			String filter = ((Column) child).getCurrentFilterExpression().toString();
+			sessionFilters.add(filter);
+		});
+		sessionConfig.setFiltersForNextSession(model.getRepoId(), sessionFilters);
+		ConfigFileHandler.saveSessionConfig(sessionConfig);
 	}
 }
