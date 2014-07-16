@@ -38,6 +38,10 @@ public class Tests {
 		assertEquals(Parser.parse("!a(b)"), new Negation(new Predicate("a", "b")));
 		assertEquals(Parser.parse("-a(b)"), new Negation(new Predicate("a", "b")));
 		assertEquals(Parser.parse("~a(b)"), new Negation(new Predicate("a", "b")));
+		
+		assertEquals(Parser.parse("milestone(0.4) state(open) or label(urgent)"),
+				new Disjunction(new Conjunction(new Predicate("milestone", "0.4"), new Predicate("state", "open")), new Predicate("label", "urgent")));
+		assertEquals(Parser.parse("milestone(0.4) state(open) or label(urgent)"), Parser.parse("milestone(0.4) and state(open) or label(urgent)"));
 	}
 	
 	@Test
@@ -77,6 +81,5 @@ public class Tests {
 				new Predicate("assignee", "darius"));
 		assertEquals(Parser.parse("assignee:dar ius(one)"),
 				new Conjunction(new Predicate("assignee", "dar"), new Predicate("ius", "one")));
-		
 	}
 }
