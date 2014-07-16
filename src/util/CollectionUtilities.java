@@ -41,41 +41,33 @@ public class CollectionUtilities {
 	
 	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues){
 		ArrayList<TurboIssue> buffer = new ArrayList<>();
-		for (Issue ghIssue : issues) {
-			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel()));
-		}
+		issues.stream()
+			  .forEach(ghIssue -> buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel())));
 		return buffer;
 	}
 	
 	public static ArrayList<TurboLabel> getHubTurboLabelList(List<Label> labels){
 		ArrayList<TurboLabel> buffer = new ArrayList<>();
-		for (Label ghLabel : labels) {
-			buffer.add(new TurboLabel(ghLabel));
-		}
+		labels.stream().forEach(ghLabel -> buffer.add(new TurboLabel(ghLabel)));
 		return buffer;
 	}
 	
 	public static ArrayList<TurboMilestone> getHubTurboMilestoneList(List<Milestone> milestones){
 		ArrayList<TurboMilestone> buffer = new ArrayList<>();
-		for(Milestone ghMilestone : milestones){
-			buffer.add(new TurboMilestone(ghMilestone));
-		}
+		milestones.stream()
+				  .forEach(ghMilestone -> buffer.add(new TurboMilestone(ghMilestone)));
 		return buffer;
 	}
 	
 	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users){
 		ArrayList<TurboUser> buffer = new ArrayList<>();
-		for(User ghUser: users){
-			buffer.add(new TurboUser(ghUser));
-		}
+		users.stream().forEach(ghUser -> buffer.add(new TurboUser(ghUser)));
 		return buffer;
 	}
 	
 	public static ArrayList<Label> getGithubLabelList(List<TurboLabel> labels){
 		ArrayList<Label> githubLabels = new ArrayList<Label>();
-		for(TurboLabel label : labels){
-			githubLabels.add(label.toGhResource());
-		}
+		labels.stream().forEach(label -> githubLabels.add(label.toGhResource()));
 		return githubLabels;
 	}
 }

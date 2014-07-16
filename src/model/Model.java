@@ -218,9 +218,8 @@ public class Model {
 	        @Override
 	        public void run() {
 	        	list.removeAll(removed);
-	        	for(Object item: newList){
-	    			updateCachedListItem((Listable)item, list);
-	    		}
+	        	newList.stream()
+	        	       .forEach(item -> updateCachedListItem((Listable)item, list));
 	        }
 	   });
 		
@@ -255,9 +254,8 @@ public class Model {
 	
 	private void setCachedCollaborators(List<User> ghCollaborators){
 		collaborators.clear();
-		for(User ghCollaborator : ghCollaborators) {
-			collaborators.add(new TurboUser(ghCollaborator));
-		}
+		ghCollaborators.stream()
+					   .forEach(ghCollaborator -> collaborators.add(new TurboUser(ghCollaborator)));
 	}
 	
 	private boolean loadIssues() {
@@ -293,9 +291,8 @@ public class Model {
 	private void standardiseStatusLabels(List<Label> ghLabels) {
 		List<String> defaultStatuses = Defaults.getDefaultStatusLabels();
 		List<String> projectLabels = new ArrayList<String>();
-		for (Label label : ghLabels) {
-			projectLabels.add(label.getName());
-		}
+		
+		ghLabels.stream().forEach(label -> projectLabels.add(label.getName()));
 		defaultStatuses.removeAll(projectLabels);
 		for (String standardStatus : defaultStatuses) {
 			Label statusLabel = new Label();
