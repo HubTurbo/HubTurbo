@@ -12,14 +12,18 @@ import model.TurboIssue;
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
 //	private final Stage mainStage;
-//	private final Model model;
+	private final Model model;
 	private final int parentColumnIndex;
+	private SidePanel sidePanel;
+	private ColumnControl parentColumnControl;
 		
-	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent, int parentColumnIndex) {
+	public IssuePanelCell(Stage mainStage, Model model, IssuePanel parent, int parentColumnIndex, SidePanel sidePanel, ColumnControl parentColumnControl) {
 		super();
 //		this.mainStage = mainStage;
-//		this.model = model;
+		this.model = model;
 		this.parentColumnIndex = parentColumnIndex;
+		this.sidePanel = sidePanel;
+		this.parentColumnControl = parentColumnControl;
 	}
 
 	@Override
@@ -47,6 +51,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 //			}
 			event.consume();
 		});
+		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue.getId()).get());
 	}
 
 //	private void registerEvents(TurboIssue issue) {

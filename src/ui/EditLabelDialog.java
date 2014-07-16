@@ -32,7 +32,6 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	
 	@Override
 	protected Parent content() {
-
 		TextField labelNameField = new TextField();
 		labelNameField.setText(originalLabel.getName());
 

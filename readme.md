@@ -1,44 +1,51 @@
 # HubTurbo (working title)
 
-## Features
-
-**Issues**
-
-- Correspond directly to GitHub's issues
-- Can be created, updated, closed, and viewed
-- Keep track of labels, a milestone, an assignee
-
-**Collaborators**
-
-- Correspond directly to GitHub's collaborators
-- Can be assigned to issues
-
-**Labels and Label Groups**
-
-- Labels correspond directly to GitHub's labels
-- Can be assigned to issues
-- Can be created, edited, deleted, and viewed
-
-- Groups are a conceptual means of aggregating labels
-- Groups can be exclusive, in which case only one of each can be assigned to a label at a time
-
-**Milestones**
-
-- Correspond directly to GitHub's milestones
-- Can be assigned to issues
-- Can be created, edited, deleted, and viewed
-
-**Panels**
-
-- A panel is a view into the underlying data
-- 1-9 panels can be active at a time
-- Issues can be edited through them
-- Panels can be filtered with a small query language
-
-## Getting started
+## Getting Started
 
 **Development environment**
 
 - JDK 1.8
 - Eclipse Kepler/Luna
-- Windows/Ubuntu
+
+## Filter Expressions
+
+**Predicates**
+
+Filters are written as a series of predicates, in the form `name(content)`. Issues for which the entire filter expression returns true will be displayed.
+
+The query "all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2" may be expressed as follows:
+
+```
+assignee(john) ~state(closed) (milestone(v0.1) or milestone(v0.2))
+```
+
+As shown, parentheses are also used for grouping.
+
+Predicates may also be written in the form `name:content` if `content` contains no spaces. This allows a syntax resembling that of Google Code's filter language:
+
+```
+assignee:john -state:closed (milestone:v0.1 or milestone:v0.2)
+```
+
+**Operators**
+
+Logical operators (AND, OR, NOT) may be applied to any filter expression. This can be used to compose complex queries. If an operator is left out, AND is implicit.
+
+Any of the following may be used:
+
+- AND (infix): `and`, `&&`, `&`
+- OR (infix): `or`, `||`, `|`
+- NOT (prefix): `~`, `!`, `-`
+
+As in most C-like languages, AND and OR are left-associative, and precedence goes: NOT > AND > OR.
+
+**Valid Predicates**
+
+- `id` (`number`)
+- `title`
+- `milestone`
+- `parent` (number or name)
+- `label`
+- `assignee`
+- `state/status` (`open` or `closed`)
+- `has` (`label`, `milestone`, `assignee`, `parent`)

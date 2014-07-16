@@ -11,17 +11,20 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class MilestoneManagementComponent {
 
 	private static final String NEW_MILESTONE_NAME = "newmilestone";
 	
+	private final Stage parentStage;
 	private final Model model;
 	
 	private ListView<TurboMilestone> listView;
 
-	public MilestoneManagementComponent(Model model) {
+	public MilestoneManagementComponent(Stage parentStage, Model model) {
+		this.parentStage = parentStage;
 		this.model = model;
 	}
 
@@ -41,7 +44,7 @@ public class MilestoneManagementComponent {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
 				if(that.get() != null){
-					return new ManageMilestonesListCell(model, that.get());
+					return new ManageMilestonesListCell(parentStage, model, that.get());
 				}else{
 					return null;
 				}

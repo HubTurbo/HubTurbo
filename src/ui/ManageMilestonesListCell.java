@@ -6,95 +6,29 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import model.Model;
 import model.TurboMilestone;
 
+
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
+	private final Stage stage;
 	private final Model model;
 	private final MilestoneManagementComponent parentDialog;
 	
-    private TextField textField;
-	private VBox content;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-    public ManageMilestonesListCell(Model model, MilestoneManagementComponent parentDialog) {
+    public ManageMilestonesListCell(Stage stage, Model model, MilestoneManagementComponent parentDialog) {
 		super();
+		this.stage = stage;
 		this.model = model;
 		this.parentDialog = parentDialog;
 	}
-    
-    private ChangeListener<Boolean> createTextFieldListener(){
-    	WeakReference<ManageMilestonesListCell> that = new WeakReference<>(this);
-    	ChangeListener<Boolean> textFieldListener = new ChangeListener<Boolean>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends Boolean> stringProperty,
-					Boolean previouslyFocused, Boolean currentlyFocused) {
-				assert previouslyFocused != currentlyFocused;
-				ManageMilestonesListCell thisRef = that.get();
-				if (thisRef != null && !currentlyFocused) {
-                    commitEdit();
-				}
-			}
-		};
-		changeListeners.add(textFieldListener);
-		return textFieldListener;
-    }
-    
-    private void createTextField() {
-        textField = new TextField(getItem().getTitle());
-        textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                if (t.getCode() == KeyCode.ENTER) {
-                    commitEdit();
-                } else if (t.getCode() == KeyCode.ESCAPE) {
-                    cancelEdit();
-                }
-            }
-        });
-        
-        textField.focusedProperty().addListener(new WeakChangeListener<Boolean>(createTextFieldListener()));
-    }
-    
-    // This is NOT an overridden method.
-    // The overridden one is, however, called in here.
-    public void commitEdit() {
-    	super.commitEdit(getItem());
-    	getItem().setTitle(textField.getText());
-    	model.updateMilestone(getItem());
-    	parentDialog.refresh();
-    }
-    
-    @Override
-    public void cancelEdit() {
-        super.cancelEdit();
-        setText(getItem().getTitle());
-        setGraphic(content);
-    }
-    
-    @Override
-    public void startEdit() {
-        super.startEdit();
-
-        if (textField == null) {
-            createTextField();
-        }
-        setText(null);
-        setGraphic(textField);
-        textField.setText(getItem().getTitle());
-        textField.selectAll();
-        textField.requestFocus();
-    }
     
     private ChangeListener<String> createMilestoneTitleListener(TurboMilestone milestone, Text milestoneTitle){
     	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
@@ -128,16 +62,20 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 				.addAll(milestoneTitle);
 
 		setGraphic(everything);
-		content = everything;
 		
 		setContextMenu(createContextMenu(milestone));
 	}
 
 	private ContextMenu createContextMenu(TurboMilestone milestone) {
-		WeakReference<ManageMilestonesListCell> that = new WeakReference<>(this); 
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
-			that.get().startEdit();
+			(new EditMilestoneDialog(stage, milestone)).show().thenApply(response -> {
+				model.updateMilestone(response);
+				return true;
+			}).exceptionally(e -> {
+				e.printStackTrace();
+				return false;
+			});
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
