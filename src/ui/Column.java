@@ -170,7 +170,7 @@ public abstract class Column extends VBox {
 	}
 	
 	private void onFilterBoxClick(Label label) {
-		(new FilterDialog(mainStage, model, filterInput))
+		(new FilterDialog(mainStage, filterInput))
 			.show()
 			.thenApply(filterString -> {
 				filterInput = filterString;
