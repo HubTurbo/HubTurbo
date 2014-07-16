@@ -6,8 +6,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class IssueDetailsDisplay extends VBox {
-	protected static final int DETAILS_WIDTH = 350;
-	
 	private TabPane detailsTab;
 	private Stage parentStage;
 	
@@ -22,7 +20,7 @@ public class IssueDetailsDisplay extends VBox {
 		Tab commentsTab = createCommentsTab();
 		Tab logTab = createChangeLogTab();
 		detailsTab.getTabs().addAll(commentsTab, logTab);
-		detailsTab.setPrefWidth(DETAILS_WIDTH);
+//		detailsTab.setPrefWidth(DETAILS_WIDTH);
 	}
 	private void setupDisplay(){
 		setupDetailsTab();
