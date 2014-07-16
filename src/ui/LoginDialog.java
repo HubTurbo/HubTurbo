@@ -19,7 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class LoginDialog extends Dialog2<Boolean> {
+public class LoginDialog extends Dialog<Boolean> {
 
 	private TextField repoOwnerField;
 	private TextField repoNameField;

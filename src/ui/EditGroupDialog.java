@@ -11,7 +11,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class EditGroupDialog extends Dialog2<TurboLabelGroup> {
+public class EditGroupDialog extends Dialog<TurboLabelGroup> {
 	
 	private String generatedName;
 	private boolean exclusive;

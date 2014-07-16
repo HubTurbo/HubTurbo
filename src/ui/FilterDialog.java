@@ -12,7 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class FilterDialog extends Dialog2<String> {
+public class FilterDialog extends Dialog<String> {
 	
 	private String input = "";
 	
@@ -60,6 +60,7 @@ public class FilterDialog extends Dialog2<String> {
 		layout.setSpacing(10);
 		layout.getChildren().addAll(createRoot());
 		setSize(530, 220);
+		setTitle("Filter");
 		return layout;
 	}
 }

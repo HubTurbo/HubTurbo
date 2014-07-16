@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class EditLabelDialog extends Dialog2<TurboLabel> {
+public class EditLabelDialog extends Dialog<TurboLabel> {
 
 	private TurboLabel originalLabel;
 

@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Listable;
 
-public class CheckboxListDialog extends Dialog2<List<Integer>> {
+public class CheckboxListDialog extends Dialog<List<Integer>> {
 
 	private ObservableList<String> objectNames;
 
