@@ -28,6 +28,7 @@ public class TurboIssue implements Listable {
 	private static final String REGEX_SPLIT_PARENT = "(,\\s+)?#";
 	private static final String REGEX_SPLIT_LINES = "(\\r?\\n)+";
 	private static final String METADATA_HEADER_PARENT = "* Parent: ";
+	private static final String OLD_METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_PARENT = "#%1d \n";
 	private static final String METADATA_SEPERATOR = "<hr>";
 	
@@ -369,6 +370,15 @@ public class TurboIssue implements Listable {
 			
 			if (line.startsWith(METADATA_HEADER_PARENT)) {
 				String value = line.replace(METADATA_HEADER_PARENT, "");
+				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
+				for (int j = 0; j < valueTokens.length; j++) {
+					if (!valueTokens[j].trim().isEmpty()){
+						return Integer.parseInt(valueTokens[j].trim());
+					}
+				}
+			}else if(line.startsWith(OLD_METADATA_HEADER_PARENT)){
+				//legacy
+				String value = line.replace(OLD_METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
 				for (int j = 0; j < valueTokens.length; j++) {
 					if (!valueTokens[j].trim().isEmpty()){
