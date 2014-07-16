@@ -14,7 +14,8 @@ public abstract class Dialog2<T> {
 	private Stage stage = null;
 	private CompletableFuture<T> response;
 
-	private double x = 0, y = 0, width = 300, height = 400;
+//	private double x = 0, y = 0;
+	private double width = 300, height = 400;
 	private String title = "";
 	private Modality modality;
 	
@@ -31,8 +32,8 @@ public abstract class Dialog2<T> {
 		stage.setOnCloseRequest(e -> onClose());
 		stage.initOwner(parentStage);
 		stage.initModality(modality);
-		stage.setX(parentStage.getX() + x);
-		stage.setY(parentStage.getY() + y);
+//		stage.setX(parentStage.getX() + x);
+//		stage.setY(parentStage.getY() + y);
 		stage.show();
 		Platform.runLater(() -> stage.requestFocus());
 		return response;
@@ -58,19 +59,12 @@ public abstract class Dialog2<T> {
 		return this;
 	}
 	
-	public Dialog2<T> setPosition(double x, double y) {
-		this.x = x;
-		this.y = y;
-		return this;
-	}
+//	public Dialog2<T> setPosition(double x, double y) {
+//		this.x = x;
+//		this.y = y;
+//		return this;
+//	}
 	
-	public Dialog2<T> center() {
-		double x = (parentStage.getWidth() - width) / 2;
-		double y = (parentStage.getHeight() - height) / 2;
-		setPosition(x, -y);
-		return this;
-	}
-
 	// Dialog actions
 
 	public void close() {
