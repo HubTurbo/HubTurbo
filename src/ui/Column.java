@@ -49,6 +49,7 @@ public abstract class Column extends VBox {
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList = null;
 	private TurboCommandExecutor dragAndDropExecutor;
+	private Label filterLabel;
 
 	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		this.mainStage = mainStage;
@@ -98,15 +99,7 @@ public abstract class Column extends VBox {
 			if (db.hasString()) {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
-								
-				// Find the right issue from its ID
-				TurboIssue rightIssue = null;
-				for (TurboIssue i : model.getIssues()) {
-					if (i.getId() == dd.getIssueIndex()) {
-						rightIssue = i;
-					}
-				}
-				assert rightIssue != null;
+				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
 				applyCurrentFilterExpressionToIssue(rightIssue, true);
 			}
 			e.setDropCompleted(success);
@@ -118,13 +111,14 @@ public abstract class Column extends VBox {
 	private Node createFilterBox() {
 		HBox filterBox = new HBox();
 
-		Label label = new Label(NO_FILTER);
-		label.setPadding(new Insets(3));
+		filterLabel = new Label(NO_FILTER);
+		filterLabel.setPadding(new Insets(3));
 		
-		filterBox.setOnMouseClicked(e -> onFilterBoxClick(label));
+		filterBox.setOnMouseClicked(e -> onFilterBoxClick());
 		filterBox.setAlignment(Pos.TOP_LEFT);
 		HBox.setHgrow(filterBox, Priority.ALWAYS);
-		filterBox.getChildren().add(label);
+		filterBox.getChildren().add(filterLabel);
+		setupIssueDragEvents(filterBox);
 		
 		HBox rightAlignBox = new HBox();
 	
@@ -172,34 +166,75 @@ public abstract class Column extends VBox {
 		return topBox;
 	}
 	
-	private void onFilterBoxClick(Label label) {
+	private void setupIssueDragEvents(HBox filterBox) {
+		filterBox.setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					e.acceptTransferModes(TransferMode.MOVE);
+				}
+			}
+		});
+
+		filterBox.setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				filterBox.getStyleClass().add("dragged-over");
+			}
+			e.consume();
+		});
+
+		filterBox.setOnDragExited(e -> {
+			filterBox.getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+		
+		filterBox.setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				success = true;
+				DragData dd = DragData.deserialise(db.getString());
+				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+				filterByString("parent(" + rightIssue.getTitle() + ")");
+			}
+			e.setDropCompleted(success);
+
+			e.consume();
+		});
+	}
+
+	private void onFilterBoxClick() {
 		(new FilterDialog(mainStage, filterInput))
 			.show()
 			.thenApply(filterString -> {
-				filterInput = filterString;
-				if (filterString.isEmpty()) {
-					label.setText(NO_FILTER);
-					this.filter(EMPTY_PREDICATE);
-				} else {
-					try {
-						FilterExpression filter = Parser.parse(filterString);
-						if (filter != null) {
-							label.setText(filter.toString());
-							this.filter(filter);
-						} else {
-							label.setText(NO_FILTER);
-							this.filter(EMPTY_PREDICATE);
-						}
-					} catch (ParseException ex) {
-						label.setText("Parse error in filter: " + ex);
-						this.filter(EMPTY_PREDICATE);
-					}
-				}
+				filterByString(filterString);
 				return true;
 			}).exceptionally(ex -> {
 				ex.printStackTrace();
 				return false;
 			});
+	}
+	
+	public void filterByString(String filterString) {
+		filterInput = filterString;
+		if (filterString.isEmpty()) {
+			filterLabel.setText(NO_FILTER);
+			this.filter(EMPTY_PREDICATE);
+		} else {
+			try {
+				FilterExpression filter = Parser.parse(filterString);
+				if (filter != null) {
+					filterLabel.setText(filter.toString());
+					this.filter(filter);
+				} else {
+					filterLabel.setText(NO_FILTER);
+					this.filter(EMPTY_PREDICATE);
+				}
+			} catch (ParseException ex) {
+				filterLabel.setText("Parse error in filter: " + ex);
+				this.filter(EMPTY_PREDICATE);
+			}
+		}
 	}
 	
 	public void filter(FilterExpression filter) {
