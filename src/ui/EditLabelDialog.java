@@ -1,6 +1,5 @@
 package ui;
 
-import model.TurboLabel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -8,10 +7,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import model.TurboLabel;
 
 public class EditLabelDialog extends Dialog<TurboLabel> {
 
@@ -22,7 +20,7 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 		this.originalLabel = originalLabel;
 		
 		setTitle("Edit Label");
-		setSize(330, 125);
+		setSize(330, 50);
 	}
 		
 	private static String toRGBCode(Color color) {
@@ -35,27 +33,22 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	@Override
 	protected Parent content() {
 
-		VBox layout = new VBox();
-		layout.setPadding(new Insets(15));
-		layout.setSpacing(10);
-		
 		TextField labelNameField = new TextField();
 		labelNameField.setText(originalLabel.getName());
 
 		ColorPicker colourPicker =  new ColorPicker(Color.web("#" + originalLabel.getColour()));
 
 		Button done = new Button("Done");
-		HBox buttonContainer = new HBox();
-		buttonContainer.setAlignment(Pos.CENTER_RIGHT);
-		buttonContainer.getChildren().add(done);
-		HBox.setHgrow(buttonContainer, Priority.ALWAYS);
-
-		layout.getChildren().addAll(labelNameField, colourPicker, buttonContainer);
-
 		done.setOnAction(e -> {
 			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
 			close();
 		});
+		
+		HBox layout = new HBox();
+		layout.setPadding(new Insets(15));
+		layout.setSpacing(10);
+		layout.setAlignment(Pos.BASELINE_CENTER);
+		layout.getChildren().addAll(labelNameField, colourPicker, done);
 
 		return layout;
 	}
