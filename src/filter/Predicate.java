@@ -63,6 +63,8 @@ public class Predicate implements FilterExpression {
 		switch (name) {
 		case "title":
 			throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
+		case "id":
+			throw new PredicateApplicationException("Unnecessary filter: id is immutable");
 		case "milestone":
 			applyMilestone(issue, model);
 			break;
