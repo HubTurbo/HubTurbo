@@ -218,21 +218,19 @@ public abstract class Column extends VBox {
 	public void filterByString(String filterString) {
 		filterInput = filterString;
 		if (filterString.isEmpty()) {
-			filterLabel.setText(NO_FILTER);
 			this.filter(EMPTY_PREDICATE);
 		} else {
 			try {
 				FilterExpression filter = Parser.parse(filterString);
 				if (filter != null) {
-					filterLabel.setText(filter.toString());
 					this.filter(filter);
 				} else {
-					filterLabel.setText(NO_FILTER);
 					this.filter(EMPTY_PREDICATE);
 				}
 			} catch (ParseException ex) {
-				filterLabel.setText("Parse error in filter: " + ex);
 				this.filter(EMPTY_PREDICATE);
+				// Override the text set in the above method
+				filterLabel.setText("Parse error in filter: " + ex.getMessage());
 			}
 		}
 	}
@@ -240,6 +238,11 @@ public abstract class Column extends VBox {
 	public void filter(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
+		if (filter == EMPTY_PREDICATE) {
+			filterLabel.setText(NO_FILTER);
+		} else {
+			filterLabel.setText(filter.toString());
+		}
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;

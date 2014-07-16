@@ -79,7 +79,6 @@ public class ColumnControl extends HBox {
 		Column column;
 		Column current = (Column) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
-		System.out.println(currentFilterExpr);
 		if (current instanceof HierarchicalIssuePanel) {
 			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
 		} else {
@@ -87,7 +86,6 @@ public class ColumnControl extends HBox {
 		}
 		column.setItems(model.getIssues());
 		column.filter(currentFilterExpr);
-		System.out.println(column.getCurrentFilterExpression());
 		getChildren().set(index, column);
 	}
 	
