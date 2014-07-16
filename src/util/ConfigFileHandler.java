@@ -115,6 +115,7 @@ public class ConfigFileHandler {
 		} else {
 			try {
 				configFile.createNewFile();
+				config = new SessionConfigurations();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

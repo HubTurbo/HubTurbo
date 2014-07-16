@@ -8,6 +8,10 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 public class SessionConfigurations {
 	private HashMap<String, List<String>> projectFilters;
 	
+	SessionConfigurations() {
+		this.projectFilters = new HashMap<String, List<String>>();
+	}
+	
 	SessionConfigurations(HashMap<String, List<String>> projectFilters) {
 		this.projectFilters = projectFilters;
 	}

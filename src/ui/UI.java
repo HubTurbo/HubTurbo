@@ -3,15 +3,16 @@ package ui;
 import java.io.File;
 import java.io.IOException;
 
-import org.controlsfx.control.NotificationPane;
-
-import service.ServiceManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
+import org.controlsfx.control.NotificationPane;
+
+import service.ServiceManager;
 
 public class UI extends Application {
 
@@ -38,6 +39,7 @@ public class UI extends Application {
 		applyCSS(scene);
 		
 		getUserCredentials();
+		columns.resumeColumns();
 	}
 	
 	private void getUserCredentials() {
@@ -72,6 +74,7 @@ public class UI extends Application {
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
 			ServiceManager.getInstance().stopModelUpdate();
+			columns.saveSession();
 		});
 	}
 

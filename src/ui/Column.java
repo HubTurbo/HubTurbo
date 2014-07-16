@@ -254,6 +254,10 @@ public abstract class Column extends VBox {
 		refreshItems();
 	}
 	
+	public FilterExpression getCurrentFilter() {
+		return this.currentFilterExpression;
+	}
+	
 	public FilteredList<TurboIssue> getFilteredList() {
 		return filteredList;
 	}
