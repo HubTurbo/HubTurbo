@@ -12,6 +12,9 @@ import model.TurboMilestone;
 import model.TurboUser;
 
 public class Predicate implements FilterExpression {
+	
+	public static final Predicate EMPTY = new filter.Predicate();
+
 	private final String name;
 	private final String content;
 
@@ -20,12 +23,13 @@ public class Predicate implements FilterExpression {
 		this.content = content;
 	}
 	
-	public Predicate() {
+	private Predicate() {
 		this.name = null;
 		this.content = null;
 	}
 
 	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+		// The empty predicate is satisfied by anything
 		if (name == null && content == null) return true;
 
 		switch (name) {
@@ -53,6 +57,7 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+		// The empty predicate should not be applied to anything
 		assert !(name == null && content == null);
 		
 		switch (name) {
@@ -91,7 +96,8 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public String toString() {
-		return name + "(" + content + ")";
+		if (this == EMPTY) return "";
+		else return name + "(" + content + ")";
 	}
 
 	@Override

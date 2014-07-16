@@ -13,7 +13,8 @@ public class Parser {
 		this.input = input;
 	}
 	public static FilterExpression parse(String input) {
-		if (input == null || input.isEmpty()) return null;
+		if (input == null) return null;
+		else if (input.isEmpty()) return Predicate.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
 	}
 		

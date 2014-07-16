@@ -35,7 +35,7 @@ public abstract class Column extends VBox {
 	// displayed -- that is the job of its subclasses.
 	
 	public static final String NO_FILTER = "No Filter";
-	public static final filter.Predicate EMPTY_PREDICATE = new filter.Predicate();
+	public static final FilterExpression EMPTY = filter.Predicate.EMPTY;
 
 	private final Stage mainStage;
 	private final Model model;
@@ -45,7 +45,7 @@ public abstract class Column extends VBox {
 
 	private Predicate<TurboIssue> predicate = p -> true;
 	private String filterInput = "";
-	private FilterExpression currentFilterExpression = EMPTY_PREDICATE;
+	private FilterExpression currentFilterExpression = EMPTY;
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList = null;
 	private TurboCommandExecutor dragAndDropExecutor;
@@ -220,28 +220,24 @@ public abstract class Column extends VBox {
 	
 	public void filterByString(String filterString) {
 		filterInput = filterString;
-		if (filterString.isEmpty()) {
-			this.filter(EMPTY_PREDICATE);
-		} else {
-			try {
-				FilterExpression filter = Parser.parse(filterString);
-				if (filter != null) {
-					this.filter(filter);
-				} else {
-					this.filter(EMPTY_PREDICATE);
-				}
-			} catch (ParseException ex) {
-				this.filter(EMPTY_PREDICATE);
-				// Override the text set in the above method
-				filterLabel.setText("Parse error in filter: " + ex.getMessage());
+		try {
+			FilterExpression filter = Parser.parse(filterString);
+			if (filter != null) {
+				this.filter(filter);
+			} else {
+				this.filter(EMPTY);
 			}
+		} catch (ParseException ex) {
+			this.filter(EMPTY);
+			// Override the text set in the above method
+			filterLabel.setText("Parse error in filter: " + ex.getMessage());
 		}
 	}
 	
 	public void filter(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
-		if (filter == EMPTY_PREDICATE) {
+		if (filter == EMPTY) {
 			filterLabel.setText(NO_FILTER);
 		} else {
 			filterLabel.setText(filter.toString());
@@ -274,7 +270,7 @@ public abstract class Column extends VBox {
 	public abstract void deselect();
 
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
-		if (currentFilterExpression != EMPTY_PREDICATE) {
+		if (currentFilterExpression != EMPTY) {
 			try {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
 					TurboIssue clone = new TurboIssue(issue);

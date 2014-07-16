@@ -9,7 +9,7 @@ public class Tests {
 	@Test
 	public void basics() {
 		assertEquals(Parser.parse(null), null);
-		assertEquals(Parser.parse(""), null);
+		assertEquals(Parser.parse(""), Predicate.EMPTY);
 	}
 	
 	@Test
