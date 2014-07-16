@@ -29,6 +29,8 @@ public class Predicate implements FilterExpression {
 		if (name == null && content == null) return true;
 
 		switch (name) {
+		case "id":
+			return idSatisfies(issue);
 		case "title":
 			return titleSatisfies(issue);
 		case "milestone":
@@ -125,7 +127,7 @@ public class Predicate implements FilterExpression {
 	}
 
 	private boolean idSatisfies(TurboIssue issue) {
-		return issue.getTitle().toLowerCase().contains(content.toLowerCase());
+		return issue.getId() == parseIdString(content);
 	}
 
 	private boolean satisfiesHasConditions(TurboIssue issue) {
