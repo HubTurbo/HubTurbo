@@ -12,6 +12,7 @@ import model.Model;
 import model.TurboIssue;
 
 public class SidePanel extends VBox {
+	protected static final int PANEL_PREF_WIDTH = 300;
 
 	public enum Layout {
 		TABS, ISSUE, HISTORY
@@ -94,6 +95,8 @@ public class SidePanel extends VBox {
 		HBox repoFields = new HBox();
 		
 		everything.getChildren().addAll(repoFields, tabs);
+		
+		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		
 		return everything;
 	}

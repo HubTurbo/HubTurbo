@@ -12,6 +12,8 @@ public class IssueDisplayPane extends HBox {
 	protected static final int LINE_HEIGHT = 18;
 	protected static final int TITLE_ROW_NUM = 3;
 	protected static final int DESC_ROW_NUM = 8;
+	protected static final int DETAILS_WIDTH = 350;
+	protected static final int ISSUE_WIDTH = 300;
 
 	private final TurboIssue issue;
 	private final Model model;
@@ -36,9 +38,13 @@ public class IssueDisplayPane extends HBox {
 
 	private void setup() {
 		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this);
+		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
+		
 		this.issueDetailsDisplay = new IssueDetailsDisplay(parentStage);
+		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
 		this.getChildren().add(issueEditDisplay);
 	}
+	
 	protected void showIssueDetailsDisplay(boolean show){
 		if(show){
 			this.getChildren().add(issueDetailsDisplay);
