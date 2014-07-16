@@ -113,6 +113,20 @@ public class Predicate implements FilterExpression {
 			return false;
 		return true;
 	}
+	
+	private int parseIdString(String id) {
+		if (id.startsWith("#")) {
+			return Integer.parseInt(id.substring(1));
+		} else if (Character.isDigit(id.charAt(0))) {
+			return Integer.parseInt(id);
+		} else {
+			return -1;
+		}
+	}
+
+	private boolean idSatisfies(TurboIssue issue) {
+		return issue.getTitle().toLowerCase().contains(content.toLowerCase());
+	}
 
 	private boolean satisfiesHasConditions(TurboIssue issue) {
 		switch (content) {
@@ -177,10 +191,9 @@ public class Predicate implements FilterExpression {
 
 	private boolean parentSatisfies(TurboIssue issue, Model model) {
 		String parent = content.toLowerCase();
-		if (parent.startsWith("#")) {
-			return issue.getParentIssue() == Integer.parseInt(parent.substring(1));
-		} else if (Character.isDigit(parent.charAt(0))) {
-			return issue.getParentIssue() == Integer.parseInt(parent);
+		int index = parseIdString(parent);
+		if (index != -1) {
+			return issue.getParentIssue() == index;
 		} else {
 			List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
 			for (int i=0; i<actualParentInstances.size(); i++) {
@@ -215,10 +228,9 @@ public class Predicate implements FilterExpression {
 	private void applyParent(TurboIssue issue, Model model)
 			throws PredicateApplicationException {
 		String parent = content.toLowerCase();
-		if (parent.startsWith("#")) {
-			issue.setParentIssue(Integer.parseInt(parent.substring(1)));
-		} else if (Character.isDigit(parent.charAt(0))) {
-			issue.setParentIssue(Integer.parseInt(parent));
+		int index = parseIdString(parent);
+		if (index != -1) {
+			issue.setParentIssue(index);
 		} else {
 			// Find parents containing the partial title
 			List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(parent.toLowerCase())).collect(Collectors.toList());
