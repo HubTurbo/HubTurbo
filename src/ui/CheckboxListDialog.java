@@ -49,8 +49,7 @@ public class CheckboxListDialog extends Dialog2<List<Integer>> {
 		layout.setPadding(new Insets(5));
 
 		setSize(400, 300);
-		center();
-
+		
 		return layout;
 	}
 
