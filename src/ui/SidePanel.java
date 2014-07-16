@@ -120,7 +120,7 @@ public class SidePanel extends VBox {
 		Tab tab = new Tab();
 		tab.setClosable(false);
 		tab.setText("M");
-		tab.setContent(new MilestoneManagementComponent(model).initialise());
+		tab.setContent(new MilestoneManagementComponent(parentStage, model).initialise());
 		return tab;
 	}
 

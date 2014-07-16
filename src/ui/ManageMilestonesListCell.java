@@ -15,10 +15,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import model.Model;
 import model.TurboMilestone;
 
+
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
+	private final Stage stage;
 	private final Model model;
 	private final MilestoneManagementComponent parentDialog;
 	
@@ -26,8 +29,9 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private VBox content;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-    public ManageMilestonesListCell(Model model, MilestoneManagementComponent parentDialog) {
+    public ManageMilestonesListCell(Stage stage, Model model, MilestoneManagementComponent parentDialog) {
 		super();
+		this.stage = stage;
 		this.model = model;
 		this.parentDialog = parentDialog;
 	}
@@ -134,10 +138,15 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	}
 
 	private ContextMenu createContextMenu(TurboMilestone milestone) {
-		WeakReference<ManageMilestonesListCell> that = new WeakReference<>(this); 
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
-			that.get().startEdit();
+			(new EditMilestoneDialog(stage, milestone)).show().thenApply(response -> {
+				model.updateMilestone(response);
+				return true;
+			}).exceptionally(e -> {
+				e.printStackTrace();
+				return false;
+			});
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
