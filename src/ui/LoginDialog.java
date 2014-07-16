@@ -26,9 +26,11 @@ public class LoginDialog extends Dialog<Boolean> {
 	private TextField usernameField;
 	private PasswordField passwordField;
 	private NotificationPane notificationPane;
+	private ColumnControl columns;
 
-	public LoginDialog(Stage parentStage) {
+	public LoginDialog(Stage parentStage, ColumnControl columns) {
 		super(parentStage);
+		this.columns = columns;
 	}
 	
 	@Override
@@ -133,6 +135,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		}
 		else {
 			loadRepository(owner, repo);
+			columns.resumeColumns();
 			completeResponse(true);
 			close();
 		}

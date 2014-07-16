@@ -21,6 +21,7 @@ public class SessionConfigurations {
 	}
 	
 	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
+		System.out.println(project);
 		return projectFilters.get(project.generateId());
 	}
 

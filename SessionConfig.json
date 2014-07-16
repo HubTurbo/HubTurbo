@@ -1,0 +1,11 @@
+{
+  "projectFilters": {
+    "dariusf/issues": [
+      "assignee(darius)"
+    ],
+    "HubTurbo/HubTurbo": [
+      "parent(#28)",
+      "(assignee(dar) and status(open))"
+    ]
+  }
+}

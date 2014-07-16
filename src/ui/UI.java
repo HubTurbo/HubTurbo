@@ -39,11 +39,10 @@ public class UI extends Application {
 		applyCSS(scene);
 		
 		getUserCredentials();
-		columns.resumeColumns();
 	}
 	
 	private void getUserCredentials() {
-		new LoginDialog(mainStage).show().thenApply(success -> {
+		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (!success) {
 //				getUserCredentials();
 				mainStage.close();

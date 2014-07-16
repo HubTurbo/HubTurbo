@@ -17,7 +17,7 @@ import util.SessionConfigurations;
 
 import command.TurboCommandExecutor;
 
-import filter.Parser;
+import filter.FilterExpression;
 
 
 public class ColumnControl extends HBox {
@@ -44,7 +44,7 @@ public class ColumnControl extends HBox {
 		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
-				addColumn(filter);
+				addColumn().filterByString(filter);
 			}
 		} else {
 			addColumn();
@@ -71,26 +71,17 @@ public class ColumnControl extends HBox {
 		}
 	}
 
-	public ColumnControl addColumnEvent(MouseEvent e) {
-		return addColumn();
+	public void addColumnEvent(MouseEvent e) {
+		addColumn();
 	}
 	
-	public ColumnControl addColumn() {
+	public Column addColumn() {
 		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
-		return this;
+		return panel;
 	}
 	
-	public ColumnControl addColumn(String filter) {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
-		// TODO apply new method of deserializing filter
-		panel.filter(Parser.parse(filter));
-		getChildren().add(panel);
-		panel.setItems(model.getIssues());
-		return this;
-	}
-
 	public Column getColumn(int index) {
 		return (Column) getChildren().get(index);
 	}
@@ -141,7 +132,7 @@ public class ColumnControl extends HBox {
 	public void saveSession() {
 		List<String> sessionFilters = new ArrayList<String>();
 		getChildren().forEach(child -> {
-			String filter = ((Column) child).getCurrentFilter().toString();
+			String filter = ((Column) child).getCurrentFilterExpression().toString();
 			sessionFilters.add(filter);
 		});
 		sessionConfig.setFiltersForNextSession(model.getRepoId(), sessionFilters);
