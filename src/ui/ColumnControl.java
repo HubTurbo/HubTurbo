@@ -81,7 +81,7 @@ public class ColumnControl extends HBox {
 		panel.setItems(model.getIssues());
 		return panel;
 	}
-	
+
 	public Column getColumn(int index) {
 		return (Column) getChildren().get(index);
 	}
