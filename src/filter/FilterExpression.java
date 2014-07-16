@@ -27,4 +27,10 @@ public interface FilterExpression {
 	// Walks the tree of predicates to get all the names that appear.
 	
 	public List<String> getPredicateNames();
+	
+	// A given FilterExpression has a string form that, when parsed, is
+	// guaranteed to produce an equivalent FilterExpression. It can thus
+	// be used to serialise FilterExpressions.
+	
+	public String toString();
 }
