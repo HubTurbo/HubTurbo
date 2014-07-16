@@ -36,14 +36,6 @@ public class IssueUpdateService extends UpdateService<Issue>{
 		return params;
 	}
 	
-	private String getFormattedDate(Date date){
-		TimeZone tz = TimeZone.getTimeZone("UTC");
-	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-	    df.setTimeZone(tz);
-	    String formatted = df.format(date);
-	    return formatted;
-	}
-	
 	@Override
 	public ArrayList<Issue> getUpdatedItems(IRepositoryIdProvider repoId){
 		ArrayList<Issue> updatedItems = super.getUpdatedItems(repoId);

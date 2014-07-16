@@ -5,10 +5,12 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -27,6 +29,14 @@ public class UpdateService<T> {
 	
 	protected void updateLastETag(HttpURLConnection connection){
 		lastETag = connection.getHeaderField("ETag");
+	}
+	
+	protected String getFormattedDate(Date date){
+		TimeZone tz = TimeZone.getTimeZone("UTC");
+	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+	    df.setTimeZone(tz);
+	    String formatted = df.format(date);
+	    return formatted;
 	}
 	
 	private void updateLastCheckTime(HttpURLConnection connection) throws ParseException{
