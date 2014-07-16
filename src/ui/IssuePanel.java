@@ -54,7 +54,7 @@ public class IssuePanel extends Column {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(mainStage, model, that.get(), columnIndex);
+					return new IssuePanelCell(mainStage, model, that.get(), columnIndex, sidePanel, parentColumnControl);
 				} else{
 					return null;
 				}
