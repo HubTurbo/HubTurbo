@@ -96,11 +96,14 @@ public abstract class Column extends VBox {
 		setOnDragDropped(e -> {
 			Dragboard db = e.getDragboard();
 			boolean success = false;
+
 			if (db.hasString()) {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
-				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-				applyCurrentFilterExpressionToIssue(rightIssue, true);
+				if (dd.getColumnIndex() != columnIndex) {
+					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+					applyCurrentFilterExpressionToIssue(rightIssue, true);
+				}
 			}
 			e.setDropCompleted(success);
 
