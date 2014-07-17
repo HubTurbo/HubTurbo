@@ -61,8 +61,8 @@ public class IssuePanelCard extends VBox {
 		
 		setMaxWidth(350);
 		getStyleClass().addAll("borders", "rounded-borders");
-		setPadding(new Insets(5,5,5,5));
-		setSpacing(5);
+		setPadding(new Insets(0,5,0,5));
+		setSpacing(3);
 		getChildren().addAll(issueTitle, labels, bottom);
 	}
 	

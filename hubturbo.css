@@ -19,7 +19,7 @@
 }
 
 .display-box-padding {
-	-fx-padding: 5;
+	-fx-padding: 1;
 }
 
 .dragged-over {
@@ -34,7 +34,7 @@
 }
 
 .issue-panel-name {
-	-fx-font-size: 18px;
+	-fx-font-size: 14px;
 }
 
 .issue-panel-closed {
@@ -42,10 +42,12 @@
 }
 
 .labels {
-	-fx-text-fill: white; -fx-background-radius: 5; -fx-border-radius: 20; -fx-padding: 5;
+<<<<<<< 60766c2073e77042c630e236d6692b8e5a43ee45
+	-fx-text-fill: white; -fx-background-radius: 3; -fx-padding: 1 5;
 }
 
 /* For buttons that are used as labels (the + and x buttons on columns) */
 .label-button {
 	-fx-font-size: 16pt;
 }
+>>>>>>> d05f23b1e49209df55552dbd743ebb04444acd8f
