@@ -42,7 +42,6 @@
 }
 
 .labels {
-<<<<<<< 60766c2073e77042c630e236d6692b8e5a43ee45
 	-fx-text-fill: white; -fx-background-radius: 3; -fx-padding: 1 5;
 }
 
@@ -50,4 +49,3 @@
 .label-button {
 	-fx-font-size: 16pt;
 }
->>>>>>> d05f23b1e49209df55552dbd743ebb04444acd8f
