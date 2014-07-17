@@ -11,6 +11,7 @@ import model.TurboIssue;
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
+import service.updateservice.CommentUpdateService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -34,6 +35,7 @@ public class IssueDetailsDisplay extends VBox {
 	private ObservableList<TurboComment> log = FXCollections.observableArrayList();
 	
 	private ListChangeListener<Comment> commentsChangeListener;
+	private CommentUpdateService commentsUpdater;
 	
 	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
@@ -56,7 +58,8 @@ public class IssueDetailsDisplay extends VBox {
 	
 	private void setupContent(){
 		getDetailsContent();
-		ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
+		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
+		//TODO:
 		setupCommentsChangeListener();
 	}
 	
@@ -72,7 +75,6 @@ public class IssueDetailsDisplay extends VBox {
 					self.updateData();
 				}
 			}
-			
 		};
 		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
 		allGhContent.addListener(listener);

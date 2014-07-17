@@ -37,17 +37,26 @@ public class IssueDisplayPane extends HBox {
 
 
 	private void setup() {
-		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this);
-		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
-		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
-
-		this.issueDetailsDisplay = new IssueDetailsDisplay(issue);
-		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
-		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
+		setupIssueEditDisplay();
 		this.getChildren().add(issueEditDisplay);
 	}
 	
+	private void setupIssueEditDisplay(){
+		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this);
+		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
+		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
+	}
+	
+	private void setupIssueDetailsDisplay(){
+		this.issueDetailsDisplay = new IssueDetailsDisplay(issue);
+		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
+		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
+	}
+	
 	protected void showIssueDetailsDisplay(boolean show){
+		if(issueDetailsDisplay == null){
+			setupIssueDetailsDisplay();
+		}
 		if(show){
 			this.getChildren().add(issueDetailsDisplay);
 		}else{
