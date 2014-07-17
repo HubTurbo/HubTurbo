@@ -4,6 +4,11 @@
 	-fx-border-width: 1px;
 }
 
+.top-borders {
+	-fx-border-color: #7f7f7f transparent transparent transparent;
+	-fx-border-width: 1px;
+}
+
 .faded-borders {
 	-fx-border-color: #B2B1AE;
 	-fx-border-width: 1px;

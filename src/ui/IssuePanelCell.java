@@ -34,6 +34,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		setGraphic(new IssuePanelCard(issue));
 		setAlignment(Pos.CENTER);
+		getStyleClass().add("top-borders");
 		
 //		registerEvents(issue);
 		
@@ -53,30 +54,4 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue.getId()).get());
 	}
-
-//	private void registerEvents(TurboIssue issue) {
-//		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-//		setOnMouseClicked((MouseEvent mouseEvent) -> {
-//			if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-//				if (mouseEvent.getClickCount() == 2) {
-////					onDoubleClick(issueRef.get());
-//				}
-//			}
-//		});
-//	}
-
-//	private void onDoubleClick(TurboIssue issue) {
-//		TurboIssue oldIssue = new TurboIssue(issue);
-//		TurboIssue modifiedIssue = new TurboIssue(issue);
-//		(new IssueDialog(mainStage, model, modifiedIssue)).show().thenApply(
-//				response -> {
-//					if (response.equals("done")) {
-//						model.updateIssue(oldIssue, modifiedIssue);
-//					}
-//					return true;
-//				}).exceptionally(ex -> {
-//					ex.printStackTrace();
-//					return false;
-//				});
-//	}
 }

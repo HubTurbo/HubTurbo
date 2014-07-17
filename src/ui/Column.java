@@ -147,7 +147,7 @@ public abstract class Column extends VBox {
 
 	private void setupColumn() {
 		setPrefWidth(380);
-		setMaxWidth(380);
+		setMinWidth(380);
 		
 		getStyleClass().add("borders");
 		
