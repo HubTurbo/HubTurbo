@@ -97,7 +97,8 @@ public class Model {
 			return;
 		}
 		WeakReference<Model> selfRef = new WeakReference<Model>(this);
-		for(Issue issue: issueList){
+		for(int i = issueList.size() - 1; i >= 0; i--){
+			Issue issue = issueList.get(i);
 			Platform.runLater(new Runnable() {
 		        @Override
 		        public void run() {
