@@ -13,7 +13,7 @@ import model.TurboUser;
 
 public class Predicate implements FilterExpression {
 	
-	public static final Predicate EMPTY = new filter.Predicate();
+	public static final Predicate EMPTY = new filter.Predicate("", "");
 
 	private final String name;
 	private final String content;
@@ -23,11 +23,6 @@ public class Predicate implements FilterExpression {
 		this.content = content;
 	}
 	
-	private Predicate() {
-		this.name = null;
-		this.content = null;
-	}
-
 	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
 		// The empty predicate is satisfied by anything
 		if (name == null && content == null) return true;
