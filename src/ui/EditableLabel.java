@@ -15,6 +15,7 @@ public class EditableLabel extends HBox {
 	
 	private Function<String, String> postEditTransformation = (s) -> s;
 	private Function<String, String> translation = (s) -> s;
+	private Runnable cancel = () -> {};
 	private String previousText = "";
 	
 	public EditableLabel(String initialText) {
@@ -42,6 +43,7 @@ public class EditableLabel extends HBox {
 					setLabelText(textField.getText());
 				} else {
 					textField.setText(previousText);
+					cancel.run();
 				}
 			}
 		});
@@ -70,6 +72,11 @@ public class EditableLabel extends HBox {
 
 	public EditableLabel setTranslationFunction(Function<String, String> translationFunction) {
 		this.translation = translationFunction;
+		return this;
+	}
+
+	public EditableLabel setOnCancel(Runnable cancel) {
+		this.cancel = cancel;
 		return this;
 	}
 }

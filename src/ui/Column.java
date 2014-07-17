@@ -84,6 +84,11 @@ public abstract class Column extends VBox {
 				applyStringFilter(filterString);
 				// filterResponse is set after filterByString is called
 				return filterResponse;
+			})
+			.setOnCancel(() -> {
+				if (isSearchPanel) {
+					parentColumnControl.closeColumn(columnIndex);
+				}
 			});
 
 		if (isSearchPanel) filterInputArea.triggerEdit();
