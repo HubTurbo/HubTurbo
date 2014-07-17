@@ -1,5 +1,7 @@
 package model;
 
+import javafx.scene.image.Image;
+
 import org.eclipse.egit.github.core.User;
 
 public class TurboUser implements Listable {
@@ -25,13 +27,14 @@ public class TurboUser implements Listable {
 		this.realName = realName;
 	}
 	
-	private String avatarUrl;
-	public String getAvatarUrl(){
-		return avatarUrl;
+	private Image avatar;
+	public Image getAvatar() {
+		return this.avatar;
 	}
-	public void setAvatarUrl(String url){
-		avatarUrl = url;
+	public void setAvatar(Image avatar) {
+		this.avatar = avatar;
 	}
+	
 	/*
 	 * Constructors and Public Methods
 	 */
@@ -45,7 +48,7 @@ public class TurboUser implements Listable {
 
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
-		this.avatarUrl = user.getAvatarUrl();
+		this.avatar = new Image(user.getAvatarUrl(), 12, 12, true, true);
 	}
 	
 	public User toGhResource() {
@@ -59,7 +62,7 @@ public class TurboUser implements Listable {
 			TurboUser obj = (TurboUser)other;
 			setGithubName(obj.getGithubName());
 			setRealName(obj.getRealName());
-			setAvatarUrl(obj.getAvatarUrl());
+			setAvatar(obj.getAvatar());
 		}
 	}
 	
