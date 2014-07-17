@@ -13,7 +13,8 @@ public class EditableLabel extends HBox {
 	private final TextField textField = new TextField();
 	private final Label label = new Label();
 	
-	private Function<String, String> translationFunction = (s) -> s;
+	private Function<String, String> postEditTransformation = (s) -> s;
+	private Function<String, String> translation = (s) -> s;
 	private String previousText = "";
 	
 	public EditableLabel(String initialText) {
@@ -37,6 +38,7 @@ public class EditableLabel extends HBox {
 				getChildren().clear();
 				getChildren().add(label);
 				if (e.getCode() == KeyCode.ENTER) {
+					textField.setText(postEditTransformation.apply(textField.getText()));
 					setLabelText(textField.getText());
 				} else {
 					textField.setText(previousText);
@@ -53,7 +55,7 @@ public class EditableLabel extends HBox {
 	}
 	
 	private void setLabelText(String text) {
-		label.setText(translationFunction.apply(text));
+		label.setText(translation.apply(text));
 	}
 
 	public void setTextFieldText(String text) {
@@ -61,8 +63,13 @@ public class EditableLabel extends HBox {
 		setLabelText(text);
 	}
 
+	public EditableLabel setEditTransformation(Function<String, String> postEditTransformation) {
+		this.postEditTransformation = postEditTransformation;
+		return this;
+	}
+
 	public EditableLabel setTranslationFunction(Function<String, String> translationFunction) {
-		this.translationFunction = translationFunction;
+		this.translation = translationFunction;
 		return this;
 	}
 }

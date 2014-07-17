@@ -43,7 +43,8 @@ public abstract class Column extends VBox {
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
 	private final SidePanel sidePanel;
-
+	private boolean isSearchPanel = false;
+	
 	// Filter-related
 	
 	private Predicate<TurboIssue> predicate = p -> true;
@@ -58,12 +59,13 @@ public abstract class Column extends VBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = dragAndDropExecutor;
+		this.isSearchPanel = isSearchPanel;
 		
 		getChildren().add(createFilterBox());
 		setupColumn();
@@ -71,11 +73,20 @@ public abstract class Column extends VBox {
 	
 	private Node createFilterBox() {
 		filterInputArea = new EditableLabel(NO_FILTER)
+			.setEditTransformation(s -> {
+				if (isSearchPanel) {
+					isSearchPanel = false;
+					return "title(" + s + ")";
+				}
+				return s;
+			})
 			.setTranslationFunction(filterString -> {
 				applyStringFilter(filterString);
 				// filterResponse is set after filterByString is called
 				return filterResponse;
 			});
+
+		if (isSearchPanel) filterInputArea.triggerEdit();
 		
 		HBox filterFieldBox = new HBox();
 		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
@@ -290,6 +301,10 @@ public abstract class Column extends VBox {
 	
 	public FilterExpression getCurrentFilterExpression() {
 		return currentFilterExpression;
+	}
+	
+	public boolean isSearchPanel() {
+		return isSearchPanel;
 	}
 	
 	// To be called by ColumnControl in order to update indices
