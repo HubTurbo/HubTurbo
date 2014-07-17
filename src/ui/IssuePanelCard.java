@@ -87,7 +87,7 @@ public class IssuePanelCard extends VBox {
 			Label milestone = new Label(issue.getMilestone().getTitle());
 			issueDetails.getChildren().add(milestone);
 		}
-		
+
 		if (issue.getAssignee() != null) {
 			Label assignee = new Label((issue.getAssignee().getGithubName()));
 			assignee.getStyleClass().add("display-box-padding");
