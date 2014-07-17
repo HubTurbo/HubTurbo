@@ -47,6 +47,13 @@ public class EditableLabel extends HBox {
 				}
 			}
 		});
+		
+		textField.focusedProperty().addListener((obs, old, newValue) -> {
+			if (!newValue) { // on losing focus
+				textField.setText(previousText);
+				cancel.run();
+			}
+		});
 	}
 
 	public void triggerEdit() {
