@@ -255,8 +255,7 @@ public class Model {
 	
 	private void setCachedCollaborators(List<User> ghCollaborators){
 		collaborators.clear();
-		ghCollaborators.stream()
-					   .forEach(ghCollaborator -> collaborators.add(new TurboUser(ghCollaborator)));
+		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
 	}
 	
 	private boolean loadIssues() {

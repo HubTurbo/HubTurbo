@@ -32,42 +32,51 @@ public class CollectionUtilities {
 		HashSet<T> added = new HashSet<T>(edited);
 		removed.removeAll(edited);
 		added.removeAll(original);
-		
+
 		changeSet.put(REMOVED_TAG, removed);
 		changeSet.put(ADDED_TAG, added);
-		
+
 		return changeSet;
 	}
-	
+
 	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues){
 		ArrayList<TurboIssue> buffer = new ArrayList<>();
-		issues.stream()
-			  .forEachOrdered(ghIssue -> buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel())));
+		System.out.println("loading...");
+		for (Issue ghIssue : issues) {
+			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel()));
+		}
 		return buffer;
 	}
-	
+
 	public static ArrayList<TurboLabel> getHubTurboLabelList(List<Label> labels){
 		ArrayList<TurboLabel> buffer = new ArrayList<>();
-		labels.stream().forEachOrdered(ghLabel -> buffer.add(new TurboLabel(ghLabel)));
+		for (Label ghLabel : labels) {
+			buffer.add(new TurboLabel(ghLabel));
+		}
 		return buffer;
 	}
-	
+
 	public static ArrayList<TurboMilestone> getHubTurboMilestoneList(List<Milestone> milestones){
 		ArrayList<TurboMilestone> buffer = new ArrayList<>();
-		milestones.stream()
-				  .forEachOrdered(ghMilestone -> buffer.add(new TurboMilestone(ghMilestone)));
+		for(Milestone ghMilestone : milestones){
+			buffer.add(new TurboMilestone(ghMilestone));
+		}
 		return buffer;
 	}
-	
+
 	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users){
 		ArrayList<TurboUser> buffer = new ArrayList<>();
-		users.stream().forEachOrdered(ghUser -> buffer.add(new TurboUser(ghUser)));
+		for(User ghUser: users){
+			buffer.add(new TurboUser(ghUser));
+		}
 		return buffer;
 	}
-	
+
 	public static ArrayList<Label> getGithubLabelList(List<TurboLabel> labels){
 		ArrayList<Label> githubLabels = new ArrayList<Label>();
-		labels.stream().forEachOrdered(label -> githubLabels.add(label.toGhResource()));
+		for(TurboLabel label : labels){
+			githubLabels.add(label.toGhResource());
+		}
 		return githubLabels;
 	}
 }
