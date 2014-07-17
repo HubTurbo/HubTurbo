@@ -14,6 +14,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -36,6 +37,7 @@ public class ServiceManager {
 	private IssueServiceExtended issueService;
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
+	private RepositoryServiceExtended repositoryService;
 	
 	private ModelUpdater modelUpdater;
 	private Model model;
@@ -51,6 +53,7 @@ public class ServiceManager {
 		issueService = new IssueServiceExtended(githubClient);
 		labelService = new LabelServiceFixed(githubClient);
 		milestoneService = new MilestoneService(githubClient);
+		repositoryService = new RepositoryServiceExtended(githubClient);
 		model = new Model();
 	}
 
@@ -353,5 +356,24 @@ public class ServiceManager {
 			issueService.setIssueAssignee(repoId, issueId, user);
 		}
 	}
-
+	
+	/**
+	 * Get user repositories
+	 * */
+	
+	public List<Repository> getRepositories() throws IOException{
+		return repositoryService.getRepositories();
+	}
+	
+	public List<String> getRepositoriesNames() throws IOException{
+		return repositoryService.getRepositoriesNames();
+	}
+	
+	public List<Repository> getAllRepositories() throws IOException{
+		return repositoryService.getAllRepositories();
+	}
+	
+	public List<String> getAllRepositoryNames() throws IOException{
+		return repositoryService.getAllRepositoriesNames();
+	}
 }
