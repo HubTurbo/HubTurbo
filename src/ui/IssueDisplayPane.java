@@ -59,8 +59,10 @@ public class IssueDisplayPane extends HBox {
 		}
 		if(show){
 			this.getChildren().add(issueDetailsDisplay);
+			issueDetailsDisplay.show();
 		}else{
 			this.getChildren().remove(issueDetailsDisplay);
+			issueDetailsDisplay.hide();
 		}
 	}
 }

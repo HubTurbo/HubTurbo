@@ -1,5 +1,7 @@
 package ui;
 
+import handler.IssueDetailsContentHandler;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -28,19 +30,18 @@ public class IssueDetailsDisplay extends VBox {
 	
 	private TabPane detailsTab;
 	
+	private IssueDetailsContentHandler contentHandler;
+	
 	private TurboIssue issue;
-	
-	private ObservableList<Comment> allGhContent = FXCollections.observableArrayList();
-	private ObservableList<TurboComment> comments = FXCollections.observableArrayList();
-	private ObservableList<TurboComment> log = FXCollections.observableArrayList();
-	
-	private ListChangeListener<Comment> commentsChangeListener;
-	private CommentUpdateService commentsUpdater;
 	
 	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
-		setupContent();
+		setupDetailsContents();
 		setupDisplay();
+	}
+	
+	private void setupDetailsContents(){
+		contentHandler = new IssueDetailsContentHandler(issue);
 	}
 	
 	
@@ -56,80 +57,16 @@ public class IssueDetailsDisplay extends VBox {
 		this.getChildren().add(detailsTab);
 	}
 	
-	private void setupContent(){
-		getDetailsContent();
-		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
-		//TODO:
-		setupCommentsChangeListener();
+	public void show(){
+		contentHandler.startContentUpdate();
 	}
 	
-	private void setupCommentsChangeListener(){
-		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);
-		commentsChangeListener = new ListChangeListener<Comment>(){
-
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends Comment> arg0) {
-				IssueDetailsDisplay self = selfRef.get();
-				if(self != null){
-					self.updateData();
-				}
-			}
-		};
-		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
-		allGhContent.addListener(listener);
-	}
-	
-	private void updateData(){
-		updateCommentsList();
-		updateLogContents();
-	}
-	
-	private void getDetailsContent(){
-		try {
-			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
-			allGhContent.addAll(allItems);
-			updateData();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void updateCommentsList(){
-		List<TurboComment> filteredComments = allGhContent.stream()
-												   .map(item -> new TurboComment(item))
-												   .filter(item -> !item.isIssueLog())
-												   .collect(Collectors.toList());
-		for(int i = filteredComments.size() - 1; i >= 0; i--){
-			updateItemInCommentsList(filteredComments.get(i));
-		}
-	}
-	
-	private void updateItemInCommentsList(TurboComment comment){
-		for(TurboComment item : comments){
-			if(item.getId() == comment.getId()){
-				item.copyValues(comment);
-				return;
-			}
-		}
-		comments.add(0, comment);
-	}
-	
-	private void updateLogContents(){
-		List<TurboComment> logItems = allGhContent.stream()
-										   .map(item -> new TurboComment(item))
-				   						   .filter(item -> item.isIssueLog())
-				   						   .collect(Collectors.toList());
-		log.clear();
-		log.addAll(logItems);
+	public void hide(){
+		contentHandler.stopContentUpdate();
 	}
 	
 	private DetailsPanel createTabContentsDisplay(DisplayType type){
-		if(type == DisplayType.COMMENTS){
-			return new DetailsPanel(issue, comments, type);
-		}else{
-			return new DetailsPanel(issue, log, type);
-		}
+		return new DetailsPanel(issue, contentHandler, type);
 	}
 	
 	private Tab createCommentsTab(){

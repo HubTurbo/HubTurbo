@@ -1,8 +1,8 @@
 package ui;
 
+import handler.IssueDetailsContentHandler;
 import model.TurboComment;
 import model.TurboIssue;
-
 import ui.IssueDetailsDisplay.DisplayType;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
@@ -13,14 +13,16 @@ import javafx.util.Callback;
 public class DetailsPanel extends VBox {
 	
 	private ListView<TurboComment> listView;
+	private IssueDetailsContentHandler handler;
 	private ObservableList<TurboComment> commentsList;
 	private TurboIssue issue;
 	private DisplayType displayType;
 	
-	public DetailsPanel(TurboIssue issue, ObservableList<TurboComment> comments, DisplayType displayType){
+	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler, DisplayType displayType){
 		this.issue = issue;
 		this.listView = new ListView<TurboComment>();
-		this.commentsList = comments;
+		this.handler = handler;
+		this.commentsList = handler.getComments();
 		this.displayType = displayType;
 		loadItems();
 	}
