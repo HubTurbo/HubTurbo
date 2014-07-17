@@ -1,10 +1,6 @@
 package ui;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,12 +31,12 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 		milestoneTitleField.setText(originalMilestone.getTitle());
 		
 		DatePicker datePicker = (originalMilestone.getDueOn() != null) ?
-			new DatePicker(toTimeDate(originalMilestone.getDueOn())) : new DatePicker();
+			new DatePicker(originalMilestone.getDueOn()) : new DatePicker();
 		datePicker.setPrefWidth(110);
 
 		Button done = new Button("Done");
 		done.setOnAction(e -> {
-			respond(milestoneTitleField.getText(), toUtilDate(datePicker.getValue()));
+			respond(milestoneTitleField.getText(), datePicker.getValue());
 			close();
 		});
 		
@@ -52,21 +48,8 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 
 		return layout;
 	}
-	
-	private LocalDate toTimeDate(Date date) {
-		Instant instant = date.toInstant();
-		ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-		LocalDate localDate = zdt.toLocalDate();
-		return localDate;
-	}
 
-	private Date toUtilDate(LocalDate localDate) {
-		long epochInMilliseconds = localDate.toEpochDay() * 24 * 60 * 60 * 1000;
-		Date date = new Date(epochInMilliseconds);
-		return date;
-	}
-
-	private void respond(String title, Date dueDate) {
+	private void respond(String title, LocalDate dueDate) {
 		originalMilestone.setTitle(title);
 		originalMilestone.setDueOn(dueDate);
 		completeResponse(originalMilestone);

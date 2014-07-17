@@ -1,5 +1,9 @@
 package model;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -28,9 +32,9 @@ public class TurboMilestone implements Listable {
 	public String getDescription() {return description;}
 	public void setDescription(String description) {this.description = description;}
 	
-	private Date dueOn;
-	public Date getDueOn() {return dueOn;}
-	public void setDueOn(Date dueOn) {this.dueOn = dueOn;}
+	private LocalDate dueOn;
+	public LocalDate getDueOn() {return dueOn;}
+	public void setDueOn(LocalDate dueOn) {this.dueOn = dueOn;}
 	
 	/*
 	 * Constructors and Public Methods
@@ -50,7 +54,7 @@ public class TurboMilestone implements Listable {
 		this.number = milestone.getNumber();
 		this.state = milestone.getState();
 		this.description = milestone.getDescription();
-		this.dueOn = milestone.getDueOn();
+		this.dueOn = toLocalDate(milestone.getDueOn());
 	}
 	
 	public Milestone toGhResource() {
@@ -59,7 +63,7 @@ public class TurboMilestone implements Listable {
 		ghMilestone.setNumber(number);
 		ghMilestone.setState(state);
 		ghMilestone.setDescription(description);
-		ghMilestone.setDueOn(dueOn);
+		ghMilestone.setDueOn(toDate(dueOn));
 		return ghMilestone;
 	}
 	
@@ -71,6 +75,33 @@ public class TurboMilestone implements Listable {
 			this.description = obj.getDescription();
 			this.dueOn = obj.getDueOn();
 		}
+	}
+	
+	/*
+	 * Private Methods
+	 */
+	
+	private LocalDate toLocalDate(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Instant instant = date.toInstant();
+		ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+		LocalDate localDate = zdt.toLocalDate();
+		// Minus one day as GitHub API milestone due date is one day
+		// ahead of GitHub UI milestone due date
+		return localDate.minusDays(1);
+	}
+
+	private Date toDate(LocalDate localDate) {
+		if (localDate == null) {
+			return null;
+		}
+		// Plus one day as GitHub UI milestone due date is one day
+		// behind of GitHub API milestone due date
+		long epochInMilliseconds = (localDate.toEpochDay() + 1) * 24 * 60 * 60 * 1000;
+		Date date = new Date(epochInMilliseconds);
+		return date;
 	}
 	
 	/*
