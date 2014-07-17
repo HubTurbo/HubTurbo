@@ -200,7 +200,7 @@ public class Predicate implements FilterExpression {
 		String parent = content.toLowerCase();
 		int index = parseIdString(parent);
 		if (index != -1) {
-			return issue.getParentIssue() == index;
+			return issue.getParentIssue() == index || issue.getId() == index;
 		} else {
 			List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
 			for (int i=0; i<actualParentInstances.size(); i++) {
