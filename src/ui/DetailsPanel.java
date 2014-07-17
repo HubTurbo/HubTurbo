@@ -1,8 +1,7 @@
 package ui;
 
+import model.TurboComment;
 import model.TurboIssue;
-
-import org.eclipse.egit.github.core.Comment;
 
 import ui.IssueDetailsDisplay.DisplayType;
 import javafx.collections.ObservableList;
@@ -13,23 +12,23 @@ import javafx.util.Callback;
 
 public class DetailsPanel extends VBox {
 	
-	private ListView<Comment> listView;
-	private ObservableList<Comment> commentsList;
+	private ListView<TurboComment> listView;
+	private ObservableList<TurboComment> commentsList;
 	private TurboIssue issue;
 	private DisplayType displayType;
 	
-	public DetailsPanel(TurboIssue issue, ObservableList<Comment> comments, DisplayType displayType){
+	public DetailsPanel(TurboIssue issue, ObservableList<TurboComment> comments, DisplayType displayType){
 		this.issue = issue;
-		this.listView = new ListView<Comment>();
+		this.listView = new ListView<TurboComment>();
 		this.commentsList = comments;
 		this.displayType = displayType;
 		loadItems();
 	}
 	
-	private Callback<ListView<Comment>, ListCell<Comment>> commentCellFactory(){
-		Callback<ListView<Comment>, ListCell<Comment>> factory = new Callback<ListView<Comment>, ListCell<Comment>>() {
+	private Callback<ListView<TurboComment>, ListCell<TurboComment>> commentCellFactory(){
+		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
 			@Override
-			public ListCell<Comment> call(ListView<Comment> list) {
+			public ListCell<TurboComment> call(ListView<TurboComment> list) {
 				return new DetailsCell(issue, displayType);
 			}
 		};

@@ -1,16 +1,20 @@
 package ui;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import model.TurboComment;
 import model.TurboIssue;
 
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
@@ -23,14 +27,17 @@ public class IssueDetailsDisplay extends VBox {
 	
 	private TabPane detailsTab;
 	
-	TurboIssue issue;
-	private ObservableList<Comment> allContent = FXCollections.observableArrayList();
-	private ObservableList<Comment> comments = FXCollections.observableArrayList();
-	private ObservableList<Comment> log = FXCollections.observableArrayList();
+	private TurboIssue issue;
+	
+	private ObservableList<Comment> allGhContent = FXCollections.observableArrayList();
+	private ObservableList<TurboComment> comments = FXCollections.observableArrayList();
+	private ObservableList<TurboComment> log = FXCollections.observableArrayList();
+	
+	private ListChangeListener<Comment> commentsChangeListener;
 	
 	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
-
+		setupContent();
 		setupDisplay();
 	}
 	
@@ -47,40 +54,59 @@ public class IssueDetailsDisplay extends VBox {
 		this.getChildren().add(detailsTab);
 	}
 	
-	private void setup(){
-		
+	private void setupContent(){
+		getDetailsContent();
+		ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
+		setupCommentsChangeListener();
+	}
+	
+	private void setupCommentsChangeListener(){
+		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);
+		commentsChangeListener = new ListChangeListener<Comment>(){
+
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends Comment> arg0) {
+				IssueDetailsDisplay self = selfRef.get();
+				if(self != null){
+					self.updateData();
+				}
+			}
+			
+		};
+		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
+		allGhContent.addListener(listener);
+	}
+	
+	private void updateData(){
+		updateCommentsList();
+		updateLogContents();
 	}
 	
 	private void getDetailsContent(){
 		try {
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
-			allContent.addAll(allItems);
-			updateCommentsList();
-			updateLogContents();
+			allGhContent.addAll(allItems);
+			updateData();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private boolean isIssueLog(Comment comment){
-		String text = comment.getBody();
-		return text.startsWith(ServiceManager.CHANGELOG_TAG);
-	}
-	
+
 	private void updateCommentsList(){
-		List<Comment> filteredComments = allContent.stream()
-												   .filter(item -> !isIssueLog(item))
+		List<TurboComment> filteredComments = allGhContent.stream()
+												   .map(item -> new TurboComment(item))
+												   .filter(item -> !item.isIssueLog())
 												   .collect(Collectors.toList());
 		for(int i = filteredComments.size() - 1; i >= 0; i--){
 			updateItemInCommentsList(filteredComments.get(i));
 		}
 	}
 	
-	private void updateItemInCommentsList(Comment comment){
-		for(Comment item : comments){
+	private void updateItemInCommentsList(TurboComment comment){
+		for(TurboComment item : comments){
 			if(item.getId() == comment.getId()){
-				//TODO:
+				item.copyValues(comment);
 				return;
 			}
 		}
@@ -88,8 +114,9 @@ public class IssueDetailsDisplay extends VBox {
 	}
 	
 	private void updateLogContents(){
-		List<Comment> logItems = allContent.stream()
-				   						   .filter(item -> isIssueLog(item))
+		List<TurboComment> logItems = allGhContent.stream()
+										   .map(item -> new TurboComment(item))
+				   						   .filter(item -> item.isIssueLog())
 				   						   .collect(Collectors.toList());
 		log.clear();
 		log.addAll(logItems);
