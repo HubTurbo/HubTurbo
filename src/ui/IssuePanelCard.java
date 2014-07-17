@@ -8,6 +8,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -46,7 +47,8 @@ public class IssuePanelCard extends VBox {
 		if (assignee != null) {
 			Label assigneeName = new Label(assignee.getGithubName());
 			assigneeName.getStyleClass().add("display-box-padding");
-			rightAlignBox.getChildren().addAll(assigneeName);
+			ImageView avatarView = new ImageView(assignee.getAvatar());
+			rightAlignBox.getChildren().addAll(avatarView, assigneeName);
 		}
 
 		HBox leftAlignBox = new HBox();
@@ -61,8 +63,8 @@ public class IssuePanelCard extends VBox {
 		
 		setMaxWidth(350);
 		getStyleClass().addAll("borders", "rounded-borders");
-		setPadding(new Insets(5,5,5,5));
-		setSpacing(5);
+		setPadding(new Insets(0,5,0,5));
+		setSpacing(3);
 		getChildren().addAll(issueTitle, labels, bottom);
 	}
 	

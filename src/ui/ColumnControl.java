@@ -3,7 +3,6 @@ package ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -44,10 +43,10 @@ public class ColumnControl extends HBox {
 		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
-				addColumn().filterByString(filter);
+				addColumn(false).filterByString(filter);
 			}
 		} else {
-			addColumn();
+			addColumn(false);
 		}
 	}
 
@@ -72,13 +71,21 @@ public class ColumnControl extends HBox {
 	}
 
 	public void addColumnEvent(MouseEvent e) {
-		addColumn();
+		addColumn(false);
 	}
 	
-	public Column addColumn() {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
+	private Column addColumn(boolean isSearchPanel) {
+		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
+		return panel;
+	}
+
+	public Column addColumnAt(boolean isSearchPanel, int index) {
+		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
+		getChildren().add(index, panel);
+		panel.setItems(model.getIssues());
+		updateColumnIndices();
 		return panel;
 	}
 
@@ -88,6 +95,10 @@ public class ColumnControl extends HBox {
 	
 	public void closeColumn(int index) {
 		getChildren().remove(index);
+		updateColumnIndices();
+	}
+
+	private void updateColumnIndices() {
 		int i = 0;
 		for (Node c : getChildren()) {
 			((Column) c).updateIndex(i++);
@@ -99,34 +110,17 @@ public class ColumnControl extends HBox {
 		Column current = (Column) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
 		if (current instanceof HierarchicalIssuePanel) {
-			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
+			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		} else {
-			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor);
+			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		}
 		column.setItems(model.getIssues());
 		column.filter(currentFilterExpr);
 		getChildren().set(index, column);
 	}
-	
-	public ColumnControl setColumnCount(int to) {
-		ObservableList<Node> panels = getChildren();
-		int panelSize = panels.size();
-
-		if (panelSize == to) {
-			return this;
-		}
-
-		if (panelSize < to) {
-			for (int i = 0; i < to - panelSize; i++) {
-				addColumn();
-			}
-		} else {
-			assert panels.size() > to;
-			int numberToRemove = panels.size() - to;
-			panels.remove(panels.size() - numberToRemove, panels.size());
-		}
 		
-		return this;
+	public void createNewSearchPanel() {
+		addColumnAt(true, 0);
 	}
 
 	public void saveSession() {

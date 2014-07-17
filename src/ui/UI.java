@@ -6,7 +6,9 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -34,7 +36,7 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		mainStage = stage;
-		
+		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot(), 800, 600);
 		setupMainStage(scene);
 		applyCSS(scene);
@@ -76,6 +78,9 @@ public class UI extends Application {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
 		});
+		
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), columns::createNewSearchPanel);
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN), sidePanel::onCreateIssueHotkey);
 	}
 
 	private Parent createRoot() throws IOException {

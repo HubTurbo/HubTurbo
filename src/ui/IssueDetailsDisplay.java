@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class IssueDetailsDisplay extends VBox {
 	public enum DisplayType{
@@ -23,15 +22,15 @@ public class IssueDetailsDisplay extends VBox {
 	}
 	
 	private TabPane detailsTab;
-	private Stage parentStage;
+	
 	TurboIssue issue;
 	private ObservableList<Comment> allContent = FXCollections.observableArrayList();
 	private ObservableList<Comment> comments = FXCollections.observableArrayList();
 	private ObservableList<Comment> log = FXCollections.observableArrayList();
 	
-	public IssueDetailsDisplay(Stage stage, TurboIssue issue){
-		this.parentStage = stage;
+	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
+
 		setupDisplay();
 	}
 	
