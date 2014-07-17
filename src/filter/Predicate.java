@@ -88,7 +88,7 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public List<String> getPredicateNames() {
-		return new ArrayList<String>(Arrays.asList(content));
+		return new ArrayList<String>(Arrays.asList(name));
 	}
 
 	@Override
