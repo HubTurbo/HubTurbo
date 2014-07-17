@@ -37,22 +37,22 @@ public abstract class Column extends VBox {
 	public static final String NO_FILTER = "No Filter";
 	public static final FilterExpression EMPTY = filter.Predicate.EMPTY;
 
-	private final Stage mainStage;
+//	private final Stage mainStage;
 	private final Model model;
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
 	private final SidePanel sidePanel;
 
 	private Predicate<TurboIssue> predicate = p -> true;
-	private String filterInput = "";
 	private FilterExpression currentFilterExpression = EMPTY;
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private FilteredList<TurboIssue> filteredList = null;
 	private TurboCommandExecutor dragAndDropExecutor;
-	private Label filterLabel;
+	private EditableLabel filterInputArea;
+	private String filterResponse;
 
 	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
-		this.mainStage = mainStage;
+//		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
@@ -114,13 +114,16 @@ public abstract class Column extends VBox {
 	private Node createFilterBox() {
 		HBox filterBox = new HBox();
 
-		filterLabel = new Label(NO_FILTER);
-		filterLabel.setPadding(new Insets(3));
+		filterInputArea = new EditableLabel(NO_FILTER)
+			.setTranslationFunction(filterString -> {
+				filterByString(filterString);
+				// filterResponse is set after filterByString is called
+				return filterResponse;
+			});
 		
-		filterBox.setOnMouseClicked(e -> onFilterBoxClick());
-		filterBox.setAlignment(Pos.TOP_LEFT);
+		filterBox.setAlignment(Pos.BASELINE_LEFT);
 		HBox.setHgrow(filterBox, Priority.ALWAYS);
-		filterBox.getChildren().add(filterLabel);
+		filterBox.getChildren().add(filterInputArea);
 		setupIssueDragEvents(filterBox);
 		
 		HBox rightAlignBox = new HBox();
@@ -199,27 +202,15 @@ public abstract class Column extends VBox {
 				DragData dd = DragData.deserialise(db.getString());
 				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
 				filterByString("parent(#" + rightIssue.getId() + ")");
+				filterInputArea.setTextFieldText(filterResponse);
 			}
 			e.setDropCompleted(success);
 
 			e.consume();
 		});
 	}
-
-	private void onFilterBoxClick() {
-		(new FilterDialog(mainStage, filterInput))
-			.show()
-			.thenApply(filterString -> {
-				filterByString(filterString);
-				return true;
-			}).exceptionally(ex -> {
-				ex.printStackTrace();
-				return false;
-			});
-	}
 	
 	public void filterByString(String filterString) {
-		filterInput = filterString;
 		try {
 			FilterExpression filter = Parser.parse(filterString);
 			if (filter != null) {
@@ -230,7 +221,7 @@ public abstract class Column extends VBox {
 		} catch (ParseException ex) {
 			this.filter(EMPTY);
 			// Override the text set in the above method
-			filterLabel.setText("Parse error in filter: " + ex.getMessage());
+			filterResponse = "Parse error in filter: " + ex.getMessage();
 		}
 	}
 	
@@ -238,9 +229,9 @@ public abstract class Column extends VBox {
 		currentFilterExpression = filter;
 		
 		if (filter == EMPTY) {
-			filterLabel.setText(NO_FILTER);
+			filterResponse = NO_FILTER;
 		} else {
-			filterLabel.setText(filter.toString());
+			filterResponse = filter.toString();
 		}
 
 		// This cast utilises a functional interface
