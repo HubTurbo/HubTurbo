@@ -47,5 +47,5 @@
 
 /* For buttons that are used as labels (the + and x buttons on columns) */
 .label-button {
-	-fx-font-size: 16pt;
+	-fx-font-size: 13pt;
 }

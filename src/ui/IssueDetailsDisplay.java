@@ -3,14 +3,11 @@ package ui;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class IssueDetailsDisplay extends VBox {
 	private TabPane detailsTab;
-	private Stage parentStage;
 	
-	public IssueDetailsDisplay(Stage stage){
-		this.parentStage = stage;
+	public IssueDetailsDisplay(){
 		setupDisplay();
 	}
 	

@@ -41,7 +41,7 @@ public class IssueDisplayPane extends HBox {
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 		
-		this.issueDetailsDisplay = new IssueDetailsDisplay(parentStage);
+		this.issueDetailsDisplay = new IssueDetailsDisplay();
 		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
 		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
 		this.getChildren().add(issueEditDisplay);

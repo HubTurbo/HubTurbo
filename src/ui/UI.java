@@ -34,7 +34,7 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		mainStage = stage;
-		
+		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot(), 800, 600);
 		setupMainStage(scene);
 		applyCSS(scene);
