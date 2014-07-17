@@ -47,8 +47,8 @@ public class IssuePanelCard extends VBox {
 		if (assignee != null) {
 			Label assigneeName = new Label(assignee.getGithubName());
 			assigneeName.getStyleClass().add("display-box-padding");
-			ImageView avatarView = new ImageView(assignee.getAvatar());
-			rightAlignBox.getChildren().addAll(avatarView, assigneeName);
+//			ImageView avatarView = new ImageView(assignee.getAvatar());
+			rightAlignBox.getChildren().addAll(assigneeName);
 		}
 
 		HBox leftAlignBox = new HBox();

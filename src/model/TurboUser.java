@@ -27,13 +27,13 @@ public class TurboUser implements Listable {
 		this.realName = realName;
 	}
 	
-	private Image avatar;
-	public Image getAvatar() {
-		return this.avatar;
-	}
-	public void setAvatar(Image avatar) {
-		this.avatar = avatar;
-	}
+//	private Image avatar;
+//	public Image getAvatar() {
+//		return this.avatar;
+//	}
+//	public void setAvatar(Image avatar) {
+//		this.avatar = avatar;
+//	}
 	
 	/*
 	 * Constructors and Public Methods
@@ -48,7 +48,7 @@ public class TurboUser implements Listable {
 
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
-		this.avatar = new Image(user.getAvatarUrl(), 12, 12, true, true);
+//		this.avatar = new Image(user.getAvatarUrl(), 12, 12, true, true);
 	}
 	
 	public User toGhResource() {
@@ -62,7 +62,7 @@ public class TurboUser implements Listable {
 			TurboUser obj = (TurboUser)other;
 			setGithubName(obj.getGithubName());
 			setRealName(obj.getRealName());
-			setAvatar(obj.getAvatar());
+//			setAvatar(obj.getAvatar());
 		}
 	}
 	

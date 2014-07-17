@@ -41,7 +41,6 @@ public class CollectionUtilities {
 
 	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues){
 		ArrayList<TurboIssue> buffer = new ArrayList<>();
-		System.out.println("loading...");
 		for (Issue ghIssue : issues) {
 			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel()));
 		}

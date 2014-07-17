@@ -302,7 +302,6 @@ public class TurboIssue implements Listable {
 		assert issue != null;
 		assert model != null;
 		this.model = new WeakReference<Model>(model);
-		System.out.println("start"+issue.getNumber());
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
 		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
@@ -314,7 +313,6 @@ public class TurboIssue implements Listable {
 		setParentIssue(extractIssueParent(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
 		setNumOfComments(issue.getComments());
-		System.out.println("end");
 	}
 
 	public Issue toGhResource() {
