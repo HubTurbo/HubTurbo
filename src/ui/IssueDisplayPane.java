@@ -17,14 +17,16 @@ public class IssueDisplayPane extends HBox {
 
 	private final TurboIssue issue;
 	private final Model model;
+	private final Stage parentStage;
 	private ColumnControl columns;
 	
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
 		
-	public IssueDisplayPane(TurboIssue displayedIssue, Model model, ColumnControl columns) {
+	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
 		this.issue = displayedIssue;
 		this.model = model;
+		this.parentStage = parentStage;
 		this.columns = columns;
 		setup();
 	}
@@ -35,7 +37,7 @@ public class IssueDisplayPane extends HBox {
 
 
 	private void setup() {
-		this.issueEditDisplay = new IssueEditDisplay(issue, model, columns, this);
+		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this);
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 
