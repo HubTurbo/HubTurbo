@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Stack;
 
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Priority;
@@ -13,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends Column {
@@ -57,7 +57,7 @@ public class HierarchicalIssuePanel extends Column {
 		// Build an adjacency list of issues and their children
 		
 		HashMap<Integer, ArrayList<TurboIssue>> childrenAdjList = new HashMap<>();
-		ObservableList<? extends TurboIssue> allIssues = getFilteredList().getSource();
+		ObservableList<? extends TurboIssue> allIssues = getIssueList().getSource();
 		for (TurboIssue issue : allIssues) {
 			int parentId = issue.getParentIssue();
 
@@ -72,7 +72,7 @@ public class HierarchicalIssuePanel extends Column {
 		
 		// Create all the items
 		
-		FilteredList<TurboIssue> filteredIssues = getFilteredList();
+		ObservableList<TurboIssue> filteredIssues = getIssueList();
 		HashMap<Integer, HierarchicalIssuePanelItem> items = new HashMap<>();
 		
 		// Make a pass through the list of filtered issues, creating items

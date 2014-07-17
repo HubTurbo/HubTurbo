@@ -1,11 +1,15 @@
 package ui;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,8 +23,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
 import command.CommandType;
 import command.TurboCommandExecutor;
+
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
@@ -56,7 +62,7 @@ public abstract class Column extends VBox {
 	// Collection-related
 	
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	private FilteredList<TurboIssue> filteredList = null;
+	private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
@@ -354,14 +360,33 @@ public abstract class Column extends VBox {
 
 	// To be called by subclasses
 	
-	protected FilteredList<TurboIssue> getFilteredList() {
-		return filteredList;
+	protected TransformationList<TurboIssue, TurboIssue> getIssueList() {
+		return transformedIssueList;
 	}
 	
 	// To be overridden by subclasses
 	
 	public void refreshItems() {
-		filteredList = new FilteredList<TurboIssue>(issues, predicate);
+		transformedIssueList = new FilteredList<TurboIssue>(issues, predicate);
+
+		if (currentFilterExpression instanceof filter.Predicate) {
+			List<String> names = ((filter.Predicate) currentFilterExpression).getPredicateNames();
+			if (names.size() == 1 && names.get(0).equals("parent")) {
+				System.out.println("parent pred only");
+				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
+				    @Override
+				    public int compare(TurboIssue a, TurboIssue b) {
+				    	if (a.getId() == b.getParentIssue()) {
+				    		return -1;
+				    	} else if (b.getId() == a.getParentIssue()) {
+				    		return 1;
+				    	} else {
+				    		return 0;
+				    	}
+				    }
+				});
+			}
+		}
 	}
 	
 	public abstract void deselect();

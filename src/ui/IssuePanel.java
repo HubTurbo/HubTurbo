@@ -64,7 +64,7 @@ public class IssuePanel extends Column {
 		// Supposedly this also causes the list view to update - not sure
 		// if it actually does on platforms other than Linux...
 		listView.setItems(null);
-		listView.setItems(getFilteredList());
+		listView.setItems(getIssueList());
 	}
 
 	@SuppressWarnings("unused")
