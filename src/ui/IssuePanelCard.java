@@ -9,9 +9,12 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import model.TurboIssue;
@@ -89,8 +92,13 @@ public class IssuePanelCard extends VBox {
 		}
 
 		if (issue.getAssignee() != null) {
-			Label assignee = new Label((issue.getAssignee().getGithubName()));
-			assignee.getStyleClass().add("display-box-padding");
+			
+			Label assigneeName = new Label((issue.getAssignee().getGithubName()));
+			assigneeName.getStyleClass().add("display-box-padding");
+			ImageView avatar = new ImageView(issue.getAssignee().getAvatar());
+			HBox assignee = new HBox();
+			assignee.setAlignment(Pos.BASELINE_CENTER);
+			assignee.getChildren().addAll(avatar, assigneeName);
 			issueDetails.getChildren().add(assignee);
 		}
 		
