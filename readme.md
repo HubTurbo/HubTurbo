@@ -9,7 +9,7 @@
 
 ## Filter Expressions
 
-**Predicates**
+### Predicates
 
 Filters are written as a series of predicates, in the form `name(content)`. Issues for which the entire filter expression returns true will be displayed.
 
@@ -27,21 +27,21 @@ Predicates may also be written in the form `name:content` if `content` contains 
 assignee:john -state:closed (milestone:v0.1 or milestone:v0.2)
 ```
 
-**Operators**
+### Operators
 
 Logical operators (AND, OR, NOT) may be applied to any filter expression. This can be used to compose complex queries. If an operator is left out, AND is implicit.
 
-Any of the following may be used:
+Operators may be written in any of the following forms:
 
-- AND (infix): `and`, `&&`, `&`
-- OR (infix): `or`, `||`, `|`
-- NOT (prefix): `~`, `!`, `-`
+- AND: `and`, `&&`, `&`
+- OR: `or`, `||`, `|`
+- NOT: `~`, `!`, `-`
 
-As in most C-like languages, AND and OR are left-associative, and precedence goes: NOT > AND > OR.
+As in C-like languages, NOT is a prefix operator, AND and OR are infix and left-associative, and precedence goes: NOT > AND > OR.
 
-**Valid Predicates**
+### Valid Predicates
 
-- `id` (`number`)
+- `id` (number)
 - `title`
 - `milestone`
 - `parent` (number or name)

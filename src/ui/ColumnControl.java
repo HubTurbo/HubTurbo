@@ -132,4 +132,27 @@ public class ColumnControl extends HBox {
 		sessionConfig.setFiltersForNextSession(model.getRepoId(), sessionFilters);
 		ConfigFileHandler.saveSessionConfig(sessionConfig);
 	}
+
+	public void swapColumns(int columnIndex, int columnIndex2) {
+		Column one = getColumn(columnIndex);
+		Column two = getColumn(columnIndex2);
+		one.updateIndex(columnIndex2);
+		two.updateIndex(columnIndex);
+		// This method of swapping is used because Collections.swap
+		// will assign one child without removing the other, causing
+		// a duplicate child exception. HBoxes are constructed because
+		// null also causes an exception.
+		getChildren().set(columnIndex, new HBox());
+		getChildren().set(columnIndex2, new HBox());
+		getChildren().set(columnIndex, two);
+		getChildren().set(columnIndex2, one);
+	}
+	
+	private int currentlyDraggedColumnIndex = -1;
+	public int getCurrentlyDraggedColumnIndex() {
+		return currentlyDraggedColumnIndex;
+	}
+	public void setCurrentlyDraggedColumnIndex(int i) {
+		currentlyDraggedColumnIndex = i;
+	}
 }

@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -91,6 +92,7 @@ public abstract class Column extends VBox {
 				}
 			});
 
+		setupColumnDragEvents(filterInputArea);
 		if (isSearchPanel) filterInputArea.triggerEdit();
 		
 		HBox filterFieldBox = new HBox();
@@ -184,6 +186,26 @@ public abstract class Column extends VBox {
 			e.consume();
 		});
 	}
+	
+	private void setupColumnDragEvents(HBox box) {
+		setOnDragDetected((event) -> {
+			Dragboard db = startDragAndDrop(TransferMode.MOVE);
+			ClipboardContent content = new ClipboardContent();
+			DragData dd = new DragData(DragData.Source.COLUMN, -1, -1);
+			content.putString(dd.serialise());
+			db.setContent(content);
+			// We're using this because the content of a dragboard can't be changed
+			// while the drag is in progress; this seemed like the simplest workaround
+			parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
+			event.consume();
+		});
+		
+		setOnDragDone((event) -> {
+//			if (event.getTransferMode() == TransferMode.MOVE) {
+//			}
+			event.consume();
+		});
+	}
 
 	private void setupIssueDragEvents(HBox filterBox) {
 		filterBox.setOnDragOver(e -> {
@@ -197,7 +219,20 @@ public abstract class Column extends VBox {
 
 		filterBox.setOnDragEntered(e -> {
 			if (e.getDragboard().hasString()) {
-				filterBox.getStyleClass().add("dragged-over");
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					filterBox.getStyleClass().add("dragged-over");
+				}
+				else if (dd.getSource() == DragData.Source.COLUMN) {
+					if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+						// Apparently the dragboard can't be updated while
+						// the drag is in progress. This is why we use an external source for updates.
+						assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
+						int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
+						parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
+						parentColumnControl.swapColumns(previous, columnIndex);
+					}
+				}
 			}
 			e.consume();
 		});
@@ -213,8 +248,18 @@ public abstract class Column extends VBox {
 			if (db.hasString()) {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
-				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-				filterByString("parent(#" + rightIssue.getId() + ")");
+				System.out.println(dd.getSource());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+					filterByString("parent(#" + rightIssue.getId() + ")");
+				}
+				else if (dd.getSource() == DragData.Source.COLUMN) {
+					// This event is never triggered when the drag is ended.
+					// It's not a huge deal, as this is only used to reinitialise
+					// the currently-dragged slot in ColumnControl.
+					// The other main consequence of this is that we can't assert
+					// to check if the slot has been cleared when starting a drag-swap.
+				}
 			}
 			e.setDropCompleted(success);
 
