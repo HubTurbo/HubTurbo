@@ -126,25 +126,8 @@ public class HierarchicalIssuePanel extends Column {
 			HierarchicalIssuePanelItem item = items.get(issue.getId());
 			item.setExpanded(true);
 			final TurboIssue thisIssue = issue;
-			item.setOnMouseClicked(e -> triggerIssueEdit(thisIssue));
+			item.setOnMouseClicked(e -> sidePanel.triggerIssueEdit(thisIssue));
 			item.setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue.getId()).get());
 		}
-	}
-	
-	private void triggerIssueEdit(TurboIssue currentIssue) {
-		TurboIssue oldIssue = new TurboIssue(currentIssue);
-		TurboIssue modifiedIssue = new TurboIssue(currentIssue);
-		sidePanel.displayIssue(modifiedIssue).thenApply(r -> {
-			if (r.equals("done")) {
-				System.out.println("was okay");
-				model.updateIssue(oldIssue, modifiedIssue);
-			}
-			parentColumnControl.refresh();
-			sidePanel.displayTabs();
-			return true;
-		}).exceptionally(e -> {
-			e.printStackTrace();
-			return false;
-		});
 	}
 }

@@ -119,7 +119,7 @@ public abstract class Column extends VBox {
 		addIssue.setOnMouseClicked((e) -> {
 			TurboIssue issue = new TurboIssue("", "", model);
 			applyCurrentFilterExpressionToIssue(issue, false);
-			sidePanel.triggerEditOnIssue(issue);
+			sidePanel.triggerIssueCreate(issue);
 		});
 		
 		Label closeList = new Label(CLOSE_LIST);

@@ -50,7 +50,7 @@ public class SidePanel extends VBox {
 	private TurboIssue displayedIssue;
 	private CompletableFuture<String> response = null;
 	
-	public CompletableFuture<String> displayIssue(TurboIssue issue) {
+	private CompletableFuture<String> displayIssue(TurboIssue issue) {
 		response = null; // Make sure previous response doesn't remain
 		displayedIssue = issue;
 		setLayout(Layout.ISSUE); // This method sets this.response
@@ -59,14 +59,29 @@ public class SidePanel extends VBox {
 	}
 	
 	public void onCreateIssueHotkey() {
-		triggerEditOnIssue(new TurboIssue("", "", model));
+		triggerIssueCreate(new TurboIssue("", "", model));
 	}
 	
-	// Convenience method for triggering edits on issues
-	public void triggerEditOnIssue(TurboIssue issue) {
+	public void triggerIssueCreate(TurboIssue issue) {
 		displayIssue(issue).thenApply(r -> {
 			if (r.equals("done")) {
 				model.createIssue(issue);
+			}
+			columns.refresh();
+			displayTabs();
+			return true;
+		}).exceptionally(ex -> {
+			ex.printStackTrace();
+			return false;
+		});
+	}
+	
+	public void triggerIssueEdit(TurboIssue issue) {
+		TurboIssue oldIssue = new TurboIssue(issue);
+		TurboIssue modifiedIssue = new TurboIssue(issue);
+		displayIssue(modifiedIssue).thenApply(r -> {
+			if (r.equals("done")) {
+				model.updateIssue(oldIssue, modifiedIssue);
 			}
 			columns.refresh();
 			displayTabs();
