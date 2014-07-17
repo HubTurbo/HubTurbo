@@ -209,8 +209,7 @@ public abstract class Column extends VBox {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-				applyStringFilter("parent(#" + rightIssue.getId() + ")");
-				filterInputArea.setTextFieldText(filterResponse);
+				filterByString("parent(#" + rightIssue.getId() + ")");
 			}
 			e.setDropCompleted(success);
 
@@ -218,9 +217,9 @@ public abstract class Column extends VBox {
 		});
 	}
 
-	public void filterByString(String filterString) {
-		filterInputArea.setTextFieldText(filterString);
-	}
+	// These two methods are triggered by the contents of the input area
+	// changing. As such they should not be invoked manually, or the input
+	// area won't update.
 	
 	private void applyStringFilter(String filterString) {
 		try {
@@ -237,7 +236,7 @@ public abstract class Column extends VBox {
 		}
 	}
 	
-	public void applyFilterExpression(FilterExpression filter) {
+	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
 		if (filter == EMPTY) {
@@ -252,7 +251,19 @@ public abstract class Column extends VBox {
 		
 		refreshItems();
 	}
-		
+	
+	// An odd workaround for the above problem: serialising, then
+	// immediately parsing a filter expression, just so the update can be triggered
+	// through the text contents of the input area changing.
+	
+	public void filter(FilterExpression filterExpr) {
+		filterByString(filterExpr.toString());
+	}
+
+	public void filterByString(String filterString) {
+		filterInputArea.setTextFieldText(filterString);
+	}
+
 	public void setItems(ObservableList<TurboIssue> items) {
 		this.issues = items;
 		refreshItems();
