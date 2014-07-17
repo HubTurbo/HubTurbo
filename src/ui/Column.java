@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -91,6 +92,7 @@ public abstract class Column extends VBox {
 				}
 			});
 
+		setupColumnDragEvents(filterInputArea);
 		if (isSearchPanel) filterInputArea.triggerEdit();
 		
 		HBox filterFieldBox = new HBox();
@@ -184,6 +186,23 @@ public abstract class Column extends VBox {
 			e.consume();
 		});
 	}
+	
+	private void setupColumnDragEvents(HBox box) {
+		setOnDragDetected((event) -> {
+			Dragboard db = startDragAndDrop(TransferMode.MOVE);
+			ClipboardContent content = new ClipboardContent();
+			DragData dd = new DragData(DragData.Source.COLUMN, columnIndex, -1);
+			content.putString(dd.serialise());
+			db.setContent(content);
+			event.consume();
+		});
+		
+		setOnDragDone((event) -> {
+//			if (event.getTransferMode() == TransferMode.MOVE) {
+//			}
+			event.consume();
+		});
+	}
 
 	private void setupIssueDragEvents(HBox filterBox) {
 		filterBox.setOnDragOver(e -> {
@@ -197,7 +216,10 @@ public abstract class Column extends VBox {
 
 		filterBox.setOnDragEntered(e -> {
 			if (e.getDragboard().hasString()) {
-				filterBox.getStyleClass().add("dragged-over");
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					filterBox.getStyleClass().add("dragged-over");
+				}
 			}
 			e.consume();
 		});

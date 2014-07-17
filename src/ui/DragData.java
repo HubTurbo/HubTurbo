@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 
 public class DragData {
 	public enum Source {
-		ISSUE_CARD
+		ISSUE_CARD, COLUMN
 	}
 	private Source source;
 	private int columnIndex;
