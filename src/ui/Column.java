@@ -72,7 +72,7 @@ public abstract class Column extends VBox {
 	private Node createFilterBox() {
 		filterInputArea = new EditableLabel(NO_FILTER)
 			.setTranslationFunction(filterString -> {
-				filterByString(filterString);
+				applyStringFilter(filterString);
 				// filterResponse is set after filterByString is called
 				return filterResponse;
 			});
@@ -209,7 +209,7 @@ public abstract class Column extends VBox {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-				filterByString("parent(#" + rightIssue.getId() + ")");
+				applyStringFilter("parent(#" + rightIssue.getId() + ")");
 				filterInputArea.setTextFieldText(filterResponse);
 			}
 			e.setDropCompleted(success);
@@ -217,23 +217,27 @@ public abstract class Column extends VBox {
 			e.consume();
 		});
 	}
-	
+
 	public void filterByString(String filterString) {
+		filterInputArea.setTextFieldText(filterString);
+	}
+	
+	private void applyStringFilter(String filterString) {
 		try {
 			FilterExpression filter = Parser.parse(filterString);
 			if (filter != null) {
-				this.filter(filter);
+				this.applyFilterExpression(filter);
 			} else {
-				this.filter(EMPTY);
+				this.applyFilterExpression(EMPTY);
 			}
 		} catch (ParseException ex) {
-			this.filter(EMPTY);
+			this.applyFilterExpression(EMPTY);
 			// Override the text set in the above method
 			filterResponse = "Parse error in filter: " + ex.getMessage();
 		}
 	}
 	
-	public void filter(FilterExpression filter) {
+	public void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
 		if (filter == EMPTY) {

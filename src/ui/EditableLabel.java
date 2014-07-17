@@ -29,15 +29,11 @@ public class EditableLabel extends HBox {
 		getChildren().add(label);
 		
 		label.setOnMouseClicked(e -> {
-			getChildren().clear();
-			previousText = textField.getText();
-			getChildren().add(textField);
-			Platform.runLater(() -> textField.requestFocus());
+			triggerEdit();
 		});
 		
 		textField.setOnKeyReleased(e -> {
-			if (e.getCode() == KeyCode.ENTER ||
-				e.getCode() == KeyCode.ESCAPE) {
+			if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.ESCAPE) {
 				getChildren().clear();
 				getChildren().add(label);
 				if (e.getCode() == KeyCode.ENTER) {
@@ -48,8 +44,15 @@ public class EditableLabel extends HBox {
 			}
 		});
 	}
+
+	public void triggerEdit() {
+		getChildren().clear();
+		previousText = textField.getText();
+		getChildren().add(textField);
+		Platform.runLater(() -> textField.requestFocus());
+	}
 	
-	public void setLabelText(String text) {
+	private void setLabelText(String text) {
 		label.setText(translationFunction.apply(text));
 	}
 
