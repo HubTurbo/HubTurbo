@@ -80,6 +80,7 @@ public class UI extends Application {
 		});
 		
 		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), columns::createNewSearchPanel);
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN), sidePanel::onCreateIssueHotkey);
 	}
 
 	private Parent createRoot() throws IOException {

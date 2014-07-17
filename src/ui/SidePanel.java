@@ -58,6 +58,25 @@ public class SidePanel extends VBox {
 		return response;
 	}
 	
+	public void onCreateIssueHotkey() {
+		triggerEditOnIssue(new TurboIssue("", "", model));
+	}
+	
+	// Convenience method for triggering edits on issues
+	public void triggerEditOnIssue(TurboIssue issue) {
+		displayIssue(issue).thenApply(r -> {
+			if (r.equals("done")) {
+				model.createIssue(issue);
+			}
+			columns.refresh();
+			displayTabs();
+			return true;
+		}).exceptionally(ex -> {
+			ex.printStackTrace();
+			return false;
+		});
+	}
+	
 	public void displayTabs() {
 		setLayout(Layout.TABS);
 	}
