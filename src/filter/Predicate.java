@@ -25,7 +25,8 @@ public class Predicate implements FilterExpression {
 	
 	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
 		// The empty predicate is satisfied by anything
-		if (name == null && content == null) return true;
+		assert name != null && content != null;
+		if (name.isEmpty() && content.isEmpty()) return true;
 
 		switch (name) {
 		case "id":
@@ -52,9 +53,10 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+		assert name != null && content != null;
 		// The empty predicate should not be applied to anything
-		assert !(name == null && content == null);
-		
+		assert !(name.isEmpty() && content.isEmpty());
+
 		switch (name) {
 		case "title":
 			throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
