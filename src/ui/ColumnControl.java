@@ -44,10 +44,10 @@ public class ColumnControl extends HBox {
 		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
-				addColumn().filterByString(filter);
+				addColumn(false).filterByString(filter);
 			}
 		} else {
-			addColumn();
+			addColumn(false);
 		}
 	}
 
@@ -72,13 +72,21 @@ public class ColumnControl extends HBox {
 	}
 
 	public void addColumnEvent(MouseEvent e) {
-		addColumn();
+		addColumn(false);
 	}
 	
-	public Column addColumn() {
+	private Column addColumn(boolean searchColumn) {
 		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
+		return panel;
+	}
+
+	public Column addColumnAt(boolean searchColumn, int index) {
+		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
+		getChildren().add(index, panel);
+		panel.setItems(model.getIssues());
+		updateColumnIndices();
 		return panel;
 	}
 
@@ -88,6 +96,10 @@ public class ColumnControl extends HBox {
 	
 	public void closeColumn(int index) {
 		getChildren().remove(index);
+		updateColumnIndices();
+	}
+
+	private void updateColumnIndices() {
 		int i = 0;
 		for (Node c : getChildren()) {
 			((Column) c).updateIndex(i++);
@@ -118,7 +130,7 @@ public class ColumnControl extends HBox {
 
 		if (panelSize < to) {
 			for (int i = 0; i < to - panelSize; i++) {
-				addColumn();
+				addColumn(false);
 			}
 		} else {
 			assert panels.size() > to;
@@ -127,6 +139,10 @@ public class ColumnControl extends HBox {
 		}
 		
 		return this;
+	}
+	
+	public void createNewSearchPanel() {
+		addColumnAt(true, 0);
 	}
 
 	public void saveSession() {
