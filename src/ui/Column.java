@@ -18,10 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
 import command.CommandType;
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
@@ -34,25 +32,33 @@ public abstract class Column extends VBox {
 	// to filter it. It does not, however, specify how the list is to be
 	// displayed -- that is the job of its subclasses.
 	
+	private static final String TOGGLE_HIERARCHY = "\u27A5";
+	private static final String CLOSE_LIST = "\u2716";
+	private static final String ADD_ISSUE = "\u271A";
+	
 	public static final String NO_FILTER = "No Filter";
 	public static final FilterExpression EMPTY = filter.Predicate.EMPTY;
 
-//	private final Stage mainStage;
 	private final Model model;
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
 	private final SidePanel sidePanel;
 
+	// Filter-related
+	
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
-	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	private FilteredList<TurboIssue> filteredList = null;
-	private TurboCommandExecutor dragAndDropExecutor;
 	private EditableLabel filterInputArea;
 	private String filterResponse;
 
+	// Collection-related
+	
+	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	private FilteredList<TurboIssue> filteredList = null;
+
+	private TurboCommandExecutor dragAndDropExecutor;
+
 	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
-//		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
@@ -60,60 +66,10 @@ public abstract class Column extends VBox {
 		this.dragAndDropExecutor = dragAndDropExecutor;
 		
 		getChildren().add(createFilterBox());
-		setup();
+		setupColumn();
 	}
 	
-	private void setup() {
-		setPrefWidth(380);
-		setMaxWidth(380);
-		
-		getStyleClass().add("borders");
-		
-		setOnDragOver(e -> {
-			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-				DragData dd = DragData.deserialise(e.getDragboard().getString());
-				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-					e.acceptTransferModes(TransferMode.MOVE);
-				}
-			}
-		});
-
-		setOnDragEntered(e -> {
-			if (e.getDragboard().hasString()) {
-				DragData dd = DragData.deserialise(e.getDragboard().getString());
-				if (dd.getColumnIndex() != columnIndex) {
-					getStyleClass().add("dragged-over");
-				}
-			}
-			e.consume();
-		});
-
-		setOnDragExited(e -> {
-			getStyleClass().remove("dragged-over");
-			e.consume();
-		});
-		
-		setOnDragDropped(e -> {
-			Dragboard db = e.getDragboard();
-			boolean success = false;
-
-			if (db.hasString()) {
-				success = true;
-				DragData dd = DragData.deserialise(db.getString());
-				if (dd.getColumnIndex() != columnIndex) {
-					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-					applyCurrentFilterExpressionToIssue(rightIssue, true);
-				}
-			}
-			e.setDropCompleted(success);
-
-			e.consume();
-		});
-	}
-
 	private Node createFilterBox() {
-		HBox filterBox = new HBox();
-
 		filterInputArea = new EditableLabel(NO_FILTER)
 			.setTranslationFunction(filterString -> {
 				filterByString(filterString);
@@ -121,17 +77,31 @@ public abstract class Column extends VBox {
 				return filterResponse;
 			});
 		
-		filterBox.setAlignment(Pos.BASELINE_LEFT);
-		HBox.setHgrow(filterBox, Priority.ALWAYS);
-		filterBox.getChildren().add(filterInputArea);
-		setupIssueDragEvents(filterBox);
+		HBox filterFieldBox = new HBox();
+		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
+		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
+		setupIssueDragEvents(filterFieldBox);
+		filterFieldBox.getChildren().add(filterInputArea);
 		
-		HBox rightAlignBox = new HBox();
+		HBox buttonBox = new HBox();
+		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
+		buttonBox.setSpacing(5);
+		buttonBox.setAlignment(Pos.TOP_RIGHT);
+		HBox.setHgrow(buttonBox, Priority.ALWAYS);
+		buttonBox.getChildren().addAll(createButtons());
+		
+		HBox layout = new HBox();
+		layout.setSpacing(5);
+		layout.getChildren().addAll(filterFieldBox, buttonBox);
+		
+		return layout;
+	}
 	
-		Label addIssue = new Label("\u271A");
-		addIssue.setStyle("-fx-font-size: 16pt;");
+	private Label[] createButtons() {
+		Label addIssue = new Label(ADD_ISSUE);
+		addIssue.getStyleClass().add("label-button");
 		addIssue.setOnMouseClicked((e) -> {
-			TurboIssue issue = new TurboIssue("New issue", "", model);
+			TurboIssue issue = new TurboIssue("", "", model);
 			applyCurrentFilterExpressionToIssue(issue, false);
 			
 			sidePanel.displayIssue(issue).thenApply(r -> {
@@ -147,31 +117,69 @@ public abstract class Column extends VBox {
 			});
 		});
 		
-		Label closeList = new Label("\u2716");
-		closeList.setStyle("-fx-font-size: 16pt;");
+		Label closeList = new Label(CLOSE_LIST);
+		closeList.getStyleClass().add("label-button");
 		closeList.setOnMouseClicked((e) -> {
 			parentColumnControl.closeColumn(columnIndex);
 		});
 		
-		Label toggleHierarchyMode = new Label("\u27A5");
-		toggleHierarchyMode.setStyle("-fx-font-size: 16pt;");
+		Label toggleHierarchyMode = new Label(TOGGLE_HIERARCHY);
+		toggleHierarchyMode.getStyleClass().add("label-button");
 		toggleHierarchyMode.setOnMouseClicked((e) -> {
 			parentColumnControl.toggleColumn(columnIndex);
 		});
-
-		HBox.setMargin(rightAlignBox, new Insets(0,5,0,0));
-		rightAlignBox.setSpacing(5);
-		rightAlignBox.setAlignment(Pos.TOP_RIGHT);
-		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
-		rightAlignBox.getChildren().addAll(toggleHierarchyMode, addIssue, closeList);
 		
-		HBox topBox = new HBox();
-		topBox.setSpacing(5);
-		topBox.getChildren().addAll(filterBox, rightAlignBox);
-		
-		return topBox;
+		return new Label[] {toggleHierarchyMode, addIssue, closeList};
 	}
+
+	private void setupColumn() {
+		setPrefWidth(380);
+		setMaxWidth(380);
+		
+		getStyleClass().add("borders");
+		
+		setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
+					e.acceptTransferModes(TransferMode.MOVE);
+				}
+			}
+		});
 	
+		setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getColumnIndex() != columnIndex) {
+					getStyleClass().add("dragged-over");
+				}
+			}
+			e.consume();
+		});
+	
+		setOnDragExited(e -> {
+			getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+		
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+	
+			if (db.hasString()) {
+				success = true;
+				DragData dd = DragData.deserialise(db.getString());
+				if (dd.getColumnIndex() != columnIndex) {
+					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+					applyCurrentFilterExpressionToIssue(rightIssue, true);
+				}
+			}
+			e.setDropCompleted(success);
+	
+			e.consume();
+		});
+	}
+
 	private void setupIssueDragEvents(HBox filterBox) {
 		filterBox.setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
@@ -240,21 +248,11 @@ public abstract class Column extends VBox {
 		
 		refreshItems();
 	}
-	
-	public FilteredList<TurboIssue> getFilteredList() {
-		return filteredList;
-	}
-	
+		
 	public void setItems(ObservableList<TurboIssue> items) {
 		this.issues = items;
 		refreshItems();
 	}
-
-	public void refreshItems() {
-		filteredList = new FilteredList<TurboIssue>(issues, predicate);
-	}
-	
-	public abstract void deselect();
 
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
 		if (currentFilterExpression != EMPTY) {
@@ -279,8 +277,23 @@ public abstract class Column extends VBox {
 		return currentFilterExpression;
 	}
 	
-	public void updateIndex(int updated) {
+	// To be called by ColumnControl in order to update indices
+	
+	void updateIndex(int updated) {
 		columnIndex = updated;
 	}
 
+	// To be called by subclasses
+	
+	protected FilteredList<TurboIssue> getFilteredList() {
+		return filteredList;
+	}
+	
+	// To be overridden by subclasses
+	
+	public void refreshItems() {
+		filteredList = new FilteredList<TurboIssue>(issues, predicate);
+	}
+	
+	public abstract void deselect();
 }
