@@ -2,6 +2,7 @@ package ui;
 
 import java.util.function.Function;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
@@ -14,7 +15,10 @@ public class FilterTextBox extends TextField {
 	public FilterTextBox(String initialText, int position) {
 //		previousText = initialText;
 		super(initialText);
-		positionCaret(position);
+		Platform.runLater(() -> {
+			requestFocus();
+			positionCaret(position);
+		});
 		setup();
 	}
 
