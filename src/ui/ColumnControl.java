@@ -82,7 +82,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public Column addColumnAt(boolean isSearchPanel, int index) {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
+		Column panel = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -119,8 +119,12 @@ public class ColumnControl extends HBox {
 		getChildren().set(index, column);
 	}
 		
-	public void createNewSearchPanel() {
+	public void createNewSearchPanelAtStart() {
 		addColumnAt(true, 0);
+	}
+
+	public void createNewSearchPanelAtEnd() {
+		addColumn(true);
 	}
 
 	public void saveSession() {
