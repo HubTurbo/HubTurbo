@@ -58,7 +58,7 @@ public class UI extends Application {
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
-				mainStage.setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");
+				statusBar.setText("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
 			}
 			return true;
 		}).exceptionally(e -> {
@@ -95,7 +95,7 @@ public class UI extends Application {
 		statusBar = new StatusBar();
 		notificationPane = new NotificationPane();
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel, statusBar);
 		sidePanel.setColumns(columns);
 		notificationPane.setContent(columns);
 		menuBar = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);

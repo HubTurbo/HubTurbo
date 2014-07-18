@@ -50,6 +50,7 @@ public abstract class Column extends VBox {
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
 	private final SidePanel sidePanel;
+	private final StatusBar statusBar;
 	private boolean isSearchPanel = false;
 	
 	// Filter-related
@@ -65,13 +66,14 @@ public abstract class Column extends VBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel, StatusBar statusBar) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = dragAndDropExecutor;
 		this.isSearchPanel = isSearchPanel;
+		this.statusBar = statusBar;
 		
 		getChildren().add(createFilterBox());
 		setupColumn();
@@ -282,20 +284,18 @@ public abstract class Column extends VBox {
 			this.applyFilterExpression(EMPTY);
 			// Override the text set in the above method
 
-			// TODO temporarily commented out, print to status bar instead
-//			filterResponse = "Parse error in filter: " + ex.getMessage();
+			statusBar.setText("Panel " + (columnIndex+1) + ": Parse error in filter: " + ex.getMessage());
 		}
 	}
 	
 	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
-		// TODO temporarily commented out, print to status bar instead
-//		if (filter == EMPTY) {
-//			filterResponse = NO_FILTER;
-//		} else {
-//			filterResponse = filter.toString();
-//		}
+		if (filter == EMPTY) {
+			statusBar.setText("Panel " + (columnIndex+1) + ": " + NO_FILTER);
+		} else {
+			statusBar.setText("Panel " + (columnIndex+1) + ": " + filter.toString());
+		}
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
