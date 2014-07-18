@@ -18,7 +18,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -89,7 +88,7 @@ public abstract class Column extends VBox {
 				return null; // returns type Void
 			})
 			.setOnCancel(() -> {
-				parentColumnControl.closeColumn(columnIndex);
+//				parentColumnControl.closeColumn(columnIndex);
 			});
 
 		setupIssueDragEvents(filterTextField);
