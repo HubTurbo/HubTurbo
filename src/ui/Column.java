@@ -92,13 +92,11 @@ public abstract class Column extends VBox {
 
 		setupIssueDragEvents(filterTextField);
 
-		// TODO re-enable column drag events
-//		setupColumnDragEvents(filterInputArea);
-		
-//		HBox filterFieldBox = new HBox();
-//		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
-//		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
-//		filterFieldBox.getChildren().add(filte/rTextField);
+		HBox dragHandle = new HBox();
+		HBox.setHgrow(dragHandle, Priority.ALWAYS);
+		Label filler = new Label("");
+		dragHandle.getChildren().addAll(filler);
+		setupColumnDragEvents(dragHandle);
 		
 		HBox buttonBox = new HBox();
 		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
@@ -108,10 +106,12 @@ public abstract class Column extends VBox {
 		buttonBox.getChildren().addAll(createButtons());
 		
 		HBox layout = new HBox();
-		layout.setSpacing(5);
 		layout.getChildren().addAll(filterTextField, buttonBox);
 		
-		return layout;
+		VBox vlayout = new VBox();
+		vlayout.getChildren().addAll(dragHandle, layout);
+		
+		return vlayout;
 	}
 	
 	private Label[] createButtons() {
