@@ -55,6 +55,7 @@ public class FilterTextField extends TextField {
 	
 	private void revertEdit() {
 		setText(previousText);
+		positionCaret(getLength());
 		cancel.run();
 	}
 
