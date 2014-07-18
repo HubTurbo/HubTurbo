@@ -56,7 +56,7 @@ public abstract class Column extends VBox {
 	
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
-	private FilterTextBox filterInputArea;
+	private FilterTextField filterTextField;
 
 	// Collection-related
 	
@@ -81,7 +81,7 @@ public abstract class Column extends VBox {
 		String initialText = isSearchPanel ? "title()" : "";
 		int initialPosition = isSearchPanel ? 6 : 0;
 		
-		filterInputArea = new FilterTextBox(initialText, initialPosition)
+		filterTextField = new FilterTextField(initialText, initialPosition)
 			.setOnConfirm((text) -> {
 				applyStringFilter(text);
 				return null; // returns type Void
@@ -97,7 +97,7 @@ public abstract class Column extends VBox {
 		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
 		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
 		setupIssueDragEvents(filterFieldBox);
-		filterFieldBox.getChildren().add(filterInputArea);
+		filterFieldBox.getChildren().add(filterTextField);
 		
 		HBox buttonBox = new HBox();
 		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
@@ -312,7 +312,7 @@ public abstract class Column extends VBox {
 	}
 
 	public void filterByString(String filterString) {
-		filterInputArea.setFilterText(filterString);
+		filterTextField.setFilterText(filterString);
 	}
 
 	public void setItems(ObservableList<TurboIssue> items) {
