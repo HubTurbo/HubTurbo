@@ -90,14 +90,15 @@ public abstract class Column extends VBox {
 				parentColumnControl.closeColumn(columnIndex);
 			});
 
+		setupIssueDragEvents(filterTextField);
+
 		// TODO re-enable column drag events
 //		setupColumnDragEvents(filterInputArea);
 		
-		HBox filterFieldBox = new HBox();
-		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
-		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
-		setupIssueDragEvents(filterFieldBox);
-		filterFieldBox.getChildren().add(filterTextField);
+//		HBox filterFieldBox = new HBox();
+//		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
+//		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
+//		filterFieldBox.getChildren().add(filte/rTextField);
 		
 		HBox buttonBox = new HBox();
 		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
@@ -108,7 +109,7 @@ public abstract class Column extends VBox {
 		
 		HBox layout = new HBox();
 		layout.setSpacing(5);
-		layout.getChildren().addAll(filterFieldBox, buttonBox);
+		layout.getChildren().addAll(filterTextField, buttonBox);
 		
 		return layout;
 	}
@@ -205,7 +206,7 @@ public abstract class Column extends VBox {
 		});
 	}
 
-	private void setupIssueDragEvents(HBox filterBox) {
+	private void setupIssueDragEvents(Node filterBox) {
 		filterBox.setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
 				DragData dd = DragData.deserialise(e.getDragboard().getString());
