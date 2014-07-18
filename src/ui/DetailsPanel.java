@@ -4,7 +4,7 @@ import handler.IssueDetailsContentHandler;
 import model.TurboComment;
 import model.TurboIssue;
 import ui.IssueDetailsDisplay.DisplayType;
-import javafx.collections.ObservableList;
+
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
@@ -14,7 +14,6 @@ public class DetailsPanel extends VBox {
 	
 	private ListView<TurboComment> listView;
 	private IssueDetailsContentHandler handler;
-	private ObservableList<TurboComment> commentsList;
 	private TurboIssue issue;
 	private DisplayType displayType;
 	
@@ -22,7 +21,6 @@ public class DetailsPanel extends VBox {
 		this.issue = issue;
 		this.listView = new ListView<TurboComment>();
 		this.handler = handler;
-		this.commentsList = handler.getComments();
 		this.displayType = displayType;
 		loadItems();
 	}
@@ -39,6 +37,10 @@ public class DetailsPanel extends VBox {
 	
 	public void loadItems() {
 		listView.setCellFactory(commentCellFactory());
-		listView.setItems(commentsList);
+		if(displayType == DisplayType.COMMENTS){
+			listView.setItems(handler.getComments());
+		}else{
+			listView.setItems(handler.getIssueHistory());
+		}
 	}
 }
