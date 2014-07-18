@@ -50,14 +50,14 @@ public class IssueDetailsContentHandler {
 	}
 	
 	public void startContentUpdate(){
-		if(isNotSetup()){
-			setupContent();
-		}
-		commentsUpdater.startCommentsListUpdate();
+//		if(isNotSetup()){
+//			setupContent();
+//		}
+//		commentsUpdater.startCommentsListUpdate();
 	}
 	
 	public void stopContentUpdate(){
-		commentsUpdater.stopCommentsListUpdate();
+//		commentsUpdater.stopCommentsListUpdate();
 	}
 	
 	public void createComment(String text){
