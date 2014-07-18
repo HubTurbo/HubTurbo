@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.NotificationPane;
@@ -32,6 +31,8 @@ public class UI extends Application {
 
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
+
+	private StatusBar statusBar;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -91,6 +92,7 @@ public class UI extends Application {
 
 	private Parent createRoot() throws IOException {
 
+		statusBar = new StatusBar();
 		notificationPane = new NotificationPane();
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
@@ -110,10 +112,7 @@ public class UI extends Application {
 		root.setTop(menuBar);
 		root.setCenter(centerContainer);
 		root.setRight(new GlobalButtonPanel(columns));
-
-//		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
-//		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
-//        sideContainer.setDividerPositions(0.4);
+		root.setBottom(statusBar);
 
 		return root;
 	}
