@@ -8,9 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -85,9 +82,6 @@ public class UI extends Application {
 			columns.saveSession();
 		});
 		
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN), columns::createNewSearchPanelAtStart);
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), columns::createNewSearchPanelAtEnd);
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN), sidePanel::onCreateIssueHotkey);
 	}
 
 	private Parent createRoot() throws IOException {
@@ -98,7 +92,7 @@ public class UI extends Application {
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel, statusBar);
 		sidePanel.setColumns(columns);
 		notificationPane.setContent(columns);
-		menuBar = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
+		menuBar = new MenuControl(columns, sidePanel);
 		
 		ScrollPane columnsScroll = new ScrollPane(columns);
 		columnsScroll.setFitToHeight(true);
@@ -111,7 +105,6 @@ public class UI extends Application {
         BorderPane root = new BorderPane();
 		root.setTop(menuBar);
 		root.setCenter(centerContainer);
-		root.setRight(new GlobalButtonPanel(columns));
 		root.setBottom(statusBar);
 
 		return root;
