@@ -2,6 +2,9 @@ package ui;
 
 import java.util.concurrent.CompletableFuture;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -22,7 +25,7 @@ public class IssueDisplayPane extends HBox {
 	
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
-		
+			
 	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
 		this.issue = displayedIssue;
 		this.model = model;
@@ -49,8 +52,8 @@ public class IssueDisplayPane extends HBox {
 	
 	private void setupIssueDetailsDisplay(){
 		this.issueDetailsDisplay = new IssueDetailsDisplay(issue);
-		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
-		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
+//		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
+//		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
 	}
 	
 	protected void showIssueDetailsDisplay(boolean show){
@@ -65,4 +68,5 @@ public class IssueDisplayPane extends HBox {
 			issueDetailsDisplay.hide();
 		}
 	}
+	
 }

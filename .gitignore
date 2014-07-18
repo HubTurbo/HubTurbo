@@ -1,3 +1,4 @@
+.DS_Store
 bin
 credentials.txt
 SessionConfig.json

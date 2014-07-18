@@ -53,7 +53,8 @@ public class IssueDetailsContentHandler {
 		if(isNotSetup()){
 			setupContent();
 		}
-		commentsUpdater.startCommentsListUpdate();
+		//TODO:
+//		commentsUpdater.startCommentsListUpdate();
 	}
 	
 	public void stopContentUpdate(){
@@ -158,5 +159,10 @@ public class IssueDetailsContentHandler {
 				   						   .collect(Collectors.toList());
 		log.clear();
 		log.addAll(logItems);
+	}
+	
+	@Override
+	public void finalize(){
+		commentsUpdater.stopCommentsListUpdate();
 	}
 }

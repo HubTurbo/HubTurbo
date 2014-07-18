@@ -4,13 +4,15 @@ import handler.IssueDetailsContentHandler;
 import model.TurboComment;
 import model.TurboIssue;
 import ui.IssueDetailsDisplay.DisplayType;
-
+import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class DetailsPanel extends VBox {
+	public static int COMMENTS_CELL_HEIGHT = 200;
+	public static int COMMENTS_PADDING = 5;
 	
 	private ListView<TurboComment> listView;
 	private IssueDetailsContentHandler handler;
@@ -22,8 +24,10 @@ public class DetailsPanel extends VBox {
 		this.listView = new ListView<TurboComment>();
 		this.handler = handler;
 		this.displayType = displayType;
+		this.setPadding(new Insets(COMMENTS_PADDING));
 		loadItems();
 	}
+	
 	
 	private Callback<ListView<TurboComment>, ListCell<TurboComment>> commentCellFactory(){
 		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
@@ -35,7 +39,25 @@ public class DetailsPanel extends VBox {
 		return factory;
 	}
 	
-	public void loadItems() {
+	private void loadItems() {
+		if(displayType == DisplayType.COMMENTS){
+			loadNewCommentsBox();
+		}
+		setListItems();
+	}
+
+	
+	private void loadNewCommentsBox(){
+//		int width = 350;
+		CommentsEditBox box = new CommentsEditBox(handler);
+		box.setPrefHeight(COMMENTS_CELL_HEIGHT);
+//		box.setPrefWidth(width);
+//		box.setMaxWidth(width);
+//		box.setMinWidth(width);
+		getChildren().add(box);
+	}
+	
+	private void setListItems(){
 		listView.setCellFactory(commentCellFactory());
 		if(displayType == DisplayType.COMMENTS){
 			listView.setItems(handler.getComments());
