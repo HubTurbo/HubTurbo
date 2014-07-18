@@ -50,14 +50,14 @@ public abstract class Column extends VBox {
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
 	private final SidePanel sidePanel;
+	private final StatusBar statusBar;
 	private boolean isSearchPanel = false;
 	
 	// Filter-related
 	
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
-	private EditableLabel filterInputArea;
-	private String filterResponse;
+	private FilterTextField filterTextField;
 
 	// Collection-related
 	
@@ -66,46 +66,39 @@ public abstract class Column extends VBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel, StatusBar statusBar) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = dragAndDropExecutor;
 		this.isSearchPanel = isSearchPanel;
+		this.statusBar = statusBar;
 		
 		getChildren().add(createFilterBox());
 		setupColumn();
 	}
 	
 	private Node createFilterBox() {
-		filterInputArea = new EditableLabel(NO_FILTER)
-			.setEditTransformation(s -> {
-				if (isSearchPanel) {
-					isSearchPanel = false;
-					return "title(" + s + ")";
-				}
-				return s;
-			})
-			.setTranslationFunction(filterString -> {
-				applyStringFilter(filterString);
-				// filterResponse is set after filterByString is called
-				return filterResponse;
+		String initialText = isSearchPanel ? "title()" : "";
+		int initialPosition = isSearchPanel ? 6 : 0;
+		
+		filterTextField = new FilterTextField(initialText, initialPosition)
+			.setOnConfirm((text) -> {
+				applyStringFilter(text);
+				return null; // returns type Void
 			})
 			.setOnCancel(() -> {
-				if (isSearchPanel) {
-					parentColumnControl.closeColumn(columnIndex);
-				}
+				parentColumnControl.closeColumn(columnIndex);
 			});
 
-		setupColumnDragEvents(filterInputArea);
-		if (isSearchPanel) filterInputArea.triggerEdit();
-		
-		HBox filterFieldBox = new HBox();
-		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
-		HBox.setHgrow(filterFieldBox, Priority.ALWAYS);
-		setupIssueDragEvents(filterFieldBox);
-		filterFieldBox.getChildren().add(filterInputArea);
+		setupIssueDragEvents(filterTextField);
+
+		HBox dragHandle = new HBox();
+		HBox.setHgrow(dragHandle, Priority.ALWAYS);
+		Label filler = new Label("");
+		dragHandle.getChildren().addAll(filler);
+		setupColumnDragEvents(dragHandle);
 		
 		HBox buttonBox = new HBox();
 		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
@@ -115,10 +108,12 @@ public abstract class Column extends VBox {
 		buttonBox.getChildren().addAll(createButtons());
 		
 		HBox layout = new HBox();
-		layout.setSpacing(5);
-		layout.getChildren().addAll(filterFieldBox, buttonBox);
+		layout.getChildren().addAll(filterTextField, buttonBox);
 		
-		return layout;
+		VBox vlayout = new VBox();
+		vlayout.getChildren().addAll(dragHandle, layout);
+		
+		return vlayout;
 	}
 	
 	private Label[] createButtons() {
@@ -213,7 +208,7 @@ public abstract class Column extends VBox {
 		});
 	}
 
-	private void setupIssueDragEvents(HBox filterBox) {
+	private void setupIssueDragEvents(Node filterBox) {
 		filterBox.setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
 				DragData dd = DragData.deserialise(e.getDragboard().getString());
@@ -288,7 +283,8 @@ public abstract class Column extends VBox {
 		} catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Override the text set in the above method
-			filterResponse = "Parse error in filter: " + ex.getMessage();
+
+			statusBar.setText("Panel " + (columnIndex+1) + ": Parse error in filter: " + ex.getMessage());
 		}
 	}
 	
@@ -296,9 +292,9 @@ public abstract class Column extends VBox {
 		currentFilterExpression = filter;
 		
 		if (filter == EMPTY) {
-			filterResponse = NO_FILTER;
+			statusBar.setText("Panel " + (columnIndex+1) + ": " + NO_FILTER);
 		} else {
-			filterResponse = filter.toString();
+			statusBar.setText("Panel " + (columnIndex+1) + ": " + filter.toString());
 		}
 
 		// This cast utilises a functional interface
@@ -317,7 +313,7 @@ public abstract class Column extends VBox {
 	}
 
 	public void filterByString(String filterString) {
-		filterInputArea.setTextFieldText(filterString);
+		filterTextField.setFilterText(filterString);
 	}
 
 	public void setItems(ObservableList<TurboIssue> items) {
@@ -372,7 +368,6 @@ public abstract class Column extends VBox {
 		if (currentFilterExpression instanceof filter.Predicate) {
 			List<String> names = ((filter.Predicate) currentFilterExpression).getPredicateNames();
 			if (names.size() == 1 && names.get(0).equals("parent")) {
-				System.out.println("parent pred only");
 				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
 				    @Override
 				    public int compare(TurboIssue a, TurboIssue b) {

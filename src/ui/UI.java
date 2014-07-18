@@ -6,11 +6,14 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.NotificationPane;
@@ -27,6 +30,9 @@ public class UI extends Application {
 	private NotificationPane notificationPane;
 
 	private SidePanel sidePanel;
+	private MenuControl menuBar;
+
+	private StatusBar statusBar;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -52,7 +58,7 @@ public class UI extends Application {
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
-				mainStage.setTitle("HubTurbo (" + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ")");
+				statusBar.setText("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
 			}
 			return true;
 		}).exceptionally(e -> {
@@ -79,29 +85,35 @@ public class UI extends Application {
 			columns.saveSession();
 		});
 		
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), columns::createNewSearchPanel);
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN), columns::createNewSearchPanelAtStart);
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), columns::createNewSearchPanelAtEnd);
 		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN), sidePanel::onCreateIssueHotkey);
 	}
 
 	private Parent createRoot() throws IOException {
 
+		statusBar = new StatusBar();
 		notificationPane = new NotificationPane();
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel, statusBar);
 		sidePanel.setColumns(columns);
 		notificationPane.setContent(columns);
-
-		BorderPane root = new BorderPane();
-		root.setCenter(notificationPane);
-		root.setRight(new GlobalButtonPanel(columns));
-
-//		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
-//		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
+		menuBar = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
 		
-        HBox sideContainer = new HBox();
-        sideContainer.getChildren().addAll(sidePanel, root);
-//        sideContainer.setDividerPositions(0.4);
+		ScrollPane columnsScroll = new ScrollPane(columns);
+		columnsScroll.setFitToHeight(true);
+		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
+		
+		HBox centerContainer = new HBox();
+		centerContainer.getChildren().addAll(sidePanel, columnsScroll);
 
-		return sideContainer;
+        BorderPane root = new BorderPane();
+		root.setTop(menuBar);
+		root.setCenter(centerContainer);
+		root.setRight(new GlobalButtonPanel(columns));
+		root.setBottom(statusBar);
+
+		return root;
 	}
 }
