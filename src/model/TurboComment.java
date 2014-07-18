@@ -36,6 +36,10 @@ public class TurboComment{
 		setCreator(new TurboUser(comment.getUser()));
 	}
 	
+	public TurboComment(TurboComment comment){
+		copyValues(comment);
+	}
+	
 	public boolean isIssueLog(){
 		return body.get().startsWith(ServiceManager.CHANGELOG_TAG);
 	}

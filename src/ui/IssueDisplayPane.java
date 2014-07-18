@@ -2,9 +2,6 @@ package ui;
 
 import java.util.concurrent.CompletableFuture;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -52,8 +49,9 @@ public class IssueDisplayPane extends HBox {
 	
 	private void setupIssueDetailsDisplay(){
 		this.issueDetailsDisplay = new IssueDetailsDisplay(issue);
-//		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
-//		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
+		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
+		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
+		this.issueDetailsDisplay.setMaxWidth(DETAILS_WIDTH);
 	}
 	
 	protected void showIssueDetailsDisplay(boolean show){

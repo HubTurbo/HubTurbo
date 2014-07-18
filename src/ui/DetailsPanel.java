@@ -26,6 +26,7 @@ public class DetailsPanel extends VBox {
 		this.displayType = displayType;
 		this.setPadding(new Insets(COMMENTS_PADDING));
 		loadItems();
+		this.setFillWidth(true);
 	}
 	
 	
@@ -48,13 +49,10 @@ public class DetailsPanel extends VBox {
 
 	
 	private void loadNewCommentsBox(){
-//		int width = 350;
 		CommentsEditBox box = new CommentsEditBox(handler);
 		box.setPrefHeight(COMMENTS_CELL_HEIGHT);
-//		box.setPrefWidth(width);
-//		box.setMaxWidth(width);
-//		box.setMinWidth(width);
 		getChildren().add(box);
+		setMargin(box, new Insets(COMMENTS_PADDING));
 	}
 	
 	private void setListItems(){
