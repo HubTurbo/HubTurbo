@@ -6,6 +6,8 @@ import java.util.List;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 
@@ -13,9 +15,7 @@ import org.controlsfx.control.NotificationPane;
 
 import util.ConfigFileHandler;
 import util.SessionConfigurations;
-
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 

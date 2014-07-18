@@ -6,11 +6,15 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.NotificationPane;
@@ -27,6 +31,7 @@ public class UI extends Application {
 	private NotificationPane notificationPane;
 
 	private SidePanel sidePanel;
+	private MenuControl menuBar;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -91,18 +96,25 @@ public class UI extends Application {
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel);
 		sidePanel.setColumns(columns);
 		notificationPane.setContent(columns);
+		menuBar = new MenuControl(mainStage, ServiceManager.getInstance().getModel(), columns, this);
+		
+		ScrollPane columnsScroll = new ScrollPane(columns);
+		columnsScroll.setFitToHeight(true);
+		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
+		
+		HBox centerContainer = new HBox();
+		centerContainer.getChildren().addAll(sidePanel, columnsScroll);
 
-		BorderPane root = new BorderPane();
-		root.setCenter(notificationPane);
+        BorderPane root = new BorderPane();
+		root.setTop(menuBar);
+		root.setCenter(centerContainer);
 		root.setRight(new GlobalButtonPanel(columns));
 
 //		Parent panel = FXMLLoader.load(getClass().getResource("/SidePanelTabs.fxml"));
 //		((TabPane) panel).getTabs().get(0).setContent(new ManageLabelsDialog(mainStage, ServiceManager.getInstance().getModel()).initialise());
-		
-        HBox sideContainer = new HBox();
-        sideContainer.getChildren().addAll(sidePanel, root);
 //        sideContainer.setDividerPositions(0.4);
 
-		return sideContainer;
+		return root;
 	}
 }
