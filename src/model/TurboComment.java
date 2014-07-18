@@ -120,4 +120,17 @@ public class TurboComment{
 			setCreator(comment.getCreator());
 		}
 	}
+	
+	public Comment toGhComment(){
+		Comment comment = new Comment();
+		comment.setCreatedAt(createdAt);
+		comment.setUpdatedAt(updatedAt);
+		comment.setBody(getBody());
+		comment.setBodyHtml(getBodyHtml());
+		comment.setBodyHtml(getBodyText());
+		comment.setId(id);
+		comment.setUrl(url);
+		comment.setUser(creator.toGhResource());
+		return comment;
+	}
 }

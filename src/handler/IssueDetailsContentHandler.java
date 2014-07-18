@@ -60,6 +60,45 @@ public class IssueDetailsContentHandler {
 		commentsUpdater.stopCommentsListUpdate();
 	}
 	
+	public void createComment(String text){
+		try {
+			Comment comment = ServiceManager.getInstance().createComment(issue.getId(), text);
+			allGhContent.add(comment);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void editComment(TurboComment comment){
+		try {
+			Comment ghComment = comment.toGhComment();
+			ServiceManager.getInstance().editComment(ghComment);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteComment(TurboComment comment){
+		try {
+			ServiceManager.getInstance().deleteComment(comment.getId());
+			removeCachedItem(comment.getId());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void removeCachedItem(long commentId){
+		for(Comment item: allGhContent){
+			if(item.getId() == commentId){
+				allGhContent.remove(item);
+				return;
+			}
+		}
+	}
+	
 	private void setupCommentsChangeListener(){
 		WeakReference<IssueDetailsContentHandler> selfRef = new WeakReference<>(this);
 		commentsChangeListener = new ListChangeListener<Comment>(){
@@ -97,8 +136,8 @@ public class IssueDetailsContentHandler {
 												   .map(item -> new TurboComment(item))
 												   .filter(item -> !item.isIssueLog())
 												   .collect(Collectors.toList());
-		for(int i = filteredComments.size() - 1; i >= 0; i--){
-			updateItemInCommentsList(filteredComments.get(i));
+		for(TurboComment item : filteredComments){
+			updateItemInCommentsList(item);
 		}
 	}
 	
@@ -109,7 +148,7 @@ public class IssueDetailsContentHandler {
 				return;
 			}
 		}
-		comments.add(0, comment);
+		comments.add(comment);
 	}
 	
 	private void updateLogContents(){

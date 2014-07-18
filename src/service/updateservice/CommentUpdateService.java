@@ -39,8 +39,6 @@ public class CommentUpdateService extends UpdateService<Comment>{
 	private Map<String, String> createUpdatedCommentsParams(){
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("since", getFormattedDate(lastCheckTime));
-		params.put("sort", "created");
-		params.put("direction", "desc");
 		return params;
 	}
 

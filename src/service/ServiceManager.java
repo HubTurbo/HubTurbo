@@ -307,7 +307,7 @@ public class ServiceManager {
 		return new ArrayList<Comment>();
 	}
 	
-	public void deleteComment(int commentId) throws IOException{
+	public void deleteComment(long commentId) throws IOException{
 		if(repoId != null){
 			issueService.deleteComment(repoId, commentId);
 		}
