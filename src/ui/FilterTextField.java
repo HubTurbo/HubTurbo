@@ -6,11 +6,18 @@ import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+
+import filter.ParseException;
+import filter.Parser;
+
 public class FilterTextField extends TextField {
 
 	private Runnable cancel = () -> {};
 	private Function<String, Void> confirm = (s) -> null;
-	
+    private ValidationSupport validationSupport = new ValidationSupport();
+
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
 		Platform.runLater(() -> {
@@ -23,6 +30,16 @@ public class FilterTextField extends TextField {
 	private void setup() {
 		setPrefColumnCount(30);
 
+		validationSupport.registerValidator(this, (c, newValue) -> {
+			boolean wasError = false;
+			try {
+				Parser.parse(getText());
+			} catch (ParseException e) {
+				wasError = true;
+			}
+			return ValidationResult.fromErrorIf(this, "Parse error", wasError);
+		});
+		
 		setOnKeyReleased(e -> {
 			if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.ESCAPE) {
 				if (e.getCode() == KeyCode.ENTER) {
