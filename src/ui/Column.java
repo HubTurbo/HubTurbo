@@ -56,8 +56,7 @@ public abstract class Column extends VBox {
 	
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
-	private EditableLabel filterInputArea;
-	private String filterResponse;
+	private FilterTextBox filterInputArea;
 
 	// Collection-related
 	
@@ -79,27 +78,20 @@ public abstract class Column extends VBox {
 	}
 	
 	private Node createFilterBox() {
-		filterInputArea = new EditableLabel(NO_FILTER)
-			.setEditTransformation(s -> {
-				if (isSearchPanel) {
-					isSearchPanel = false;
-					return "title(" + s + ")";
-				}
-				return s;
-			})
-			.setTranslationFunction(filterString -> {
-				applyStringFilter(filterString);
-				// filterResponse is set after filterByString is called
-				return filterResponse;
+		String initialText = isSearchPanel ? "title()" : "";
+		int initialPosition = isSearchPanel ? 6 : 0;
+		
+		filterInputArea = new FilterTextBox(initialText, initialPosition)
+			.setOnConfirm((text) -> {
+				applyStringFilter(text);
+				return null; // returns type Void
 			})
 			.setOnCancel(() -> {
-				if (isSearchPanel) {
-					parentColumnControl.closeColumn(columnIndex);
-				}
+				parentColumnControl.closeColumn(columnIndex);
 			});
 
-		setupColumnDragEvents(filterInputArea);
-		if (isSearchPanel) filterInputArea.triggerEdit();
+		// TODO re-enable column drag events
+//		setupColumnDragEvents(filterInputArea);
 		
 		HBox filterFieldBox = new HBox();
 		filterFieldBox.setAlignment(Pos.BASELINE_LEFT);
@@ -288,18 +280,21 @@ public abstract class Column extends VBox {
 		} catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Override the text set in the above method
-			filterResponse = "Parse error in filter: " + ex.getMessage();
+
+			// TODO temporarily commented out, print to status bar instead
+//			filterResponse = "Parse error in filter: " + ex.getMessage();
 		}
 	}
 	
 	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
-		if (filter == EMPTY) {
-			filterResponse = NO_FILTER;
-		} else {
-			filterResponse = filter.toString();
-		}
+		// TODO temporarily commented out, print to status bar instead
+//		if (filter == EMPTY) {
+//			filterResponse = NO_FILTER;
+//		} else {
+//			filterResponse = filter.toString();
+//		}
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
@@ -317,7 +312,7 @@ public abstract class Column extends VBox {
 	}
 
 	public void filterByString(String filterString) {
-		filterInputArea.setTextFieldText(filterString);
+		filterInputArea.setFilterText(filterString);
 	}
 
 	public void setItems(ObservableList<TurboIssue> items) {
@@ -372,7 +367,6 @@ public abstract class Column extends VBox {
 		if (currentFilterExpression instanceof filter.Predicate) {
 			List<String> names = ((filter.Predicate) currentFilterExpression).getPredicateNames();
 			if (names.size() == 1 && names.get(0).equals("parent")) {
-				System.out.println("parent pred only");
 				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
 				    @Override
 				    public int compare(TurboIssue a, TurboIssue b) {
