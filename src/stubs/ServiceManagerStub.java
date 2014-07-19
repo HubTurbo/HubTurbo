@@ -2,14 +2,12 @@ package stubs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubRequest;
 
 import model.Model;
 import service.ServiceManager;
@@ -79,5 +77,21 @@ public class ServiceManagerStub extends ServiceManager{
 	
 	public List<String> getAllRepositoryNames() throws IOException{
 		return new ArrayList<String>();
+	}
+	
+	public List<Comment> getComments(int issueId) throws IOException{
+		ArrayList<Comment> comments = new ArrayList<Comment>();
+		
+		Comment comment1 = new Comment();
+		comment1.setBody("test comment");
+		comment1.setId(1);
+		
+		Comment log1 = new Comment();
+		log1.setBody(ServiceManager.CHANGELOG_TAG+ "log");
+		log1.setId(2);
+		
+		comments.add(comment1);
+		comments.add(log1);
+		return comments;
 	}
 }

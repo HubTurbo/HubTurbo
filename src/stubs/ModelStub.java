@@ -47,6 +47,7 @@ public class ModelStub extends Model{
 	
 	private void setupIssueStub(){
 		TurboIssue issue = new TurboIssue("Test", "", this);
+		issue.setId(1);
 		issues.add(issue);
 	}
 	
