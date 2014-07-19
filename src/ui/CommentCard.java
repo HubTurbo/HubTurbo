@@ -4,6 +4,10 @@ import handler.IssueDetailsContentHandler;
 
 import java.lang.ref.WeakReference;
 
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+
+import util.DialogMessage;
 import model.TurboComment;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -102,7 +106,12 @@ public class CommentCard extends IssueDetailsCard{
 
 	
 	private void handleDeleteButtonPressed(){
-		handler.deleteComment(editedComment);
+		Action response = DialogMessage.showConfirmDialog("Delete Comment", 
+										String.format("Are you sure you want to delete the comment: %s...?", 
+												getStartOfComment()));
+		if(response == Dialog.Actions.OK){
+			handler.deleteComment(editedComment);
+		}
 	}
 	
 	private void handleEditButtonPressed(){
@@ -116,5 +125,10 @@ public class CommentCard extends IssueDetailsCard{
 		}else{
 			editButton.setText(EDIT_BTN_TXT);
 		}
+	}
+	
+	private String getStartOfComment(){
+		String text = editedComment.getBody();
+		return text.substring(0, (int)Math.min(15, text.length() - 1));
 	}
 }

@@ -1,5 +1,7 @@
 package util;
 
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
 public class DialogMessage {
@@ -8,5 +10,14 @@ public class DialogMessage {
         .title(title)
         .message(message)
         .showWarning();
+	}
+	
+	public static Action showConfirmDialog(String title, String message){
+		Action response = Dialogs.create()
+		        .title(title)
+		        .message(message)
+		        .actions(Dialog.Actions.OK, Dialog.Actions.CANCEL)
+		        .showConfirm();
+		return response;
 	}
 }
