@@ -27,7 +27,7 @@ import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
 
 public class ServiceManager {
-	public static final boolean isTestMode = true;
+	public static final boolean isTestMode = false;
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
 	public static final String CHANGELOG_TAG = "[Change Log]\n";
