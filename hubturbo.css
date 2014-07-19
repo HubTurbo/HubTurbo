@@ -57,4 +57,5 @@
 
 .list-cell:empty {
     -fx-opacity: 0;
+  -fx-cell-size: 0;
 }

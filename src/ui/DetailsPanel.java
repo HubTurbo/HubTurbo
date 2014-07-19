@@ -1,9 +1,17 @@
 package ui;
 
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import handler.IssueDetailsContentHandler;
 import model.TurboComment;
 import model.TurboIssue;
 import ui.IssueDetailsDisplay.DisplayType;
+import javafx.collections.ListChangeListener;
+import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -11,14 +19,20 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class DetailsPanel extends VBox {
-	public static int COMMENTS_CELL_HEIGHT = 200;
-	public static int COMMENTS_CELL_WIDTH = 330;
-	public static int COMMENTS_PADDING = 5;
+	protected static final int LIST_MAX_HEIGHT = 500;
+	public static final int COMMENTS_CELL_HEIGHT = 200;
+	public static final int COMMENTS_CELL_WIDTH = 330;
+	public static final int COMMENTS_PADDING = 5;
+	protected static final int DEFAULT_HEIGHT = 150;
 	
 	private ListView<TurboComment> listView;
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
 	private DisplayType displayType;
+	
+	private ListChangeListener<TurboComment> displayedListSizeListener;
+	
+	private HashMap<Long, DetailsCell> displayedCells = new HashMap<Long, DetailsCell>();
 	
 	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler, DisplayType displayType){
 		this.issue = issue;
@@ -29,16 +43,52 @@ public class DetailsPanel extends VBox {
 		loadItems();
 	}
 	
+	protected void addListViewCellReference(Long commentId, DetailsCell cell){
+		displayedCells.put(commentId, cell);
+	}
+	
 	private void setupLayout(){
 		this.setPadding(new Insets(COMMENTS_PADDING));
 		this.setSpacing(COMMENTS_PADDING);
 	}
 	
+	
+	private void setupDisplayedListSizeListener(){
+		displayedListSizeListener = new ListChangeListener<TurboComment>() {
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends TurboComment> arg0) {
+				
+			}
+		};
+		listView.getItems().addListener(new WeakListChangeListener<TurboComment>(displayedListSizeListener));
+	}
+	
+	private void resizeListView(){
+		List<Long> displayedIDs = listView.getItems().stream().map(item -> item.getId()).collect(Collectors.toList());
+		Optional<Double> totalHeight = displayedIDs.stream()
+				.map(id -> getHeightOfCommentCell(id))
+				.reduce((accum, val) -> accum + val);
+		double height = Math.min(totalHeight.get(), LIST_MAX_HEIGHT);
+		listView.setPrefHeight(height);
+	}
+	
+	private double getHeightOfCommentCell(long commentId){
+		DetailsCell cell = displayedCells.get(commentId);
+		if(cell == null){
+			return DEFAULT_HEIGHT;
+		}else{
+			return cell.getHeight() + COMMENTS_PADDING;
+		}
+	}
+	
 	private Callback<ListView<TurboComment>, ListCell<TurboComment>> commentCellFactory(){
+		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
 		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
 			@Override
 			public ListCell<TurboComment> call(ListView<TurboComment> list) {
-				return new DetailsCell(issue, displayType, handler);
+				selfRef.get().resizeListView();
+				return new DetailsCell(issue, displayType, handler, selfRef.get());
 			}
 		};
 		return factory;
@@ -50,6 +100,7 @@ public class DetailsPanel extends VBox {
 		}
 		setListItems();
 		getChildren().add(0, listView);
+		setupDisplayedListSizeListener();
 	}
 
 	
