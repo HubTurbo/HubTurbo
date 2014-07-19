@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -72,7 +71,7 @@ public class ColumnControl extends HBox {
 		}
 	}
 
-	public void addColumnEvent(MouseEvent e) {
+	public void addNormalColumn() {
 		addColumn(false);
 	}
 	

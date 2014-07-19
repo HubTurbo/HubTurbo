@@ -17,9 +17,11 @@ public class FilterTextField extends TextField {
 	private Runnable cancel = () -> {};
 	private Function<String, Void> confirm = (s) -> null;
     private ValidationSupport validationSupport = new ValidationSupport();
+    private String previousText;
 
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
+		previousText = initialText;
 		Platform.runLater(() -> {
 			requestFocus();
 			positionCaret(position);
@@ -45,13 +47,20 @@ public class FilterTextField extends TextField {
 				if (e.getCode() == KeyCode.ENTER) {
 					confirmEdit();
 				} else {
-					cancel.run();
+					revertEdit();
 				}
 			}
 		});
 	}
+	
+	private void revertEdit() {
+		setText(previousText);
+		positionCaret(getLength());
+		cancel.run();
+	}
 
 	private void confirmEdit() {
+		previousText = getText();
 		confirm.apply(getText());
 	}
 	

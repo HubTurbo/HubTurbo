@@ -18,7 +18,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -39,7 +38,7 @@ public abstract class Column extends VBox {
 	// to filter it. It does not, however, specify how the list is to be
 	// displayed -- that is the job of its subclasses.
 	
-	private static final String TOGGLE_HIERARCHY = "\u27A5";
+//	private static final String TOGGLE_HIERARCHY = "\u27A5";
 	private static final String CLOSE_LIST = "\u2716";
 	private static final String ADD_ISSUE = "\u271A";
 	
@@ -89,31 +88,23 @@ public abstract class Column extends VBox {
 				return null; // returns type Void
 			})
 			.setOnCancel(() -> {
-				parentColumnControl.closeColumn(columnIndex);
+//				parentColumnControl.closeColumn(columnIndex);
 			});
 
 		setupIssueDragEvents(filterTextField);
-
-		HBox dragHandle = new HBox();
-		HBox.setHgrow(dragHandle, Priority.ALWAYS);
-		Label filler = new Label("");
-		dragHandle.getChildren().addAll(filler);
-		setupColumnDragEvents(dragHandle);
-		
-		HBox buttonBox = new HBox();
-		HBox.setMargin(buttonBox, new Insets(0,5,0,0));
-		buttonBox.setSpacing(5);
-		buttonBox.setAlignment(Pos.TOP_RIGHT);
-		HBox.setHgrow(buttonBox, Priority.ALWAYS);
-		buttonBox.getChildren().addAll(createButtons());
+	
+		HBox buttonsBox = new HBox();
+		buttonsBox.setSpacing(5);
+		buttonsBox.setAlignment(Pos.TOP_RIGHT);
+		buttonsBox.setMinWidth(50);
+		buttonsBox.getChildren().addAll(createButtons());
 		
 		HBox layout = new HBox();
-		layout.getChildren().addAll(filterTextField, buttonBox);
+		layout.getChildren().addAll(filterTextField, buttonsBox);
+		layout.setPadding(new Insets(4,5,3,5));		
 		
-		VBox vlayout = new VBox();
-		vlayout.getChildren().addAll(dragHandle, layout);
-		
-		return vlayout;
+		setupColumnDragEvents(layout);
+		return layout;
 	}
 	
 	private Label[] createButtons() {
@@ -131,13 +122,13 @@ public abstract class Column extends VBox {
 			parentColumnControl.closeColumn(columnIndex);
 		});
 		
-		Label toggleHierarchyMode = new Label(TOGGLE_HIERARCHY);
-		toggleHierarchyMode.getStyleClass().add("label-button");
-		toggleHierarchyMode.setOnMouseClicked((e) -> {
-			parentColumnControl.toggleColumn(columnIndex);
-		});
+//		Label toggleHierarchyMode = new Label(TOGGLE_HIERARCHY);
+//		toggleHierarchyMode.getStyleClass().add("label-button");
+//		toggleHierarchyMode.setOnMouseClicked((e) -> {
+//			parentColumnControl.toggleColumn(columnIndex);
+//		});
 		
-		return new Label[] {toggleHierarchyMode, addIssue, closeList};
+		return new Label[] {addIssue, closeList};
 	}
 
 	private void setupColumn() {

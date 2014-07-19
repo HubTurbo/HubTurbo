@@ -1,8 +1,15 @@
 package ui;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
+import service.ServiceManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
@@ -126,13 +133,34 @@ public class SidePanel extends VBox {
 		
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab, feedTab);
 		
-		HBox repoFields = new HBox();
+		HBox repoFields = createRepoFields();
+		
 		
 		everything.getChildren().addAll(repoFields, tabs);
 		
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		
 		return everything;
+	}
+
+	private HBox createRepoFields() {
+		ComboBox<String> comboBox = new ComboBox<String>();
+		
+/*		if (ServiceManager.getInstance().getRepoId() != null) {
+			try {
+				comboBox.setItems(FXCollections.observableArrayList(
+						ServiceManager.getInstance().getRepositoriesNames()));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+*/
+		HBox repoIdBox = new HBox();
+		repoIdBox.setPadding(new Insets(5));
+		repoIdBox.setAlignment(Pos.CENTER);
+		repoIdBox.getChildren().add(comboBox);
+		return repoIdBox;
 	}
 
 	private Tab createFeedTab() {

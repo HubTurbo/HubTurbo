@@ -5,12 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import util.Browse;
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -26,6 +21,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.Model;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
+import util.Browse;
 
 public class IssueEditDisplay extends VBox{
 	private static final int TITLE_SPACING = 5;
@@ -113,6 +114,7 @@ public class IssueEditDisplay extends VBox{
 		});
 		
 		TextArea issueTitle = createIssueTitle();
+		Platform.runLater(() -> issueTitle.requestFocus());
 		
 		Parent statusBox = createStatusBox(parentStage);
 		
