@@ -19,7 +19,7 @@ public class IssueDetailsCard extends VBox{
 	protected static int ELEMENTS_SPACING = 10;
 	protected static int PADDING = 8;
 	
-	protected VBox topBar;
+	protected HBox topBar;
 	protected Text commentsText;
 	protected VBox commentsTextDisplay;
 	
@@ -61,7 +61,7 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	protected void initialiseTopBar(){
-		topBar = new VBox();
+		topBar = new HBox();
 		topBar.setPrefWidth(PREF_WIDTH);
 		topBar.setSpacing(ELEMENTS_SPACING);
 	}
@@ -98,7 +98,7 @@ public class IssueDetailsCard extends VBox{
 		Text creationDate = new Text(formatDisplayedDate(originalComment.getCreatedAt()));
 		creationDate.getStyleClass().add("issue-comment-details");
 		
-		details.setAlignment(Pos.BASELINE_LEFT);
+		details.setAlignment(Pos.BOTTOM_LEFT);
 		details.setSpacing(ELEMENTS_SPACING);
 		details.getChildren().addAll(creator, creationDate);
 		return details;

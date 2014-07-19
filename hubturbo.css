@@ -48,6 +48,7 @@
 
 .issue-comment-details {
 	-fx-font-size: 11px;
+	/*-fx-padding: 15 0 0 0;*/
 }
 
 .labels {
@@ -60,6 +61,7 @@
 }
 
 .button-github-octicon{
+	-fx-padding: 0;
 	-fx-font-family: github-octicons;
 }
 

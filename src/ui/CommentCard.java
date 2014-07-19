@@ -10,9 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
 public class CommentCard extends IssueDetailsCard{
-	protected static String EDIT_BTN_TXT = "Edit";
-	protected static String CANCEL_BTN_TXT = "Cancel";
-	protected static String DELETE_BTN_TXT = "Delete";
+	protected static String EDIT_BTN_TXT = "\uf058";
+	protected static String CANCEL_BTN_TXT = " \uf0a4 ";
+	protected static String DELETE_BTN_TXT = "\uf0d0";
 	
 	
 	protected IssueDetailsContentHandler handler;
@@ -45,6 +45,7 @@ public class CommentCard extends IssueDetailsCard{
 	private void initialiseEditButton(){
 		editButton = new Button();
 		editButton.setText(EDIT_BTN_TXT);
+		editButton.getStyleClass().add("button-github-octicon");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
 		editButton.setOnMousePressed(e -> {
 		    selfRef.get().handleEditButtonPressed();
@@ -54,6 +55,7 @@ public class CommentCard extends IssueDetailsCard{
 	private void intialiseDeleteButton(){
 		deleteButton = new Button();
 		deleteButton.setText(DELETE_BTN_TXT);
+		deleteButton.getStyleClass().add("button-github-octicon");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
 		deleteButton.setOnMousePressed(e -> {
 		    selfRef.get().handleDeleteButtonPressed();
@@ -67,7 +69,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	private HBox createControlsBox(){
 		HBox controls = new HBox();
-		controls.setAlignment(Pos.BASELINE_RIGHT);
+		controls.setAlignment(Pos.BOTTOM_RIGHT);
 		controls.getChildren().addAll(editButton, deleteButton);
 		controls.setSpacing(5);
 		return controls;
@@ -75,7 +77,8 @@ public class CommentCard extends IssueDetailsCard{
 	
 	@Override
 	protected void loadTopBar(){
-		topBar.getChildren().addAll(createControlsBox(), createCommentsDetailsDisplay());
+		topBar.setSpacing(100);
+		topBar.getChildren().addAll(createCommentsDetailsDisplay(), createControlsBox());
 	}
 	
 	@Override
