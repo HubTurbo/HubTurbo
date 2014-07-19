@@ -101,7 +101,6 @@ public class IssueDetailsContentHandler {
 			updateItemInCommentsList(comment);
 			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -112,7 +111,6 @@ public class IssueDetailsContentHandler {
 			ServiceManager.getInstance().deleteComment(comment.getId());
 			removeCachedItem(comment.getId());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

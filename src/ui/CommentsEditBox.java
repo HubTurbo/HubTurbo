@@ -36,7 +36,6 @@ public class CommentsEditBox extends VBox{
 		this.editedComment = editedComment;
 		if(editedComment != null){
 			initialText = editedComment.getBody();
-			System.out.println(initialText);
 		}
 		initialiseUIComponents();
 		setupForCommentsEdit(editedComment);

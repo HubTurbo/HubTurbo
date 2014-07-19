@@ -54,6 +54,10 @@ public class CommentCard extends IssueDetailsCard{
 	private void intialiseDeleteButton(){
 		deleteButton = new Button();
 		deleteButton.setText(DELETE_BTN_TXT);
+		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
+		deleteButton.setOnMousePressed(e -> {
+		    selfRef.get().handleDeleteButtonPressed();
+		});
 	}
 	
 	
@@ -92,6 +96,11 @@ public class CommentCard extends IssueDetailsCard{
 		commentsTextDisplay.getChildren().add(commentEditField);
 	}
 
+	
+	private void handleDeleteButtonPressed(){
+		handler.deleteComment(editedComment);
+	}
+	
 	private void handleEditButtonPressed(){
 		handler.toggleCommentEditState(originalComment);
 		loadCommentsDisplay();
