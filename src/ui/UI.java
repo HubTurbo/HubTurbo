@@ -11,6 +11,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.NotificationPane;
@@ -42,8 +43,8 @@ public class UI extends Application {
 		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot(), 800, 600);
 		setupMainStage(scene);
+		loadFonts();
 		applyCSS(scene);
-		
 		getUserCredentials();
 	}
 	
@@ -63,12 +64,17 @@ public class UI extends Application {
 			return false;
 		});
 	}
+	
 
 	private static final String CSS = "file:///" + new File("hubturbo.css").getAbsolutePath().replace("\\", "/");
 
 	public static void applyCSS(Scene scene) {
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(CSS);
+	}
+	
+	public static void loadFonts(){
+		Font res = Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 24);
 	}
 
 	private void setupMainStage(Scene scene) {

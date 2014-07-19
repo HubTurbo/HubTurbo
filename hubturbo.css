@@ -59,6 +59,10 @@
 	-fx-font-size: 13pt;
 }
 
+.button-github-octicon{
+	-fx-font-family: github-octicons;
+}
+
 .button{
 	-fx-padding: 2;
 }
