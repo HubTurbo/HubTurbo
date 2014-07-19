@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class IssueDetailsCard extends VBox{
-	protected static int PREF_WIDTH = 320;
+	protected static int PREF_WIDTH = 300;
 	protected static int ELEMENTS_SPACING = 10;
 	protected static int PADDING = 8;
 	
