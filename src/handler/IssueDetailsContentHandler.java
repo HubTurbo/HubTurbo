@@ -29,6 +29,7 @@ public class IssueDetailsContentHandler {
 	
 	public IssueDetailsContentHandler(TurboIssue issue){
 		this.issue = issue;
+		setupContent();
 	}
 	
 	private boolean isNotSetup(){
@@ -58,7 +59,7 @@ public class IssueDetailsContentHandler {
 	}
 	
 	public void stopContentUpdate(){
-		commentsUpdater.stopCommentsListUpdate();
+//		commentsUpdater.stopCommentsListUpdate();
 	}
 	
 	public void createComment(String text){

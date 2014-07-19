@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import model.TurboComment;
 import model.TurboIssue;
@@ -15,11 +16,15 @@ public class DetailsCell extends ListCell<TurboComment>{
 	
 	public DetailsCell(TurboIssue issue, DisplayType displayType){
 		this.issue = issue;
+		this.displayType = displayType;
 	}
 	
 	@Override
 	public void updateItem(TurboComment item, boolean empty){
 		super.updateItem(item, empty);
-		
+		if(displayType == DisplayType.COMMENTS && item != null){
+			setGraphic(new CommentCard(item));
+		}
+		setAlignment(Pos.CENTER);
 	}
 }

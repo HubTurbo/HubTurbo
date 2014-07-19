@@ -54,3 +54,7 @@
 .label-button {
 	-fx-font-size: 13pt;
 }
+
+.list-cell:empty {
+    -fx-opacity: 0;
+}
