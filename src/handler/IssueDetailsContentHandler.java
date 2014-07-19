@@ -55,11 +55,15 @@ public class IssueDetailsContentHandler {
 			setupContent();
 		}
 		//TODO:
-//		commentsUpdater.startCommentsListUpdate();
+		if(commentsUpdater != null){
+//			commentsUpdater.startCommentsListUpdate();			
+		}
 	}
 	
 	public void stopContentUpdate(){
-//		commentsUpdater.stopCommentsListUpdate();
+		if(commentsUpdater != null){
+//			commentsUpdater.stopCommentsListUpdate();			
+		}
 	}
 	
 	public void createComment(String text){

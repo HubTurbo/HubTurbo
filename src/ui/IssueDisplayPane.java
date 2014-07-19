@@ -35,7 +35,6 @@ public class IssueDisplayPane extends HBox {
 		return issueEditDisplay.getResponse();
 	}
 
-
 	private void setup() {
 		setupIssueEditDisplay();
 		this.getChildren().add(issueEditDisplay);

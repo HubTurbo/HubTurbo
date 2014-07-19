@@ -39,7 +39,7 @@ public class Model {
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
-	private IRepositoryIdProvider repoId;
+	protected IRepositoryIdProvider repoId;
 
 	private UserConfigurations config = ConfigFileHandler.loadUserConfig();
 	

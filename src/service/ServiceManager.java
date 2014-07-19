@@ -24,8 +24,10 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
+import stubs.ServiceManagerStub;
 
 public class ServiceManager {
+	public static final boolean isTestMode = true;
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
 	public static final String CHANGELOG_TAG = "[Change Log]\n";
@@ -47,7 +49,7 @@ public class ServiceManager {
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
 	
-	private ServiceManager(){
+	protected ServiceManager(){
 		githubClient = new GitHubClientExtended();
 		collabService = new CollaboratorService(githubClient);
 		issueService = new IssueServiceExtended(githubClient);
@@ -96,7 +98,11 @@ public class ServiceManager {
 	}
 	
 	public static ServiceManager getInstance(){
-		return serviceManagerInstance;
+		if(!isTestMode){
+			return serviceManagerInstance;
+		}else{
+			return new ServiceManagerStub();
+		}
 	}
 	
 	public boolean login(String userId, String password){
@@ -325,14 +331,20 @@ public class ServiceManager {
 	 * */
 	
 	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
-		return labelService.setLabels(repoId, Integer.toString(issueId), labels);
+		if(repoId != null){
+			return labelService.setLabels(repoId, Integer.toString(issueId), labels);
+		}
+		return new ArrayList<Label>();
 	}
 	
 	/**
 	 * Adds list of labels to a github issue. Returns all the labels for the issue.
 	 * */
 	public List<Label> addLabelsToIssue(int issueId, List<Label> labels) throws IOException{
-		return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
+		if(repoId != null){
+			return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
+		}
+		return new ArrayList<Label>();
 	}
 	
 	public void deleteLabelsFromIssue(int issueId, List<Label> labels) throws IOException{
@@ -342,7 +354,9 @@ public class ServiceManager {
 	}
 	
 	public void deleteLabelFromIssue(int issueId, Label label) throws IOException{
-		labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
+		if(repoId != null){
+			labelService.deleteLabelFromIssue(repoId, Integer.toString(issueId), label);
+		}		
 	}
 	
 	public void setIssueMilestone(int issueId, Milestone milestone) throws IOException{
