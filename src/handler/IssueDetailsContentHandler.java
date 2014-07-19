@@ -76,6 +76,10 @@ public class IssueDetailsContentHandler {
 		}
 	}
 	
+	public void setCommentEditStateFalse(TurboComment comment){
+		commentsInEditMode.remove(comment);
+	}
+	
 	public boolean commentIsInEditState(TurboComment comment){
 		return commentsInEditMode.contains(comment);
 	}
@@ -90,13 +94,15 @@ public class IssueDetailsContentHandler {
 		}
 	}
 	
-	public void editComment(TurboComment comment){
+	public boolean editComment(TurboComment comment){
 		try {
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
+			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 	}
 	

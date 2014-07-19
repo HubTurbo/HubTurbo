@@ -5,13 +5,14 @@ import handler.IssueDetailsContentHandler;
 import java.lang.ref.WeakReference;
 
 import model.TurboComment;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
+
 public class CommentCard extends IssueDetailsCard{
 	protected static String EDIT_BTN_TXT = "Edit";
+	protected static String CANCEL_BTN_TXT = "Cancel";
 	protected static String DELETE_BTN_TXT = "Delete";
 	
 	
@@ -22,8 +23,8 @@ public class CommentCard extends IssueDetailsCard{
 	private Button deleteButton;
 	private Button editButton;
 	
-	private TextArea editableCommentsText;
-	
+	private CommentsEditBox editableCommentsText;
+		
 	public CommentCard(IssueDetailsContentHandler handler){
 		super();
 		this.handler = handler;
@@ -40,7 +41,6 @@ public class CommentCard extends IssueDetailsCard{
 		super.initialiseUIComponents();
 		initialiseEditButton();
 		intialiseDeleteButton();
-		initialiseEditableCommentsText();
 	}
 	
 	private void initialiseEditButton(){
@@ -59,8 +59,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	
 	private void initialiseEditableCommentsText(){
-		editableCommentsText = new TextArea();
-		editableCommentsText.setWrapText(true);
+		editableCommentsText = new CommentsEditBox(handler, editedComment);
 	}
 	
 	private HBox createControlsBox(){
@@ -78,19 +77,33 @@ public class CommentCard extends IssueDetailsCard{
 	@Override
 	protected void loadCommentsDisplay(){
 		commentsTextDisplay.getChildren().clear();
-		//TODO:
 		if(!handler.commentIsInEditState(originalComment)){
+			editableCommentsText = null;
 			super.loadCommentsDisplay();
 		}else{
-			editableCommentsText.setText(originalComment.getBody());
-			commentsTextDisplay.getChildren().add(editableCommentsText);
+			loadCommentEditField();
 		}
 		
 	}
 	
+	private void loadCommentEditField(){
+		if(editableCommentsText == null){
+			initialiseEditableCommentsText();
+		}
+		commentsTextDisplay.getChildren().add(editableCommentsText);
+	}
+
 	private void handleEditButtonPressed(){
 		handler.toggleCommentEditState(originalComment);
+		updateEditButtonText();
 		loadCommentsDisplay();
 	}
 	
+	private void updateEditButtonText(){
+		if(handler.commentIsInEditState(originalComment)){
+			editButton.setText(CANCEL_BTN_TXT);
+		}else{
+			editButton.setText(EDIT_BTN_TXT);
+		}
+	}
 }
