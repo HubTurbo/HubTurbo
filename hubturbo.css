@@ -46,6 +46,10 @@
 	-fx-strikethrough: true;
 }
 
+.issue-comment-details {
+	-fx-font-size: 11px;
+}
+
 .labels {
 	-fx-text-fill: white; -fx-background-radius: 3; -fx-padding: 1 5;
 }
@@ -53,6 +57,14 @@
 /* For buttons that are used as labels (the + and x buttons on columns) */
 .label-button {
 	-fx-font-size: 13pt;
+}
+
+.button{
+	-fx-padding: 2;
+}
+
+.toggle-button{
+	-fx-padding: 2;
 }
 
 .list-cell:empty {

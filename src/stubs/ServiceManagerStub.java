@@ -86,7 +86,7 @@ public class ServiceManagerStub extends ServiceManager{
 		User testUser = new User();
 		testUser.setLogin("random guy");
 		User anotherUser = new User();
-		testUser.setLogin("another guy");
+		anotherUser.setLogin("another guy");
 		
 		
 		Comment comment1 = new Comment();

@@ -69,6 +69,7 @@ public class CommentCard extends IssueDetailsCard{
 		HBox controls = new HBox();
 		controls.setAlignment(Pos.BASELINE_RIGHT);
 		controls.getChildren().addAll(editButton, deleteButton);
+		controls.setSpacing(5);
 		return controls;
 	}
 	
