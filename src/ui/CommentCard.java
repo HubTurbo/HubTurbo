@@ -5,7 +5,6 @@ import handler.IssueDetailsContentHandler;
 import java.lang.ref.WeakReference;
 
 import model.TurboComment;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -23,7 +22,7 @@ public class CommentCard extends IssueDetailsCard{
 	private Button deleteButton;
 	private Button editButton;
 	
-	private CommentsEditBox editableCommentsText;
+	private CommentsEditBox commentEditField;
 		
 	public CommentCard(IssueDetailsContentHandler handler){
 		super();
@@ -59,7 +58,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	
 	private void initialiseEditableCommentsText(){
-		editableCommentsText = new CommentsEditBox(handler, editedComment);
+		commentEditField = new CommentsEditBox(handler, editedComment);
 	}
 	
 	private HBox createControlsBox(){
@@ -78,24 +77,23 @@ public class CommentCard extends IssueDetailsCard{
 	protected void loadCommentsDisplay(){
 		commentsTextDisplay.getChildren().clear();
 		if(!handler.commentIsInEditState(originalComment)){
-			editableCommentsText = null;
+			commentEditField = null;
 			super.loadCommentsDisplay();
 		}else{
 			loadCommentEditField();
 		}
-		
+		updateEditButtonText();
 	}
 	
 	private void loadCommentEditField(){
-		if(editableCommentsText == null){
+		if(commentEditField == null){
 			initialiseEditableCommentsText();
 		}
-		commentsTextDisplay.getChildren().add(editableCommentsText);
+		commentsTextDisplay.getChildren().add(commentEditField);
 	}
 
 	private void handleEditButtonPressed(){
 		handler.toggleCommentEditState(originalComment);
-		updateEditButtonText();
 		loadCommentsDisplay();
 	}
 	

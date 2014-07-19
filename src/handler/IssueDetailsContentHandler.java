@@ -98,6 +98,7 @@ public class IssueDetailsContentHandler {
 		try {
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
+			updateItemInCommentsList(comment);
 			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

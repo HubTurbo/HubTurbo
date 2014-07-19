@@ -98,6 +98,8 @@ public class CommentsEditBox extends VBox{
 	
 	private void handleCommentEdit(){
 		boolean editRes = commentHandler.editComment(editedComment);
-		
+		if(editRes){
+			commentHandler.setCommentEditStateFalse(editedComment);
+		}
 	}
 }
