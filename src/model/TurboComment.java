@@ -108,7 +108,6 @@ public class TurboComment{
 	public TurboUser getCreator(){
 		return creator;
 	}
-
 	
 	public void copyValues(Object other) {
 		assert other != null;

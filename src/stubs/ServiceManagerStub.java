@@ -95,7 +95,7 @@ public class ServiceManagerStub extends ServiceManager{
 		
 		Comment comment2 = new Comment();
 		comment2.setBody("test comment 2");
-		comment2.setId(1);
+		comment2.setId(3);
 		comment2.setUser(testUser);
 		comment2.setCreatedAt(new Date());
 		
@@ -107,6 +107,8 @@ public class ServiceManagerStub extends ServiceManager{
 		
 		comments.add(comment1);
 		comments.add(log1);
+		comments.add(comment2);
+		
 		return comments;
 	}
 }

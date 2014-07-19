@@ -129,6 +129,7 @@ public class IssueDetailsContentHandler {
 	
 	private void getDetailsContent(){
 		try {
+			allGhContent.clear();
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
 			allGhContent.addAll(allItems);
 			updateData();

@@ -22,6 +22,8 @@ public class DetailsCell extends ListCell<TurboComment>{
 		super.updateItem(item, empty);
 		if(displayType == DisplayType.COMMENTS && item != null){
 			setGraphic(new CommentCard(item));
+		}else if(item != null){
+			setGraphic(new IssueDetailsCard(item));
 		}
 		setAlignment(Pos.CENTER);
 	}
