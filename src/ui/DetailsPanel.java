@@ -38,7 +38,7 @@ public class DetailsPanel extends VBox {
 		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
 			@Override
 			public ListCell<TurboComment> call(ListView<TurboComment> list) {
-				return new DetailsCell(issue, displayType);
+				return new DetailsCell(issue, displayType, handler);
 			}
 		};
 		return factory;

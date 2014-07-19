@@ -1,7 +1,8 @@
 package ui;
 
-import java.lang.ref.WeakReference;
+import handler.IssueDetailsContentHandler;
 
+import java.lang.ref.WeakReference;
 
 import model.TurboComment;
 import javafx.geometry.Pos;
@@ -14,16 +15,23 @@ public class CommentCard extends IssueDetailsCard{
 	protected static String DELETE_BTN_TXT = "Delete";
 	
 	
+	protected IssueDetailsContentHandler handler;
+	
 	private TurboComment editedComment;
 	
 	private Button deleteButton;
-	private ToggleButton editButton;
-	
+	private Button editButton;
 	
 	private TextArea editableCommentsText;
 	
-	public CommentCard(TurboComment comment){
-		super(comment);
+	public CommentCard(IssueDetailsContentHandler handler){
+		super();
+		this.handler = handler;
+	}
+	
+	@Override
+	public void setDisplayedItem(TurboComment comment){
+		super.setDisplayedItem(comment);
 		this.editedComment = new TurboComment(comment);
 	}
 	
@@ -36,7 +44,7 @@ public class CommentCard extends IssueDetailsCard{
 	}
 	
 	private void initialiseEditButton(){
-		editButton = new ToggleButton();
+		editButton = new Button();
 		editButton.setText(EDIT_BTN_TXT);
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
 		editButton.setOnMousePressed(e -> {
@@ -70,7 +78,8 @@ public class CommentCard extends IssueDetailsCard{
 	@Override
 	protected void loadCommentsDisplay(){
 		commentsTextDisplay.getChildren().clear();
-		if(editButton.selectedProperty().get() == false){
+		//TODO:
+		if(!handler.commentIsInEditState(originalComment)){
 			super.loadCommentsDisplay();
 		}else{
 			editableCommentsText.setText(originalComment.getBody());
@@ -80,11 +89,7 @@ public class CommentCard extends IssueDetailsCard{
 	}
 	
 	private void handleEditButtonPressed(){
-		//TODO:
-		System.out.println("here");
-		if(editButton.selectedProperty().get()){
-			
-		}
+		handler.toggleCommentEditState(originalComment);
 		loadCommentsDisplay();
 	}
 	

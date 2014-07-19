@@ -10,7 +10,9 @@ import javafx.scene.layout.VBox;
 public class CommentsEditBox extends VBox{
 	protected static final int ELEMENT_SPACING = 8;
 	protected static final String COMMENT_BTN_TXT = "Comment";
+	
 	private IssueDetailsContentHandler commentHandler;
+	
 	private Button commentButton;
 	private TextArea commentText;
 	

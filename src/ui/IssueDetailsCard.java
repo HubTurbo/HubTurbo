@@ -27,11 +27,30 @@ public class IssueDetailsCard extends VBox{
 	
 	protected ChangeListener<String> bodyChangeListener;
 	
-	public IssueDetailsCard(TurboComment comment){
-		this.originalComment = comment;
+	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
 		initialiseUIComponents();
+	}
+	
+	public void setDisplayedItem(TurboComment comment){
+		this.originalComment = comment;
+		reload();
+	}
+	
+	protected void reload(){
+		resetComponents();
+		loadComponents();
+	}
+	
+	protected void resetComponents(){
+		topBar.getChildren().clear();
+		commentsTextDisplay.getChildren().clear();
+		this.getChildren().clear();
+	}
+	
+	protected void loadComponents(){
+		setupCommentBodyChangeListener();
 		loadCardComponents();
 	}
 	
@@ -50,10 +69,9 @@ public class IssueDetailsCard extends VBox{
 	protected void initialiseCommentsText(){
 		commentsText = new Text();
 		commentsText.setWrappingWidth(PREF_WIDTH);
-		initialiseCommentBodyChangeListener();
 	}
 	
-	protected void initialiseCommentBodyChangeListener(){
+	protected void setupCommentBodyChangeListener(){
 		bodyChangeListener = new ChangeListener<String>(){
 			@Override
 			public void changed(ObservableValue<? extends String> arg0,
@@ -105,7 +123,6 @@ public class IssueDetailsCard extends VBox{
 	
 	private String stripChangeLogHeader(String text){
 		if(text == null || !originalComment.isIssueLog()){
-			System.out.println("returned "+text);
 			return text;
 		}
 		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "");

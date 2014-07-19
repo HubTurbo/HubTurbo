@@ -85,6 +85,8 @@ public class ServiceManagerStub extends ServiceManager{
 		ArrayList<Comment> comments = new ArrayList<Comment>();
 		User testUser = new User();
 		testUser.setLogin("random guy");
+		User anotherUser = new User();
+		testUser.setLogin("another guy");
 		
 		
 		Comment comment1 = new Comment();
@@ -96,7 +98,7 @@ public class ServiceManagerStub extends ServiceManager{
 		Comment comment2 = new Comment();
 		comment2.setBody("test comment 2");
 		comment2.setId(3);
-		comment2.setUser(testUser);
+		comment2.setUser(anotherUser);
 		comment2.setCreatedAt(new Date());
 		
 		Comment log1 = new Comment();

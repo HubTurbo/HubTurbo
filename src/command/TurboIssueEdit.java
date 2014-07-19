@@ -139,7 +139,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		String originalMilestoneTitle = originalMilestone.getTitle();
 		String editedMilestoneTitle = editedMilestone.getTitle();
 		if (editedMilestoneTitle == null) {
-			changeLog.append("Milestone removed: [previous: " + originalMilestoneTitle + "]");
+			changeLog.append("Milestone removed: [previous: " + originalMilestoneTitle + "]\n");
 		} else {
 			changeLog.append("Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + editedMilestoneTitle + "]\n");
 		}
@@ -204,11 +204,11 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	
 	private void logParentChange(Integer originalParent, Integer editedParent, StringBuilder changeLog){
 		if(editedParent < 0){
-			changeLog.append(String.format("Removed issue parent: %1d", originalParent));
+			changeLog.append(String.format("Removed issue parent: %1d\n", originalParent));
 		}else if(originalParent > 0){
-			changeLog.append(String.format("Changed Issue parent from %1d to %2d", originalParent, editedParent));
+			changeLog.append(String.format("Changed Issue parent from %1d to %2d\n", originalParent, editedParent));
 		}else{
-			changeLog.append(String.format("Set Issue parent to %1d", editedParent));
+			changeLog.append(String.format("Set Issue parent to %1d\n", editedParent));
 		}
 	}
 

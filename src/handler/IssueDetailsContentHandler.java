@@ -2,6 +2,7 @@ package handler;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,9 +28,10 @@ public class IssueDetailsContentHandler {
 	private CommentUpdateService commentsUpdater;
 	private ListChangeListener<Comment> commentsChangeListener;
 	
+	private HashSet<TurboComment> commentsInEditMode = new HashSet<TurboComment>();
+	
 	public IssueDetailsContentHandler(TurboIssue issue){
 		this.issue = issue;
-		setupContent();
 	}
 	
 	private boolean isNotSetup(){
@@ -64,6 +66,18 @@ public class IssueDetailsContentHandler {
 		if(commentsUpdater != null){
 //			commentsUpdater.stopCommentsListUpdate();			
 		}
+	}
+	
+	public void toggleCommentEditState(TurboComment comment){
+		if(commentIsInEditState(comment)){
+			commentsInEditMode.remove(comment);
+		}else{
+			commentsInEditMode.add(comment);
+		}
+	}
+	
+	public boolean commentIsInEditState(TurboComment comment){
+		return commentsInEditMode.contains(comment);
 	}
 	
 	public void createComment(String text){

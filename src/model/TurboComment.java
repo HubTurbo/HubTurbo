@@ -1,7 +1,6 @@
 package model;
 
 import java.util.Date;
-
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
@@ -19,7 +18,7 @@ public class TurboComment{
 
 	private StringProperty bodyText = new SimpleStringProperty();
 
-	private long id;
+	private long id = 0;
 
 	private String url;
 
@@ -41,7 +40,11 @@ public class TurboComment{
 	}
 	
 	public boolean isIssueLog(){
-		return body.get().startsWith(ServiceManager.CHANGELOG_TAG);
+		String text = getBodyText();
+		if(text == null){
+			text = getBody();
+		}
+		return text.startsWith(ServiceManager.CHANGELOG_TAG);
 	}
 	
 	public void setCreatedAt(Date date){
@@ -135,5 +138,22 @@ public class TurboComment{
 		comment.setUrl(url);
 		comment.setUser(creator.toGhResource());
 		return comment;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+		if(!(obj instanceof TurboComment)){
+			return false;
+		}
+		return ((TurboComment)obj).getId() == this.getId();
+	}
+	
+	@Override
+	public int hashCode() {
+		Long idObj = new Long(id);
+		return idObj.hashCode();
 	}
 }

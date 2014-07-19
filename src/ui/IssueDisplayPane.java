@@ -8,10 +8,6 @@ import model.Model;
 import model.TurboIssue;
 
 public class IssueDisplayPane extends HBox {
-	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
-	protected static final int LINE_HEIGHT = 18;
-	protected static final int TITLE_ROW_NUM = 3;
-	protected static final int DESC_ROW_NUM = 8;
 	protected static final int DETAILS_WIDTH = 350;
 	protected static final int ISSUE_WIDTH = 300;
 
