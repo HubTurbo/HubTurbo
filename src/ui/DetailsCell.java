@@ -5,8 +5,6 @@ import javafx.scene.control.ListCell;
 import model.TurboComment;
 import model.TurboIssue;
 
-import org.eclipse.egit.github.core.Comment;
-
 import ui.IssueDetailsDisplay.DisplayType;
 
 

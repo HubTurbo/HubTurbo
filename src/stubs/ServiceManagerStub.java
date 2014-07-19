@@ -2,12 +2,14 @@ package stubs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 
 import model.Model;
 import service.ServiceManager;
@@ -81,14 +83,27 @@ public class ServiceManagerStub extends ServiceManager{
 	
 	public List<Comment> getComments(int issueId) throws IOException{
 		ArrayList<Comment> comments = new ArrayList<Comment>();
+		User testUser = new User();
+		testUser.setLogin("random guy");
+		
 		
 		Comment comment1 = new Comment();
 		comment1.setBody("test comment");
 		comment1.setId(1);
+		comment1.setUser(testUser);
+		comment1.setCreatedAt(new Date());
+		
+		Comment comment2 = new Comment();
+		comment2.setBody("test comment 2");
+		comment2.setId(1);
+		comment2.setUser(testUser);
+		comment2.setCreatedAt(new Date());
 		
 		Comment log1 = new Comment();
 		log1.setBody(ServiceManager.CHANGELOG_TAG+ "log");
 		log1.setId(2);
+		log1.setUser(testUser);
+		log1.setCreatedAt(new Date());
 		
 		comments.add(comment1);
 		comments.add(log1);
