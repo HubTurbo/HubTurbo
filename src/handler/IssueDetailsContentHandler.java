@@ -165,6 +165,14 @@ public class IssueDetailsContentHandler {
 		for(TurboComment item : filteredComments){
 			updateItemInCommentsList(item);
 		}
+		removeDifference(comments, filteredComments);
+	}
+	
+	private void removeDifference(List<TurboComment> storedList, List<TurboComment> fetchedList){
+		List<TurboComment> removed = storedList.stream()
+											   .filter(item -> !fetchedList.contains(item))
+											   .collect(Collectors.toList());
+		storedList.removeAll(removed);
 	}
 	
 	private void updateItemInCommentsList(TurboComment comment){
