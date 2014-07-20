@@ -58,13 +58,13 @@ public class IssueDetailsContentHandler {
 		}
 		//TODO:
 		if(commentsUpdater != null){
-//			commentsUpdater.startCommentsListUpdate();			
+			commentsUpdater.startCommentsListUpdate();			
 		}
 	}
 	
 	public void stopContentUpdate(){
 		if(commentsUpdater != null){
-//			commentsUpdater.stopCommentsListUpdate();			
+			commentsUpdater.stopCommentsListUpdate();			
 		}
 	}
 	

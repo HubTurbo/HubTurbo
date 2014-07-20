@@ -226,19 +226,23 @@ public class IssueEditDisplay extends VBox{
 		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
 			columns.deselect();
+			issueViewCleanup();
 		});
 
 		Button done = new Button();
 		done.setText("Done");
 		done.setOnMouseClicked(e -> {
 			response.complete("done");
+			issueViewCleanup();
 		});
 
 		buttons.getChildren().addAll(done, cancel);
 		return buttons;
 	}
 
-	
+	private void issueViewCleanup(){
+		parentContainer.get().showIssueDetailsDisplay(false);
+	}
 	private HBox createIssueDetailsButton(){
 		HBox container = new HBox();
 		container.setAlignment(Pos.BASELINE_RIGHT);
@@ -248,7 +252,6 @@ public class IssueEditDisplay extends VBox{
 		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
 		details.setOnAction((ActionEvent e) -> {
 		    boolean selected = ref.get().selectedProperty().get();
-		    System.out.println("Selected: " + selected);
 		    parentContainer.get().showIssueDetailsDisplay(selected);
 		});
 		

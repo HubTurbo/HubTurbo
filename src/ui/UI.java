@@ -3,7 +3,9 @@ package ui;
 import java.io.File;
 import java.io.IOException;
 
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -14,7 +16,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+
 import org.controlsfx.control.NotificationPane;
+
 
 import service.ServiceManager;
 
@@ -74,7 +78,7 @@ public class UI extends Application {
 	}
 	
 	public static void loadFonts(){
-		Font res = Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 24);
+		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 24);
 	}
 
 	private void setupMainStage(Scene scene) {
@@ -86,6 +90,8 @@ public class UI extends Application {
 		mainStage.setOnCloseRequest(e -> {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
+			Platform.exit();
+			System.exit(0);
 		});
 		
 	}
