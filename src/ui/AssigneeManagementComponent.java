@@ -38,7 +38,7 @@ public class AssigneeManagementComponent {
 			@Override
 			public ListCell<TurboUser> call(ListView<TurboUser> list) {
 				if(that.get() != null){
-					return new AssigneeManagementCell();
+					return new ManageAssigneeListCell();
 				} else{
 					return null;
 				}
