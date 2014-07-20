@@ -6,6 +6,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -36,6 +38,16 @@ public class TurboMilestone implements Listable {
 	public LocalDate getDueOn() {return dueOn;}
 	public void setDueOn(LocalDate dueOn) {this.dueOn = dueOn;}
 	
+	private IntegerProperty closed = new SimpleIntegerProperty();
+    public final Integer getClosed() {return closed.get();}
+    private final void setClosed(Integer value) {closed.set(value);}
+    public IntegerProperty closedProperty() {return closed;}
+    
+    private IntegerProperty open = new SimpleIntegerProperty();
+    public final Integer getOpen() {return open.get();}
+    private final void setOpen(Integer value) {open.set(value);}
+    public IntegerProperty OpenProperty() {return open;}
+	
 	/*
 	 * Constructors and Public Methods
 	 */
@@ -55,6 +67,8 @@ public class TurboMilestone implements Listable {
 		this.state = milestone.getState();
 		this.description = milestone.getDescription();
 		this.dueOn = toLocalDate(milestone.getDueOn());
+		setClosed(milestone.getClosedIssues());
+		setOpen(milestone.getOpenIssues());
 	}
 	
 	public Milestone toGhResource() {
@@ -75,6 +89,19 @@ public class TurboMilestone implements Listable {
 			this.description = obj.getDescription();
 			this.dueOn = obj.getDueOn();
 		}
+	}
+	
+	public double getProgress(){
+		if (getClosed() == 0 && getOpen() == 0) {
+			return 0;
+		}
+		
+		double total = getClosed() + getOpen();
+		double progress = getClosed() / total;
+		System.out.println("total: " + total);
+		System.out.println("progress: " + progress);
+		
+		return progress;
 	}
 	
 	/*

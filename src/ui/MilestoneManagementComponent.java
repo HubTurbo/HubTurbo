@@ -55,7 +55,6 @@ public class MilestoneManagementComponent {
 	private Node createListView() {
 		listView = new ListView<>();
 		listView.setItems(model.getMilestones());
-		listView.setEditable(true);
 		VBox.setVgrow(listView, Priority.ALWAYS);
 		
 		refresh();

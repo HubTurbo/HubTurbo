@@ -6,11 +6,16 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboMilestone;
@@ -29,8 +34,50 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		this.model = model;
 		this.parentDialog = parentDialog;
 	}
-    
-    private ChangeListener<String> createMilestoneTitleListener(TurboMilestone milestone, Text milestoneTitle){
+
+	@Override
+	public void updateItem(TurboMilestone milestone, boolean empty) {
+		super.updateItem(milestone, empty);
+		if (milestone == null)
+			return;
+
+		setGraphic(createMilestoneItem(milestone));
+		setContextMenu(createContextMenu(milestone));
+	}
+
+	private Node createMilestoneItem(TurboMilestone milestone) {
+		Label title = new Label(milestone.getTitle());
+		milestone.titleProperty().addListener(new WeakChangeListener<String>(createMilestoneTitleListener(milestone, title)));
+		HBox titleContainer = new HBox();
+		HBox.setHgrow(titleContainer, Priority.ALWAYS);
+		titleContainer.setAlignment(Pos.BASELINE_LEFT);
+		titleContainer.getChildren().add(title);
+		
+		HBox top = new HBox();
+		HBox.setHgrow(top, Priority.ALWAYS);
+		top.getChildren().add(titleContainer);
+		
+		if (milestone.getDueOn() != null) {
+			// TODO ADD CHANGE LISTENER
+			Label dueDate = new Label(milestone.getDueOn().toString());
+			HBox dueDateContainer = new HBox();
+			HBox.setHgrow(dueDateContainer, Priority.ALWAYS);
+			dueDateContainer.setAlignment(Pos.BASELINE_RIGHT);
+			dueDateContainer.getChildren().add(dueDate);
+			top.getChildren().add(dueDateContainer);
+		}
+		
+		ProgressBar progressBar = new ProgressBar(milestone.getProgress());
+		
+		VBox milestoneItem = new VBox();
+		milestoneItem.setStyle("-fx-border-color: yellow; -fx-border-width: 3px"); 
+		milestoneItem.setSpacing(3);
+		milestoneItem.getChildren().addAll(top, progressBar);
+
+		return milestoneItem;
+	}
+	
+    private ChangeListener<String> createMilestoneTitleListener(TurboMilestone milestone, Label milestoneTitle){
     	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
     	ChangeListener<String> listener = new ChangeListener<String>() {
 			@Override
@@ -46,25 +93,6 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		changeListeners.add(listener);
 		return listener;
     }
-    
-	@Override
-	public void updateItem(TurboMilestone milestone, boolean empty) {
-		super.updateItem(milestone, empty);
-		if (milestone == null)
-			return;
-
-		Text milestoneTitle = new Text(milestone.getTitle());
-		milestone.titleProperty().addListener(new WeakChangeListener<String>(createMilestoneTitleListener(milestone, milestoneTitle)));
-
-		VBox everything = new VBox();
-		everything.setSpacing(2);
-		everything.getChildren()
-				.addAll(milestoneTitle);
-
-		setGraphic(everything);
-		
-		setContextMenu(createContextMenu(milestone));
-	}
 
 	private ContextMenu createContextMenu(TurboMilestone milestone) {
 		MenuItem edit = new MenuItem("Edit Milestone");
