@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Parser {
 
 	public static void main(String[] args) {
-		FilterExpression p = Parser.parse("milestone(0.4) state(open) or label(urgent)");
+		FilterExpression p = Parser.parse("~");
 		System.out.println(p);
 	}
 	
@@ -17,7 +17,7 @@ public class Parser {
 		else if (input.isEmpty()) return Predicate.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
 	}
-		
+
 	private ArrayList<Token> input;
 	private int position = 0;
 	
@@ -39,7 +39,9 @@ public class Parser {
 		
 	private FilterExpression parseExpression(int precedence) {
 		Token token = consume();
-		assert token.getType() != TokenType.EOF;
+		if (token.getType() == TokenType.EOF) {
+			throw new ParseException("Unexpected EOF while parsing at " + position);
+		}
 		
 		// Prefix
 		
