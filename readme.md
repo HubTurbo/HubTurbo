@@ -41,11 +41,13 @@ As in C-like languages, NOT is a prefix operator, AND and OR are infix and left-
 
 ### Valid Predicates
 
-- `id` (number)
+- `id` (`number`)
 - `title`
 - `milestone`
-- `parent` (number or name)
-- `label`
+- `parent` (`number` or `name`)
+- `label` (`name`, `group.name`, or `group.`)
 - `assignee`
-- `state/status` (`open` or `closed`)
-- `has` (`label`, `milestone`, `assignee`, `parent`)
+- `state/status` ('open', 'closed')
+- `has` ('label', 'milestone', 'assignee', 'parent')
+
+`number`s may be written with a leading `#`.
