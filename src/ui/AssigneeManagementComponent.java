@@ -1,19 +1,21 @@
 package ui;
 
-import java.util.stream.Collectors;
+import java.lang.ref.WeakReference;
 
-import model.Model;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
+import model.Model;
+import model.TurboUser;
 
 public class AssigneeManagementComponent {
 
 	private final Model model;
 	
-	private ListView<String> listView;
+	private ListView<TurboUser> listView;
 
 	public AssigneeManagementComponent(Model model) {
 		this.model = model;
@@ -29,7 +31,23 @@ public class AssigneeManagementComponent {
 
 	private Node createListView() {
 		listView = new ListView<>();
-		listView.setItems(FXCollections.observableArrayList(model.getCollaborators().stream().map(c -> c.getGithubName()).collect(Collectors.toList())));
+		
+		WeakReference<AssigneeManagementComponent> that = new WeakReference<AssigneeManagementComponent>(this);
+		
+		listView.setCellFactory(new Callback<ListView<TurboUser>, ListCell<TurboUser>>() {
+			@Override
+			public ListCell<TurboUser> call(ListView<TurboUser> list) {
+				if(that.get() != null){
+					return new AssigneeManagementCell();
+				} else{
+					return null;
+				}
+			}
+		});
+		
+		listView.setItems(null);
+		listView.setItems(model.getCollaborators());
+		
 		return listView;
 	}
 }

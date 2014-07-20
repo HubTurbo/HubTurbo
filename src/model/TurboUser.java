@@ -38,7 +38,7 @@ public class TurboUser implements Listable {
 	private Image avatar;
 	public Image getAvatar() {
 		if(avatar == null){
-			avatar = new Image(getAvatarUrl(), 12, 12, true, true);
+			avatar = new Image(getAvatarUrl(), 12, 12, true, false);
 		}
 		return avatar;
 	}
@@ -57,6 +57,10 @@ public class TurboUser implements Listable {
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
 		this.avatarUrl = user.getAvatarUrl();
+		
+		System.out.println("userLogin: " + githubName);
+		System.out.println("userName: " + realName);
+
 	}
 	
 	public User toGhResource() {
