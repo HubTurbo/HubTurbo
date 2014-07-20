@@ -25,6 +25,18 @@ public class Tests {
 	}
 	
 	@Test
+	public void unexpectedEOFs() {
+		try {
+			Parser.parse("~");
+			fail("Inputs which end unexpectedly should throw a parse exception");
+		} catch (ParseException e) {}
+		try {
+			Parser.parse("a(b) ||");
+			fail("Inputs which end unexpectedly should throw a parse exception");
+		} catch (ParseException e) {}
+	}
+	
+	@Test
 	public void operators() {
 		assertEquals(Parser.parse("a(b) or c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 		assertEquals(Parser.parse("a(b) | c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
