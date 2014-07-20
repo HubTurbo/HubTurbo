@@ -9,6 +9,7 @@ import model.TurboComment;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,8 +17,9 @@ import javafx.scene.text.Text;
 
 public class IssueDetailsCard extends VBox{
 	protected static int PREF_WIDTH = 300;
-	protected static int ELEMENTS_SPACING = 10;
-	protected static int PADDING = 8;
+	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
+	protected static int ELEMENTS_VERTICAL_SPACING = 5;
+	protected static int PADDING = 3;
 	
 	protected HBox topBar;
 	protected Text commentsText;
@@ -28,8 +30,9 @@ public class IssueDetailsCard extends VBox{
 	protected ChangeListener<String> bodyChangeListener;
 	
 	public IssueDetailsCard(){
-		this.setSpacing(ELEMENTS_SPACING);
+		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
+		this.setPadding(new Insets(PADDING));
 		initialiseUIComponents();
 	}
 	
@@ -63,7 +66,7 @@ public class IssueDetailsCard extends VBox{
 	protected void initialiseTopBar(){
 		topBar = new HBox();
 		topBar.setPrefWidth(PREF_WIDTH);
-		topBar.setSpacing(ELEMENTS_SPACING);
+		topBar.setSpacing(ELEMENTS_HORIZONTAL_SPACING);
 	}
 	
 	protected void initialiseCommentsText(){
@@ -99,7 +102,7 @@ public class IssueDetailsCard extends VBox{
 		creationDate.getStyleClass().add("issue-comment-details");
 		
 		details.setAlignment(Pos.BOTTOM_LEFT);
-		details.setSpacing(ELEMENTS_SPACING);
+		details.setSpacing(ELEMENTS_HORIZONTAL_SPACING);
 		details.getChildren().addAll(creator, creationDate);
 		return details;
 	}
@@ -128,6 +131,6 @@ public class IssueDetailsCard extends VBox{
 		if(text == null || !originalComment.isIssueLog()){
 			return text;
 		}
-		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "");
+		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "").trim();
 	}
 }
