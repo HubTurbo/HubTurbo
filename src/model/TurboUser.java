@@ -57,10 +57,6 @@ public class TurboUser implements Listable {
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
 		this.avatarUrl = user.getAvatarUrl();
-		
-		System.out.println("userLogin: " + githubName);
-		System.out.println("userName: " + realName);
-
 	}
 	
 	public User toGhResource() {

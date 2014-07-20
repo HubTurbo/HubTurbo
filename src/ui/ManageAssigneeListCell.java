@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import model.TurboUser;
 
-public class AssigneeManagementCell extends ListCell<TurboUser> {
+public class ManageAssigneeListCell extends ListCell<TurboUser> {
 
 	@Override
 	protected void updateItem(TurboUser user, boolean empty) {
