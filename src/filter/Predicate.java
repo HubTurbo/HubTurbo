@@ -180,15 +180,14 @@ public class Predicate implements FilterExpression {
 			labelName = content.substring(pos+1);
 		}
 		
-		// Both can't be empty
+		// Both can't be null
+		assert group != null && labelName != null;
+		// At most one can be empty
 		assert !(group.isEmpty() && labelName.isEmpty());
 		
 		for (TurboLabel l : issue.getLabels()) {
-			if (labelName == null || l.getName().toLowerCase().contains(labelName)) {
-				if(l.getGroup() == null){
-					return group == null || group == "";
-				}
-				if (group == null || l.getGroup().toLowerCase().contains(group)) {
+			if (labelName.isEmpty() || l.getName() != null && l.getName().toLowerCase().contains(labelName)) {
+				if (group.isEmpty() || l.getGroup() != null && l.getGroup().toLowerCase().contains(group)) {
 					return true;
 				}
 			}
