@@ -220,7 +220,7 @@ public class Model {
 	        public void run() {
 	        	list.removeAll(removed);
 	        	newList.stream()
-	        	       .forEach(item -> updateCachedListItem((Listable)item, list));
+	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
 	        }
 	   });
 		
@@ -292,7 +292,10 @@ public class Model {
 		List<String> defaultStatuses = Defaults.getDefaultStatusLabels();
 		List<String> projectLabels = new ArrayList<String>();
 		
-		ghLabels.stream().forEach(label -> projectLabels.add(label.getName()));
+		for(Label label : ghLabels){
+			projectLabels.add(label.getName());
+		}
+		
 		defaultStatuses.removeAll(projectLabels);
 		for (String standardStatus : defaultStatuses) {
 			Label statusLabel = new Label();

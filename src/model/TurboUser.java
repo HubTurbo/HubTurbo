@@ -27,16 +27,21 @@ public class TurboUser implements Listable {
 		this.realName = realName;
 	}
 	
-	private String avatarUrl;
+	private String avatarUrl = "";
 	public String getAvatarUrl(){
 		return avatarUrl;
 	}
 	public void setAvatarUrl(String url){
-		this.avatarUrl = url;
+		if(url != null){
+			this.avatarUrl = url;
+		}
 	}
 	
 	private Image avatar;
 	public Image getAvatar() {
+		if(avatarUrl == ""){
+			return null;
+		}
 		if(avatar == null){
 			avatar = new Image(getAvatarUrl(), 12, 12, true, false);
 		}

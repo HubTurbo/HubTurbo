@@ -81,8 +81,10 @@ public class CommentCard extends IssueDetailsCard{
 	
 	@Override
 	protected void loadTopBar(){
+		HBox commentsDetailsDisp = createCommentsDetailsDisplay();
+		HBox controlsBox = createControlsBox();
 		topBar.setSpacing(100);
-		topBar.getChildren().addAll(createCommentsDetailsDisplay(), createControlsBox());
+		topBar.getChildren().addAll(commentsDetailsDisp, controlsBox);
 	}
 	
 	@Override

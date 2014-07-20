@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.application.Platform;
+
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -57,11 +59,16 @@ public class CommentUpdateService extends UpdateService<Comment>{
 	
 	private void updateCommentsInList(Comment comment){
 		int index = getCommentsInListWithId(comment.getId());
-		if(index != -1){
-			commentsList.set(index, comment);
-		}else{
-			commentsList.add(0, comment);
-		}
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	if(index != -1){
+	    			commentsList.set(index, comment);
+	    		}else{
+	    			commentsList.add(0, comment);
+	    		}
+	        }
+	   });
 	}
 	
 	private int getCommentsInListWithId(long id){

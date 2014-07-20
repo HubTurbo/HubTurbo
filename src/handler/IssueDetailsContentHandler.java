@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -144,6 +145,7 @@ public class IssueDetailsContentHandler {
 	private void updateData(){
 		updateCommentsList();
 		updateLogContents();
+
 	}
 	
 	private void getDetailsContent(){

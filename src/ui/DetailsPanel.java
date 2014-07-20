@@ -54,6 +54,7 @@ public class DetailsPanel extends VBox {
 	
 	protected void addListViewCellReference(Long commentId, DetailsCell cell){
 		displayedCells.put(commentId, cell);
+		resizeListView();
 	}
 	
 	private void setupLayout(){
@@ -81,8 +82,11 @@ public class DetailsPanel extends VBox {
 	protected void resizeListView(){
 		List<Long> displayedIDs = detailsList.stream().map(item -> item.getId()).collect(Collectors.toList());
 		double height;
-		if(displayedIDs.size() == 0){
+		int size = displayedIDs.size();
+		if(size == 0){
 			height = 0;
+		}else if(size > 10){
+			height = LIST_MAX_HEIGHT;
 		}else{
 			Optional<Double> totalHeight = displayedIDs.stream()
 					.map(id -> getHeightOfCommentCell(id))
