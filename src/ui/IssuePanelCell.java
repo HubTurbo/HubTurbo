@@ -34,7 +34,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		setGraphic(new IssuePanelCard(issue));
 		setAlignment(Pos.CENTER);
-		getStyleClass().add("top-borders");
+		getStyleClass().add("bottom-borders");
 		
 //		registerEvents(issue);
 		

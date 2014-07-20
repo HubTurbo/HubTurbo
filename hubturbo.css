@@ -4,8 +4,8 @@
 	-fx-border-width: 1px;
 }
 
-.top-borders {
-	-fx-border-color: #7f7f7f transparent transparent transparent;
+.bottom-borders {
+	-fx-border-color: transparent transparent #7f7f7f transparent;
 	-fx-border-width: 1px;
 }
 

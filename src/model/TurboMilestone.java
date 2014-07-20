@@ -38,6 +38,11 @@ public class TurboMilestone implements Listable {
 	public LocalDate getDueOn() {return dueOn;}
 	public void setDueOn(LocalDate dueOn) {this.dueOn = dueOn;}
 	
+	private StringProperty dueOnString = new SimpleStringProperty();
+    public final String getDueOnString() {return dueOnString.get();}
+    public final void setDueOnString(String value) {dueOnString.set(value);}
+    public StringProperty dueOnStringProperty() {return dueOnString;}
+	
 	private IntegerProperty closed = new SimpleIntegerProperty();
     public final Integer getClosed() {return closed.get();}
     private final void setClosed(Integer value) {closed.set(value);}
@@ -46,7 +51,7 @@ public class TurboMilestone implements Listable {
     private IntegerProperty open = new SimpleIntegerProperty();
     public final Integer getOpen() {return open.get();}
     private final void setOpen(Integer value) {open.set(value);}
-    public IntegerProperty OpenProperty() {return open;}
+    public IntegerProperty openProperty() {return open;}
 	
 	/*
 	 * Constructors and Public Methods
@@ -88,6 +93,8 @@ public class TurboMilestone implements Listable {
 			this.state = obj.getState();
 			this.description = obj.getDescription();
 			this.dueOn = obj.getDueOn();
+			setClosed(obj.getClosed());
+			setOpen(obj.getOpen());
 		}
 	}
 	
@@ -95,12 +102,8 @@ public class TurboMilestone implements Listable {
 		if (getClosed() == 0 && getOpen() == 0) {
 			return 0;
 		}
-		
 		double total = getClosed() + getOpen();
 		double progress = getClosed() / total;
-		System.out.println("total: " + total);
-		System.out.println("progress: " + progress);
-		
 		return progress;
 	}
 	

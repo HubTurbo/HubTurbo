@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -13,8 +14,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -40,14 +43,16 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		super.updateItem(milestone, empty);
 		if (milestone == null)
 			return;
-
+		
+		setPadding(new Insets(0, 10, 0, 10));
 		setGraphic(createMilestoneItem(milestone));
 		setContextMenu(createContextMenu(milestone));
 	}
 
 	private Node createMilestoneItem(TurboMilestone milestone) {
 		Label title = new Label(milestone.getTitle());
-		milestone.titleProperty().addListener(new WeakChangeListener<String>(createMilestoneTitleListener(milestone, title)));
+		milestone.titleProperty().addListener(new WeakChangeListener<String>(createTitleListener(milestone, title)));
+		
 		HBox titleContainer = new HBox();
 		HBox.setHgrow(titleContainer, Priority.ALWAYS);
 		titleContainer.setAlignment(Pos.BASELINE_LEFT);
@@ -67,17 +72,51 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 			top.getChildren().add(dueDateContainer);
 		}
 		
+		StackPane progressStack = new StackPane();
+		HBox.setHgrow(progressStack, Priority.ALWAYS);
+		progressStack.setAlignment(Pos.TOP_CENTER);
+		Label progressLabel = new Label(milestone.getClosed() + " of " + (milestone.getOpen() + milestone.getClosed()));
 		ProgressBar progressBar = new ProgressBar(milestone.getProgress());
+		progressBar.prefWidthProperty().bind(progressStack.widthProperty());
+		progressStack.getChildren().addAll(progressBar, progressLabel);
+		
+		milestone.closedProperty().addListener(new WeakChangeListener<Number>(createProgressListener(milestone, progressStack)));
+		milestone.openProperty().addListener(new WeakChangeListener<Number>(createProgressListener(milestone, progressStack)));
+		
+		Separator seperator = new Separator();
 		
 		VBox milestoneItem = new VBox();
-		milestoneItem.setStyle("-fx-border-color: yellow; -fx-border-width: 3px"); 
 		milestoneItem.setSpacing(3);
-		milestoneItem.getChildren().addAll(top, progressBar);
+		milestoneItem.getChildren().addAll(top, progressStack, seperator);
 
 		return milestoneItem;
 	}
 	
-    private ChangeListener<String> createMilestoneTitleListener(TurboMilestone milestone, Label milestoneTitle){
+    private ChangeListener<Number> createProgressListener(TurboMilestone milestone, StackPane progressStack) {
+    	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
+		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> integerProperty,
+					Number oldValue, Number newValue) {
+				TurboMilestone milestone = milestoneRef.get();
+				if(milestone != null){
+					for(Node node : progressStack.getChildren()){
+						if (node instanceof ProgressBar) {
+							ProgressBar progressBar = (ProgressBar) node;
+							progressBar.setProgress(milestone.getProgress());
+						} else if (node instanceof Label) {
+							Label progressLabel = (Label) node;
+							progressLabel.setText(milestone.getClosed() + " of " + (milestone.getOpen() + milestone.getClosed()));
+						}
+					}
+				}
+			}
+		};
+		changeListeners.add(changeListener);
+		return changeListener;
+	}
+
+	private ChangeListener<String> createTitleListener(TurboMilestone milestone, Label milestoneTitle){
     	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
     	ChangeListener<String> listener = new ChangeListener<String>() {
 			@Override
