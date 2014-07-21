@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboLabel;
@@ -170,28 +171,32 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 
 	private MenuItem[] createRootContextMenu() {
-		MenuItem newGroup = new MenuItem("New Group");
+		MenuItem newGroup = new MenuItem("New Label Group");
 		newGroup.setOnAction((event) -> {
-			TurboLabelGroup group = new TurboLabelGroup("newgroup" + LabelManagementComponent.getUniqueId());
-			(new EditGroupDialog(stage, group))
-				.setExclusiveCheckboxEnabled(true)
-				.show().thenApply(response -> {
-	
-					assert response.getValue() != null;
-					if (response.getValue().isEmpty()) {
-						return false;
-					}
-	
-					TreeItem<LabelTreeItem> item = new TreeItem<>(response);
-					getTreeView().getRoot().getChildren().add(item);
-	
-					return true;
-				}).exceptionally(ex -> {
-					ex.printStackTrace();
-					return false;
-				});
+			createNewGroup(stage, getTreeView());
 		});
 		return new MenuItem[] {newGroup};
+	}
+
+	public static void createNewGroup(Stage stage, TreeView<LabelTreeItem> treeView) {
+		TurboLabelGroup group = new TurboLabelGroup("newgroup" + LabelManagementComponent.getUniqueId());
+		(new EditGroupDialog(stage, group))
+			.setExclusiveCheckboxEnabled(true)
+			.show().thenApply(response -> {
+
+				assert response.getValue() != null;
+				if (response.getValue().isEmpty()) {
+					return false;
+				}
+
+				TreeItem<LabelTreeItem> item = new TreeItem<>(response);
+				treeView.getRoot().getChildren().add(item);
+
+				return true;
+			}).exceptionally(ex -> {
+				ex.printStackTrace();
+				return false;
+			});
 	}
 
 	private boolean isRoot(TreeItem<LabelTreeItem> treeItem) {

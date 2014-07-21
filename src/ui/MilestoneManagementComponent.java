@@ -64,7 +64,7 @@ public class MilestoneManagementComponent {
 	}
 
 	private Node createButtons() {
-		Button create = new Button("Create Milestone");
+		Button create = new Button("New Milestone");
 		create.setOnAction(e -> {
 			model.createMilestone(new TurboMilestone(NEW_MILESTONE_NAME));
 		});
