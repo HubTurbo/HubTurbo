@@ -41,6 +41,22 @@ public class TurboIssue implements Listable {
 		return model;
 	}
 	
+	private String creator;
+	public String getCreator() {
+		return this.creator;
+	}
+	private void setCreator(String creator) {
+		this.creator = creator;
+	}
+	
+	private String createdAt;
+	public String getCreatedAt() {
+		return this.createdAt;
+	}
+	private void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+	
 	private int numOfComments;
 	public int getNumOfComments(){
 		return numOfComments;
@@ -56,7 +72,6 @@ public class TurboIssue implements Listable {
 	public void setPullRequest(PullRequest pr){
 		this.pullRequest = pr;
 	}
-	
 	
 	private IntegerProperty id = new SimpleIntegerProperty();
     public final int getId() {
@@ -318,6 +333,8 @@ public class TurboIssue implements Listable {
 		setParentIssue(extractIssueParent(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
 		setNumOfComments(issue.getComments());
+		setCreator(issue.getUser().getLogin());
+		setCreatedAt(issue.getCreatedAt().toString());
 	}
 
 	public Issue toGhResource() {
@@ -350,6 +367,8 @@ public class TurboIssue implements Listable {
 			setParentIssue(obj.getParentIssue());
 			setPullRequest(obj.getPullRequest());
 			setNumOfComments(obj.getNumOfComments());
+			setCreator(obj.getCreator());
+			setCreatedAt(obj.getCreatedAt());
 		}
 	}
 	

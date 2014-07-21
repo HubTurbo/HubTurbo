@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -30,9 +31,7 @@ import ui.issue.comments.IssueDisplayPane;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
-	private static final int TITLE_SPACING = 5;
-	private static final int ELEMENT_SPACING = 10;
-	private static final int MIDDLE_SPACING = 5;
+	private static final int ELEMENT_SPACING = 5;
 	
 	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
 	protected static final int LINE_HEIGHT = 18;
@@ -64,7 +63,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void setup(){
 		setPadding(new Insets(15));
-		setSpacing(MIDDLE_SPACING);
+		setSpacing(ELEMENT_SPACING);
 		getChildren().addAll(top(), bottom());
 	}
 	
@@ -105,13 +104,12 @@ public class IssueEditDisplay extends VBox{
 	private HBox createTopTitle(){
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
-		title.setSpacing(TITLE_SPACING);
+		title.setSpacing(ELEMENT_SPACING);
 		
 		// TODO ALIGNMENT
 		Text issueIdText = new Text("#" + issue.getId());
 		HBox issueId = new HBox();
 		issueId.getChildren().add(issueIdText);
-		issueId.getStyleClass().addAll("borders", "rounded-borders");
 		issueId.setStyle("-fx-font-size: 16pt;");
 		issueId.setOnMouseClicked(e -> {
 			Browse.browse(issue.getHtmlUrl());
@@ -154,15 +152,21 @@ public class IssueEditDisplay extends VBox{
 
 		HBox title = createTopTitle();
 		
-		TextArea issueDesc = createIssueDescription();
+		Text issueCreator = new Text("created by " + issue.getCreator() + " on " + issue.getCreatedAt());
+		issueCreator.getStyleClass().add("issue-creator");
+		HBox issueCreatorContainer = new HBox();
+		HBox.setHgrow(issueCreatorContainer, Priority.ALWAYS);
+		issueCreatorContainer.setAlignment(Pos.BASELINE_RIGHT);
+		issueCreatorContainer.getChildren().add(issueCreator);
 
+		TextArea issueDesc = createIssueDescription();
 		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
 		issueDesc.setMaxHeight(maxIssueDescHeight);
 		
 		VBox top = new VBox();
 		top.setSpacing(ELEMENT_SPACING);
-		top.getChildren().addAll(title, issueDesc);
-		top.setMaxHeight(maxIssueDescHeight + title.getMaxHeight());
+		top.getChildren().addAll(title, issueCreatorContainer ,issueDesc);
+		top.setMaxHeight(maxIssueDescHeight + title.getMaxHeight() + issueCreatorContainer.getMaxHeight());
 		return top;
 	}
 	
@@ -209,9 +213,9 @@ public class IssueEditDisplay extends VBox{
 		Parent milestone = createMilestoneBox(parentStage);
 		Parent labels = createLabelBox(parentStage);
 		Parent assignee = createAssigneeBox(parentStage);
-
-		HBox buttons = createButtons(parentStage);
+		
 		HBox detailsButton = createIssueDetailsButton();
+		HBox buttons = createButtons(parentStage);
 
 		VBox bottom = new VBox();
 		bottom.setSpacing(ELEMENT_SPACING);
@@ -222,19 +226,22 @@ public class IssueEditDisplay extends VBox{
 	
 	private HBox createButtons(Stage stage) {
 		HBox buttons = new HBox();
+		HBox.setHgrow(buttons, Priority.ALWAYS);
 		buttons.setAlignment(Pos.BASELINE_RIGHT);
-		buttons.setSpacing(8);
+		buttons.setSpacing(ELEMENT_SPACING);
 
-		Button cancel = new Button();
-		cancel.setText("Cancel");
+		Button cancel = new Button("Cancel");
+		HBox.setHgrow(cancel, Priority.ALWAYS);
+		cancel.setMaxWidth(Double.MAX_VALUE);
 		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
 			columns.deselect();
 			issueViewCleanup();
 		});
 
-		Button done = new Button();
-		done.setText("Done");
+		Button done = new Button("Done");
+		HBox.setHgrow(done, Priority.ALWAYS);
+		done.setMaxWidth(Double.MAX_VALUE);
 		done.setOnMouseClicked(e -> {
 			response.complete("done");
 			issueViewCleanup();
@@ -249,10 +256,11 @@ public class IssueEditDisplay extends VBox{
 	}
 	private HBox createIssueDetailsButton(){
 		HBox container = new HBox();
-		container.setAlignment(Pos.BASELINE_RIGHT);
+		HBox.setHgrow(container, Priority.ALWAYS);
 		
-		ToggleButton details = new ToggleButton();
-		details.setText(ISSUE_DETAILS_BTN_TXT);
+		ToggleButton details = new ToggleButton(ISSUE_DETAILS_BTN_TXT);
+		HBox.setHgrow(details, Priority.ALWAYS);
+		details.setMaxWidth(Double.MAX_VALUE);
 		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
 		details.setOnAction((ActionEvent e) -> {
 		    boolean selected = ref.get().selectedProperty().get();
