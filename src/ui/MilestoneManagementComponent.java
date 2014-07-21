@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -32,7 +33,7 @@ public class MilestoneManagementComponent {
 		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
-		layout.getChildren().addAll(createListView(), createButtons());
+		layout.getChildren().addAll(createButtons(), createListView());
 		return layout;
 	}
 	
@@ -67,6 +68,8 @@ public class MilestoneManagementComponent {
 		create.setOnAction(e -> {
 			model.createMilestone(new TurboMilestone(NEW_MILESTONE_NAME));
 		});
+		HBox.setHgrow(create, Priority.ALWAYS);
+		create.setMaxWidth(Double.MAX_VALUE);
 
 		VBox container = new VBox();
 		container.setSpacing(5);
