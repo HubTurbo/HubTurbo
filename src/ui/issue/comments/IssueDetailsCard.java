@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import org.w3c.dom.Document;
+
 import service.ServiceManager;
 import model.TurboComment;
 import javafx.beans.value.ChangeListener;
@@ -14,20 +16,27 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 
 public class IssueDetailsCard extends VBox{
 	protected static int PREF_WIDTH = 300;
 	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
 	protected static int ELEMENTS_VERTICAL_SPACING = 5;
 	protected static int PADDING = 3;
+	protected static int TEXT_PADDING = 10;
+	
+	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" +
+	           "<div id=\"wrapper\">%1s</div>" +
+	           "</body></html>";
 	
 	protected HBox topBar;
-	protected Text commentsText;
+	protected WebView commentsText;
 	protected VBox commentsTextDisplay;
 	
 	protected TurboComment originalComment;
 	
 	protected ChangeListener<String> bodyChangeListener;
+	protected ChangeListener<Document> webViewHeightListener;
 	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
@@ -70,8 +79,10 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	protected void initialiseCommentsText(){
-		commentsText = new Text();
-		commentsText.setWrappingWidth(PREF_WIDTH);
+		commentsText = new WebView();
+		commentsText.setPrefWidth(PREF_WIDTH);
+		setupWebEngineHeightListener();
+//		commentsText.setWrappingWidth(PREF_WIDTH);
 	}
 	
 	protected void setupCommentBodyChangeListener(){
@@ -124,7 +135,27 @@ public class IssueDetailsCard extends VBox{
 	
 	private void setDisplayedCommentText(){
 		String text = originalComment.getBody();
-		commentsText.setText(stripChangeLogHeader(text));
+		String displayedText = formatStringForHTMLDisplay(text);
+		commentsText.getEngine().loadContent(displayedText);
+	}
+	
+	private void setupWebEngineHeightListener(){
+		webViewHeightListener = new ChangeListener<Document>() {
+	        @Override
+	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
+	            Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+	            adjustHeight();
+	        }
+		};
+		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+	}
+	
+	private void adjustHeight(){
+		Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+        if(res!= null && res instanceof Integer) {
+        	Integer height = (Integer)res + TEXT_PADDING;
+        	commentsText.setPrefHeight(height);
+        }
 	}
 	
 	private String stripChangeLogHeader(String text){
@@ -132,5 +163,9 @@ public class IssueDetailsCard extends VBox{
 			return text;
 		}
 		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "").trim();
+	}
+	
+	private String formatStringForHTMLDisplay(String text){
+		return String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
 	}
 }
