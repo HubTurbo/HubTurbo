@@ -12,6 +12,7 @@ import model.TurboComment;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 public class CommentCard extends IssueDetailsCard{
 	protected static String EDIT_BTN_TXT = "\uf058";
@@ -85,6 +86,7 @@ public class CommentCard extends IssueDetailsCard{
 		if(originalComment != null && !originalComment.isIssueLog()){
 			HBox commentsDetailsDisp = createCommentsDetailsDisplay();
 			HBox controlsBox = createControlsBox();
+			HBox.setHgrow(controlsBox, Priority.ALWAYS);
 			topBar.setSpacing(100);
 			topBar.getChildren().addAll(commentsDetailsDisp, controlsBox);
 		}else{

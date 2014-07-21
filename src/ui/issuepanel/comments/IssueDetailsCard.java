@@ -31,7 +31,7 @@ public class IssueDetailsCard extends VBox{
 	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
 	protected static int ELEMENTS_VERTICAL_SPACING = 5;
 	protected static int PADDING = 3;
-	protected static int WEB_TEXT_PADDING = 15;
+	protected static int WEB_TEXT_PADDING = 20;
 	
 	public static final String EVENT_TYPE_CLICK = "click";
 	
@@ -48,7 +48,6 @@ public class IssueDetailsCard extends VBox{
 	protected ChangeListener<String> bodyChangeListener;
 	protected ChangeListener<Document> webViewHeightListener;
 	protected ChangeListener<State> weblinkClickListeners;
-	protected boolean clicklistenerCreated = false;
 	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
@@ -75,7 +74,7 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void loadComponents(){
 		setupCommentBodyChangeListener();
-		setupWeblinkClickListener();
+		setupWeblinkClickListeners();
 		loadCardComponents();
 	}
 	
@@ -161,12 +160,11 @@ public class IssueDetailsCard extends VBox{
 		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
 	}
 	
-	private void setupWeblinkClickListener(){		
+	private void setupWeblinkClickListeners(){		
 //		weblinkClickListeners = new ChangeListener<State>() {
 //            @Override
 //            public void changed(ObservableValue ov, State oldState, State newState) {
-//                if (newState == Worker.State.SUCCEEDED && clicklistenerCreated == false) {
-//                	clicklistenerCreated = true;
+//                if (newState == Worker.State.SUCCEEDED) {
 //                	System.out.println("listener created");
 //                    EventListener listener = new EventListener() {
 //						@Override
@@ -191,7 +189,7 @@ public class IssueDetailsCard extends VBox{
 //            }
 //        };
 //        commentsText.getEngine().getLoadWorker().stateProperty()
-//        			.addListener(new WeakChangeListener<State>(weblinkClickListeners));
+//        			.addListener(weblinkClickListeners);
 	}
 	
 	private void adjustWebEngineHeight(){

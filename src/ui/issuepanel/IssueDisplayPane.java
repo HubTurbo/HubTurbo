@@ -74,6 +74,8 @@ public class IssueDisplayPane extends HBox {
 		}
 	}
 	public void cleanup(){
-		issueDetailsDisplay.cleanup();
+		if(issueDetailsDisplay != null){
+			issueDetailsDisplay.cleanup();
+		}
 	}
 }
