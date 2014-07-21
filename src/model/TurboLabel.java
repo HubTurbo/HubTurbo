@@ -113,6 +113,10 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return ghLabels;
 	}
 	
+	public String getBackgroundColourStyle() {
+		return "-fx-background-color: #" + getColour() + ";";
+	}
+	
 	/*
 	 * Overriden Methods
 	 */

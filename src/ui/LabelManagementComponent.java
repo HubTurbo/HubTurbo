@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
@@ -29,13 +32,28 @@ public class LabelManagementComponent {
 		this.model = model;
 	}
 
-	public HBox initialise() {
-		HBox layout = new HBox();
+	public VBox initialise() {
+		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		TreeView<LabelTreeItem> treeView = createTreeView(parentStage);
-		layout.getChildren().addAll(treeView);
+		layout.getChildren().addAll(createButtons(treeView), treeView);
 		return layout;
+	}
+
+	private Node createButtons(TreeView<LabelTreeItem> treeView) {
+		Button create = new Button("New Group");
+		create.setOnAction(e -> {
+			ManageLabelsTreeCell.createNewGroup(parentStage, treeView);
+		});
+		HBox.setHgrow(create, Priority.ALWAYS);
+		create.setMaxWidth(Double.MAX_VALUE);
+
+		VBox container = new VBox();
+		container.setSpacing(5);
+		container.getChildren().addAll(create);
+		
+		return container;
 	}
 
 	private TreeView<LabelTreeItem> createTreeView(Stage stage) {
@@ -45,7 +63,7 @@ public class LabelManagementComponent {
 
 		final TreeView<LabelTreeItem> treeView = new TreeView<>();
 		treeView.setRoot(treeRoot);
-		treeView.setShowRoot(true);
+		treeView.setShowRoot(false);
 		HBox.setHgrow(treeView, Priority.ALWAYS);
 //		VBox.setVgrow(treeView, Priority.ALWAYS);
 		treeView.setPrefHeight(2000);
