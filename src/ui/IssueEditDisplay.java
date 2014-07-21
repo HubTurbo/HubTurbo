@@ -107,7 +107,10 @@ public class IssueEditDisplay extends VBox{
 		title.setSpacing(TITLE_SPACING);
 		
 		// TODO ALIGNMENT
-		Text issueId = new Text("#" + issue.getId());
+		Text issueIdText = new Text("#" + issue.getId());
+		HBox issueId = new HBox();
+		issueId.getChildren().add(issueIdText);
+		issueId.getStyleClass().addAll("borders", "rounded-borders");
 		issueId.setStyle("-fx-font-size: 16pt;");
 		issueId.setOnMouseClicked(e -> {
 			Browse.browse(issue.getHtmlUrl());
