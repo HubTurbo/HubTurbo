@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Arrays;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
@@ -8,6 +10,10 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import command.TurboIssueAddLabels;
+import command.TurboIssueSetAssignee;
+import command.TurboIssueSetMilestone;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
@@ -78,7 +84,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			getStyleClass().remove("dragged-over");
 			e.consume();
 		});
-		
+
 		setOnDragDropped(e -> {
 			Dragboard db = e.getDragboard();
 			boolean success = false;
@@ -87,11 +93,11 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
-					issue.addLabel(model.getLabelByGhName(dd.getEntityName()));
+					(new TurboIssueAddLabels(model, issue, Arrays.asList(model.getLabelByGhName(dd.getEntityName())))).execute();
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-					issue.setAssignee(model.getUserByGhName(dd.getEntityName()));
+					(new TurboIssueSetAssignee(model, issue, model.getUserByGhName(dd.getEntityName()))).execute();
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-					issue.setMilestone(model.getMilestoneByTitle(dd.getEntityName()));
+					(new TurboIssueSetMilestone(model, issue, model.getMilestoneByTitle(dd.getEntityName()))).execute();
 				}
 			}
 			e.setDropCompleted(success);
