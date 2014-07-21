@@ -15,6 +15,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -47,6 +50,19 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		setPadding(new Insets(0, 10, 0, 10));
 		setGraphic(createMilestoneItem(milestone));
 		setContextMenu(createContextMenu(milestone));
+		
+		setOnDragDetected((event) -> {
+			Dragboard db = startDragAndDrop(TransferMode.COPY);
+			ClipboardContent content = new ClipboardContent();
+			DragData dd = new DragData(DragData.Source.MILESTONE_TAB, milestone.getTitle());
+			content.putString(dd.serialise());
+			db.setContent(content);
+			event.consume();
+		});
+		
+		setOnDragDone((event) -> {
+			event.consume();
+		});
 	}
 
 	private Node createMilestoneItem(TurboMilestone milestone) {

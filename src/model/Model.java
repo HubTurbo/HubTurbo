@@ -18,13 +18,13 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import command.TurboIssueEdit;
 import service.ServiceManager;
 import util.CollectionUtilities;
-
 import util.ConfigFileHandler;
 import util.Defaults;
 import util.UserConfigurations;
+
+import command.TurboIssueEdit;
 
 
 public class Model {
@@ -220,7 +220,7 @@ public class Model {
 		return null;
 	}
 	
-	public TurboMilestone getMilestoneByGhName(String title) {
+	public TurboMilestone getMilestoneByTitle(String title) {
 		for (int i=0; i<milestones.size(); i++) {
 			if (milestones.get(i).getTitle().equals(title)) {
 				return milestones.get(i);

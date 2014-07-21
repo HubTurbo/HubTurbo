@@ -88,12 +88,10 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
 					issue.addLabel(model.getLabelByGhName(dd.getEntityName()));
-//					dd.getLabel().toGhName()
-//					model.getLabels()
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
 					// nothing yet
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-					// nothing yet
+					issue.setMilestone(model.getMilestoneByTitle(dd.getEntityName()));
 				}
 			}
 			e.setDropCompleted(success);
