@@ -1,6 +1,5 @@
 package ui;
 
-import java.io.File;
 import java.io.IOException;
 
 import javafx.application.Application;
@@ -36,6 +35,8 @@ public class UI extends Application {
 	@Override
 	public void start(Stage stage) throws IOException {
 
+		initCSS();
+		
 		mainStage = stage;
 		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot(), 800, 600);
@@ -62,8 +63,11 @@ public class UI extends Application {
 		});
 	}
 	
-
-	private static final String CSS = "file:///" + new File("hubturbo.css").getAbsolutePath().replace("\\", "/");
+	private static String CSS = "";
+	
+	public void initCSS() {
+		CSS = this.getClass().getResource("hubturbo.css").toString();
+	}
 
 	public static void applyCSS(Scene scene) {
 		scene.getStylesheets().clear();
