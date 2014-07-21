@@ -18,13 +18,13 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import command.TurboIssueEdit;
 import service.ServiceManager;
 import util.CollectionUtilities;
-
 import util.ConfigFileHandler;
 import util.Defaults;
 import util.UserConfigurations;
+
+import command.TurboIssueEdit;
 
 
 public class Model {
@@ -208,6 +208,33 @@ public class Model {
 			}
 		}
 		
+		return null;
+	}
+	
+	public TurboLabel getLabelByGhName(String name) {
+		for (int i=0; i<labels.size(); i++) {
+			if (labels.get(i).toGhName().equals(name)) {
+				return labels.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public TurboMilestone getMilestoneByTitle(String title) {
+		for (int i=0; i<milestones.size(); i++) {
+			if (milestones.get(i).getTitle().equals(title)) {
+				return milestones.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public TurboUser getUserByGhName(String name) {
+		for (int i=0; i<labels.size(); i++) {
+			if (collaborators.get(i).getGithubName().equals(name)) {
+				return collaborators.get(i);
+			}
+		}
 		return null;
 	}
 	

@@ -9,6 +9,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboLabel;
@@ -38,6 +41,19 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			if (getTreeItem().getValue() instanceof TurboLabel) {
 				label.getStyleClass().add("labels");
 				label.setStyle(((TurboLabel) getTreeItem().getValue()).getBackgroundColourStyle());
+				
+				setOnDragDetected((event) -> {
+					Dragboard db = startDragAndDrop(TransferMode.COPY);
+					ClipboardContent content = new ClipboardContent();
+					DragData dd = new DragData(DragData.Source.LABEL_TAB, ((TurboLabel) getTreeItem().getValue()).toGhName());
+					content.putString(dd.serialise());
+					db.setContent(content);
+					event.consume();
+				});
+				
+				setOnDragDone((event) -> {
+					event.consume();
+				});
 			}
 		}
 	}

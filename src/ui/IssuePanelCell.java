@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Arrays;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
@@ -8,6 +10,10 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import command.TurboIssueAddLabels;
+import command.TurboIssueSetAssignee;
+import command.TurboIssueSetMilestone;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
@@ -36,7 +42,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 		
-//		registerEvents(issue);
+		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
 		setOnDragDetected((event) -> {
 			Dragboard db = startDragAndDrop(TransferMode.MOVE);
@@ -48,10 +54,55 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		setOnDragDone((event) -> {
-//			if (event.getTransferMode() == TransferMode.MOVE) {
-//			}
 			event.consume();
 		});
-		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
+		
+		setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB
+					|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
+					|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					e.acceptTransferModes(TransferMode.COPY);
+				}
+			}
+		});
+	
+		setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB
+					|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
+					|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					getStyleClass().add("dragged-over");
+				}
+			}
+			e.consume();
+		});
+	
+		setOnDragExited(e -> {
+			getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+	
+			if (db.hasString()) {
+				success = true;
+				DragData dd = DragData.deserialise(db.getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB) {
+					(new TurboIssueAddLabels(model, issue, Arrays.asList(model.getLabelByGhName(dd.getEntityName())))).execute();
+				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
+					(new TurboIssueSetAssignee(model, issue, model.getUserByGhName(dd.getEntityName()))).execute();
+				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					(new TurboIssueSetMilestone(model, issue, model.getMilestoneByTitle(dd.getEntityName()))).execute();
+				}
+			}
+			e.setDropCompleted(success);
+	
+			e.consume();
+		});
 	}
 }

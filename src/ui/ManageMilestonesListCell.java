@@ -15,6 +15,10 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -47,6 +51,19 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		setPadding(new Insets(0, 10, 0, 10));
 		setGraphic(createMilestoneItem(milestone));
 		setContextMenu(createContextMenu(milestone));
+		
+		setOnDragDetected((event) -> {
+			Dragboard db = startDragAndDrop(TransferMode.COPY);
+			ClipboardContent content = new ClipboardContent();
+			DragData dd = new DragData(DragData.Source.MILESTONE_TAB, milestone.getTitle());
+			content.putString(dd.serialise());
+			db.setContent(content);
+			event.consume();
+		});
+		
+		setOnDragDone((event) -> {
+			event.consume();
+		});
 	}
 
 	private Node createMilestoneItem(TurboMilestone milestone) {
@@ -64,7 +81,10 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		
 		if (milestone.getDueOn() != null) {
 			// TODO ADD CHANGE LISTENER
-			Label dueDate = new Label(milestone.getDueOn().toString());
+			Label dueDate = new Label("by " + milestone.getDueOnString());
+			Tooltip realtiveDueDate = new Tooltip(milestone.relativeDueDateInString());
+			dueDate.setTooltip(realtiveDueDate);
+			milestone.dueOnStringProperty().addListener(new WeakChangeListener<String>(createDueDateListener(milestone, dueDate)));
 			HBox dueDateContainer = new HBox();
 			HBox.setHgrow(dueDateContainer, Priority.ALWAYS);
 			dueDateContainer.setAlignment(Pos.BASELINE_RIGHT);
@@ -92,7 +112,24 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		return milestoneItem;
 	}
 	
-    private ChangeListener<Number> createProgressListener(TurboMilestone milestone, StackPane progressStack) {
+    private ChangeListener<String> createDueDateListener(TurboMilestone milestone, Label dueDate) {
+    	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
+		ChangeListener<String> changeListener = new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> integerProperty,
+					String oldValue, String newValue) {
+				TurboMilestone milestone = milestoneRef.get();
+				if(milestone != null){
+					dueDate.setText(milestone.getDueOnString());
+					dueDate.getTooltip().setText(milestone.relativeDueDateInString());
+				}
+			}
+		};
+		changeListeners.add(changeListener);
+		return changeListener;
+	}
+
+	private ChangeListener<Number> createProgressListener(TurboMilestone milestone, StackPane progressStack) {
     	WeakReference<TurboMilestone> milestoneRef = new WeakReference<TurboMilestone>(milestone);
 		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
 			@Override
