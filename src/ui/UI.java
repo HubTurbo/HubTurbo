@@ -3,7 +3,6 @@ package ui;
 import java.io.File;
 import java.io.IOException;
 
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -15,11 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-
-import org.controlsfx.control.NotificationPane;
-
-
 import service.ServiceManager;
 
 public class UI extends Application {
@@ -29,7 +23,6 @@ public class UI extends Application {
 	private Stage mainStage;
 
 	private ColumnControl columns;
-	private NotificationPane notificationPane;
 
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
@@ -99,11 +92,9 @@ public class UI extends Application {
 	private Parent createRoot() throws IOException {
 
 		statusBar = new StatusBar();
-		notificationPane = new NotificationPane();
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), notificationPane, sidePanel, statusBar);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), sidePanel, statusBar);
 		sidePanel.setColumns(columns);
-		notificationPane.setContent(columns);
 		menuBar = new MenuControl(columns, sidePanel);
 		
 		ScrollPane columnsScroll = new ScrollPane(columns);

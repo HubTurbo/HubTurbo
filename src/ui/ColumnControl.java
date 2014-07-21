@@ -7,9 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
-
-import org.controlsfx.control.NotificationPane;
-
 import util.ConfigFileHandler;
 import util.SessionConfigurations;
 
@@ -22,7 +19,6 @@ public class ColumnControl extends HBox {
 
 	private final Stage stage;
 	private final Model model;
-	private final NotificationPane notificationPane;
 	private final SidePanel sidePanel;
 	
 	private TurboCommandExecutor dragAndDropExecutor;
@@ -30,11 +26,10 @@ public class ColumnControl extends HBox {
 	private SessionConfigurations sessionConfig;
 	private StatusBar statusBar;
 
-	public ColumnControl(Stage stage, Model model, NotificationPane notificationPane, SidePanel sidePanel, StatusBar statusBar) {
+	public ColumnControl(Stage stage, Model model, SidePanel sidePanel, StatusBar statusBar) {
 		this.stage = stage;
 		this.model = model;
 		this.sidePanel = sidePanel;
-		this.notificationPane = notificationPane;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
 		this.sessionConfig = ConfigFileHandler.loadSessionConfig();
 		this.statusBar = statusBar;
@@ -52,8 +47,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public void displayMessage(String message) {
-		notificationPane.setText(message);
-		notificationPane.show();
+		statusBar.setText(message);
 	}
 	
 	public void refresh() {
