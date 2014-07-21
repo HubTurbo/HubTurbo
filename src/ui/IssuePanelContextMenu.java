@@ -24,7 +24,7 @@ public class IssuePanelContextMenu {
 		
 		MenuItem newChild = new MenuItem("New Child Issue");
 		newChild.setOnAction(e -> {
-			TurboIssue issue = new TurboIssue("New issue", "", model);
+			TurboIssue issue = new TurboIssue("", "", model);
 			assert issueIndex != -1;
 			issue.setParentIssue(issueIndex);
 			sidePanel.triggerIssueCreate(issue);
