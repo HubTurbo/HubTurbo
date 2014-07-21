@@ -1,8 +1,11 @@
-package ui;
+package ui.issue.comments;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 
+import ui.ColumnControl;
+import ui.IssueEditDisplay;
+import ui.SidePanel;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -20,7 +23,7 @@ public class IssueDisplayPane extends HBox {
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
 	private WeakReference<SidePanel> parentPanel;
-	protected boolean showIssueDetailsPanel = false;
+	public boolean showIssueDetailsPanel = false;
 			
 	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel) {
 		this.issue = displayedIssue;
@@ -55,7 +58,7 @@ public class IssueDisplayPane extends HBox {
 		this.issueDetailsDisplay.setMaxWidth(DETAILS_WIDTH);
 	}
 	
-	protected void showIssueDetailsDisplay(boolean show){
+	public void showIssueDetailsDisplay(boolean show){
 		parentPanel.get().expandedIssueView = show;
 		if(show){
 			if(issueDetailsDisplay == null){

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import service.ServiceManager;
+import ui.issue.comments.IssueDisplayPane;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,7 +20,7 @@ import model.TurboIssue;
 
 public class SidePanel extends VBox {
 	protected static final int PANEL_PREF_WIDTH = 300;
-	protected boolean expandedIssueView = false;
+	public boolean expandedIssueView = false;
 
 	public enum Layout {
 		TABS, ISSUE, HISTORY

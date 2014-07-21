@@ -1,4 +1,4 @@
-package ui;
+package ui.issue.comments;
 
 import handler.IssueDetailsContentHandler;
 

@@ -26,6 +26,7 @@ import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+import ui.issue.comments.IssueDisplayPane;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
