@@ -3,6 +3,7 @@ package filter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import model.Model;
 import model.TurboIssue;
@@ -48,14 +49,16 @@ public class Conjunction implements FilterExpression {
 	}
 	
 	private boolean containsDuplicatePredicateNames() {
-		List<String> predicateNames = getPredicateNames();
-		HashSet<String> noDuplicates = new HashSet<>(predicateNames);
-		return noDuplicates.size() != predicateNames.size();
+		List<String> nonLabelPredicateNames = getPredicateNames().stream().filter(pn -> !pn.equals("label")).collect(Collectors.toList());
+		HashSet<String> noDuplicates = new HashSet<>(nonLabelPredicateNames);
+		return noDuplicates.size() != nonLabelPredicateNames.size();
 	}
 	
 	@Override
 	public boolean canBeAppliedToIssue() {
-		return !containsDuplicatePredicateNames() && left.canBeAppliedToIssue() && right.canBeAppliedToIssue();
+		return !containsDuplicatePredicateNames()
+				&& left.canBeAppliedToIssue()
+				&& right.canBeAppliedToIssue();
 	}
 
 	@Override

@@ -282,11 +282,11 @@ public abstract class Column extends VBox {
 	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
 		
-		if (filter == EMPTY) {
-			statusBar.setText("Panel " + (columnIndex+1) + ": " + NO_FILTER);
-		} else {
-			statusBar.setText("Panel " + (columnIndex+1) + ": " + filter.toString());
-		}
+//		if (filter == EMPTY) {
+//			statusBar.setText("Panel " + (columnIndex+1) + ": " + NO_FILTER);
+//		} else {
+//			statusBar.setText("Panel " + (columnIndex+1) + ": " + filter.toString());
+//		}
 
 		// This cast utilises a functional interface
 		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
