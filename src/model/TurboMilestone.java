@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import javafx.beans.property.IntegerProperty;
@@ -15,6 +17,7 @@ import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
 	
+	private static final String CUSTOM_DATETIME_PATTERN = "d MMMM yyyy";
 	/*
 	 * Attributes, Getters & Setters
 	 */
@@ -36,11 +39,16 @@ public class TurboMilestone implements Listable {
 	
 	private LocalDate dueOn;
 	public LocalDate getDueOn() {return dueOn;}
-	public void setDueOn(LocalDate dueOn) {this.dueOn = dueOn;}
-	
+	public void setDueOn(LocalDate dueOn) {
+		this.dueOn = dueOn;
+		if (this.dueOn != null) {
+			setDueOnString(getDueOn().format(DateTimeFormatter.ofPattern(CUSTOM_DATETIME_PATTERN)));
+		}
+	}
+
 	private StringProperty dueOnString = new SimpleStringProperty();
     public final String getDueOnString() {return dueOnString.get();}
-    public final void setDueOnString(String value) {dueOnString.set(value);}
+    private final void setDueOnString(String value) {dueOnString.set(value);}
     public StringProperty dueOnStringProperty() {return dueOnString;}
 	
 	private IntegerProperty closed = new SimpleIntegerProperty();
@@ -71,7 +79,7 @@ public class TurboMilestone implements Listable {
 		this.number = milestone.getNumber();
 		this.state = milestone.getState();
 		this.description = milestone.getDescription();
-		this.dueOn = toLocalDate(milestone.getDueOn());
+		setDueOn(toLocalDate(milestone.getDueOn()));
 		setClosed(milestone.getClosedIssues());
 		setOpen(milestone.getOpenIssues());
 	}
@@ -92,7 +100,7 @@ public class TurboMilestone implements Listable {
 			setTitle(obj.getTitle());
 			this.state = obj.getState();
 			this.description = obj.getDescription();
-			this.dueOn = obj.getDueOn();
+			setDueOn(obj.getDueOn());
 			setClosed(obj.getClosed());
 			setOpen(obj.getOpen());
 		}
@@ -105,6 +113,24 @@ public class TurboMilestone implements Listable {
 		double total = getClosed() + getOpen();
 		double progress = getClosed() / total;
 		return progress;
+	}
+	
+	public Long relativeDueDateInDays() {
+		if (getDueOn() == null) {
+			return null;
+		}
+		long daysUntilDueDate = LocalDate.now().until(getDueOn(), ChronoUnit.DAYS);
+		return daysUntilDueDate;
+	}
+	
+	public String relativeDueDateInString() {
+		Long days = relativeDueDateInDays();
+		if (days == null) {return null;}
+		if (days < 0) {return "over";}
+		if (days == 0) {return "today";}
+		if (days > 0) {return days.toString() + " days";}
+		
+		return ""; //stub value, should never be returned
 	}
 	
 	/*
