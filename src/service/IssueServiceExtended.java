@@ -62,6 +62,16 @@ public class IssueServiceExtended extends IssueService{
 		return connection;
 	}
 	
+	@Override
+	public Issue createIssue(IRepositoryIdProvider repository, Issue issue) throws IOException{
+		Issue returnedIssue = super.createIssue(repository, issue);
+		if(returnedIssue.getState() != issue.getState()){
+			returnedIssue.setState(issue.getState());
+			editIssueState(repository, returnedIssue.getNumber(), returnedIssue.getState().equals(STATE_OPEN));
+		}
+		return returnedIssue;
+	}
+	
 	public Issue editIssue(IRepositoryIdProvider repository, Issue issue, String dateModified) throws IOException {
 		if (issue == null)
 			throw new IllegalArgumentException("Issue cannot be null"); //$NON-NLS-1$
