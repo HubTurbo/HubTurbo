@@ -42,7 +42,7 @@ public class LabelManagementComponent {
 	}
 
 	private Node createButtons(TreeView<LabelTreeItem> treeView) {
-		Button create = new Button("New Group");
+		Button create = new Button("New Label Group");
 		create.setOnAction(e -> {
 			ManageLabelsTreeCell.createNewGroup(parentStage, treeView);
 		});

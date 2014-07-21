@@ -36,7 +36,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 		
-//		registerEvents(issue);
+		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
 		setOnDragDetected((event) -> {
 			Dragboard db = startDragAndDrop(TransferMode.MOVE);
@@ -48,10 +48,57 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 		
 		setOnDragDone((event) -> {
-//			if (event.getTransferMode() == TransferMode.MOVE) {
-//			}
 			event.consume();
 		});
-		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
+		
+		setOnDragOver(e -> {
+			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB
+					|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
+					|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					e.acceptTransferModes(TransferMode.COPY);
+				}
+			}
+		});
+	
+		setOnDragEntered(e -> {
+			if (e.getDragboard().hasString()) {
+				DragData dd = DragData.deserialise(e.getDragboard().getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB
+					|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
+					|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					getStyleClass().add("dragged-over");
+				}
+			}
+			e.consume();
+		});
+	
+		setOnDragExited(e -> {
+			getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+		
+		setOnDragDropped(e -> {
+			Dragboard db = e.getDragboard();
+			boolean success = false;
+	
+			if (db.hasString()) {
+				success = true;
+				DragData dd = DragData.deserialise(db.getString());
+				if (dd.getSource() == DragData.Source.LABEL_TAB) {
+					issue.addLabel(model.getLabelByGhName(dd.getEntityName()));
+//					dd.getLabel().toGhName()
+//					model.getLabels()
+				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
+					// nothing yet
+				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					// nothing yet
+				}
+			}
+			e.setDropCompleted(success);
+	
+			e.consume();
+		});
 	}
 }

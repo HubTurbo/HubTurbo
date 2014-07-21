@@ -1,9 +1,5 @@
 package ui;
 
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
-
 import com.google.gson.Gson;
 
 public class DragData {
