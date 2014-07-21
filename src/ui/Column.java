@@ -22,10 +22,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
 import command.CommandType;
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
@@ -206,6 +204,11 @@ public abstract class Column extends VBox {
 				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
 					e.acceptTransferModes(TransferMode.MOVE);
 				}
+				else if (dd.getSource() == DragData.Source.LABEL_TAB
+						|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
+						|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					e.acceptTransferModes(TransferMode.COPY);
+				}
 			}
 		});
 
@@ -252,6 +255,14 @@ public abstract class Column extends VBox {
 					// The other main consequence of this is that we can't assert
 					// to check if the slot has been cleared when starting a drag-swap.
 				}
+				else if (dd.getSource() == DragData.Source.LABEL_TAB) {
+					filterByString("label(" + dd.getEntityName() + ")");
+				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
+					filterByString("assignee(" + dd.getEntityName() + ")");
+				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
+					filterByString("milestone(" + dd.getEntityName() + ")");
+				}
+
 			}
 			e.setDropCompleted(success);
 
