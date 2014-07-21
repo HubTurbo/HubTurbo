@@ -156,7 +156,12 @@ public class TurboIssue implements Listable {
 		List<TurboLabel> allLabels = model.get().getLabels();
 		int index = allLabels.indexOf(label);
 		assert index != -1;
-		return allLabels.get(index);
+		if(index >= 0){
+			return allLabels.get(index);
+		}else{
+			//Should not happen
+			return label;
+		}
 	}
 	
 	private TurboMilestone getMilestoneReference(TurboMilestone milestone){

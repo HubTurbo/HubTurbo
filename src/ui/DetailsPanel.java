@@ -63,7 +63,7 @@ public class DetailsPanel extends VBox {
 	
 	
 	private void setupDisplayedListSizeListener(){
-		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
+//		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
 		displayedListSizeListener = new ListChangeListener<TurboComment>() {
 			@Override
 			public void onChanged(
