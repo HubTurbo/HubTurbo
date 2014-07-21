@@ -3,13 +3,14 @@ package ui;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import model.Model;
-import model.TurboLabel;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
+import model.Model;
+import model.TurboLabel;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
@@ -22,17 +23,21 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
     
 	@Override
-	protected void updateItem(LabelTreeItem item, boolean empty) {
-		super.updateItem(item, empty);
+	protected void updateItem(LabelTreeItem treeItem, boolean empty) {
+		super.updateItem(treeItem, empty);
 		
-		if (item == null) {
+		if (treeItem == null) {
 			setText(null);
 			setGraphic(null);
 		}
 		else {
-	        setText(getItem().getValue());
-	        setGraphic(getTreeItem().getGraphic());
+			Label label = new Label(treeItem.getValue());
+	        setGraphic(label);
 			setContextMenu(getContextMenuForItem(getTreeItem()));
+			if (getTreeItem().getValue() instanceof TurboLabel) {
+				label.getStyleClass().add("labels");
+				label.setStyle(((TurboLabel) getTreeItem().getValue()).getBackgroundColourStyle());
+			}
 		}
 	}
 	
