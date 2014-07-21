@@ -52,6 +52,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 //			}
 			event.consume();
 		});
-		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue.getId()).get());
+		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 	}
 }
