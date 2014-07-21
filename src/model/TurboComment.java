@@ -1,6 +1,8 @@
 package model;
 
+import java.io.IOException;
 import java.util.Date;
+
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
@@ -23,6 +25,8 @@ public class TurboComment{
 	private String url;
 
 	private TurboUser creator;
+	
+	private String cachedHtmlBodyMarkup;
 	
 	public TurboComment(Comment comment){
 		createdAt = comment.getCreatedAt();
@@ -91,6 +95,19 @@ public class TurboComment{
 		return bodyText;
 	}
 	
+	public String getBodyHtmlMarkUp(){
+		if(cachedHtmlBodyMarkup == null){
+			try {
+				cachedHtmlBodyMarkup = ServiceManager.getInstance().getRepositoryHtml(getBody());
+			} catch (IOException e) {
+				cachedHtmlBodyMarkup = getBody();
+			}
+		}
+		return cachedHtmlBodyMarkup;
+	}
+	
+	
+	
 	public void setId(long id){
 		this.id = id;
 	}
@@ -124,6 +141,7 @@ public class TurboComment{
 			setId(comment.getId());
 			setUrl(comment.getUrl());
 			setCreator(comment.getCreator());
+			cachedHtmlBodyMarkup = null; //TODO:
 		}
 	}
 	

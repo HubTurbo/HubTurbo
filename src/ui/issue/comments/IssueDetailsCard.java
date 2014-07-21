@@ -134,8 +134,8 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	private void setDisplayedCommentText(){
-		String text = originalComment.getBody();
-		String displayedText = formatStringForHTMLDisplay(text);
+		String text = originalComment.getBodyHtmlMarkUp();
+		String displayedText = String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
 		commentsText.getEngine().loadContent(displayedText);
 	}
 	
@@ -143,7 +143,6 @@ public class IssueDetailsCard extends VBox{
 		webViewHeightListener = new ChangeListener<Document>() {
 	        @Override
 	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-	            Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
 	            adjustHeight();
 	        }
 		};
@@ -163,9 +162,5 @@ public class IssueDetailsCard extends VBox{
 			return text;
 		}
 		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "").trim();
-	}
-	
-	private String formatStringForHTMLDisplay(String text){
-		return String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
 	}
 }

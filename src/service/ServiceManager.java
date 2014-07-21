@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
 import service.updateservice.CommentUpdateService;
@@ -41,6 +42,7 @@ public class ServiceManager {
 	private LabelServiceFixed labelService;
 	private MilestoneService milestoneService;
 	private RepositoryServiceExtended repositoryService;
+	private MarkdownService markdownService;
 	
 	private ModelUpdater modelUpdater;
 	private Model model;
@@ -57,6 +59,7 @@ public class ServiceManager {
 		labelService = new LabelServiceFixed(githubClient);
 		milestoneService = new MilestoneService(githubClient);
 		repositoryService = new RepositoryServiceExtended(githubClient);
+		markdownService = new MarkdownService(githubClient);
 		model = new Model();
 	}
 
@@ -407,5 +410,21 @@ public class ServiceManager {
 	 * */
 	public List<String> getAllRepositoryNames() throws IOException{
 		return repositoryService.getAllRepositoriesNames(getUserId());
+	}
+	
+	/**
+	 * Markdown service methods
+	 * */
+	public String getRepositoryHtml(final String text) throws IOException {
+		if(repoId != null){
+			return markdownService.getRepositoryHtml(repoId, text);
+		}else{
+			return "";
+		}
+	}
+	
+	public String getHtml(final String text, final String mode)
+			throws IOException {
+		return markdownService.getHtml(text, mode);
 	}
 }
