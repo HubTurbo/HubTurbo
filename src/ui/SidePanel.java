@@ -1,7 +1,10 @@
 package ui;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
+import service.ServiceManager;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -143,16 +146,17 @@ public class SidePanel extends VBox {
 	private HBox createRepoFields() {
 		ComboBox<String> comboBox = new ComboBox<String>();
 		
-/*		if (ServiceManager.getInstance().getRepoId() != null) {
+		if (ServiceManager.getInstance().getUserId() != null) {
+			System.out.println(ServiceManager.getInstance().getUserId());
 			try {
 				comboBox.setItems(FXCollections.observableArrayList(
-						ServiceManager.getInstance().getRepositoriesNames()));
+						ServiceManager.getInstance().getAllRepositoryNames()));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-*/
+
 		HBox repoIdBox = new HBox();
 		repoIdBox.setPadding(new Insets(5));
 		repoIdBox.setAlignment(Pos.CENTER);

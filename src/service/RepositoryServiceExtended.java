@@ -48,20 +48,20 @@ public class RepositoryServiceExtended extends RepositoryService{
 	 * and repositories belonging to organisations the user is a member of
 	 * */
 	
-	public List<Repository> getAllRepositories() throws IOException{
-		HashSet<Repository> result = new HashSet<Repository>(getRepositories());
+	public List<Repository> getAllRepositories(String user) throws IOException{
+		HashSet<Repository> result = new HashSet<Repository>(getRepositories(user));
 		result.addAll(getOrganisationRepositories());
 		return new ArrayList<Repository>(result);
 	}
 	
-	public List<String> getAllRepositoriesNames() throws IOException{
-		return getAllRepositories().stream()
+	public List<String> getAllRepositoriesNames(String user) throws IOException{
+		return getAllRepositories(user).stream()
 									   .map(repo -> repo.getName())
 									   .collect(Collectors.toList());
 	}
 	
-	public List<String> getRepositoriesNames() throws IOException{
-		return getRepositories().stream()
+	public List<String> getRepositoriesNames(String user) throws IOException{
+		return getRepositories(user).stream()
 								.map(repo -> repo.getName())
 								.collect(Collectors.toList());
 	}

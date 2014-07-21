@@ -119,6 +119,11 @@ public class ServiceManager {
 		return true;
 	}
 	
+	public String getUserId(){
+		return githubClient.getUser();
+	}
+	
+	
 	public void setupRepository(String owner, String name){
 		repoId = RepositoryId.create(owner, name);
 		model.loadComponents(repoId);
@@ -376,19 +381,31 @@ public class ServiceManager {
 	 * Get user repositories
 	 * */
 	
+	/**
+	 * Returns a list of the user's public repositories
+	 * */
 	public List<Repository> getRepositories() throws IOException{
 		return repositoryService.getRepositories();
 	}
 	
+	/**
+	 * Returns a list of the names of the user's public repositories
+	 * */
 	public List<String> getRepositoriesNames() throws IOException{
-		return repositoryService.getRepositoriesNames();
+		return repositoryService.getRepositoriesNames(getUserId());
 	}
 	
+	/**
+	 * Returns a list of the public repositories belonging to the user and the user's organisations
+	 * */
 	public List<Repository> getAllRepositories() throws IOException{
-		return repositoryService.getAllRepositories();
+		return repositoryService.getAllRepositories(getUserId());
 	}
 	
+	/**
+	 * Returns a list of the names of the public repositories belonging to the user and the user's organisations
+	 * */
 	public List<String> getAllRepositoryNames() throws IOException{
-		return repositoryService.getAllRepositoriesNames();
+		return repositoryService.getAllRepositoriesNames(getUserId());
 	}
 }
