@@ -211,6 +211,33 @@ public class Model {
 		return null;
 	}
 	
+	public TurboLabel getLabelByGhName(String name) {
+		for (int i=0; i<labels.size(); i++) {
+			if (labels.get(i).toGhName().equals(name)) {
+				return labels.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public TurboMilestone getMilestoneByGhName(String title) {
+		for (int i=0; i<milestones.size(); i++) {
+			if (milestones.get(i).getTitle().equals(title)) {
+				return milestones.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public TurboUser getUserByGhName(String name) {
+		for (int i=0; i<labels.size(); i++) {
+			if (collaborators.get(i).getGithubName().equals(name)) {
+				return collaborators.get(i);
+			}
+		}
+		return null;
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updateCachedList(List list, List newList){
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
