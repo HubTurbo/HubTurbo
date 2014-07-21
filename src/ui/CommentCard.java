@@ -81,10 +81,15 @@ public class CommentCard extends IssueDetailsCard{
 	
 	@Override
 	protected void loadTopBar(){
-		HBox commentsDetailsDisp = createCommentsDetailsDisplay();
-		HBox controlsBox = createControlsBox();
-		topBar.setSpacing(100);
-		topBar.getChildren().addAll(commentsDetailsDisp, controlsBox);
+		//show comment editing options only when the comment is not a change log
+		if(originalComment != null && !originalComment.isIssueLog()){
+			HBox commentsDetailsDisp = createCommentsDetailsDisplay();
+			HBox controlsBox = createControlsBox();
+			topBar.setSpacing(100);
+			topBar.getChildren().addAll(commentsDetailsDisp, controlsBox);
+		}else{
+			super.loadTopBar();
+		}
 	}
 	
 	@Override

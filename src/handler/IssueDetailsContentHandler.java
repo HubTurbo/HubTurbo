@@ -161,7 +161,6 @@ public class IssueDetailsContentHandler {
 	private void updateCommentsList(){
 		List<TurboComment> filteredComments = allGhContent.stream()
 												   .map(item -> new TurboComment(item))
-												   .filter(item -> !item.isIssueLog())
 												   .collect(Collectors.toList());
 		for(TurboComment item : filteredComments){
 			updateItemInCommentsList(item);
