@@ -73,7 +73,7 @@ public class LabelDisplayBox extends FlowPane {
 		for (TurboLabel label : labels) {
 			Label labelText = new Label(label.getName());
 			labelText.getStyleClass().add("labels");
-			labelText.setStyle(getBackgroundColourStyle(label));
+			labelText.setStyle(label.getBackgroundColourStyle());
 			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
 			if (label.getGroup() != null) {
 				Tooltip groupTooltip = new Tooltip(label.getGroup());
@@ -127,9 +127,5 @@ public class LabelDisplayBox extends FlowPane {
 	
 	private void clearChangeListeners(){
 		changeListeners.clear();
-	}
-
-	private String getBackgroundColourStyle(TurboLabel label) {
-		return "-fx-background-color: #" + label.getColour() + ";";
 	}
 }
