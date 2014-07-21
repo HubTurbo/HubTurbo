@@ -141,7 +141,7 @@ public class TurboComment{
 			setId(comment.getId());
 			setUrl(comment.getUrl());
 			setCreator(comment.getCreator());
-			cachedHtmlBodyMarkup = null; //TODO:
+			cachedHtmlBodyMarkup = null; //Reset cached html markup obtained from github
 		}
 	}
 	

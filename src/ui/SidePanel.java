@@ -30,6 +30,7 @@ public class SidePanel extends VBox {
 	private Stage parentStage;
 	private Model model;
 	private ColumnControl columns = null;
+	IssueDisplayPane currentIssueDisplay = null;
 	
 	public SidePanel(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
@@ -201,8 +202,11 @@ public class SidePanel extends VBox {
 	}
 
 	private Node issueLayout() {
-		IssueDisplayPane result = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this);
-		response = result.getResponse();
-		return result;
+		if(currentIssueDisplay != null){
+			currentIssueDisplay.cleanup();
+		}
+		currentIssueDisplay = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this);
+		response = currentIssueDisplay.getResponse();
+		return currentIssueDisplay;
 	}
 }

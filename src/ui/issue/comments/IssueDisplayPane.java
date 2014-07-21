@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
+//TODO: shift this out of ui.issue.comments
 public class IssueDisplayPane extends HBox {
 	protected static final int DETAILS_WIDTH = 350;
 	protected static final int ISSUE_WIDTH = 300;
@@ -73,5 +73,7 @@ public class IssueDisplayPane extends HBox {
 			}
 		}
 	}
-	
+	public void cleanup(){
+		issueDetailsDisplay.cleanup();
+	}
 }

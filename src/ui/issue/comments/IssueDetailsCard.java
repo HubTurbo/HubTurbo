@@ -5,8 +5,14 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
 
 import service.ServiceManager;
+import util.Browse;
 import model.TurboComment;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,13 +23,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 
 public class IssueDetailsCard extends VBox{
 	protected static int PREF_WIDTH = 300;
 	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
 	protected static int ELEMENTS_VERTICAL_SPACING = 5;
 	protected static int PADDING = 3;
-	protected static int TEXT_PADDING = 10;
+	protected static int WEB_TEXT_PADDING = 15;
+	
+	public static final String EVENT_TYPE_CLICK = "click";
 	
 	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" +
 	           "<div id=\"wrapper\">%1s</div>" +
@@ -37,6 +47,8 @@ public class IssueDetailsCard extends VBox{
 	
 	protected ChangeListener<String> bodyChangeListener;
 	protected ChangeListener<Document> webViewHeightListener;
+	protected ChangeListener<State> weblinkClickListeners;
+	protected boolean clicklistenerCreated = false;
 	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
@@ -63,6 +75,7 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void loadComponents(){
 		setupCommentBodyChangeListener();
+		setupWeblinkClickListener();
 		loadCardComponents();
 	}
 	
@@ -149,10 +162,43 @@ public class IssueDetailsCard extends VBox{
 		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
 	}
 	
+	private void setupWeblinkClickListener(){		
+//		weblinkClickListeners = new ChangeListener<State>() {
+//            @Override
+//            public void changed(ObservableValue ov, State oldState, State newState) {
+//                if (newState == Worker.State.SUCCEEDED && clicklistenerCreated == false) {
+//                	clicklistenerCreated = true;
+//                	System.out.println("listener created");
+//                    EventListener listener = new EventListener() {
+//						@Override
+//						public void handleEvent(Event evt) {
+//							 String domEventType = evt.getType();
+//							 System.out.println(evt.getType());
+//	                            if (domEventType.equals(EVENT_TYPE_CLICK)) {
+//	                                String href = ((Element)evt.getTarget()).getAttribute("href");
+//	                                System.out.println(href);
+////	                                Browse.browse(href);                            
+//	                            } 
+//						}
+//                    };
+//
+//                    Document doc = commentsText.getEngine().getDocument();
+//                    NodeList nodeList = doc.getElementsByTagName("a");
+//                    for (int i = 0; i < nodeList.getLength(); i++) {
+//                    	System.out.println("node");
+//                        ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
+//                    }
+//                }
+//            }
+//        };
+//        commentsText.getEngine().getLoadWorker().stateProperty()
+//        			.addListener(new WeakChangeListener<State>(weblinkClickListeners));
+	}
+	
 	private void adjustHeight(){
 		Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
         if(res!= null && res instanceof Integer) {
-        	Integer height = (Integer)res + TEXT_PADDING;
+        	Integer height = (Integer)res + WEB_TEXT_PADDING;
         	commentsText.setPrefHeight(height);
         }
 	}

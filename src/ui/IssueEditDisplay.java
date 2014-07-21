@@ -245,7 +245,7 @@ public class IssueEditDisplay extends VBox{
 	}
 
 	private void issueViewCleanup(){
-		parentContainer.get().showIssueDetailsDisplay(false);
+		parentContainer.get().cleanup();
 	}
 	private HBox createIssueDetailsButton(){
 		HBox container = new HBox();
