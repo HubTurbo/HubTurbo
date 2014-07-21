@@ -255,6 +255,7 @@ public class IssueEditDisplay extends VBox{
 		    parentContainer.get().showIssueDetailsDisplay(selected);
 		});
 		
+		details.setSelected(parentContainer.get().showIssueDetailsPanel);
 		container.getChildren().add(details);
 		
 		return container;

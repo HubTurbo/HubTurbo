@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.scene.layout.HBox;
@@ -18,12 +19,16 @@ public class IssueDisplayPane extends HBox {
 	
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
+	private WeakReference<SidePanel> parentPanel;
+	protected boolean showIssueDetailsPanel = false;
 			
-	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns) {
+	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel) {
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
 		this.columns = columns;
+		this.parentPanel = new WeakReference<SidePanel>(parentPanel);
+		showIssueDetailsPanel = parentPanel.expandedIssueView;
 		setup();
 	}
 	
@@ -34,6 +39,7 @@ public class IssueDisplayPane extends HBox {
 	private void setup() {
 		setupIssueEditDisplay();
 		this.getChildren().add(issueEditDisplay);
+		showIssueDetailsDisplay(showIssueDetailsPanel);
 	}
 	
 	private void setupIssueEditDisplay(){
@@ -50,15 +56,18 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	protected void showIssueDetailsDisplay(boolean show){
-		if(issueDetailsDisplay == null){
-			setupIssueDetailsDisplay();
-		}
+		parentPanel.get().expandedIssueView = show;
 		if(show){
+			if(issueDetailsDisplay == null){
+				setupIssueDetailsDisplay();
+			}
 			this.getChildren().add(issueDetailsDisplay);
 			issueDetailsDisplay.show();
 		}else{
-			this.getChildren().remove(issueDetailsDisplay);
-			issueDetailsDisplay.hide();
+			if(issueDetailsDisplay != null){
+				this.getChildren().remove(issueDetailsDisplay);
+				issueDetailsDisplay.hide();
+			}
 		}
 	}
 	

@@ -54,7 +54,6 @@ public class DetailsPanel extends VBox {
 	
 	protected void addListViewCellReference(Long commentId, DetailsCell cell){
 		displayedCells.put(commentId, cell);
-		resizeListView();
 	}
 	
 	private void setupLayout(){
@@ -72,7 +71,6 @@ public class DetailsPanel extends VBox {
 				if(listView.focusedProperty().get() != true && !detailsList.isEmpty()){
 					listView.scrollTo(detailsList.size() - 1);
 				}
-				selfRef.get().resizeListView();
 			}
 		};
 		detailsList.addListener(new WeakListChangeListener<TurboComment>(displayedListSizeListener));
@@ -135,7 +133,6 @@ public class DetailsPanel extends VBox {
 	
 	private void setListItems(){
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
-		listView.setPrefHeight(0);
 		listView.setCellFactory(commentCellFactory());
 		listView.setItems(detailsList);
 	}

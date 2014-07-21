@@ -1,11 +1,7 @@
 package ui;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import service.ServiceManager;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -20,6 +16,7 @@ import model.TurboIssue;
 
 public class SidePanel extends VBox {
 	protected static final int PANEL_PREF_WIDTH = 300;
+	protected boolean expandedIssueView = false;
 
 	public enum Layout {
 		TABS, ISSUE, HISTORY
@@ -199,7 +196,7 @@ public class SidePanel extends VBox {
 	}
 
 	private Node issueLayout() {
-		IssueDisplayPane result = new IssueDisplayPane(displayedIssue, parentStage, model, columns);
+		IssueDisplayPane result = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this);
 		response = result.getResponse();
 		return result;
 	}
