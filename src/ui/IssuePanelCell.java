@@ -89,7 +89,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
 					issue.addLabel(model.getLabelByGhName(dd.getEntityName()));
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-					// nothing yet
+					issue.setAssignee(model.getUserByGhName(dd.getEntityName()));
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
 					issue.setMilestone(model.getMilestoneByTitle(dd.getEntityName()));
 				}
