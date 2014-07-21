@@ -1,4 +1,4 @@
-package ui;
+package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

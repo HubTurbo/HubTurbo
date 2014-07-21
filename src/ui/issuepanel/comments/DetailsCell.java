@@ -1,4 +1,4 @@
-package ui.issue.comments;
+package ui.issuepanel.comments;
 
 import java.lang.ref.WeakReference;
 
@@ -7,7 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import model.TurboComment;
 import model.TurboIssue;
-import ui.issue.comments.IssueDetailsDisplay.DisplayType;
+import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 
 
 public class DetailsCell extends ListCell<TurboComment>{

@@ -1,11 +1,11 @@
-package ui.issue.comments;
+package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 
 import ui.ColumnControl;
-import ui.IssueEditDisplay;
 import ui.SidePanel;
+import ui.issuepanel.comments.IssueDetailsDisplay;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;

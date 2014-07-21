@@ -1,4 +1,4 @@
-package ui;
+package ui.issuepanel;
 
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.ContentDisplay;

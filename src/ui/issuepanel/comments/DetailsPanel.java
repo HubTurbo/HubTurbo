@@ -1,4 +1,4 @@
-package ui.issue.comments;
+package ui.issuepanel.comments;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import handler.IssueDetailsContentHandler;
 import model.TurboComment;
 import model.TurboIssue;
-import ui.issue.comments.IssueDetailsDisplay.DisplayType;
+import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;

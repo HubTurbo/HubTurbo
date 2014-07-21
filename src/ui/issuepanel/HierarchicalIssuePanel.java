@@ -1,9 +1,13 @@
-package ui;
+package ui.issuepanel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import ui.Column;
+import ui.ColumnControl;
+import ui.SidePanel;
+import ui.StatusBar;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -12,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends Column {

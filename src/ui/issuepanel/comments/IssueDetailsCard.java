@@ -1,4 +1,4 @@
-package ui.issue.comments;
+package ui.issuepanel.comments;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -95,7 +95,6 @@ public class IssueDetailsCard extends VBox{
 		commentsText = new WebView();
 		commentsText.setPrefWidth(PREF_WIDTH);
 		setupWebEngineHeightListener();
-//		commentsText.setWrappingWidth(PREF_WIDTH);
 	}
 	
 	protected void setupCommentBodyChangeListener(){
@@ -156,7 +155,7 @@ public class IssueDetailsCard extends VBox{
 		webViewHeightListener = new ChangeListener<Document>() {
 	        @Override
 	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-	            adjustHeight();
+	            adjustWebEngineHeight();
 	        }
 		};
 		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
@@ -195,7 +194,7 @@ public class IssueDetailsCard extends VBox{
 //        			.addListener(new WeakChangeListener<State>(weblinkClickListeners));
 	}
 	
-	private void adjustHeight(){
+	private void adjustWebEngineHeight(){
 		Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
         if(res!= null && res instanceof Integer) {
         	Integer height = (Integer)res + WEB_TEXT_PADDING;

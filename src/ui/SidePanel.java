@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import service.ServiceManager;
-import ui.issue.comments.IssueDisplayPane;
+import ui.issuepanel.IssueDisplayPane;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

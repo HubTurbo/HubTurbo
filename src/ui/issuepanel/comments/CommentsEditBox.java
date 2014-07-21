@@ -1,4 +1,4 @@
-package ui.issue.comments;
+package ui.issuepanel.comments;
 
 import java.lang.ref.WeakReference;
 

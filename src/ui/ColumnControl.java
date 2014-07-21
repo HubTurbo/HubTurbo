@@ -7,11 +7,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+import ui.issuepanel.HierarchicalIssuePanel;
+import ui.issuepanel.IssuePanel;
 import util.ConfigFileHandler;
 import util.SessionConfigurations;
-
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 

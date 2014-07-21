@@ -1,7 +1,11 @@
-package ui;
+package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
+import ui.Column;
+import ui.ColumnControl;
+import ui.SidePanel;
+import ui.StatusBar;
 import command.TurboCommandExecutor;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;

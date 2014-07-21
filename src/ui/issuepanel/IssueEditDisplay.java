@@ -1,4 +1,4 @@
-package ui;
+package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -27,7 +27,12 @@ import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
-import ui.issue.comments.IssueDisplayPane;
+import ui.CheckboxListDialog;
+import ui.ColumnControl;
+import ui.LabelCheckboxListDialog;
+import ui.LabelDisplayBox;
+import ui.ListableDisplayBox;
+import ui.ParentIssuesDisplayBox;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{

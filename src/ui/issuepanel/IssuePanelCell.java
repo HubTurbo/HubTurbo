@@ -1,7 +1,11 @@
-package ui;
+package ui.issuepanel;
 
 import java.util.Arrays;
 
+import ui.ColumnControl;
+import ui.DragData;
+import ui.SidePanel;
+import ui.DragData.Source;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
@@ -10,7 +14,6 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
 import command.TurboIssueSetMilestone;
