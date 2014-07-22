@@ -15,7 +15,7 @@ import filter.Parser;
 public class FilterTextField extends TextField {
 
 	private Runnable cancel = () -> {};
-	private Function<String, Void> confirm = (s) -> null;
+	private Function<String, String> confirm = (s) -> s;
     private ValidationSupport validationSupport = new ValidationSupport();
     private String previousText;
 
@@ -61,7 +61,8 @@ public class FilterTextField extends TextField {
 
 	private void confirmEdit() {
 		previousText = getText();
-		confirm.apply(getText());
+		String newText = confirm.apply(getText());
+		setText(newText);
 	}
 	
 	public void setFilterText(String text) {
@@ -74,7 +75,7 @@ public class FilterTextField extends TextField {
 		return this;
 	}
 
-	public FilterTextField setOnConfirm(Function<String, Void> confirm) {
+	public FilterTextField setOnConfirm(Function<String, String> confirm) {
 		this.confirm = confirm;
 		return this;
 	}

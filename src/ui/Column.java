@@ -77,13 +77,16 @@ public abstract class Column extends VBox {
 	}
 	
 	private Node createFilterBox() {
-		String initialText = isSearchPanel ? "title()" : "";
-		int initialPosition = isSearchPanel ? 6 : 0;
+//		String initialText = isSearchPanel ? "title()" : "";
+//		int initialPosition = isSearchPanel ? 6 : 0;
 		
-		filterTextField = new FilterTextField(initialText, initialPosition)
+		filterTextField = new FilterTextField("", 0)
 			.setOnConfirm((text) -> {
+				if (Parser.isListOfSymbols(text)) {
+					text = "title(" + text + ")";
+				}
 				applyStringFilter(text);
-				return null; // returns type Void
+				return text;
 			})
 			.setOnCancel(() -> {
 //				parentColumnControl.closeColumn(columnIndex);
@@ -243,7 +246,6 @@ public abstract class Column extends VBox {
 			if (db.hasString()) {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
-				System.out.println(dd.getSource());
 				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
 					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
 					filterByString("parent(#" + rightIssue.getId() + ")");
