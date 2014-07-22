@@ -1,6 +1,7 @@
 package model;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -335,7 +336,7 @@ public class TurboIssue implements Listable {
 		setPullRequest(issue.getPullRequest());
 		setNumOfComments(issue.getComments());
 		setCreator(issue.getUser().getLogin());
-		setCreatedAt(issue.getCreatedAt().toString());
+		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue.getCreatedAt()));
 	}
 
 	public Issue toGhResource() {
