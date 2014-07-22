@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -21,10 +20,9 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
-import ui.LabelTreeItem;
-import ui.TurboLabelGroup;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
+import util.LocalConfigurations;
 import util.ProjectConfigurations;
 
 import command.TurboIssueEdit;
@@ -45,11 +43,12 @@ public class Model {
 	protected IRepositoryIdProvider repoId;
 	
 	private ProjectConfigurations projectConfig = null;
+	private LocalConfigurations localConfig = null;
 	
 	public Model(){
 		
 	}
-	
+		
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;
 	}
@@ -389,5 +388,13 @@ public class Model {
 		milestones.clear();
 		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
+	}
+	
+	public void setLocalConfig(LocalConfigurations config) {
+		localConfig = config;
+	}
+
+	public LocalConfigurations getLocalConfig() {
+		return localConfig;
 	}
 }

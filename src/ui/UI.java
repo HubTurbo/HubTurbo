@@ -50,6 +50,7 @@ public class UI extends Application {
 	
 	private void initLocalConfig() {
 		localConfigurations = ConfigFileHandler.loadLocalConfig();
+		ServiceManager.getInstance().getModel().setLocalConfig(localConfigurations);
 	}
 
 	private void getUserCredentials() {

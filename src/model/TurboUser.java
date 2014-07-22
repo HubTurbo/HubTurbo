@@ -1,15 +1,23 @@
 package model;
 
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;
+
+import service.ServiceManager;
 
 public class TurboUser implements Listable {
 	
 	/*
 	 * Attributes, Getters & Setters
 	 */
+	
+	public String getAlias() {
+		// By the time this is first called, the local configuration file should have been loaded
+		assert ServiceManager.getInstance().getModel().getLocalConfig() != null;
+		String name = ServiceManager.getInstance().getModel().getLocalConfig().getUserAliases().get(getGithubName());
+		return name == null ? getGithubName() : name;
+	}
 	
 	private String githubName;
 	public String getGithubName() {
