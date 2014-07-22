@@ -14,8 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import org.eclipse.egit.github.core.RepositoryId;
+
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
+import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
 	protected static final int PANEL_PREF_WIDTH = 300;
@@ -144,22 +148,24 @@ public class SidePanel extends VBox {
 	}
 
 	private HBox createRepoFields() {
-		ComboBox<String> comboBox = new ComboBox<String>();
+		final ComboBox<String> comboBox = new ComboBox<String>();
 		comboBox.setEditable(true);
 		if (ServiceManager.getInstance().getRepoId() != null) {
 			comboBox.setValue(ServiceManager.getInstance().getRepoId().generateId());
+			comboBox.getItems().addAll(SessionConfigurations.getLastViewedRepositories());
 		}
 		
 		Button refreshButton = new Button("Load");
 		refreshButton.getStyleClass().add("large-button");
 		refreshButton.setOnMouseClicked((e) -> {
-			String repoId = comboBox.getValue();
-			if (repoId != null && !repoId.isEmpty()) {
+			RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
+			if (repoId != null) {
 				columns.saveSession();
-				String[] repoIdTokens = repoId.split("/");
-				ServiceManager.getInstance().setupRepository(repoIdTokens[0], repoIdTokens[1]);
+				ServiceManager.getInstance().setupRepository(repoId.getOwner(), repoId.getName());
 				columns.resumeColumns();
 				this.refresh();
+				
+				SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
 			}
 		});
 
