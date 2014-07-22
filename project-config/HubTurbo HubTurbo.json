@@ -1,0 +1,21 @@
+{
+  "nonInheritedLabels": [
+    "status.",
+    "type."
+  ],
+  "openStatusLabels": [
+    "status.new",
+    "status.accepted",
+    "status.started",
+    "status.reopened"
+  ],
+  "closedStatusLabels": [
+    "status.closed",
+    "status.fixed",
+    "status.verified",
+    "status.invalid",
+    "status.duplicate",
+    "status.wontfix",
+    "status.done"
+  ]
+}
