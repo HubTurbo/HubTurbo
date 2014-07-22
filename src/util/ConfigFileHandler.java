@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
@@ -62,7 +63,14 @@ public class ConfigFileHandler {
 				e.printStackTrace();
 			}
 		} else {
-			config = new ProjectConfigurations(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>());
+			List<String> nonInheritedLabels = new ArrayList<String>();
+			nonInheritedLabels.add("status.");
+			List<String> openStatusLabels = new ArrayList<String>();
+			openStatusLabels.add("status.open");
+			List<String> closedStatusLabels = new ArrayList<String>();
+			closedStatusLabels.add("status.closed");
+			// default project configuration file
+			config = new ProjectConfigurations(nonInheritedLabels, openStatusLabels, closedStatusLabels);
 			try {
 				configFile.createNewFile();
 				saveProjectConfig(config, repoId);
