@@ -31,7 +31,7 @@ public class IssueDetailsCard extends VBox{
 	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
 	protected static int ELEMENTS_VERTICAL_SPACING = 5;
 	protected static int PADDING = 3;
-	protected static int WEB_TEXT_PADDING = 20;
+	protected static int WEB_TEXT_PADDING = 30;
 	
 	public static final String EVENT_TYPE_CLICK = "click";
 	
@@ -53,6 +53,7 @@ public class IssueDetailsCard extends VBox{
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
 		this.setPadding(new Insets(PADDING));
+		this.getStyleClass().add("comments-list-cell");
 		initialiseUIComponents();
 	}
 	

@@ -65,17 +65,21 @@
 	-fx-font-size: 13pt;
 }
 
-.button-github-octicon{
+.button-github-octicon {
 	-fx-padding: 0;
 	-fx-font-family: github-octicons;
 }
 
-.button{
+.button {
 	-fx-padding: 2;
 }
 
-.toggle-button{
+.toggle-button {
 	-fx-padding: 2;
+}
+
+.comments-list-cell {
+    -fx-background-color: white;
 }
 
 .list-cell:empty {
