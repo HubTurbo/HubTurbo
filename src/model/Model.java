@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,7 +22,6 @@ import org.eclipse.egit.github.core.User;
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
-import util.Defaults;
 import util.ProjectConfigurations;
 
 import command.TurboIssueEdit;
@@ -317,21 +317,17 @@ public class Model {
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
-		List<String> defaultStatuses = Defaults.getDefaultStatusLabels();
-		List<String> projectLabels = new ArrayList<String>();
-		
-		for(Label label : ghLabels){
-			projectLabels.add(label.getName());
-		}
+		List<String> defaultStatuses = ProjectConfigurations.getStatusLabels();
+		List<String> projectLabels =
+				new ArrayList<String>(ghLabels.stream()
+				.map(label -> label.getName())
+				.collect(Collectors.toList()));
 		
 		defaultStatuses.removeAll(projectLabels);
 		for (String standardStatus : defaultStatuses) {
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
-			if (standardStatus.endsWith(".new") ||
-				standardStatus.endsWith(".accepted") ||
-				standardStatus.endsWith(".started") ||
-				standardStatus.endsWith(".reopened")) {
+			if (ProjectConfigurations.isOpenStatusLabel(standardStatus)) {
 				statusLabel.setColor("009800");
 			} else {
 				statusLabel.setColor("0052cc");

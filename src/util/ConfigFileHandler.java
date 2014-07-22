@@ -32,17 +32,14 @@ public class ConfigFileHandler {
 	
 	private static void saveProjectConfig(ProjectConfigurations config, IRepositoryIdProvider repoId) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)) , CHARSET);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)), CHARSET);
 			gson.toJson(config, ProjectConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
-			// from construction of OutputStreamWriter
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// from construction of FileOutputStream
 			e.printStackTrace();
 		} catch (IOException e) {
-			// from closing writer
 			e.printStackTrace();
 		}
 	}
@@ -58,13 +55,10 @@ public class ConfigFileHandler {
 				config = gson.fromJson(reader, ProjectConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
-				// from construction of InputStreamReader
 				e.printStackTrace();
 			} catch (FileNotFoundException e) {
-				// from construction of FileInputStream;
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO from closing reader
 				e.printStackTrace();
 			}
 		} else {
@@ -73,7 +67,6 @@ public class ConfigFileHandler {
 				configFile.createNewFile();
 				saveProjectConfig(config, repoId);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -99,13 +92,10 @@ public class ConfigFileHandler {
 			gson.toJson(config, SessionConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
-			// from construction of OutputStreamWriter
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// from construction of FileOutputStream
 			e.printStackTrace();
 		} catch (IOException e) {
-			// from closing writer
 			e.printStackTrace();
 		}
 	}
@@ -119,20 +109,16 @@ public class ConfigFileHandler {
 				config = gson.fromJson(reader, SessionConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
-				// from construction of InputStreamReader
 				e.printStackTrace();
 			} catch (FileNotFoundException e) {
-				// from construction of FileInputStream;
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO from closing reader
 				e.printStackTrace();
 			}
 		} else {
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

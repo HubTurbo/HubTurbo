@@ -1,23 +1,28 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class ProjectConfigurations {
 	
 	private static List<String> nonInheritedLabels;
-	public List<String> getNonInheritedLabels() {
-		return Collections.unmodifiableList(nonInheritedLabels);
-	}
 	
 	private static List<String> openStatusLabels;
-	public List<String> getOpenStatusLabels() {
+	private static List<String> getOpenStatusLabels() {
 		return Collections.unmodifiableList(openStatusLabels);
 	}
 	
 	private static List<String> closedStatusLabels;
-	public List<String> getClosedStatusLabels() {
+	private static List<String> getClosedStatusLabels() {
 		return Collections.unmodifiableList(closedStatusLabels);
+	}
+	
+	public static List<String> getStatusLabels() {
+		List<String> statusLabels = new ArrayList<String>();
+		statusLabels.addAll(getOpenStatusLabels());
+		statusLabels.addAll(getClosedStatusLabels());
+		return statusLabels;
 	}
 	
 	ProjectConfigurations(List<String> nonInheritedLabels, 
