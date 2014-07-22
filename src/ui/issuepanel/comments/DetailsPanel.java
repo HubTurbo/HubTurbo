@@ -22,7 +22,8 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 public class DetailsPanel extends VBox {
-	protected static final int LIST_MAX_HEIGHT = 500;
+	protected static final int LIST_MAX_HEIGHT = 650;
+	protected static final int COMMENTS_BOX_PREF_HEIGHT = 400;
 	public static final int COMMENTS_CELL_HEIGHT = 200;
 	public static final int COMMENTS_CELL_WIDTH = 330;
 	public static final int COMMENTS_PADDING = 5;
@@ -139,11 +140,13 @@ public class DetailsPanel extends VBox {
 		
 		TitledPane commentsContainer = new TitledPane("Add Comment", box);
 		commentsContainer.setExpanded(false);
+		commentsContainer.setPrefHeight(COMMENTS_BOX_PREF_HEIGHT);
 		getChildren().add(commentsContainer);
 	}
 	
 	private void setListItems(){
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
+		listView.setPrefHeight(LIST_MAX_HEIGHT);
 		listView.setCellFactory(commentCellFactory());
 		listView.setItems(detailsList);
 	}
