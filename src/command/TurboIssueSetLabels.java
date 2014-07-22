@@ -2,8 +2,6 @@ package command;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
@@ -54,19 +52,8 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 		}
 	}
 	
-	private void logLabelsChange(List<TurboLabel> oldLabels, List<TurboLabel> labels, boolean logRemarks){
-		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities.getChangesToList(oldLabels, labels);
-		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
-		StringBuilder changeLog = new StringBuilder();
-		if(added.size() > 0){
-			changeLog.append(LABELS_ADD_LOG_PREFIX + added.toString() + "\n");
-		}
-		if(removed.size() > 0){
-			changeLog.append(LABELS_REMOVE_LOG_PREFIX + removed.toString() + "\n");
-		}
-		lastOperationExecuted = changeLog.toString();
-		logChangesInGithub(logRemarks, lastOperationExecuted);
+	private void logLabelsChange(List<TurboLabel> oldLabels, List<TurboLabel> labels, boolean logRemarks){		
+		lastOperationExecuted = IssueChangeLogger.logLabelsChange(model.get(), issue, oldLabels, labels);
 	}
 	
 	@Override

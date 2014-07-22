@@ -26,27 +26,22 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		this.removedLabels = labels;
 	}
 	
-	private void logRemoveOperation(boolean remove){
-		String changeLog;
-		if(remove){
-			changeLog = LABELS_REMOVE_LOG_PREFIX + removedLabels.toString() + "\n";
-		}else{
-			changeLog = LABELS_ADD_LOG_PREFIX + removedLabels.toString() + "\n";
-		}
+	private void logRemoveOperation(List<TurboLabel> original, List<TurboLabel> edited){
+		String changeLog = IssueChangeLogger.logLabelsChange(model.get(), issue, original, edited);
 		lastOperationExecuted = changeLog;
-		logChangesInGithub(remove, changeLog);
 	}
 	
 
 	@Override
 	public boolean execute() {
 		ServiceManager service = ServiceManager.getInstance();
+		List<TurboLabel> original = issue.getLabels();
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(removedLabels);
 		issue.removeLabels(removedLabels);
 		try {
 			service.deleteLabelsFromIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
-			logRemoveOperation(true);
+			logRemoveOperation(original, issue.getLabels());
 			isSuccessful = true;
 		} catch (IOException e) {
 			issue.addLabels(removedLabels);
@@ -60,12 +55,13 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	@Override
 	public boolean undo() {
 		ServiceManager service = ServiceManager.getInstance();
+		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(removedLabels);
 		try {
 			ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
 			service.setLabelsForIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
-			logRemoveOperation(false);
+			logRemoveOperation(original, issue.getLabels());
 			isUndone = true;
 		} catch (IOException e) {
 			issue.removeLabels(removedLabels);

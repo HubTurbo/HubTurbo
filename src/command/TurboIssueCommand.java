@@ -11,11 +11,7 @@ import model.TurboLabel;
 
 public abstract class TurboIssueCommand {
 	protected TurboIssue issue;
-	protected static final String LABELS_ADD_LOG_PREFIX = "Labels added: ";
-	protected static final String LABELS_REMOVE_LOG_PREFIX = "Labels removed: ";
-	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description. \n"; 
-	protected static final String ADDITIONAL_COMMENTS_FORMAT = "\n [Remarks] %1s \n";
-	
+
 	protected WeakReference<Model> model;
 	protected boolean isUndoableCommand = false;
 	protected boolean isSuccessful = false;
@@ -50,13 +46,6 @@ public abstract class TurboIssueCommand {
 		}else{
 			service.closeIssue(issue.getId());
 		}
-	}
-	
-	protected void logChangesInGithub(boolean logAdditionalRemarks, String changeLog){
-		if(logAdditionalRemarks && loggingRemarks != null && loggingRemarks.length() > 0){
-			changeLog += String.format(ADDITIONAL_COMMENTS_FORMAT, loggingRemarks);
-		}
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
 	}
 	
 	protected void processInheritedLabels(Integer originalParent, Integer newParent, TurboIssue issue) {

@@ -25,15 +25,9 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		this.addedLabels = labels;
 	}
 	
-	private void logAddOperation(boolean added){
-		String changeLog;
-		if(added){
-			changeLog = LABELS_ADD_LOG_PREFIX + addedLabels.toString() + "\n";
-		}else{
-			changeLog = LABELS_REMOVE_LOG_PREFIX + addedLabels.toString() + "\n";
-		}
+	private void logAddOperation(List<TurboLabel> original, List<TurboLabel> edited){
+		String changeLog = IssueChangeLogger.logLabelsChange(model.get(), issue, original, edited);
 		lastOperationExecuted = changeLog;
-		logChangesInGithub(added, changeLog);
 	}
 
 	
@@ -51,10 +45,11 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
+		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(addedLabels);
 		try {
 			addLabelsToIssueInGithub();
-			logAddOperation(true);
+			logAddOperation(original, issue.getLabels());
 			isSuccessful = true;
 		} catch (IOException e) {
 			issue.removeLabels(addedLabels);
@@ -68,10 +63,11 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	@Override
 	public boolean undo() {
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
+		List<TurboLabel> original = issue.getLabels();
 		issue.removeLabels(addedLabels);
 		try {
 			removeLabelsFromIssueInGithub(ghLabels);
-			logAddOperation(false);
+			logAddOperation(original, issue.getLabels());
 			isUndone = true;
 		} catch (IOException e) {
 			issue.addLabels(addedLabels);

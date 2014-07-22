@@ -25,16 +25,7 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 	}
 	
 	private void logMilestoneChange(TurboMilestone prevMilestone, TurboMilestone newMilestone, boolean logRemarks){
-		String changeLog;
-		String originalMilestoneTitle = prevMilestone.getTitle();
-		String newMilestoneTitle = newMilestone.getTitle();
-		if (newMilestoneTitle == null) {
-			changeLog = "Milestone removed: [previous: " + originalMilestoneTitle + "]\n";
-		} else {
-			changeLog = "Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + newMilestoneTitle + "]\n";
-		}
-		lastOperationExecuted = changeLog;
-		logChangesInGithub(logRemarks, changeLog);
+		lastOperationExecuted = IssueChangeLogger.logMilestoneChange(issue, prevMilestone, newMilestone);
 	}
 
 	private boolean setIssueMilestone(TurboMilestone prev, TurboMilestone milestone, boolean logRemarks){

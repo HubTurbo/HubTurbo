@@ -24,10 +24,9 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 		}
 	}
 	
-	private void logAssigneeChange(TurboUser assignee, boolean logRemarks){
-		String changeLog = "Changed issue assignee to: " + assignee.getGithubName() + "\n";
+	private void logAssigneeChange(TurboUser original, TurboUser edited){
+		String changeLog = IssueChangeLogger.logAssigneeChange(issue, original, edited);
 		lastOperationExecuted = changeLog;
-		logChangesInGithub(logRemarks, changeLog);
 	}
 	
 	@Override
@@ -38,9 +37,10 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	
 	private boolean setIssueAssignee(TurboUser user, boolean logRemarks){
 		try {
+			TurboUser original = issue.getAssignee();
 			ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
 			issue.setAssignee(user);
-			logAssigneeChange(user, logRemarks);
+			logAssigneeChange(original, user);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

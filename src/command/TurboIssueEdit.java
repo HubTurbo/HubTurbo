@@ -102,19 +102,8 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				latestLabels.add(label);
 			}
 		}
-		logLabelChange(removed, added, changeLog);
+		changeLog.append(IssueChangeLogger.getLabelsChangeLog(model.get(), originalLabels, editedLabels));
 		latest.setLabels(latestLabels);
-	}
-	
-	private void logLabelChange(HashSet<TurboLabel> removed, HashSet<TurboLabel> added, StringBuilder changeLog){
-		if(added.size() > 0){
-			System.out.println("Labels added: " + added.toString());
-			changeLog.append("Labels added: " + added.toString() + "\n");
-		}
-		if(removed.size() > 0){
-			System.out.println("Labels removed: " + removed.toString());
-			changeLog.append("Labels removed: " + removed.toString() + "\n");
-		}
 	}
 	
 	private void mergeMilestone(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
@@ -131,17 +120,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				originalMilestone = new TurboMilestone();
 			}
 			latest.setMilestone(editedMilestone);
-			logMilestoneChange(originalMilestone, editedMilestone, changeLog);
-		}
-	}
-
-	private void logMilestoneChange(TurboMilestone originalMilestone, TurboMilestone editedMilestone,StringBuilder changeLog){
-		String originalMilestoneTitle = originalMilestone.getTitle();
-		String editedMilestoneTitle = editedMilestone.getTitle();
-		if (editedMilestoneTitle == null) {
-			changeLog.append("Milestone removed: [previous: " + originalMilestoneTitle + "]\n");
-		} else {
-			changeLog.append("Milestone changed: [previous: " + originalMilestoneTitle + "] [new: " + editedMilestoneTitle + "]\n");
+			changeLog.append(IssueChangeLogger.getMilestoneChangeLog(originalMilestone, editedMilestone));
 		}
 	}
 	
@@ -165,12 +144,8 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		} 
 		if (!originalAssignee.equals(editedAssignee)) {
 			latest.setAssignee(editedAssignee);
-			logAssigneeChange(editedAssignee, changeLog);
+			changeLog.append(IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
 		}
-	}
-	
-	private void logAssigneeChange(TurboUser assignee, StringBuilder changeLog){
-		changeLog.append("Changed issue assignee to: "+ assignee.getGithubName() + "\n");
 	}
 
 	/**
@@ -186,7 +161,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				return false;
 			}
 			latest.setDescription(editedDesc);
-			changeLog.append("Edited description. \n");
+			changeLog.append(IssueChangeLogger.getDescriptionChangeLog(originalDesc, editedDesc));
 		}
 		return true;
 	}
@@ -198,17 +173,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		if(originalParent != editedParent){
 			latest.setParentIssue(editedParent);
 			processInheritedLabels(originalParent, editedParent, edited);
-			logParentChange(originalParent, editedParent, changeLog);
-		}
-	}
-	
-	private void logParentChange(Integer originalParent, Integer editedParent, StringBuilder changeLog){
-		if(editedParent < 0){
-			changeLog.append(String.format("Removed issue parent: %1d\n", originalParent));
-		}else if(originalParent > 0){
-			changeLog.append(String.format("Changed Issue parent from %1d to %2d\n", originalParent, editedParent));
-		}else{
-			changeLog.append(String.format("Set Issue parent to %1d\n", editedParent));
+			changeLog.append(IssueChangeLogger.getParentChangeLog(originalParent, editedParent));
 		}
 	}
 
@@ -217,7 +182,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		String editedTitle = edited.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-			changeLog.append("Title edited: [previous: " + originalTitle + "] [new: " + editedTitle + "]\n");
+			changeLog.append(IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
 		}
 	}
 }

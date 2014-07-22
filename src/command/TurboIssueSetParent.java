@@ -26,16 +26,7 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	}
 	
 	private void logParentChange(Integer oldParent, Integer parent, boolean logRemarks){
-		String changeLog;
-		if(parent < 0){
-			changeLog = String.format("Removed issue parent: %1d\n", oldParent);
-		}else if(oldParent > 0){
-			changeLog = String.format("Changed Issue parent from %1d to %2d\n", oldParent, parent);
-		}else{
-			changeLog = String.format("Set Issue parent to %1d\n", parent);
-		}
-		lastOperationExecuted = changeLog;
-		logChangesInGithub(logRemarks, changeLog);
+		lastOperationExecuted = IssueChangeLogger.logParentChange(issue, oldParent, parent);
 	}
 	
 	private void setLocalIssueParent(Integer oldParent, Integer parent){
