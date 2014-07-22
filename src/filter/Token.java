@@ -39,4 +39,24 @@ public class Token {
 	public String toString() {
 		return type + " " + value;
 	}
+
+	// Tokens are not equated based on position
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Token other = (Token) obj;
+		if (type != other.type)
+			return false;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
+	}
 }
