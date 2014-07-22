@@ -205,6 +205,7 @@ public class IssueDetailsCard extends VBox{
 		if(text == null || !originalComment.isIssueLog()){
 			return text;
 		}
-		return text.replaceFirst(Pattern.quote(ServiceManager.CHANGELOG_TAG), "").trim();
+		String regex = Pattern.quote(ServiceManager.CHANGELOG_TAG);
+		return text.replaceFirst(regex, "").trim();
 	}
 }

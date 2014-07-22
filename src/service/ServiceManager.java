@@ -32,7 +32,7 @@ public class ServiceManager {
 	
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
-	public static final String CHANGELOG_TAG = "[Change Log]\n";
+	public static final String CHANGELOG_TAG = "[Change Log]";
 	
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
@@ -295,7 +295,7 @@ public class ServiceManager {
 	 * */
 	
 	public void logIssueChanges(int issueId, String changes){
-		String changeLog = CHANGELOG_TAG + changes;
+		String changeLog = CHANGELOG_TAG + "\n" + changes;
 		try {
 			createComment(issueId, changeLog);
 		} catch (IOException e) {
