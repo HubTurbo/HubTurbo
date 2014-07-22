@@ -113,7 +113,7 @@ public class IssueEditDisplay extends VBox{
 		title.setSpacing(ELEMENT_SPACING);
 		
 		// TODO ALIGNMENT
-		Text issueIdText = new Text("#" + issue.getId());
+		Text issueIdText = new Text(issue.getId() == 0 ? "" : "#" + issue.getId());
 		HBox issueId = new HBox();
 		issueId.getChildren().add(issueIdText);
 		issueId.setStyle("-fx-font-size: 16pt;");
@@ -158,7 +158,9 @@ public class IssueEditDisplay extends VBox{
 
 		HBox title = createTopTitle();
 		
-		Label issueCreator = new Label("created by " + issue.getCreator() + " on " + issue.getCreatedAt());
+		String issueCreatorName = issue.getCreator() == null ? "you" : issue.getCreator();
+		String issueCreatedDate = issue.getCreatedAt() == null ? "" : " on " + issue.getCreatedAt();
+		Label issueCreator = new Label("created by " + issueCreatorName + issueCreatedDate);
 		issueCreator.getStyleClass().add("issue-creator");
 		HBox issueCreatorContainer = new HBox();
 		HBox.setHgrow(issueCreatorContainer, Priority.ALWAYS);
