@@ -15,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
@@ -157,7 +158,7 @@ public class IssueEditDisplay extends VBox{
 
 		HBox title = createTopTitle();
 		
-		Text issueCreator = new Text("created by " + issue.getCreator() + " on " + issue.getCreatedAt());
+		Label issueCreator = new Label("created by " + issue.getCreator() + " on " + issue.getCreatedAt());
 		issueCreator.getStyleClass().add("issue-creator");
 		HBox issueCreatorContainer = new HBox();
 		HBox.setHgrow(issueCreatorContainer, Priority.ALWAYS);
