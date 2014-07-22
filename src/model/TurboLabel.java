@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -115,6 +116,20 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	
 	public String getBackgroundColourStyle() {
 		return "-fx-background-color: #" + getColour() + ";";
+	}
+	
+	
+	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels, String ungroupedName) {
+		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
+		for (TurboLabel l : labels) {
+			String groupName = l.getGroup() == null ? ungroupedName : l.getGroup();
+
+			if (groups.get(groupName) == null) {
+				groups.put(groupName, new ArrayList<TurboLabel>());
+			}
+			groups.get(groupName).add(l);
+		}
+		return groups;
 	}
 	
 	/*

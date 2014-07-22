@@ -81,18 +81,18 @@ public class LabelManagementComponent {
 		return treeView;
 	}
 
-	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels) {
-		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
-		for (TurboLabel l : labels) {
-			String groupName = l.getGroup() == null ? UNGROUPED_NAME : l.getGroup();
-
-			if (groups.get(groupName) == null) {
-				groups.put(groupName, new ArrayList<TurboLabel>());
-			}
-			groups.get(groupName).add(l);
-		}
-		return groups;
-	}
+//	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels) {
+//		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
+//		for (TurboLabel l : labels) {
+//			String groupName = l.getGroup() == null ? UNGROUPED_NAME : l.getGroup();
+//
+//			if (groups.get(groupName) == null) {
+//				groups.put(groupName, new ArrayList<TurboLabel>());
+//			}
+//			groups.get(groupName).add(l);
+//		}
+//		return groups;
+//	}
 
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
 		
@@ -101,7 +101,7 @@ public class LabelManagementComponent {
 		}
 	
 		// Hash all labels by group
-		HashMap<String, ArrayList<TurboLabel>> labels = groupLabels(model.getLabels());
+		HashMap<String, ArrayList<TurboLabel>> labels = TurboLabel.groupLabels(model.getLabels(), UNGROUPED_NAME);
 		ArrayList<TurboLabel> ungrouped = labels.get(UNGROUPED_NAME);
 		if (ungrouped == null) ungrouped = new ArrayList<>();
 		labels.remove(UNGROUPED_NAME);
