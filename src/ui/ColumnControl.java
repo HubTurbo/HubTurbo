@@ -36,6 +36,8 @@ public class ColumnControl extends HBox {
 	}
 	
 	public void resumeColumns() {
+		getChildren().clear();
+		
 		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {

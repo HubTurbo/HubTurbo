@@ -1,14 +1,11 @@
 package ui;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import service.ServiceManager;
-import ui.issuepanel.IssueDisplayPane;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -17,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import service.ServiceManager;
+import ui.issuepanel.IssueDisplayPane;
 
 public class SidePanel extends VBox {
 	protected static final int PANEL_PREF_WIDTH = 300;
@@ -136,8 +135,7 @@ public class SidePanel extends VBox {
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab, feedTab);
 		
 		HBox repoFields = createRepoFields();
-		
-		
+
 		everything.getChildren().addAll(repoFields, tabs);
 		
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
@@ -147,22 +145,29 @@ public class SidePanel extends VBox {
 
 	private HBox createRepoFields() {
 		ComboBox<String> comboBox = new ComboBox<String>();
-		
-		if (ServiceManager.getInstance().getUserId() != null) {
-			System.out.println(ServiceManager.getInstance().getUserId());
-			try {
-				comboBox.setItems(FXCollections.observableArrayList(
-						ServiceManager.getInstance().getAllRepositoryNames()));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		comboBox.setEditable(true);
+		if (ServiceManager.getInstance().getRepoId() != null) {
+			comboBox.setValue(ServiceManager.getInstance().getRepoId().generateId());
 		}
+		
+		Button refreshButton = new Button("Load");
+		refreshButton.getStyleClass().add("large-button");
+		refreshButton.setOnMouseClicked((e) -> {
+			String repoId = comboBox.getValue();
+			if (repoId != null && !repoId.isEmpty()) {
+				columns.saveSession();
+				String[] repoIdTokens = repoId.split("/");
+				ServiceManager.getInstance().setupRepository(repoIdTokens[0], repoIdTokens[1]);
+				columns.resumeColumns();
+				this.refresh();
+			}
+		});
 
 		HBox repoIdBox = new HBox();
+		repoIdBox.setSpacing(5);
 		repoIdBox.setPadding(new Insets(5));
 		repoIdBox.setAlignment(Pos.CENTER);
-		repoIdBox.getChildren().add(comboBox);
+		repoIdBox.getChildren().addAll(comboBox, refreshButton);
 		return repoIdBox;
 	}
 

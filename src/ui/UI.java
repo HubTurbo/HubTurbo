@@ -72,7 +72,7 @@ public class UI extends Application {
 	}
 	
 	public static void loadFonts(){
-		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 24);
+		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
 
 	private void setupMainStage(Scene scene) {
