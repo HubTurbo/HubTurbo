@@ -48,11 +48,15 @@ public class IssueDetailsDisplay extends VBox {
 	
 	public void show(){
 		Task<Boolean> bgTask = new Task<Boolean>(){
+
 			@Override
 			protected Boolean call() throws Exception {
 				contentHandler.startContentUpdate();
+//				commentsDisplay.scrollToBottom();
+//				issueLogDisplay.scrollToBottom();
 				return true;
 			}
+			
 		};
 		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
 		new Thread(bgTask).start();

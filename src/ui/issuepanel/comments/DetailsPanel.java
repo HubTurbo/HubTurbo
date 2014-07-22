@@ -16,6 +16,8 @@ import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -134,7 +136,10 @@ public class DetailsPanel extends VBox {
 		CommentsEditBox box = new CommentsEditBox(handler);
 		box.setPrefHeight(COMMENTS_CELL_HEIGHT);
 		box.setPrefWidth(COMMENTS_CELL_WIDTH);
-		getChildren().add(box);
+		
+		TitledPane commentsContainer = new TitledPane("Add Comment", box);
+		commentsContainer.setExpanded(false);
+		getChildren().add(commentsContainer);
 	}
 	
 	private void setListItems(){
