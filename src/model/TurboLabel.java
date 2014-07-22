@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -125,7 +126,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	}
 	
 	
-	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels, String ungroupedName) {
+	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(Collection<TurboLabel> labels, String ungroupedName) {
 		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
 		for (TurboLabel l : labels) {
 			String groupName = l.getGroup() == null ? ungroupedName : l.getGroup();

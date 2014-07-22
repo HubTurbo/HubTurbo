@@ -81,19 +81,6 @@ public class LabelManagementComponent {
 		return treeView;
 	}
 
-//	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(List<TurboLabel> labels) {
-//		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
-//		for (TurboLabel l : labels) {
-//			String groupName = l.getGroup() == null ? UNGROUPED_NAME : l.getGroup();
-//
-//			if (groups.get(groupName) == null) {
-//				groups.put(groupName, new ArrayList<TurboLabel>());
-//			}
-//			groups.get(groupName).add(l);
-//		}
-//		return groups;
-//	}
-
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
 		
 		for (TurboLabel l : model.getLabels()) {

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -20,6 +21,8 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
+import ui.LabelTreeItem;
+import ui.TurboLabelGroup;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
@@ -78,6 +81,19 @@ public class Model {
 	
 	public void appendToCachedIssues(TurboIssue issue){
 		issues.add(0, issue);
+	}
+	
+	public boolean isExclusiveLabelGroup(String group){
+		List<TurboLabel> labelsInGrp = labels.stream()
+											 .filter(l -> group.equals(l.getGroup()))
+											 .collect(Collectors.toList());
+		
+		for(TurboLabel label : labelsInGrp){
+			if(!label.isExclusive()){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public TurboIssue createIssue(TurboIssue newIssue) {
