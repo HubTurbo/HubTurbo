@@ -37,7 +37,7 @@ public class ManageAssigneeListCell extends ListCell<TurboUser> {
 	private HBox createAssigneeItem(TurboUser user) {
 		ImageView avatar = new ImageView(user.getAvatar());
 		
-		Label assigneeHandle = new Label((user.getGithubName()));
+		Label assigneeHandle = new Label((user.getAlias()));
 		assigneeHandle.getStyleClass().add("display-box-padding");
 
 		HBox assigneeItem = new HBox();

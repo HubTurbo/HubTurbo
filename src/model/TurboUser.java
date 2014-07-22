@@ -94,7 +94,7 @@ public class TurboUser implements Listable {
 	
 	@Override
 	public String getListName() {
-		return getGithubName();
+		return getAlias();
 	}
 
 	@Override
