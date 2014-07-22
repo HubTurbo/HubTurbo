@@ -77,6 +77,12 @@ public class FilterTextField extends TextField {
 			}
 		});
 		
+		setOnKeyPressed(e -> {
+			 if (e.getCode() == KeyCode.TAB) {
+				 e.consume();
+			 }
+		});
+		
 		setOnKeyReleased(e -> {
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
