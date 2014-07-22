@@ -2,6 +2,7 @@ package handler;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ public class IssueDetailsContentHandler {
 	private ObservableList<Comment> allGhContent = FXCollections.observableArrayList();
 	private ObservableList<TurboComment> comments = FXCollections.observableArrayList();
 	private ObservableList<TurboComment> log = FXCollections.observableArrayList();
+	
+	HashMap<Long, String> commentsMarkup = new HashMap<>();
 	
 	private CommentUpdateService commentsUpdater;
 	private ListChangeListener<Comment> commentsChangeListener;
@@ -96,6 +99,7 @@ public class IssueDetailsContentHandler {
 	
 	public boolean editComment(TurboComment comment){
 		try {
+			comment.setBodyHtml(comment.getBody());
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
 			updateItemInCommentsList(comment);

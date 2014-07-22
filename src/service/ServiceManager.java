@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import model.Model;
 
@@ -315,9 +316,24 @@ public class ServiceManager {
 		return null;
 	}
 	
+	public String getMarkupForComment(Comment comment){
+		try {
+			return getRepositoryHtml(comment.getBody());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return comment.getBody();
+		}
+	}
+	
 	public List<Comment> getComments(int issueId) throws IOException{
 		if(repoId != null){
-			return issueService.getComments(repoId, issueId);
+			List<Comment> comments = issueService.getComments(repoId, issueId);
+			return comments.stream()
+						   .map(c -> {
+							   c.setBodyHtml(getMarkupForComment(c));
+							   return c;})
+						   .collect(Collectors.toList());
 		}
 		return new ArrayList<Comment>();
 	}

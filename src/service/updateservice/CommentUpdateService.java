@@ -58,6 +58,7 @@ public class CommentUpdateService extends UpdateService<Comment>{
 	}
 	
 	private void updateCommentsInList(Comment comment){
+		comment.setBodyHtml(ServiceManager.getInstance().getMarkupForComment(comment));
 		int index = getCommentsInListWithId(comment.getId());
 		Platform.runLater(new Runnable() {
 	        @Override

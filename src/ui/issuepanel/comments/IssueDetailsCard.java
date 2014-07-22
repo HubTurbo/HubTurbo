@@ -146,7 +146,7 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	private void setDisplayedCommentText(){
-		String text = originalComment.getBodyHtmlMarkUp();
+		String text = originalComment.getBodyHtml();
 		String displayedText = String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
 		commentsText.getEngine().loadContent(displayedText);
 	}
