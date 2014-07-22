@@ -123,7 +123,23 @@ public class TurboIssue implements Listable {
     	}
     	return null;
     }
-    
+    public boolean hasAncestor(int index) {
+    	TurboIssue current = this;
+		while (current.getParentIssue() != -1) {
+			if (current.getParentIssue() == index) return true;
+			current = current.parentReference();
+		}
+    	return false;
+    }
+    public int getDepth() {
+    	int depth = 0;
+    	TurboIssue current = this;
+		while (current.getParentIssue() != -1) {
+			++depth;
+			current = current.parentReference();
+		}
+    	return depth;
+    }
     
     private BooleanProperty state = new SimpleBooleanProperty();
     public final Boolean getOpen() {

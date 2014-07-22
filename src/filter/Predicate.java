@@ -201,15 +201,11 @@ public class Predicate implements FilterExpression {
 		if (index > 0) {
 			TurboIssue current = issue;
 			
-			// The parent itself should show too
+			// The parent itself should show
 			if (current.getId() == index) return true;
 			
-			// See if the current parent occurs anywhere on a walk up to the root
-			while (current.getParentIssue() != -1) {
-				if (current.getParentIssue() == index) return true;
-				current = model.getIssueWithId(current.getParentIssue());
-			}
-			return false;
+			// Descendants should show too
+			return current.hasAncestor(index);
 		}
 		// Invalid issue number
 		return false;
