@@ -11,6 +11,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,8 +21,8 @@ import com.google.gson.GsonBuilder;
 public class ConfigFileHandler {
 
 	private static final String CHARSET = "UTF-8";
-	private static final String FILE_CONFIG_USER = "UserConfig.json";
-	private static final String FILE_CONFIG_SESSION = "SessionConfig.json";
+	private static final String FILE_CONFIG_SESSION = "session-config.json";
+	private static final String DIR_CONFIG_PROJECTS = "project-config";
 	
 	
 	private static Gson gson = new GsonBuilder()
@@ -27,10 +30,10 @@ public class ConfigFileHandler {
 								.excludeFieldsWithModifiers(Modifier.TRANSIENT)
 								.create();
 	
-	private static void saveUserConfig(UserConfigurations config) {
+	private static void saveProjectConfig(ProjectConfigurations config, IRepositoryIdProvider repoId) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_USER) , CHARSET);
-			gson.toJson(config, UserConfigurations.class, writer);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)) , CHARSET);
+			gson.toJson(config, ProjectConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
 			// from construction of OutputStreamWriter
@@ -44,13 +47,15 @@ public class ConfigFileHandler {
 		}
 	}
 	
-	public static UserConfigurations loadUserConfig() {
-		UserConfigurations config = null;
-		File configFile = new File(FILE_CONFIG_USER);
+	public static ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
+		directorySetup();
+		ProjectConfigurations config = null;
+		String fileName = generateFileName(repoId);
+		File configFile = new File(fileName);
 		if (configFile.exists()) {
 			try {
-				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_USER), CHARSET);
-				config = gson.fromJson(reader, UserConfigurations.class);
+				Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
+				config = gson.fromJson(reader, ProjectConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
 				// from construction of InputStreamReader
@@ -63,12 +68,10 @@ public class ConfigFileHandler {
 				e.printStackTrace();
 			}
 		} else {
-			config = new UserConfigurations(Defaults.getDefaultNonInheritedLabels(),
-					Defaults.getDefaultOpenStatusLabels(),
-					Defaults.getDefaultClosedStatusLabels());
+			config = new ProjectConfigurations(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>());
 			try {
 				configFile.createNewFile();
-				saveUserConfig(config);
+				saveProjectConfig(config, repoId);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -77,6 +80,19 @@ public class ConfigFileHandler {
 		return config;
 	}
 	
+	private static void directorySetup() {
+		File directory = new File(DIR_CONFIG_PROJECTS);
+		if (!directory.exists()) {
+			directory.mkdir();
+		}
+	}
+
+	private static String generateFileName(IRepositoryIdProvider repoId) {
+		String[] repoIdTokens = repoId.generateId().split("/");
+		String fileName = DIR_CONFIG_PROJECTS + File.separator + repoIdTokens[0] + " " + repoIdTokens[1] + ".json";
+		return fileName;
+	}
+
 	public static void saveSessionConfig(SessionConfigurations config) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_SESSION) , CHARSET);

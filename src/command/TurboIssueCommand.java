@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import service.ServiceManager;
-import util.UserConfigurations;
+import util.ProjectConfigurations;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -71,7 +71,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for(TurboLabel label : addedParent.getLabels()){
-			if(!UserConfigurations.isNonInheritedLabel(label.toGhName())){
+			if(!ProjectConfigurations.isNonInheritedLabel(label.toGhName())){
 				issue.addLabel(label);
 			}
 		}
@@ -84,7 +84,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for (TurboLabel label : removedParent.getLabels()) {
-			if(!UserConfigurations.isNonInheritedLabel(label.toGhName())){
+			if(!ProjectConfigurations.isNonInheritedLabel(label.toGhName())){
 				issue.removeLabel(label);
 			}
 		}

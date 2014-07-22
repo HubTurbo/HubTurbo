@@ -22,7 +22,7 @@ import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.Defaults;
-import util.UserConfigurations;
+import util.ProjectConfigurations;
 
 import command.TurboIssueEdit;
 
@@ -40,8 +40,8 @@ public class Model {
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
 	protected IRepositoryIdProvider repoId;
-
-	private UserConfigurations config = ConfigFileHandler.loadUserConfig();
+	
+	private ProjectConfigurations projectConfig = null;
 	
 	public Model(){
 		
@@ -53,6 +53,7 @@ public class Model {
 	
 	public void loadComponents(IRepositoryIdProvider repoId){
 		this.repoId = repoId;
+		this.projectConfig = ConfigFileHandler.loadProjectConfig(getRepoId());
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();

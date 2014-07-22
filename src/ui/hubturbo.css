@@ -48,7 +48,7 @@
 
 .issue-creator {
 	-fx-font-style: italic;
-	-fx-fill: grey;
+	-fx-text-fill: grey;
 }
 
 .issue-comment-details {

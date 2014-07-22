@@ -16,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
@@ -222,12 +223,15 @@ public class IssueEditDisplay extends VBox{
 		Parent labels = createLabelBox(parentStage);
 		Parent assignee = createAssigneeBox(parentStage);
 		
+		Separator separator = new Separator();
+		separator.setPadding(new Insets(5));
+		
 		HBox detailsButton = createIssueDetailsButton();
 		HBox buttons = createButtons(parentStage);
 
 		VBox bottom = new VBox();
 		bottom.setSpacing(ELEMENT_SPACING);
-		bottom.getChildren().addAll(parents, milestone, labels, assignee, buttons, detailsButton);
+		bottom.getChildren().addAll(parents, milestone, labels, assignee, separator, buttons, detailsButton);
 
 		return bottom;
 	}

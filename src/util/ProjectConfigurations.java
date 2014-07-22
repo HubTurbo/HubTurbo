@@ -3,7 +3,7 @@ package util;
 import java.util.Collections;
 import java.util.List;
 
-public class UserConfigurations {
+public class ProjectConfigurations {
 	
 	private static List<String> nonInheritedLabels;
 	public List<String> getNonInheritedLabels() {
@@ -20,11 +20,11 @@ public class UserConfigurations {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
 	
-	UserConfigurations(List<String> nonInheritedLabels, 
+	ProjectConfigurations(List<String> nonInheritedLabels, 
 			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		UserConfigurations.nonInheritedLabels = nonInheritedLabels;
-		UserConfigurations.openStatusLabels = openStatusLabels;
-		UserConfigurations.closedStatusLabels = closedStatusLabels;
+		ProjectConfigurations.nonInheritedLabels = nonInheritedLabels;
+		ProjectConfigurations.openStatusLabels = openStatusLabels;
+		ProjectConfigurations.closedStatusLabels = closedStatusLabels;
 	}
 	
 	public static boolean isNonInheritedLabel(String label) {

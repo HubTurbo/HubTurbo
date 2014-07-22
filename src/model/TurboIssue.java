@@ -18,7 +18,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 
-import util.UserConfigurations;
+import util.ProjectConfigurations;
 
 
 public class TurboIssue implements Listable {
@@ -219,7 +219,7 @@ public class TurboIssue implements Listable {
 	public boolean hasStatusLabel(){
 		for(TurboLabel label : labels){
 			String ghName = label.toGhName();
-			if(UserConfigurations.isStatusLabel(ghName)){
+			if(ProjectConfigurations.isStatusLabel(ghName)){
 				return true;
 			}
 		}
@@ -228,7 +228,7 @@ public class TurboIssue implements Listable {
 	
 	public TurboLabel getStatusLabel(){
 		List<TurboLabel> statusLabel = labels.stream()
-				.filter(l -> (UserConfigurations.isStatusLabel(l.toGhName())))
+				.filter(l -> (ProjectConfigurations.isStatusLabel(l.toGhName())))
 				.collect(Collectors.toList());
 		if(!statusLabel.isEmpty()){
 			return statusLabel.get(0);
@@ -239,7 +239,7 @@ public class TurboIssue implements Listable {
 	
 	public List<TurboLabel> getNonStatusLabel(){
 		return labels.stream()
-				.filter(l -> (!UserConfigurations.isStatusLabel(l.toGhName())))
+				.filter(l -> (!ProjectConfigurations.isStatusLabel(l.toGhName())))
 				.collect(Collectors.toList());
 	}
 	
@@ -254,9 +254,9 @@ public class TurboIssue implements Listable {
 		if(label.isExclusive()){
 			removeLabelsWithGroup(label.getGroup());
 		}
-		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
+		if (ProjectConfigurations.isClosedStatusLabel(label.toGhName())) {
 			this.setOpen(false);
-		}else if(UserConfigurations.isOpenStatusLabel(label.toGhName())){
+		}else if(ProjectConfigurations.isOpenStatusLabel(label.toGhName())){
 			this.setOpen(true);
 		}
 		addToLabels(label);
@@ -283,7 +283,7 @@ public class TurboIssue implements Listable {
 		if(!labels.remove(label)){
 			return;
 		}
-		if (UserConfigurations.isClosedStatusLabel(label.toGhName())) {
+		if (ProjectConfigurations.isClosedStatusLabel(label.toGhName())) {
 			//Default status of the issue is open
 			this.setOpen(true);
 		}
