@@ -1,6 +1,10 @@
 package filter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -94,4 +98,23 @@ public class Tests {
 		assertEquals(Parser.parse("assignee:dar ius(one)"),
 				new Conjunction(new Predicate("assignee", "dar"), new Predicate("ius", "one")));
 	}
+	
+	@Test
+	public void lexer() {
+		assertEquals(new Lexer("").lex(), new ArrayList<Token>(Arrays.asList(
+				new Token(TokenType.EOF, "", 0))));
+		assertEquals(new Lexer("a' b' c'").lex(), new ArrayList<Token>(Arrays.asList(
+				new Token(TokenType.SYMBOL, "a'", 0),
+				new Token(TokenType.SYMBOL, "b'", 0),
+				new Token(TokenType.SYMBOL, "c'", 0),
+				new Token(TokenType.EOF, "", 0))));
+	}
+	
+	@Test
+	public void listsOfSymbols() {
+		assertEquals(Parser.isListOfSymbols("a' b c'"), true);
+		assertEquals(Parser.isListOfSymbols("a b c("), false);
+		assertEquals(Parser.isListOfSymbols("a(d) c(b)"), false);
+	}
+
 }
