@@ -198,17 +198,21 @@ public class Predicate implements FilterExpression {
 	private boolean parentSatisfies(TurboIssue issue, Model model) {
 		String parent = content.toLowerCase();
 		int index = parseIdString(parent);
-		if (index != -1) {
-			return issue.getParentIssue() == index || issue.getId() == index;
-		} else {
-			List<TurboIssue> actualParentInstances = model.getIssues().stream().filter(i -> (issue.getParentIssue() == i.getId())).collect(Collectors.toList());
-			for (int i=0; i<actualParentInstances.size(); i++) {
-				if (actualParentInstances.get(i).getTitle().toLowerCase().contains(parent)) {
-					return true;
-				}
+		if (index > 0) {
+			TurboIssue current = issue;
+			
+			// The parent itself should show too
+			if (current.getId() == index) return true;
+			
+			// See if the current parent occurs anywhere on a walk up to the root
+			while (current.getParentIssue() != -1) {
+				if (current.getParentIssue() == index) return true;
+				current = model.getIssueWithId(current.getParentIssue());
 			}
 			return false;
 		}
+		// Invalid issue number
+		return false;
 	}
 
 	private boolean milestoneSatisfies(TurboIssue issue) {
