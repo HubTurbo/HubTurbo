@@ -2,3 +2,4 @@
 bin
 credentials.txt
 SessionConfig.json
+/session-config.json
