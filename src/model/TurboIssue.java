@@ -246,7 +246,8 @@ public class TurboIssue implements Listable {
 	}
 	
 	private void removeLabelsWithGroup(String group){
-		removeLabels(getLabelsWithGroup(group));
+		List<TurboLabel> labels = getLabelsWithGroup(group);
+		removeLabels(labels);
 	}
 	
 	private List<TurboLabel> getLabelsWithGroup(String group){

@@ -1,5 +1,6 @@
 package model;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;

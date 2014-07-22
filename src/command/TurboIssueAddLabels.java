@@ -37,8 +37,10 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	}
 
 	
-	private void addLabelsToIssueInGithub(List<Label> ghLabels) throws IOException{
-		ServiceManager.getInstance().addLabelsToIssue(issue.getId(), ghLabels);
+	private void addLabelsToIssueInGithub() throws IOException{
+		List<Label> issueLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
+		//Use setLabelsForIssue instead of addLabels to enforce label group exclusivity
+		ServiceManager.getInstance().setLabelsForIssue(issue.getId(), issueLabels);
 		updateGithubIssueState();
 	}
 	
@@ -49,10 +51,9 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	
 	@Override
 	public boolean execute() {
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
 		issue.addLabels(addedLabels);
 		try {
-			addLabelsToIssueInGithub(ghLabels);
+			addLabelsToIssueInGithub();
 			logAddOperation(true);
 			isSuccessful = true;
 		} catch (IOException e) {

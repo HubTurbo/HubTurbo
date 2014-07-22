@@ -60,10 +60,10 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	@Override
 	public boolean undo() {
 		ServiceManager service = ServiceManager.getInstance();
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(removedLabels);
 		issue.addLabels(removedLabels);
 		try {
-			service.addLabelsToIssue(issue.getId(), ghLabels);
+			ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
+			service.setLabelsForIssue(issue.getId(), ghLabels);
 			updateGithubIssueState();
 			logRemoveOperation(false);
 			isUndone = true;
