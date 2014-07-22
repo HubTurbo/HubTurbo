@@ -373,13 +373,7 @@ public abstract class Column extends VBox {
 				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
 				    @Override
 				    public int compare(TurboIssue a, TurboIssue b) {
-				    	if (a.getId() == b.getParentIssue()) {
-				    		return -1;
-				    	} else if (b.getId() == a.getParentIssue()) {
-				    		return 1;
-				    	} else {
-				    		return 0;
-				    	}
+				    	return a.getDepth() - b.getDepth();
 				    }
 				});
 			}
