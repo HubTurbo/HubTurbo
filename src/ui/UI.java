@@ -14,19 +14,20 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import service.ServiceManager;
+import util.ConfigFileHandler;
+import util.LocalConfigurations;
 
 public class UI extends Application {
 
 	// Main UI elements
 	
 	private Stage mainStage;
-
 	private ColumnControl columns;
-
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
-
 	private StatusBar statusBar;
+	
+	private LocalConfigurations localConfigurations;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -36,6 +37,7 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		initCSS();
+		initLocalConfig();
 		
 		mainStage = stage;
 		stage.setMaximized(true);
@@ -46,6 +48,10 @@ public class UI extends Application {
 		getUserCredentials();
 	}
 	
+	private void initLocalConfig() {
+		localConfigurations = ConfigFileHandler.loadLocalConfig();
+	}
+
 	private void getUserCredentials() {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (!success) {

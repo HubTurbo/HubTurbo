@@ -23,6 +23,7 @@ public class ConfigFileHandler {
 
 	private static final String CHARSET = "UTF-8";
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
+	private static final String FILE_CONFIG_LOCAL = "local-config.json";
 	private static final String DIR_CONFIG_PROJECTS = "project-config";
 	
 	
@@ -133,5 +134,45 @@ public class ConfigFileHandler {
 		if (config == null) config = new SessionConfigurations();
 		return config;
 	}
+
+	public static void saveLocalConfig(LocalConfigurations config) {
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_LOCAL) , CHARSET);
+			gson.toJson(config, LocalConfigurations.class, writer);
+			writer.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
+	public static LocalConfigurations loadLocalConfig() {
+		LocalConfigurations config = null;
+		File configFile = new File(FILE_CONFIG_LOCAL);
+		if (configFile.exists()) {
+			try {
+				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_LOCAL), CHARSET);
+				config = gson.fromJson(reader, LocalConfigurations.class);
+				reader.close();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				configFile.createNewFile();
+				config = new LocalConfigurations();
+				saveLocalConfig(config);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return config;
+	}
 }
