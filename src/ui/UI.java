@@ -20,12 +20,9 @@ public class UI extends Application {
 	// Main UI elements
 	
 	private Stage mainStage;
-
 	private ColumnControl columns;
-
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
-
 	private StatusBar statusBar;
 	
 	public static void main(String[] args) {
@@ -75,7 +72,7 @@ public class UI extends Application {
 	}
 	
 	public static void loadFonts(){
-		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 24);
+		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
 
 	private void setupMainStage(Scene scene) {

@@ -2,4 +2,5 @@
 bin
 credentials.txt
 SessionConfig.json
-/session-config.json
+session-config.json
+local-config.json

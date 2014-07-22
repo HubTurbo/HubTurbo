@@ -119,7 +119,7 @@ public class IssueDetailsCard extends VBox{
 	
 	protected HBox createCommentsDetailsDisplay(){
 		HBox details = new HBox();
-		Text creator = new Text(originalComment.getCreator().getGithubName());
+		Text creator = new Text(originalComment.getCreator().getAlias());
 		creator.getStyleClass().add("issue-comment-details");
 		Text creationDate = new Text(formatDisplayedDate(originalComment.getCreatedAt()));
 		creationDate.getStyleClass().add("issue-comment-details");

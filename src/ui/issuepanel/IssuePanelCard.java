@@ -93,7 +93,7 @@ public class IssuePanelCard extends VBox {
 
 		if (issue.getAssignee() != null) {
 			
-			Label assigneeName = new Label((issue.getAssignee().getGithubName()));
+			Label assigneeName = new Label((issue.getAssignee().getAlias()));
 			assigneeName.getStyleClass().add("display-box-padding");
 			ImageView avatar = new ImageView(issue.getAssignee().getAvatar());
 			HBox assignee = new HBox();

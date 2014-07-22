@@ -1,15 +1,23 @@
 package model;
 
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;
+
+import util.LocalConfigurations;
 
 public class TurboUser implements Listable {
 	
 	/*
 	 * Attributes, Getters & Setters
 	 */
+	
+	public String getAlias() {
+		// By the time this is first called, the local configuration file should have been loaded
+		assert LocalConfigurations.getInstance() != null;
+		String name = LocalConfigurations.getInstance().getUserAliases().get(getGithubName());
+		return name == null ? getGithubName() : name;
+	}
 	
 	private String githubName;
 	public String getGithubName() {
@@ -86,7 +94,7 @@ public class TurboUser implements Listable {
 	
 	@Override
 	public String getListName() {
-		return getGithubName();
+		return getAlias();
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -21,8 +20,6 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
-import ui.LabelTreeItem;
-import ui.TurboLabelGroup;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
@@ -49,7 +46,7 @@ public class Model {
 	public Model(){
 		
 	}
-	
+		
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;
 	}

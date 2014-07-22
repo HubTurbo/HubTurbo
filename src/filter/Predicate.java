@@ -162,7 +162,8 @@ public class Predicate implements FilterExpression {
 
 	private boolean assigneeSatisfies(TurboIssue issue) {
 		if (issue.getAssignee() == null) return false;
-		return issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
+		return issue.getAssignee().getAlias().toLowerCase().contains(content.toLowerCase())
+				|| issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
 				|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
 	}
 
