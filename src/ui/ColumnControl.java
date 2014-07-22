@@ -9,9 +9,10 @@ import javafx.stage.Stage;
 import model.Model;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
-import util.ConfigFileHandler;
 import util.SessionConfigurations;
+
 import command.TurboCommandExecutor;
+
 import filter.FilterExpression;
 
 
@@ -23,7 +24,6 @@ public class ColumnControl extends HBox {
 	
 	private TurboCommandExecutor dragAndDropExecutor;
 	
-	private SessionConfigurations sessionConfig;
 	private StatusBar statusBar;
 
 	public ColumnControl(Stage stage, Model model, SidePanel sidePanel, StatusBar statusBar) {
@@ -31,14 +31,13 @@ public class ColumnControl extends HBox {
 		this.model = model;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
-		this.sessionConfig = ConfigFileHandler.loadSessionConfig();
 		this.statusBar = statusBar;
 	}
 	
 	public void resumeColumns() {
 		getChildren().clear();
 		
-		List<String> filters = sessionConfig.getFiltersFromPreviousSession(model.getRepoId());
+		List<String> filters = SessionConfigurations.getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
 				addColumn(false).filterByString(filter);
@@ -130,8 +129,7 @@ public class ColumnControl extends HBox {
 			String filter = ((Column) child).getCurrentFilterExpression().toString();
 			sessionFilters.add(filter);
 		});
-		sessionConfig.setFiltersForNextSession(model.getRepoId(), sessionFilters);
-		ConfigFileHandler.saveSessionConfig(sessionConfig);
+		SessionConfigurations.setFiltersForNextSession(model.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {

@@ -14,6 +14,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import service.ServiceManager;
+import util.ConfigFileHandler;
+import util.SessionConfigurations;
 
 public class UI extends Application {
 
@@ -25,6 +27,8 @@ public class UI extends Application {
 	private MenuControl menuBar;
 	private StatusBar statusBar;
 	
+	private SessionConfigurations sessionConfig;
+	
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -33,6 +37,7 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		initCSS();
+		sessionConfig = ConfigFileHandler.loadSessionConfig();
 		
 		mainStage = stage;
 		stage.setMaximized(true);
@@ -84,6 +89,7 @@ public class UI extends Application {
 		mainStage.setOnCloseRequest(e -> {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
+//			ConfigFileHandler.saveSessionConfig(sessionConfig);
 			Platform.exit();
 			System.exit(0);
 		});
