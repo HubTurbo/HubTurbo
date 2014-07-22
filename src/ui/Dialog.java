@@ -17,7 +17,6 @@ public abstract class Dialog<T> {
 //	private double x = 0, y = 0;
 	private double width = 300, height = 400;
 	private String title = "";
-	private Modality modality;
 	
 	public Dialog(Stage parentStage) {
 		this.parentStage = parentStage;
@@ -31,7 +30,7 @@ public abstract class Dialog<T> {
 		stage.setTitle(title);
 		stage.setOnCloseRequest(e -> onClose());
 		stage.initOwner(parentStage);
-		stage.initModality(modality);
+		stage.initModality(Modality.APPLICATION_MODAL);
 //		stage.setX(parentStage.getX() + x);
 //		stage.setY(parentStage.getY() + y);
 		stage.show();
@@ -45,11 +44,6 @@ public abstract class Dialog<T> {
 	public Dialog<T> setTitle(String title) {
 		this.title = title;
 		if (stage != null) stage.setTitle(title);
-		return this;
-	}
-	
-	public Dialog<T> setModality(Modality modality) {
-		this.modality = modality;
 		return this;
 	}
 	

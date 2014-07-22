@@ -43,7 +43,6 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		setTitle("GitHub Login");
 		setSize(320, 200);
-		setModality(Modality.APPLICATION_MODAL);
 
 		notificationPane = new NotificationPane();
 		
