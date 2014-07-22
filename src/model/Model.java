@@ -22,7 +22,6 @@ import org.eclipse.egit.github.core.User;
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
-import util.LocalConfigurations;
 import util.ProjectConfigurations;
 
 import command.TurboIssueEdit;
@@ -43,7 +42,6 @@ public class Model {
 	protected IRepositoryIdProvider repoId;
 	
 	private ProjectConfigurations projectConfig = null;
-	private LocalConfigurations localConfig = null;
 	
 	public Model(){
 		
@@ -388,13 +386,5 @@ public class Model {
 		milestones.clear();
 		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
-	}
-	
-	public void setLocalConfig(LocalConfigurations config) {
-		localConfig = config;
-	}
-
-	public LocalConfigurations getLocalConfig() {
-		return localConfig;
 	}
 }

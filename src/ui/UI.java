@@ -14,8 +14,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import service.ServiceManager;
-import util.ConfigFileHandler;
-import util.LocalConfigurations;
 
 public class UI extends Application {
 
@@ -27,8 +25,6 @@ public class UI extends Application {
 	private MenuControl menuBar;
 	private StatusBar statusBar;
 	
-	private LocalConfigurations localConfigurations;
-	
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -37,7 +33,6 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 
 		initCSS();
-		initLocalConfig();
 		
 		mainStage = stage;
 		stage.setMaximized(true);
@@ -48,11 +43,6 @@ public class UI extends Application {
 		getUserCredentials();
 	}
 	
-	private void initLocalConfig() {
-		localConfigurations = ConfigFileHandler.loadLocalConfig();
-		ServiceManager.getInstance().getModel().setLocalConfig(localConfigurations);
-	}
-
 	private void getUserCredentials() {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (!success) {

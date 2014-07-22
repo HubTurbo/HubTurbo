@@ -18,6 +18,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 
+import util.LocalConfigurations;
 import util.ProjectConfigurations;
 
 
@@ -44,7 +45,11 @@ public class TurboIssue implements Listable {
 	
 	private String creator;
 	public String getCreator() {
-		return this.creator;
+		String name = LocalConfigurations.getInstance().getUserAliases().get(creator);
+		if (name == null) {
+			name = creator;
+		}
+		return name;
 	}
 	private void setCreator(String creator) {
 		this.creator = creator;
