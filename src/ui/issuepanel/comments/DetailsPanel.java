@@ -31,7 +31,7 @@ public class DetailsPanel extends VBox {
 	private TurboIssue issue;
 	private DisplayType displayType;
 	
-	private ListChangeListener<TurboComment> displayedListSizeListener;
+//	private ListChangeListener<TurboComment> displayedListSizeListener;
 	
 	private HashMap<Long, DetailsCell> displayedCells = new HashMap<Long, DetailsCell>();
 	
@@ -62,20 +62,26 @@ public class DetailsPanel extends VBox {
 	}
 	
 	
-	private void setupDisplayedListSizeListener(){
-//		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
-		displayedListSizeListener = new ListChangeListener<TurboComment>() {
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends TurboComment> arg0) {
-				if(listView.focusedProperty().get() != true && !detailsList.isEmpty()){
-					listView.scrollTo(detailsList.size() - 1);
-				}
-			}
-		};
-		detailsList.addListener(new WeakListChangeListener<TurboComment>(displayedListSizeListener));
-	}
+//	private void setupDisplayedListSizeListener(){
+////		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
+//		displayedListSizeListener = new ListChangeListener<TurboComment>() {
+//			@Override
+//			public void onChanged(
+//					javafx.collections.ListChangeListener.Change<? extends TurboComment> arg0) {
+//				if(listView.focusedProperty().get() != true && !detailsList.isEmpty()){
+//					listView.scrollTo(detailsList.size() - 1);
+//				}
+//			}
+//		};
+//		detailsList.addListener(new WeakListChangeListener<TurboComment>(displayedListSizeListener));
+//	}
 	
+	protected void scrollToBottom(){
+		System.out.println(listView.getItems().size());
+		if(!listView.getItems().isEmpty()){
+			listView.scrollTo(detailsList.size() - 1);
+		}
+	}
 	
 	protected void resizeListView(){
 		List<Long> displayedIDs = detailsList.stream().map(item -> item.getId()).collect(Collectors.toList());
@@ -119,7 +125,7 @@ public class DetailsPanel extends VBox {
 			loadNewCommentsBox();
 		}
 		setListItems();
-		setupDisplayedListSizeListener();
+//		setupDisplayedListSizeListener();
 		getChildren().add(0, listView);
 	}
 

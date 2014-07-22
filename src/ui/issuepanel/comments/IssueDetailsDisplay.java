@@ -1,9 +1,9 @@
 package ui.issuepanel.comments;
 
+import util.DialogMessage;
 import handler.IssueDetailsContentHandler;
-
 import model.TurboIssue;
-
+import javafx.concurrent.Task;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
@@ -19,6 +19,9 @@ public class IssueDetailsDisplay extends VBox {
 	private IssueDetailsContentHandler contentHandler;
 	
 	private TurboIssue issue;
+	
+	DetailsPanel commentsDisplay;
+	DetailsPanel issueLogDisplay;
 	
 	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
@@ -44,7 +47,15 @@ public class IssueDetailsDisplay extends VBox {
 	}
 	
 	public void show(){
-		contentHandler.startContentUpdate();
+		Task<Boolean> bgTask = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws Exception {
+				contentHandler.startContentUpdate();
+				return true;
+			}
+		};
+		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
+		new Thread(bgTask).start();
 	}
 	
 	public void hide(){
@@ -63,7 +74,8 @@ public class IssueDetailsDisplay extends VBox {
 		Tab comments =  new Tab();
 		comments.setText("C");
 		comments.setClosable(false);
-		comments.setContent(createTabContentsDisplay(DisplayType.COMMENTS));
+		commentsDisplay = createTabContentsDisplay(DisplayType.COMMENTS);
+		comments.setContent(commentsDisplay);
 		return comments;
 	}
 	
@@ -71,7 +83,8 @@ public class IssueDetailsDisplay extends VBox {
 		Tab log = new Tab();
 		log.setText("Log");
 		log.setClosable(false);
-		log.setContent(createTabContentsDisplay(DisplayType.LOG));
+		issueLogDisplay = createTabContentsDisplay(DisplayType.LOG);
+		log.setContent(issueLogDisplay);
 		return log;
 	}
 	

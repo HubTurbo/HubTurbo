@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -42,6 +43,7 @@ public class IssueDetailsContentHandler {
 	}
 	
 	private void setupContent(){
+		//Computationally intensive as list of all comments and their html markup will be retrieved from github
 		getDetailsContent();
 		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
 		setupCommentsChangeListener();
@@ -153,6 +155,7 @@ public class IssueDetailsContentHandler {
 	
 	private void getDetailsContent(){
 		try {
+			//Reuse allGhContent instance to ensure that all observers get change signals
 			allGhContent.clear();
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
 			allGhContent.addAll(allItems);
@@ -169,15 +172,14 @@ public class IssueDetailsContentHandler {
 		for(TurboComment item : filteredComments){
 			updateItemInCommentsList(item);
 		}
-		removeDifference(comments, filteredComments);
 	}
 	
-	private void removeDifference(List<TurboComment> storedList, List<TurboComment> fetchedList){
-		List<TurboComment> removed = storedList.stream()
-											   .filter(item -> !fetchedList.contains(item))
-											   .collect(Collectors.toList());
-		storedList.removeAll(removed);
-	}
+//	private void removeDifference(List<TurboComment> storedList, List<TurboComment> fetchedList){
+//		List<TurboComment> removed = storedList.stream()
+//											   .filter(item -> !fetchedList.contains(item))
+//											   .collect(Collectors.toList());
+//		storedList.removeAll(removed);
+//	}
 	
 	private void updateItemInCommentsList(TurboComment comment){
 		for(TurboComment item : comments){
@@ -186,7 +188,7 @@ public class IssueDetailsContentHandler {
 				return;
 			}
 		}
-		comments.add(comment);
+		addItemToObservedCommentList(comment);
 	}
 	
 	private void updateLogContents(){
@@ -194,8 +196,31 @@ public class IssueDetailsContentHandler {
 										   .map(item -> new TurboComment(item))
 				   						   .filter(item -> item.isIssueLog())
 				   						   .collect(Collectors.toList());
-		log.clear();
-		log.addAll(logItems);
+		
+		setObservedLog(logItems);
+	}
+	
+	private void setObservedLog(List<TurboComment> logItems){
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				log.clear();
+				log.addAll(logItems);
+			}
+			
+		});
+	}
+	
+	private void addItemToObservedCommentList(TurboComment comment){
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				comments.add(comment);
+			}
+			
+		});	
 	}
 	
 	@Override

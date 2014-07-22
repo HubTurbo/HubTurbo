@@ -1,5 +1,7 @@
 package util;
 
+import javafx.concurrent.Task;
+
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
@@ -19,5 +21,11 @@ public class DialogMessage {
 		        .actions(Dialog.Actions.OK, Dialog.Actions.CANCEL)
 		        .showConfirm();
 		return response;
+	}
+	
+	public static void showProgressDialog(Task<?> task, String progressTitle){
+		Dialogs.create()
+			   .title(progressTitle)
+			   .showWorkerProgress(task);
 	}
 }
