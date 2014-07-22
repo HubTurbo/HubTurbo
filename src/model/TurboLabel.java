@@ -114,8 +114,14 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return ghLabels;
 	}
 	
-	public String getBackgroundColourStyle() {
-		return "-fx-background-color: #" + getColour() + ";";
+	public String getStyle() {
+		String colour = getColour();
+		int R = Integer.parseInt(colour.substring(0, 2), 16);
+		int G = Integer.parseInt(colour.substring(2, 4), 16);
+		int B = Integer.parseInt(colour.substring(4, 6), 16);
+		double L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+		boolean bright = L > 128;
+		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
 	}
 	
 	

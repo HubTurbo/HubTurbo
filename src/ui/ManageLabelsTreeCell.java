@@ -40,7 +40,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			setContextMenu(getContextMenuForItem(getTreeItem()));
 			if (getTreeItem().getValue() instanceof TurboLabel) {
 				label.getStyleClass().add("labels");
-				label.setStyle(((TurboLabel) getTreeItem().getValue()).getBackgroundColourStyle());
+				label.setStyle(((TurboLabel) getTreeItem().getValue()).getStyle());
 				
 				setOnDragDetected((event) -> {
 					Dragboard db = startDragAndDrop(TransferMode.COPY);

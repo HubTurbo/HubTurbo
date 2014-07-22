@@ -69,7 +69,7 @@ public class IssuePanelCard extends VBox {
 		for (TurboLabel label : issue.getLabels()) {
 			Label labelText = new Label(label.getName());
 			labelText.getStyleClass().add("labels");
-			labelText.setStyle(getBackgroundColourStyle(label));
+			labelText.setStyle(label.getStyle());
 			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
 			if (label.getGroup() != null) {
 				Tooltip groupTooltip = new Tooltip(label.getGroup());
@@ -104,10 +104,6 @@ public class IssuePanelCard extends VBox {
 		
 	}
 	
-	private String getBackgroundColourStyle(TurboLabel label) {
-		return "-fx-background-color: #" + label.getColour() + ";";
-	}
-
 	private ListChangeListener<TurboLabel> createLabelsChangeListener(){
 		WeakReference<IssuePanelCard> that = new WeakReference<IssuePanelCard>(this);
 		ListChangeListener<TurboLabel> listener = new ListChangeListener<TurboLabel>() {
