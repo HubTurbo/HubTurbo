@@ -93,6 +93,7 @@ public abstract class Column extends VBox {
 			});
 
 		setupIssueDragEvents(filterTextField);
+		setupIssueFocusEvents(filterTextField);
 	
 		HBox buttonsBox = new HBox();
 		buttonsBox.setSpacing(5);
@@ -108,6 +109,18 @@ public abstract class Column extends VBox {
 		return layout;
 	}
 	
+	private void setupIssueFocusEvents(FilterTextField field) {
+		field.focusedProperty().addListener((obs, old, newValue) -> {
+			if (newValue) {
+				// Gained focus
+				parentColumnControl.setCurrentlyFocusedColumnIndex(columnIndex);
+			} else {
+				// Lost focus
+				// Do nothing
+			}
+		});
+	}
+
 	private Label[] createButtons() {
 		Label addIssue = new Label(ADD_ISSUE);
 		addIssue.getStyleClass().add("label-button");
