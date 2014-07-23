@@ -173,13 +173,6 @@ public class IssueDetailsContentHandler {
 		}
 	}
 	
-//	private void removeDifference(List<TurboComment> storedList, List<TurboComment> fetchedList){
-//		List<TurboComment> removed = storedList.stream()
-//											   .filter(item -> !fetchedList.contains(item))
-//											   .collect(Collectors.toList());
-//		storedList.removeAll(removed);
-//	}
-	
 	private void updateItemInCommentsList(TurboComment comment){
 		for(TurboComment item : comments){
 			if(item.getId() == comment.getId()){

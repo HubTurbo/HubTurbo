@@ -1,8 +1,11 @@
 package ui.issuepanel.comments;
 
+import java.lang.ref.WeakReference;
+
 import util.DialogMessage;
 import handler.IssueDetailsContentHandler;
 import model.TurboIssue;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -62,17 +65,29 @@ public class IssueDetailsDisplay extends VBox {
 			}
 			
 		};	
-		
+		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);
 		bgTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
             @Override
             public void handle(WorkerStateEvent t) {
-            	commentsDisplay.scrollToBottom();
-        		issueLogDisplay.scrollToBottom();
+            	IssueDetailsDisplay self = selfRef.get();
+            	if(self != null){
+            		self.scrollDisplayToBottom();
+            	}
             }
         });
 		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
 		new Thread(bgTask).start();
+	}
+	
+	private void scrollDisplayToBottom(){
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				commentsDisplay.scrollToBottom();
+        		issueLogDisplay.scrollToBottom();
+			}
+		});	
 	}
 	
 	public void hide(){

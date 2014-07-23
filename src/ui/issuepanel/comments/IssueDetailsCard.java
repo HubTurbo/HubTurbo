@@ -2,6 +2,8 @@ package ui.issuepanel.comments;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import javafx.beans.value.ChangeListener;
@@ -22,6 +24,7 @@ import service.ServiceManager;
 
 public class IssueDetailsCard extends VBox{
 	protected static int PREF_WIDTH = 300;
+	protected static int PREF_WEB_HEIGHT = 150;
 	protected static int ELEMENTS_HORIZONTAL_SPACING = 10;
 	protected static int ELEMENTS_VERTICAL_SPACING = 5;
 	protected static int PADDING = 3;
@@ -41,10 +44,9 @@ public class IssueDetailsCard extends VBox{
 	
 	protected ChangeListener<String> bodyChangeListener;
 	protected ChangeListener<Document> webViewHeightListener;
-	protected ChangeListener<State> weblinkClickListeners;
+	protected ChangeListener<Number> contentLoadListeners;
 	
-	private boolean heightAdjusted = false;
-	
+//	private LinkedList<Integer> setHeights = new LinkedList<Integer>(); //Stores the last 2 set height. This is to fix the height oscillating issue
 	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
@@ -72,7 +74,7 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void loadComponents(){
 		setupCommentBodyChangeListener();
-		setupWeblinkClickListeners();
+//		setupWebContentLoadListener();
 		loadCardComponents();
 	}
 	
@@ -91,7 +93,8 @@ public class IssueDetailsCard extends VBox{
 	protected void initialiseCommentsText(){
 		commentsText = new WebView();
 		commentsText.setPrefWidth(PREF_WIDTH);
-		setupWebEngineHeightListener();
+		commentsText.setPrefHeight(PREF_WEB_HEIGHT);
+//		setupWebEngineHeightListener();
 	}
 	
 	protected void setupCommentBodyChangeListener(){
@@ -100,7 +103,6 @@ public class IssueDetailsCard extends VBox{
 			public void changed(ObservableValue<? extends String> arg0,
 					String original, String change) {
 				setDisplayedCommentText();
-				heightAdjusted = false;
 			}	
 		};
 		originalComment.getBodyHtmlProperty().addListener(new WeakChangeListener<String>(bodyChangeListener));
@@ -146,62 +148,50 @@ public class IssueDetailsCard extends VBox{
 	private void setDisplayedCommentText(){
 		String text = originalComment.getBodyHtml();
 		String displayedText = String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
-		commentsText.getEngine().loadContent(displayedText);
+		commentsText.getEngine().loadContent(displayedText);	
 	}
 	
-	private void setupWebEngineHeightListener(){
-		webViewHeightListener = new ChangeListener<Document>() {
-	        @Override
-	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-	            adjustWebEngineHeight();
-	        }
-		};
-		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
-	}
+//	private void setupWebEngineHeightListener(){
+//		webViewHeightListener = new ChangeListener<Document>() {
+//	        @Override
+//	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
+//	            adjustWebEngineHeight();
+//	        }
+//		};
+//		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+//	}
 	
-	private void setupWeblinkClickListeners(){		
-//		weblinkClickListeners = new ChangeListener<State>() {
-//            @Override
-//            public void changed(ObservableValue ov, State oldState, State newState) {
-//                if (newState == Worker.State.SUCCEEDED) {
-//                	System.out.println("listener created");
-//                    EventListener listener = new EventListener() {
-//						@Override
-//						public void handleEvent(Event evt) {
-//							 String domEventType = evt.getType();
-//							 System.out.println(evt.getType());
-//	                            if (domEventType.equals(EVENT_TYPE_CLICK)) {
-//	                                String href = ((Element)evt.getTarget()).getAttribute("href");
-//	                                System.out.println(href);
-////	                                Browse.browse(href);                            
-//	                            } 
-//						}
-//                    };
+//	private void setupWebContentLoadListener(){		
+//		contentLoadListeners = new ChangeListener<Number>() {
 //
-//                    Document doc = commentsText.getEngine().getDocument();
-//                    NodeList nodeList = doc.getElementsByTagName("a");
-//                    for (int i = 0; i < nodeList.getLength(); i++) {
-//                    	System.out.println("node");
-//                        ((EventTarget) nodeList.item(i)).addEventListener(EVENT_TYPE_CLICK, listener, false);
-//                    }
-//                }
-//            }
+//			@Override
+//			public void changed(ObservableValue<? extends Number> arg0,
+//					Number arg1, Number arg2) {
+//				adjustWebEngineHeight();
+//			}
 //        };
-//        commentsText.getEngine().getLoadWorker().stateProperty()
-//        			.addListener(weblinkClickListeners);
-	}
+//        commentsText.getEngine().getLoadWorker().workDoneProperty()
+//        			.addListener(contentLoadListeners);
+//	}
 	
-	private void adjustWebEngineHeight(){
-		if(heightAdjusted == true){
-			return;
-		}
-		Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
-        if(res!= null && res instanceof Integer) {
-        	Integer height = (Integer)res + WEB_TEXT_PADDING;
-        	commentsText.setPrefHeight(height);
-        }
-        heightAdjusted = true;
-	}
+//	private void adjustWebEngineHeight(){
+//		try{
+//			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+//	        if(res!= null && res instanceof Integer) {
+//	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
+//	        	checkAndSetHeight(height);
+//	        }
+//		}catch(Exception e){
+//		}
+//		return;
+//	}
+	
+//	private void checkAndSetHeight(Integer height){
+//		if(!setHeights.contains(height)){
+//			setHeights.add(height);
+//			commentsText.setPrefHeight(height);
+//		}
+//	}
 	
 	private String stripChangeLogHeader(String text){
 		if(text == null || !originalComment.isIssueLog()){
