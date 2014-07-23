@@ -2,6 +2,7 @@ package ui.issuepanel.comments;
 
 import java.lang.ref.WeakReference;
 
+import ui.StatusBar;
 import util.DialogMessage;
 import handler.IssueDetailsContentHandler;
 import model.TurboIssue;
@@ -9,6 +10,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
@@ -25,6 +27,8 @@ public class IssueDetailsDisplay extends VBox {
 	private IssueDetailsContentHandler contentHandler;
 	
 	private TurboIssue issue;
+	
+	private int loadFailCount = 0;
 	
 	DetailsPanel commentsDisplay;
 	DetailsPanel issueLogDisplay;
@@ -67,7 +71,8 @@ public class IssueDetailsDisplay extends VBox {
 				return true;
 			}
 			
-		};	
+		};
+				
 		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);
 		bgTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
@@ -76,6 +81,25 @@ public class IssueDetailsDisplay extends VBox {
             	IssueDetailsDisplay self = selfRef.get();
             	if(self != null){
             		self.scrollDisplayToBottom();
+            		self.loadFailCount = 0;
+            	}
+            }
+        });
+
+		bgTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+
+            @Override
+            public void handle(WorkerStateEvent t) {
+            	IssueDetailsDisplay self = selfRef.get();
+            	if(self != null){
+            		self.loadFailCount += 1;
+            		if(loadFailCount <= 3){
+            			self.show();
+            		}else{
+            			//Notify user of load failure and reset count
+            			loadFailCount = 0;
+            			StatusBar.displayMessage("An error occured while loading the issue's comments. Comments partially loaded");
+            		}
             	}
             }
         });
