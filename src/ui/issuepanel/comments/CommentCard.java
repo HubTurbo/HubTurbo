@@ -51,7 +51,7 @@ public class CommentCard extends IssueDetailsCard{
 	private void initialiseEditButton(){
 		editButton = new Label();
 		editButton.setText(EDIT_BTN_TXT);
-		editButton.getStyleClass().add("button-github-octicon");
+		editButton.getStyleClass().addAll("button-github-octicon", "comments-label-button");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
 		editButton.setOnMousePressed(e -> {
 		    selfRef.get().handleEditButtonPressed();
@@ -61,7 +61,7 @@ public class CommentCard extends IssueDetailsCard{
 	private void intialiseDeleteButton(){
 		deleteButton = new Label();
 		deleteButton.setText(DELETE_BTN_TXT);
-		deleteButton.getStyleClass().add("button-github-octicon");
+		deleteButton.getStyleClass().addAll("button-github-octicon", "comments-label-button");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
 		deleteButton.setOnMousePressed(e -> {
 		    selfRef.get().handleDeleteButtonPressed();
