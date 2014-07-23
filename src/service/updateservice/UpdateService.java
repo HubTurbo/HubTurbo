@@ -14,6 +14,7 @@ import java.util.TimeZone;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 
@@ -52,8 +53,8 @@ public class UpdateService<T> {
 		return connection;
 	}
 	
-	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
-		GitHubRequest request = new GitHubRequest();
+	protected PagedRequest<T> createUpdatedRequest(IRepositoryIdProvider repoId){
+		PagedRequest<T> request = new PagedRequest<T>();
 		String path = SEGMENT_REPOS + "/" + repoId.generateId() + apiSuffix;
 		request.setUri(path);
 		request.setResponseContentType(CONTENT_TYPE_JSON);

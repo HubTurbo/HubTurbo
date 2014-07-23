@@ -7,18 +7,20 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 import service.ServiceManager;
+import util.CollectionUtilities;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -36,19 +38,19 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		lastCheckTime = new Date();
 	}
 	
-	private Map<String, String> createUpdatedCommentsParams(){
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("since", getFormattedDate(lastCheckTime));
-		return params;
-	}
+//	private Map<String, String> createUpdatedCommentsParams(){
+//		Map<String, String> params = new HashMap<String, String>();
+//		params.put("since", getFormattedDate(lastCheckTime));
+//		return params;
+//	}
 
 	@Override
-	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
-		GitHubRequest request = new GitHubRequest();
+	protected PagedRequest<Comment> createUpdatedRequest(IRepositoryIdProvider repoId){
+		PagedRequest<Comment> request = new PagedRequest<Comment>();
 		String path = SEGMENT_REPOS + "/" + repoId.generateId() + SEGMENT_ISSUES
 				+ "/" + issueId + SEGMENT_COMMENTS;
 		request.setUri(path);
-		request.setParams(createUpdatedCommentsParams());
+//		request.setParams(createUpdatedCommentsParams());
 		request.setResponseContentType(CONTENT_TYPE_JSON);
 		request.setType(new TypeToken<Comment>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<Comment>>(){}.getType());
@@ -77,8 +79,26 @@ public class CommentUpdateService extends UpdateService<Comment>{
 	protected void updateCachedComments(IRepositoryIdProvider repoId){
 		List<Comment> updatedComments = super.getUpdatedItems(repoId);
 		if(!updatedComments.isEmpty()){
+			List<Comment> removed = getRemovedComments(updatedComments);
+			commentsList.removeAll(removed);
+			System.out.println(removed.size());
+			System.out.println(updatedComments.size());
 			updatedComments.stream().forEach(comment -> updateCommentsInList(comment));
 		}
+	}
+	
+	private List<Comment> getRemovedComments(List<Comment> updatedComments){
+		//TODO: optimise for sorted list
+		return commentsList.stream().filter(item -> !hasComment(updatedComments, item)).collect(Collectors.toList());
+	}
+	
+	private boolean hasComment(List<Comment> comments, Comment comment){
+		for(Comment item: comments){
+			if(comment.getId() == item.getId()){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void startCommentsListUpdate(){

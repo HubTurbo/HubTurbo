@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 
@@ -18,8 +19,8 @@ public class LabelUpdateService extends UpdateService<Label> {
 		apiSuffix = SEGMENT_LABELS;
 	}
 	@Override
-	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
-		GitHubRequest request = super.createUpdatedRequest(repoId);
+	protected PagedRequest<Label> createUpdatedRequest(IRepositoryIdProvider repoId){
+		PagedRequest<Label> request = super.createUpdatedRequest(repoId);
 		request.setType(new TypeToken<Label>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<Label>>(){}.getType());
 		return request;

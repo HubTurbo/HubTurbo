@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 
@@ -21,8 +22,8 @@ public class CollaboratorUpdateService extends UpdateService<User>{
 	}
 	
 	@Override
-	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
-		GitHubRequest request = super.createUpdatedRequest(repoId);
+	protected PagedRequest<User> createUpdatedRequest(IRepositoryIdProvider repoId){
+		PagedRequest<User> request = super.createUpdatedRequest(repoId);
 		request.setType(new TypeToken<User>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<User>>(){}.getType());
 		return request;

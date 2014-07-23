@@ -10,6 +10,7 @@ import java.util.Map;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 
@@ -40,8 +41,8 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	}
 	
 	@Override
-	protected GitHubRequest createUpdatedRequest(IRepositoryIdProvider repoId){
-		GitHubRequest request = super.createUpdatedRequest(repoId);
+	protected PagedRequest<Issue> createUpdatedRequest(IRepositoryIdProvider repoId){
+		PagedRequest<Issue> request = super.createUpdatedRequest(repoId);
 		request.setParams(createUpdatedIssuesParams());
 		request.setType(new TypeToken<Issue>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<Issue>>(){}.getType());
