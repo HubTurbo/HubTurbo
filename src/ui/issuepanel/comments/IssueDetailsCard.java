@@ -49,6 +49,8 @@ public class IssueDetailsCard extends VBox{
 	protected ChangeListener<Document> webViewHeightListener;
 	protected ChangeListener<State> weblinkClickListeners;
 	
+	private boolean heightAdjusted = false;
+	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
@@ -103,6 +105,7 @@ public class IssueDetailsCard extends VBox{
 			public void changed(ObservableValue<? extends String> arg0,
 					String original, String change) {
 				setDisplayedCommentText();
+				heightAdjusted = false;
 			}	
 		};
 		originalComment.getBodyHtmlProperty().addListener(new WeakChangeListener<String>(bodyChangeListener));
@@ -152,13 +155,13 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	private void setupWebEngineHeightListener(){
-//		webViewHeightListener = new ChangeListener<Document>() {
-//	        @Override
-//	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-//	            adjustWebEngineHeight();
-//	        }
-//		};
-//		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+		webViewHeightListener = new ChangeListener<Document>() {
+	        @Override
+	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
+	            adjustWebEngineHeight();
+	        }
+		};
+		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
 	}
 	
 	private void setupWeblinkClickListeners(){		
@@ -194,11 +197,15 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	private void adjustWebEngineHeight(){
+		if(heightAdjusted == true){
+			return;
+		}
 		Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
         if(res!= null && res instanceof Integer) {
         	Integer height = (Integer)res + WEB_TEXT_PADDING;
         	commentsText.setPrefHeight(height);
         }
+        heightAdjusted = true;
 	}
 	
 	private String stripChangeLogHeader(String text){
