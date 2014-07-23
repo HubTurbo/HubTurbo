@@ -14,11 +14,13 @@ import java.util.TimeZone;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.service.GitHubService;
 
 import service.GitHubClientExtended;
 
-public class UpdateService<T> {
+public class UpdateService<T> extends GitHubService{
 	protected String apiSuffix;
 	protected GitHubClientExtended client;
 	protected String lastETag;
@@ -65,7 +67,8 @@ public class UpdateService<T> {
 	public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
 		try {
 			
-			GitHubRequest request = createUpdatedRequest(repoId);
+			PagedRequest<T> request = createUpdatedRequest(repoId);
+			PageIterator<T> requestIterator = new PageIterator<T>(request, client);
 			HttpURLConnection connection = createUpdatedConnection(request);
 			int responseCode = connection.getResponseCode();
 			System.out.println(responseCode);
@@ -75,7 +78,8 @@ public class UpdateService<T> {
 			updateLastETag(connection);
 			updateLastCheckTime(connection);
 			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
-				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
+//				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
+				return (ArrayList<T>)getAll(requestIterator);
 			}
 			
 		} catch (IOException e) {
