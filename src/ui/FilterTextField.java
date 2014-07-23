@@ -3,6 +3,8 @@ package ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.application.Platform;
 import javafx.scene.control.IndexRange;
@@ -175,11 +177,26 @@ public class FilterTextField extends TextField {
 	private String getCurrentWord() {
 //		int caret = getCaretPosition();
 		int caret = Math.min(getSelection().getStart(), getSelection().getEnd());
-		int pos = getText().substring(0, caret).lastIndexOf(" "); // TODO colon should also be here
+//		int pos = getText().substring(0, caret).lastIndexOf(" ");
+		int pos = regexLastIndexOf(getText().substring(0, caret), "[ (:)]");
 		if (pos == -1) {
 			pos = 0;
 		}
 		return getText().substring(pos > 0 ? pos+1 : pos, caret);
+	}
+	
+	// Caveat: algorithm only works for character-class regexes
+	private int regexLastIndexOf(String inString, String charClassRegex) {
+		inString = new StringBuilder(inString).reverse().toString();
+		
+		Pattern pattern = Pattern.compile(charClassRegex);
+	    Matcher m = pattern.matcher(inString);
+	    
+	    if (m.find()) {
+	    	return inString.length() - (m.start() + 1);
+	    } else {
+	    	return -1;
+	    }
 	}
 
 	private String getCharAfterCaret() {
