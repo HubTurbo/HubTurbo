@@ -31,7 +31,7 @@ public class SessionConfigurations {
 		return projectFilters.get(project.generateId());
 	}
 	
-	public static void addToLastViewedRepositories(String repository) {
+	public static List<String> addToLastViewedRepositories(String repository) {
 		RepoViewRecord latestRepoView = new RepoViewRecord(repository);
 		int index = lastViewedRepositories.indexOf(latestRepoView);
 		if (index < 0) {
@@ -44,6 +44,8 @@ public class SessionConfigurations {
 		while (lastViewedRepositories.size() > 10) {
 			lastViewedRepositories.remove(lastViewedRepositories.size() - 1);
 		}
+		
+		return getLastViewedRepositories();
 	}
 	
 	public static List<String> getLastViewedRepositories() {

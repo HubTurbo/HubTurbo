@@ -2,6 +2,7 @@ package ui;
 
 import java.util.concurrent.CompletableFuture;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -156,7 +157,9 @@ public class SidePanel extends VBox {
 		final ComboBox<String> comboBox = new ComboBox<String>();
 		comboBox.setEditable(true);
 		if (ServiceManager.getInstance().getRepoId() != null) {
-			comboBox.setValue(ServiceManager.getInstance().getRepoId().generateId());
+			String repoId = ServiceManager.getInstance().getRepoId().generateId();
+			comboBox.setValue(repoId);
+			SessionConfigurations.addToLastViewedRepositories(repoId);
 			comboBox.getItems().addAll(SessionConfigurations.getLastViewedRepositories());
 		}
 		
@@ -169,8 +172,8 @@ public class SidePanel extends VBox {
 				ServiceManager.getInstance().setupRepository(repoId.getOwner(), repoId.getName());
 				columns.resumeColumns();
 				this.refresh();
-				
-				SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
+				comboBox.setItems(FXCollections.observableArrayList(
+						SessionConfigurations.addToLastViewedRepositories(repoId.generateId())));
 			}
 		});
 
