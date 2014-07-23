@@ -56,7 +56,6 @@ public class UI extends Application {
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
-				StatusBar.displayMessage("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
 			}
 			return true;
 		}).exceptionally(e -> {

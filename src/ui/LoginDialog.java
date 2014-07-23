@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,11 +14,14 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
+import util.TextAnimation;
 
 public class LoginDialog extends Dialog<Boolean> {
 
@@ -27,6 +31,8 @@ public class LoginDialog extends Dialog<Boolean> {
 	private PasswordField passwordField;
 	private NotificationPane notificationPane;
 	private ColumnControl columns;
+	private Button loginButton;
+	private Label statusLabel;
 
 	public LoginDialog(Stage parentStage, ColumnControl columns) {
 		super(parentStage);
@@ -34,7 +40,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	}
 	
 	@Override
-	protected void onClose() {
+	protected void onClose(WindowEvent e) {
 		completeResponse(false);
 	}
 	
@@ -56,35 +62,40 @@ public class LoginDialog extends Dialog<Boolean> {
 		grid.add(repoNameLabel, 0, 0);
 
 		repoOwnerField = new TextField("HubTurbo");
-		repoOwnerField.setOnAction(this::login);
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
 		repoNameField = new TextField("HubTurbo");
-		repoNameField.setOnAction(this::login);
 		grid.add(repoNameField, 3, 0);
 
 		Label usernameLabel = new Label("Username:");
 		grid.add(usernameLabel, 0, 1);
 
 		usernameField = new TextField();
-		usernameField.setOnAction(this::login);
 		grid.add(usernameField, 1, 1, 3, 1);
 
 		Label passwordLabel = new Label("Password:");
 		grid.add(passwordLabel, 0, 2);
 
 		passwordField = new PasswordField();
-		passwordField.setOnAction(this::login);
 		grid.add(passwordField, 1, 2, 3, 1);
 
+		statusLabel = new Label();
+		HBox.setHgrow(statusLabel, Priority.ALWAYS);
+		grid.add(statusLabel, 0, 3);
+		
 		repoOwnerField.setMaxWidth(80);
 		repoNameField.setMaxWidth(80);
 
-		Button loginButton = new Button("Sign in");
+		loginButton = new Button("Sign in");
 		loginButton.setOnAction(this::login);
+
+		repoOwnerField.setOnAction(this::login);
+		repoNameField.setOnAction(this::login);
+		usernameField.setOnAction(this::login);
+		passwordField.setOnAction(this::login);
 
 		HBox buttons = new HBox(10);
 		buttons.setAlignment(Pos.BOTTOM_RIGHT);
@@ -98,6 +109,9 @@ public class LoginDialog extends Dialog<Boolean> {
 	
 
 	private void login(Event e) {
+		
+		// Resolve username and password
+		
 		String owner = repoOwnerField.getText();
 		String repo = repoNameField.getText();
 		String username = usernameField.getText();
@@ -109,35 +123,77 @@ public class LoginDialog extends Dialog<Boolean> {
 				reader = new BufferedReader(new FileReader("credentials.txt"));
 				String line = null;
 				while ((line = reader.readLine()) != null) {
-					if (username.isEmpty())
+					if (username.isEmpty()) {
 						username = line;
-					else
+					} else {
 						password = line;
+					}
 				}
 				System.out.println("Logged in using credentials.txt");
 			} catch (Exception ex) {
 				System.out.println("Failed to find or open credentials.txt");
 			}
 		}
-
-		boolean success = ServiceManager.getInstance().login(username, password);
 		
-		if (!success) {
-//		        notificationPane.getActions().addAll(new AbstractAction("Retry") {
-//		            @Override public void handle(ActionEvent ae) {
-//		            	System.out.println("clicked button");
-//		            	notificationPane.hide();
-//		            }
-//		        });
-			notificationPane.setText("Failed to log in. Please try again.");
-			notificationPane.show();
-		}
-		else {
-			loadRepository(owner, repo);
-			columns.resumeColumns();
-			completeResponse(true);
-			close();
-		}
+		// Update UI
+
+		enableElements(false);
+		TextAnimation animation = new TextAnimation(new String[] {
+			"\\", "|", "/", "-"
+		}, s -> {
+			statusLabel.setText(s); return null;
+		});
+		animation.start();
+		
+		// Run blocking operations in the background
+
+		final String username2 = username;
+		final String password2 = password;
+		Task<Boolean> task = new Task<Boolean>() {
+		    @Override
+		    protected Boolean call() throws Exception {
+	    		StatusBar.displayMessage("Signing in at GitHub...");
+		    	boolean couldLogIn = ServiceManager.getInstance().login(username2, password2);
+		    	if (couldLogIn) {
+		    		StatusBar.displayMessage("Logged in; loading data...");
+			    	loadRepository(owner, repo);
+		    	}
+		    	return couldLogIn;
+		    }
+		};
+		Thread th = new Thread(task);
+		th.setDaemon(true);
+		th.start();
+
+		task.setOnSucceeded(wse -> {
+			if (task.getValue()) {
+				StatusBar.displayMessage("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
+				columns.resumeColumns();
+				completeResponse(true);
+				close();
+			} else {
+				handleError("Failed to log in. Please try again.", animation);
+			}
+		});
+		
+		task.setOnFailed(wse -> {
+			handleError("An error occurred: " + task.getException(), animation);
+		});
+	}
+
+	private void handleError(String message, TextAnimation animation) {
+		StatusBar.displayMessage(message);
+		enableElements(true);
+		animation.stop(() -> statusLabel.setText(""));
+	}
+
+	private void enableElements(boolean enable) {
+		boolean disable = !enable;
+		loginButton.setDisable(disable);
+		repoOwnerField.setDisable(disable);
+		repoNameField.setDisable(disable);
+		usernameField.setDisable(disable);
+		passwordField.setDisable(disable);
 	}
 	
 	private void loadRepository(String owner, String repoName) {
