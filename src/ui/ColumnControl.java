@@ -65,10 +65,6 @@ public class ColumnControl extends HBox {
 			panel.setItems(model.getIssues());
 		}
 	}
-
-	public void addNormalColumn() {
-		addColumn(false);
-	}
 	
 	private Column addColumn(boolean isSearchPanel) {
 		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel, statusBar);
@@ -153,5 +149,20 @@ public class ColumnControl extends HBox {
 	}
 	public void setCurrentlyDraggedColumnIndex(int i) {
 		currentlyDraggedColumnIndex = i;
+	}
+	
+	private int currentlyFocusedColumnIndex = -1;
+	public int getCurrentlyFocusedColumnIndex() {
+		return currentlyFocusedColumnIndex;
+	}
+	public void setCurrentlyFocusedColumnIndex(int i) {
+		currentlyFocusedColumnIndex = i;
+	}
+
+	public void closeCurrentColumn() {
+		if (currentlyFocusedColumnIndex != -1) {
+			closeColumn(currentlyFocusedColumnIndex);
+			currentlyFocusedColumnIndex = -1;
+		}
 	}
 }

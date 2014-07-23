@@ -33,18 +33,20 @@ public class MenuControl extends MenuBar {
 
 	private MenuItem createColumnsMenuItem() {
 		Menu cols = new Menu("Columns");
-		MenuItem createNormal = new MenuItem("Create column");
-		createNormal.setOnAction(e -> columns.addNormalColumn());
 
-		MenuItem createLeft = new MenuItem("Create on the left");
+		MenuItem createLeft = new MenuItem("Create Column (Left)");
 		createLeft.setOnAction(e -> columns.createNewSearchPanelAtStart());
 		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
-		MenuItem createRight = new MenuItem("Create on the right");
+		MenuItem createRight = new MenuItem("Create Column");
 		createRight.setOnAction(e -> columns.createNewSearchPanelAtEnd());
-		createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN)	);
+		createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
 
-		cols.getItems().addAll(createNormal, createLeft, createRight);
+		MenuItem closeColumn = new MenuItem("Close Column");
+		closeColumn.setOnAction(e -> columns.closeCurrentColumn());
+		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
+
+		cols.getItems().addAll(createRight, createLeft, closeColumn);
 		return cols;
 	}
 
