@@ -49,6 +49,10 @@ public class IssueDetailsDisplay extends VBox {
 	}
 	
 	public void show(){
+		if(issue == null || issue.getId() <= 0){
+			return;
+		}
+		
 		Task<Boolean> bgTask = new Task<Boolean>(){
 
 			@Override
