@@ -89,7 +89,7 @@ public class UI extends Application {
 		mainStage.setOnCloseRequest(e -> {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
-//			ConfigFileHandler.saveSessionConfig(sessionConfig);
+			ConfigFileHandler.saveSessionConfig(sessionConfig);
 			Platform.exit();
 			System.exit(0);
 		});
