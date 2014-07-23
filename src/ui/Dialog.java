@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public abstract class Dialog<T> {
@@ -18,7 +19,8 @@ public abstract class Dialog<T> {
 //	private double x = 0, y = 0;
 	private double width = 300, height = 400;
 	private String title = "";
-	
+	private StageStyle stageStyle;
+
 	public Dialog(Stage parentStage) {
 		this.parentStage = parentStage;
 		this.response = new CompletableFuture<T>();
@@ -32,6 +34,7 @@ public abstract class Dialog<T> {
 		stage.setOnCloseRequest(e -> onClose(e));
 		stage.initOwner(parentStage);
 		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initStyle(stageStyle);
 //		stage.setX(parentStage.getX() + x);
 //		stage.setY(parentStage.getY() + y);
 		stage.show();
@@ -54,12 +57,11 @@ public abstract class Dialog<T> {
 		return this;
 	}
 	
-//	public Dialog2<T> setPosition(double x, double y) {
-//		this.x = x;
-//		this.y = y;
-//		return this;
-//	}
-	
+	public Dialog<T> setStageStyle(StageStyle stageStyle) {
+		this.stageStyle = stageStyle;
+		return this;
+	}
+
 	// Dialog actions
 
 	public void close() {

@@ -16,6 +16,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import org.controlsfx.control.NotificationPane;
@@ -49,7 +50,8 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		setTitle("GitHub Login");
 		setSize(320, 200);
-
+		setStageStyle(StageStyle.UTILITY);
+		
 		notificationPane = new NotificationPane();
 		
 		GridPane grid = new GridPane();
@@ -107,7 +109,6 @@ public class LoginDialog extends Dialog<Boolean> {
 		return notificationPane;
 	}
 	
-
 	private void login(Event e) {
 		
 		// Resolve username and password
