@@ -134,9 +134,8 @@ public class SidePanel extends VBox {
 		Tab labelsTab = createLabelsTab();
 		Tab milestonesTab = createMilestonesTab();
 		Tab assigneesTab = createAssgineesTab();
-		Tab feedTab = createFeedTab();
 		
-		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab, feedTab);
+		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
 		
 		HBox repoFields = createRepoFields();
 
@@ -175,13 +174,6 @@ public class SidePanel extends VBox {
 		repoIdBox.setAlignment(Pos.CENTER);
 		repoIdBox.getChildren().addAll(comboBox, refreshButton);
 		return repoIdBox;
-	}
-
-	private Tab createFeedTab() {
-		Tab tab = new Tab();
-		tab.setClosable(false);
-		tab.setText("Feed");
-		return tab;
 	}
 
 	private Tab createAssgineesTab() {
