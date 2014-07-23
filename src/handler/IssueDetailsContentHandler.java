@@ -154,14 +154,18 @@ public class IssueDetailsContentHandler {
 	
 	private void getDetailsContent(){
 		try {
-			//Reuse allGhContent instance to ensure that all observers get change signals
-			allGhContent.clear();
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
-			allGhContent.addAll(allItems);
+			setGithubCommentsList(allItems);
 			updateData();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void setGithubCommentsList(List<Comment> allItems){
+		//Reuse allGhContent instance to ensure that all observers get change signals
+		allGhContent.clear();
+		allGhContent.addAll(allItems);
 	}
 
 	private void updateCommentsList(){

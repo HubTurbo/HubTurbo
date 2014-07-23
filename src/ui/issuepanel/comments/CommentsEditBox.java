@@ -34,13 +34,12 @@ public class CommentsEditBox extends VBox{
 	
 	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, String commentBtnTxt){
 		this.commentButtonText = commentBtnTxt;
+		this.commentHandler = handler;
 		this.editedComment = editedComment;
 		if(editedComment != null){
 			initialText = editedComment.getBody();
 		}
-		initialiseUIComponents();
-		setupForCommentsEdit(editedComment);
-		setupLayout();
+		setupForEditing();
 	}
 	
 	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment){
@@ -49,6 +48,10 @@ public class CommentsEditBox extends VBox{
 		if(editedComment != null){
 			initialText = editedComment.getBody();
 		}
+		setupForEditing();
+	}
+	
+	private void setupForEditing(){
 		initialiseUIComponents();
 		setupForCommentsEdit(editedComment);
 		setupLayout();
@@ -108,6 +111,9 @@ public class CommentsEditBox extends VBox{
 	}
 	
 	private void handleCommentEdit(){
+		if(commentHandler == null){
+			System.out.println("null here");
+		}
 		boolean editRes = commentHandler.editComment(editedComment);
 		if(editRes){
 			commentHandler.setCommentEditStateFalse(editedComment);

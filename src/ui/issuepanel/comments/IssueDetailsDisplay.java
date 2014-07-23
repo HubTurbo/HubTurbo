@@ -10,7 +10,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
@@ -62,7 +61,10 @@ public class IssueDetailsDisplay extends VBox {
 		if(issue == null || issue.getId() <= 0){
 			return;
 		}
-		
+		loadIssueDetailsInBackground();
+	}
+	
+	private void loadIssueDetailsInBackground(){
 		Task<Boolean> bgTask = new Task<Boolean>(){
 
 			@Override
@@ -87,7 +89,6 @@ public class IssueDetailsDisplay extends VBox {
         });
 
 		bgTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-
             @Override
             public void handle(WorkerStateEvent t) {
             	IssueDetailsDisplay self = selfRef.get();
@@ -103,6 +104,7 @@ public class IssueDetailsDisplay extends VBox {
             	}
             }
         });
+		
 		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
 		backgroundThread = new Thread(bgTask);
 		backgroundThread.start();
