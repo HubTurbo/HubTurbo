@@ -101,7 +101,7 @@ public abstract class Column extends VBox {
 		
 		HBox layout = new HBox();
 		layout.getChildren().addAll(filterTextField, buttonsBox);
-		layout.setPadding(new Insets(4,5,3,5));		
+		layout.setPadding(new Insets(0,0,3,0));		
 		
 		setupColumnDragEvents(layout);
 		return layout;
@@ -146,8 +146,8 @@ public abstract class Column extends VBox {
 	private void setupColumn() {
 		setPrefWidth(380);
 		setMinWidth(380);
-		
-		getStyleClass().add("borders");
+		setPadding(new Insets(5));
+		getStyleClass().addAll("borders", "rounded-borders");
 		
 		setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {

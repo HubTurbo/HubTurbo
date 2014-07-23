@@ -103,6 +103,7 @@ public class UI extends Application {
 		menuBar = new MenuControl(columns, sidePanel);
 		
 		ScrollPane columnsScroll = new ScrollPane(columns);
+		columnsScroll.getStyleClass().add("transparent-bg");
 		columnsScroll.setFitToHeight(true);
 		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScroll, Priority.ALWAYS);

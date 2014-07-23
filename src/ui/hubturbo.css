@@ -86,3 +86,7 @@
     -fx-opacity: 0;
   -fx-cell-size: 0;
 }
+
+.transparent-bg {
+	-fx-background-color: transparent;
+}

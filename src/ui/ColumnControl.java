@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -29,6 +30,8 @@ public class ColumnControl extends HBox {
 		this.model = model;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
+		setSpacing(10);
+		setPadding(new Insets(5));
 	}
 	
 	public void resumeColumns() {
