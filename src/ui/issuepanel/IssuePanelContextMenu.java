@@ -31,10 +31,10 @@ public class IssuePanelContextMenu {
 		});
 		MenuItem newChild = new MenuItem("New Child Issue");
 		newChild.setOnAction(e -> {
-			TurboIssue issue = new TurboIssue("", "", model);
+			TurboIssue newIssue = new TurboIssue("", "", model);
 			assert issue != null;
-			issue.setParentIssue(issue.getId());
-			sidePanel.triggerIssueCreate(issue);
+			newIssue.setParentIssue(issue.getId());
+			sidePanel.triggerIssueCreate(newIssue);
 		});
 		menu.getItems().addAll(viewOnGitHub, newChild);
 		
