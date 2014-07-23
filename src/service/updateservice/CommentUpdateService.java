@@ -1,9 +1,9 @@
 package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMENTS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,16 +13,14 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javafx.application.Platform;
-
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 
-import com.google.gson.reflect.TypeToken;
-
 import service.GitHubClientExtended;
 import service.ServiceManager;
+
+import com.google.gson.reflect.TypeToken;
 
 public class CommentUpdateService extends UpdateService<Comment>{
 	

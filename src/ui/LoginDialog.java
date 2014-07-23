@@ -3,9 +3,6 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.controlsfx.control.NotificationPane;
-
-import service.ServiceManager;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,8 +13,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import org.controlsfx.control.NotificationPane;
+
+import service.ServiceManager;
 
 public class LoginDialog extends Dialog<Boolean> {
 

@@ -4,27 +4,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-
-import service.ServiceManager;
-import util.Browse;
-import model.TurboComment;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.concurrent.Worker.State;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
+import model.TurboComment;
+
+import org.w3c.dom.Document;
+
+import service.ServiceManager;
 
 public class IssueDetailsCard extends VBox{
 	protected static int PREF_WIDTH = 300;

@@ -1,25 +1,23 @@
 package ui.issuepanel.comments;
 
+import handler.IssueDetailsContentHandler;
+
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import handler.IssueDetailsContentHandler;
-import model.TurboComment;
-import model.TurboIssue;
-import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import model.TurboComment;
+import model.TurboIssue;
+import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 
 public class DetailsPanel extends VBox {
 	protected static final int LIST_MAX_HEIGHT = 650;

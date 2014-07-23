@@ -1,13 +1,13 @@
 package model;
 
-import java.io.IOException;
 import java.util.Date;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 public class TurboComment{
 	private Date createdAt;
