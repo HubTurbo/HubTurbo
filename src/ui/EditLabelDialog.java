@@ -18,9 +18,6 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	public EditLabelDialog(Stage parentStage, TurboLabel originalLabel) {
 		super(parentStage);
 		this.originalLabel = originalLabel;
-		
-		setTitle("Edit Label");
-		setSize(330, 50);
 	}
 		
 	private static String toRGBCode(Color color) {
@@ -32,6 +29,10 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	
 	@Override
 	protected Parent content() {
+		
+		setTitle("Edit Label");
+		setSize(400, 50);
+
 		TextField labelNameField = new TextField();
 		labelNameField.setText(originalLabel.getName());
 
@@ -42,7 +43,12 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
 			close();
 		});
-		
+
+		labelNameField.setOnAction(e -> {
+			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
+			close();
+		});
+
 		HBox layout = new HBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
