@@ -103,6 +103,7 @@ public class IssueDetailsContentHandler {
 		try {
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
+			setCommentEditStateFalse(comment);
 			commentsUpdater.restartCommentsListUpdate();
 			return true;
 		} catch (IOException e) {

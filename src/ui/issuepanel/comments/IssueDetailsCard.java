@@ -162,7 +162,6 @@ public class IssueDetailsCard extends VBox{
 	private void adjustWebEngineHeight(){
 		try{
 			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
-			System.out.println(commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetWidth"));
 	        if(res!= null && res instanceof Integer) {
 	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
 	        	commentsText.setPrefHeight(height);
