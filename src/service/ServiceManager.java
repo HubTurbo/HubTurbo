@@ -319,7 +319,6 @@ public class ServiceManager {
 	}
 	
 	public String getMarkupForComment(Comment comment){
-		String text = comment.getBody();
 		try {
 			return getContentMarkup(comment.getBody());
 		} catch (IOException e) {

@@ -95,9 +95,15 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		pollTimer.scheduleAtFixedRate(pollTask, 0, pollInterval);
 	}
 	
+	public void restartCommentsListUpdate(){
+		stopCommentsListUpdate();
+		startCommentsListUpdate();
+	}
+	
 	public void stopCommentsListUpdate(){
 		if(pollTimer != null){
 			pollTimer.cancel();
+			pollTimer = null;
 		}
 	}
 }

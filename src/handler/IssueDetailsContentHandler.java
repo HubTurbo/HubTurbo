@@ -91,9 +91,8 @@ public class IssueDetailsContentHandler {
 	
 	public void createComment(String text){
 		try {
-			Comment comment = ServiceManager.getInstance().createComment(issue.getId(), text);
-			comment.setBodyHtml(comment.getBody());
-			allGhContent.add(comment);
+			ServiceManager.getInstance().createComment(issue.getId(), text);			
+			commentsUpdater.restartCommentsListUpdate();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -102,10 +101,9 @@ public class IssueDetailsContentHandler {
 	
 	public boolean editComment(TurboComment comment){
 		try {
-			comment.setBodyHtml(comment.getBody());
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
-			updateItemInCommentsList(comment);
+			commentsUpdater.restartCommentsListUpdate();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -203,24 +201,20 @@ public class IssueDetailsContentHandler {
 	
 	private void setObservedLog(List<TurboComment> logItems){
 		Platform.runLater(new Runnable() {
-
 			@Override
 			public void run() {
 				log.clear();
 				log.addAll(logItems);
 			}
-			
 		});
 	}
 	
 	private void addItemToObservedCommentList(TurboComment comment){
 		Platform.runLater(new Runnable() {
-
 			@Override
 			public void run() {
 				comments.add(comment);
 			}
-			
 		});	
 	}
 	
