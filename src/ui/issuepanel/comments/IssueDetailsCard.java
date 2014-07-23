@@ -51,6 +51,7 @@ public class IssueDetailsCard extends VBox{
 	
 	private boolean heightAdjusted = false;
 	
+	
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);

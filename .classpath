@@ -17,6 +17,6 @@
 	<classpathentry kind="lib" path="lib/jfxrt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/naomileow/Documents/school/HubTurbo/lib/markdown4j-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/markdown4j-2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
