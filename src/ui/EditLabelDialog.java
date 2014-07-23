@@ -34,7 +34,11 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 		setSize(400, 50);
 
 		TextField labelNameField = new TextField();
-		labelNameField.setText(originalLabel.getName());
+		if (originalLabel.getGroup() == null) {
+			labelNameField.setText(originalLabel.getName());
+		} else {
+			labelNameField.setText(originalLabel.getGroup() + "." + originalLabel.getName());
+		}
 
 		ColorPicker colourPicker =  new ColorPicker(Color.web("#" + originalLabel.getColour()));
 
@@ -59,9 +63,18 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	}
 	
 	private void respond(String name, String rgbCode) {
+		
+		String group = null;
+		String[] nameParts = TurboLabel.parseName(name);
+		if (nameParts != null) {
+			group = nameParts[0];
+			name = nameParts[1];
+		}
+		
 		TurboLabel label = new TurboLabel("doesn't matter");
 		label.copyValues(originalLabel);
 		label.setName(name);
+		label.setGroup(group);
 		label.setColour(rgbCode.substring(1));
 		completeResponse(label);
 	}

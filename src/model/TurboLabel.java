@@ -125,6 +125,17 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
 	}
 	
+	public static String[] parseName(String name) {
+		String[] result = new String[2];
+		int dotPos = name.indexOf(".");
+		if (dotPos == -1) {
+			return null;
+		} else {
+			result[0] = name.substring(0, dotPos);
+			result[1] = name.substring(dotPos+1).replaceAll("\\.", "");
+			return result;
+		}
+	}
 	
 	public static HashMap<String, ArrayList<TurboLabel>> groupLabels(Collection<TurboLabel> labels, String ungroupedName) {
 		HashMap<String, ArrayList<TurboLabel>> groups = new HashMap<>();
