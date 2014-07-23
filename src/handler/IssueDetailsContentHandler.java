@@ -176,11 +176,21 @@ public class IssueDetailsContentHandler {
 	private void updateItemInCommentsList(TurboComment comment){
 		for(TurboComment item : comments){
 			if(item.getId() == comment.getId()){
-				item.copyValues(comment);
+				replaceItemInObservedCommentsList(item, comment);
 				return;
 			}
 		}
 		addItemToObservedCommentList(comment);
+	}
+	
+	private void replaceItemInObservedCommentsList(TurboComment original, TurboComment replacement){
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				original.copyValues(replacement);
+			}
+		});
+		
 	}
 	
 	private void updateLogContents(){
