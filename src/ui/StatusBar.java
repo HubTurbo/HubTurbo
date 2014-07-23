@@ -1,5 +1,9 @@
 package ui;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -26,7 +30,40 @@ public class StatusBar extends HBox {
 	}
 	
 	public static void displayMessage(String text) {
-		getInstance().text.setText(text);
+		if (!getInstance().signingIn) {
+			getInstance().text.setText(text);
+		}
+	}
+	
+	private Timer signIn = new Timer();
+	private boolean signingIn = false;
+	private TimerTask animateLabel = new TimerTask() {
+	    public void run() {
+	         Platform.runLater(() -> {
+	        	 if (text.getText().endsWith("...")) {
+		        	 text.setText("Signing in");
+	        	 }
+	        	 else if (text.getText().endsWith("..")) {
+		        	 text.setText("Signing in...");
+	        	 }
+	        	 else if (text.getText().endsWith(".")) {
+		        	 text.setText("Signing in..");
+	        	 }
+	        	 else {
+	        		 text.setText("Signing in.");
+	        	 }
+	         });
+	    }
+	};
+	
+	public static void setSigningIn(boolean yes) {
+		getInstance().signingIn = yes;
+		if (yes) {
+			getInstance().signIn.scheduleAtFixedRate(getInstance().animateLabel, 200, 200);
+		} else {
+			getInstance().signIn.cancel();
+			getInstance().signIn.purge();
+		}
 	}
 	
 }
