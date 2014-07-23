@@ -26,10 +26,12 @@ public class LabelManagementComponent {
 	
 	private final Stage parentStage;
 	private final Model model;
+	private final SidePanel sidePanel;
 
-	public LabelManagementComponent(Stage parentStage, Model model) {
+	public LabelManagementComponent(Stage parentStage, Model model, SidePanel sidePanel) {
 		this.parentStage = parentStage;
 		this.model = model;
+		this.sidePanel = sidePanel;
 	}
 
 	public VBox initialise() {
@@ -74,7 +76,7 @@ public class LabelManagementComponent {
 		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
 			@Override
 			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model);
+				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model, sidePanel);
 			}
 		});
 

@@ -20,10 +20,12 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 	private final Model model;
 	private final Stage stage;
-	
-	public ManageLabelsTreeCell(Stage stage, Model model) {
+	private final SidePanel sidePanel;
+
+	public ManageLabelsTreeCell(Stage stage, Model model, SidePanel sidePanel) {
 		this.model = model;
 		this.stage = stage;
+		this.sidePanel = sidePanel;
 	}
     
 	@Override
@@ -68,6 +70,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	    	// no binding; manually trigger the update
 	    	label.copyValues(response);
 	    	updateItem(label, false);
+	    	sidePanel.refresh();
 	    	
 			return true;
 		}).exceptionally(e -> {
