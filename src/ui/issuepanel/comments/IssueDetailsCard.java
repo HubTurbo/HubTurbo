@@ -103,7 +103,6 @@ public class IssueDetailsCard extends VBox{
 			public void changed(ObservableValue<? extends String> arg0,
 					String original, String change) {
 				setDisplayedCommentText();
-				adjustWebEngineHeight();
 			}	
 		};
 		originalComment.getBodyHtmlProperty().addListener(new WeakChangeListener<String>(bodyChangeListener));
@@ -153,13 +152,13 @@ public class IssueDetailsCard extends VBox{
 	}
 	
 	private void setupWebEngineHeightListener(){
-		webViewHeightListener = new ChangeListener<Document>() {
-	        @Override
-	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-	            adjustWebEngineHeight();
-	        }
-		};
-		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+//		webViewHeightListener = new ChangeListener<Document>() {
+//	        @Override
+//	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
+//	            adjustWebEngineHeight();
+//	        }
+//		};
+//		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
 	}
 	
 	private void setupWeblinkClickListeners(){		

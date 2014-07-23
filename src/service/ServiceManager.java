@@ -317,6 +317,10 @@ public class ServiceManager {
 	}
 	
 	public String getMarkupForComment(Comment comment){
+		String text = comment.getBody();
+		if(text.startsWith(CHANGELOG_TAG)){
+			return comment.getBody();
+		}
 		try {
 			return getRepositoryHtml(comment.getBody());
 		} catch (IOException e) {
