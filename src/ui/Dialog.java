@@ -19,7 +19,7 @@ public abstract class Dialog<T> {
 //	private double x = 0, y = 0;
 	private double width = 300, height = 400;
 	private String title = "";
-	private StageStyle stageStyle;
+	private StageStyle stageStyle = StageStyle.UTILITY;
 
 	public Dialog(Stage parentStage) {
 		this.parentStage = parentStage;
