@@ -45,9 +45,7 @@ public class IssueDetailsCard extends VBox{
 	protected ChangeListener<String> bodyChangeListener;
 	protected ChangeListener<Document> webViewHeightListener;
 	protected ChangeListener<Number> contentLoadListeners;
-	
-//	private LinkedList<Integer> setHeights = new LinkedList<Integer>(); //Stores the last 2 set height. This is to fix the height oscillating issue
-	
+		
 	public IssueDetailsCard(){
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
@@ -94,7 +92,7 @@ public class IssueDetailsCard extends VBox{
 		commentsText = new WebView();
 		commentsText.setPrefWidth(PREF_WIDTH);
 		commentsText.setPrefHeight(PREF_WEB_HEIGHT);
-//		setupWebEngineHeightListener();
+		setupWebEngineHeightListener();
 	}
 	
 	protected void setupCommentBodyChangeListener(){
@@ -151,47 +149,28 @@ public class IssueDetailsCard extends VBox{
 		commentsText.getEngine().loadContent(displayedText);	
 	}
 	
-//	private void setupWebEngineHeightListener(){
-//		webViewHeightListener = new ChangeListener<Document>() {
-//	        @Override
-//	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
-//	            adjustWebEngineHeight();
-//	        }
-//		};
-//		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
-//	}
+	private void setupWebEngineHeightListener(){
+		webViewHeightListener = new ChangeListener<Document>() {
+	        @Override
+	        public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
+	            adjustWebEngineHeight();
+	        }
+		};
+		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+	}
 	
-//	private void setupWebContentLoadListener(){		
-//		contentLoadListeners = new ChangeListener<Number>() {
-//
-//			@Override
-//			public void changed(ObservableValue<? extends Number> arg0,
-//					Number arg1, Number arg2) {
-//				adjustWebEngineHeight();
-//			}
-//        };
-//        commentsText.getEngine().getLoadWorker().workDoneProperty()
-//        			.addListener(contentLoadListeners);
-//	}
+	private void adjustWebEngineHeight(){
+		try{
+			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+	        if(res!= null && res instanceof Integer) {
+	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
+	        	commentsText.setPrefHeight(height);
+	        }
+		}catch(Exception e){
+		}
+		return;
+	}
 	
-//	private void adjustWebEngineHeight(){
-//		try{
-//			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
-//	        if(res!= null && res instanceof Integer) {
-//	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
-//	        	checkAndSetHeight(height);
-//	        }
-//		}catch(Exception e){
-//		}
-//		return;
-//	}
-	
-//	private void checkAndSetHeight(Integer height){
-//		if(!setHeights.contains(height)){
-//			setHeights.add(height);
-//			commentsText.setPrefHeight(height);
-//		}
-//	}
 	
 	private String stripChangeLogHeader(String text){
 		if(text == null || !originalComment.isIssueLog()){
