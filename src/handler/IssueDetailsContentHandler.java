@@ -121,9 +121,9 @@ public class IssueDetailsContentHandler {
 	}
 	
 	private void removeCachedItem(long commentId){
-		for(Comment item: allGhContent){
+		for(TurboComment item: comments){
 			if(item.getId() == commentId){
-				allGhContent.remove(item);
+				comments.remove(item);
 				return;
 			}
 		}

@@ -330,12 +330,26 @@ public class ServiceManager {
 	
 	public List<Comment> getComments(int issueId) throws IOException{
 		if(repoId != null){
+			List<Comment> cached = model.getCommentsListForIssue(issueId);
+			if(cached == null){
+				return getLatestComments(issueId);
+			}else{
+				return cached;
+			}
+		}
+		return new ArrayList<Comment>();
+	}
+	
+	public List<Comment> getLatestComments(int issueId) throws IOException{
+		if(repoId != null){
 			List<Comment> comments = issueService.getComments(repoId, issueId);
-			return comments.stream()
-						   .map(c -> {
-							   c.setBodyHtml(getMarkupForComment(c));
-							   return c;})
-						   .collect(Collectors.toList());
+			List<Comment> list =  comments.stream()
+						   				  .map(c -> {
+						   					  			c.setBodyHtml(getMarkupForComment(c));
+						   					  			return c;})
+						   				  .collect(Collectors.toList());
+			model.cacheCommentsListForIssue(list, issueId);
+			return list;
 		}
 		return new ArrayList<Comment>();
 	}

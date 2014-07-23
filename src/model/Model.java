@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -23,7 +25,6 @@ import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
-
 import command.TurboIssueEdit;
 
 
@@ -38,6 +39,8 @@ public class Model {
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
+	
+	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 	
 	protected IRepositoryIdProvider repoId;
 	
@@ -54,6 +57,7 @@ public class Model {
 	public void loadComponents(IRepositoryIdProvider repoId){
 		this.repoId = repoId;
 		this.projectConfig = ConfigFileHandler.loadProjectConfig(getRepoId());
+		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		loadCollaborators();
 		loadLabels();
 		loadMilestones();
@@ -76,6 +80,14 @@ public class Model {
 		return milestones;
 	}
 	
+	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
+		cachedGithubComments.put(issueId, new ArrayList<Comment>(comments));
+	}
+	
+	public List<Comment>getCommentsListForIssue(int issueId){
+		return cachedGithubComments.get(issueId);
+	}
+ 	
 	public void appendToCachedIssues(TurboIssue issue){
 		issues.add(0, issue);
 	}

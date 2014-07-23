@@ -95,6 +95,7 @@ public class IssueDetailsDisplay extends VBox {
             	if(self != null){
             		self.loadFailCount += 1;
             		if(loadFailCount <= 3){
+            			contentHandler.stopContentUpdate();
             			self.show();
             		}else{
             			//Notify user of load failure and reset count
