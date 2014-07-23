@@ -33,7 +33,7 @@ public class IssueDetailsCard extends VBox{
 	public static final String EVENT_TYPE_CLICK = "click";
 	
 	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" +
-	           "<div id=\"wrapper\">%1s</div>" +
+	           "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
 	           "</body></html>";
 	
 	protected HBox topBar;
@@ -162,6 +162,7 @@ public class IssueDetailsCard extends VBox{
 	private void adjustWebEngineHeight(){
 		try{
 			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+			System.out.println(commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetWidth"));
 	        if(res!= null && res instanceof Integer) {
 	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
 	        	commentsText.setPrefHeight(height);

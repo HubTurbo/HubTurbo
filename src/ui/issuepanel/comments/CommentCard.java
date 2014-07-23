@@ -88,7 +88,6 @@ public class CommentCard extends IssueDetailsCard{
 			HBox commentsDetailsDisp = createCommentsDetailsDisplay();
 			HBox controlsBox = createControlsBox();
 			HBox.setHgrow(controlsBox, Priority.ALWAYS);
-			topBar.setSpacing(100);
 			topBar.getChildren().addAll(commentsDetailsDisp, controlsBox);
 		}else{
 			super.loadTopBar();

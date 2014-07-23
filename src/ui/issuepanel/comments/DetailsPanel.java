@@ -10,14 +10,15 @@ import java.util.stream.Collectors;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.TurboComment;
 import model.TurboIssue;
-
 import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 
 public class DetailsPanel extends VBox {
@@ -110,6 +111,7 @@ public class DetailsPanel extends VBox {
 		}
 		setListItems();
 		getChildren().add(0, listView);
+		VBox.setVgrow(listView, Priority.ALWAYS);
 	}
 
 	
@@ -121,6 +123,7 @@ public class DetailsPanel extends VBox {
 		TitledPane commentsContainer = new TitledPane("Add Comment", box);
 		commentsContainer.setExpanded(false);
 		commentsContainer.setPrefHeight(COMMENTS_BOX_PREF_HEIGHT);
+		commentsContainer.setAlignment(Pos.BOTTOM_CENTER);
 		getChildren().add(commentsContainer);
 	}
 	

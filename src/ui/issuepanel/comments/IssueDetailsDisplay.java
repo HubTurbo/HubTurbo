@@ -11,6 +11,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class IssueDetailsDisplay extends VBox {
@@ -27,6 +28,8 @@ public class IssueDetailsDisplay extends VBox {
 	
 	DetailsPanel commentsDisplay;
 	DetailsPanel issueLogDisplay;
+	
+	Thread backgroundThread;
 	
 	public IssueDetailsDisplay(TurboIssue issue){
 		this.issue = issue;
@@ -77,7 +80,8 @@ public class IssueDetailsDisplay extends VBox {
             }
         });
 		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
-		new Thread(bgTask).start();
+		backgroundThread = new Thread(bgTask);
+		backgroundThread.start();
 	}
 	
 	private void scrollDisplayToBottom(){
@@ -107,6 +111,7 @@ public class IssueDetailsDisplay extends VBox {
 		comments.setText("C");
 		comments.setClosable(false);
 		commentsDisplay = createTabContentsDisplay(DisplayType.COMMENTS);
+		VBox.setVgrow(commentsDisplay, Priority.ALWAYS);
 		comments.setContent(commentsDisplay);
 		return comments;
 	}
