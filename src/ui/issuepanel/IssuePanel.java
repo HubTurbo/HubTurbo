@@ -2,11 +2,6 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
-import ui.Column;
-import ui.ColumnControl;
-import ui.SidePanel;
-import ui.StatusBar;
-import command.TurboCommandExecutor;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.control.ListCell;
@@ -16,6 +11,11 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import ui.Column;
+import ui.ColumnControl;
+import ui.SidePanel;
+
+import command.TurboCommandExecutor;
 
 public class IssuePanel extends Column {
 
@@ -27,8 +27,8 @@ public class IssuePanel extends Column {
 
 	private ListView<TurboIssue> listView;
 	
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel, StatusBar statusBar) {
-		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel, statusBar);
+	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;

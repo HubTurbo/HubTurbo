@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
-import ui.Column;
-import ui.ColumnControl;
-import ui.SidePanel;
-import ui.StatusBar;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -16,6 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import ui.Column;
+import ui.ColumnControl;
+import ui.SidePanel;
+
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends Column {
@@ -29,8 +29,8 @@ public class HierarchicalIssuePanel extends Column {
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
 	
-	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel, StatusBar statusBar) {
-		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel, statusBar);
+	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
 //		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;

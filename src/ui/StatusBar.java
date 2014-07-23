@@ -7,6 +7,14 @@ import javafx.scene.layout.Priority;
 
 public class StatusBar extends HBox {
 
+	private static StatusBar instance = null;
+	public static StatusBar getInstance() {
+		if (instance == null) {
+			instance = new StatusBar();
+		}
+		return instance;
+	}
+	
 	private final Label text;
 	
 	public StatusBar() {
@@ -16,8 +24,8 @@ public class StatusBar extends HBox {
 		getChildren().add(text);
 	}
 	
-	public void setText(String text) {
-		this.text.setText(text);
+	public static void displayMessage(String text) {
+		getInstance().text.setText(text);
 	}
 	
 }

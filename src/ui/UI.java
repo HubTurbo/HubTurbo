@@ -25,7 +25,6 @@ public class UI extends Application {
 	private ColumnControl columns;
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
-	private StatusBar statusBar;
 	
 	private SessionConfigurations sessionConfig;
 	
@@ -56,7 +55,7 @@ public class UI extends Application {
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
-				statusBar.setText("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
+				StatusBar.displayMessage("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
 			}
 			return true;
 		}).exceptionally(e -> {
@@ -98,9 +97,8 @@ public class UI extends Application {
 
 	private Parent createRoot() throws IOException {
 
-		statusBar = new StatusBar();
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), sidePanel, statusBar);
+		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), sidePanel);
 		sidePanel.setColumns(columns);
 		menuBar = new MenuControl(columns, sidePanel);
 		
@@ -115,7 +113,7 @@ public class UI extends Application {
         BorderPane root = new BorderPane();
 		root.setTop(menuBar);
 		root.setCenter(centerContainer);
-		root.setBottom(statusBar);
+		root.setBottom(StatusBar.getInstance());
 
 		return root;
 	}
