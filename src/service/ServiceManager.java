@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import model.Model;
 
+import org.markdown4j.Markdown4jProcessor;
+
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -318,11 +320,8 @@ public class ServiceManager {
 	
 	public String getMarkupForComment(Comment comment){
 		String text = comment.getBody();
-		if(text.startsWith(CHANGELOG_TAG)){
-			return comment.getBody();
-		}
 		try {
-			return getRepositoryHtml(comment.getBody());
+			return getContentMarkup(comment.getBody());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -434,7 +433,15 @@ public class ServiceManager {
 	
 	/**
 	 * Markdown service methods
+	 * @throws IOException 
 	 * */
+	public String getContentMarkup(final String text) throws IOException{
+		if(text.contains("#")){
+			return getRepositoryHtml(text);
+		}
+		return new Markdown4jProcessor().process(text);
+	}
+	
 	public String getRepositoryHtml(final String text) throws IOException {
 		if(repoId != null){
 			return markdownService.getRepositoryHtml(repoId, text);
