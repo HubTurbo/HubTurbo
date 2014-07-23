@@ -14,8 +14,7 @@ import javafx.scene.layout.VBox;
 
 public class CommentsEditBox extends VBox{
 	protected static final int ELEMENT_SPACING = 8;
-	protected static final String COMMENT_BTN_TXT = "Comment";
-	
+
 	private IssueDetailsContentHandler commentHandler;
 	
 	private ChangeListener<String> commentFieldChangeListener;
@@ -25,9 +24,22 @@ public class CommentsEditBox extends VBox{
 	private TextArea commentTextField;
 	private TurboComment editedComment;
 	
+	protected String commentButtonText = "Comment";
+	
 	public CommentsEditBox(IssueDetailsContentHandler handler){
 		this.commentHandler = handler;
 		initialiseUIComponents();
+		setupLayout();
+	}
+	
+	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, String commentBtnTxt){
+		this.commentButtonText = commentBtnTxt;
+		this.editedComment = editedComment;
+		if(editedComment != null){
+			initialText = editedComment.getBody();
+		}
+		initialiseUIComponents();
+		setupForCommentsEdit(editedComment);
 		setupLayout();
 	}
 	
@@ -55,7 +67,7 @@ public class CommentsEditBox extends VBox{
 	
 	private void initialiseCommentButton(){
 		WeakReference<CommentsEditBox> selfRef = new WeakReference<CommentsEditBox>(this);
-		commentButton = new Button(COMMENT_BTN_TXT);
+		commentButton = new Button(commentButtonText);
 		commentButton.setOnMousePressed(e -> {
 		    if(selfRef.get() != null){
 		    	handleCommentButtonPressed();
@@ -99,6 +111,15 @@ public class CommentsEditBox extends VBox{
 		boolean editRes = commentHandler.editComment(editedComment);
 		if(editRes){
 			commentHandler.setCommentEditStateFalse(editedComment);
+		}
+	}
+	
+	@Override
+	public void requestFocus(){
+		if(commentTextField != null){
+			commentTextField.requestFocus();
+		}else{
+			super.requestFocus();
 		}
 	}
 }

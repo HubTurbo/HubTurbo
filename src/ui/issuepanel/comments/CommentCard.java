@@ -4,16 +4,16 @@ import handler.IssueDetailsContentHandler;
 
 import java.lang.ref.WeakReference;
 
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import model.TurboComment;
+
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
 import util.DialogMessage;
-import model.TurboComment;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
 public class CommentCard extends IssueDetailsCard{
 	protected static String EDIT_BTN_TXT = "\uf058";
@@ -70,7 +70,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	
 	private void initialiseEditableCommentsText(){
-		commentEditField = new CommentsEditBox(handler, editedComment);
+		commentEditField = new CommentsEditBox(handler, editedComment, "Update");
 	}
 	
 	private HBox createControlsBox(){

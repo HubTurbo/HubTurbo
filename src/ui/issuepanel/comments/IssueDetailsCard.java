@@ -37,7 +37,7 @@ public class IssueDetailsCard extends VBox{
 	           "</body></html>";
 	
 	protected HBox topBar;
-	protected WebView commentsText;
+	protected WebView commentsBody;
 	protected VBox commentsTextDisplay;
 	
 	protected TurboComment originalComment;
@@ -78,7 +78,7 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void initialiseUIComponents(){
 		initialiseTopBar();
-		initialiseCommentsText();
+		initialiseCommentsBodyDisplay();
 		initialiseCommentsTextDisplay();
 	}
 	
@@ -88,10 +88,10 @@ public class IssueDetailsCard extends VBox{
 		topBar.setSpacing(ELEMENTS_HORIZONTAL_SPACING);
 	}
 	
-	protected void initialiseCommentsText(){
-		commentsText = new WebView();
-		commentsText.setPrefWidth(PREF_WIDTH);
-		commentsText.setPrefHeight(PREF_WEB_HEIGHT);
+	protected void initialiseCommentsBodyDisplay(){
+		commentsBody = new WebView();
+		commentsBody.setPrefWidth(PREF_WIDTH);
+		commentsBody.setPrefHeight(PREF_WEB_HEIGHT);
 		setupWebEngineHeightListener();
 	}
 	
@@ -140,13 +140,13 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void loadCommentsDisplay(){
 		setDisplayedCommentText();
-		commentsTextDisplay.getChildren().add(commentsText);
+		commentsTextDisplay.getChildren().add(commentsBody);
 	}
 	
 	private void setDisplayedCommentText(){
 		String text = originalComment.getBodyHtml();
 		String displayedText = String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
-		commentsText.getEngine().loadContent(displayedText);	
+		commentsBody.getEngine().loadContent(displayedText);	
 	}
 	
 	private void setupWebEngineHeightListener(){
@@ -156,15 +156,15 @@ public class IssueDetailsCard extends VBox{
 	            adjustWebEngineHeight();
 	        }
 		};
-		commentsText.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
+		commentsBody.getEngine().documentProperty().addListener(new WeakChangeListener<Document>(webViewHeightListener));
 	}
 	
 	private void adjustWebEngineHeight(){
 		try{
-			Object res = commentsText.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
+			Object res = commentsBody.getEngine().executeScript("document.getElementById('wrapper').offsetHeight");
 	        if(res!= null && res instanceof Integer) {
 	        	Integer height = (Integer)res + WEB_TEXT_PADDING;
-	        	commentsText.setPrefHeight(height);
+	        	commentsBody.setPrefHeight(height);
 	        }
 		}catch(Exception e){
 		}

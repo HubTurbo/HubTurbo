@@ -61,7 +61,6 @@ public class IssueDetailsContentHandler {
 		if(isNotSetup()){
 			setupContent();
 		}
-		//TODO:
 		if(commentsUpdater != null){
 			commentsUpdater.startCommentsListUpdate();			
 		}
@@ -101,9 +100,9 @@ public class IssueDetailsContentHandler {
 	
 	public boolean editComment(TurboComment comment){
 		try {
+			updateItemInCommentsList(comment);
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
-			setCommentEditStateFalse(comment);
 			commentsUpdater.restartCommentsListUpdate();
 			return true;
 		} catch (IOException e) {
