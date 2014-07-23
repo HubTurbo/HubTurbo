@@ -11,6 +11,7 @@ import util.DialogMessage;
 import model.TurboComment;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -24,8 +25,8 @@ public class CommentCard extends IssueDetailsCard{
 	
 	private TurboComment editedComment;
 	
-	private Button deleteButton;
-	private Button editButton;
+	private Label deleteButton;
+	private Label editButton;
 	
 	private CommentsEditBox commentEditField;
 		
@@ -48,7 +49,7 @@ public class CommentCard extends IssueDetailsCard{
 	}
 	
 	private void initialiseEditButton(){
-		editButton = new Button();
+		editButton = new Label();
 		editButton.setText(EDIT_BTN_TXT);
 		editButton.getStyleClass().add("button-github-octicon");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);
@@ -58,7 +59,7 @@ public class CommentCard extends IssueDetailsCard{
 	}
 	
 	private void intialiseDeleteButton(){
-		deleteButton = new Button();
+		deleteButton = new Label();
 		deleteButton.setText(DELETE_BTN_TXT);
 		deleteButton.getStyleClass().add("button-github-octicon");
 		WeakReference<CommentCard> selfRef = new WeakReference<CommentCard>(this);

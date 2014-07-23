@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.TurboComment;
 import model.TurboIssue;
+
 import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 
 public class DetailsPanel extends VBox {
@@ -31,9 +32,7 @@ public class DetailsPanel extends VBox {
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
 	private DisplayType displayType;
-	
-//	private ListChangeListener<TurboComment> displayedListSizeListener;
-	
+		
 	private HashMap<Long, DetailsCell> displayedCells = new HashMap<Long, DetailsCell>();
 	
 	private ObservableList<TurboComment> detailsList;
@@ -61,21 +60,6 @@ public class DetailsPanel extends VBox {
 		this.setPadding(new Insets(COMMENTS_PADDING));
 		this.setSpacing(COMMENTS_PADDING);
 	}
-	
-	
-//	private void setupDisplayedListSizeListener(){
-////		WeakReference<DetailsPanel> selfRef = new WeakReference<>(this);
-//		displayedListSizeListener = new ListChangeListener<TurboComment>() {
-//			@Override
-//			public void onChanged(
-//					javafx.collections.ListChangeListener.Change<? extends TurboComment> arg0) {
-//				if(listView.focusedProperty().get() != true && !detailsList.isEmpty()){
-//					listView.scrollTo(detailsList.size() - 1);
-//				}
-//			}
-//		};
-//		detailsList.addListener(new WeakListChangeListener<TurboComment>(displayedListSizeListener));
-//	}
 	
 	protected void scrollToBottom(){
 		if(!listView.getItems().isEmpty()){
@@ -125,7 +109,6 @@ public class DetailsPanel extends VBox {
 			loadNewCommentsBox();
 		}
 		setListItems();
-//		setupDisplayedListSizeListener();
 		getChildren().add(0, listView);
 	}
 
