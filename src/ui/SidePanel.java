@@ -163,9 +163,10 @@ public class SidePanel extends VBox {
 			comboBox.getItems().addAll(SessionConfigurations.getLastViewedRepositories());
 		}
 		
-		Button refreshButton = new Button("Load");
-		refreshButton.getStyleClass().add("large-button");
-		refreshButton.setOnMouseClicked((e) -> {
+//		Button refreshButton = new Button("Load");
+//		refreshButton.getStyleClass().add("large-button");
+//		refreshButton.setOnMouseClicked((e) -> {
+		comboBox.setOnAction((e) -> {
 			RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
 			if (repoId != null) {
 				columns.saveSession();
@@ -181,7 +182,7 @@ public class SidePanel extends VBox {
 		repoIdBox.setSpacing(5);
 		repoIdBox.setPadding(new Insets(5));
 		repoIdBox.setAlignment(Pos.CENTER);
-		repoIdBox.getChildren().addAll(comboBox, refreshButton);
+		repoIdBox.getChildren().addAll(comboBox);
 		return repoIdBox;
 	}
 
