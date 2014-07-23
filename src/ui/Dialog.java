@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public abstract class Dialog<T> {
 	
@@ -28,7 +29,7 @@ public abstract class Dialog<T> {
 		stage = new Stage();
 		stage.setScene(scene);
 		stage.setTitle(title);
-		stage.setOnCloseRequest(e -> onClose());
+		stage.setOnCloseRequest(e -> onClose(e));
 		stage.initOwner(parentStage);
 		stage.initModality(Modality.APPLICATION_MODAL);
 //		stage.setX(parentStage.getX() + x);
@@ -71,7 +72,7 @@ public abstract class Dialog<T> {
 	
 	// To be overridden by subclasses
 
-	protected void onClose() {
+	protected void onClose(WindowEvent e) {
 		// To be implemented by extending classes
 	}
 
