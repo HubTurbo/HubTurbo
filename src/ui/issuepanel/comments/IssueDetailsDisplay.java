@@ -4,6 +4,8 @@ import util.DialogMessage;
 import handler.IssueDetailsContentHandler;
 import model.TurboIssue;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
@@ -52,12 +54,19 @@ public class IssueDetailsDisplay extends VBox {
 			@Override
 			protected Boolean call() throws Exception {
 				contentHandler.startContentUpdate();
-//				commentsDisplay.scrollToBottom();
-//				issueLogDisplay.scrollToBottom();
 				return true;
 			}
 			
-		};
+		};	
+		
+		bgTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+            @Override
+            public void handle(WorkerStateEvent t) {
+            	commentsDisplay.scrollToBottom();
+        		issueLogDisplay.scrollToBottom();
+            }
+        });
 		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
 		new Thread(bgTask).start();
 	}

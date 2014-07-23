@@ -103,9 +103,10 @@ public class IssueDetailsCard extends VBox{
 			public void changed(ObservableValue<? extends String> arg0,
 					String original, String change) {
 				setDisplayedCommentText();
+				adjustWebEngineHeight();
 			}	
 		};
-		originalComment.getBodyProperty().addListener(new WeakChangeListener<String>(bodyChangeListener));
+		originalComment.getBodyHtmlProperty().addListener(new WeakChangeListener<String>(bodyChangeListener));
 	}
 	
 	protected void initialiseCommentsTextDisplay(){

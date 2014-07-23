@@ -92,6 +92,7 @@ public class IssueDetailsContentHandler {
 	public void createComment(String text){
 		try {
 			Comment comment = ServiceManager.getInstance().createComment(issue.getId(), text);
+			comment.setBodyHtml(comment.getBody());
 			allGhContent.add(comment);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

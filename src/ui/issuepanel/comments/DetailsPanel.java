@@ -80,7 +80,6 @@ public class DetailsPanel extends VBox {
 //	}
 	
 	protected void scrollToBottom(){
-		System.out.println(listView.getItems().size());
 		if(!listView.getItems().isEmpty()){
 			listView.scrollTo(detailsList.size() - 1);
 		}
