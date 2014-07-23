@@ -38,6 +38,7 @@ public class SidePanel extends VBox {
 	public SidePanel(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
 		this.model = model;
+		getStyleClass().add("sidepanel");
 		setLayout(Layout.TABS);
 	}
 

@@ -22,6 +22,7 @@ import model.TurboLabel;
 
 public class IssuePanelCard extends VBox {
 
+	private static final int CARD_WIDTH = 330;
 	/**
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
@@ -38,7 +39,7 @@ public class IssuePanelCard extends VBox {
 	
 	private void setup() {
 		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueTitle.setWrappingWidth(340);
+		issueTitle.setWrappingWidth(CARD_WIDTH);
 		issueTitle.getStyleClass().add("issue-panel-name");
 		if (!issue.getOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
@@ -51,8 +52,8 @@ public class IssuePanelCard extends VBox {
 	}
 	
 	private void setupIssueDetailsBox() {
-		issueDetails.setMaxWidth(340);
-		issueDetails.setPrefWrapLength(340);
+		issueDetails.setMaxWidth(CARD_WIDTH);
+		issueDetails.setPrefWrapLength(CARD_WIDTH);
 		issueDetails.setHgap(3);
 		
 		issue.getLabelsReference().addListener(new WeakListChangeListener<TurboLabel>(createLabelsChangeListener()));

@@ -1,11 +1,16 @@
 
 .borders {
-	-fx-border-color: #7f7f7f;
+	-fx-border-color: grey;
 	-fx-border-width: 1px;
 }
 
 .bottom-borders {
-	-fx-border-color: transparent transparent #7f7f7f transparent;
+	-fx-border-color: transparent transparent grey transparent;
+	-fx-border-width: 1px;
+}
+
+.top-borders {
+	-fx-border-color: lightgray transparent transparent transparent;
 	-fx-border-width: 1px;
 }
 
@@ -21,6 +26,12 @@
 
 .rounded-borders {
 	-fx-border-radius: 5;
+}
+
+.sidepanel {
+	-fx-border-radius: 0 5 5 0;
+	-fx-border-width: 1px;
+	-fx-border-color: grey grey grey transparent;
 }
 
 .display-box-padding {

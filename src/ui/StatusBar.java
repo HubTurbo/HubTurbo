@@ -19,8 +19,9 @@ public class StatusBar extends HBox {
 	
 	public StatusBar() {
 		text = new Label();
-		HBox.setMargin(text, new Insets(5));
+		HBox.setMargin(text, new Insets(3));
 		HBox.setHgrow(this, Priority.ALWAYS);
+		getStyleClass().add("top-borders");
 		getChildren().add(text);
 	}
 	

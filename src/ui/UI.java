@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -109,6 +110,7 @@ public class UI extends Application {
 		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
 		
 		HBox centerContainer = new HBox();
+		centerContainer.setPadding(new Insets(5,0,5,0));
 		centerContainer.getChildren().addAll(sidePanel, columnsScroll);
 
         BorderPane root = new BorderPane();

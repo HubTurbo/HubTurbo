@@ -31,7 +31,7 @@ public class ColumnControl extends HBox {
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
 		setSpacing(10);
-		setPadding(new Insets(5));
+		setPadding(new Insets(0,10,0,10));
 	}
 	
 	public void resumeColumns() {
