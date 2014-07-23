@@ -80,7 +80,7 @@ public class IssuePanel extends Column {
 				
 				// TODO save the previous issue?
 				
-				sidePanel.triggerIssueEdit(currentIssue);
+				sidePanel.triggerIssueEdit(currentIssue, false);
 			}));
 	}
 }

@@ -59,12 +59,18 @@ public class SidePanel extends VBox {
 		changeLayout();
 	}
 	
+	// For passing information to and from the issue panel display
+	
 	private TurboIssue displayedIssue;
+	private boolean focusRequested;
 	private CompletableFuture<String> response = null;
 	
-	private CompletableFuture<String> displayIssue(TurboIssue issue) {
+	private CompletableFuture<String> displayIssue(TurboIssue issue, boolean requestFocus) {
 		response = null; // Make sure previous response doesn't remain
+		
+		// Pass required information to the issue display
 		displayedIssue = issue;
+		focusRequested = requestFocus;
 		setLayout(Layout.ISSUE); // This method sets this.response
 		assert response != null;
 		return response;
@@ -75,7 +81,7 @@ public class SidePanel extends VBox {
 	}
 	
 	public void triggerIssueCreate(TurboIssue issue) {
-		displayIssue(issue).thenApply(r -> {
+		displayIssue(issue, true).thenApply(r -> {
 			if (r.equals("done")) {
 				model.createIssue(issue);
 			}
@@ -88,10 +94,10 @@ public class SidePanel extends VBox {
 		});
 	}
 	
-	public void triggerIssueEdit(TurboIssue issue) {
+	public void triggerIssueEdit(TurboIssue issue, boolean requestFocus) {
 		TurboIssue oldIssue = new TurboIssue(issue);
 		TurboIssue modifiedIssue = new TurboIssue(issue);
-		displayIssue(modifiedIssue).thenApply(r -> {
+		displayIssue(modifiedIssue, requestFocus).thenApply(r -> {
 			if (r.equals("done")) {
 				model.updateIssue(oldIssue, modifiedIssue);
 			}
@@ -208,7 +214,7 @@ public class SidePanel extends VBox {
 		if(currentIssueDisplay != null){
 			currentIssueDisplay.cleanup();
 		}
-		currentIssueDisplay = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this);
+		currentIssueDisplay = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this, focusRequested);
 		response = currentIssueDisplay.getResponse();
 		return currentIssueDisplay;
 	}

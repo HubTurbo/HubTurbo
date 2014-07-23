@@ -129,7 +129,7 @@ public class HierarchicalIssuePanel extends Column {
 			HierarchicalIssuePanelItem item = items.get(issue.getId());
 			item.setExpanded(true);
 			final TurboIssue thisIssue = issue;
-			item.setOnMouseClicked(e -> sidePanel.triggerIssueEdit(thisIssue));
+			item.setOnMouseClicked(e -> sidePanel.triggerIssueEdit(thisIssue, true));
 			item.setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		}
 	}

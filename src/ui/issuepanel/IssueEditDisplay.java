@@ -50,17 +50,19 @@ public class IssueEditDisplay extends VBox{
 	private final Stage parentStage;
 	private final WeakReference<IssueDisplayPane> parentContainer;
 	private ColumnControl columns;
+	private boolean focusRequested;
 	
 	private final CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
-	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, IssueDisplayPane parent){
+	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, IssueDisplayPane parent, boolean focusRequested){
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
 		this.response = new CompletableFuture<>();
 		this.columns = columns;
 		this.parentContainer = new WeakReference<IssueDisplayPane>(parent);
+		this.focusRequested = focusRequested;
 		setup();
 	}
 	
@@ -123,7 +125,9 @@ public class IssueEditDisplay extends VBox{
 		});
 		
 		TextArea issueTitle = createIssueTitle();
-		Platform.runLater(() -> issueTitle.requestFocus());
+		if (focusRequested) {
+			Platform.runLater(() -> issueTitle.requestFocus());
+		}
 		
 		Parent statusBox = createStatusBox(parentStage);
 		

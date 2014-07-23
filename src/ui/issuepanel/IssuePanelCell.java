@@ -2,18 +2,19 @@ package ui.issuepanel;
 
 import java.util.Arrays;
 
-import ui.ColumnControl;
-import ui.DragData;
-import ui.SidePanel;
-import ui.DragData.Source;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import ui.ColumnControl;
+import ui.DragData;
+import ui.SidePanel;
+
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
 import command.TurboIssueSetMilestone;
@@ -47,6 +48,12 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
+		registerDragEvents(issue);
+		
+		registerDoubleClickEvent(issue);
+	}
+
+	private void registerDragEvents(TurboIssue issue) {
 		setOnDragDetected((event) -> {
 			Dragboard db = startDragAndDrop(TransferMode.MOVE);
 			ClipboardContent content = new ClipboardContent();
@@ -107,5 +114,19 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	
 			e.consume();
 		});
+	}
+	
+	private void registerDoubleClickEvent(TurboIssue issue) {
+		setOnMouseClicked(e -> {
+			if (e.getButton().equals(MouseButton.PRIMARY)) {
+				if (e.getClickCount() == 2) {
+					onDoubleClick(issue);
+				}
+			}
+		});
+	}
+
+	private void onDoubleClick(TurboIssue issue) {
+		sidePanel.triggerIssueEdit(issue, true);
 	}
 }

@@ -24,13 +24,15 @@ public class IssueDisplayPane extends HBox {
 	private IssueEditDisplay issueEditDisplay;
 	private WeakReference<SidePanel> parentPanel;
 	public boolean showIssueDetailsPanel = false;
+	private boolean focusRequested;
 			
-	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel) {
+	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel, boolean focusRequested) {
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
 		this.columns = columns;
 		this.parentPanel = new WeakReference<SidePanel>(parentPanel);
+		this.focusRequested = focusRequested;
 		showIssueDetailsPanel = parentPanel.expandedIssueView;
 		setup();
 	}
@@ -46,7 +48,7 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	private void setupIssueEditDisplay(){
-		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this);
+		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this, focusRequested);
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 	}
