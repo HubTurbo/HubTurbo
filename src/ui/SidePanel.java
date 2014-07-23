@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -155,6 +154,7 @@ public class SidePanel extends VBox {
 
 	private HBox createRepoFields() {
 		final ComboBox<String> comboBox = new ComboBox<String>();
+		
 		comboBox.setEditable(true);
 		if (ServiceManager.getInstance().getRepoId() != null) {
 			String repoId = ServiceManager.getInstance().getRepoId().generateId();
@@ -163,27 +163,27 @@ public class SidePanel extends VBox {
 			comboBox.getItems().addAll(SessionConfigurations.getLastViewedRepositories());
 		}
 		
-//		Button refreshButton = new Button("Load");
-//		refreshButton.getStyleClass().add("large-button");
-//		refreshButton.setOnMouseClicked((e) -> {
-		comboBox.setOnAction((e) -> {
-			RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
-			if (repoId != null) {
-				columns.saveSession();
-				ServiceManager.getInstance().setupRepository(repoId.getOwner(), repoId.getName());
-				columns.resumeColumns();
-				this.refresh();
-				comboBox.setItems(FXCollections.observableArrayList(
-						SessionConfigurations.addToLastViewedRepositories(repoId.generateId())));
-			}
-		});
+		comboBox.valueProperty().addListener((a, b, c) -> loadRepo(comboBox));
 
 		HBox repoIdBox = new HBox();
 		repoIdBox.setSpacing(5);
 		repoIdBox.setPadding(new Insets(5));
 		repoIdBox.setAlignment(Pos.CENTER);
 		repoIdBox.getChildren().addAll(comboBox);
+		comboBox.prefWidthProperty().bind(repoIdBox.widthProperty());
 		return repoIdBox;
+	}
+
+	private void loadRepo(final ComboBox<String> comboBox) {
+		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
+		if (repoId != null) {
+			columns.saveSession();
+			ServiceManager.getInstance().setupRepository(repoId.getOwner(), repoId.getName());
+			columns.resumeColumns();
+			this.refresh();
+			comboBox.setItems(FXCollections.observableArrayList(
+					SessionConfigurations.addToLastViewedRepositories(repoId.generateId())));
+		}
 	}
 
 	private Tab createAssgineesTab() {
