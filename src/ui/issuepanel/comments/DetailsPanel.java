@@ -71,7 +71,6 @@ public class DetailsPanel extends VBox {
 	}
 	
 	private void loadItems() {
-//		VBox.setVgrow(listView, Priority.ALWAYS);
 		if(displayType == DisplayType.COMMENTS){
 			loadNewCommentsBox();
 		}

@@ -135,7 +135,7 @@ public class IssueDetailsDisplay extends VBox {
 	
 	private Tab createCommentsTab(){
 		Tab comments =  new Tab();
-		comments.setText("C");
+		comments.setText("Comments");
 		comments.setClosable(false);
 		commentsDisplay = createTabContentsDisplay(DisplayType.COMMENTS);
 		VBox.setVgrow(commentsDisplay, Priority.ALWAYS);
