@@ -88,8 +88,10 @@ public class SidePanel extends VBox {
 				model.createIssue(issue);
 			}
 			columns.refresh();
-			displayTabs();
-			return true;
+			if(!expandedIssueView || r.equals("cancel")){
+				displayTabs();
+			}
+			return expandedIssueView == false; //Close the issue view only if issue is not expanded
 		}).exceptionally(ex -> {
 			ex.printStackTrace();
 			return false;
@@ -104,8 +106,10 @@ public class SidePanel extends VBox {
 				model.updateIssue(oldIssue, modifiedIssue);
 			}
 			columns.refresh();
-			displayTabs();
-			return true;
+			if(!expandedIssueView || r.equals("cancel")){
+				displayTabs();
+			}
+			return expandedIssueView == false; //Close the issue view only if issue is not expanded
 		}).exceptionally(ex -> {
 			ex.printStackTrace();
 			return false;

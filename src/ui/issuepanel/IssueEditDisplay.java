@@ -252,8 +252,7 @@ public class IssueEditDisplay extends VBox{
 		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
 			columns.deselect();
-			parentContainer.get().showIssueDetailsDisplay(false);
-			issueViewCleanup();
+			closeIssueView();
 		});
 
 		Button done = new Button("Done");
@@ -261,14 +260,17 @@ public class IssueEditDisplay extends VBox{
 		done.setMaxWidth(Double.MAX_VALUE);
 		done.setOnMouseClicked(e -> {
 			response.complete("done");
-			issueViewCleanup();
+			if(parentContainer.get().isExpandedIssueView()){
+				closeIssueView();
+			}
 		});
 
 		buttons.getChildren().addAll(done, cancel);
 		return buttons;
 	}
 
-	private void issueViewCleanup(){
+	private void closeIssueView(){
+		parentContainer.get().showIssueDetailsDisplay(false);
 		parentContainer.get().cleanup();
 	}
 	private HBox createIssueDetailsButton(){

@@ -37,6 +37,10 @@ public class IssueDisplayPane extends HBox {
 		setup();
 	}
 	
+	public boolean isExpandedIssueView(){
+		return showIssueDetailsPanel;
+	}
+		
 	public CompletableFuture<String> getResponse() {
 		return issueEditDisplay.getResponse();
 	}
