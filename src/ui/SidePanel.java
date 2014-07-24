@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -155,8 +156,9 @@ public class SidePanel extends VBox {
 
 	private HBox createRepoFields() {
 		final ComboBox<String> comboBox = new ComboBox<String>();
-		
+		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
+		
 		if (ServiceManager.getInstance().getRepoId() != null) {
 			String repoId = ServiceManager.getInstance().getRepoId().generateId();
 			comboBox.setValue(repoId);

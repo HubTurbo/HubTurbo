@@ -22,7 +22,7 @@ import model.TurboLabel;
 
 public class IssuePanelCard extends VBox {
 
-	private static final int CARD_WIDTH = 330;
+	private static final int CARD_WIDTH = 350;
 	/**
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
