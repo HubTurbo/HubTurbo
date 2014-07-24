@@ -113,7 +113,7 @@ public class SidePanel extends VBox {
 		TabPane tabs = new TabPane();
 		Tab labelsTab = createLabelsTab();
 		Tab milestonesTab = createMilestonesTab();
-		Tab assigneesTab = createAssgineesTab();
+		Tab assigneesTab = createCollaboratorsTab();
 		
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
 		
@@ -161,18 +161,18 @@ public class SidePanel extends VBox {
 		}
 	}
 
-	private Tab createAssgineesTab() {
+	private Tab createCollaboratorsTab() {
 		Tab tab = new Tab();
 		tab.setClosable(false);
-		tab.setText("A");
-		tab.setContent(new AssigneeManagementComponent(model).initialise());
+		tab.setText("Collaborators");
+		tab.setContent(new CollaboratorManagementComponent(model).initialise());
 		return tab;
 	}
 
 	private Tab createMilestonesTab() {
 		Tab tab = new Tab();
 		tab.setClosable(false);
-		tab.setText("M");
+		tab.setText("Milestones");
 		tab.setContent(new MilestoneManagementComponent(parentStage, model).initialise());
 		return tab;
 	}
@@ -180,7 +180,7 @@ public class SidePanel extends VBox {
 	private Tab createLabelsTab() {
 		Tab tab = new Tab();
 		tab.setClosable(false);
-		tab.setText("L");
+		tab.setText("Labels");
 		tab.setContent(new LabelManagementComponent(parentStage, model, this).initialise());
 		return tab;
 	}

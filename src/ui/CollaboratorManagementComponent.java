@@ -11,13 +11,13 @@ import javafx.util.Callback;
 import model.Model;
 import model.TurboUser;
 
-public class AssigneeManagementComponent {
+public class CollaboratorManagementComponent {
 
 	private final Model model;
 	
 	private ListView<TurboUser> listView;
 
-	public AssigneeManagementComponent(Model model) {
+	public CollaboratorManagementComponent(Model model) {
 		this.model = model;
 	}
 
@@ -32,7 +32,7 @@ public class AssigneeManagementComponent {
 	private Node createListView() {
 		listView = new ListView<>();
 		
-		WeakReference<AssigneeManagementComponent> that = new WeakReference<AssigneeManagementComponent>(this);
+		WeakReference<CollaboratorManagementComponent> that = new WeakReference<CollaboratorManagementComponent>(this);
 		
 		listView.setCellFactory(new Callback<ListView<TurboUser>, ListCell<TurboUser>>() {
 			@Override
