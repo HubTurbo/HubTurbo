@@ -41,7 +41,7 @@ public class UI extends Application {
 		
 		mainStage = stage;
 		stage.setMaximized(true);
-		Scene scene = new Scene(createRoot(), 800, 600);
+		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
 		applyCSS(scene);
