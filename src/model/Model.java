@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,9 @@ import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
+
+import command.TurboIssueAddLabels;
+import command.TurboIssueCommand;
 import command.TurboIssueEdit;
 
 
@@ -319,6 +323,7 @@ public class Model {
 			// of updates to subscribers of the ObservableList
 			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			// Add them all at once, so this hopefully propagates only one change
+			alignIssueStatusAndState(buffer);
 			issues.addAll(buffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -329,6 +334,16 @@ public class Model {
 		return true;
 	}
 	
+	private void alignIssueStatusAndState(ArrayList<TurboIssue> buffer) {
+		for (TurboIssue turboIssue : buffer) {
+			if (turboIssue.getStatusLabel() == null && !turboIssue.getOpen()) {
+				TurboIssueCommand command = new TurboIssueAddLabels(
+						this, turboIssue, Arrays.asList(getLabelByGhName("status.closed")));
+				command.execute();
+			}
+		}
+	}
+
 	private boolean loadLabels(){
 		try {
 			List<Label> ghLabels = ServiceManager.getInstance().getLabels();
