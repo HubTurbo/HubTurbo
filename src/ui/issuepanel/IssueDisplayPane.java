@@ -1,21 +1,25 @@
 package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.CompletableFuture;
 
+import command.TurboIssueAdd;
+import command.TurboIssueCommand;
+import command.TurboIssueEdit;
 import ui.ColumnControl;
 import ui.SidePanel;
+import ui.SidePanel.IssueEditMode;
 import ui.issuepanel.comments.IssueDetailsDisplay;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-//TODO: shift this out of ui.issue.comments
+
 public class IssueDisplayPane extends HBox {
 	protected static final int DETAILS_WIDTH = 350;
 	protected static final int ISSUE_WIDTH = 300;
 
-	private final TurboIssue issue;
+	private final TurboIssue originalIssue;
+	private final TurboIssue displayedIssue;
 	private final Model model;
 	private final Stage parentStage;
 	private ColumnControl columns;
@@ -25,24 +29,23 @@ public class IssueDisplayPane extends HBox {
 	private WeakReference<SidePanel> parentPanel;
 	public boolean showIssueDetailsPanel = false;
 	private boolean focusRequested;
+	private IssueEditMode mode;
 			
-	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel, boolean focusRequested) {
-		this.issue = displayedIssue;
+	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel, boolean focusRequested, IssueEditMode mode) {
+		this.displayedIssue = displayedIssue;
+		this.originalIssue = new TurboIssue(displayedIssue);
 		this.model = model;
 		this.parentStage = parentStage;
 		this.columns = columns;
 		this.parentPanel = new WeakReference<SidePanel>(parentPanel);
 		this.focusRequested = focusRequested;
+		this.mode = mode;
 		showIssueDetailsPanel = parentPanel.expandedIssueView;
 		setup();
 	}
 	
 	public boolean isExpandedIssueView(){
 		return showIssueDetailsPanel;
-	}
-		
-	public CompletableFuture<String> getResponse() {
-		return issueEditDisplay.getResponse();
 	}
 	
 	public void handleCancelClicked(){
@@ -54,7 +57,19 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	public void handleDoneClicked(){
-		
+		TurboIssueCommand command;
+		if(mode == IssueEditMode.CREATE){
+			command = new TurboIssueAdd(model, displayedIssue);
+			command.execute();
+		}else if(mode == IssueEditMode.EDIT){
+			command = new TurboIssueEdit(model, originalIssue, displayedIssue);
+			command.execute();
+		}
+		if(!showIssueDetailsPanel){
+			cleanup();
+			showIssueDetailsDisplay(false);
+			parentPanel.get().displayTabs();
+		}
 	}
 
 	private void setup() {
@@ -64,13 +79,13 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	private void setupIssueEditDisplay(){
-		this.issueEditDisplay = new IssueEditDisplay(issue, parentStage, model, columns, this, focusRequested);
+		this.issueEditDisplay = new IssueEditDisplay(displayedIssue, parentStage, model, columns, this, focusRequested);
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 	}
 	
 	private void setupIssueDetailsDisplay(){
-		this.issueDetailsDisplay = new IssueDetailsDisplay(issue);
+		this.issueDetailsDisplay = new IssueDetailsDisplay(displayedIssue);
 		this.issueDetailsDisplay.setPrefWidth(DETAILS_WIDTH);
 		this.issueDetailsDisplay.setMinWidth(DETAILS_WIDTH);
 		this.issueDetailsDisplay.setMaxWidth(DETAILS_WIDTH);
@@ -78,6 +93,7 @@ public class IssueDisplayPane extends HBox {
 	
 	public void showIssueDetailsDisplay(boolean show){
 		parentPanel.get().expandedIssueView = show;
+		showIssueDetailsPanel = show;
 		if(show){
 			if(issueDetailsDisplay == null){
 				setupIssueDetailsDisplay();

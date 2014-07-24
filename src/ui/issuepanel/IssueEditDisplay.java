@@ -3,7 +3,6 @@ package ui.issuepanel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -52,23 +51,18 @@ public class IssueEditDisplay extends VBox{
 	private ColumnControl columns;
 	private boolean focusRequested;
 	
-	private final CompletableFuture<String> response;
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
 	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, IssueDisplayPane parent, boolean focusRequested){
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
-		this.response = new CompletableFuture<>();
 		this.columns = columns;
 		this.parentContainer = new WeakReference<IssueDisplayPane>(parent);
 		this.focusRequested = focusRequested;
 		setup();
 	}
-	
-	public CompletableFuture<String> getResponse() {
-		return response;
-	}
+
 	
 	private void setup(){
 		setPadding(new Insets(15));
@@ -257,20 +251,13 @@ public class IssueEditDisplay extends VBox{
 		HBox.setHgrow(done, Priority.ALWAYS);
 		done.setMaxWidth(Double.MAX_VALUE);
 		done.setOnMouseClicked(e -> {
-			response.complete("done");
-			if(parentContainer.get().isExpandedIssueView()){
-				closeIssueView();
-			}
+			parentContainer.get().handleDoneClicked();
 		});
 
 		buttons.getChildren().addAll(done, cancel);
 		return buttons;
 	}
 
-	private void closeIssueView(){
-		parentContainer.get().showIssueDetailsDisplay(false);
-		parentContainer.get().cleanup();
-	}
 	private HBox createIssueDetailsButton(){
 		HBox container = new HBox();
 		HBox.setHgrow(container, Priority.ALWAYS);

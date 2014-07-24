@@ -1,7 +1,5 @@
 package ui;
 
-import java.util.concurrent.CompletableFuture;
-
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -23,6 +20,8 @@ import ui.issuepanel.IssueDisplayPane;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
+	public enum IssueEditMode{NIL, CREATE, EDIT};
+	
 	protected static final int PANEL_PREF_WIDTH = 300;
 	public boolean expandedIssueView = false;
 
@@ -65,58 +64,27 @@ public class SidePanel extends VBox {
 	
 	private TurboIssue displayedIssue;
 	private boolean focusRequested;
-	private CompletableFuture<String> response = null;
-	
-	private CompletableFuture<String> displayIssue(TurboIssue issue, boolean requestFocus) {
-		response = null; // Make sure previous response doesn't remain
-		
-		// Pass required information to the issue display
-		displayedIssue = issue;
-		focusRequested = requestFocus;
-		setLayout(Layout.ISSUE); // This method sets this.response
-		assert response != null;
-		return response;
-	}
+	private IssueEditMode mode = IssueEditMode.NIL;
 	
 	public void onCreateIssueHotkey() {
 		triggerIssueCreate(new TurboIssue("", "", model));
 	}
 	
 	public void triggerIssueCreate(TurboIssue issue) {
-		displayIssue(issue, true).thenApply(r -> {
-			if (r.equals("done")) {
-				model.createIssue(issue);
-			}
-			columns.refresh();
-			if(!expandedIssueView || r.equals("cancel")){
-				displayTabs();
-			}
-			return expandedIssueView == false; //Close the issue view only if issue is not expanded
-		}).exceptionally(ex -> {
-			ex.printStackTrace();
-			return false;
-		});
+		mode = IssueEditMode.CREATE;
+		displayedIssue = issue;
+		setLayout(Layout.ISSUE);
 	}
 	
 	public void triggerIssueEdit(TurboIssue issue, boolean requestFocus) {
-		TurboIssue oldIssue = new TurboIssue(issue);
-		TurboIssue modifiedIssue = new TurboIssue(issue);
-		displayIssue(modifiedIssue, requestFocus).thenApply(r -> {
-			if (r.equals("done")) {
-				model.updateIssue(oldIssue, modifiedIssue);
-			}
-			columns.refresh();
-			if(!expandedIssueView || r.equals("cancel")){
-				displayTabs();
-			}
-			return expandedIssueView == false; //Close the issue view only if issue is not expanded
-		}).exceptionally(ex -> {
-			ex.printStackTrace();
-			return false;
-		});
+		mode = IssueEditMode.EDIT;
+		displayedIssue = new TurboIssue(issue);
+		focusRequested = requestFocus;
+		setLayout(Layout.ISSUE);
 	}
 	
 	public void displayTabs() {
+		mode = IssueEditMode.NIL; //TODO:
 		setLayout(Layout.TABS);
 	}
 	
@@ -225,8 +193,7 @@ public class SidePanel extends VBox {
 		if(currentIssueDisplay != null){
 			currentIssueDisplay.cleanup();
 		}
-		currentIssueDisplay = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this, focusRequested);
-		response = currentIssueDisplay.getResponse();
+		currentIssueDisplay = new IssueDisplayPane(displayedIssue, parentStage, model, columns, this, focusRequested, mode);
 		return currentIssueDisplay;
 	}
 }
