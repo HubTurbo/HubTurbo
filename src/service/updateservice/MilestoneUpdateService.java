@@ -2,18 +2,17 @@ package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_MILESTONES;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MilestoneUpdateService extends UpdateService<Milestone>{
 	

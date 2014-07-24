@@ -70,7 +70,7 @@ public class IssueChangeLogger {
 		if(removed != null && removed.size() > 0){
 			removedLabel = removed.get(0);
 		}
-		return String.format(LABEL_EXCLUSIVE_CHANGELOG_FORMAT, group, removedLabel, addedLabel);
+		return String.format(LABEL_EXCLUSIVE_CHANGELOG_FORMAT, group, getDisplayedLabelName(removedLabel), getDisplayedLabelName(addedLabel));
 	}
 	
 	public static String getNonexclusiveLabelLog(String grp, ArrayList<TurboLabel> added, ArrayList<TurboLabel> removed){

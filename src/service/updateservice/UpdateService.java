@@ -20,6 +20,10 @@ import org.eclipse.egit.github.core.service.GitHubService;
 
 import service.GitHubClientExtended;
 
+
+/**
+ * Base class for obtaining updates from Github for a repository object
+ * */
 public class UpdateService<T> extends GitHubService{
 	protected String apiSuffix;
 	protected GitHubClientExtended client;
@@ -63,7 +67,6 @@ public class UpdateService<T> extends GitHubService{
 		return request;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
 		ArrayList<T> result = new ArrayList<T>();
 		try {
@@ -78,7 +81,6 @@ public class UpdateService<T> extends GitHubService{
 			}
 			
 			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
-//				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
 				result = (ArrayList<T>)getAll(requestIterator);
 			}
 			updateLastETag(connection);

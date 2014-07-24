@@ -30,6 +30,7 @@ public class TurboCommandExecutor {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected TurboIssueCommand createIssueCommand(CommandType command, Model model, TurboIssue issue, Object... args){
 		switch(command){
 		case ADD_ISSUE:

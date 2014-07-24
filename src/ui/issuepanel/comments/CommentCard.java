@@ -116,7 +116,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	private void handleDeleteButtonPressed(){
 		Action response = DialogMessage.showConfirmDialog("Delete Comment", 
-										String.format("Are you sure you want to delete the comment: %s...?", 
+										String.format("Are you sure you want to delete the comment:\n %s...?", 
 												getStartOfComment()));
 		if(response == Dialog.Actions.OK){
 			handler.deleteComment(editedComment);

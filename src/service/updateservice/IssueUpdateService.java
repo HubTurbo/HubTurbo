@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
 import service.GitHubClientExtended;
