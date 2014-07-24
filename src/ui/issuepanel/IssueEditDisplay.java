@@ -252,6 +252,7 @@ public class IssueEditDisplay extends VBox{
 		cancel.setOnMouseClicked(e -> {
 			response.complete("cancel");
 			columns.deselect();
+			parentContainer.get().showIssueDetailsDisplay(false);
 			issueViewCleanup();
 		});
 
