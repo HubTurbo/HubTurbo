@@ -88,22 +88,24 @@ public class IssueDetailsContentHandler {
 		return commentsInEditMode.contains(comment);
 	}
 	
-	public void createComment(String text){
+	public boolean createComment(String text){
 		try {
 			ServiceManager.getInstance().createComment(issue.getId(), text);			
 			commentsUpdater.restartCommentsListUpdate();
+			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
 	public boolean editComment(TurboComment comment){
 		try {
+			commentsUpdater.stopCommentsListUpdate();
 			updateItemInCommentsList(comment);
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
-			commentsUpdater.restartCommentsListUpdate();
+			commentsUpdater.startCommentsListUpdate();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,8 +115,10 @@ public class IssueDetailsContentHandler {
 	
 	public void deleteComment(TurboComment comment){
 		try {
+			commentsUpdater.stopCommentsListUpdate();
 			ServiceManager.getInstance().deleteComment(comment.getId());
 			removeCachedItem(comment.getId());
+			commentsUpdater.startCommentsListUpdate();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -76,10 +76,8 @@ public class IssuePanel extends Column {
 		setVgrow(listView, Priority.ALWAYS);
 		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
 			listener = (observable, previousIssue, currentIssue) -> {
-				if (currentIssue == null) return;
-				
+				if (currentIssue == null) return;				
 				// TODO save the previous issue?
-				
 				sidePanel.triggerIssueEdit(currentIssue, false);
 			}));
 	}

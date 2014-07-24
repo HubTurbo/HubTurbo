@@ -34,12 +34,6 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		this.commentsList = list;
 		lastCheckTime = new Date();
 	}
-	
-//	private Map<String, String> createUpdatedCommentsParams(){
-//		Map<String, String> params = new HashMap<String, String>();
-//		params.put("since", getFormattedDate(lastCheckTime));
-//		return params;
-//	}
 
 	@Override
 	protected PagedRequest<Comment> createUpdatedRequest(IRepositoryIdProvider repoId){

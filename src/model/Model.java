@@ -109,18 +109,6 @@ public class Model {
 		return true;
 	}
 	
-	public TurboIssue createIssue(TurboIssue newIssue) {
-		Issue ghIssue = newIssue.toGhResource();
-		Issue createdIssue = null;
-		try {
-			createdIssue = ServiceManager.getInstance().createIssue(ghIssue);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		TurboIssue returnedIssue = new TurboIssue(createdIssue, this);
-		appendToCachedIssues(returnedIssue);
-		return returnedIssue;
-	}
 	
 	public void updateCachedIssues(List<Issue> issueList){
 		if(issueList.size() == 0){
@@ -193,10 +181,10 @@ public class Model {
 		}
 	}
 	
-	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
-		TurboIssueEdit command = new TurboIssueEdit(this, originalIssue, editedIssue);
-		command.execute();
-	}
+//	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
+//		TurboIssueEdit command = new TurboIssueEdit(this, originalIssue, editedIssue);
+//		command.execute();
+//	}
 	
 	
 	public void updateLabel(TurboLabel editedLabel, String labelName) {

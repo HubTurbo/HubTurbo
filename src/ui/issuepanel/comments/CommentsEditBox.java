@@ -2,10 +2,13 @@ package ui.issuepanel.comments;
 
 import java.lang.ref.WeakReference;
 
+import ui.StatusBar;
+import util.DialogMessage;
 import model.TurboComment;
 import handler.IssueDetailsContentHandler;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -106,8 +109,25 @@ public class CommentsEditBox extends VBox{
 	}
 	
 	private void handleCommentAdd(){
-		commentHandler.createComment(commentTextField.getText());
-		commentTextField.setText("");
+		Task<Boolean> bgTask = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws Exception {
+				Boolean result = commentHandler.createComment(commentTextField.getText());
+				return result;
+			}
+		};
+		bgTask.setOnSucceeded(e -> {
+			if(bgTask.getValue() == true){
+				commentTextField.setText("");
+			}else{
+				StatusBar.displayMessage("An error occurred while adding issue comment.");
+			}
+		});
+		bgTask.setOnFailed(e -> StatusBar.displayMessage("An error occurred while adding issue comment."));
+		
+		DialogMessage.showProgressDialog(bgTask, "Adding issue comment...");
+		Thread backgroundThread = new Thread(bgTask);
+		backgroundThread.start();
 	}
 	
 	private void handleCommentEdit(){
