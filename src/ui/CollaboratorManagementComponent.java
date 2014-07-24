@@ -7,6 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboUser;
@@ -21,11 +23,12 @@ public class CollaboratorManagementComponent {
 		this.model = model;
 	}
 
-	public HBox initialise() {
-		HBox layout = new HBox();
+	public VBox initialise() {
+		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		layout.getChildren().addAll(createListView());
+		VBox.setVgrow(listView, Priority.ALWAYS);
 		return layout;
 	}
 
