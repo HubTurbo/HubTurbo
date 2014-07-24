@@ -65,6 +65,7 @@ public class UpdateService<T> extends GitHubService{
 	
 	@SuppressWarnings("unchecked")
 	public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
+		ArrayList<T> result = new ArrayList<T>();
 		try {
 			
 			PagedRequest<T> request = createUpdatedRequest(repoId);
@@ -75,13 +76,13 @@ public class UpdateService<T> extends GitHubService{
 			if(client.isError(responseCode)){
 				return new ArrayList<T>();
 			}
-			updateLastETag(connection);
-			updateLastCheckTime(connection);
+			
 			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
 //				return (ArrayList<T>)client.getBody(request, client.getStream(connection));
-				return (ArrayList<T>)getAll(requestIterator);
+				result = (ArrayList<T>)getAll(requestIterator);
 			}
-			
+			updateLastETag(connection);
+			updateLastCheckTime(connection);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,7 +90,7 @@ public class UpdateService<T> extends GitHubService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new ArrayList<T>();
+		return result;
 	}
 	
 }
