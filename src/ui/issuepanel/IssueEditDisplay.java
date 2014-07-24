@@ -39,6 +39,8 @@ import util.Browse;
 public class IssueEditDisplay extends VBox{
 	private static final int ELEMENT_SPACING = 5;
 	
+	Text issueIdText;
+	
 	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
 	protected static final int LINE_HEIGHT = 18;
 	protected static final int TITLE_ROW_NUM = 3;
@@ -104,13 +106,19 @@ public class IssueEditDisplay extends VBox{
 		return issueTitle;
 	}
 	
+	protected void updateIssueId(Integer id){
+		if(issueIdText != null){
+			issueIdText.setText(issue.getId() == 0 ? "" : "#" + issue.getId());
+		}
+	}
+	
 	private HBox createTopTitle(){
 		HBox title = new HBox();
 		title.setAlignment(Pos.BASELINE_LEFT);
 		title.setSpacing(ELEMENT_SPACING);
 		
 		// TODO ALIGNMENT
-		Text issueIdText = new Text(issue.getId() == 0 ? "" : "#" + issue.getId());
+		issueIdText = new Text(issue.getId() == 0 ? "" : "#" + issue.getId());
 		HBox issueId = new HBox();
 		issueId.getChildren().add(issueIdText);
 		issueId.setStyle("-fx-font-size: 16pt;");
@@ -271,7 +279,7 @@ public class IssueEditDisplay extends VBox{
 		    parentContainer.get().showIssueDetailsDisplay(selected);
 		});
 		
-		details.setSelected(parentContainer.get().showIssueDetailsPanel);
+		details.setSelected(parentContainer.get().expandedIssueView);
 		container.getChildren().add(details);
 		
 		return container;

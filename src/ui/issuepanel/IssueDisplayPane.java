@@ -7,6 +7,7 @@ import command.TurboIssueCommand;
 import command.TurboIssueEdit;
 import ui.ColumnControl;
 import ui.SidePanel;
+import ui.StatusBar;
 import ui.SidePanel.IssueEditMode;
 import ui.issuepanel.comments.IssueDetailsDisplay;
 import javafx.scene.layout.HBox;
@@ -27,7 +28,7 @@ public class IssueDisplayPane extends HBox {
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
 	private WeakReference<SidePanel> parentPanel;
-	public boolean showIssueDetailsPanel = false;
+	public boolean expandedIssueView = false;
 	private boolean focusRequested;
 	private IssueEditMode mode;
 			
@@ -40,12 +41,12 @@ public class IssueDisplayPane extends HBox {
 		this.parentPanel = new WeakReference<SidePanel>(parentPanel);
 		this.focusRequested = focusRequested;
 		this.mode = mode;
-		showIssueDetailsPanel = parentPanel.expandedIssueView;
+		this.expandedIssueView = parentPanel.expandedIssueView;
 		setup();
 	}
 	
 	public boolean isExpandedIssueView(){
-		return showIssueDetailsPanel;
+		return expandedIssueView;
 	}
 	
 	public void handleCancelClicked(){
@@ -58,16 +59,32 @@ public class IssueDisplayPane extends HBox {
 	
 	public void handleDoneClicked(){
 		TurboIssueCommand command;
+		String message = "";
+		boolean success = false;
 		if(mode == IssueEditMode.CREATE){
 			command = new TurboIssueAdd(model, displayedIssue);
-			command.execute();
+			success = command.execute();
+			if(success){
+				displayedIssue.copyValues(((TurboIssueAdd)command).getAddedIssue());
+				issueEditDisplay.updateIssueId(displayedIssue.getId());
+				message = "Issue successfully created!";
+			}else{
+				message = "An error occured while creating the issue";
+			}
 		}else if(mode == IssueEditMode.EDIT){
 			command = new TurboIssueEdit(model, originalIssue, displayedIssue);
-			command.execute();
+			success = command.execute();
+			if(success){
+				message = "Issue successfully edited!";
+			}else{
+				message = "An error occured while editing the issue. Changes have not been saved.";
+			}
 		}
-		if(!showIssueDetailsPanel){
-			cleanup();
+		
+		StatusBar.displayMessage(message);
+		if(success && !expandedIssueView){
 			showIssueDetailsDisplay(false);
+			cleanup();
 			parentPanel.get().displayTabs();
 		}
 	}
@@ -75,7 +92,7 @@ public class IssueDisplayPane extends HBox {
 	private void setup() {
 		setupIssueEditDisplay();
 		this.getChildren().add(issueEditDisplay);
-		showIssueDetailsDisplay(showIssueDetailsPanel);
+		showIssueDetailsDisplay(expandedIssueView);
 	}
 	
 	private void setupIssueEditDisplay(){
@@ -93,7 +110,7 @@ public class IssueDisplayPane extends HBox {
 	
 	public void showIssueDetailsDisplay(boolean show){
 		parentPanel.get().expandedIssueView = show;
-		showIssueDetailsPanel = show;
+		expandedIssueView = show;
 		if(show){
 			if(issueDetailsDisplay == null){
 				setupIssueDetailsDisplay();
