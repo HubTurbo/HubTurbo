@@ -1,8 +1,14 @@
 package ui;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -12,11 +18,12 @@ public class MenuControl extends MenuBar {
 
 	private final ColumnControl columns;
 	private final SidePanel sidePanel;
+	private final ScrollPane columnsScroll;
 
-	public MenuControl(ColumnControl columns, SidePanel sidePanel) {
+	public MenuControl(ColumnControl columns, SidePanel sidePanel, ScrollPane columnsScroll) {
 		this.columns = columns;
 		this.sidePanel = sidePanel;
-		
+		this.columnsScroll = columnsScroll;
 		createMenuItems();
 	}
 	
@@ -35,11 +42,35 @@ public class MenuControl extends MenuBar {
 		Menu cols = new Menu("Columns");
 
 		MenuItem createLeft = new MenuItem("Create Column (Left)");
-		createLeft.setOnAction(e -> columns.createNewSearchPanelAtStart());
+		createLeft.setOnAction(e -> {
+			columns.createNewSearchPanelAtStart();
+			columnsScroll.setHvalue(columnsScroll.getHmin());
+		});
 		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
 		MenuItem createRight = new MenuItem("Create Column");
-		createRight.setOnAction(e -> columns.createNewSearchPanelAtEnd());
+		createRight.setOnAction(e -> {
+			columns.createNewSearchPanelAtEnd();
+			// listener is used as columnsScroll's Hmax property doesn't update 
+			ChangeListener<Number> listener = new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> arg0,
+						Number arg1, Number arg2) {
+					for (Node child : columnsScroll.getChildrenUnmodifiable()) {
+						if (child instanceof ScrollBar) {
+							ScrollBar scrollBar = (ScrollBar) child;
+							if (scrollBar.getOrientation() == Orientation.HORIZONTAL &&
+									scrollBar.visibleProperty().get()) {
+								columnsScroll.setHvalue(columnsScroll.getHmax());
+								break;
+							}			
+						}
+					}
+					columns.widthProperty().removeListener(this);
+				}
+			};
+			columns.widthProperty().addListener(listener);
+		});
 		createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
 
 		MenuItem closeColumn = new MenuItem("Close Column");

@@ -100,13 +100,14 @@ public class UI extends Application {
 		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), sidePanel);
 		sidePanel.setColumns(columns);
-		menuBar = new MenuControl(columns, sidePanel);
-		
+
 		ScrollPane columnsScroll = new ScrollPane(columns);
 		columnsScroll.getStyleClass().add("transparent-bg");
 		columnsScroll.setFitToHeight(true);
 		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
+		
+		menuBar = new MenuControl(columns, sidePanel, columnsScroll);
 		
 		HBox centerContainer = new HBox();
 		centerContainer.setPadding(new Insets(5,0,5,0));
