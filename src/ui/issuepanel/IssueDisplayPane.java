@@ -44,6 +44,18 @@ public class IssueDisplayPane extends HBox {
 	public CompletableFuture<String> getResponse() {
 		return issueEditDisplay.getResponse();
 	}
+	
+	public void handleCancelClicked(){
+		columns.deselect();
+		columns.refresh();
+		showIssueDetailsDisplay(false);
+		cleanup();
+		parentPanel.get().displayTabs();
+	}
+	
+	public void handleDoneClicked(){
+		
+	}
 
 	private void setup() {
 		setupIssueEditDisplay();

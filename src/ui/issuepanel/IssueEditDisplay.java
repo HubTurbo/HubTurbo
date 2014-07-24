@@ -250,9 +250,7 @@ public class IssueEditDisplay extends VBox{
 		HBox.setHgrow(cancel, Priority.ALWAYS);
 		cancel.setMaxWidth(Double.MAX_VALUE);
 		cancel.setOnMouseClicked(e -> {
-			response.complete("cancel");
-			columns.deselect();
-			closeIssueView();
+			parentContainer.get().handleCancelClicked();
 		});
 
 		Button done = new Button("Done");
