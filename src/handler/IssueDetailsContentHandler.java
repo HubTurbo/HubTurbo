@@ -45,8 +45,12 @@ public class IssueDetailsContentHandler {
 	private void setupContent(){
 		//Computationally intensive as list of all comments and their html markup will be retrieved from github
 		getDetailsContent();
-		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
+		setupContentUpdater();
 		setupCommentsChangeListener();
+	}
+	
+	private void setupContentUpdater(){
+		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
 	}
 	
 	public ObservableList<TurboComment> getComments(){
@@ -72,6 +76,11 @@ public class IssueDetailsContentHandler {
 		}
 	}
 	
+	public void restartContentUpdate(){
+		stopContentUpdate();
+		startContentUpdate();
+	}
+	
 	public void toggleCommentEditState(TurboComment comment){
 		if(commentIsInEditState(comment)){
 			commentsInEditMode.remove(comment);
@@ -91,7 +100,7 @@ public class IssueDetailsContentHandler {
 	public boolean createComment(String text){
 		try {
 			ServiceManager.getInstance().createComment(issue.getId(), text);			
-			commentsUpdater.restartCommentsListUpdate();
+			restartContentUpdate();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -101,11 +110,11 @@ public class IssueDetailsContentHandler {
 	
 	public boolean editComment(TurboComment comment){
 		try {
-			commentsUpdater.stopCommentsListUpdate();
+			stopContentUpdate();
 			updateItemInCommentsList(comment);
 			Comment ghComment = comment.toGhComment();
 			ServiceManager.getInstance().editComment(ghComment);
-			commentsUpdater.startCommentsListUpdate();
+			startContentUpdate();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -115,10 +124,10 @@ public class IssueDetailsContentHandler {
 	
 	public void deleteComment(TurboComment comment){
 		try {
-			commentsUpdater.stopCommentsListUpdate();
+			stopContentUpdate();
 			ServiceManager.getInstance().deleteComment(comment.getId());
 			removeCachedItem(comment.getId());
-			commentsUpdater.startCommentsListUpdate();
+			startContentUpdate();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -33,6 +33,7 @@ public class ProjectConfigurations {
 	}
 	
 	public static boolean isNonInheritedLabel(String label) {
+		assert nonInheritedLabels != null;
 		for (String nonInherited : nonInheritedLabels) {
 			if (label.contains(nonInherited)) {
 				return true;
@@ -46,6 +47,7 @@ public class ProjectConfigurations {
 	}
 
 	public static boolean isOpenStatusLabel(String label) {
+		assert openStatusLabels != null;
 		for (String openLabel : openStatusLabels) {
 			if (label.equalsIgnoreCase(openLabel)) {
 				return true;
@@ -55,6 +57,7 @@ public class ProjectConfigurations {
 	}
 
 	public static boolean isClosedStatusLabel(String label) {
+		assert closedStatusLabels != null;
 		for (String closedLabel : closedStatusLabels) {
 			if (label.equalsIgnoreCase(closedLabel)) {
 				return true;
