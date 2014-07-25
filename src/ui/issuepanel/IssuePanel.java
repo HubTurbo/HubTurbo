@@ -74,11 +74,11 @@ public class IssuePanel extends Column {
 	private ChangeListener<TurboIssue> listener;
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
-		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
-			listener = (observable, previousIssue, currentIssue) -> {
-				if (currentIssue == null) return;				
-				// TODO save the previous issue?
-				sidePanel.triggerIssueEdit(currentIssue, false);
-			}));
+//		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
+//			listener = (observable, previousIssue, currentIssue) -> {
+//				if (currentIssue == null) return;				
+//				// TODO save the previous issue?
+//				sidePanel.triggerIssueEdit(currentIssue, false);
+//			}));
 	}
 }

@@ -50,7 +50,9 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		registerDragEvents(issue);
 		
-		registerDoubleClickEvent(issue);
+		registerClickEvents(issue);
+		
+		
 	}
 
 	private void registerDragEvents(TurboIssue issue) {
@@ -116,14 +118,22 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		});
 	}
 	
-	private void registerDoubleClickEvent(TurboIssue issue) {
+	
+	private void registerClickEvents(TurboIssue issue) {
 		setOnMouseClicked(e -> {
 			if (e.getButton().equals(MouseButton.PRIMARY)) {
+				if (e.getClickCount() == 1) {
+					onSingleClick(issue);
+				}
 				if (e.getClickCount() == 2) {
 					onDoubleClick(issue);
 				}
 			}
 		});
+	}
+	
+	private void onSingleClick(TurboIssue issue) {
+		sidePanel.triggerIssueEdit(issue, false);
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
