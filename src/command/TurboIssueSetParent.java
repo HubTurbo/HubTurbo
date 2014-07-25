@@ -55,13 +55,13 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		isSuccessful = setIssueParent(previousParent, newParent, true);
 		return isSuccessful;
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		isUndone = setIssueParent(newParent, previousParent, false);
 		return isUndone;
 	}

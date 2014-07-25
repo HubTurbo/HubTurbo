@@ -29,13 +29,13 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	public boolean performExecuteAction() {
 		isSuccessful = updateIssue(issue, editedIssue);
 		return isSuccessful;
 	}
 	
 	@Override
-	public boolean undo() {
+	public boolean performUndoAction() {
 		return true;
 	}
 	

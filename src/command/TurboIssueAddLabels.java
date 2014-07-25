@@ -44,7 +44,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(addedLabels);
 		try {
@@ -61,7 +61,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
 		List<TurboLabel> original = issue.getLabels();
 		issue.removeLabels(addedLabels);

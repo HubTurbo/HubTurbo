@@ -174,6 +174,7 @@ public class Model {
 		}
 		TurboLabel returnedLabel = new TurboLabel(createdLabel);
 		labels.add(returnedLabel);
+		refresh();
 		return returnedLabel;
 	}
 	
@@ -187,6 +188,7 @@ public class Model {
 		} 
 		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
 		milestones.add(returnedMilestone);
+		refresh();
 		return returnedMilestone;
 	}
 	
@@ -194,6 +196,7 @@ public class Model {
 		try {
 			ServiceManager.getInstance().deleteLabel(URLEncoder.encode(label.toGhName(), CHARSET));
 			labels.remove(label);
+			refresh();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -203,6 +206,7 @@ public class Model {
 		try {
 			ServiceManager.getInstance().deleteMilestone(milestone.getNumber());
 			milestones.remove(milestone);
+			refresh();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -218,6 +222,7 @@ public class Model {
 		Label ghLabel = editedLabel.toGhResource();
 		try {
 			ServiceManager.getInstance().editLabel(ghLabel, URLEncoder.encode(labelName, CHARSET));
+			refresh();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -227,6 +232,7 @@ public class Model {
 		Milestone ghMilestone = editedMilestone.toGhResource();
 		try {
 			ServiceManager.getInstance().editMilestone(ghMilestone);
+			refresh();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -445,5 +451,10 @@ public class Model {
 		milestones.clear();
 		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
+	}
+	
+	public void refresh(){
+		ServiceManager.getInstance().restartModelUpdate();
+		applyChangeMethods();
 	}
 }

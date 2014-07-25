@@ -41,13 +41,13 @@ public class TurboIssueSetMilestone extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		isSuccessful = setIssueMilestone(previousMilestone, newMilestone, true);
 		return isSuccessful;
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		isUndone = setIssueMilestone(newMilestone, previousMilestone, false);
 		return isUndone;
 	}

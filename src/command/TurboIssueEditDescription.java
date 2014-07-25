@@ -21,7 +21,7 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		String oldDescription = issue.getDescription();
 		isSuccessful = editIssueDescription(oldDescription, newDescription);
 		return isSuccessful;
@@ -46,7 +46,7 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		return true;
 	}
 

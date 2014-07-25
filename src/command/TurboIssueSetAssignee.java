@@ -30,7 +30,7 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		isSuccessful = setIssueAssignee(newAssignee, true);
 		return isSuccessful;
 	}
@@ -49,7 +49,7 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		isUndone = setIssueAssignee(previousAssignee, false);
 		return isUndone;
 	}

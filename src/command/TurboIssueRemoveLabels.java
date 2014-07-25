@@ -33,7 +33,7 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	
 
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		ServiceManager service = ServiceManager.getInstance();
 		List<TurboLabel> original = issue.getLabels();
 		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(removedLabels);
@@ -53,7 +53,7 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		ServiceManager service = ServiceManager.getInstance();
 		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(removedLabels);

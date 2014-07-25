@@ -28,8 +28,23 @@ public abstract class TurboIssueCommand {
 		return isUndoableCommand;
 	}
 	
-	public abstract boolean execute();
-	public abstract boolean undo();
+	public boolean execute(){
+		boolean result = performExecuteAction();
+		if(result){
+			model.get().refresh();
+		}
+		return result;
+	}
+	protected abstract boolean performExecuteAction();
+	
+	public boolean undo(){
+		boolean result = performUndoAction();
+		if(result){
+			model.get().refresh();
+		}
+		return result;
+	}
+	protected abstract boolean performUndoAction();
 	
 	public void setLoggingRemarks(String remarks){
 		this.loggingRemarks = remarks;

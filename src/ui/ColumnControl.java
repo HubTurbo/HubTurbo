@@ -40,13 +40,7 @@ public class ColumnControl extends HBox {
 	private void setupModelChangeResponse(){
 		WeakReference<ColumnControl> selfRef = new WeakReference<>(this);
 		//No need for weak listeners because ColumnControl is persistent for the lifetime of the app
-		model.applyMethodOnModelChange(() -> selfRef.get().handleModelChange());
-	}
-	
-	private void handleModelChange(){
-		System.out.println("model changed");
-		ServiceManager.getInstance().restartModelUpdate();
-		this.refresh();
+		model.applyMethodOnModelChange(() -> selfRef.get().refresh());
 	}
 	
 	public void resumeColumns() {

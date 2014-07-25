@@ -28,7 +28,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		isSuccessful = setLabelsForIssue(previousLabels, newLabels, true);
 		return isSuccessful;
 	}
@@ -57,7 +57,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		if(isSuccessful){
 			isUndone = setLabelsForIssue(newLabels, previousLabels, false);
 		}

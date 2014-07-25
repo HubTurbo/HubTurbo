@@ -26,7 +26,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		String previousTitle = issue.getTitle();
 		try {
 			ServiceManager.getInstance().editIssueTitle(issue.getId(), newTitle);
@@ -41,7 +41,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		return true;
 	}
 }

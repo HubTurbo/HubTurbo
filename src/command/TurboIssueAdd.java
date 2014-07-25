@@ -47,7 +47,7 @@ public class TurboIssueAdd extends TurboIssueCommand{
 	}
 	
 	@Override
-	public boolean execute() {
+	protected boolean performExecuteAction() {
 		addResult = createIssueInGithub(issue);
 		if(addResult != null){
 			addIssueToLocalCache(addResult);
@@ -60,7 +60,7 @@ public class TurboIssueAdd extends TurboIssueCommand{
 	}
 
 	@Override
-	public boolean undo() {
+	protected boolean performUndoAction() {
 		return true;
 	}
 
