@@ -53,6 +53,10 @@ public class FilterTextField extends TextField {
 		});
 		
 		setOnKeyTyped(e -> {
+			String key = e.getCharacter();
+			if(key == null || key.isEmpty()){
+				return;
+			}
 			
 			char typed = e.getCharacter().charAt(0);
 			
