@@ -2,10 +2,9 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -70,15 +69,16 @@ public class IssuePanel extends Column {
 		listView.setItems(getIssueList());
 	}
 
-	@SuppressWarnings("unused")
-	private ChangeListener<TurboIssue> listener;
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
-//		listView.getSelectionModel().selectedItemProperty().addListener(new WeakChangeListener<TurboIssue>(
-//			listener = (observable, previousIssue, currentIssue) -> {
-//				if (currentIssue == null) return;				
-//				// TODO save the previous issue?
-//				sidePanel.triggerIssueEdit(currentIssue, false);
-//			}));
+		setOnKeyReleased((e) -> {
+			if (e.getCode().equals(KeyCode.DOWN) ||
+					e.getCode().equals(KeyCode.UP)) {
+				TurboIssue selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
+				if (selectedIssue != null) {
+					sidePanel.triggerIssueEdit(selectedIssue, false);
+				}
+			}
+		}); 
 	}
 }
