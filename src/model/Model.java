@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -26,10 +26,6 @@ import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
-
-import command.TurboIssueAddLabels;
-import command.TurboIssueCommand;
-import command.TurboIssueEdit;
 
 
 public class Model {
@@ -307,11 +303,12 @@ public class Model {
 		issues.clear();
 		try {		
 			List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
+			enforceStatusStateConsistency(ghIssues);
 			// Add the issues to a temporary list to prevent a quadratic number
 			// of updates to subscribers of the ObservableList
 			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			// Add them all at once, so this hopefully propagates only one change
-			alignIssueStatusAndState(buffer);
+			
 			issues.addAll(buffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -321,15 +318,31 @@ public class Model {
 		
 		return true;
 	}
-	
-	private void alignIssueStatusAndState(ArrayList<TurboIssue> buffer) {
-//		for (TurboIssue turboIssue : buffer) {
-//			if (turboIssue.getStatusLabel() == null && !turboIssue.getOpen()) {
-//				TurboIssueCommand command = new TurboIssueAddLabels(
-//						this, turboIssue, Arrays.asList(getLabelByGhName("status.closed")));
-//				command.execute();
-//			}
-//		}
+
+	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
+		for (Issue ghIssue : ghIssues) {
+			Set<Label> toBeRemovedLabels = new HashSet<Label>();
+			for (Label ghLabel : ghIssue.getLabels()) {
+				if (isInconsistent(ghIssue.getState(), ghLabel.getName())) {
+					toBeRemovedLabels.add(ghLabel);
+				}
+			}
+			ghIssue.getLabels().removeAll(toBeRemovedLabels);
+			
+			if (!toBeRemovedLabels.isEmpty()) {
+				try {
+					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private boolean isInconsistent(String state, String ghLabelName) {
+		return ((ProjectConfigurations.isOpenStatusLabel(ghLabelName) && state.equals(STATE_CLOSED)) ||
+				(ProjectConfigurations.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
 	}
 
 	private boolean loadLabels(){

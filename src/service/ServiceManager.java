@@ -371,9 +371,9 @@ public class ServiceManager {
 	 * Methods to work with issue labels
 	 * */
 	
-	public List<Label> setLabelsForIssue(int issueId, List<Label> labels) throws IOException{
+	public List<Label> setLabelsForIssue(long issueId, List<Label> labels) throws IOException{
 		if(repoId != null){
-			return labelService.setLabels(repoId, Integer.toString(issueId), labels);
+			return labelService.setLabels(repoId, Long.toString(issueId), labels);
 		}
 		return new ArrayList<Label>();
 	}
