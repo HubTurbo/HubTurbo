@@ -1,5 +1,8 @@
 package ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +11,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+import service.ServiceManager;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import util.SessionConfigurations;
-
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 
@@ -32,6 +34,19 @@ public class ColumnControl extends HBox {
 		this.dragAndDropExecutor = new TurboCommandExecutor();
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
+		setupModelChangeResponse();
+	}
+	
+	private void setupModelChangeResponse(){
+		WeakReference<ColumnControl> selfRef = new WeakReference<>(this);
+		//No need for weak listeners because ColumnControl is persistent for the lifetime of the app
+		model.applyMethodOnModelChange(() -> selfRef.get().handleModelChange());
+	}
+	
+	private void handleModelChange(){
+		System.out.println("model changed");
+		ServiceManager.getInstance().restartModelUpdate();
+		this.refresh();
 	}
 	
 	public void resumeColumns() {

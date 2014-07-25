@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.eclipse.egit.github.core.Comment;
@@ -26,7 +28,6 @@ import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
 import util.ProjectConfigurations;
-
 import command.TurboIssueAddLabels;
 import command.TurboIssueCommand;
 import command.TurboIssueEdit;
@@ -46,12 +47,14 @@ public class Model {
 	
 	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 	
+	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
+	
 	protected IRepositoryIdProvider repoId;
 	
 	private ProjectConfigurations projectConfig = null;
-	
-	public Model(){
 		
+	public Model(){
+		setupModelChangeListeners();
 	}
 		
 	public IRepositoryIdProvider getRepoId(){
@@ -66,6 +69,33 @@ public class Model {
 		loadLabels();
 		loadMilestones();
 		loadIssues();
+	}
+	
+	public void applyMethodOnModelChange(Runnable method){
+		methodsOnChange.add(method);
+	}
+	
+	private void setupModelChangeListeners(){
+		WeakReference<Model> selfRef = new WeakReference<>(this);
+		//No need to use weak listeners because model is persistent through the lifetime of the application
+		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) ->{
+			selfRef.get().applyChangeMethods();
+		}); 
+		issues.addListener((ListChangeListener.Change<? extends TurboIssue> c) ->{
+			selfRef.get().applyChangeMethods();
+		});
+		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) ->{
+			selfRef.get().applyChangeMethods();
+		});
+		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) ->{
+			selfRef.get().applyChangeMethods();
+		});
+	}
+	
+	private void applyChangeMethods(){
+		for(Runnable method : methodsOnChange){
+			method.run();
+		}
 	}
 
 	public ObservableList<TurboIssue> getIssues() {
@@ -127,7 +157,7 @@ public class Model {
 		}
 
 	}
-	
+		
 	public void updateCachedIssue(TurboIssue issue){
 		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if(tIssue != null){
