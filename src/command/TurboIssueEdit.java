@@ -24,6 +24,9 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		this.editedIssue = editedIssue;
 	}
 	
+	public TurboIssue getEditedIssue(){
+		return editedIssue;
+	}
 	
 	@Override
 	public boolean execute() {
@@ -54,7 +57,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			
 			if(!descUpdated){
 				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
-						+ "Please refresh and enter your descripton again.");
+						+ "Please reload and enter your descripton again.");
 			}
 			
 			model.get().updateCachedIssue(latestIssue);

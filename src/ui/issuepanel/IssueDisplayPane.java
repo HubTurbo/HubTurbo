@@ -57,6 +57,18 @@ public class IssueDisplayPane extends HBox {
 		parentPanel.get().displayTabs();
 	}
 	
+	private void updateStateAfterSuccessfulAdd(TurboIssue addedIssue){
+		displayedIssue.copyValues(addedIssue);
+		originalIssue.copyValues(addedIssue);
+		issueEditDisplay.updateIssueId(displayedIssue.getId());
+		mode = IssueEditMode.EDIT;
+	}
+	
+	private void updateStateAfterSuccessfulEdit(TurboIssue editedIssue){
+		displayedIssue.copyValues(editedIssue);
+		originalIssue.copyValues(editedIssue);
+	}
+	
 	public void handleDoneClicked(){
 		TurboIssueCommand command;
 		String message = "";
@@ -65,8 +77,7 @@ public class IssueDisplayPane extends HBox {
 			command = new TurboIssueAdd(model, displayedIssue);
 			success = command.execute();
 			if(success){
-				displayedIssue.copyValues(((TurboIssueAdd)command).getAddedIssue());
-				issueEditDisplay.updateIssueId(displayedIssue.getId());
+				updateStateAfterSuccessfulAdd(((TurboIssueAdd)command).getAddedIssue());
 				message = "Issue successfully created!";
 			}else{
 				message = "An error occured while creating the issue";
@@ -75,6 +86,7 @@ public class IssueDisplayPane extends HBox {
 			command = new TurboIssueEdit(model, originalIssue, displayedIssue);
 			success = command.execute();
 			if(success){
+				updateStateAfterSuccessfulEdit(((TurboIssueEdit)command).getEditedIssue());
 				message = "Issue successfully edited!";
 			}else{
 				message = "An error occured while editing the issue. Changes have not been saved.";
