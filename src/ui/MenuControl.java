@@ -51,7 +51,7 @@ public class MenuControl extends MenuBar {
 		MenuItem createRight = new MenuItem("Create Column");
 		createRight.setOnAction(e -> {
 			columns.createNewSearchPanelAtEnd();
-			// listener is used as columnsScroll's Hmax property doesn't update 
+			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
 				@Override
 				public void changed(ObservableValue<? extends Number> arg0,

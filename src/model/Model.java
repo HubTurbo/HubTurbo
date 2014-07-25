@@ -323,13 +323,13 @@ public class Model {
 	}
 	
 	private void alignIssueStatusAndState(ArrayList<TurboIssue> buffer) {
-		for (TurboIssue turboIssue : buffer) {
-			if (turboIssue.getStatusLabel() == null && !turboIssue.getOpen()) {
-				TurboIssueCommand command = new TurboIssueAddLabels(
-						this, turboIssue, Arrays.asList(getLabelByGhName("status.closed")));
-				command.execute();
-			}
-		}
+//		for (TurboIssue turboIssue : buffer) {
+//			if (turboIssue.getStatusLabel() == null && !turboIssue.getOpen()) {
+//				TurboIssueCommand command = new TurboIssueAddLabels(
+//						this, turboIssue, Arrays.asList(getLabelByGhName("status.closed")));
+//				command.execute();
+//			}
+//		}
 	}
 
 	private boolean loadLabels(){
