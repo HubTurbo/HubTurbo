@@ -94,10 +94,14 @@ public class IssueDisplayPane extends HBox {
 		}
 		
 		StatusBar.displayMessage(message);
-		if(success && !expandedIssueView){
-			showIssueDetailsDisplay(false);
-			cleanup();
-			parentPanel.get().displayTabs();
+		if(success){
+			if(expandedIssueView){
+				issueDetailsDisplay.refresh(); //Refresh comments so change log can be seen
+			}else{
+				showIssueDetailsDisplay(false);
+				cleanup();
+				parentPanel.get().displayTabs();
+			}
 		}
 	}
 

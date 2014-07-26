@@ -129,6 +129,10 @@ public class IssueDetailsDisplay extends VBox {
 		contentHandler.stopContentUpdate();
 	}
 	
+	public void refresh(){
+		contentHandler.restartContentUpdate();
+	}
+	
 	private DetailsPanel createTabContentsDisplay(DisplayType type){
 		return new DetailsPanel(issue, contentHandler, type);
 	}
