@@ -53,7 +53,7 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		if(index != -1){
 			commentsList.set(index, comment);
 		}else{
-			commentsList.add(0, comment);
+			commentsList.add(comment);
 		}
 	}
 	
