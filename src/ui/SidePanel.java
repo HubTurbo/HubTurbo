@@ -73,6 +73,7 @@ public class SidePanel extends VBox {
 	public void triggerIssueCreate(TurboIssue issue) {
 		mode = IssueEditMode.CREATE;
 		displayedIssue = issue;
+		focusRequested = true;
 		setLayout(Layout.ISSUE);
 	}
 	
