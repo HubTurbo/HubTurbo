@@ -16,12 +16,12 @@ import model.TurboUser;
 
 public class IssueChangeLogger {
 	public static final String LABEL_CHANGELOG_HEADER = "[Edited labels]\n";
-	public static final String LABEL_EXCLUSIVE_CHANGELOG_FORMAT = "**%1s**: %2s ~> %3s\n";
-	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "**%1s**: [added: %2s] [removed: %3s]";
+	public static final String LABEL_EXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: %2s ~> **%3s**\n";
+	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: [added: %2s] [removed: %3s]";
 	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description. \n"; 
-	protected static final String MILESTONE_CHANGE_LOG = "**Milestone changed:** %1s ~> %2s\n";
-	protected static final String ASSIGNEE_CHANGE_LOG = "**Assignee changed:** %1s ~> new: %2s\n";
-	
+	protected static final String MILESTONE_CHANGE_LOG = "*Milestone changed:* %1s ~> **%2s**\n";
+	protected static final String ASSIGNEE_CHANGE_LOG = "*Assignee changed:* %1s ~> **%2s**\n";
+	protected static final String UNGROUPED_LABELS_TAG = "Ungrouped";
 	protected static final String ADDITIONAL_COMMENTS_FORMAT = "\n [Remarks] %1s \n";
 	
 	private static void logChangesInGithub(TurboIssue issue, String changeLog){
@@ -39,8 +39,8 @@ public class IssueChangeLogger {
 		HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
 		
-		HashMap<String,  ArrayList<TurboLabel>> groupedRemoved = TurboLabel.groupLabels(removed, "Ungrouped");
-		HashMap<String,  ArrayList<TurboLabel>> groupedAdded = TurboLabel.groupLabels(added, "Ungrouped");
+		HashMap<String,  ArrayList<TurboLabel>> groupedRemoved = TurboLabel.groupLabels(removed, UNGROUPED_LABELS_TAG);
+		HashMap<String,  ArrayList<TurboLabel>> groupedAdded = TurboLabel.groupLabels(added, UNGROUPED_LABELS_TAG);
 		
 		Set<String> removedLabelGrps = groupedRemoved.keySet();
 		Set<String> addedLabelGrps = groupedAdded.keySet();
@@ -52,7 +52,7 @@ public class IssueChangeLogger {
 		for(String grpName : allGroups){
 			 ArrayList<TurboLabel> addedLabs = groupedAdded.get(grpName);
 			 ArrayList<TurboLabel> remLabs = groupedRemoved.get(grpName);
-			if(model.isExclusiveLabelGroup(grpName)){
+			if(!grpName.equals(UNGROUPED_LABELS_TAG) && model.isExclusiveLabelGroup(grpName)){
 				log.append(getExclusiveLabelLog(grpName, addedLabs, remLabs));
 			}else{
 				log.append(getNonexclusiveLabelLog(grpName, addedLabs, remLabs));
@@ -82,7 +82,7 @@ public class IssueChangeLogger {
 		if(removed != null){
 			removedlist = getLabelPrintoutList(removed);
 		}
-		return String.format(LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT, grp, removedlist, addedlist);
+		return String.format(LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT, grp, addedlist, removedlist);
 	}
 	
 	private static String getLabelPrintoutList(ArrayList<TurboLabel> labels){
@@ -169,9 +169,9 @@ public class IssueChangeLogger {
 		if(edited < 0){
 			changeLog = String.format("Removed issue parent: %1d\n", original);
 		}else if(original > 0){
-			changeLog = String.format("Changed Issue parent from %1d to %2d\n", original, edited);
+			changeLog = String.format("Changed Issue parent from %1d to **%2d**\n", original, edited);
 		}else{
-			changeLog = String.format("Set Issue parent to %1d\n", edited);
+			changeLog = String.format("Set Issue parent to **%1d**\n", edited);
 		}
 		return changeLog;
 	}
