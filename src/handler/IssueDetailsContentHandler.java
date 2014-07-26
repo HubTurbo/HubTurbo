@@ -42,6 +42,22 @@ public class IssueDetailsContentHandler {
 		return commentsUpdater == null || commentsChangeListener == null;
 	}
 	
+	private void getDetailsContent(){
+		try {
+			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
+			setGithubCommentsList(allItems);
+			updateData();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void setGithubCommentsList(List<Comment> allItems){
+		//Reuse allGhContent instance to ensure that all observers get change signals
+		allGhContent.clear();
+		allGhContent.addAll(allItems);
+	}
+	
 	private void setupContent(){
 		//Computationally intensive as list of all comments and their html markup will be retrieved from github
 		getDetailsContent();
@@ -49,6 +65,23 @@ public class IssueDetailsContentHandler {
 		setupCommentsChangeListener();
 	}
 	
+	private void setupCommentsChangeListener(){
+		WeakReference<IssueDetailsContentHandler> selfRef = new WeakReference<>(this);
+		commentsChangeListener = new ListChangeListener<Comment>(){
+
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends Comment> arg0) {
+				IssueDetailsContentHandler self = selfRef.get();
+				if(self != null){
+					self.updateData();
+				}
+			}
+		};
+		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
+		allGhContent.addListener(listener);
+	}
+
 	private void setupContentUpdater(){
 		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
 	}
@@ -60,6 +93,10 @@ public class IssueDetailsContentHandler {
 	public ObservableList<TurboComment> getIssueHistory(){
 		return log;
 	}
+	
+	/**
+	 * Content Update Methods
+	 * */
 	
 	public void startContentUpdate(){
 		if(isNotSetup()){
@@ -81,6 +118,35 @@ public class IssueDetailsContentHandler {
 		startContentUpdate();
 	}
 	
+	private void updateData(){
+		updateCommentsList();
+		updateLogContents();
+
+	}
+	
+	private void updateLogContents(){
+		List<TurboComment> logItems = allGhContent.stream()
+										   .map(item -> new TurboComment(item))
+				   						   .filter(item -> item.isIssueLog())
+				   						   .collect(Collectors.toList());
+		
+		setObservedLog(logItems);
+	}
+	
+	private void updateCommentsList(){
+		List<TurboComment> filteredComments = allGhContent.stream()
+												   .map(item -> new TurboComment(item))
+												   .collect(Collectors.toList());
+		for(TurboComment item : filteredComments){
+			updateItemInCommentsList(item);
+		}
+		Platform.runLater(() -> {removeDifference(comments, filteredComments);});
+	}
+	
+	/**
+	 * Methods to track whether comment is in edit mode
+	 * */
+	
 	public void toggleCommentEditState(TurboComment comment){
 		if(commentIsInEditState(comment)){
 			commentsInEditMode.remove(comment);
@@ -96,6 +162,10 @@ public class IssueDetailsContentHandler {
 	public boolean commentIsInEditState(TurboComment comment){
 		return commentsInEditMode.contains(comment);
 	}
+	
+	/**
+	 * Methods to create/edit/delete comment
+	 * */
 	
 	public boolean createComment(String text){
 		try {
@@ -126,107 +196,20 @@ public class IssueDetailsContentHandler {
 		try {
 			stopContentUpdate();
 			ServiceManager.getInstance().deleteComment(comment.getId());
-			removeCachedItem(comment.getId());
+			removeCachedComment(comment.getId());
 			startContentUpdate();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void removeCachedItem(long commentId){
-		for(TurboComment item: comments){
-			if(item.getId() == commentId){
-				comments.remove(item);
-				return;
-			}
-		}
-	}
-	
-	private void setupCommentsChangeListener(){
-		WeakReference<IssueDetailsContentHandler> selfRef = new WeakReference<>(this);
-		commentsChangeListener = new ListChangeListener<Comment>(){
 
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends Comment> arg0) {
-				IssueDetailsContentHandler self = selfRef.get();
-				if(self != null){
-					self.updateData();
-				}
-			}
-		};
-		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
-		allGhContent.addListener(listener);
-	}
-	
-	private void updateData(){
-		updateCommentsList();
-		updateLogContents();
-
-	}
-	
-	private void getDetailsContent(){
-		try {
-			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
-			setGithubCommentsList(allItems);
-			updateData();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void setGithubCommentsList(List<Comment> allItems){
-		//Reuse allGhContent instance to ensure that all observers get change signals
-		allGhContent.clear();
-		allGhContent.addAll(allItems);
-	}
-
-	private void updateCommentsList(){
-		List<TurboComment> filteredComments = allGhContent.stream()
-												   .map(item -> new TurboComment(item))
-												   .collect(Collectors.toList());
-		for(TurboComment item : filteredComments){
-			updateItemInCommentsList(item);
-		}
-		Platform.runLater(() -> {removeDifference(comments, filteredComments);});
-	}
 	
 	private void removeDifference(List<TurboComment> storedList, List<TurboComment> fetchedList){
 		List<TurboComment> removed = storedList.stream()
 											   .filter(item -> !fetchedList.contains(item))
 											   .collect(Collectors.toList());
 		storedList.removeAll(removed);
-	}
-	
-
-	
-	private void updateItemInCommentsList(TurboComment comment){
-		for(TurboComment item : comments){
-			if(item.getId() == comment.getId()){
-				replaceItemInObservedCommentsList(item, comment);
-				return;
-			}
-		}
-		addItemToObservedCommentList(comment);
-	}
-	
-	private void replaceItemInObservedCommentsList(TurboComment original, TurboComment replacement){
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				original.copyValues(replacement);
-			}
-		});
-		
-	}
-	
-	private void updateLogContents(){
-		List<TurboComment> logItems = allGhContent.stream()
-										   .map(item -> new TurboComment(item))
-				   						   .filter(item -> item.isIssueLog())
-				   						   .collect(Collectors.toList());
-		
-		setObservedLog(logItems);
 	}
 	
 	private void setObservedLog(List<TurboComment> logItems){
@@ -239,13 +222,27 @@ public class IssueDetailsContentHandler {
 		});
 	}
 	
-	private void addItemToObservedCommentList(TurboComment comment){
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				comments.add(comment);
+	private void removeCachedComment(long commentId){
+		Platform.runLater(() -> {
+			for(TurboComment item: comments){
+				if(item.getId() == commentId){
+					comments.remove(item);
+					return;
+				}
 			}
-		});	
+		});
+	}
+	
+	private void updateItemInCommentsList(TurboComment comment){
+		Platform.runLater(()->{
+			for(TurboComment item : comments){
+				if(item.getId() == comment.getId()){
+					item.copyValues(comment);
+					return;
+				}
+			}
+			comments.add(comment);
+		});
 	}
 	
 	@Override
