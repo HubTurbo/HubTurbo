@@ -179,6 +179,10 @@ public class Predicate implements FilterExpression {
 			int pos = content.indexOf('.');
 			group = content.substring(0, pos);
 			labelName = content.substring(pos+1);
+		}else if(content.contains("-")){
+			int pos = content.indexOf('-');
+			group = content.substring(0, pos);
+			labelName = content.substring(pos+1);
 		}
 		
 		// Both can't be null
@@ -251,7 +255,7 @@ public class Predicate implements FilterExpression {
 
 	private void applyLabel(TurboIssue issue, Model model)
 			throws PredicateApplicationException {
-		// Find labels containing the partial title
+		// Find labels containing the label name
 		List<TurboLabel> labels = model.getLabels().stream().filter(l -> l.getName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
 		if (labels.size() > 1) {
 			throw new PredicateApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());

@@ -16,10 +16,10 @@ public abstract class Dialog<T> {
 	private Stage stage = null;
 	private CompletableFuture<T> response;
 
-//	private double x = 0, y = 0;
 	private double width = 300, height = 400;
 	private String title = "";
 	private StageStyle stageStyle = StageStyle.UTILITY;
+	private Modality modality = Modality.APPLICATION_MODAL;
 
 	public Dialog(Stage parentStage) {
 		this.parentStage = parentStage;
@@ -33,7 +33,7 @@ public abstract class Dialog<T> {
 		stage.setTitle(title);
 		stage.setOnCloseRequest(e -> onClose(e));
 		stage.initOwner(parentStage);
-		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initModality(modality);
 		stage.initStyle(stageStyle);
 //		stage.setX(parentStage.getX() + x);
 //		stage.setY(parentStage.getY() + y);
@@ -60,6 +60,10 @@ public abstract class Dialog<T> {
 	public Dialog<T> setStageStyle(StageStyle stageStyle) {
 		this.stageStyle = stageStyle;
 		return this;
+	}
+	
+	public void setModality(Modality modality){
+		this.modality = modality;
 	}
 
 	// Dialog actions
