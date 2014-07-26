@@ -1,9 +1,14 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -26,6 +31,9 @@ public class LabelManagementComponent {
 	private final Stage parentStage;
 	private final Model model;
 	private final SidePanel sidePanel;
+	private TreeView<LabelTreeItem> treeView;
+	private ObservableList<TurboLabel> labels;
+	private ListChangeListener<TurboLabel> listChangeListener;
 
 	public LabelManagementComponent(Stage parentStage, Model model, SidePanel sidePanel) {
 		this.parentStage = parentStage;
@@ -37,11 +45,11 @@ public class LabelManagementComponent {
 		VBox layout = new VBox();
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
-		TreeView<LabelTreeItem> treeView = createTreeView(parentStage);
+		treeView = createTreeView(parentStage);
 		layout.getChildren().addAll(createButtons(treeView), treeView);
 		return layout;
 	}
-
+	
 	private Node createButtons(TreeView<LabelTreeItem> treeView) {
 		Button create = new Button("New Label Group");
 		create.setOnAction(e -> {
@@ -57,6 +65,15 @@ public class LabelManagementComponent {
 		return container;
 	}
 
+	private Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>> createLabelCellFactory(Stage stage){
+		return new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
+			@Override
+			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
+				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model, sidePanel);
+			}
+		};
+	}
+	
 	private TreeView<LabelTreeItem> createTreeView(Stage stage) {
 		
 		final TreeItem<LabelTreeItem> treeRoot = new TreeItem<>(new TurboLabelGroup(ROOT_NAME));
@@ -66,42 +83,52 @@ public class LabelManagementComponent {
 		treeView.setRoot(treeRoot);
 		treeView.setShowRoot(false);
 		HBox.setHgrow(treeView, Priority.ALWAYS);
-//		VBox.setVgrow(treeView, Priority.ALWAYS);
 		treeView.setPrefHeight(2000);
 
 		treeRoot.setExpanded(true);
 		treeRoot.getChildren().forEach(child -> child.setExpanded(true));
 
-		treeView.setCellFactory(new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
-			@Override
-			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model, sidePanel);
-			}
-		});
-
+		treeView.setCellFactory(createLabelCellFactory(stage));
+		
+		setupLabelsListChangeListener();
+		
 		return treeView;
 	}
+	
+	private void setupLabelsListChangeListener(){
+		listChangeListener = new ListChangeListener<TurboLabel>(){
 
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends TurboLabel> arg0) {
+				Platform.runLater(()->sidePanel.refresh());
+			}
+			
+		};
+		labels.addListener(new WeakListChangeListener<TurboLabel>(listChangeListener));
+	}
+	
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
+		labels = model.getLabels();
 		
-		for (TurboLabel l : model.getLabels()) {
+		for (TurboLabel l : labels) {
 			assert l.getGroup() == null || !l.getGroup().equals(UNGROUPED_NAME);
 		}
 	
 		// Hash all labels by group
-		HashMap<String, ArrayList<TurboLabel>> labels = TurboLabel.groupLabels(model.getLabels(), UNGROUPED_NAME);
-		ArrayList<TurboLabel> ungrouped = labels.get(UNGROUPED_NAME);
+		HashMap<String, ArrayList<TurboLabel>> allLabels = TurboLabel.groupLabels(labels, UNGROUPED_NAME);
+		ArrayList<TurboLabel> ungrouped = allLabels.get(UNGROUPED_NAME);
 		if (ungrouped == null) ungrouped = new ArrayList<>();
-		labels.remove(UNGROUPED_NAME);
+		allLabels.remove(UNGROUPED_NAME);
 
 		// Add labels with a group into the tree
-		for (String groupName : labels.keySet()) {
+		for (String groupName : allLabels.keySet()) {
 			TurboLabelGroup group = new TurboLabelGroup(groupName);
 			TreeItem<LabelTreeItem> groupItem = new TreeItem<>(group);
 			treeRoot.getChildren().add(groupItem);
 			
 			boolean exclusive = true;
-			for (TurboLabel l : labels.get(group.getValue())) {
+			for (TurboLabel l : allLabels.get(group.getValue())) {
 				group.addLabel(l);
 				TreeItem<LabelTreeItem> labelItem = new TreeItem<>(l);
 				groupItem.getChildren().add(labelItem);

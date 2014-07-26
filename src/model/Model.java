@@ -89,7 +89,7 @@ public class Model {
 		});
 	}
 	
-	private void applyChangeMethods(){
+	public void applyChangeMethods(){
 		for(Runnable method : methodsOnChange){
 			method.run();
 		}
