@@ -61,12 +61,12 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		String labelName = label.getName();
 		String[] tokens = null;
 		if (labelName.contains(".")) {
-			tokens = labelName.split("\\.");
+			tokens = labelName.split("\\.", 2);
 			setGroup(tokens[0]);
 			setName(tokens[1]);
 			setExclusive(true);
 		} else if (labelName.contains("-")) {
-			tokens = labelName.split("-");
+			tokens = labelName.split("-", 2);
 			setGroup(tokens[0]);
 			setName(tokens[1]);
 			setExclusive(false);
