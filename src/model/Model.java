@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -47,9 +46,7 @@ public class Model {
 	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
 	
 	protected IRepositoryIdProvider repoId;
-	
-	private ProjectConfigurations projectConfig = null;
-		
+			
 	public Model(){
 		setupModelChangeListeners();
 	}
@@ -60,7 +57,7 @@ public class Model {
 	
 	public void loadComponents(IRepositoryIdProvider repoId){
 		this.repoId = repoId;
-		this.projectConfig = ConfigFileHandler.loadProjectConfig(getRepoId());
+		ConfigFileHandler.loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		loadCollaborators();
 		loadLabels();

@@ -108,7 +108,7 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	private void setupIssueEditDisplay(){
-		this.issueEditDisplay = new IssueEditDisplay(displayedIssue, parentStage, model, columns, this, focusRequested);
+		this.issueEditDisplay = new IssueEditDisplay(displayedIssue, parentStage, model, this, focusRequested);
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 	}

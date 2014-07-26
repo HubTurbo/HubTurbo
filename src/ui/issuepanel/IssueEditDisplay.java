@@ -29,7 +29,6 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 import ui.CheckboxListDialog;
-import ui.ColumnControl;
 import ui.LabelCheckboxListDialog;
 import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
@@ -50,16 +49,14 @@ public class IssueEditDisplay extends VBox{
 	private final Model model;
 	private final Stage parentStage;
 	private final WeakReference<IssueDisplayPane> parentContainer;
-	private ColumnControl columns;
 	private boolean focusRequested;
 	
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
-	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, IssueDisplayPane parent, boolean focusRequested){
+	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, IssueDisplayPane parent, boolean focusRequested){
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
-		this.columns = columns;
 		this.parentContainer = new WeakReference<IssueDisplayPane>(parent);
 		this.focusRequested = focusRequested;
 		setup();
