@@ -6,8 +6,11 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUE
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -35,12 +38,23 @@ public class CommentUpdateService extends UpdateService<Comment>{
 		lastCheckTime = new Date();
 	}
 
+	
+	private Map<String, String> createUpdatedCommentsParams(){
+		//Comments must be retrieved in descending order although they are always displayed in ascending order because of paging.
+		//Otherwise, new comments will not be seen because the first page of comments remains the same
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("sort", "created");
+		params.put("direction", "desc");
+		return params;
+	}
+	
 	@Override
 	protected PagedRequest<Comment> createUpdatedRequest(IRepositoryIdProvider repoId){
 		PagedRequest<Comment> request = new PagedRequest<Comment>();
 		String path = SEGMENT_REPOS + "/" + repoId.generateId() + SEGMENT_ISSUES
 				+ "/" + issueId + SEGMENT_COMMENTS;
 		request.setUri(path);
+		request.setParams(createUpdatedCommentsParams());
 		request.setResponseContentType(CONTENT_TYPE_JSON);
 		request.setType(new TypeToken<Comment>(){}.getType());
 		request.setArrayType(new TypeToken<ArrayList<Comment>>(){}.getType());
@@ -68,6 +82,7 @@ public class CommentUpdateService extends UpdateService<Comment>{
 	
 	protected void updateCachedComments(IRepositoryIdProvider repoId){
 		List<Comment> updatedComments = super.getUpdatedItems(repoId); //updateComments is the list of all comments for the issue.
+		Collections.reverse(updatedComments);
 		if(!updatedComments.isEmpty()){
 			List<Comment> removed = getRemovedComments(updatedComments);
 			commentsList.removeAll(removed);
