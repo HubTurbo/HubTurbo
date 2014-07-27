@@ -159,7 +159,6 @@ public class TurboLabel implements Listable, LabelTreeItem {
 			return null;
 		} else {
 			result[0] = name.substring(0, pos);
-//			result[1] = name.substring(dotPos+1).replaceAll("\\.", "");
 			result[1] = name.substring(pos+1);
 			result[2] = name.substring(pos, pos+1);
 			return result;

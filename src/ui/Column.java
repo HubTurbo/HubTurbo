@@ -296,6 +296,7 @@ private static final int COLUMN_WIDTH = 400;
 			} else {
 				this.applyFilterExpression(EMPTY);
 			}
+			StatusBar.displayMessage(""); //Clear displayed message on successful filter
 		} catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Override the text set in the above method
