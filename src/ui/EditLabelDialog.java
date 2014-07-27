@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.concurrent.CompletableFuture;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -8,12 +10,14 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.TurboLabel;
 
 public class EditLabelDialog extends Dialog<TurboLabel> {
-
 	private TurboLabel originalLabel;
+	TextField labelGrpField;
+	TextField labelNameField;
 
 	public EditLabelDialog(Stage parentStage, TurboLabel originalLabel) {
 		super(parentStage);
@@ -28,28 +32,40 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
     }
 	
 	@Override
+	public CompletableFuture<TurboLabel> show(){
+		CompletableFuture<TurboLabel> response = super.show();
+		labelNameField.requestFocus();
+		return response;
+	}
+	
+	@Override
 	protected Parent content() {
 		
 		setTitle("Edit Label");
-		setSize(400, 50);
-
-		TextField labelNameField = new TextField();
-		if (originalLabel.getGroup() == null) {
-			labelNameField.setText(originalLabel.getName());
-		} else {
-			labelNameField.setText(originalLabel.getGroup() + "." + originalLabel.getName());
+		setSize(450, 50);
+		
+		labelGrpField = new TextField();
+		if(originalLabel.getGroup() != null){
+			labelGrpField.setText(originalLabel.getGroup());
 		}
+		labelGrpField.setPrefWidth(80);
+		
+		Text delimiter = new Text(originalLabel.getGroupDelimiter());
+		
+		labelNameField = new TextField();
+		labelNameField.setText(originalLabel.getName());
+		labelNameField.setPrefWidth(150);
 
 		ColorPicker colourPicker =  new ColorPicker(Color.web("#" + originalLabel.getColour()));
 
 		Button done = new Button("Done");
 		done.setOnAction(e -> {
-			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
+			respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
 			close();
 		});
 
 		labelNameField.setOnAction(e -> {
-			respond(labelNameField.getText(), toRGBCode(colourPicker.getValue()));
+			respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
 			close();
 		});
 
@@ -57,25 +73,20 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 		layout.setPadding(new Insets(15));
 		layout.setSpacing(10);
 		layout.setAlignment(Pos.BASELINE_CENTER);
-		layout.getChildren().addAll(labelNameField, colourPicker, done);
+		layout.getChildren().addAll(labelGrpField, delimiter, labelNameField, colourPicker, done);
 
 		return layout;
 	}
 	
-	private void respond(String name, String rgbCode) {
-		
-		String group = null;
-		String[] nameParts = TurboLabel.parseName(name);
-		if (nameParts != null) {
-			group = nameParts[0];
-			name = nameParts[1];
-		}
-		
+	private void respond(String grp, String name, String rgbCode) {		
 		TurboLabel label = new TurboLabel();
 		label.copyValues(originalLabel);
 		label.setName(name);
-		label.setGroup(group);
+		if(!grp.isEmpty()){
+			label.setGroup(grp);
+		}
 		label.setColour(rgbCode.substring(1));
 		completeResponse(label);
 	}
+	
 }

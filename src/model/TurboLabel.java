@@ -106,6 +106,11 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return ghLabel;
 	}
 	
+	public String getGroupDelimiter(){
+		String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
+		return groupDelimiter;
+	}
+	
 	public String toGhName() {
 		String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
 		String groupPrefix = getGroup() == null ? "" : getGroup() + groupDelimiter;
