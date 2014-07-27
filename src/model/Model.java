@@ -55,14 +55,18 @@ public class Model {
 		return repoId;
 	}
 	
-	public void loadComponents(IRepositoryIdProvider repoId){
+	public void setRepoId(IRepositoryIdProvider repoId) {
+		this.repoId = repoId;
+	}
+	
+	public void loadComponents(IRepositoryIdProvider repoId) throws IOException{
 		this.repoId = repoId;
 		ConfigFileHandler.loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
-		loadCollaborators();
-		loadLabels();
-		loadMilestones();
-		loadIssues();
+		loadCollaborators(ServiceManager.getInstance().getCollaborators());
+		loadLabels(ServiceManager.getInstance().getLabels());
+		loadMilestones(ServiceManager.getInstance().getMilestones());
+		loadIssues(ServiceManager.getInstance().getAllIssues());
 	}
 	
 	public void applyMethodOnModelChange(Runnable method){
@@ -312,15 +316,9 @@ public class Model {
 		}
 	}
 	
-	private boolean loadCollaborators() {	
-		try {
-			List<User> ghCollaborators = ServiceManager.getInstance().getCollaborators();
-			setCachedCollaborators(ghCollaborators);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+	public void loadCollaborators(List<User> ghCollaborators) {	
+		collaborators.clear();
+		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
@@ -328,28 +326,15 @@ public class Model {
 		updateCachedList(collaborators, newCollaborators);
 	}
 	
-	private void setCachedCollaborators(List<User> ghCollaborators){
-		collaborators.clear();
-		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
-	}
-	
-	private boolean loadIssues() {
+	public void loadIssues(List<Issue> ghIssues) {
 		issues.clear();
-		try {		
-			List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
-			enforceStatusStateConsistency(ghIssues);
-			// Add the issues to a temporary list to prevent a quadratic number
-			// of updates to subscribers of the ObservableList
-			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-			// Add them all at once, so this hopefully propagates only one change
-			
-			issues.addAll(buffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
+		enforceStatusStateConsistency(ghIssues);
+		// Add the issues to a temporary list to prevent a quadratic number
+		// of updates to subscribers of the ObservableList
+		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
+		// Add them all at once, so this hopefully propagates only one change
 		
-		return true;
+		issues.addAll(buffer);
 	}
 
 	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
@@ -378,16 +363,11 @@ public class Model {
 				(ProjectConfigurations.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
 	}
 
-	private boolean loadLabels(){
-		try {
-			List<Label> ghLabels = ServiceManager.getInstance().getLabels();
-			standardiseStatusLabels(ghLabels);
-			setCachedLabels(ghLabels);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+	public void loadLabels(List<Label> ghLabels){
+		standardiseStatusLabels(ghLabels);
+		labels.clear();
+		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
+		labels.addAll(buffer);
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
@@ -421,32 +401,15 @@ public class Model {
 		updateCachedList(labels, newLabels);
 	}
 	
-	private void setCachedLabels(List<Label> ghLabels){
-		labels.clear();
-		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		labels.addAll(buffer);
-	}
-	
-	private boolean loadMilestones(){
-		try {		
-			List<Milestone> ghMilestones = ServiceManager.getInstance().getMilestones();
-			setCachedMilestones(ghMilestones);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+	public void loadMilestones(List<Milestone> ghMilestones){
+		milestones.clear();
+		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
+		milestones.addAll(buffer);
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		updateCachedList(milestones, newMilestones);
-	}
-	
-	private void setCachedMilestones(List<Milestone> ghMilestones){
-		milestones.clear();
-		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-		milestones.addAll(buffer);
 	}
 	
 	public void refresh(){

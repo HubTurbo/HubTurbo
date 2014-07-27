@@ -25,12 +25,22 @@ public class ServiceManagerStub extends ServiceManager{
 	}
 	
 	public boolean login(String userId, String password){
-		model.loadComponents(getRepoId());
+		try {
+			model.loadComponents(getRepoId());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 	
 	public void setupRepository(String owner, String name){
-		model.loadComponents(RepositoryId.create(owner, name));
+		try {
+			model.loadComponents(RepositoryId.create(owner, name));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public Model getModel(){

@@ -70,6 +70,11 @@ public class ServiceManager {
 		return repoId;
 	}
 	
+	public void setRepoId(IRepositoryIdProvider repoId) {
+		this.repoId = repoId;
+		model.setRepoId(repoId);
+	}
+	
 	public Model getModel(){
 		return model;
 	}
@@ -132,8 +137,13 @@ public class ServiceManager {
 	
 	public void setupRepository(String owner, String name){
 		repoId = RepositoryId.create(owner, name);
-		model.loadComponents(repoId);
-		setupAndStartModelUpdate();
+		try {
+			model.loadComponents(repoId);
+			setupAndStartModelUpdate();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public int getRemainingRequests(){

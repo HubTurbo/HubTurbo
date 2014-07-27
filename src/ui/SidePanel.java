@@ -1,6 +1,9 @@
 package ui;
 
-import javafx.collections.FXCollections;
+import java.util.HashMap;
+import java.util.List;
+
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,13 +16,23 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
+import util.DialogMessage;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
+	private static final String KEY_ISSUES = "issues";
+	private static final String KEY_MILESTONES = "milestones";
+	private static final String KEY_LABELS = "labels";
+	private static final String KEY_COLLABORATORS = "collaborators";
+
 	public enum IssueEditMode{NIL, CREATE, EDIT};
 	
 	protected static final int PANEL_PREF_WIDTH = 300;
@@ -135,8 +148,7 @@ public class SidePanel extends VBox {
 		if (ServiceManager.getInstance().getRepoId() != null) {
 			String repoId = ServiceManager.getInstance().getRepoId().generateId();
 			comboBox.setValue(repoId);
-			SessionConfigurations.addToLastViewedRepositories(repoId);
-			comboBox.getItems().addAll(SessionConfigurations.getLastViewedRepositories());
+			comboBox.getItems().addAll(SessionConfigurations.addToLastViewedRepositories(repoId));
 		}
 		
 		comboBox.valueProperty().addListener((a, b, c) -> loadRepo(comboBox));
@@ -152,13 +164,51 @@ public class SidePanel extends VBox {
 
 	private void loadRepo(final ComboBox<String> comboBox) {
 		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
+		System.out.println(repoId.generateId());
 		if (repoId != null) {
 			columns.saveSession();
-			ServiceManager.getInstance().setupRepository(repoId.getOwner(), repoId.getName());
-			columns.resumeColumns();
-			this.refresh();
-			comboBox.setItems(FXCollections.observableArrayList(
-					SessionConfigurations.addToLastViewedRepositories(repoId.generateId())));
+			Task<HashMap<String, List>> task = new Task<HashMap<String, List>>(){
+				@Override
+				protected HashMap<String, List> call() throws Exception {
+					//TODO: repository validity check?
+					ServiceManager.getInstance().setRepoId(repoId);
+					List<User> ghCollaborators = ServiceManager.getInstance().getCollaborators();
+					List<Label> ghLabels = ServiceManager.getInstance().getLabels();
+					List<Milestone> ghMilestones = ServiceManager.getInstance().getMilestones();
+					List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
+					
+					HashMap<String, List> map = new HashMap<String, List>();
+					map.put(KEY_COLLABORATORS, ghCollaborators);
+					map.put(KEY_LABELS, ghLabels);
+					map.put(KEY_MILESTONES, ghMilestones);
+					map.put(KEY_ISSUES, ghIssues);
+					return map;
+				}
+			};
+			DialogMessage.showProgressDialog(task, "Switching repository...");
+			Thread thread = new Thread(task);
+			thread.setDaemon(true);
+			thread.start();
+			
+			task.setOnSucceeded(wse -> {
+				HashMap<String, List> map = task.getValue();
+				if (map != null) {
+					StatusBar.displayMessage("Repository switched successfully!");
+					model.loadCollaborators(map.get(KEY_COLLABORATORS));
+					model.loadLabels(map.get(KEY_LABELS));
+					model.loadMilestones(map.get(KEY_MILESTONES));
+					model.loadIssues(map.get(KEY_ISSUES));
+					ServiceManager.getInstance().setupAndStartModelUpdate();
+					columns.resumeColumns();
+					SidePanel.this.refresh();
+				} else {
+					StatusBar.displayMessage("Repository switched failed.");
+				}
+			});
+			
+			task.setOnFailed(wse -> {
+				StatusBar.displayMessage("An error occurred: " + task.getException());
+			});
 		}
 	}
 
