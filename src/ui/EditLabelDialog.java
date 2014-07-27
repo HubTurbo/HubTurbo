@@ -83,7 +83,9 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 		label.copyValues(originalLabel);
 		label.setName(name);
 		if(!grp.isEmpty()){
-			label.setGroup(grp);
+			String group = grp.replaceAll("\\.", "");
+			group = group.replaceAll("\\-", "");
+			label.setGroup(group);
 		}
 		label.setColour(rgbCode.substring(1));
 		completeResponse(label);
