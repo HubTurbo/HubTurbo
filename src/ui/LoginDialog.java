@@ -22,7 +22,7 @@ import javafx.stage.WindowEvent;
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
-import util.TextAnimation;
+import util.DialogMessage;
 
 public class LoginDialog extends Dialog<Boolean> {
 
@@ -139,12 +139,6 @@ public class LoginDialog extends Dialog<Boolean> {
 		// Update UI
 
 		enableElements(false);
-		TextAnimation animation = new TextAnimation(new String[] {
-			"\\", "|", "/", "-"
-		}, s -> {
-			statusLabel.setText(s); return null;
-		});
-		animation.start();
 		
 		// Run blocking operations in the background
 
@@ -162,6 +156,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		    	return couldLogIn;
 		    }
 		};
+		
+		DialogMessage.showProgressDialog(task, "Signing in at GitHub...");
 		Thread th = new Thread(task);
 		th.setDaemon(true);
 		th.start();
@@ -173,19 +169,19 @@ public class LoginDialog extends Dialog<Boolean> {
 				completeResponse(true);
 				close();
 			} else {
-				handleError("Failed to log in. Please try again.", animation);
+				handleError("Failed to log in. Please try again.");
 			}
 		});
 		
 		task.setOnFailed(wse -> {
-			handleError("An error occurred: " + task.getException(), animation);
+			handleError("An error occurred: " + task.getException());
 		});
 	}
 
-	private void handleError(String message, TextAnimation animation) {
+	private void handleError(String message) {
 		StatusBar.displayMessage(message);
 		enableElements(true);
-		animation.stop(() -> statusLabel.setText(""));
+		DialogMessage.showWarningDialog("Warning", message);
 	}
 
 	private void enableElements(boolean enable) {
