@@ -52,7 +52,8 @@ public class ModelStub extends Model{
 	}
 	
 	private void setupLabelStub(){
-		TurboLabel label = new TurboLabel("label1");
+		TurboLabel label = new TurboLabel();
+		label.setName("label1");
 		labels.add(label);
 	}
 	

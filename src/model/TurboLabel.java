@@ -17,6 +17,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	/*
 	 * Attributes, Getters & Setters
 	 */
+	public static final String EXCLUSIVE_DELIM = ".";
+	public static final String NONEXCLUSIVE_DELIM = "-";
 	
 	public String getValue() {return getName();}
 	public void setValue(String value) {setName(value);}
@@ -50,8 +52,12 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	 * Constructors and Public Methods
 	 */
 	
-	public TurboLabel(String name) {
-		setName(name);
+//	public TurboLabel(String name) {
+//		setName(name);
+//		setColour("000000");
+//	}
+	
+	public TurboLabel(){
 		setColour("000000");
 	}
 	
@@ -59,21 +65,27 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		assert label != null;
 		
 		String labelName = label.getName();
-		String[] tokens = null;
-		if (labelName.contains(".")) {
-			tokens = labelName.split("\\.", 2);
-			setGroup(tokens[0]);
-			setName(tokens[1]);
-			setExclusive(true);
-		} else if (labelName.contains("-")) {
-			tokens = labelName.split("-", 2);
-			setGroup(tokens[0]);
-			setName(tokens[1]);
-			setExclusive(false);
-		} else {
+		String[] tokens = TurboLabel.parseName(labelName);
+//		if (labelName.contains(".")) {
+//			tokens = labelName.split("\\.", 2);
+//			setGroup(tokens[0]);
+//			setName(tokens[1]);
+//			setExclusive(true);
+//		} else if (labelName.contains("-")) {
+//			tokens = labelName.split("-", 2);
+//			setGroup(tokens[0]);
+//			setName(tokens[1]);
+//			setExclusive(false);
+//		} else {
+//			setName(labelName);
+//		}
+		if(tokens == null){
 			setName(labelName);
+		}else{
+			setGroup(tokens[0]);
+			setName(tokens[1]);
+			setExclusive(tokens[2].equals(EXCLUSIVE_DELIM));
 		}
-
 		setColour(label.getColor());
 	}
 	
@@ -126,13 +138,25 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	}
 	
 	public static String[] parseName(String name) {
-		String[] result = new String[2];
-		int dotPos = name.indexOf(".");
-		if (dotPos == -1) {
+		String[] result = new String[3];
+		int dotPos = name.indexOf(EXCLUSIVE_DELIM);
+		int dashPos = name.indexOf(NONEXCLUSIVE_DELIM);
+		int pos = -1;
+		if(dotPos == -1){
+			pos = dashPos;
+		}else if(dashPos == -1){
+			pos = dotPos;
+		}else{
+			pos = Math.min(dashPos, dotPos);
+		}
+		
+		if (pos == -1) {
 			return null;
 		} else {
-			result[0] = name.substring(0, dotPos);
-			result[1] = name.substring(dotPos+1).replaceAll("\\.", "");
+			result[0] = name.substring(0, pos);
+//			result[1] = name.substring(dotPos+1).replaceAll("\\.", "");
+			result[1] = name.substring(pos+1);
+			result[2] = name.substring(pos, pos+1);
 			return result;
 		}
 	}

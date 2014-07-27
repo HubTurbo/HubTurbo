@@ -71,7 +71,7 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 			name = nameParts[1];
 		}
 		
-		TurboLabel label = new TurboLabel("doesn't matter");
+		TurboLabel label = new TurboLabel();
 		label.copyValues(originalLabel);
 		label.setName(name);
 		label.setGroup(group);

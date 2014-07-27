@@ -166,23 +166,29 @@ public class Predicate implements FilterExpression {
 				|| issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
 				|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
 	}
-
+	
 	private boolean labelsSatisfy(TurboIssue issue) {
 		String group = "";
 		String labelName = content.toLowerCase();
 		
-		if (content.contains(".")) {
-			if (content.length() == 1) {
-				// It's just a dot
-				return true;
-			}
-			int pos = content.indexOf('.');
-			group = content.substring(0, pos);
-			labelName = content.substring(pos+1);
-		}else if(content.contains("-")){
-			int pos = content.indexOf('-');
-			group = content.substring(0, pos);
-			labelName = content.substring(pos+1);
+//		if (content.contains(".")) {
+//			if (content.length() == 1) {
+//				// It's just a dot
+//				return true;
+//			}
+//			int pos = content.indexOf('.');
+//			group = content.substring(0, pos);
+//			labelName = content.substring(pos+1);
+//		}else if(content.contains("-")){
+//			int pos = content.indexOf('-');
+//			group = content.substring(0, pos);
+//			labelName = content.substring(pos+1);
+//		}
+		
+		String[] tokens = TurboLabel.parseName(labelName);
+		if(tokens != null){
+			group = tokens[0];
+			labelName = tokens[1];
 		}
 		
 		// Both can't be null
@@ -256,7 +262,9 @@ public class Predicate implements FilterExpression {
 	private void applyLabel(TurboIssue issue, Model model)
 			throws PredicateApplicationException {
 		// Find labels containing the label name
-		List<TurboLabel> labels = model.getLabels().stream().filter(l -> l.getName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
+		List<TurboLabel> labels = model.getLabels()
+									   .stream()
+									   .filter(l -> l.toGhName().toLowerCase().contains(content.toLowerCase())).collect(Collectors.toList());
 		if (labels.size() > 1) {
 			throw new PredicateApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
 		} else {
