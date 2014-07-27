@@ -107,7 +107,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	}
 	
 	public String toGhName() {
-		String groupDelimiter = isExclusive ? "." : "-";
+		String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
 		String groupPrefix = getGroup() == null ? "" : getGroup() + groupDelimiter;
 		String groupAppended = groupPrefix + getName();
 		return groupAppended;
@@ -208,7 +208,7 @@ public class TurboLabel implements Listable, LabelTreeItem {
 
 	@Override
 	public String toString() {
-        String groupDelimiter = isExclusive ? "." : "-";
+        String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
         return getGroup() + groupDelimiter + getName();
     }
 	
