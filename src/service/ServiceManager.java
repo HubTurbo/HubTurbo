@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import model.Model;
 
 import org.markdown4j.Markdown4jProcessor;
-
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -36,6 +35,11 @@ public class ServiceManager {
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
 	public static final String CHANGELOG_TAG = "[Change Log]";
+	
+	public static final String KEY_ISSUES = "issues";
+	public static final String KEY_MILESTONES = "milestones";
+	public static final String KEY_LABELS = "labels";
+	public static final String KEY_COLLABORATORS = "collaborators";
 	
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
@@ -68,11 +72,6 @@ public class ServiceManager {
 
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;
-	}
-	
-	public void setRepoId(IRepositoryIdProvider repoId) {
-		this.repoId = repoId;
-		model.setRepoId(repoId);
 	}
 	
 	public Model getModel(){
@@ -152,6 +151,22 @@ public class ServiceManager {
 	
 	public int getRequestLimit(){
 		return githubClient.getRequestLimit();
+	}
+	
+	public HashMap<String, List> getGitHubResources(IRepositoryIdProvider repoId) throws IOException {
+		this.repoId = repoId;
+		model.setRepoId(repoId);
+		List<User> ghCollaborators = getCollaborators();
+		List<Label> ghLabels = getLabels();
+		List<Milestone> ghMilestones = getMilestones();
+		List<Issue> ghIssues = getAllIssues();
+		
+		HashMap<String, List> map = new HashMap<String, List>();
+		map.put(KEY_COLLABORATORS, ghCollaborators);
+		map.put(KEY_LABELS, ghLabels);
+		map.put(KEY_MILESTONES, ghMilestones);
+		map.put(KEY_ISSUES, ghIssues);
+		return map;
 	}
 	
 	/**

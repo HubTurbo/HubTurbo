@@ -16,23 +16,15 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
-import util.ConfigFileHandler;
 import util.DialogMessage;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
-	private static final String KEY_ISSUES = "issues";
-	private static final String KEY_MILESTONES = "milestones";
-	private static final String KEY_LABELS = "labels";
-	private static final String KEY_COLLABORATORS = "collaborators";
+
 
 	public enum IssueEditMode{NIL, CREATE, EDIT};
 	
@@ -172,18 +164,7 @@ public class SidePanel extends VBox {
 				@Override
 				protected HashMap<String, List> call() throws Exception {
 					//TODO: repository validity check?
-					ServiceManager.getInstance().setRepoId(repoId);
-					List<User> ghCollaborators = ServiceManager.getInstance().getCollaborators();
-					List<Label> ghLabels = ServiceManager.getInstance().getLabels();
-					List<Milestone> ghMilestones = ServiceManager.getInstance().getMilestones();
-					List<Issue> ghIssues = ServiceManager.getInstance().getAllIssues();
-					
-					HashMap<String, List> map = new HashMap<String, List>();
-					map.put(KEY_COLLABORATORS, ghCollaborators);
-					map.put(KEY_LABELS, ghLabels);
-					map.put(KEY_MILESTONES, ghMilestones);
-					map.put(KEY_ISSUES, ghIssues);
-					return map;
+					return ServiceManager.getInstance().getGitHubResources(repoId);
 				}
 			};
 			DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
@@ -195,11 +176,12 @@ public class SidePanel extends VBox {
 				HashMap<String, List> map = task.getValue();
 				if (map != null) {
 					StatusBar.displayMessage("Issues loaded successfully!");
-					ConfigFileHandler.loadProjectConfig(repoId);
-					model.loadCollaborators(map.get(KEY_COLLABORATORS));
-					model.loadLabels(map.get(KEY_LABELS));
-					model.loadMilestones(map.get(KEY_MILESTONES));
-					model.loadIssues(map.get(KEY_ISSUES));
+					try {
+						model.loadComponents(repoId, map);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					ServiceManager.getInstance().setupAndStartModelUpdate();
 					columns.resumeColumns();
 					SidePanel.this.refresh();

@@ -69,6 +69,17 @@ public class Model {
 		loadIssues(ServiceManager.getInstance().getAllIssues());
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources) throws IOException{
+		this.repoId = repoId;
+		ConfigFileHandler.loadProjectConfig(getRepoId());
+		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
+		loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
+		loadLabels((List<Label>) ghResources.get(ServiceManager.KEY_LABELS));
+		loadMilestones((List<Milestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
+		loadIssues((List<Issue>)ghResources.get(ServiceManager.KEY_ISSUES));
+	}
+	
 	public void applyMethodOnModelChange(Runnable method){
 		methodsOnChange.add(method);
 	}
