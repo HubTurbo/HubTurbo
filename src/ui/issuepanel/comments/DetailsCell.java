@@ -1,5 +1,7 @@
 package ui.issuepanel.comments;
 
+import com.sun.prism.paint.Color;
+
 import handler.IssueDetailsContentHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
@@ -21,6 +23,7 @@ public class DetailsCell extends ListCell<TurboComment>{
 		}else{
 			display = new IssueDetailsCard();
 		}
+		this.getStyleClass().add("comments-list-cell");
 	}
 	
 	@Override

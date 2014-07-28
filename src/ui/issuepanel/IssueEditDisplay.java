@@ -79,7 +79,7 @@ public class IssueEditDisplay extends VBox{
 	}
 	
 	private void setupDescriptionDisplays(){
-		setupIssueDescriptionDisplay(); //TODO:
+		setupIssueDescriptionDisplay();
 		setupEditableDescription();
 	}
 	
@@ -200,7 +200,6 @@ public class IssueEditDisplay extends VBox{
 	
 	private void setupEditableDescription(){
 		editableIssueDesc = new TextArea(issue.getDescription());
-//		editableIssueDesc.setPrefRowCount(DESC_ROW_NUM);
 		editableIssueDesc.setPrefColumnCount(42);
 		editableIssueDesc.setWrapText(true);
 		editableIssueDesc.setPromptText("Description");

@@ -69,7 +69,6 @@ public class IssueDetailsCard extends VBox{
 	
 	protected void loadComponents(){
 		setupCommentBodyChangeListener();
-//		setupWebContentLoadListener();
 		loadCardComponents();
 	}
 	
