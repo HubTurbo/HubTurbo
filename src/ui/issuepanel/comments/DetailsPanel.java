@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
@@ -72,6 +73,14 @@ public class DetailsPanel extends VBox {
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
 		listView.setCellFactory(commentCellFactory());
 		listView.setItems(detailsList);
+	}
+	
+	protected void addItemToDisplay(Node child){
+		displayArea.getChildren().add(child);
+	}
+	
+	protected void removeItemFromDisplay(Node child){
+		displayArea.getChildren().remove(child);
 	}
 	
 	private void setupLayout(){

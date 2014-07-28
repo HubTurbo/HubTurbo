@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
@@ -74,7 +75,10 @@ public class IssueDetailsDisplay extends VBox {
 			}
 			
 		};
-				
+		
+		ProgressIndicator indicator = new ProgressIndicator();
+		indicator.progressProperty().bind(bgTask.progressProperty());
+		
 		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);
 		bgTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
@@ -82,6 +86,7 @@ public class IssueDetailsDisplay extends VBox {
             public void handle(WorkerStateEvent t) {
             	IssueDetailsDisplay self = selfRef.get();
             	if(self != null){
+            		commentsDisplay.removeItemFromDisplay(indicator);
             		self.scrollDisplayToBottom();
             		self.loadFailCount = 0;
             	}
@@ -101,12 +106,13 @@ public class IssueDetailsDisplay extends VBox {
             			//Notify user of load failure and reset count
             			loadFailCount = 0;
             			StatusBar.displayMessage("An error occured while loading the issue's comments. Comments partially loaded");
+            			commentsDisplay.removeItemFromDisplay(indicator);
             		}
             	}
             }
         });
 		
-		DialogMessage.showProgressDialog(bgTask, "Loading Issue Comments...");
+		commentsDisplay.addItemToDisplay(indicator);
 		backgroundThread = new Thread(bgTask);
 		backgroundThread.start();
 	}
