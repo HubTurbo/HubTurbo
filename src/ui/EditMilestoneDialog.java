@@ -18,7 +18,7 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 
 	public EditMilestoneDialog(Stage parentStage, TurboMilestone originalMilestone) {
 		super(parentStage);
-		this.originalMilestone = originalMilestone;
+		this.originalMilestone = originalMilestone != null ? originalMilestone : new TurboMilestone();
 		
 		setTitle("Edit Milestone");
 		setSize(330, 50);
@@ -36,8 +36,10 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 
 		Button done = new Button("Done");
 		done.setOnAction(e -> {
-			respond(milestoneTitleField.getText(), datePicker.getValue());
-			close();
+			if (!milestoneTitleField.getText().isEmpty()) {
+				respond(milestoneTitleField.getText(), datePicker.getValue());
+				close();
+			}
 		});
 		
 		HBox layout = new HBox();
@@ -54,9 +56,5 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 		originalMilestone.setDueOn(dueDate);
 		completeResponse(originalMilestone);
 	}
-	
-	
-	
-	
 	
 }

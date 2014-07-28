@@ -2,8 +2,6 @@ package ui;
 
 import java.lang.ref.WeakReference;
 
-import model.Model;
-import model.TurboMilestone;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -14,10 +12,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.Model;
+import model.TurboMilestone;
 
 public class MilestoneManagementComponent {
-
-	private static final String NEW_MILESTONE_NAME = "newmilestone";
 	
 	private final Stage parentStage;
 	private final Model model;
@@ -65,8 +63,14 @@ public class MilestoneManagementComponent {
 
 	private Node createButtons() {
 		Button create = new Button("New Milestone");
-		create.setOnAction(e -> {
-			model.createMilestone(new TurboMilestone(NEW_MILESTONE_NAME));
+		create.setOnAction(event -> {
+			(new EditMilestoneDialog(parentStage, null)).show().thenApply(response -> {
+				model.createMilestone(response);
+				return true;
+			}).exceptionally(exception -> {
+				exception.printStackTrace();
+				return false;
+			});
 		});
 		HBox.setHgrow(create, Priority.ALWAYS);
 		create.setMaxWidth(Double.MAX_VALUE);

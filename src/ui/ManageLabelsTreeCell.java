@@ -60,18 +60,24 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		}
 	}
 	
-	private void triggerLabelEdit(TurboLabel label) {
+	private void triggerLabelEdit(TurboLabel label, boolean isNewLabel) {
 		String oldName = label.toGhName();
 
 		(new EditLabelDialog(stage, label)).show().thenApply(response -> {
-	    	model.updateLabel(response, oldName);
-	    	
-	    	// The tree view doesn't update automatically because there is;
-	    	// no binding; manually trigger the update
-	    	label.copyValues(response);
-	    	updateItem(label, false);
-	    	sidePanel.refresh();
-	    	
+	    	if (isNewLabel) {
+	    		TurboLabel createdLabel = model.createLabel(response);
+	    		// Make sure this TurboLabelGroup has a reference to the new label
+				((TurboLabelGroup) getTreeItem().getValue()).addLabel(createdLabel);
+				getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(createdLabel));
+				getTreeItem().setExpanded(true);
+	    	} else {
+	    		model.updateLabel(response, oldName);
+	    		// The tree view doesn't update automatically because there is;
+		    	// no binding; manually trigger the update
+		    	label.copyValues(response);
+		    	updateItem(label, false);
+		    	sidePanel.refresh();
+	    	}
 			return true;
 		}).exceptionally(e -> {
 			e.printStackTrace();
@@ -84,7 +90,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		edit.setOnAction((event) -> {
 			assert getItem() instanceof TurboLabel;
 			TurboLabel original = (TurboLabel) getItem();
-			triggerLabelEdit(original);
+			triggerLabelEdit(original, false);
 		});
 		MenuItem delete = new MenuItem("Delete Label");
 		delete.setOnAction((event) -> {
@@ -145,7 +151,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			
 			// Create a new label
 			TurboLabel newLabel = new TurboLabel();
-			newLabel.setName("newlabel" + LabelManagementComponent.getUniqueId());
+			newLabel.setName("");
 			
 			// Set its group value to null if it's being created under the <Ungrouped> group
 			String groupName = getTreeItem().getValue().getValue();
@@ -155,15 +161,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			// Set its exclusivity
 			newLabel.setExclusive(((TurboLabelGroup) getTreeItem().getValue()).isExclusive());
 			
-			newLabel = model.createLabel(newLabel);
+			triggerLabelEdit(newLabel, true);
 			
-			// Make sure this TurboLabelGroup has a reference to the new label
-			((TurboLabelGroup) getTreeItem().getValue()).addLabel(newLabel);
-			getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(newLabel));
-			
-			getTreeItem().setExpanded(true);
-			
-			triggerLabelEdit(newLabel);
 		});
 		
 		boolean isUngroupedHeading = getTreeItem().getValue().getValue().equals(LabelManagementComponent.UNGROUPED_NAME);
@@ -199,7 +198,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	}
 
 	public static void createNewGroup(Stage stage, TreeView<LabelTreeItem> treeView) {
-		TurboLabelGroup group = new TurboLabelGroup("newgroup" + LabelManagementComponent.getUniqueId());
+		TurboLabelGroup group = new TurboLabelGroup("");
 		(new EditGroupDialog(stage, group))
 			.setExclusiveCheckboxEnabled(true)
 			.show().thenApply(response -> {

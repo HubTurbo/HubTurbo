@@ -40,8 +40,10 @@ public class EditGroupDialog extends Dialog<TurboLabelGroup> {
 
 		Button done = new Button("Done");
 		done.setOnAction(e -> {
-			respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
-			close();
+			if (!groupNameField.getText().isEmpty()) {
+				respond(groupNameField.getText(), showExclusiveCheckbox ? checkbox.isSelected() : exclusive);
+				close();
+			}
 		});
 		
 		HBox layout = new HBox();

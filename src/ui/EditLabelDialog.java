@@ -60,13 +60,17 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 
 		Button done = new Button("Done");
 		done.setOnAction(e -> {
-			respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
-			close();
+			if (!labelNameField.getText().isEmpty()) {
+				respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
+				close();
+			}
 		});
 
 		labelNameField.setOnAction(e -> {
-			respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
-			close();
+			if (!labelNameField.getText().isEmpty()) {
+				respond(labelGrpField.getText(), labelNameField.getText(), toRGBCode(colourPicker.getValue()));
+				close();
+			}
 		});
 
 		HBox layout = new HBox();
