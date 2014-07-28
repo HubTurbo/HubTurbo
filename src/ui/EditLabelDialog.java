@@ -42,7 +42,7 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 	protected Parent content() {
 		
 		setTitle("Edit Label");
-		setSize(450, 50);
+		setSize(450, 45);
 		
 		labelGrpField = new TextField();
 		if(originalLabel.getGroup() != null){
@@ -74,7 +74,7 @@ public class EditLabelDialog extends Dialog<TurboLabel> {
 		});
 
 		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
+		layout.setPadding(new Insets(5));
 		layout.setSpacing(10);
 		layout.setAlignment(Pos.BASELINE_CENTER);
 		layout.getChildren().addAll(labelGrpField, delimiter, labelNameField, colourPicker, done);

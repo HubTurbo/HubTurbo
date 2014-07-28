@@ -21,7 +21,7 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 		this.originalMilestone = originalMilestone != null ? originalMilestone : new TurboMilestone();
 		
 		setTitle("Edit Milestone");
-		setSize(330, 50);
+		setSize(330, 45);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class EditMilestoneDialog extends Dialog<TurboMilestone>{
 		});
 		
 		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
+		layout.setPadding(new Insets(5));
 		layout.setSpacing(10);
 		layout.setAlignment(Pos.BASELINE_CENTER);
 		layout.getChildren().addAll(milestoneTitleField, datePicker, done);

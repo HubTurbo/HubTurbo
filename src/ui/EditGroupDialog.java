@@ -21,7 +21,7 @@ public class EditGroupDialog extends Dialog<TurboLabelGroup> {
 		this.exclusive = group.isExclusive();
 		
 		setTitle("Edit Group");
-		setSize(330, 50);
+		setSize(330, 45);
 	}
 	
 	public EditGroupDialog setExclusiveCheckboxEnabled(boolean visible) {
@@ -47,7 +47,7 @@ public class EditGroupDialog extends Dialog<TurboLabelGroup> {
 		});
 		
 		HBox layout = new HBox();
-		layout.setPadding(new Insets(15));
+		layout.setPadding(new Insets(5));
 		layout.setSpacing(10);
 		layout.setAlignment(Pos.BASELINE_CENTER);
 		layout.getChildren().addAll(groupNameField, checkbox, done);
