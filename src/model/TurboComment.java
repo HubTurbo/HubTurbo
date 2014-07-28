@@ -25,9 +25,7 @@ public class TurboComment{
 	private String url;
 
 	private TurboUser creator;
-	
-//	private String cachedHtmlBodyMarkup;
-	
+		
 	public TurboComment(Comment comment){
 		createdAt = comment.getCreatedAt();
 		updatedAt = comment.getUpdatedAt();
@@ -94,22 +92,7 @@ public class TurboComment{
 	public StringProperty getBodyTextProperty(){
 		return bodyText;
 	}
-	
-//	public boolean markupIsLoaded(){
-//		return cachedHtmlBodyMarkup == null;
-//	}
-//	
-//	public String getBodyHtmlMarkUp(){
-//		if(cachedHtmlBodyMarkup == null){
-//			try {
-//				cachedHtmlBodyMarkup = ServiceManager.getInstance().getRepositoryHtml(getBody());
-//			} catch (IOException e) {
-//				cachedHtmlBodyMarkup = getBody();
-//			}
-//		}
-//		return cachedHtmlBodyMarkup;
-//	}
-	
+		
 	public void setId(long id){
 		this.id = id;
 	}
@@ -143,7 +126,6 @@ public class TurboComment{
 			setId(comment.getId());
 			setUrl(comment.getUrl());
 			setCreator(comment.getCreator());
-//			cachedHtmlBodyMarkup = null; //Reset cached html markup obtained from github
 		}
 	}
 	

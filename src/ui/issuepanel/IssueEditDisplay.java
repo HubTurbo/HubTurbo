@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
@@ -37,8 +38,14 @@ import util.Browse;
 
 public class IssueEditDisplay extends VBox{
 	private static final int ELEMENT_SPACING = 5;
+	protected static String EDIT_BTN_TXT = "\uf058";
+	protected static String BACK_BTN_TXT = " \uf0a4 ";
 	
-	Text issueIdText;
+	private Text issueIdText;
+	private TextArea editableIssueDesc;
+	private WebView issueDesc;
+	private ToggleButton descEditMode;
+	private VBox descArea;
 	
 	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
 	protected static final int LINE_HEIGHT = 18;
@@ -66,8 +73,51 @@ public class IssueEditDisplay extends VBox{
 	private void setup(){
 		setPadding(new Insets(15));
 		setSpacing(ELEMENT_SPACING);
-		getChildren().addAll(top(), bottom());
+		setupDescription();
+		getChildren().addAll(top(), descArea, bottom());
 	}
+	
+	private void setupDescriptionDisplays(){
+		setupIssueDescriptionDisplay(); //TODO:
+		setupEditableDescription();
+	}
+	
+	private void setupDescription(){
+		descArea = new VBox();
+		
+		HBox container = new HBox();
+		initialiseDescEditButton();
+		container.getChildren().add(descEditMode);
+		container.setAlignment(Pos.BASELINE_RIGHT);
+		
+		setupDescriptionDisplays();
+		
+		descArea.getChildren().addAll(container, issueDesc);
+	}
+	
+	private void initialiseDescEditButton(){
+		descEditMode = new ToggleButton();
+		descEditMode.getStyleClass().addAll("button-github-octicon");
+		descEditMode.setText(EDIT_BTN_TXT);
+		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
+		WeakReference<ToggleButton> btnRef = new WeakReference<>(descEditMode);
+		descEditMode.setOnAction((ActionEvent e) -> {
+			boolean editMode = btnRef.get().isSelected();
+			selfRef.get().toggleDescriptionAreaForEditMode(editMode);
+		});
+	}
+	
+	private void toggleDescriptionAreaForEditMode(boolean edit){
+		descArea.getChildren().remove(1);
+		if(edit){
+			descArea.getChildren().add(editableIssueDesc);
+			descEditMode.setText(BACK_BTN_TXT);
+		}else{
+			descArea.getChildren().add(issueDesc);
+			descEditMode.setText(EDIT_BTN_TXT);
+		}
+	}
+	
 	
 	private ChangeListener<String> createIssueTitleChangeListener(){
 		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
@@ -83,10 +133,12 @@ public class IssueEditDisplay extends VBox{
 	
 	private ChangeListener<String> createIssueDescriptionChangeListener(){
 		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		WeakReference<IssueEditDisplay> selfRef = new WeakReference<IssueEditDisplay>(this);
 		ChangeListener<String> listener =  (observable, oldValue, newValue) -> {
 			TurboIssue issue = issueRef.get();
         	if(issue != null){
         		issue.setDescription(newValue);
+        		selfRef.get().loadIssueDescriptionViewContent();
         	}
 		};
 		changeListeners.add(listener);
@@ -145,17 +197,29 @@ public class IssueEditDisplay extends VBox{
 		return title;
 	}
 	
-	private TextArea createIssueDescription(){
-		TextArea issueDesc = new TextArea(issue.getDescription());
-		issueDesc.setPrefRowCount(DESC_ROW_NUM);
-		issueDesc.setPrefColumnCount(42);
-		issueDesc.setWrapText(true);
-		issueDesc.setPromptText("Description");
-		issueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
+	private void setupEditableDescription(){
+		editableIssueDesc = new TextArea(issue.getDescription());
+		editableIssueDesc.setPrefRowCount(DESC_ROW_NUM);
+		editableIssueDesc.setPrefColumnCount(42);
+		editableIssueDesc.setWrapText(true);
+		editableIssueDesc.setPromptText("Description");
+		editableIssueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
 
 		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
-		issueDesc.setMaxHeight(maxIssueDescHeight);
-		return issueDesc;
+		editableIssueDesc.setMaxHeight(maxIssueDescHeight);
+	}
+	
+	private void setupIssueDescriptionDisplay(){
+		issueDesc = new WebView();
+		int issueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
+		issueDesc.setPrefHeight(issueDescHeight);
+		loadIssueDescriptionViewContent();
+	}
+	
+	private void loadIssueDescriptionViewContent(){
+		if(issueDesc != null){
+			issueDesc.getEngine().loadContent(issue.getDescriptionMarkup());
+		}
 	}
 	
 	private Parent top() {
@@ -171,14 +235,10 @@ public class IssueEditDisplay extends VBox{
 		issueCreatorContainer.setAlignment(Pos.BASELINE_RIGHT);
 		issueCreatorContainer.getChildren().add(issueCreator);
 
-		TextArea issueDesc = createIssueDescription();
-		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
-		issueDesc.setMaxHeight(maxIssueDescHeight);
-		
 		VBox top = new VBox();
 		top.setSpacing(ELEMENT_SPACING);
-		top.getChildren().addAll(title, issueCreatorContainer ,issueDesc);
-		top.setMaxHeight(maxIssueDescHeight + title.getMaxHeight() + issueCreatorContainer.getMaxHeight());
+		top.getChildren().addAll(title, issueCreatorContainer);
+		top.setMaxHeight(title.getMaxHeight() + issueCreatorContainer.getMaxHeight());
 		return top;
 	}
 	

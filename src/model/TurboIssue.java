@@ -1,5 +1,6 @@
 package model;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 
+import service.ServiceManager;
 import util.LocalConfigurations;
 import util.ProjectConfigurations;
 
@@ -106,10 +108,25 @@ public class TurboIssue implements Listable {
     	return description.get();
     }
     public final void setDescription(String value) {
+    	cachedDescriptionMarkup = null; //markup is invalid since the issue's description is to be overwritten
     	description.set(value);
     }
     public StringProperty descriptionProperty() {
     	return description;
+    }
+    
+    private String cachedDescriptionMarkup;
+    public String getDescriptionMarkup(){
+    	try{
+    		if(cachedDescriptionMarkup == null){
+        		final String desc = getDescription();
+        		cachedDescriptionMarkup = ServiceManager.getInstance().getContentMarkup(desc);
+        	}
+    	}catch(IOException e){
+    		e.printStackTrace();
+    		return getDescription();
+    	}
+    	return cachedDescriptionMarkup;
     }
     
     private IntegerProperty parentIssue = new SimpleIntegerProperty();
