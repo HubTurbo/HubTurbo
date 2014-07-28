@@ -74,6 +74,7 @@ public class IssueEditDisplay extends VBox{
 		setPadding(new Insets(15));
 		setSpacing(ELEMENT_SPACING);
 		setupDescription();
+		setVgrow(descArea, Priority.ALWAYS);
 		getChildren().addAll(top(), descArea, bottom());
 	}
 	
@@ -199,20 +200,18 @@ public class IssueEditDisplay extends VBox{
 	
 	private void setupEditableDescription(){
 		editableIssueDesc = new TextArea(issue.getDescription());
-		editableIssueDesc.setPrefRowCount(DESC_ROW_NUM);
+//		editableIssueDesc.setPrefRowCount(DESC_ROW_NUM);
 		editableIssueDesc.setPrefColumnCount(42);
 		editableIssueDesc.setWrapText(true);
 		editableIssueDesc.setPromptText("Description");
 		editableIssueDesc.textProperty().addListener(new WeakChangeListener<String>(createIssueDescriptionChangeListener()));
-
-		int maxIssueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
-		editableIssueDesc.setMaxHeight(maxIssueDescHeight);
+		editableIssueDesc.setPrefHeight(700); //Large number so textarea scales to fill remaining space
 	}
 	
 	private void setupIssueDescriptionDisplay(){
 		issueDesc = new WebView();
-		int issueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
-		issueDesc.setPrefHeight(issueDescHeight);
+//		int issueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
+//		issueDesc.setPrefHeight(issueDescHeight);
 		loadIssueDescriptionViewContent();
 	}
 	
