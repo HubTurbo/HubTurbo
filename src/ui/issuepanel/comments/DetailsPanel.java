@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.TurboComment;
@@ -26,6 +27,7 @@ public class DetailsPanel extends VBox {
 	public static final int COMMENTS_PADDING = 5;
 	protected static final int DEFAULT_HEIGHT = 150;
 	
+	private StackPane displayArea;
 	private ListView<TurboComment> listView;
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
@@ -46,7 +48,30 @@ public class DetailsPanel extends VBox {
 			detailsList = handler.getIssueHistory();
 		}
 		setupLayout();
-		loadItems();
+		loadDisplayElements();
+	}
+	
+	private void loadDisplayElements(){
+		setupDetailsDisplay();
+		getChildren().add(displayArea);
+		if(displayType == DisplayType.COMMENTS){
+			TitledPane cBox = createNewCommentsBox();
+			getChildren().add(cBox);
+		}
+	}
+	
+	private void setupDetailsDisplay(){
+		displayArea = new StackPane();
+		displayArea.setPrefHeight(LIST_MAX_HEIGHT);
+		setupListItems();
+		displayArea.getChildren().add(listView);
+	}
+	
+	private void setupListItems(){
+		listView = new ListView<TurboComment>();
+		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
+		listView.setCellFactory(commentCellFactory());
+		listView.setItems(detailsList);
 	}
 	
 	private void setupLayout(){
@@ -69,23 +94,15 @@ public class DetailsPanel extends VBox {
 		};
 		return factory;
 	}
-	
-	private void loadItems() {
-		if(displayType == DisplayType.COMMENTS){
-			loadNewCommentsBox();
-		}
-		setListItems();
-		getChildren().add(0, listView);
-	}
 
 	
-	private void loadNewCommentsBox(){
+	private TitledPane createNewCommentsBox(){
 		CommentsEditBox box = new CommentsEditBox(handler);
 		box.setPrefHeight(COMMENTS_CELL_HEIGHT);
 		box.setPrefWidth(COMMENTS_CELL_WIDTH);
 		
 		TitledPane commentsContainer = createCommentsContainer(box);
-		getChildren().add(commentsContainer);
+		return commentsContainer;
 	}
 	
 	private TitledPane createCommentsContainer(CommentsEditBox box){
@@ -115,10 +132,4 @@ public class DetailsPanel extends VBox {
 		return commentsContainer;
 	}
 	
-	private void setListItems(){
-		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
-		listView.setPrefHeight(LIST_MAX_HEIGHT);
-		listView.setCellFactory(commentCellFactory());
-		listView.setItems(detailsList);
-	}
 }
