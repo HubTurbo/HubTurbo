@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
+import util.ConfigFileHandler;
 import util.DialogMessage;
 import util.SessionConfigurations;
 
@@ -194,6 +195,7 @@ public class SidePanel extends VBox {
 				HashMap<String, List> map = task.getValue();
 				if (map != null) {
 					StatusBar.displayMessage("Issues loaded successfully!");
+					ConfigFileHandler.loadProjectConfig(repoId);
 					model.loadCollaborators(map.get(KEY_COLLABORATORS));
 					model.loadLabels(map.get(KEY_LABELS));
 					model.loadMilestones(map.get(KEY_MILESTONES));
