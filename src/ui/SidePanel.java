@@ -185,7 +185,7 @@ public class SidePanel extends VBox {
 					return map;
 				}
 			};
-			DialogMessage.showProgressDialog(task, "Switching repository...");
+			DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
 			Thread thread = new Thread(task);
 			thread.setDaemon(true);
 			thread.start();
@@ -193,7 +193,7 @@ public class SidePanel extends VBox {
 			task.setOnSucceeded(wse -> {
 				HashMap<String, List> map = task.getValue();
 				if (map != null) {
-					StatusBar.displayMessage("Repository switched successfully!");
+					StatusBar.displayMessage("Issues loaded successfully!");
 					model.loadCollaborators(map.get(KEY_COLLABORATORS));
 					model.loadLabels(map.get(KEY_LABELS));
 					model.loadMilestones(map.get(KEY_MILESTONES));
@@ -202,7 +202,7 @@ public class SidePanel extends VBox {
 					columns.resumeColumns();
 					SidePanel.this.refresh();
 				} else {
-					StatusBar.displayMessage("Repository switched failed.");
+					StatusBar.displayMessage("Issues failed to load. Please try again.");
 				}
 			});
 			

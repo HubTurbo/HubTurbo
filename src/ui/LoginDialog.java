@@ -141,41 +141,41 @@ public class LoginDialog extends Dialog<Boolean> {
 		enableElements(false);
 		
 		// Run blocking operations in the background
+		
+		StatusBar.displayMessage("Signing in at GitHub...");
+    	boolean couldLogIn = ServiceManager.getInstance().login(username, password);
 
-		final String username2 = username;
-		final String password2 = password;
 		Task<Boolean> task = new Task<Boolean>() {
 		    @Override
 		    protected Boolean call() throws Exception {
-	    		StatusBar.displayMessage("Signing in at GitHub...");
-		    	boolean couldLogIn = ServiceManager.getInstance().login(username2, password2);
-		    	if (couldLogIn) {
-		    		StatusBar.displayMessage("Logged in; loading data...");
-			    	loadRepository(owner, repo);
-		    	}
-		    	return couldLogIn;
+		    	StatusBar.displayMessage("Signed in; loading data...");
+			    loadRepository(owner, repo);
+		    	return true;
 		    }
 		};
-		
-		DialogMessage.showProgressDialog(task, "Signing in at GitHub...");
-		Thread th = new Thread(task);
-		th.setDaemon(true);
-		th.start();
-
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
-				StatusBar.displayMessage("Logged in successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
+				StatusBar.displayMessage("Issues loaded successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
 				columns.resumeColumns();
 				completeResponse(true);
 				close();
 			} else {
-				handleError("Failed to log in. Please try again.");
+				handleError("Issues failed to load. Please try again.");
 			}
 		});
-		
 		task.setOnFailed(wse -> {
 			handleError("An error occurred: " + task.getException());
 		});
+		
+		if (couldLogIn) {
+			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
+			Thread th = new Thread(task);
+			th.setDaemon(true);
+			th.start();
+		} else {
+			handleError("Failed to sign in. Please try again.");
+		}
+		
 	}
 
 	private void handleError(String message) {
