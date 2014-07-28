@@ -89,14 +89,17 @@
 	-fx-padding: 2;
 }
 
-.comments-list-cell {
-    -fx-background-color: #FFFFFF;
+.desc-toggle-button {
+	-fx-border-color: transparent;
+	-fx-background-color: transparent;
 }
 
 .comments-label-button {
 	-fx-background-color: transparent;
-	-fx-text-fill: rgb(0, 0 , 0, 1);
-	-fx-highlight-text-fill: rgb(0, 0, 0, 1);
+}
+
+.comments-list-cell {
+    -fx-background-color: #FFFFFF;
 }
 
 .list-cell:empty {
