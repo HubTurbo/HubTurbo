@@ -33,8 +33,11 @@ public class ServiceManagerTest {
 		boolean wrongCred = service.login(TEST_GH_USERNAME, "123");
 		assertFalse(wrongCred);
 		assertTrue(service.login(TEST_GH_USERNAME, TEST_GH_PASSWORD));
-		service.setupRepository(TEST_GH_USERNAME, TEST_REPO_NAME);
-		service.stopModelUpdate();
+		try {
+			service.setupRepository(TEST_GH_USERNAME, TEST_REPO_NAME);
+		} catch (IOException e) {
+			fail();
+		}
 	}
 	
 //	@Test

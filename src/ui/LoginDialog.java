@@ -2,7 +2,9 @@ package ui;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -179,9 +181,11 @@ public class LoginDialog extends Dialog<Boolean> {
 	}
 
 	private void handleError(String message) {
-		StatusBar.displayMessage(message);
-		enableElements(true);
-		DialogMessage.showWarningDialog("Warning", message);
+		Platform.runLater(()->{
+			enableElements(true);
+			StatusBar.displayMessage(message);
+			DialogMessage.showWarningDialog("Warning", message);
+		});
 	}
 
 	private void enableElements(boolean enable) {
@@ -193,7 +197,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField.setDisable(disable);
 	}
 	
-	private void loadRepository(String owner, String repoName) {
+	private void loadRepository(String owner, String repoName) throws IOException {
 		ServiceManager.getInstance().setupRepository(owner, repoName);
+		ServiceManager.getInstance().setupAndStartModelUpdate();
 	}
 }

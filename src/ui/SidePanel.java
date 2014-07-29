@@ -17,6 +17,7 @@ import model.Model;
 import model.TurboIssue;
 
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
@@ -163,7 +164,6 @@ public class SidePanel extends VBox {
 			Task<HashMap<String, List>> task = new Task<HashMap<String, List>>(){
 				@Override
 				protected HashMap<String, List> call() throws Exception {
-					//TODO: repository validity check?
 					return ServiceManager.getInstance().getGitHubResources(repoId);
 				}
 			};
@@ -191,6 +191,9 @@ public class SidePanel extends VBox {
 			});
 			
 			task.setOnFailed(wse -> {
+//				if(task.getException() instanceof RequestException){
+//					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
+//				}
 				StatusBar.displayMessage("An error occurred: " + task.getException());
 			});
 		}

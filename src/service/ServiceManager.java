@@ -1,6 +1,7 @@
 package service;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MarkdownService;
@@ -28,6 +30,9 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.HOST_API;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 public class ServiceManager {
 	public static final boolean isTestMode = false;
@@ -134,14 +139,30 @@ public class ServiceManager {
 	}
 	
 	
-	public void setupRepository(String owner, String name){
+	public void setupRepository(String owner, String name) throws IOException{
 		repoId = RepositoryId.create(owner, name);
-		try {
+		if(checkRepository(repoId)){
 			model.loadComponents(repoId);
-			setupAndStartModelUpdate();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}else{
+			throw new IOException("Cannot access repository"); //TODO: create specific exception for this
+		}
+		
+	}
+	
+	public boolean checkRepository(IRepositoryIdProvider repo) throws IOException{
+		String repoURL = SEGMENT_REPOS + "/" + repo.generateId();
+		return check(repoURL);
+	}
+	
+	protected boolean check(String uri) throws IOException {
+		try {
+			GitHubRequest req = new GitHubRequest();
+			githubClient.get(req.setUri(uri));
+			return true;
+		} catch (RequestException e) {
+			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND)
+				return false;
+			throw e;
 		}
 	}
 	
