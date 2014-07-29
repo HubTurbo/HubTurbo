@@ -1,7 +1,9 @@
 package ui;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import service.ServiceManager;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,6 +20,11 @@ import javafx.stage.Stage;
 public class EditableMarkupPopup extends Stage{	
 	protected static final String EDIT_BTN_TXT = "\uf058";
 	protected static final String BACK_BTN_TXT = " \uf0a4 ";
+	protected static final String DEFAULT_CSS = "<style type=\"text/css\">"
+			+ "img{"
+			+ "max-width: 100%;"
+			+ "}"
+			+ "</style>";
 	
 	private WebView markupDisplay;
 	private VBox editableDisplayView;
@@ -47,14 +54,28 @@ public class EditableMarkupPopup extends Stage{
 		return editableDisplay.getHtmlText();
 	}
 	
+	public String getDisplayedContentMarkup(){
+		try {
+			return ServiceManager.getInstance().getContentMarkup(getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return getText();
+		}
+	}
+	
 	public void setDisplayedText(String markup){
-		markupDisplay.getEngine().loadContent(markup);
+		loadContentForWebView(markup);
 		editableDisplay.setHtmlText(markup);
 	}
 	
 	public void setDisplayedText(String markup, String original){
-		markupDisplay.getEngine().loadContent(markup);
+		loadContentForWebView(markup);
 		editableDisplay.setHtmlText(original);
+	}
+	
+	private void loadContentForWebView(String markup){
+		String content = DEFAULT_CSS + markup;
+		markupDisplay.getEngine().loadContent(content);
 	}
 	
 	private void setupContents(){
@@ -98,7 +119,7 @@ public class EditableMarkupPopup extends Stage{
 				container.getChildren().add(editableDisplayView);
 			}else{
 				btnRef.get().setText(EDIT_BTN_TXT);
-				markupDisplay.getEngine().loadContent(getText());
+				loadContentForWebView(getDisplayedContentMarkup());
 				container.getChildren().add(markupDisplay);
 			}
 		});

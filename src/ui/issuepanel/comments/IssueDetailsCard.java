@@ -28,9 +28,9 @@ public class IssueDetailsCard extends VBox{
 	protected static int WEB_TEXT_PADDING = 30;
 	
 	public static final String EVENT_TYPE_CLICK = "click";
-	
-	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" +
-	           "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
+	protected static final String HTML_CONTENT_WRAPPER = "<html>"
+			+  "<body>" 
+	        +   "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
 	           "</body></html>";
 	
 	protected HBox topBar;
