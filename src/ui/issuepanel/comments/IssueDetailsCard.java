@@ -47,7 +47,6 @@ public class IssueDetailsCard extends VBox{
 		this.setSpacing(ELEMENTS_VERTICAL_SPACING);
 		this.setPrefWidth(PREF_WIDTH);
 		this.setPadding(new Insets(PADDING));
-//		this.getStyleClass().add("comments-list-cell");
 		initialiseUIComponents();
 	}
 	

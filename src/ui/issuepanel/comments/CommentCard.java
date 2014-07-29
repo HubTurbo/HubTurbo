@@ -83,11 +83,11 @@ public class CommentCard extends IssueDetailsCard{
 	
 	private EditableMarkupPopup createPopup(){
 		EditableMarkupPopup popup = new EditableMarkupPopup("Update");
-		popup.setDisplayedText(editedComment.getBodyHtml());
+		popup.setDisplayedText(editedComment.getBodyHtml(), editedComment.getBody());
 		
 		WeakReference<EditableMarkupPopup> ref = new WeakReference<>(popup);
 		popup.setEditModeCompletion(() -> {
-			editedComment.setBody(ref.get().getDisplayedText());
+			editedComment.setBody(ref.get().getText());
 			handler.editComment(editedComment);
 		});
 		return popup;
@@ -122,13 +122,13 @@ public class CommentCard extends IssueDetailsCard{
 	@Override
 	protected void loadCommentsDisplay(){
 		commentsTextDisplay.getChildren().clear();
+		updateEditButtonText();
 		if(!handler.commentIsInEditState(originalComment)){
 			commentEditField = null;
 			super.loadCommentsDisplay();
 		}else{
 			loadCommentEditField();
 		}
-		updateEditButtonText();
 	}
 	
 	private void loadCommentEditField(){
@@ -136,6 +136,7 @@ public class CommentCard extends IssueDetailsCard{
 			initialiseEditableCommentsText();
 		}
 		commentsTextDisplay.getChildren().add(commentEditField);
+		commentEditField.requestFocus();
 	}
 
 	

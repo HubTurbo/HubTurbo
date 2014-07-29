@@ -43,13 +43,18 @@ public class EditableMarkupPopup extends Stage{
 		this.initOwner(null);
 	}
 	
-	public String getDisplayedText(){
+	public String getText(){
 		return editableDisplay.getHtmlText();
 	}
 	
 	public void setDisplayedText(String markup){
 		markupDisplay.getEngine().loadContent(markup);
 		editableDisplay.setHtmlText(markup);
+	}
+	
+	public void setDisplayedText(String markup, String original){
+		markupDisplay.getEngine().loadContent(markup);
+		editableDisplay.setHtmlText(original);
 	}
 	
 	private void setupContents(){
@@ -93,7 +98,7 @@ public class EditableMarkupPopup extends Stage{
 				container.getChildren().add(editableDisplayView);
 			}else{
 				btnRef.get().setText(EDIT_BTN_TXT);
-				markupDisplay.getEngine().loadContent(getDisplayedText());
+				markupDisplay.getEngine().loadContent(getText());
 				container.getChildren().add(markupDisplay);
 			}
 		});
