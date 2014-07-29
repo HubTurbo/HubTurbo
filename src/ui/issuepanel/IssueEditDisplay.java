@@ -30,6 +30,7 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 import ui.CheckboxListDialog;
+import ui.EditableMarkupPopup;
 import ui.LabelCheckboxListDialog;
 import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
@@ -46,11 +47,13 @@ public class IssueEditDisplay extends VBox{
 			+ "</style>";
 	protected static String EDIT_BTN_TXT = "\uf058";
 	protected static String BACK_BTN_TXT = " \uf0a4 ";
+	protected static String POPUP_BTN_TXT = "\uf07f";
 	
 	private Text issueIdText;
 	private TextArea editableIssueDesc;
 	private WebView issueDesc;
 	private ToggleButton descEditMode;
+	private Button descPopup;
 	private VBox descArea;
 	
 	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
@@ -94,7 +97,9 @@ public class IssueEditDisplay extends VBox{
 		
 		HBox container = new HBox();
 		initialiseDescEditButton();
-		container.getChildren().add(descEditMode);
+		initialDescPopupButton();
+		
+		container.getChildren().addAll(descPopup, descEditMode);
 		container.setAlignment(Pos.BASELINE_RIGHT);
 		
 		setupDescriptionDisplays();
@@ -113,6 +118,28 @@ public class IssueEditDisplay extends VBox{
 			selfRef.get().toggleDescriptionAreaForEditMode(editMode);
 		});
 	}
+	
+	private void initialDescPopupButton(){
+		descPopup = new Button();
+		descPopup.setText(POPUP_BTN_TXT);
+		descPopup.getStyleClass().addAll("button-github-octicon", "borderless-button");
+		descPopup.setOnMouseClicked(e -> {
+			EditableMarkupPopup popup = createDescPopup();
+			popup.show();
+		});
+	}
+	
+	private EditableMarkupPopup createDescPopup(){
+		EditableMarkupPopup popup = new EditableMarkupPopup("Update");
+		popup.setDisplayedText(issue.getDescriptionMarkup(), issue.getDescription());
+		
+		WeakReference<EditableMarkupPopup> ref = new WeakReference<>(popup);
+		popup.setEditModeCompletion(() -> {
+			editableIssueDesc.setText(ref.get().getText());
+		});
+		return popup;
+	}
+	
 	
 	private void toggleDescriptionAreaForEditMode(boolean edit){
 		descArea.getChildren().remove(1);
@@ -215,8 +242,6 @@ public class IssueEditDisplay extends VBox{
 	
 	private void setupIssueDescriptionDisplay(){
 		issueDesc = new WebView();
-//		int issueDescHeight = DESC_ROW_NUM * LINE_HEIGHT;
-//		issueDesc.setPrefHeight(issueDescHeight);
 		loadIssueDescriptionViewContent();
 	}
 	

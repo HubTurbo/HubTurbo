@@ -94,6 +94,11 @@
 	-fx-background-color: transparent;
 }
 
+.borderless-button {
+	-fx-border-color: transparent;
+	-fx-background-color: transparent;
+}
+
 .comments-label-button {
 	-fx-background-color: transparent;
 }

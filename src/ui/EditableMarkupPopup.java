@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 
 import service.ServiceManager;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -80,6 +81,8 @@ public class EditableMarkupPopup extends Stage{
 	
 	private void setupContents(){
 		container = new VBox();
+		container.setPadding(new Insets(10));
+		
 		setupToggleButton();
 		setupMarkupDisplay();
 		setupEditableDisplayView();
@@ -97,6 +100,7 @@ public class EditableMarkupPopup extends Stage{
 	
 	private void setupEditableDisplayView(){
 		editableDisplayView = new VBox();
+		editableDisplayView.setSpacing(5);
 		editableDisplay = new HTMLEditor();
 		
 		setupCompleteButton();
