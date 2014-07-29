@@ -87,6 +87,10 @@ public class IssueEditDisplay extends VBox{
 		getChildren().addAll(top(), descArea, bottom());
 	}
 	
+	private boolean descriptionIsEmpty(){
+		return issue.getDescription().isEmpty();
+	}
+	
 	private void setupDescriptionDisplays(){
 		setupIssueDescriptionDisplay();
 		setupEditableDescription();
@@ -104,13 +108,17 @@ public class IssueEditDisplay extends VBox{
 		
 		setupDescriptionDisplays();
 		
-		descArea.getChildren().addAll(container, issueDesc);
+		descArea.getChildren().add(container);
+		setDescriptionAreaContentForEditMode(descEditMode.isSelected());
 	}
 	
 	private void initialiseDescEditButton(){
 		descEditMode = new ToggleButton();
 		descEditMode.getStyleClass().addAll("button-github-octicon", "borderless-toggle-button");
-		descEditMode.setText(EDIT_BTN_TXT);
+		boolean isEditMode = descriptionIsEmpty();
+		setDescModeButtonText(isEditMode);
+		descEditMode.setSelected(isEditMode);
+		
 		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
 		WeakReference<ToggleButton> btnRef = new WeakReference<>(descEditMode);
 		descEditMode.setOnAction((ActionEvent e) -> {
@@ -140,16 +148,26 @@ public class IssueEditDisplay extends VBox{
 		return popup;
 	}
 	
+	private void setDescModeButtonText(boolean editMode){
+		if(editMode){
+			descEditMode.setText(BACK_BTN_TXT);
+		}else{
+			descEditMode.setText(EDIT_BTN_TXT);
+		}
+	}
+	
+	private void setDescriptionAreaContentForEditMode(boolean edit){
+		if(edit){
+			descArea.getChildren().add(editableIssueDesc);
+		}else{
+			descArea.getChildren().add(issueDesc);
+		}
+	}
 	
 	private void toggleDescriptionAreaForEditMode(boolean edit){
 		descArea.getChildren().remove(1);
-		if(edit){
-			descArea.getChildren().add(editableIssueDesc);
-			descEditMode.setText(BACK_BTN_TXT);
-		}else{
-			descArea.getChildren().add(issueDesc);
-			descEditMode.setText(EDIT_BTN_TXT);
-		}
+		setDescModeButtonText(edit);
+		setDescriptionAreaContentForEditMode(edit);
 	}
 	
 	
