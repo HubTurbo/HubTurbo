@@ -138,7 +138,7 @@ public class IssueEditDisplay extends VBox{
 	}
 	
 	private EditableMarkupPopup createDescPopup(){
-		EditableMarkupPopup popup = new EditableMarkupPopup("Update");
+		EditableMarkupPopup popup = new EditableMarkupPopup("Done");
 		popup.setDisplayedText(issue.getDescriptionMarkup(), issue.getDescription());
 		
 		WeakReference<EditableMarkupPopup> ref = new WeakReference<>(popup);
@@ -360,14 +360,14 @@ public class IssueEditDisplay extends VBox{
 			parentContainer.get().handleCancelClicked();
 		});
 
-		Button done = new Button("Done");
-		HBox.setHgrow(done, Priority.ALWAYS);
-		done.setMaxWidth(Double.MAX_VALUE);
-		done.setOnMouseClicked(e -> {
-			parentContainer.get().handleDoneClicked();
+		Button save = new Button("Save");
+		HBox.setHgrow(save, Priority.ALWAYS);
+		save.setMaxWidth(Double.MAX_VALUE);
+		save.setOnMouseClicked(e -> {
+			parentContainer.get().handleSaveClicked();
 		});
 
-		buttons.getChildren().addAll(done, cancel);
+		buttons.getChildren().addAll(save, cancel);
 		return buttons;
 	}
 
@@ -414,8 +414,6 @@ public class IssueEditDisplay extends VBox{
 						if (wasAnythingSelected) {
 							Integer parent = response.size() > 0 ? allIssues.get(response.get(0)).getId() : null;
 							issue.setParentIssue(parent);
-							//TODO:
-//							model.processInheritedLabels(issue, originalParent);
 						} else {
 							issue.setParentIssue(-1);
 						}

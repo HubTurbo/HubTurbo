@@ -1,7 +1,5 @@
 package ui.issuepanel.comments;
 
-import com.sun.prism.paint.Color;
-
 import handler.IssueDetailsContentHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;

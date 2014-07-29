@@ -69,7 +69,7 @@ public class IssueDisplayPane extends HBox {
 		originalIssue.copyValues(editedIssue);
 	}
 	
-	public void handleDoneClicked(){
+	public void handleSaveClicked(){
 		TurboIssueCommand command;
 		String message = "";
 		boolean success = false;

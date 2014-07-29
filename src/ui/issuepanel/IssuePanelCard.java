@@ -3,7 +3,6 @@ package ui.issuepanel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
