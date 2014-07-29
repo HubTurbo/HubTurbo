@@ -33,6 +33,7 @@ public class EditableMarkupPopup extends Stage{
 		this.buttonText = buttonText;
 		setupContents();
 		Scene scene = new Scene(container);
+		scene.getStylesheets().add(EditableMarkupPopup.class.getResource("hubturbo.css").toString());
 		this.setScene(scene);
 		this.initModality(Modality.APPLICATION_MODAL);
 		this.initOwner(null);
