@@ -28,9 +28,13 @@ public class IssueDetailsCard extends VBox{
 	protected static int WEB_TEXT_PADDING = 30;
 	
 	public static final String EVENT_TYPE_CLICK = "click";
-	protected static final String HTML_CONTENT_WRAPPER = "<html>"
-			+  "<body>" 
-	        +   "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
+	protected static final String DEFAULT_CSS = "<style type=\"text/css\">"
+			+ "img{"
+			+ "max-width: 100%;"
+			+ "}"
+			+ "</style>";
+	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" 
+	        +  "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
 	           "</body></html>";
 	
 	protected HBox topBar;
@@ -140,7 +144,7 @@ public class IssueDetailsCard extends VBox{
 	
 	private void setDisplayedCommentText(){
 		String text = originalComment.getBodyHtml();
-		String displayedText = String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
+		String displayedText = DEFAULT_CSS + String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
 		commentsBody.getEngine().loadContent(displayedText);	
 	}
 	

@@ -38,6 +38,12 @@ import util.Browse;
 
 public class IssueEditDisplay extends VBox{
 	private static final int ELEMENT_SPACING = 5;
+	protected static final String DEFAULT_WEB_CSS = 
+			"<style type=\"text/css\">"
+			+ "img{"
+			+ "max-width: 100%;"
+			+ "}"
+			+ "</style>";
 	protected static String EDIT_BTN_TXT = "\uf058";
 	protected static String BACK_BTN_TXT = " \uf0a4 ";
 	
@@ -216,7 +222,8 @@ public class IssueEditDisplay extends VBox{
 	
 	private void loadIssueDescriptionViewContent(){
 		if(issueDesc != null){
-			issueDesc.getEngine().loadContent(issue.getDescriptionMarkup());
+			String content = DEFAULT_WEB_CSS + issue.getDescriptionMarkup();
+			issueDesc.getEngine().loadContent(content);
 		}
 	}
 	
