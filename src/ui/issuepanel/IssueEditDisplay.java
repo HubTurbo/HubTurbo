@@ -98,7 +98,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void initialiseDescEditButton(){
 		descEditMode = new ToggleButton();
-		descEditMode.getStyleClass().addAll("button-github-octicon", "desc-toggle-button");
+		descEditMode.getStyleClass().addAll("button-github-octicon", "borderless-toggle-button");
 		descEditMode.setText(EDIT_BTN_TXT);
 		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
 		WeakReference<ToggleButton> btnRef = new WeakReference<>(descEditMode);

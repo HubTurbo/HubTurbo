@@ -13,13 +13,14 @@ import model.TurboComment;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
+import ui.EditableMarkupPopup;
 import util.DialogMessage;
 
 public class CommentCard extends IssueDetailsCard{
 	protected static String EDIT_BTN_TXT = "\uf058";
 	protected static String CANCEL_BTN_TXT = " \uf0a4 ";
 	protected static String DELETE_BTN_TXT = "\uf0d0";
-	
+	protected static String POPUP_BTN_TXT = "\uf07f";
 	
 	protected IssueDetailsContentHandler handler;
 	
@@ -27,6 +28,7 @@ public class CommentCard extends IssueDetailsCard{
 	
 	private Label deleteButton;
 	private Label editButton;
+	private Label popupButton;
 	
 	private CommentsEditBox commentEditField;
 		
@@ -45,7 +47,8 @@ public class CommentCard extends IssueDetailsCard{
 	protected void initialiseUIComponents(){
 		super.initialiseUIComponents();
 		initialiseEditButton();
-		intialiseDeleteButton();
+		initialiseDeleteButton();
+		initialisePopupButton();
 	}
 	
 	private void initialiseEditButton(){
@@ -58,7 +61,7 @@ public class CommentCard extends IssueDetailsCard{
 		});
 	}
 	
-	private void intialiseDeleteButton(){
+	private void initialiseDeleteButton(){
 		deleteButton = new Label();
 		deleteButton.setText(DELETE_BTN_TXT);
 		deleteButton.getStyleClass().addAll("button-github-octicon", "comments-label-button");
@@ -66,6 +69,28 @@ public class CommentCard extends IssueDetailsCard{
 		deleteButton.setOnMousePressed(e -> {
 		    selfRef.get().handleDeleteButtonPressed();
 		});
+	}
+	
+	private void initialisePopupButton(){
+		popupButton = new Label();
+		popupButton.setText(POPUP_BTN_TXT);
+		popupButton.getStyleClass().addAll("button-github-octicon");
+		popupButton.setOnMousePressed(e -> {
+			EditableMarkupPopup popup = createPopup();
+			popup.show();
+		});
+	}
+	
+	private EditableMarkupPopup createPopup(){
+		EditableMarkupPopup popup = new EditableMarkupPopup("Update");
+		popup.setDisplayedText(editedComment.getBodyHtml());
+		
+		WeakReference<EditableMarkupPopup> ref = new WeakReference<>(popup);
+		popup.setEditModeCompletion(() -> {
+			editedComment.setBody(ref.get().getDisplayedText());
+			handler.editComment(editedComment);
+		});
+		return popup;
 	}
 	
 	
@@ -76,7 +101,7 @@ public class CommentCard extends IssueDetailsCard{
 	private HBox createControlsBox(){
 		HBox controls = new HBox();
 		controls.setAlignment(Pos.BOTTOM_RIGHT);
-		controls.getChildren().addAll(editButton, deleteButton);
+		controls.getChildren().addAll(popupButton, editButton, deleteButton);
 		controls.setSpacing(5);
 		return controls;
 	}

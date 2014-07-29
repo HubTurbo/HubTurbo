@@ -3,7 +3,6 @@ package ui.issuepanel.comments;
 import java.lang.ref.WeakReference;
 
 import ui.StatusBar;
-import util.DialogMessage;
 import handler.IssueDetailsContentHandler;
 import model.TurboIssue;
 import javafx.application.Platform;
@@ -86,7 +85,7 @@ public class IssueDetailsDisplay extends VBox {
             public void handle(WorkerStateEvent t) {
             	IssueDetailsDisplay self = selfRef.get();
             	if(self != null){
-            		commentsDisplay.removeItemFromDisplay(indicator);
+            		self.hideProgressIndicator(indicator);
             		self.scrollDisplayToBottom();
             		self.loadFailCount = 0;
             	}
@@ -106,15 +105,27 @@ public class IssueDetailsDisplay extends VBox {
             			//Notify user of load failure and reset count
             			loadFailCount = 0;
             			StatusBar.displayMessage("An error occured while loading the issue's comments. Comments partially loaded");
-            			commentsDisplay.removeItemFromDisplay(indicator);
+            			self.hideProgressIndicator(indicator);
             		}
             	}
             }
         });
 		
-		commentsDisplay.addItemToDisplay(indicator);
+		displayProgressIndicator(indicator);
 		backgroundThread = new Thread(bgTask);
 		backgroundThread.start();
+	}
+	
+	private void displayProgressIndicator(ProgressIndicator indicator){
+		Platform.runLater(() -> {
+			commentsDisplay.addItemToDisplay(indicator);
+		});
+	}
+	
+	private void hideProgressIndicator(ProgressIndicator indicator){
+		Platform.runLater(() -> {
+			commentsDisplay.removeItemFromDisplay(indicator);
+		});
 	}
 	
 	private void scrollDisplayToBottom(){
