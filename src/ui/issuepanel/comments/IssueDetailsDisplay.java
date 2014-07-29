@@ -64,6 +64,13 @@ public class IssueDetailsDisplay extends VBox {
 		loadIssueDetailsInBackground();
 	}
 	
+	private ProgressIndicator createProgressIndicator(){
+		ProgressIndicator indicator = new ProgressIndicator();
+		indicator.setPrefSize(50, 50);
+		indicator.setMaxSize(50, 50);
+		return indicator;
+	}
+	
 	private void loadIssueDetailsInBackground(){
 		Task<Boolean> bgTask = new Task<Boolean>(){
 
@@ -75,7 +82,7 @@ public class IssueDetailsDisplay extends VBox {
 			
 		};
 		
-		ProgressIndicator indicator = new ProgressIndicator();
+		ProgressIndicator indicator = createProgressIndicator();
 		indicator.progressProperty().bind(bgTask.progressProperty());
 		
 		WeakReference<IssueDetailsDisplay> selfRef = new WeakReference<>(this);

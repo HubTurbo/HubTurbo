@@ -98,7 +98,8 @@
 	-fx-background-color: transparent;
 }
 
-.comments-list-cell {
+.comments-list-cell,
+.comments-list-cell:selected {
     -fx-background-color: #FFFFFF;
 }
 

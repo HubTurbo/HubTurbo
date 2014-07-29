@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -31,9 +32,12 @@ public class EditableMarkupPopup extends Stage{
 	
 	public EditableMarkupPopup(String buttonText){
 		this.buttonText = buttonText;
+		
 		setupContents();
 		Scene scene = new Scene(container);
 		scene.getStylesheets().add(EditableMarkupPopup.class.getResource("hubturbo.css").toString());
+		scene.setFill(Color.WHITE);
+		
 		this.setScene(scene);
 		this.initModality(Modality.APPLICATION_MODAL);
 		this.initOwner(null);
