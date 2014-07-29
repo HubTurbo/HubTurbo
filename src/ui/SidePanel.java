@@ -1,8 +1,10 @@
 package ui;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,7 +19,6 @@ import model.Model;
 import model.TurboIssue;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import ui.issuepanel.IssueDisplayPane;
@@ -142,7 +143,15 @@ public class SidePanel extends VBox {
 		if (ServiceManager.getInstance().getRepoId() != null) {
 			String repoId = ServiceManager.getInstance().getRepoId().generateId();
 			comboBox.setValue(repoId);
-			comboBox.getItems().addAll(SessionConfigurations.addToLastViewedRepositories(repoId));
+			try {
+				if(ServiceManager.getInstance().checkRepository(repoId)){
+					comboBox.getItems().addAll(SessionConfigurations.addToLastViewedRepositories(repoId));
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				//Means checkRepository threw an exception...
+				e.printStackTrace();
+			}
 		}
 		
 		comboBox.valueProperty().addListener((a, b, c) -> loadRepo(comboBox));
@@ -155,10 +164,27 @@ public class SidePanel extends VBox {
 		comboBox.prefWidthProperty().bind(repoIdBox.widthProperty());
 		return repoIdBox;
 	}
+	
+	private boolean checkRepoAccess(RepositoryId repoId){
+		try {
+			if(!ServiceManager.getInstance().checkRepository(repoId)){
+				Platform.runLater(() -> {
+					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
+				});
+				return false;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
 
 	private void loadRepo(final ComboBox<String> comboBox) {
 		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
-		System.out.println(repoId.generateId());
+		if(!checkRepoAccess(repoId)){
+			return;
+		}
 		if (repoId != null) {
 			columns.saveSession();
 			Task<HashMap<String, List>> task = new Task<HashMap<String, List>>(){
@@ -191,9 +217,6 @@ public class SidePanel extends VBox {
 			});
 			
 			task.setOnFailed(wse -> {
-//				if(task.getException() instanceof RequestException){
-//					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
-//				}
 				StatusBar.displayMessage("An error occurred: " + task.getException());
 			});
 		}

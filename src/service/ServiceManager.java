@@ -149,9 +149,13 @@ public class ServiceManager {
 		
 	}
 	
-	public boolean checkRepository(IRepositoryIdProvider repo) throws IOException{
-		String repoURL = SEGMENT_REPOS + "/" + repo.generateId();
+	public boolean checkRepository(String repo) throws IOException{
+		String repoURL = SEGMENT_REPOS + "/" + repo;
 		return check(repoURL);
+	}
+	
+	public boolean checkRepository(IRepositoryIdProvider repo) throws IOException{
+		return checkRepository(repo.generateId());
 	}
 	
 	protected boolean check(String uri) throws IOException {
