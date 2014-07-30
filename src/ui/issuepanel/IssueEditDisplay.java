@@ -18,6 +18,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -52,6 +56,7 @@ public class IssueEditDisplay extends VBox{
 	protected static final int LINE_HEIGHT = 18;
 	protected static final int TITLE_ROW_NUM = 3;
 	protected static final int DESC_ROW_NUM = 8;
+	protected static final KeyCombination SAVE_ISSUE_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	
 	private Text issueIdText;
 	private TextArea editableIssueDesc;
@@ -78,6 +83,7 @@ public class IssueEditDisplay extends VBox{
 		this.parentContainer = new WeakReference<IssueDisplayPane>(parent);
 		this.focusRequested = focusRequested;
 		setup();
+		setupKeyboardShortcuts();
 	}
 
 	
@@ -87,6 +93,14 @@ public class IssueEditDisplay extends VBox{
 		setupDescription();
 		setVgrow(descArea, Priority.ALWAYS);
 		getChildren().addAll(top(), descArea, bottom());
+	}
+	
+	private void setupKeyboardShortcuts(){
+		this.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+			if(SAVE_ISSUE_SHORTCUT.match(e)){
+				parentContainer.get().handleSaveClicked();
+			}
+		});
 	}
 	
 	private boolean descriptionIsEmpty(){
