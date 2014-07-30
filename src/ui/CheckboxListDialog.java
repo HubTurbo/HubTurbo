@@ -3,6 +3,7 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.textfield.TextFields;
@@ -33,6 +34,13 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 						.collect(Collectors.toList()));
 
 		this.objectNames = stringRepresentations;
+	}
+	
+	@Override
+	public CompletableFuture<List<Integer>> show() {
+		CompletableFuture<List<Integer>> response = super.show();
+		autoCompleteBox.requestFocus();
+		return response;
 	}
 
 	@Override
