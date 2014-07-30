@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.controlsfx.control.textfield.TextFields;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Listable;
@@ -17,6 +20,7 @@ import model.Listable;
 public class CheckboxListDialog extends Dialog<List<Integer>> {
 
 	private ObservableList<String> objectNames;
+	private TextField autoCompleteBox;
 
 	public CheckboxListDialog(Stage parentStage, ObservableList<Listable> objects) {
 		super(parentStage);
@@ -35,8 +39,9 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		checkListView.setSingleSelection(!multipleSelection);
 		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
+		createAutoCompleteTextField();
+		
 		Button close = new Button("Close");
-		VBox.setMargin(close, new Insets(5));
 		close.setOnAction((e) -> {
 			completeResponse(checkListView);
 			close();
@@ -44,13 +49,18 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
-		layout.getChildren().addAll(checkListView, close);
+		layout.getChildren().addAll(checkListView, autoCompleteBox, close);
 		layout.setSpacing(5);
-		layout.setPadding(new Insets(5));
+		layout.setPadding(new Insets(10));
 
 		setSize(400, 300);
 		
 		return layout;
+	}
+	
+	private void createAutoCompleteTextField(){
+		autoCompleteBox = new TextField();
+		
 	}
 
 	private void completeResponse(BetterCheckListView checkListView) {
