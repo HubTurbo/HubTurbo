@@ -39,6 +39,23 @@ public class BetterCheckListView extends VBox {
 	
 	boolean disabled = false;
 	
+	public void checkItem(String itemName){
+		int index = getItemIndex(itemName);
+		if(index >= 0){
+			setChecked(index, true);
+			listView.scrollTo(index);
+		}
+	}
+	
+	public int getItemIndex(String itemName){
+		for(int i = 0; i < items.size(); i++){
+			if(items.get(i).getContents().equalsIgnoreCase(itemName)){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public void setItems(ObservableList<String> items) {
 		// It's assumed that we won't need to observe this list in the
 		// long term, so we don't use the same list object

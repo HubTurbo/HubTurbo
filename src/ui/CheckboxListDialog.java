@@ -1,5 +1,6 @@
 package ui;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Listable;
@@ -21,7 +23,8 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 
 	private ObservableList<String> objectNames;
 	private TextField autoCompleteBox;
-
+	private BetterCheckListView checkListView;
+	
 	public CheckboxListDialog(Stage parentStage, ObservableList<Listable> objects) {
 		super(parentStage);
 		ObservableList<String> stringRepresentations = FXCollections
@@ -35,7 +38,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 	@Override
 	protected Parent content() {
 		
-		BetterCheckListView checkListView = new BetterCheckListView(objectNames);
+		checkListView = new BetterCheckListView(objectNames);
 		checkListView.setSingleSelection(!multipleSelection);
 		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
@@ -60,7 +63,26 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 	
 	private void createAutoCompleteTextField(){
 		autoCompleteBox = new TextField();
-		
+		TextFields.bindAutoCompletion(autoCompleteBox, objectNames);
+		WeakReference<CheckboxListDialog> selfRef = new WeakReference<>(this);
+		WeakReference<TextField> fieldRef = new WeakReference<>(autoCompleteBox);
+		autoCompleteBox.setOnKeyReleased(e -> {
+			KeyCode code = e.getCode();
+			CheckboxListDialog self = selfRef.get();
+			switch (code) {
+            case ENTER:
+                if(self != null){
+                	self.checkCheckItemWithName(fieldRef.get().getText());
+                }
+                break;
+            default:
+                break;
+            }
+		});
+	}
+	
+	private void checkCheckItemWithName(String name){
+		checkListView.checkItem(name);
 	}
 
 	private void completeResponse(BetterCheckListView checkListView) {
