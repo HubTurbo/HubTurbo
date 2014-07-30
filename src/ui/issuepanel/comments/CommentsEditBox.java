@@ -12,10 +12,15 @@ import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class CommentsEditBox extends VBox{
+	protected static final KeyCombination BUTTON_TRIGGER_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	protected static final int ELEMENT_SPACING = 8;
 
 	private IssueDetailsContentHandler commentHandler;
@@ -33,6 +38,7 @@ public class CommentsEditBox extends VBox{
 		this.commentHandler = handler;
 		initialiseUIComponents();
 		setupLayout();
+		setupKeyboardShortcuts();
 	}
 	
 	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment){
@@ -42,11 +48,21 @@ public class CommentsEditBox extends VBox{
 			initialText = editedComment.getBody();
 		}
 		setupForEditing();
+		setupKeyboardShortcuts();
 	}
 	
 	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, String commentBtnTxt){
 		this(handler, editedComment);
 		this.commentButtonText = commentBtnTxt;
+	}
+	
+	private void setupKeyboardShortcuts(){
+		WeakReference<CommentsEditBox> selfRef = new WeakReference<>(this);
+		addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+			if(BUTTON_TRIGGER_SHORTCUT.match(e)){
+				selfRef.get().handleCommentButtonPressed();
+			}
+		});
 	}
 	
 	private void setupForEditing(){
