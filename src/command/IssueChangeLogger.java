@@ -17,7 +17,7 @@ import model.TurboUser;
 public class IssueChangeLogger {
 	public static final String LABEL_CHANGELOG_HEADER = "[Edited labels]\n";
 	public static final String LABEL_EXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: %2s ~> **%3s**\n";
-	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: [added: %2s] [removed: %3s]";
+	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: [added: %2s] [removed: %3s]\n";
 	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description. \n"; 
 	protected static final String MILESTONE_CHANGE_LOG = "*Milestone changed:* %1s ~> **%2s**\n";
 	protected static final String ASSIGNEE_CHANGE_LOG = "*Assignee changed:* %1s ~> **%2s**\n";
