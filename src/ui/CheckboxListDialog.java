@@ -25,6 +25,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 	private ObservableList<String> objectNames;
 	private TextField autoCompleteBox;
 	private BetterCheckListView checkListView;
+	private Button close;
 	
 	public CheckboxListDialog(Stage parentStage, ObservableList<Listable> objects) {
 		super(parentStage);
@@ -42,7 +43,25 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		autoCompleteBox.requestFocus();
 		return response;
 	}
-
+	
+	private void handleCloseButtonAction(){
+		completeResponse(checkListView);
+		close();
+	}
+	
+	private void setupCloseButton(){
+		WeakReference<CheckboxListDialog> selfRef = new WeakReference<>(this);
+		close = new Button("Close");
+		close.setOnAction((e) -> {
+			selfRef.get().handleCloseButtonAction();
+		});
+		close.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER){
+				selfRef.get().handleCloseButtonAction();
+			}
+		});
+	}
+	
 	@Override
 	protected Parent content() {
 		
@@ -50,13 +69,9 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		checkListView.setSingleSelection(!multipleSelection);
 		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
-		createAutoCompleteTextField();
+		setupCloseButton();
 		
-		Button close = new Button("Close");
-		close.setOnAction((e) -> {
-			completeResponse(checkListView);
-			close();
-		});
+		createAutoCompleteTextField();
 
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
@@ -81,6 +96,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
             case ENTER:
                 if(self != null){
                 	self.checkCheckItemWithName(fieldRef.get().getText());
+                	close.requestFocus();
                 }
                 break;
             default:

@@ -48,6 +48,10 @@ public class IssueEditDisplay extends VBox{
 	protected static String EDIT_BTN_TXT = "\uf058";
 	protected static String BACK_BTN_TXT = " \uf0a4 ";
 	protected static String POPUP_BTN_TXT = "\uf07f";
+	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
+	protected static final int LINE_HEIGHT = 18;
+	protected static final int TITLE_ROW_NUM = 3;
+	protected static final int DESC_ROW_NUM = 8;
 	
 	private Text issueIdText;
 	private TextArea editableIssueDesc;
@@ -56,10 +60,8 @@ public class IssueEditDisplay extends VBox{
 	private Button descPopup;
 	private VBox descArea;
 	
-	protected static final String ISSUE_DETAILS_BTN_TXT = "Details >>";
-	protected static final int LINE_HEIGHT = 18;
-	protected static final int TITLE_ROW_NUM = 3;
-	protected static final int DESC_ROW_NUM = 8;
+	private Button cancel;
+	private Button save;
 	
 	private final TurboIssue issue;
 	private final Model model;
@@ -353,14 +355,14 @@ public class IssueEditDisplay extends VBox{
 		buttons.setAlignment(Pos.BASELINE_RIGHT);
 		buttons.setSpacing(ELEMENT_SPACING);
 
-		Button cancel = new Button("Cancel");
+		cancel = new Button("Cancel");
 		HBox.setHgrow(cancel, Priority.ALWAYS);
 		cancel.setMaxWidth(Double.MAX_VALUE);
 		cancel.setOnMouseClicked(e -> {
 			parentContainer.get().handleCancelClicked();
 		});
 
-		Button save = new Button("Save");
+		save = new Button("Save");
 		HBox.setHgrow(save, Priority.ALWAYS);
 		save.setMaxWidth(Double.MAX_VALUE);
 		save.setOnMouseClicked(e -> {

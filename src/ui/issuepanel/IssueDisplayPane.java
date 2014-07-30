@@ -10,12 +10,16 @@ import ui.SidePanel;
 import ui.StatusBar;
 import ui.SidePanel.IssueEditMode;
 import ui.issuepanel.comments.IssueDetailsDisplay;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
 public class IssueDisplayPane extends HBox {
+	protected static final KeyCombination SAVE_ISSUE_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	protected static final int DETAILS_WIDTH = 350;
 	protected static final int ISSUE_WIDTH = 300;
 
