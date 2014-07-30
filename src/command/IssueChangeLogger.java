@@ -49,12 +49,12 @@ public class IssueChangeLogger {
 		allGroups.addAll(addedLabelGrps);
 		
 		StringBuilder log = new StringBuilder();
-		for(String grpName : allGroups){
+		for(String grpName : allGroups) {
 			 ArrayList<TurboLabel> addedLabs = groupedAdded.get(grpName);
 			 ArrayList<TurboLabel> remLabs = groupedRemoved.get(grpName);
-			if(!grpName.equals(UNGROUPED_LABELS_TAG) && model.isExclusiveLabelGroup(grpName)){
+			if (!grpName.equals(UNGROUPED_LABELS_TAG) && model.isExclusiveLabelGroup(grpName)) {
 				log.append(getExclusiveLabelLog(grpName, addedLabs, remLabs));
-			}else{
+			} else {
 				log.append(getNonexclusiveLabelLog(grpName, addedLabs, remLabs));
 			}
 		}
@@ -64,10 +64,10 @@ public class IssueChangeLogger {
 	public static String getExclusiveLabelLog(String group, ArrayList<TurboLabel> added, ArrayList<TurboLabel> removed){
 		TurboLabel removedLabel =  null;
 		TurboLabel addedLabel = null;
-		if(added != null && added.size() > 0){
+		if (added != null && added.size() > 0) {
 			addedLabel = added.get(0);
 		}
-		if(removed != null && removed.size() > 0){
+		if (removed != null && removed.size() > 0) {
 			removedLabel = removed.get(0);
 		}
 		return String.format(LABEL_EXCLUSIVE_CHANGELOG_FORMAT, group, getDisplayedLabelName(removedLabel), getDisplayedLabelName(addedLabel));
@@ -76,10 +76,10 @@ public class IssueChangeLogger {
 	public static String getNonexclusiveLabelLog(String grp, ArrayList<TurboLabel> added, ArrayList<TurboLabel> removed){
 		String addedlist = "";
 		String removedlist = "";
-		if(added != null){
+		if (added != null) {
 			addedlist = getLabelPrintoutList(added);
 		}
-		if(removed != null){
+		if (removed != null) {
 			removedlist = getLabelPrintoutList(removed);
 		}
 		return String.format(LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT, grp, addedlist, removedlist);
@@ -88,16 +88,16 @@ public class IssueChangeLogger {
 	private static String getLabelPrintoutList(ArrayList<TurboLabel> labels){
 		StringBuilder printout = new StringBuilder();
 		String printoutDelim = ", ";
-		for(TurboLabel label : labels){
+		for (TurboLabel label : labels) {
 			printout.append(printoutDelim + getDisplayedLabelName(label));
 		}
 		return printout.toString().substring(printoutDelim.length());
 	}
 	
 	public static String getDisplayedLabelName(TurboLabel label){
-		if(label == null){
+		if (label == null) {
 			return "<none>";
-		}else{
+		} else {
 			return label.getListName();
 		}
 	}
@@ -133,9 +133,9 @@ public class IssueChangeLogger {
 	}
 	
 	public static String getDisplayedMilestoneName(TurboMilestone milestone){
-		if(milestone == null){
+		if (milestone == null) {
 			return "<none>";
-		}else{
+		} else {
 			return milestone.getTitle();
 		}
 	}
@@ -151,9 +151,9 @@ public class IssueChangeLogger {
 	}
 	
 	public static String getDisplayedAssigneeName(TurboUser user){
-		if(user == null){
+		if (user == null) {
 			return "<none>";
-		}else{
+		} else {
 			return user.getGithubName();
 		}
 	}
@@ -166,12 +166,12 @@ public class IssueChangeLogger {
 	
 	public static String getParentChangeLog(Integer original, Integer edited){
 		String changeLog;
-		if(edited < 0){
+		if (edited < 0){
 			changeLog = String.format("Removed issue parent: %1d\n", original);
-		}else if(original > 0){
-			changeLog = String.format("Changed Issue parent from %1d to **%2d**\n", original, edited);
-		}else{
-			changeLog = String.format("Set Issue parent to **%1d**\n", edited);
+		} else if (original > 0){
+			changeLog = String.format("Changed issue parent from %1d to **%2d**\n", original, edited);
+		} else {
+			changeLog = String.format("Set issue parent to **%1d**\n", edited);
 		}
 		return changeLog;
 	}
