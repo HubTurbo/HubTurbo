@@ -1,7 +1,9 @@
 package service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.lang.reflect.Type;
@@ -27,6 +29,32 @@ public class GitHubClientExtended extends GitHubClient{
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(method);
 		return configureRequest(connection);
+	}
+	
+	public HttpURLConnection configureURLRequest(final HttpURLConnection request) {
+		HttpURLConnection req = super.configureRequest(request);
+		request.setRequestProperty(HEADER_ACCEPT,"text/html, application/xhtml+xml, application/xml");
+		return req;
+	}
+	
+	public HttpURLConnection createURLRequestConnection(String url) throws IOException{
+		URL link = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) link.openConnection();
+		connection.setRequestMethod(METHOD_GET);
+		connection = configureURLRequest(connection);
+		return connection;
+	}
+	
+	public String getHTMLResponseFromURLRequest(String url) throws IOException{
+		HttpURLConnection connection = createURLRequestConnection(url);
+		InputStream responseStream = getResponseStream(connection);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream));
+		StringBuilder content = new StringBuilder();
+		String line;
+		while((line = reader.readLine()) != null){
+			content.append(line);
+		}
+		return content.toString();
 	}
 	
 	public IOException createException(InputStream response, int code,
