@@ -17,7 +17,9 @@ import model.TurboUser;
 public class IssueChangeLogger {
 	public static final String LABEL_CHANGELOG_HEADER = "[Edited labels]\n";
 	public static final String LABEL_EXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: %2s ~> **%3s**\n";
-	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: [added: %2s] [removed: %3s]\n";
+	protected static final String LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT = "*%1s*: %2s %3s\n";
+	protected static final String LABEL_ADDED_FORMAT = "[added: %1s]";
+	protected static final String LABEL_REMOVED_FORMAT = "[removed: %1s]";
 	protected static final String DESCRIPTION_CHANGE_LOG = "Edited description. \n"; 
 	protected static final String MILESTONE_CHANGE_LOG = "*Milestone changed:* %1s ~> **%2s**\n";
 	protected static final String ASSIGNEE_CHANGE_LOG = "*Assignee changed:* %1s ~> **%2s**\n";
@@ -82,7 +84,16 @@ public class IssueChangeLogger {
 		if (removed != null) {
 			removedlist = getLabelPrintoutList(removed);
 		}
-		return String.format(LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT, grp, addedlist, removedlist);
+		
+		String addLog = "";
+		String remLog = "";
+		if(!addedlist.isEmpty()){
+			addLog = String.format(LABEL_ADDED_FORMAT, addedlist);
+		}
+		if(!removedlist.isEmpty()){
+			remLog = String.format(LABEL_REMOVED_FORMAT, removedlist);
+		}
+		return String.format(LABEL_NONEXCLUSIVE_CHANGELOG_FORMAT, grp, addLog, remLog);
 	}
 	
 	private static String getLabelPrintoutList(ArrayList<TurboLabel> labels){
