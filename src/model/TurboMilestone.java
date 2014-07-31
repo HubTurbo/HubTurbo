@@ -22,7 +22,7 @@ public class TurboMilestone implements Listable {
 	 * Attributes, Getters & Setters
 	 */
 	
-	private int number;
+	private int number = -1;
 	public int getNumber() {return number;}
 	
 	private StringProperty title = new SimpleStringProperty();

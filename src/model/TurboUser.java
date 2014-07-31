@@ -19,7 +19,7 @@ public class TurboUser implements Listable {
 		return name == null ? getGithubName() : name;
 	}
 	
-	private String githubName;
+	private String githubName = "";
 	public String getGithubName() {
 		return githubName;
 	}

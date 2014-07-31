@@ -412,22 +412,18 @@ public class TurboIssue implements Listable {
 		}
 	}
 	
-	/*
-	 * Private Methods
-	 */
-	
-	private String extractDescription(String issueBody) {
+	public static String extractDescription(String issueBody) {
 		if (issueBody == null) return "";
 		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 		return description;
 	}
 	
-	private Integer extractIssueParent(String issueBody) {
+	public static Integer extractIssueParent(String issueBody) {
 		if (issueBody == null){
 			return  -1;
 		}
 		String[] lines = issueBody.split(REGEX_SPLIT_LINES);
-		int seperatorLineIndex = getSeperatorIndex(lines);
+		int seperatorLineIndex = getSeparatorIndex(lines);
 		for (int i = 0; i < seperatorLineIndex; i++) {
 			String line = lines[i];
 			
@@ -453,6 +449,10 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 	
+	/*
+	 * Private Methods
+	 */
+	
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		if (labels == null) return turboLabels;
@@ -464,7 +464,7 @@ public class TurboIssue implements Listable {
 		return turboLabels;
 	}
 	
-	private int getSeperatorIndex(String[] lines) {
+	private static int getSeparatorIndex(String[] lines) {
 		for (int i = 0; i < lines.length; i++) {
 			if (lines[i].equals(METADATA_SEPERATOR)) {
 				return i;

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import javafx.collections.ObservableList;
 import service.ServiceManager;
@@ -17,7 +19,15 @@ import model.TurboMilestone;
 import model.TurboUser;
 
 public class TurboIssueEdit extends TurboIssueCommand{
+	protected static final String TITLE_FIELD = "title";
+	protected static final String DESCRIPTION_FIELD = "desc";
+	protected static final String LABEL_FIELD = "label";
+	protected static final String MILESTONE_FIELD = "milestone";
+	protected static final String ASSIGNEE_FIELD = "assignee";
+	protected static final String PARENT_FIELD = "parent";
+	
 	private TurboIssue editedIssue;
+	private HashMap<String, String> changeLogs = new HashMap<>();
 	
 	public TurboIssueEdit(Model model, TurboIssue originalIssue, TurboIssue editedIssue){
 		super(model, originalIssue);
@@ -39,9 +49,75 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		return true;
 	}
 	
+	private void checkTitleChange(Issue sent, Issue result){
+		if(!result.getTitle().equals(sent.getTitle())){
+			changeLogs.put(TITLE_FIELD, "");
+		}
+	}
+	
+	private void checkLabelsChange(Issue sent, Issue result){
+		if(!result.getLabels().containsAll(sent.getLabels())){
+			changeLogs.put(LABEL_FIELD, "");
+		}
+	}
+	
+	private void checkAssigneeChange(Issue sent, Issue result){
+		User assignee = result.getAssignee();
+		User intended = sent.getAssignee();
+		boolean assigneeChanged;
+		if(assignee == null){
+			assigneeChanged = ((intended == null) || (intended.getLogin().isEmpty()));
+		}else{
+			assigneeChanged = assignee.getLogin().equals(intended.getLogin());
+		}
+		if(!assigneeChanged){
+			changeLogs.put(ASSIGNEE_FIELD, "");
+		}
+	}
+	
+	private void checkMilestoneChange(Issue sent, Issue result){
+		Milestone milestone = result.getMilestone();
+		Milestone intendedMs = sent.getMilestone();
+		boolean milestoneChanged;
+		if(milestone == null){
+			milestoneChanged = ((intendedMs == null) || (intendedMs.getNumber() == -1));
+		}else{
+			milestoneChanged = intendedMs.getNumber() == milestone.getNumber();
+		}
+		if(!milestoneChanged){
+			changeLogs.put(MILESTONE_FIELD, "");
+		}
+	}
+	
+	private void checkDescriptionChange(Issue sent, Issue result){
+		String body = result.getBody();
+		String iBody = sent.getBody();
+		if(!TurboIssue.extractDescription(body).equals(TurboIssue.extractDescription(iBody))){
+			changeLogs.put(DESCRIPTION_FIELD, "");
+		}
+	}
+	
+	private void checkParentChange(Issue sent, Issue result){
+		String body = result.getBody();
+		String iBody = sent.getBody();
+		if(TurboIssue.extractIssueParent(body) != TurboIssue.extractIssueParent(iBody)){
+			changeLogs.put(PARENT_FIELD, "");
+		}
+	}
+	
+	private void updateIssueInGithub(Issue sent, String dateModified) throws IOException{
+		Issue result = ServiceManager.getInstance().editIssue(sent, dateModified);
+		
+		checkTitleChange(sent, result);
+		checkLabelsChange(sent, result);
+		checkAssigneeChange(sent, result);
+		checkMilestoneChange(sent, result);
+		checkDescriptionChange(sent, result);
+		checkParentChange(sent, result);
+	}
+	
 	private boolean updateIssue(TurboIssue originalIssue, TurboIssue editedIssue){
 		int issueId = editedIssue.getId();
-		StringBuilder changeLog = new StringBuilder();
 		HashMap<String, Object> issueQuery;
 		try {
 			issueQuery = ServiceManager.getInstance().getIssueData(issueId);
@@ -49,11 +125,11 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			String dateModified = ServiceManager.getInstance().getDateFromIssueData(issueQuery);
 			TurboIssue latestIssue = new TurboIssue(ServiceManager.getInstance().getIssueFromIssueData(issueQuery), model.get());
 			
-			boolean descUpdated = mergeIssues(originalIssue, editedIssue, latestIssue, changeLog);
+			boolean descUpdated = mergeIssues(originalIssue, editedIssue, latestIssue);
 			Issue latest = latestIssue.toGhResource();
-			ServiceManager.getInstance().editIssue(latest, dateModified);
+			updateIssueInGithub(latest, dateModified);
 			
-			logChanges(changeLog);
+			logChanges();
 			
 			if(!descUpdated){
 				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
@@ -64,11 +140,15 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return true;
+			return false;
 		}
 	}
 	
-	private void logChanges(StringBuilder changeLog){
+	private void logChanges(){
+		StringBuilder changeLog = new StringBuilder();
+		for(String log : changeLogs.values()){
+			changeLog.append(log);
+		}
 		if(changeLog.length() > 0){
 			lastOperationExecuted = changeLog.toString();
 			ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
@@ -80,18 +160,18 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	 * Stores change log in @param changeLog
 	 * @return true if issue description has been successfully merged, false otherwise
 	 * */
-	private boolean mergeIssues(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
-		mergeTitle(original, edited, latest, changeLog);
-		boolean fullMerge = mergeDescription(original, edited, latest, changeLog);
-		mergeIssueParent(original, edited, latest, changeLog);
-		mergeLabels(original, edited, latest, changeLog);
-		mergeAssignee(original, edited, latest, changeLog);
-		mergeMilestone(original, edited, latest, changeLog);
+	private boolean mergeIssues(TurboIssue original, TurboIssue edited, TurboIssue latest){
+		mergeTitle(original, edited, latest);
+		boolean fullMerge = mergeDescription(original, edited, latest);
+		mergeIssueParent(original, edited, latest);
+		mergeLabels(original, edited, latest);
+		mergeAssignee(original, edited, latest);
+		mergeMilestone(original, edited, latest);
 		mergeOpen(original, edited, latest);
 		return fullMerge;
 	}
 	
-	private void mergeLabels(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
+	private void mergeLabels(TurboIssue original, TurboIssue edited, TurboIssue latest) {
 		ObservableList<TurboLabel> originalLabels = original.getLabels();
 		ObservableList<TurboLabel> editedLabels = edited.getLabels();
 		HashMap<String, HashSet<TurboLabel>> changeSet = CollectionUtilities.getChangesToList(originalLabels, editedLabels);
@@ -105,11 +185,11 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				latestLabels.add(label);
 			}
 		}
-		changeLog.append(IssueChangeLogger.getLabelsChangeLog(model.get(), originalLabels, editedLabels));
+		changeLogs.put(LABEL_FIELD, IssueChangeLogger.getLabelsChangeLog(model.get(), originalLabels, editedLabels));
 		latest.setLabels(latestLabels);
 	}
 	
-	private void mergeMilestone(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
+	private void mergeMilestone(TurboIssue original, TurboIssue edited, TurboIssue latest) {
 		TurboMilestone originalMilestone = original.getMilestone();
 		TurboMilestone editedMilestone = edited.getMilestone();
 		int originalMNumber = (originalMilestone != null) ? originalMilestone.getNumber() : 0;
@@ -123,7 +203,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				originalMilestone = new TurboMilestone();
 			}
 			latest.setMilestone(editedMilestone);
-			changeLog.append(IssueChangeLogger.getMilestoneChangeLog(originalMilestone, editedMilestone));
+			changeLogs.put(MILESTONE_FIELD, IssueChangeLogger.getMilestoneChangeLog(originalMilestone, editedMilestone));
 		}
 	}
 	
@@ -135,7 +215,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		}
 	}
 
-	private void mergeAssignee(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
+	private void mergeAssignee(TurboIssue original, TurboIssue edited, TurboIssue latest) {
 		TurboUser originalAssignee = original.getAssignee();
 		TurboUser editedAssignee = edited.getAssignee();
 		// this check is for cleared assignee
@@ -147,7 +227,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		} 
 		if (!originalAssignee.equals(editedAssignee)) {
 			latest.setAssignee(editedAssignee);
-			changeLog.append(IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
+			changeLogs.put(ASSIGNEE_FIELD, IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
 		}
 	}
 
@@ -155,7 +235,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	 * Merges changes to description only if the description in the latest version has not been updated. 
 	 * Returns false if description was not merged because the issue's description has been modified in @param latest
 	 * */
-	private boolean mergeDescription(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
+	private boolean mergeDescription(TurboIssue original, TurboIssue edited, TurboIssue latest) {
 		String originalDesc = original.getDescription();
 		String editedDesc = edited.getDescription();
 		String latestDesc = latest.getDescription();
@@ -164,28 +244,28 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				return false;
 			}
 			latest.setDescription(editedDesc);
-			changeLog.append(IssueChangeLogger.getDescriptionChangeLog(originalDesc, editedDesc));
+			changeLogs.put(DESCRIPTION_FIELD, IssueChangeLogger.getDescriptionChangeLog(originalDesc, editedDesc));
 		}
 		return true;
 	}
 	
-	private void mergeIssueParent(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog){
+	private void mergeIssueParent(TurboIssue original, TurboIssue edited, TurboIssue latest){
 		Integer originalParent = original.getParentIssue();
 		Integer editedParent = edited.getParentIssue();
 		
 		if(originalParent != editedParent){
 			latest.setParentIssue(editedParent);
 			processInheritedLabels(originalParent, editedParent, edited);
-			changeLog.append(IssueChangeLogger.getParentChangeLog(originalParent, editedParent));
+			changeLogs.put(PARENT_FIELD, IssueChangeLogger.getParentChangeLog(originalParent, editedParent));
 		}
 	}
 
-	private void mergeTitle(TurboIssue original, TurboIssue edited, TurboIssue latest, StringBuilder changeLog) {
+	private void mergeTitle(TurboIssue original, TurboIssue edited, TurboIssue latest) {
 		String originalTitle = original.getTitle();
 		String editedTitle = edited.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-			changeLog.append(IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
+			changeLogs.put(TITLE_FIELD, IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
 		}
 	}
 }
