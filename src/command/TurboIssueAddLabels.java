@@ -1,7 +1,6 @@
 package command;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
@@ -31,16 +30,15 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 	}
 
 	
-	private void addLabelsToIssueInGithub() throws IOException{
+	private boolean setLabelsForIssueInGithub() throws IOException{
 		List<Label> issueLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
 		//Use setLabelsForIssue instead of addLabels to enforce label group exclusivity
-		ServiceManager.getInstance().setLabelsForIssue(issue.getId(), issueLabels);
-		updateGithubIssueState();
-	}
-	
-	private void removeLabelsFromIssueInGithub(List<Label> ghLabels) throws IOException{
-		ServiceManager.getInstance().deleteLabelsFromIssue(issue.getId(), ghLabels);
-		updateGithubIssueState();
+		List<Label> resLabels = ServiceManager.getInstance().setLabelsForIssue(issue.getId(), issueLabels);
+		boolean result =  resLabels.containsAll(issueLabels);
+		if(result){
+			updateGithubIssueState();
+		}
+		return result;
 	}
 	
 	@Override
@@ -48,9 +46,10 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(addedLabels);
 		try {
-			addLabelsToIssueInGithub();
-			logAddOperation(original, issue.getLabels());
-			isSuccessful = true;
+			isSuccessful = setLabelsForIssueInGithub();
+			if(isSuccessful){
+				logAddOperation(original, issue.getLabels());
+			}
 		} catch (IOException e) {
 			issue.removeLabels(addedLabels);
 			isSuccessful = false;
@@ -62,13 +61,14 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 
 	@Override
 	protected boolean performUndoAction() {
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(addedLabels);
 		List<TurboLabel> original = issue.getLabels();
 		issue.removeLabels(addedLabels);
 		try {
-			removeLabelsFromIssueInGithub(ghLabels);
-			logAddOperation(original, issue.getLabels());
-			isUndone = true;
+			boolean result = setLabelsForIssueInGithub();
+			if(result){
+				logAddOperation(original, issue.getLabels());
+			}
+			isUndone = result;
 		} catch (IOException e) {
 			issue.addLabels(addedLabels);
 			e.printStackTrace();

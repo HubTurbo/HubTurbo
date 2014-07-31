@@ -38,10 +38,12 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 	private boolean setIssueAssignee(TurboUser user, boolean logRemarks){
 		try {
 			TurboUser original = issue.getAssignee();
-			ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
-			issue.setAssignee(user);
-			logAssigneeChange(original, user);
-			return true;
+			boolean result = ServiceManager.getInstance().setIssueAssignee(issue.getId(), user.toGhResource());
+			if(result){
+				issue.setAssignee(user);
+				logAssigneeChange(original, user);
+			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

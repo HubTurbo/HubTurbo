@@ -1,5 +1,7 @@
 package service;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import java.util.stream.Collectors;
 
 import model.Model;
 
-import org.markdown4j.Markdown4jProcessor;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -26,13 +27,11 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+import org.markdown4j.Markdown4jProcessor;
 
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.HOST_API;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 public class ServiceManager {
 	public static final boolean isTestMode = false;
@@ -450,16 +449,30 @@ public class ServiceManager {
 		}		
 	}
 	
-	public void setIssueMilestone(int issueId, Milestone milestone) throws IOException{
+	public boolean setIssueMilestone(int issueId, Milestone milestone) throws IOException{
 		if(repoId != null){
-			issueService.setIssueMilestone(repoId, issueId, milestone);
+			Issue result = issueService.setIssueMilestone(repoId, issueId, milestone);
+			Milestone resMilestone = result.getMilestone();
+			if(resMilestone == null){
+				return milestone == null;
+			}else{
+				return milestone.getNumber() == resMilestone.getNumber();
+			}
 		}
+		return false;
 	}
 	
-	public void setIssueAssignee(int issueId, User user) throws IOException{
+	public boolean setIssueAssignee(int issueId, User user) throws IOException{
 		if(repoId != null){
-			issueService.setIssueAssignee(repoId, issueId, user);
+			Issue result = issueService.setIssueAssignee(repoId, issueId, user);
+			User assignee = result.getAssignee();
+			if(assignee == null){
+				return user == null;
+			}else{
+				return assignee.getLogin().equals(user.getLogin());
+			}
 		}
+		return false;
 	}
 	
 	/**

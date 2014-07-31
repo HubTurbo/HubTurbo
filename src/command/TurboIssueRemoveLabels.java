@@ -1,7 +1,6 @@
 package command;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
@@ -31,18 +30,26 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 		lastOperationExecuted = changeLog;
 	}
 	
+	private boolean setLabelsForIssueInGithub() throws IOException{
+		List<Label> issueLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
+		//Use setLabelsForIssue instead of addLabels to enforce label group exclusivity
+		List<Label> resLabels = ServiceManager.getInstance().setLabelsForIssue(issue.getId(), issueLabels);
+		boolean result =  resLabels.containsAll(issueLabels);
+		if(result){
+			updateGithubIssueState();
+		}
+		return result;
+	}
 
 	@Override
 	protected boolean performExecuteAction() {
-		ServiceManager service = ServiceManager.getInstance();
 		List<TurboLabel> original = issue.getLabels();
-		ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(removedLabels);
 		issue.removeLabels(removedLabels);
 		try {
-			service.deleteLabelsFromIssue(issue.getId(), ghLabels);
-			updateGithubIssueState();
-			logRemoveOperation(original, issue.getLabels());
-			isSuccessful = true;
+			isSuccessful = setLabelsForIssueInGithub();
+			if(isSuccessful){
+				logRemoveOperation(original, issue.getLabels());
+			}
 		} catch (IOException e) {
 			issue.addLabels(removedLabels);
 			isSuccessful = false;
@@ -54,15 +61,14 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 
 	@Override
 	protected boolean performUndoAction() {
-		ServiceManager service = ServiceManager.getInstance();
 		List<TurboLabel> original = issue.getLabels();
 		issue.addLabels(removedLabels);
 		try {
-			ArrayList<Label> ghLabels = CollectionUtilities.getGithubLabelList(issue.getLabels());
-			service.setLabelsForIssue(issue.getId(), ghLabels);
-			updateGithubIssueState();
-			logRemoveOperation(original, issue.getLabels());
-			isUndone = true;
+			boolean result = setLabelsForIssueInGithub();
+			if(result){
+				logRemoveOperation(original, issue.getLabels());
+			}
+			isUndone = result;
 		} catch (IOException e) {
 			issue.removeLabels(removedLabels);
 			isUndone = false;
