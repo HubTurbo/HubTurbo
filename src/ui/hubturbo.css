@@ -105,7 +105,7 @@
 
 .comments-list-cell,
 .comments-list-cell:selected {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #F3F3F3;
 }
 
 .list-cell:empty {
@@ -159,4 +159,8 @@
     -fx-background-color:derive(black,90%);
 	-fx-background-insets: 2, 0, 0;
 	-fx-background-radius: 2em;
+}
+
+div {
+  -fx-font-family: Calibri;
 }

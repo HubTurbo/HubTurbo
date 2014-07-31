@@ -48,6 +48,10 @@ public class IssueEditDisplay extends VBox{
 			+ "img{"
 			+ "max-width: 100%;"
 			+ "}"
+			+ "p {"
+			+ "font-family: System;"
+			+ "font-size: 13px"
+			+ "}"
 			+ "</style>";
 	protected static String EDIT_BTN_TXT = "\uf058";
 	protected static String BACK_BTN_TXT = " \uf0a4 ";

@@ -32,6 +32,10 @@ public class IssueDetailsCard extends VBox{
 			+ "img{"
 			+ "max-width: 100%;"
 			+ "}"
+			+ "p {"
+			+ "font-family: System;"
+			+ "font-size: 12px"
+			+ "}"
 			+ "</style>";
 	protected static final String HTML_CONTENT_WRAPPER = "<html><body>" 
 	        +  "<div id=\"wrapper\" style = \"width: 280\">%1s</div>" +
