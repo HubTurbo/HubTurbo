@@ -142,6 +142,8 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
 	}
 	
+	//Returns an array in the format {label group, label name, separator : the delimiter used to separate group and name}
+	//Returns null if given string is not in the format: group.name or group-name
 	public static String[] parseName(String name) {
 		String[] result = new String[3];
 		int dotPos = name.indexOf(EXCLUSIVE_DELIM);

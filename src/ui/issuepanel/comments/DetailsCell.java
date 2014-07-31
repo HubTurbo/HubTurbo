@@ -21,7 +21,7 @@ public class DetailsCell extends ListCell<TurboComment>{
 		}else{
 			display = new IssueDetailsCard();
 		}
-//		this.getStyleClass().add("comments-list-cell");
+		this.getStyleClass().add("comments-list-cell");
 	}
 	
 	@Override
