@@ -51,7 +51,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 	
 	private void setupCloseButton(){
 		WeakReference<CheckboxListDialog> selfRef = new WeakReference<>(this);
-		close = new Button("Close");
+		close = new Button("Done");
 		close.setOnAction((e) -> {
 			selfRef.get().handleCloseButtonAction();
 		});

@@ -2,6 +2,8 @@ package command;
 
 import java.io.IOException;
 
+import javafx.application.Platform;
+
 import org.eclipse.egit.github.core.Issue;
 
 import service.ServiceManager;
@@ -39,7 +41,9 @@ public class TurboIssueAdd extends TurboIssueCommand{
 	}
 	
 	private void addIssueToLocalCache(TurboIssue issue){
-		model.get().appendToCachedIssues(issue);
+		Platform.runLater(() -> {
+			model.get().appendToCachedIssues(issue);
+		});
 	}
 	
 	public TurboIssue getAddedIssue(){

@@ -150,7 +150,7 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 
 	private void setupCloseButton(){
 		WeakReference<LabelCheckboxListDialog> selfRef = new WeakReference<>(this);
-		close = new Button("Close");
+		close = new Button("Done");
 		close.setOnAction((e) -> {
 			selfRef.get().handleCloseButtonAction();
 		});

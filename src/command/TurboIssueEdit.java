@@ -8,6 +8,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import service.ServiceManager;
 import util.CollectionUtilities;
@@ -136,7 +137,10 @@ public class TurboIssueEdit extends TurboIssueCommand{
 						+ "Please reload and enter your descripton again.");
 			}
 			
-			model.get().updateCachedIssue(latestIssue);
+			Platform.runLater(() -> {
+				//Must be run on application thread since this triggers ui updates.
+				model.get().updateCachedIssue(latestIssue);
+			});
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -2,6 +2,8 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -11,7 +13,7 @@ import ui.SidePanel;
 import ui.SidePanel.IssueEditMode;
 import ui.StatusBar;
 import ui.issuepanel.comments.IssueDetailsDisplay;
-
+import util.DialogMessage;
 import command.TurboIssueAdd;
 import command.TurboIssueCommand;
 import command.TurboIssueEdit;
@@ -58,51 +60,86 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	private void updateStateAfterSuccessfulAdd(TurboIssue addedIssue){
-		displayedIssue.copyValues(addedIssue);
-		originalIssue.copyValues(addedIssue);
-		issueEditDisplay.updateIssueId(displayedIssue.getId());
+		Platform.runLater(() -> {
+			displayedIssue.copyValues(addedIssue);
+			originalIssue.copyValues(addedIssue);
+			issueEditDisplay.updateIssueId(displayedIssue.getId());
+		});
 		mode = IssueEditMode.EDIT;
 	}
 	
 	private void updateStateAfterSuccessfulEdit(TurboIssue editedIssue){
-		displayedIssue.copyValues(editedIssue);
-		originalIssue.copyValues(editedIssue);
+		Platform.runLater(() -> {
+			displayedIssue.copyValues(editedIssue);
+			originalIssue.copyValues(editedIssue);
+		});
+	}
+	
+	private boolean handleIssueCreate(){
+		String message = "";
+		TurboIssueCommand command = new TurboIssueAdd(model, displayedIssue);
+		boolean success = command.execute();
+		if(success){
+			updateStateAfterSuccessfulAdd(((TurboIssueAdd)command).getAddedIssue());
+			message = "Issue successfully created!";
+		}else{
+			message = "An error occured while creating the issue";
+		}
+		StatusBar.displayMessage(message);
+		return success;
+	}
+	
+	private boolean handleIssueEdit(){
+		String message = "";
+		TurboIssueCommand command = new TurboIssueEdit(model, originalIssue, displayedIssue);
+		boolean success = command.execute();
+		if(success){
+			updateStateAfterSuccessfulEdit(((TurboIssueEdit)command).getEditedIssue());
+			message = "Issue successfully edited!";
+		}else{
+			message = "An error occured while editing the issue. Changes have not been saved.";
+		}
+		StatusBar.displayMessage(message);
+		return success;
 	}
 	
 	public void handleSaveClicked(){
-		TurboIssueCommand command;
-		String message = "";
-		boolean success = false;
-		if(mode == IssueEditMode.CREATE){
-			command = new TurboIssueAdd(model, displayedIssue);
-			success = command.execute();
-			if(success){
-				updateStateAfterSuccessfulAdd(((TurboIssueAdd)command).getAddedIssue());
-				message = "Issue successfully created!";
-			}else{
-				message = "An error occured while creating the issue";
+		Task<Boolean> bgTask = new Task<Boolean>(){
+
+			@Override
+			protected Boolean call() throws Exception {
+				boolean success = false;
+				if(mode == IssueEditMode.CREATE){
+					success = handleIssueCreate();
+				}else if(mode == IssueEditMode.EDIT){
+					success = handleIssueEdit();
+				}
+				return success;
 			}
-		}else if(mode == IssueEditMode.EDIT){
-			command = new TurboIssueEdit(model, originalIssue, displayedIssue);
-			success = command.execute();
-			if(success){
-				updateStateAfterSuccessfulEdit(((TurboIssueEdit)command).getEditedIssue());
-				message = "Issue successfully edited!";
-			}else{
-				message = "An error occured while editing the issue. Changes have not been saved.";
-			}
-		}
+			
+		};
 		
-		StatusBar.displayMessage(message);
-		if(success){
-			if(expandedIssueView){
-				issueDetailsDisplay.refresh(); //Refresh comments so change log can be seen
-			}else{
-				showIssueDetailsDisplay(false);
-				cleanup();
-				parentPanel.get().displayTabs();
+		bgTask.setOnSucceeded(e -> {
+			try {
+				boolean success = bgTask.get();
+				if(success){
+					if(expandedIssueView){
+						issueDetailsDisplay.refresh(); //Refresh comments so change log can be seen
+					}else{
+						showIssueDetailsDisplay(false);
+						cleanup();
+						parentPanel.get().displayTabs();
+					}
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
-		}
+
+		});
+				
+		DialogMessage.showProgressDialog(bgTask, "Saving issue...");
+		Thread thread = new Thread(bgTask);
+		thread.start();
 	}
 
 	private void setup() {

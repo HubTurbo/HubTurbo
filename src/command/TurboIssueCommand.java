@@ -3,6 +3,7 @@ package command;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import javafx.application.Platform;
 import service.ServiceManager;
 import util.ProjectConfigurations;
 import model.Model;
@@ -31,7 +32,9 @@ public abstract class TurboIssueCommand {
 	public boolean execute(){
 		boolean result = performExecuteAction();
 		if(result){
-			model.get().refresh();
+			Platform.runLater(() -> {
+				model.get().refresh();
+			});
 		}
 		return result;
 	}
@@ -40,7 +43,9 @@ public abstract class TurboIssueCommand {
 	public boolean undo(){
 		boolean result = performUndoAction();
 		if(result){
-			model.get().refresh();
+			Platform.runLater(() -> {
+				model.get().refresh();
+			});
 		}
 		return result;
 	}
