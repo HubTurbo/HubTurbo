@@ -5,12 +5,16 @@ import java.util.concurrent.CompletableFuture;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public abstract class Dialog<T> {
+	protected static final KeyCombination BUTTON_TRIGGER_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	
 	private final Stage parentStage;
 	private Stage stage = null;

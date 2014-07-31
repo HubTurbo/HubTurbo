@@ -95,8 +95,10 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 			switch (code) {
             case ENTER:
                 if(self != null){
-                	self.checkCheckItemWithName(fieldRef.get().getText());
-                	close.requestFocus();
+                	if(self.checkCheckItemWithName(fieldRef.get().getText())){
+                		fieldRef.get().setText("");
+                		close.requestFocus();
+                	}
                 }
                 break;
             default:
@@ -105,8 +107,8 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		});
 	}
 	
-	private void checkCheckItemWithName(String name){
-		checkListView.checkItem(name);
+	private boolean checkCheckItemWithName(String name){
+		return checkListView.checkItem(name);
 	}
 
 	private void completeResponse(BetterCheckListView checkListView) {

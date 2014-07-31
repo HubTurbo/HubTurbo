@@ -39,12 +39,14 @@ public class BetterCheckListView extends VBox {
 	
 	boolean disabled = false;
 	
-	public void checkItem(String itemName){
+	public boolean checkItem(String itemName){
 		int index = getItemIndex(itemName);
 		if(index >= 0){
 			setChecked(index, true);
 			listView.scrollTo(index);
+			return true;
 		}
+		return false;
 	}
 	
 	public int getItemIndex(String itemName){
