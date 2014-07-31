@@ -80,8 +80,15 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 		}
 		checklist = controls.get(groupName);
 		boolean result = checklist.checkItem(labelName);
-		display.scrollTo(getIndexOfGroup(groupName));
+		scrollToGroup(groupName);
 		return result;
+	}
+	
+	private void scrollToGroup(String groupName){
+		int index = getIndexOfGroup(groupName);
+		if(index >= 0){
+			display.scrollTo(getIndexOfGroup(groupName));
+		}
 	}
 	
 	private int getIndexOfGroup(String groupName){
@@ -141,12 +148,26 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 		return setupLayout();
 	}
 
-	private Parent setupLayout() {
+	private void setupCloseButton(){
+		WeakReference<LabelCheckboxListDialog> selfRef = new WeakReference<>(this);
 		close = new Button("Close");
 		close.setOnAction((e) -> {
-			respond();
-			close();
+			selfRef.get().handleCloseButtonAction();
 		});
+		close.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER){
+				selfRef.get().handleCloseButtonAction();
+			}
+		});
+	}
+	
+	private void handleCloseButtonAction(){
+		respond();
+		close();
+	}
+	
+	private Parent setupLayout() {
+		setupCloseButton();
 		
 		setupAutoCompleteBox();
 		
