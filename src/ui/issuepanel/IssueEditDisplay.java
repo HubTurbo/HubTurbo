@@ -16,7 +16,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -39,6 +38,7 @@ import ui.LabelCheckboxListDialog;
 import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
 import ui.ParentIssuesDisplayBox;
+import ui.TraversableTextArea;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
@@ -63,7 +63,7 @@ public class IssueEditDisplay extends VBox{
 	protected static final KeyCombination SAVE_ISSUE_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	
 	private Text issueIdText;
-	private TextArea editableIssueDesc;
+	private TraversableTextArea editableIssueDesc;
 	private WebView issueDesc;
 	private ToggleButton descEditMode;
 	private Button descPopup;
@@ -217,8 +217,8 @@ public class IssueEditDisplay extends VBox{
 		return listener;
 	}
 	
-	private TextArea createIssueTitle(){
-		TextArea issueTitle = new TextArea(issue.getTitle());
+	private TraversableTextArea createIssueTitle(){
+		TraversableTextArea issueTitle = new TraversableTextArea(issue.getTitle());
 		issueTitle.setPromptText("Title");
 		issueTitle.setPrefRowCount(TITLE_ROW_NUM);
 		issueTitle.setPrefColumnCount(42);
@@ -247,7 +247,7 @@ public class IssueEditDisplay extends VBox{
 			Browse.browse(issue.getHtmlUrl());
 		});
 		
-		TextArea issueTitle = createIssueTitle();
+		TraversableTextArea issueTitle = createIssueTitle();
 		if (focusRequested) {
 			Platform.runLater(() -> issueTitle.requestFocus());
 		}
@@ -270,7 +270,7 @@ public class IssueEditDisplay extends VBox{
 	}
 	
 	private void setupEditableDescription(){
-		editableIssueDesc = new TextArea(issue.getDescription());
+		editableIssueDesc = new TraversableTextArea(issue.getDescription());
 		editableIssueDesc.setPrefColumnCount(42);
 		editableIssueDesc.setWrapText(true);
 		editableIssueDesc.setPromptText("Description");
