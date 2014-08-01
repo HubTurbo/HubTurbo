@@ -167,7 +167,7 @@ public class SidePanel extends VBox {
 	
 	private boolean checkRepoAccess(RepositoryId repoId){
 		try {
-			if(!ServiceManager.getInstance().checkRepository(repoId)){
+			if (!ServiceManager.getInstance().checkRepository(repoId)) {
 				Platform.runLater(() -> {
 					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
 				});
@@ -182,7 +182,7 @@ public class SidePanel extends VBox {
 
 	private void loadRepo(final ComboBox<String> comboBox) {
 		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
-		if(!checkRepoAccess(repoId)){
+		if (!checkRepoAccess(repoId)) {
 			return;
 		}
 		if (repoId != null) {

@@ -25,6 +25,10 @@ public class EditableMarkupPopup extends Stage{
 			+ "img{"
 			+ "max-width: 100%;"
 			+ "}"
+			+ "p {"
+			+ "font-family: System;"
+			+ "font-size: 12px"
+			+ "}"
 			+ "</style>";
 	
 	private WebView markupDisplay;
