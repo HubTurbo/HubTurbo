@@ -53,9 +53,9 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	public void handleCancelClicked(){
+		cleanup();
 		columns.deselect();
 		showIssueDetailsDisplay(false);
-		cleanup();
 		parentPanel.get().displayTabs();
 	}
 	
