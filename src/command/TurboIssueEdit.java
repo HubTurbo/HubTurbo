@@ -153,6 +153,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		for(String log : changeLogs.values()){
 			changeLog.append(log);
 		}
+		
 		if(changeLog.length() > 0){
 			lastOperationExecuted = changeLog.toString();
 			ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
@@ -189,7 +190,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				latestLabels.add(label);
 			}
 		}
-		changeLogs.put(LABEL_FIELD, IssueChangeLogger.getLabelsChangeLog(model.get(), originalLabels, editedLabels));
+//		changeLogs.put(LABEL_FIELD, IssueChangeLogger.getLabelsChangeLog(model.get(), originalLabels, editedLabels));
 		latest.setLabels(latestLabels);
 	}
 	
@@ -231,7 +232,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		} 
 		if (!originalAssignee.equals(editedAssignee)) {
 			latest.setAssignee(editedAssignee);
-			changeLogs.put(ASSIGNEE_FIELD, IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
+//			changeLogs.put(ASSIGNEE_FIELD, IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
 		}
 	}
 
@@ -269,7 +270,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		String editedTitle = edited.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-			changeLogs.put(TITLE_FIELD, IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
+//			changeLogs.put(TITLE_FIELD, IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
 		}
 	}
 }
