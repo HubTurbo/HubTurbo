@@ -5,22 +5,14 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import model.TurboComment;
 import model.TurboIssue;
-import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
-
 
 public class DetailsCell extends ListCell<TurboComment>{
 	TurboIssue issue;
-	DisplayType displayType;
 	IssueDetailsCard display;
 	
-	public DetailsCell(TurboIssue issue, DisplayType displayType, IssueDetailsContentHandler handler){
+	public DetailsCell(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
-		this.displayType = displayType;
-		if(displayType == DisplayType.COMMENTS){
-			display = new CommentCard(handler);
-		}else{
-			display = new IssueDetailsCard();
-		}
+		display = new CommentCard(handler);
 		this.getStyleClass().add("comments-list-cell");
 	}
 	

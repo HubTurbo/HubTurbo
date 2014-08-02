@@ -18,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.TurboComment;
 import model.TurboIssue;
-import ui.issuepanel.comments.IssueDetailsDisplay.DisplayType;
 
 public class DetailsPanel extends VBox {
 	protected static final int LIST_MAX_HEIGHT = 1000;
@@ -32,22 +31,15 @@ public class DetailsPanel extends VBox {
 	private ListView<TurboComment> listView;
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
-	private DisplayType displayType;
 			
 	private ObservableList<TurboComment> detailsList;
 	private ChangeListener<Boolean> expandedChangeListener;
 	
-	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler, DisplayType displayType){
+	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
 		this.listView = new ListView<TurboComment>();
 		this.handler = handler;
-		this.displayType = displayType;
-		if(displayType == DisplayType.COMMENTS){
-			detailsList = handler.getComments();
-			
-		}else{
-			detailsList = handler.getIssueHistory();
-		}
+		detailsList = handler.getComments();
 		setupLayout();
 		loadDisplayElements();
 	}
@@ -55,10 +47,8 @@ public class DetailsPanel extends VBox {
 	private void loadDisplayElements(){
 		setupDetailsDisplay();
 		getChildren().add(displayArea);
-		if(displayType == DisplayType.COMMENTS){
-			TitledPane cBox = createNewCommentsBox();
-			getChildren().add(cBox);
-		}
+		TitledPane cBox = createNewCommentsBox();
+		getChildren().add(cBox);
 	}
 	
 	private void setupDetailsDisplay(){
@@ -98,7 +88,7 @@ public class DetailsPanel extends VBox {
 		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
 			@Override
 			public ListCell<TurboComment> call(ListView<TurboComment> list) {
-				return new DetailsCell(issue, displayType, handler);
+				return new DetailsCell(issue, handler);
 			}
 		};
 		return factory;
