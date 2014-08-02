@@ -124,6 +124,9 @@ public class IssueEditDisplay extends VBox{
 			}else{
 				KeyCode code = e.getCode();
 				switch(code){
+				case ESCAPE:
+					selfRef.get().requestFocus();
+					break;
 				case D:
 					descEditMode.fire();
 					break;
