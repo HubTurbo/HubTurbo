@@ -116,6 +116,13 @@ public class IssueEditDisplay extends VBox{
 						true, true, true, true, true, true, true, true, true, true, null));
 	}
 	
+	private void handleEscKeyPressed(){
+		if(this.isFocused()){
+			cancel.fire();
+		}else{
+			requestFocus();
+		}
+	}
 	private void setupKeyboardShortcuts(){
 		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
 		this.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
@@ -125,7 +132,7 @@ public class IssueEditDisplay extends VBox{
 				KeyCode code = e.getCode();
 				switch(code){
 				case ESCAPE:
-					selfRef.get().requestFocus();
+					selfRef.get().handleEscKeyPressed();
 					break;
 				case D:
 					descEditMode.fire();
