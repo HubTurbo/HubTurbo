@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -21,12 +22,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.event.Event;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -69,6 +73,12 @@ public class IssueEditDisplay extends VBox{
 	private Button descPopup;
 	private VBox descArea;
 	
+	private LabelDisplayBox statusBox;
+	private Parent parents;
+	private Parent milestone;
+	private Parent labels;
+	private Parent assignee;
+	
 	private Button cancel;
 	private Button save;
 	
@@ -99,10 +109,42 @@ public class IssueEditDisplay extends VBox{
 		getChildren().addAll(top(), descArea, bottom());
 	}
 	
+	private void triggerClick(Node node){
+		Event.fireEvent(node, 
+				new MouseEvent(MouseEvent.MOUSE_CLICKED, 
+						0, 0, 0, 0, MouseButton.PRIMARY, 1, 
+						true, true, true, true, true, true, true, true, true, true, null));
+	}
+	
 	private void setupKeyboardShortcuts(){
+		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
 		this.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 			if(SAVE_ISSUE_SHORTCUT.match(e)){
 				parentContainer.get().handleSaveClicked();
+			}else{
+				KeyCode code = e.getCode();
+				switch(code){
+				case D:
+					descEditMode.fire();
+					break;
+				case P:
+					selfRef.get().triggerClick(parents);
+					break;
+				case S:
+					selfRef.get().triggerClick(statusBox);
+					break;
+				case L:
+					selfRef.get().triggerClick(labels);
+					break;
+				case A:
+					selfRef.get().triggerClick(assignee);
+					break;
+				case M:
+					selfRef.get().triggerClick(milestone);
+					break;
+				default:
+					break;
+				}
 			}
 		});
 	}
@@ -181,6 +223,7 @@ public class IssueEditDisplay extends VBox{
 	private void setDescriptionAreaContentForEditMode(boolean edit){
 		if(edit){
 			descArea.getChildren().add(editableIssueDesc);
+			editableIssueDesc.requestFocus();
 		}else{
 			descArea.getChildren().add(issueDesc);
 		}
@@ -254,7 +297,7 @@ public class IssueEditDisplay extends VBox{
 			Platform.runLater(() -> issueTitle.requestFocus());
 		}
 		
-		Parent statusBox = createStatusBox(parentStage);
+		statusBox = createStatusBox(parentStage);
 		
 		VBox topLeft = new VBox();
 		topLeft.setSpacing(5);
@@ -351,10 +394,10 @@ public class IssueEditDisplay extends VBox{
 
 	private Parent bottom() {
 
-		Parent parents = createParentsBox(parentStage);
-		Parent milestone = createMilestoneBox(parentStage);
-		Parent labels = createLabelBox(parentStage);
-		Parent assignee = createAssigneeBox(parentStage);
+		parents = createParentsBox(parentStage);
+		milestone = createMilestoneBox(parentStage);
+		labels = createLabelBox(parentStage);
+		assignee = createAssigneeBox(parentStage);
 		
 		Separator separator = new Separator();
 		separator.setPadding(new Insets(5));
