@@ -134,6 +134,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void initialiseDescEditButton(){
 		descEditMode = new ToggleButton();
+		descEditMode.setFocusTraversable(false);
 		descEditMode.getStyleClass().addAll("button-github-octicon", "borderless-toggle-button");
 		boolean isEditMode = descriptionIsEmpty();
 		setDescModeButtonText(isEditMode);
@@ -149,6 +150,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void initialDescPopupButton(){
 		descPopup = new Button();
+		descPopup.setFocusTraversable(false);
 		descPopup.setText(POPUP_BTN_TXT);
 		descPopup.getStyleClass().addAll("button-github-octicon", "borderless-button");
 		descPopup.setOnMouseClicked(e -> {
@@ -376,14 +378,14 @@ public class IssueEditDisplay extends VBox{
 		cancel = new Button("Cancel");
 		HBox.setHgrow(cancel, Priority.ALWAYS);
 		cancel.setMaxWidth(Double.MAX_VALUE);
-		cancel.setOnMouseClicked(e -> {
+		cancel.setOnAction(e -> {
 			parentContainer.get().handleCancelClicked();
 		});
 
 		save = new Button("Save");
 		HBox.setHgrow(save, Priority.ALWAYS);
 		save.setMaxWidth(Double.MAX_VALUE);
-		save.setOnMouseClicked(e -> {
+		save.setOnAction(e -> {
 			parentContainer.get().handleSaveClicked();
 		});
 
