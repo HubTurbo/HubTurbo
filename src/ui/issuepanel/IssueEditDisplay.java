@@ -128,7 +128,7 @@ public class IssueEditDisplay extends VBox{
 		this.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 			if(SAVE_ISSUE_SHORTCUT.match(e)){
 				parentContainer.get().handleSaveClicked();
-			}else{
+			}else if(!e.isShiftDown()){
 				KeyCode code = e.getCode();
 				switch(code){
 				case ESCAPE:
