@@ -151,7 +151,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 			
 			// Create a new label
 			TurboLabel newLabel = new TurboLabel();
-			newLabel.setName("");
+			newLabel.setName("newlabel");
 			
 			// Set its group value to null if it's being created under the <Ungrouped> group
 			String groupName = getTreeItem().getValue().getValue();
