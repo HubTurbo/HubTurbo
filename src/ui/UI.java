@@ -108,13 +108,19 @@ public class UI extends Application {
 		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
 		
 		menuBar = new MenuControl(columns, sidePanel, columnsScroll);
-		
+
 		HBox centerContainer = new HBox();
 		centerContainer.setPadding(new Insets(5,0,5,0));
-		centerContainer.getChildren().addAll(sidePanel, columnsScroll);
+		// To cater for collapsible SidePanel (start)
+		//centerContainer.getChildren().addAll(sidePanel, columnsScroll);
+		centerContainer.getChildren().addAll(sidePanel.getControlLabel(), columnsScroll);
+		// To cater for collapsible SidePanel (end)
 
-        BorderPane root = new BorderPane();
+		BorderPane root = new BorderPane();
 		root.setTop(menuBar);
+		// To cater for collapsible SidePanel (start)
+		root.setLeft(sidePanel);
+		// To cater for collapsible SidePanel (end)
 		root.setCenter(centerContainer);
 		root.setBottom(StatusBar.getInstance());
 

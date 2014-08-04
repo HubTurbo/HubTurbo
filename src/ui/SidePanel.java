@@ -4,17 +4,23 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import javafx.animation.Animation;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.Model;
 import model.TurboIssue;
 
@@ -26,8 +32,6 @@ import util.DialogMessage;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
-
-
 	public enum IssueEditMode{NIL, CREATE, EDIT};
 	
 	protected static final int PANEL_PREF_WIDTH = 300;
@@ -43,11 +47,77 @@ public class SidePanel extends VBox {
 	private ColumnControl columns = null;
 	IssueDisplayPane currentIssueDisplay = null;
 	
+    // To cater for the SidePanel to collapse or expand
+    private static final String EXPAND_RIGHT_POINTING_TRIANGLE = "\u25C0";
+    private static final String COLLAPSE_LEFT_POINTING_TRIANGLE = "\u25B6";
+	private double prefWidth = PANEL_PREF_WIDTH;
+	private Label controlLabel;
+	private Animation hideSidebar;
+	private Animation showSidebar;
+
 	public SidePanel(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
 		this.model = model;
 		getStyleClass().add("sidepanel");
 		setLayout(Layout.TABS);
+
+	    // Set up controls & animation to allow the SidePanel to collapse or expand
+		controlLabel = new Label(EXPAND_RIGHT_POINTING_TRIANGLE);
+		controlLabel.getStyleClass().add("label-button");
+		controlLabel.setOnMouseClicked((e) -> {
+			setupCollapse();
+			setupExpand();
+			if (showSidebar.statusProperty().get() == Animation.Status.STOPPED && 
+				hideSidebar.statusProperty().get() == Animation.Status.STOPPED) {
+				if (isVisible()) {
+					hideSidebar.play();
+				} else {
+					setVisible(true);
+					showSidebar.play();
+				}
+			}
+		});
+	}
+
+    // Get control Label to enable the SidePanel to collapse or expand
+    public Label getControlLabel() { 
+    	return controlLabel; 
+    }
+
+    // Set up controls & animation to allow the SidePanel to collapse or expand
+   private void setupCollapse() {
+		// create an animation to hide sidebar.
+		hideSidebar = new Transition() {
+			{ setCycleDuration(Duration.millis(250)); }
+			protected void interpolate(double frac) {
+				final double curWidth = prefWidth * (1.0 - frac);
+				setPrefWidth(curWidth);
+				setTranslateX(-prefWidth + curWidth);
+			}
+		};
+		hideSidebar.onFinishedProperty().set(new EventHandler<ActionEvent>() {
+			@Override public void handle(ActionEvent actionEvent) {
+				setVisible(false);
+				controlLabel.setText(COLLAPSE_LEFT_POINTING_TRIANGLE);
+			}
+		});
+	}
+
+	private void setupExpand() {
+		// create an animation to show a sidebar.
+		showSidebar = new Transition() {
+			{ setCycleDuration(Duration.millis(250)); }
+			protected void interpolate(double frac) {
+				final double curWidth = prefWidth * frac;
+				setPrefWidth(curWidth);
+				setTranslateX(-prefWidth + curWidth);
+			}
+		};
+		showSidebar.onFinishedProperty().set(new EventHandler<ActionEvent>() {
+			@Override public void handle(ActionEvent actionEvent) {
+				controlLabel.setText(EXPAND_RIGHT_POINTING_TRIANGLE);
+			}
+		});
 	}
 
 	// Needed due to a circular dependency with ColumnControl
@@ -167,7 +237,7 @@ public class SidePanel extends VBox {
 	
 	private boolean checkRepoAccess(RepositoryId repoId){
 		try {
-			if (!ServiceManager.getInstance().checkRepository(repoId)) {
+			if(!ServiceManager.getInstance().checkRepository(repoId)){
 				Platform.runLater(() -> {
 					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
 				});
@@ -182,7 +252,7 @@ public class SidePanel extends VBox {
 
 	private void loadRepo(final ComboBox<String> comboBox) {
 		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
-		if (!checkRepoAccess(repoId)) {
+		if(!checkRepoAccess(repoId)){
 			return;
 		}
 		if (repoId != null) {
