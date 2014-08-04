@@ -47,7 +47,7 @@ As in C-like languages, NOT is a prefix operator, AND and OR are infix and left-
 - `parent` (`number`)
 - `label` (`name`, `group.name`, or `group.`)
 - `assignee`
-- `state/status` ('open', 'closed')
-- `has` ('label', 'milestone', 'assignee', 'parent')
+- `state/status` (`open`, `closed`)
+- `has` (`label`, `milestone`, `assignee`, `parent`)
 
 `number`s may be written with a leading `#`.
