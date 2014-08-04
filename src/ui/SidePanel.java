@@ -65,16 +65,14 @@ public class SidePanel extends VBox {
 		controlLabel = new Label(EXPAND_RIGHT_POINTING_TRIANGLE);
 		controlLabel.getStyleClass().add("label-button");
 		controlLabel.setOnMouseClicked((e) -> {
-			setupCollapse();
-			setupExpand();
-			if (showSidebar.statusProperty().get() == Animation.Status.STOPPED && 
-				hideSidebar.statusProperty().get() == Animation.Status.STOPPED) {
-				if (isVisible()) {
-					hideSidebar.play();
-				} else {
-					setVisible(true);
-					showSidebar.play();
-				}
+			if (isVisible()) {
+				getChildren().clear();
+				setVisible(false);
+				controlLabel.setText(COLLAPSE_LEFT_POINTING_TRIANGLE);
+			} else {
+				changeLayout();
+				setVisible(true);
+				controlLabel.setText(EXPAND_RIGHT_POINTING_TRIANGLE);
 			}
 		});
 	}
@@ -83,42 +81,6 @@ public class SidePanel extends VBox {
     public Label getControlLabel() { 
     	return controlLabel; 
     }
-
-    // Set up controls & animation to allow the SidePanel to collapse or expand
-   private void setupCollapse() {
-		// create an animation to hide sidebar.
-		hideSidebar = new Transition() {
-			{ setCycleDuration(Duration.millis(250)); }
-			protected void interpolate(double frac) {
-				final double curWidth = prefWidth * (1.0 - frac);
-				setPrefWidth(curWidth);
-				setTranslateX(-prefWidth + curWidth);
-			}
-		};
-		hideSidebar.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-			@Override public void handle(ActionEvent actionEvent) {
-				setVisible(false);
-				controlLabel.setText(COLLAPSE_LEFT_POINTING_TRIANGLE);
-			}
-		});
-	}
-
-	private void setupExpand() {
-		// create an animation to show a sidebar.
-		showSidebar = new Transition() {
-			{ setCycleDuration(Duration.millis(250)); }
-			protected void interpolate(double frac) {
-				final double curWidth = prefWidth * frac;
-				setPrefWidth(curWidth);
-				setTranslateX(-prefWidth + curWidth);
-			}
-		};
-		showSidebar.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-			@Override public void handle(ActionEvent actionEvent) {
-				controlLabel.setText(EXPAND_RIGHT_POINTING_TRIANGLE);
-			}
-		});
-	}
 
 	// Needed due to a circular dependency with ColumnControl
 	public void setColumns(ColumnControl columns) {
@@ -200,8 +162,7 @@ public class SidePanel extends VBox {
 
 		everything.getChildren().addAll(repoFields, tabs);
 		
-		everything.setPrefWidth(PANEL_PREF_WIDTH);
-		
+		//everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
 	}
 
