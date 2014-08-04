@@ -25,7 +25,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 	private ObservableList<String> objectNames;
 	private TextField autoCompleteBox;
 	private BetterCheckListView checkListView;
-	private Button close;
+	private Button done;
 	
 	public CheckboxListDialog(Stage parentStage, ObservableList<Listable> objects) {
 		super(parentStage);
@@ -44,20 +44,20 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		return response;
 	}
 	
-	private void handleCloseButtonAction(){
+	private void handleDoneButtonAction(){
 		completeResponse(checkListView);
 		close();
 	}
 	
-	private void setupCloseButton(){
+	private void setupDoneButton(){
 		WeakReference<CheckboxListDialog> selfRef = new WeakReference<>(this);
-		close = new Button("Done");
-		close.setOnAction((e) -> {
-			selfRef.get().handleCloseButtonAction();
+		done = new Button("Done");
+		done.setOnAction((e) -> {
+			selfRef.get().handleDoneButtonAction();
 		});
-		close.setOnKeyPressed(e -> {
+		done.setOnKeyPressed(e -> {
 			if(e.getCode() == KeyCode.ENTER){
-				selfRef.get().handleCloseButtonAction();
+				selfRef.get().handleDoneButtonAction();
 			}
 		});
 	}
@@ -69,13 +69,13 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
 		checkListView.setSingleSelection(!multipleSelection);
 		initialCheckedState.forEach((i) -> checkListView.setChecked(i, true));
 		
-		setupCloseButton();
+		setupDoneButton();
 		
 		createAutoCompleteTextField();
 
 		VBox layout = new VBox();
 		layout.setAlignment(Pos.CENTER_RIGHT);
-		layout.getChildren().addAll(checkListView, autoCompleteBox, close);
+		layout.getChildren().addAll(checkListView, autoCompleteBox, done);
 		layout.setSpacing(5);
 		layout.setPadding(new Insets(10));
 
@@ -97,7 +97,7 @@ public class CheckboxListDialog extends Dialog<List<Integer>> {
                 if(self != null){
                 	if(self.checkCheckItemWithName(fieldRef.get().getText())){
                 		fieldRef.get().setText("");
-                		close.requestFocus();
+                		done.requestFocus();
                 	}
                 }
                 break;

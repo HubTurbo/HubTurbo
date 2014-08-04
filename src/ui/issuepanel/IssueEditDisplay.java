@@ -12,22 +12,25 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.event.Event;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -39,6 +42,7 @@ import ui.LabelCheckboxListDialog;
 import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
 import ui.ParentIssuesDisplayBox;
+import ui.TraversableTextArea;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
@@ -63,11 +67,17 @@ public class IssueEditDisplay extends VBox{
 	protected static final KeyCombination SAVE_ISSUE_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
 	
 	private Text issueIdText;
-	private TextArea editableIssueDesc;
+	private TraversableTextArea editableIssueDesc;
 	private WebView issueDesc;
 	private ToggleButton descEditMode;
 	private Button descPopup;
 	private VBox descArea;
+	
+	private LabelDisplayBox statusBox;
+	private Parent parents;
+	private Parent milestone;
+	private Parent labels;
+	private Parent assignee;
 	
 	private Button cancel;
 	private Button save;
@@ -99,10 +109,52 @@ public class IssueEditDisplay extends VBox{
 		getChildren().addAll(top(), descArea, bottom());
 	}
 	
+	private void triggerClick(Node node){
+		Event.fireEvent(node, 
+				new MouseEvent(MouseEvent.MOUSE_CLICKED, 
+						0, 0, 0, 0, MouseButton.PRIMARY, 1, 
+						true, true, true, true, true, true, true, true, true, true, null));
+	}
+	
+	private void handleEscKeyPressed(){
+		if(this.isFocused()){
+			cancel.fire();
+		}else{
+			requestFocus();
+		}
+	}
 	private void setupKeyboardShortcuts(){
+		WeakReference<IssueEditDisplay> selfRef = new WeakReference<>(this);
 		this.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 			if(SAVE_ISSUE_SHORTCUT.match(e)){
 				parentContainer.get().handleSaveClicked();
+			}else if(!e.isShiftDown()){
+				KeyCode code = e.getCode();
+				switch(code){
+				case ESCAPE:
+					selfRef.get().handleEscKeyPressed();
+					break;
+				case D:
+					descEditMode.fire();
+					break;
+				case P:
+					selfRef.get().triggerClick(parents);
+					break;
+				case S:
+					selfRef.get().triggerClick(statusBox);
+					break;
+				case L:
+					selfRef.get().triggerClick(labels);
+					break;
+				case A:
+					selfRef.get().triggerClick(assignee);
+					break;
+				case M:
+					selfRef.get().triggerClick(milestone);
+					break;
+				default:
+					break;
+				}
 			}
 		});
 	}
@@ -134,6 +186,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void initialiseDescEditButton(){
 		descEditMode = new ToggleButton();
+		descEditMode.setFocusTraversable(false);
 		descEditMode.getStyleClass().addAll("button-github-octicon", "borderless-toggle-button");
 		boolean isEditMode = descriptionIsEmpty();
 		setDescModeButtonText(isEditMode);
@@ -149,6 +202,7 @@ public class IssueEditDisplay extends VBox{
 	
 	private void initialDescPopupButton(){
 		descPopup = new Button();
+		descPopup.setFocusTraversable(false);
 		descPopup.setText(POPUP_BTN_TXT);
 		descPopup.getStyleClass().addAll("button-github-octicon", "borderless-button");
 		descPopup.setOnMouseClicked(e -> {
@@ -179,6 +233,7 @@ public class IssueEditDisplay extends VBox{
 	private void setDescriptionAreaContentForEditMode(boolean edit){
 		if(edit){
 			descArea.getChildren().add(editableIssueDesc);
+			editableIssueDesc.requestFocus();
 		}else{
 			descArea.getChildren().add(issueDesc);
 		}
@@ -217,8 +272,8 @@ public class IssueEditDisplay extends VBox{
 		return listener;
 	}
 	
-	private TextArea createIssueTitle(){
-		TextArea issueTitle = new TextArea(issue.getTitle());
+	private TraversableTextArea createIssueTitle(){
+		TraversableTextArea issueTitle = new TraversableTextArea(issue.getTitle());
 		issueTitle.setPromptText("Title");
 		issueTitle.setPrefRowCount(TITLE_ROW_NUM);
 		issueTitle.setPrefColumnCount(42);
@@ -247,12 +302,12 @@ public class IssueEditDisplay extends VBox{
 			Browse.browse(issue.getHtmlUrl());
 		});
 		
-		TextArea issueTitle = createIssueTitle();
+		TraversableTextArea issueTitle = createIssueTitle();
 		if (focusRequested) {
 			Platform.runLater(() -> issueTitle.requestFocus());
 		}
 		
-		Parent statusBox = createStatusBox(parentStage);
+		statusBox = createStatusBox(parentStage);
 		
 		VBox topLeft = new VBox();
 		topLeft.setSpacing(5);
@@ -270,7 +325,7 @@ public class IssueEditDisplay extends VBox{
 	}
 	
 	private void setupEditableDescription(){
-		editableIssueDesc = new TextArea(issue.getDescription());
+		editableIssueDesc = new TraversableTextArea(issue.getDescription());
 		editableIssueDesc.setPrefColumnCount(42);
 		editableIssueDesc.setWrapText(true);
 		editableIssueDesc.setPromptText("Description");
@@ -349,10 +404,10 @@ public class IssueEditDisplay extends VBox{
 
 	private Parent bottom() {
 
-		Parent parents = createParentsBox(parentStage);
-		Parent milestone = createMilestoneBox(parentStage);
-		Parent labels = createLabelBox(parentStage);
-		Parent assignee = createAssigneeBox(parentStage);
+		parents = createParentsBox(parentStage);
+		milestone = createMilestoneBox(parentStage);
+		labels = createLabelBox(parentStage);
+		assignee = createAssigneeBox(parentStage);
 		
 		Separator separator = new Separator();
 		separator.setPadding(new Insets(5));
@@ -376,14 +431,14 @@ public class IssueEditDisplay extends VBox{
 		cancel = new Button("Cancel");
 		HBox.setHgrow(cancel, Priority.ALWAYS);
 		cancel.setMaxWidth(Double.MAX_VALUE);
-		cancel.setOnMouseClicked(e -> {
+		cancel.setOnAction(e -> {
 			parentContainer.get().handleCancelClicked();
 		});
 
 		save = new Button("Save");
 		HBox.setHgrow(save, Priority.ALWAYS);
 		save.setMaxWidth(Double.MAX_VALUE);
-		save.setOnMouseClicked(e -> {
+		save.setOnAction(e -> {
 			parentContainer.get().handleSaveClicked();
 		});
 

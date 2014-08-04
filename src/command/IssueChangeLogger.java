@@ -32,7 +32,7 @@ public class IssueChangeLogger {
 	
 	public static String logLabelsChange(Model model, TurboIssue issue, List<TurboLabel> original, List<TurboLabel> edited){
 		String changeLog = getLabelsChangeLog(model, original, edited);
-		logChangesInGithub(issue, changeLog);
+//		logChangesInGithub(issue, changeLog);
 		return changeLog;
 	}
 	
@@ -115,7 +115,7 @@ public class IssueChangeLogger {
 	
 	public static String logTitleChange(TurboIssue issue, String original, String edited){
 		String changeLog = IssueChangeLogger.getTitleChangeLog(original, edited);
-		logChangesInGithub(issue, changeLog);
+//		logChangesInGithub(issue, changeLog);
 		return changeLog;
 	}
 	
@@ -153,7 +153,7 @@ public class IssueChangeLogger {
 	
 	public static String logAssigneeChange(TurboIssue issue, TurboUser original, TurboUser edited){
 		String changeLog = IssueChangeLogger.getAssigneeChangeLog(original, edited);
-		logChangesInGithub(issue, changeLog);
+//		logChangesInGithub(issue, changeLog);
 		return changeLog;
 	}
 	

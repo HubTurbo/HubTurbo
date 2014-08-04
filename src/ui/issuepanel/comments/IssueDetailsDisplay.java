@@ -16,10 +16,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class IssueDetailsDisplay extends VBox {
-	public enum DisplayType{
-		COMMENTS,
-		LOG
-	}
+//	public enum DisplayType{
+//		COMMENTS,
+//		LOG
+//	}
 	
 	private TabPane detailsTab;
 	
@@ -30,7 +30,6 @@ public class IssueDetailsDisplay extends VBox {
 	private int loadFailCount = 0;
 	
 	DetailsPanel commentsDisplay;
-	DetailsPanel issueLogDisplay;
 	
 	Thread backgroundThread;
 	
@@ -48,8 +47,7 @@ public class IssueDetailsDisplay extends VBox {
 	private void setupDetailsTab(){
 		this.detailsTab = new TabPane();
 		Tab commentsTab = createCommentsTab();
-		Tab logTab = createChangeLogTab();
-		detailsTab.getTabs().addAll(commentsTab, logTab);
+		detailsTab.getTabs().add(commentsTab);
 	}
 	
 	private void setupDisplay(){
@@ -140,7 +138,6 @@ public class IssueDetailsDisplay extends VBox {
 			@Override
 			public void run() {
 				commentsDisplay.scrollToBottom();
-        		issueLogDisplay.scrollToBottom();
 			}
 		});	
 	}
@@ -157,27 +154,18 @@ public class IssueDetailsDisplay extends VBox {
 		contentHandler.restartContentUpdate();
 	}
 	
-	private DetailsPanel createTabContentsDisplay(DisplayType type){
-		return new DetailsPanel(issue, contentHandler, type);
+	private DetailsPanel createTabContentsDisplay(){
+		return new DetailsPanel(issue, contentHandler);
 	}
 	
 	private Tab createCommentsTab(){
 		Tab comments =  new Tab();
 		comments.setText("Comments");
 		comments.setClosable(false);
-		commentsDisplay = createTabContentsDisplay(DisplayType.COMMENTS);
+		commentsDisplay = createTabContentsDisplay();
 		VBox.setVgrow(commentsDisplay, Priority.ALWAYS);
 		comments.setContent(commentsDisplay);
 		return comments;
-	}
-	
-	private Tab createChangeLogTab(){
-		Tab log = new Tab();
-		log.setText("Log");
-		log.setClosable(false);
-		issueLogDisplay = createTabContentsDisplay(DisplayType.LOG);
-		log.setContent(issueLogDisplay);
-		return log;
 	}
 	
 }

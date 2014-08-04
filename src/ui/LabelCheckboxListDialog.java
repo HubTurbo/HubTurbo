@@ -36,7 +36,7 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 	private List<String> labelSuggestions = new ArrayList<>();
 	
 	private TextField autoCompleteBox;
-	private Button close;
+	private Button done;
 	private ListView<VBox> display = new ListView<>();
 	
 	public LabelCheckboxListDialog(Stage parentStage, ObservableList<TurboLabel> labels) {
@@ -148,26 +148,26 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 		return setupLayout();
 	}
 
-	private void setupCloseButton(){
+	private void setupDoneButton(){
 		WeakReference<LabelCheckboxListDialog> selfRef = new WeakReference<>(this);
-		close = new Button("Done");
-		close.setOnAction((e) -> {
-			selfRef.get().handleCloseButtonAction();
+		done = new Button("Done");
+		done.setOnAction((e) -> {
+			selfRef.get().handleDoneButtonAction();
 		});
-		close.setOnKeyPressed(e -> {
+		done.setOnKeyPressed(e -> {
 			if(e.getCode() == KeyCode.ENTER){
-				selfRef.get().handleCloseButtonAction();
+				selfRef.get().handleDoneButtonAction();
 			}
 		});
 	}
 	
-	private void handleCloseButtonAction(){
+	private void handleDoneButtonAction(){
 		respond();
 		close();
 	}
 	
 	private Parent setupLayout() {
-		setupCloseButton();
+		setupDoneButton();
 		
 		setupAutoCompleteBox();
 		
@@ -175,7 +175,7 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 		layout.setAlignment(Pos.CENTER_RIGHT);
 		layout.setSpacing(5);
 		layout.setPadding(new Insets(10));
-		layout.getChildren().addAll(display, autoCompleteBox, close);
+		layout.getChildren().addAll(display, autoCompleteBox, done);
 
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		setTitle("Choose Labels");

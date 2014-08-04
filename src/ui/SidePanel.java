@@ -32,15 +32,21 @@ import util.DialogMessage;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
-	public enum IssueEditMode{NIL, CREATE, EDIT};
+	public enum IssueEditMode{
+		NIL, CREATE, EDIT
+	};
+	public enum Layout {
+		TABS, ISSUE, HISTORY
+	};
 	
 	protected static final int PANEL_PREF_WIDTH = 300;
 	public boolean expandedIssueView = false;
-
-	public enum Layout {
-		TABS, ISSUE, HISTORY
-	}
-
+	
+	Tab labelsTab;
+	Tab milestonesTab;
+	Tab assigneesTab;
+	HBox repoFields;
+	
 	private Layout layout;
 	private Stage parentStage;
 	private Model model;
@@ -97,6 +103,8 @@ public class SidePanel extends VBox {
 	}
 
 	public void refresh() {
+		resetTabs();
+		resetRepoFields(); //TODO:
 		changeLayout();
 	}
 	
@@ -147,18 +155,37 @@ public class SidePanel extends VBox {
 		}
 	}
 
+	private void resetTabs(){
+		labelsTab = null;
+		milestonesTab = null;
+		assigneesTab = null;
+	}
+	
+	private void resetRepoFields(){
+		repoFields = null;
+	}
+	
 	private Node tabLayout() {
 		
 		VBox everything = new VBox();
 		
 		TabPane tabs = new TabPane();
-		Tab labelsTab = createLabelsTab();
-		Tab milestonesTab = createMilestonesTab();
-		Tab assigneesTab = createCollaboratorsTab();
+		
+		if(labelsTab ==  null){
+			labelsTab = createLabelsTab();
+		}
+		if(milestonesTab == null){
+			milestonesTab = createMilestonesTab();
+		}
+		if(assigneesTab ==  null){
+			assigneesTab = createCollaboratorsTab();
+		}
 		
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
 		
-		HBox repoFields = createRepoFields();
+		if(repoFields == null){
+			repoFields = createRepoFields();
+		}
 
 		everything.getChildren().addAll(repoFields, tabs);
 		
