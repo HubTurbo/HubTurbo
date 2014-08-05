@@ -65,11 +65,11 @@ public class SidePanel extends VBox {
 		controlLabel.setOnMouseClicked((e) -> {
 			if (isVisible()) {
 				getChildren().clear();
-				setVisible(false);
+				collapse();
 				controlLabel.setText(COLLAPSE_LEFT_POINTING_TRIANGLE);
 			} else {
 				changeLayout();
-				setVisible(true);
+				expand();
 				controlLabel.setText(EXPAND_RIGHT_POINTING_TRIANGLE);
 			}
 		});
@@ -85,6 +85,16 @@ public class SidePanel extends VBox {
 		this.columns = columns;
 	}
 	
+    private void collapse() {
+		setVisible(false);
+		controlLabel.setText(COLLAPSE_LEFT_POINTING_TRIANGLE);
+    }
+
+    private void expand() {
+		setVisible(true);
+		controlLabel.setText(EXPAND_RIGHT_POINTING_TRIANGLE);
+    }
+    
 	public Layout getLayout() {
 		return layout;
 	}
@@ -115,7 +125,7 @@ public class SidePanel extends VBox {
 		displayedIssue = issue;
 		focusRequested = true;
 		setLayout(Layout.ISSUE);
-		setVisible(true);
+		expand();
 	}
 	
 	public void triggerIssueEdit(TurboIssue issue, boolean requestFocus) {
@@ -123,7 +133,7 @@ public class SidePanel extends VBox {
 		displayedIssue = new TurboIssue(issue);
 		focusRequested = requestFocus;
 		setLayout(Layout.ISSUE);
-		setVisible(true);
+		expand();
 	}
 	
 	public void displayTabs() {
