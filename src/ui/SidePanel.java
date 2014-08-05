@@ -123,6 +123,7 @@ public class SidePanel extends VBox {
 		displayedIssue = issue;
 		focusRequested = true;
 		setLayout(Layout.ISSUE);
+		setVisible(true);
 	}
 	
 	public void triggerIssueEdit(TurboIssue issue, boolean requestFocus) {
@@ -130,6 +131,7 @@ public class SidePanel extends VBox {
 		displayedIssue = new TurboIssue(issue);
 		focusRequested = requestFocus;
 		setLayout(Layout.ISSUE);
+		setVisible(true);
 	}
 	
 	public void displayTabs() {
@@ -171,24 +173,23 @@ public class SidePanel extends VBox {
 		
 		TabPane tabs = new TabPane();
 		
-		if(labelsTab ==  null){
+		if (labelsTab ==  null) {
 			labelsTab = createLabelsTab();
 		}
-		if(milestonesTab == null){
+		if (milestonesTab == null) {
 			milestonesTab = createMilestonesTab();
 		}
-		if(assigneesTab ==  null){
+		if (assigneesTab ==  null) {
 			assigneesTab = createCollaboratorsTab();
 		}
 		
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
 		
-		if(repoFields == null){
+		if (repoFields == null) {
 			repoFields = createRepoFields();
 		}
 
 		everything.getChildren().addAll(repoFields, tabs);
-		
 		//everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
 	}
@@ -202,12 +203,12 @@ public class SidePanel extends VBox {
 			String repoId = ServiceManager.getInstance().getRepoId().generateId();
 			comboBox.setValue(repoId);
 			try {
-				if(ServiceManager.getInstance().checkRepository(repoId)){
+				if (ServiceManager.getInstance().checkRepository(repoId)) {
 					comboBox.getItems().addAll(SessionConfigurations.addToLastViewedRepositories(repoId));
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				//Means checkRepository threw an exception...
+				// Means checkRepository threw an exception...
 				e.printStackTrace();
 			}
 		}
