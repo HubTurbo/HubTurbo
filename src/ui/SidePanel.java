@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import javafx.animation.Animation;
-import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -20,7 +16,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import model.Model;
 import model.TurboIssue;
 
@@ -56,10 +51,7 @@ public class SidePanel extends VBox {
     // To cater for the SidePanel to collapse or expand
     private static final String EXPAND_RIGHT_POINTING_TRIANGLE = "\u25C0";
     private static final String COLLAPSE_LEFT_POINTING_TRIANGLE = "\u25B6";
-	private double prefWidth = PANEL_PREF_WIDTH;
 	private Label controlLabel;
-	private Animation hideSidebar;
-	private Animation showSidebar;
 
 	public SidePanel(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
@@ -190,7 +182,7 @@ public class SidePanel extends VBox {
 		}
 
 		everything.getChildren().addAll(repoFields, tabs);
-		//everything.setPrefWidth(PANEL_PREF_WIDTH);
+		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
 	}
 
