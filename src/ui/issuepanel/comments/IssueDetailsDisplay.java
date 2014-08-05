@@ -1,19 +1,17 @@
 package ui.issuepanel.comments;
 
+import handler.IssueDetailsContentHandler;
+
 import java.lang.ref.WeakReference;
 
-import ui.StatusBar;
-import handler.IssueDetailsContentHandler;
-import model.TurboIssue;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import model.TurboIssue;
+import ui.StatusBar;
 
 public class IssueDetailsDisplay extends VBox {
 //	public enum DisplayType{
@@ -21,7 +19,7 @@ public class IssueDetailsDisplay extends VBox {
 //		LOG
 //	}
 	
-	private TabPane detailsTab;
+//	private TabPane detailsTab;
 	
 	private IssueDetailsContentHandler contentHandler;
 	
@@ -43,16 +41,20 @@ public class IssueDetailsDisplay extends VBox {
 		contentHandler = new IssueDetailsContentHandler(issue);
 	}
 	
-	
-	private void setupDetailsTab(){
-		this.detailsTab = new TabPane();
-		Tab commentsTab = createCommentsTab();
-		detailsTab.getTabs().add(commentsTab);
+	private void setupCommentsView(){
+		commentsDisplay = new DetailsPanel(issue, contentHandler);
 	}
 	
+//	private void setupDetailsTab(){
+//		this.detailsTab = new TabPane();
+//		Tab commentsTab = createCommentsTab();
+//		detailsTab.getTabs().add(commentsTab);
+//	}
+	
 	private void setupDisplay(){
-		setupDetailsTab();
-		this.getChildren().add(detailsTab);
+//		setupDetailsTab();
+		setupCommentsView();
+		this.getChildren().add(commentsDisplay);
 	}
 	
 	public void show(){
@@ -154,18 +156,18 @@ public class IssueDetailsDisplay extends VBox {
 		contentHandler.restartContentUpdate();
 	}
 	
-	private DetailsPanel createTabContentsDisplay(){
-		return new DetailsPanel(issue, contentHandler);
-	}
+//	private DetailsPanel createTabContentsDisplay(){
+//		return new DetailsPanel(issue, contentHandler);
+//	}
 	
-	private Tab createCommentsTab(){
-		Tab comments =  new Tab();
-		comments.setText("Comments");
-		comments.setClosable(false);
-		commentsDisplay = createTabContentsDisplay();
-		VBox.setVgrow(commentsDisplay, Priority.ALWAYS);
-		comments.setContent(commentsDisplay);
-		return comments;
-	}
+//	private Tab createCommentsTab(){
+//		Tab comments =  new Tab();
+//		comments.setText("Comments");
+//		comments.setClosable(false);
+//		commentsDisplay = createTabContentsDisplay();
+//		VBox.setVgrow(commentsDisplay, Priority.ALWAYS);
+//		comments.setContent(commentsDisplay);
+//		return comments;
+//	}
 	
 }
