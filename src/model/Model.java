@@ -69,8 +69,8 @@ public class Model {
 		loadIssues(ServiceManager.getInstance().getAllIssues());
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources) throws IOException{
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources){
 		this.repoId = repoId;
 		ConfigFileHandler.loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
@@ -328,8 +328,10 @@ public class Model {
 	}
 	
 	public void loadCollaborators(List<User> ghCollaborators) {	
-		collaborators.clear();
-		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+		Platform.runLater(()->{
+			collaborators.clear();
+			collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+		});
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
@@ -338,14 +340,15 @@ public class Model {
 	}
 	
 	public void loadIssues(List<Issue> ghIssues) {
-		issues.clear();
 		enforceStatusStateConsistency(ghIssues);
-		// Add the issues to a temporary list to prevent a quadratic number
-		// of updates to subscribers of the ObservableList
-		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-		// Add them all at once, so this hopefully propagates only one change
-		
-		issues.addAll(buffer);
+		Platform.runLater(()->{
+			issues.clear();
+			// Add the issues to a temporary list to prevent a quadratic number
+			// of updates to subscribers of the ObservableList
+			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
+			// Add them all at once, so this hopefully propagates only one change
+			issues.addAll(buffer);
+		});
 	}
 
 	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
@@ -376,9 +379,11 @@ public class Model {
 
 	public void loadLabels(List<Label> ghLabels){
 		standardiseStatusLabels(ghLabels);
-		labels.clear();
-		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		labels.addAll(buffer);
+		Platform.runLater(()->{
+			labels.clear();
+			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
+			labels.addAll(buffer);
+		});
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
@@ -413,9 +418,11 @@ public class Model {
 	}
 	
 	public void loadMilestones(List<Milestone> ghMilestones){
-		milestones.clear();
-		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-		milestones.addAll(buffer);
+		Platform.runLater(()->{
+			milestones.clear();
+			ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
+			milestones.addAll(buffer);
+		});
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){

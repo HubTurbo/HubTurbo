@@ -177,6 +177,7 @@ public class ServiceManager {
 		return githubClient.getRequestLimit();
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getGitHubResources(IRepositoryIdProvider repoId) throws IOException {
 		this.repoId = repoId;
 		model.setRepoId(repoId);

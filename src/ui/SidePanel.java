@@ -3,6 +3,7 @@ package ui;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -241,6 +242,7 @@ public class SidePanel extends VBox {
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void loadRepo(final ComboBox<String> comboBox) {
 		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
 		if(!checkRepoAccess(repoId)){
@@ -248,10 +250,22 @@ public class SidePanel extends VBox {
 		}
 		if (repoId != null) {
 			columns.saveSession();
-			Task<HashMap<String, List>> task = new Task<HashMap<String, List>>(){
+			Task<Boolean> task = new Task<Boolean>(){
 				@Override
-				protected HashMap<String, List> call() throws Exception {
-					return ServiceManager.getInstance().getGitHubResources(repoId);
+				protected Boolean call() throws Exception {
+					HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+					if(items != null){
+						final CountDownLatch latch = new CountDownLatch(1);
+						Platform.runLater(()->{
+							model.loadComponents(repoId, items);
+							columns.resumeColumns();
+							latch.countDown();
+						});
+						latch.await(); 
+						ServiceManager.getInstance().setupAndStartModelUpdate();
+						return true;
+					}
+					return false;
 				}
 			};
 			DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
@@ -260,18 +274,9 @@ public class SidePanel extends VBox {
 			thread.start();
 			
 			task.setOnSucceeded(wse -> {
-				HashMap<String, List> map = task.getValue();
-				if (map != null) {
+				Boolean result = task.getValue();
+				if (result == true) {
 					StatusBar.displayMessage("Issues loaded successfully!");
-					try {
-						model.loadComponents(repoId, map);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					ServiceManager.getInstance().setupAndStartModelUpdate();
-					columns.resumeColumns();
-					SidePanel.this.refresh();
 				} else {
 					StatusBar.displayMessage("Issues failed to load. Please try again.");
 				}
