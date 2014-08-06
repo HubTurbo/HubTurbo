@@ -256,9 +256,9 @@ public class SidePanel extends VBox {
 			Task<Boolean> task = new Task<Boolean>(){
 				@Override
 				protected Boolean call() throws IOException {
+					ServiceManager.getInstance().stopModelUpdate();
 					HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
 					
-					ServiceManager.getInstance().stopModelUpdate();
 					final CountDownLatch latch = new CountDownLatch(1);
 					model.loadComponents(repoId, items);
 					Platform.runLater(()->{
