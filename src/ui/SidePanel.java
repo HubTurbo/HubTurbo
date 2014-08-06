@@ -1,6 +1,7 @@
 package ui;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -106,8 +107,12 @@ public class SidePanel extends VBox {
 	}
 
 	public void refresh() {
-		resetTabs();
 		resetRepoFields(); //TODO:
+		refreshSidebar();
+	}
+	
+	public void refreshSidebar(){
+		resetTabs();
 		changeLayout();
 	}
 	
