@@ -76,7 +76,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		    	// no binding; manually trigger the update
 		    	label.copyValues(response);
 		    	updateItem(label, false);
-		    	sidePanel.refresh();
+		    	sidePanel.refreshSidebarLabels();
 	    	}
 			return true;
 		}).exceptionally(e -> {

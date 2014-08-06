@@ -116,6 +116,11 @@ public class SidePanel extends VBox {
 		changeLayout();
 	}
 	
+	public void refreshSidebarLabels(){
+		labelsTab = null;
+		changeLayout();
+	}
+	
 	// For passing information to and from the issue panel display
 	
 	private TurboIssue displayedIssue;

@@ -100,7 +100,7 @@ public class LabelManagementComponent {
 			@Override
 			public void onChanged(
 					javafx.collections.ListChangeListener.Change<? extends TurboLabel> arg0) {
-				Platform.runLater(()->sidePanel.refreshSidebar());
+				Platform.runLater(()->sidePanel.refreshSidebarLabels());
 			}
 			
 		};
