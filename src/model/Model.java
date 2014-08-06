@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import util.CollectionUtilities;
@@ -405,8 +406,14 @@ public class Model {
 			try {
 				ghLabels.add(ServiceManager.getInstance().createLabel(statusLabel));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
+				if(e instanceof RequestException){
+					//Happens because user has no repo permissions
+					if(((RequestException) e).getStatus() == 404){
+						break;
+					}
+				}
 			}
 		}
 		

@@ -152,13 +152,15 @@ public class LoginDialog extends Dialog<Boolean> {
 		    protected Boolean call() throws Exception {
 		    	StatusBar.displayMessage("Signed in; loading data...");
 			    loadRepository(owner, repo);
+			    Platform.runLater(()->{
+			    	columns.resumeColumns();
+			    });
 		    	return true;
 		    }
 		};
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
 				StatusBar.displayMessage("Issues loaded successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
-				columns.resumeColumns();
 				completeResponse(true);
 				close();
 			} else {

@@ -196,7 +196,7 @@ public class SidePanel extends VBox {
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
 	}
-
+	
 	private HBox createRepoFields() {
 		final ComboBox<String> comboBox = new ComboBox<String>();
 		comboBox.setFocusTraversable(false);
@@ -207,7 +207,8 @@ public class SidePanel extends VBox {
 			comboBox.setValue(repoId);
 			try {
 				if (ServiceManager.getInstance().checkRepository(repoId)) {
-					comboBox.getItems().addAll(SessionConfigurations.addToLastViewedRepositories(repoId));
+					List<String> items = SessionConfigurations.addToLastViewedRepositories(repoId);
+					comboBox.getItems().addAll(items);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -248,20 +249,28 @@ public class SidePanel extends VBox {
 		if(!checkRepoAccess(repoId)){
 			return;
 		}
+		
 		if (repoId != null) {
 			columns.saveSession();
+			SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
 			Task<Boolean> task = new Task<Boolean>(){
 				@Override
-				protected Boolean call() throws Exception {
+				protected Boolean call() throws IOException {
 					HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
 					if(items != null){
+						ServiceManager.getInstance().stopModelUpdate();
 						final CountDownLatch latch = new CountDownLatch(1);
+						model.loadComponents(repoId, items);
 						Platform.runLater(()->{
-							model.loadComponents(repoId, items);
 							columns.resumeColumns();
 							latch.countDown();
 						});
-						latch.await(); 
+						try {
+							latch.await();
+							System.out.println("done");
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} 
 						ServiceManager.getInstance().setupAndStartModelUpdate();
 						return true;
 					}
