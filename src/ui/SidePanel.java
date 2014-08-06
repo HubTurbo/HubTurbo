@@ -257,24 +257,22 @@ public class SidePanel extends VBox {
 				@Override
 				protected Boolean call() throws IOException {
 					HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
-					if(items != null){
-						ServiceManager.getInstance().stopModelUpdate();
-						final CountDownLatch latch = new CountDownLatch(1);
-						model.loadComponents(repoId, items);
-						Platform.runLater(()->{
-							columns.resumeColumns();
-							latch.countDown();
-						});
-						try {
-							latch.await();
-							System.out.println("done");
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} 
-						ServiceManager.getInstance().setupAndStartModelUpdate();
-						return true;
-					}
-					return false;
+					
+					ServiceManager.getInstance().stopModelUpdate();
+					final CountDownLatch latch = new CountDownLatch(1);
+					model.loadComponents(repoId, items);
+					Platform.runLater(()->{
+						columns.resumeColumns();
+						latch.countDown();
+					});
+					try {
+						latch.await();
+						System.out.println("done");
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} 
+					return true;
+					
 				}
 			};
 			DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
@@ -283,12 +281,8 @@ public class SidePanel extends VBox {
 			thread.start();
 			
 			task.setOnSucceeded(wse -> {
-				Boolean result = task.getValue();
-				if (result == true) {
-					StatusBar.displayMessage("Issues loaded successfully!");
-				} else {
-					StatusBar.displayMessage("Issues failed to load. Please try again.");
-				}
+				StatusBar.displayMessage("Issues loaded successfully!");
+				ServiceManager.getInstance().setupAndStartModelUpdate();
 			});
 			
 			task.setOnFailed(wse -> {
