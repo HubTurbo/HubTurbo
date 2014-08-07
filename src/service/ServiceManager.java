@@ -19,11 +19,13 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CollaboratorService;
+import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -54,6 +56,7 @@ public class ServiceManager {
 	private MilestoneService milestoneService;
 	private RepositoryServiceExtended repositoryService;
 	private MarkdownService markdownService;
+	private ContentsService contentService;
 	
 	private ModelUpdater modelUpdater;
 	private Model model;
@@ -71,6 +74,7 @@ public class ServiceManager {
 		milestoneService = new MilestoneService(githubClient);
 		repositoryService = new RepositoryServiceExtended(githubClient);
 		markdownService = new MarkdownService(githubClient);
+		contentService = new ContentsService(githubClient);
 		model = new Model();
 	}
 
@@ -510,7 +514,6 @@ public class ServiceManager {
 	
 	/**
 	 * Markdown service methods
-	 * @throws IOException 
 	 * */
 	public String getContentMarkup(final String text) throws IOException{
 		if(text.contains("#")){
@@ -531,4 +534,18 @@ public class ServiceManager {
 			throws IOException {
 		return markdownService.getHtml(text, mode);
 	}
+	
+	/**
+	 * Contents service methods
+	 * */
+	public List<RepositoryContents> getContents(IRepositoryIdProvider repository)
+			throws IOException {
+		return contentService.getContents(repository);
+	}
+	public List<RepositoryContents> getContents(
+			IRepositoryIdProvider repository, String path) throws IOException {
+		return contentService.getContents(repository, path);
+	}
+
+
 }
