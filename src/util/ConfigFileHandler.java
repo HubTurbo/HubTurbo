@@ -15,6 +15,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -90,33 +92,44 @@ public class ConfigFileHandler {
 		directorySetup();
 		ProjectConfigurations config = null;
 		String fileName = generateFileName(repoId);
-		File configFile = new File(fileName);
-
+		
 		// Download config file from repo if available
-			if (isValidURL(generateFileURL(repoId))) {
-				try {
-					download(generateFileURL(repoId), DIR_CONFIG_PROJECTS);
+		if (isValidURL(generateFileURL(repoId))) {
+			try {
+				download(generateFileURL(repoId), fileName);
+				File configFile = new File(fileName);
+				if (configFile.exists()) {
 					config = readConfigFile(fileName);
-				} catch (IOException e) {
-					e.printStackTrace();
+				} else {
+					config = createConfigFile(repoId, fileName);
 				}
-			} else {
-				// Create new config file
-				List<String> nonInheritedLabels = new ArrayList<String>();
-				nonInheritedLabels.add("status.");
-				List<String> openStatusLabels = new ArrayList<String>();
-				openStatusLabels.add("status.open");
-				List<String> closedStatusLabels = new ArrayList<String>();
-				closedStatusLabels.add("status.closed");
-				// Default project configuration file
-				config = new ProjectConfigurations(nonInheritedLabels, openStatusLabels, closedStatusLabels);
-				try {
-					configFile.createNewFile();
-					saveProjectConfig(config, repoId);
-				} catch (IOException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
 			}
+		} else {
+			config = createConfigFile(repoId, fileName);
+		}
+		return config;
+
+	}
+	
+	private static ProjectConfigurations createConfigFile(IRepositoryIdProvider repoId, String fileName) {
+		ProjectConfigurations config = null;
+		List<String> nonInheritedLabels = new ArrayList<String>();
+		nonInheritedLabels.add("status.");
+		List<String> openStatusLabels = new ArrayList<String>();
+		openStatusLabels.add("status.open");
+		List<String> closedStatusLabels = new ArrayList<String>();
+		closedStatusLabels.add("status.closed");
+		// Default project configuration file
+		config = new ProjectConfigurations(nonInheritedLabels, openStatusLabels, closedStatusLabels);
+		File configFile = new File(fileName);
+		try {
+			configFile.createNewFile();
+			saveProjectConfig(config, repoId);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return config;
 	}
 
@@ -145,17 +158,17 @@ public class ConfigFileHandler {
 
 	private static String generateFileName(IRepositoryIdProvider repoId) {
 		String[] repoIdTokens = repoId.generateId().split("/");
-		String fileName = DIR_CONFIG_PROJECTS + File.separator + repoIdTokens[0] + " " + repoIdTokens[1] + ".json";
+		String fileName = DIR_CONFIG_PROJECTS + File.separator + repoIdTokens[0].toLowerCase() + " " + repoIdTokens[1].toLowerCase() + ".json";
 		return fileName;
 	}
 	
 	private static String generateFileURL(IRepositoryIdProvider repoId) {
 		String[] repoIdTokens = repoId.generateId().split(ADDRESS_SEPARATOR);
-		String stringURL = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
-									   + ADDRESS_SEPARATOR + repoIdTokens[1]
-									   + ADDRESS_SEPARATOR + DEFAULT_BRANCH
-									   + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
-									   + ADDRESS_SEPARATOR + repoIdTokens[0] + " " + repoIdTokens[1] + ".json";
+		String stringURL = GITHUB_DOMAIN + repoIdTokens[0] 
+									     + ADDRESS_SEPARATOR + repoIdTokens[1]
+									     + ADDRESS_SEPARATOR + DEFAULT_BRANCH
+									     + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
+									     + ADDRESS_SEPARATOR + repoIdTokens[0].toLowerCase() + " " + repoIdTokens[1].toLowerCase() + ".json";
 		return stringURL;
 	}
 
@@ -184,15 +197,17 @@ public class ConfigFileHandler {
 		}
 	}
 
-	private static void download(String stringURL, String destinationDirectory) throws IOException {
+	private static void download(String stringURL, String destination) throws IOException {
 		// File name that is being downloaded
 		String downloadedFileName = stringURL.substring(stringURL.lastIndexOf(ADDRESS_SEPARATOR) + 1);
-
+		// Converts the input string to a Path object.
+        Path inputPath = Paths.get(destination);
+        
 		// Open connection to the file
 		URL url = new URL(stringURL);
 		InputStream inStream = url.openStream();
 		// Stream to the destination file
-		FileOutputStream fos = new FileOutputStream(destinationDirectory + File.separator + downloadedFileName);
+		FileOutputStream fos = new FileOutputStream(inputPath.toAbsolutePath().toString());
 
 		// Read bytes from URL to the local file
 		byte[] buffer = new byte[4096];
