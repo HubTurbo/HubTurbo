@@ -86,18 +86,9 @@ public class ModelStub extends Model{
 		return newIssue;
 	}
 	
-	public TurboLabel createLabel(TurboLabel newLabel) {
-		labels.add(newLabel);
-		return newLabel;
-	}
-	
 	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
 		milestones.add(newMilestone);
 		return newMilestone;
-	}
-	
-	public void deleteLabel(TurboLabel label) {
-		labels.remove(label);
 	}
 	
 	public void deleteMilestone(TurboMilestone milestone) {

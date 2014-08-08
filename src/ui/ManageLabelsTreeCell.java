@@ -1,5 +1,7 @@
 package ui;
 
+import handler.LabelsHandler;
+
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -22,12 +24,12 @@ import org.apache.logging.log4j.Logger;
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	private static final Logger logger = LogManager.getLogger(ManageLabelsTreeCell.class.getName());
 	
-	private final Model model;
+	private final LabelsHandler labelHandler;
 	private final Stage stage;
 	private final SidePanel sidePanel;
 
 	public ManageLabelsTreeCell(Stage stage, Model model, SidePanel sidePanel) {
-		this.model = model;
+		this.labelHandler = new LabelsHandler(model);
 		this.stage = stage;
 		this.sidePanel = sidePanel;
 	}
@@ -69,13 +71,13 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 		(new EditLabelDialog(stage, label)).show().thenApply(response -> {
 	    	if (isNewLabel) {
-	    		TurboLabel createdLabel = model.createLabel(response);
+	    		TurboLabel createdLabel = labelHandler.createLabel(response);
 	    		// Make sure this TurboLabelGroup has a reference to the new label
 				((TurboLabelGroup) getTreeItem().getValue()).addLabel(createdLabel);
 				getTreeItem().getChildren().add(new TreeItem<LabelTreeItem>(createdLabel));
 				getTreeItem().setExpanded(true);
 	    	} else {
-	    		model.updateLabel(response, oldName);
+	    		labelHandler.updateLabel(response, oldName);
 		    	label.copyValues(response);
 		    	updateItem(label, false);
 	    	}
@@ -95,7 +97,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 		});
 		MenuItem delete = new MenuItem("Delete Label");
 		delete.setOnAction((event) -> {
-			model.deleteLabel((TurboLabel) getItem());
+			labelHandler.deleteLabel((TurboLabel) getItem());
 			for (TreeItem<LabelTreeItem> lti : getTreeItem().getParent().getChildren()) {
 				if (lti.getValue().getValue().equals(getItem().getValue())) {
 					getTreeItem().getParent().getChildren().remove(lti);
@@ -130,7 +132,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	
 		    		// Trigger updates on all the labels
 		    		for (int i=0; i<oldNames.size(); i++) {
-		    			model.updateLabel(group.getLabels().get(i), oldNames.get(i));
+		    			labelHandler.updateLabel(group.getLabels().get(i), oldNames.get(i));
 		    		}
 		    		
 		    		// Manually update the treeview, since there is no binding

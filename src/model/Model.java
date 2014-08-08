@@ -193,18 +193,12 @@ public class Model {
 		}
 	}
 	
-	public TurboLabel createLabel(TurboLabel newLabel) {
-		Label ghLabel = newLabel.toGhResource();
-		Label createdLabel = null;
-		try {
-			createdLabel = ServiceManager.getInstance().createLabel(ghLabel);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		TurboLabel returnedLabel = new TurboLabel(createdLabel);
-		labels.add(returnedLabel);
-		refresh();
-		return returnedLabel;
+	public void createLabel(TurboLabel label){
+		labels.add(label);
+	}
+	
+	public void deleteLabel(TurboLabel label){
+		labels.remove(label);
 	}
 	
 	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
@@ -221,30 +215,10 @@ public class Model {
 		return returnedMilestone;
 	}
 	
-	public void deleteLabel(TurboLabel label) {
-		try {
-			ServiceManager.getInstance().deleteLabel(URLEncoder.encode(label.toGhName(), CHARSET));
-			labels.remove(label);
-			refresh();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
 	public void deleteMilestone(TurboMilestone milestone) {
 		try {
 			ServiceManager.getInstance().deleteMilestone(milestone.getNumber());
 			milestones.remove(milestone);
-			refresh();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	public void updateLabel(TurboLabel editedLabel, String labelName) {
-		Label ghLabel = editedLabel.toGhResource();
-		try {
-			ServiceManager.getInstance().editLabel(ghLabel, URLEncoder.encode(labelName, CHARSET));
 			refresh();
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
