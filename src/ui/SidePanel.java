@@ -276,7 +276,6 @@ public class SidePanel extends VBox {
 					});
 					try {
 						latch.await();
-						System.out.println("done");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					} 

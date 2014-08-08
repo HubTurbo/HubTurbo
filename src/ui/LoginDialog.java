@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -152,9 +153,16 @@ public class LoginDialog extends Dialog<Boolean> {
 		    protected Boolean call() throws Exception {
 		    	StatusBar.displayMessage("Signed in; loading data...");
 			    loadRepository(owner, repo);
+			    final CountDownLatch latch = new CountDownLatch(1);
 			    Platform.runLater(()->{
 			    	columns.resumeColumns();
+			    	latch.countDown();
 			    });
+			    try {
+					latch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
 		    	return true;
 		    }
 		};

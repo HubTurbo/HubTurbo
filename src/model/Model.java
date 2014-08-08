@@ -2,7 +2,9 @@ package model;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,7 @@ import org.eclipse.egit.github.core.client.RequestException;
 import service.ServiceManager;
 import util.CollectionUtilities;
 import util.ConfigFileHandler;
+import util.DialogMessage;
 import util.ProjectConfigurations;
 
 
@@ -62,8 +65,15 @@ public class Model {
 	
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId) throws IOException{
-		HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
-		loadComponents(repoId, items);
+		try{
+			HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+			loadComponents(repoId, items);
+		}catch(UnknownHostException e){
+			DialogMessage.showWarningDialog("No Internet Connection", "Please check your internet connection and try again");
+		}catch(SocketTimeoutException e){
+			DialogMessage.showWarningDialog("Internet Connection is down", 
+					"Timeout while loading items from github. Please check your internet connection.");
+		}
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
