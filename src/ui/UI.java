@@ -38,10 +38,9 @@ public class UI extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException {
-
 		initCSS();
 		sessionConfig = ConfigFileHandler.loadSessionConfig();
-		
+//		PropertyConfigurator.configure();
 		mainStage = stage;
 		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot());

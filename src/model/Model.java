@@ -421,8 +421,9 @@ public class Model {
 						logger.error("No repository permissions to create label", e);
 						break;
 					}
+				}else{
+					logger.error(e.getLocalizedMessage(), e);
 				}
-				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 		
