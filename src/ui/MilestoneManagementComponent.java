@@ -1,5 +1,7 @@
 package ui;
 
+import handler.MilestoneHandler;
+
 import java.lang.ref.WeakReference;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,13 +23,13 @@ import model.TurboMilestone;
 public class MilestoneManagementComponent {
 	private static final Logger logger = LogManager.getLogger(MilestoneManagementComponent.class.getName());
 	private final Stage parentStage;
-	private final Model model;
+	private final MilestoneHandler msHandler;
 	
 	private ListView<TurboMilestone> listView;
 
 	public MilestoneManagementComponent(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
-		this.model = model;
+		this.msHandler = new MilestoneHandler(model);
 	}
 
 	public VBox initialise() {
@@ -46,7 +48,7 @@ public class MilestoneManagementComponent {
 			@Override
 			public ListCell<TurboMilestone> call(ListView<TurboMilestone> list) {
 				if(that.get() != null){
-					return new ManageMilestonesListCell(parentStage, model, that.get());
+					return new ManageMilestonesListCell(parentStage, msHandler, that.get());
 				}else{
 					return null;
 				}
@@ -56,7 +58,7 @@ public class MilestoneManagementComponent {
 
 	private Node createListView() {
 		listView = new ListView<>();
-		listView.setItems(model.getMilestones());
+		listView.setItems(msHandler.getMilestones());
 		VBox.setVgrow(listView, Priority.ALWAYS);
 		
 		refresh();
@@ -68,7 +70,7 @@ public class MilestoneManagementComponent {
 		Button create = new Button("New Milestone");
 		create.setOnAction(event -> {
 			(new EditMilestoneDialog(parentStage, null)).show().thenApply(response -> {
-				model.createMilestone(response);
+				msHandler.createMilestone(response);
 				return true;
 			}).exceptionally(exception -> {
 				logger.error(exception.getLocalizedMessage(), exception);

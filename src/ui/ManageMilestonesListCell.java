@@ -1,10 +1,9 @@
 package ui;
 
+import handler.MilestoneHandler;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,31 +17,33 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.Model;
 import model.TurboMilestone;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private static final Logger logger = LogManager.getLogger(ManageMilestonesListCell.class.getName());
 	private final Stage stage;
-	private final Model model;
+	private final MilestoneHandler msHandler;
 	private final MilestoneManagementComponent parentDialog;
 	
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-    public ManageMilestonesListCell(Stage stage, Model model, MilestoneManagementComponent parentDialog) {
+    public ManageMilestonesListCell(Stage stage, MilestoneHandler handler, MilestoneManagementComponent parentDialog) {
 		super();
 		this.stage = stage;
-		this.model = model;
+		this.msHandler = handler;
 		this.parentDialog = parentDialog;
 	}
 
@@ -178,7 +179,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		MenuItem edit = new MenuItem("Edit Milestone");
 		edit.setOnAction((event) -> {
 			(new EditMilestoneDialog(stage, milestone)).show().thenApply(response -> {
-				model.updateMilestone(response);
+				msHandler.updateMilestone(response);
 				return true;
 			}).exceptionally(e -> {
 				logger.error(e.getLocalizedMessage(), e);
@@ -187,7 +188,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 		});
 		MenuItem delete = new MenuItem("Delete Milestone");
 		delete.setOnAction((event) -> {
-			model.deleteMilestone(milestone);
+			msHandler.deleteMilestone(milestone);
 			parentDialog.refresh();
 		});
 		

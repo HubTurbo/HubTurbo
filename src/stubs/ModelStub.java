@@ -85,27 +85,9 @@ public class ModelStub extends Model{
 		appendToCachedIssues(newIssue);
 		return newIssue;
 	}
-	
-	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
-		milestones.add(newMilestone);
-		return newMilestone;
-	}
-	
-	public void deleteMilestone(TurboMilestone milestone) {
-		milestones.remove(milestone);
-	}
-	
+
 	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
 		this.updateCachedIssue(editedIssue);
-	}
-	
-	
-	public void updateLabel(TurboLabel editedLabel, String labelName) {
-		
-	}
-	
-	public void updateMilestone(TurboMilestone editedMilestone) {
-		
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

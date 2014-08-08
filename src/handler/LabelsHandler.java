@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 
+import javafx.collections.ObservableList;
+import model.Model;
+import model.TurboLabel;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Label;
 
 import service.ServiceManager;
-import model.Model;
-import model.TurboLabel;
 
 public class LabelsHandler {
 	private static final Logger logger = LogManager.getLogger(LabelsHandler.class.getName());
@@ -31,7 +33,7 @@ public class LabelsHandler {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		TurboLabel returnedLabel = new TurboLabel(createdLabel);
-		modelRef.get().createLabel(returnedLabel);
+		modelRef.get().addLabel(returnedLabel);
 		modelRef.get().refresh();
 		return returnedLabel;
 	}
@@ -54,5 +56,9 @@ public class LabelsHandler {
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+	}
+	
+	public ObservableList<TurboLabel> getLabels(){
+		return modelRef.get().getLabels();
 	}
 }

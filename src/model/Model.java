@@ -3,7 +3,6 @@ package model;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +36,6 @@ import util.ProjectConfigurations;
 
 public class Model {
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
-	private static final String CHARSET = "ISO-8859-1";
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
@@ -193,7 +191,7 @@ public class Model {
 		}
 	}
 	
-	public void createLabel(TurboLabel label){
+	public void addLabel(TurboLabel label){
 		labels.add(label);
 	}
 	
@@ -201,38 +199,12 @@ public class Model {
 		labels.remove(label);
 	}
 	
-	public TurboMilestone createMilestone(TurboMilestone newMilestone) {
-		Milestone ghMilestone = newMilestone.toGhResource();
-		Milestone createdMilestone = null;
-		try {
-			createdMilestone = ServiceManager.getInstance().createMilestone(ghMilestone);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} 
-		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
-		milestones.add(returnedMilestone);
-		refresh();
-		return returnedMilestone;
+	public void addMilestone(TurboMilestone milestone){
+		milestones.add(milestone);
 	}
 	
-	public void deleteMilestone(TurboMilestone milestone) {
-		try {
-			ServiceManager.getInstance().deleteMilestone(milestone.getNumber());
-			milestones.remove(milestone);
-			refresh();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	public void updateMilestone(TurboMilestone editedMilestone) {
-		Milestone ghMilestone = editedMilestone.toGhResource();
-		try {
-			ServiceManager.getInstance().editMilestone(ghMilestone);
-			refresh();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
+	public void deleteMilestone(TurboMilestone milestone){
+		milestones.remove(milestone);
 	}
 
 	public int getIndexOfIssue(int id){
