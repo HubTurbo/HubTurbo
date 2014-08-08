@@ -192,19 +192,27 @@ public class Model {
 	}
 	
 	public void addLabel(TurboLabel label){
-		labels.add(label);
+		Platform.runLater(()->{
+			labels.add(label);
+		});
 	}
 	
 	public void deleteLabel(TurboLabel label){
-		labels.remove(label);
+		Platform.runLater(()->{
+			labels.remove(label);
+		});
 	}
 	
 	public void addMilestone(TurboMilestone milestone){
-		milestones.add(milestone);
+		Platform.runLater(()->{
+			milestones.add(milestone);
+		});
 	}
 	
 	public void deleteMilestone(TurboMilestone milestone){
-		milestones.remove(milestone);
+		Platform.runLater(()->{
+			milestones.remove(milestone);
+		});
 	}
 
 	public int getIndexOfIssue(int id){

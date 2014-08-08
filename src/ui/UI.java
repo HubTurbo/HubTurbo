@@ -40,7 +40,6 @@ public class UI extends Application {
 	public void start(Stage stage) throws IOException {
 		initCSS();
 		sessionConfig = ConfigFileHandler.loadSessionConfig();
-//		PropertyConfigurator.configure();
 		mainStage = stage;
 		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot());
@@ -53,7 +52,6 @@ public class UI extends Application {
 	private void getUserCredentials() {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (!success) {
-//				getUserCredentials();
 				mainStage.close();
 			} else {
 				columns.loadIssues();
