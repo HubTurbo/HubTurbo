@@ -2,6 +2,9 @@ package ui;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -19,7 +22,7 @@ import util.ConfigFileHandler;
 import util.SessionConfigurations;
 
 public class UI extends Application {
-
+	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	// Main UI elements
 	
 	private Stage mainStage;
@@ -59,7 +62,7 @@ public class UI extends Application {
 			}
 			return true;
 		}).exceptionally(e -> {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return false;
 		});
 	}

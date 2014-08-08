@@ -18,6 +18,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import com.google.gson.Gson;
@@ -37,6 +39,7 @@ public class ConfigFileHandler {
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
 	private static final String DIR_CONFIG_PROJECTS = "project-config";
 	
+	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
 	private static Gson gson = new GsonBuilder()
 								.setPrettyPrinting()
@@ -70,11 +73,11 @@ public class ConfigFileHandler {
 			gson.toJson(config, ProjectConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -89,11 +92,11 @@ public class ConfigFileHandler {
 				config = gson.fromJson(reader, ProjectConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		} else {
 			List<String> nonInheritedLabels = new ArrayList<String>();
@@ -108,7 +111,7 @@ public class ConfigFileHandler {
 				configFile.createNewFile();
 				saveProjectConfig(config, repoId);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 		return config;
@@ -133,11 +136,11 @@ public class ConfigFileHandler {
 			gson.toJson(config, SessionConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -150,17 +153,17 @@ public class ConfigFileHandler {
 				config = gson.fromJson(reader, SessionConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		} else {
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 		if (config == null) config = new SessionConfigurations();
@@ -173,11 +176,11 @@ public class ConfigFileHandler {
 			gson.toJson(config, LocalConfigurations.class, writer);
 			writer.close();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -190,11 +193,11 @@ public class ConfigFileHandler {
 				config = gson.fromJson(reader, LocalConfigurations.class);
 				reader.close();
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		} else {
 			try {
@@ -202,7 +205,7 @@ public class ConfigFileHandler {
 				config = new LocalConfigurations();
 				saveLocalConfig(config);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 		return config;

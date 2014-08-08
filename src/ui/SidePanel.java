@@ -1,6 +1,8 @@
 package ui;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -20,6 +22,9 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
@@ -28,6 +33,8 @@ import util.DialogMessage;
 import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
+	private static final Logger logger = LogManager.getLogger(SidePanel.class.getName());
+	
 	public enum IssueEditMode{
 		NIL, CREATE, EDIT
 	};
@@ -211,19 +218,15 @@ public class SidePanel extends VBox {
 		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
 		
-		if (ServiceManager.getInstance().getRepoId() != null) {
-			String repoId = ServiceManager.getInstance().getRepoId().generateId();
+		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
+		if (currRepo != null) {
+			String repoId = currRepo.generateId();
 			comboBox.setValue(repoId);
-			try {
-				if (ServiceManager.getInstance().checkRepository(repoId)) {
-					List<String> items = SessionConfigurations.addToLastViewedRepositories(repoId);
-					comboBox.getItems().addAll(items);
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// Means checkRepository threw an exception...
-				e.printStackTrace();
+			if (checkRepoAccess(currRepo)) {
+				List<String> items = SessionConfigurations.addToLastViewedRepositories(repoId);
+				comboBox.getItems().addAll(items);
 			}
+
 		}
 		
 		comboBox.valueProperty().addListener((a, b, c) -> loadRepo(comboBox));
@@ -236,18 +239,23 @@ public class SidePanel extends VBox {
 		comboBox.prefWidthProperty().bind(repoIdBox.widthProperty());
 		return repoIdBox;
 	}
-	
-	private boolean checkRepoAccess(RepositoryId repoId){
+		
+	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		try {
-			if(!ServiceManager.getInstance().checkRepository(repoId)){
+			if(!ServiceManager.getInstance().checkRepository(currRepo)){
 				Platform.runLater(() -> {
 					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
 				});
 				return false;
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SocketTimeoutException e){
+			DialogMessage.showWarningDialog("Internet Connection Timeout", 
+					"Timeout while connecting to GitHub, please check your internet connection.");
+		} catch (UnknownHostException e){
+			DialogMessage.showWarningDialog("No Internet Connection", 
+					"Please check your internet connection and try again.");
+		}catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return true;
 	}

@@ -22,13 +22,16 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
 import util.DialogMessage;
 
 public class LoginDialog extends Dialog<Boolean> {
-
+	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
+	
 	private TextField repoOwnerField;
 	private TextField repoNameField;
 	private TextField usernameField;
@@ -133,9 +136,9 @@ public class LoginDialog extends Dialog<Boolean> {
 						password = line;
 					}
 				}
-				System.out.println("Logged in using credentials.txt");
+				logger.info("Logged in using credentials.txt");
 			} catch (Exception ex) {
-				System.out.println("Failed to find or open credentials.txt");
+				logger.info("Failed to find or open credentials.txt");
 			}
 		}
 		

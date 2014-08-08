@@ -18,6 +18,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -34,7 +36,7 @@ import util.ProjectConfigurations;
 
 
 public class Model {
-	
+	private static final Logger logger = LogManager.getLogger(Model.class.getName());
 	private static final String CHARSET = "ISO-8859-1";
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -69,16 +71,16 @@ public class Model {
 			HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
 			loadComponents(repoId, items);
 			return true;
-		}catch(UnknownHostException e){
-			Platform.runLater(()->{
-				DialogMessage.showWarningDialog("No Internet Connection", 
-						"Please check your internet connection and try again");
-			});
-			return false;
-		}catch(SocketTimeoutException e){
+		} catch(SocketTimeoutException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("Internet Connection is down", 
 						"Timeout while loading items from github. Please check your internet connection.");
+			});
+			return false;
+		} catch(UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("No Internet Connection", 
+						"Please check your internet connection and try again");
 			});
 			return false;
 		}
@@ -197,7 +199,7 @@ public class Model {
 		try {
 			createdLabel = ServiceManager.getInstance().createLabel(ghLabel);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		TurboLabel returnedLabel = new TurboLabel(createdLabel);
 		labels.add(returnedLabel);
@@ -211,7 +213,7 @@ public class Model {
 		try {
 			createdMilestone = ServiceManager.getInstance().createMilestone(ghMilestone);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} 
 		TurboMilestone returnedMilestone = new TurboMilestone(createdMilestone);
 		milestones.add(returnedMilestone);
@@ -225,7 +227,7 @@ public class Model {
 			labels.remove(label);
 			refresh();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -235,15 +237,9 @@ public class Model {
 			milestones.remove(milestone);
 			refresh();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
-	
-//	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
-//		TurboIssueEdit command = new TurboIssueEdit(this, originalIssue, editedIssue);
-//		command.execute();
-//	}
-	
 	
 	public void updateLabel(TurboLabel editedLabel, String labelName) {
 		Label ghLabel = editedLabel.toGhResource();
@@ -251,7 +247,7 @@ public class Model {
 			ServiceManager.getInstance().editLabel(ghLabel, URLEncoder.encode(labelName, CHARSET));
 			refresh();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -261,7 +257,7 @@ public class Model {
 			ServiceManager.getInstance().editMilestone(ghMilestone);
 			refresh();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -380,8 +376,7 @@ public class Model {
 				try {
 					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -420,14 +415,14 @@ public class Model {
 			try {
 				ghLabels.add(ServiceManager.getInstance().createLabel(statusLabel));
 			} catch (IOException e) {
-				e.printStackTrace();
-				
 				if(e instanceof RequestException){
 					//Happens because user has no repo permissions
 					if(((RequestException) e).getStatus() == 404){
+						logger.error("No repository permissions to create label", e);
 						break;
 					}
 				}
+				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 		
