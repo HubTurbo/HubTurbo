@@ -38,6 +38,11 @@ public class UI extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException {
+		//log all uncaught exceptions
+		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
+            logger.error(throwable.getMessage(), throwable);
+        });
+		
 		initCSS();
 		sessionConfig = ConfigFileHandler.loadSessionConfig();
 		mainStage = stage;
