@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryContents;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,18 +38,20 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import service.ServiceManager;
+
 public class ConfigFileHandler {
 
 	private static final String CHARSET = "UTF-8";
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
 	private static final String DIR_CONFIG_PROJECTS = "project-config";
-	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
-	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com/";
 	private static final String ADDRESS_SEPARATOR = "/";
-	private static final String DEFAULT_BRANCH = "master";
 	private static final String URL_SPACE = "%20";
 	private static final int BUFFER_SIZE = 1024;
+	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
+	private static final String DEFAULT_BRANCH = "master";
+	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
 	private static Gson gson = new GsonBuilder()
 								.setPrettyPrinting()
@@ -166,21 +169,31 @@ public class ConfigFileHandler {
 
 	private static String determineConfigFileName(IRepositoryIdProvider repoId, String space_char) {
 		String[] repoIdTokens = repoId.generateId().split("/");
-		String configFileName = repoIdTokens[0].toLowerCase() + space_char + repoIdTokens[1].toLowerCase() + ".json";
+		String expectedFileName = repoIdTokens[0] + space_char + repoIdTokens[1] + ".json";
+		String configFileName = expectedFileName;
+		try {
+			ServiceManager service = ServiceManager.getInstance();
+			List<RepositoryContents> repoContents = service.getContents(repoId, DIR_CONFIG_PROJECTS);
+			for (RepositoryContents content : repoContents) {
+				if (content.getName().equalsIgnoreCase(expectedFileName)) {
+					configFileName = content.getName();
+					break;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return configFileName;
 	}
 
 	private static String generateFileURL(IRepositoryIdProvider repoId) {
-		
 		String[] repoIdTokens = repoId.generateId().split(ADDRESS_SEPARATOR);
-		String stringURL = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
-									     + ADDRESS_SEPARATOR + repoIdTokens[1]
-									     + ADDRESS_SEPARATOR + DEFAULT_BRANCH
-									     + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
-									     + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE);
-		return stringURL;
-		
-		//return getContents(repoId, DIR_CONFIG_PROJECTS + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE));
+		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
+										 + ADDRESS_SEPARATOR + repoIdTokens[1]
+										 + ADDRESS_SEPARATOR + DEFAULT_BRANCH
+										 + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
+										 + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE);
+		return urlString;
 	}
 
 	private static boolean isValidURL(String stringURL) {
