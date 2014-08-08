@@ -68,7 +68,7 @@ public class LabelManagementComponent {
 		return new Callback<TreeView<LabelTreeItem>, TreeCell<LabelTreeItem>>() {
 			@Override
 			public TreeCell<LabelTreeItem> call(TreeView<LabelTreeItem> stringTreeView) {
-				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model, sidePanel);
+				return new ManageLabelsTreeCell<LabelTreeItem>(stage, model);
 			}
 		};
 	}

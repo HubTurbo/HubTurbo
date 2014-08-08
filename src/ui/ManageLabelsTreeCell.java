@@ -26,12 +26,10 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	
 	private final LabelsHandler labelHandler;
 	private final Stage stage;
-	private final SidePanel sidePanel;
 
-	public ManageLabelsTreeCell(Stage stage, Model model, SidePanel sidePanel) {
+	public ManageLabelsTreeCell(Stage stage, Model model) {
 		this.labelHandler = new LabelsHandler(model);
 		this.stage = stage;
-		this.sidePanel = sidePanel;
 	}
     
 	@Override
