@@ -1,11 +1,11 @@
 package util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -47,6 +47,8 @@ public class ConfigFileHandler {
 	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com/";
 	private static final String ADDRESS_SEPARATOR = "/";
 	private static final String DEFAULT_BRANCH = "master";
+	private static final String URL_SPACE = "%20";
+	private static final int BUFFER_SIZE = 1024;
 	
 	private static Gson gson = new GsonBuilder()
 								.setPrettyPrinting()
@@ -92,10 +94,10 @@ public class ConfigFileHandler {
 		directorySetup();
 		ProjectConfigurations config = null;
 		String fileName = generateFileName(repoId);
-		
-		// Download config file from repo if available
+
 		if (isValidURL(generateFileURL(repoId))) {
 			try {
+				// Download config file from repo if available
 				download(generateFileURL(repoId), fileName);
 				File configFile = new File(fileName);
 				if (configFile.exists()) {
@@ -106,13 +108,30 @@ public class ConfigFileHandler {
 			} catch (IOException e) {
 				logger.error(e.getLocalizedMessage(), e);
 			}
+		
 		} else {
 			config = createConfigFile(repoId, fileName);
 		}
+		
 		return config;
-
 	}
-	
+
+	private static ProjectConfigurations readConfigFile(String fileName) {
+		ProjectConfigurations config = null;
+		try {
+			Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
+			config = gson.fromJson(reader, ProjectConfigurations.class);
+			reader.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return config;
+	}
+
 	private static ProjectConfigurations createConfigFile(IRepositoryIdProvider repoId, String fileName) {
 		ProjectConfigurations config = null;
 		List<String> nonInheritedLabels = new ArrayList<String>();
@@ -133,22 +152,6 @@ public class ConfigFileHandler {
 		return config;
 	}
 
-	private static ProjectConfigurations readConfigFile(String fileName) {
-		ProjectConfigurations config = null;
-		try {
-			Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
-			config = gson.fromJson(reader, ProjectConfigurations.class);
-			reader.close();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return config;
-	}
-
 	private static void directorySetup() {
 		File directory = new File(DIR_CONFIG_PROJECTS);
 		if (!directory.exists()) {
@@ -157,19 +160,27 @@ public class ConfigFileHandler {
 	}
 
 	private static String generateFileName(IRepositoryIdProvider repoId) {
-		String[] repoIdTokens = repoId.generateId().split("/");
-		String fileName = DIR_CONFIG_PROJECTS + File.separator + repoIdTokens[0].toLowerCase() + " " + repoIdTokens[1].toLowerCase() + ".json";
+		String fileName = DIR_CONFIG_PROJECTS + File.separator + determineConfigFileName(repoId, " ");
 		return fileName;
 	}
-	
+
+	private static String determineConfigFileName(IRepositoryIdProvider repoId, String space_char) {
+		String[] repoIdTokens = repoId.generateId().split("/");
+		String configFileName = repoIdTokens[0].toLowerCase() + space_char + repoIdTokens[1].toLowerCase() + ".json";
+		return configFileName;
+	}
+
 	private static String generateFileURL(IRepositoryIdProvider repoId) {
+		
 		String[] repoIdTokens = repoId.generateId().split(ADDRESS_SEPARATOR);
-		String stringURL = GITHUB_DOMAIN + repoIdTokens[0] 
+		String stringURL = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
 									     + ADDRESS_SEPARATOR + repoIdTokens[1]
 									     + ADDRESS_SEPARATOR + DEFAULT_BRANCH
 									     + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
-									     + ADDRESS_SEPARATOR + repoIdTokens[0].toLowerCase() + " " + repoIdTokens[1].toLowerCase() + ".json";
+									     + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE);
 		return stringURL;
+		
+		//return getContents(repoId, DIR_CONFIG_PROJECTS + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE));
 	}
 
 	private static boolean isValidURL(String stringURL) {
@@ -178,15 +189,8 @@ public class ConfigFileHandler {
 			httpUrlConn = (HttpURLConnection) new URL(stringURL)
 			.openConnection();
 
-			// A HEAD request is just like a GET request, except that it asks
-			// the server to return the response headers only, and not the
-			// actual resource (i.e. no message body).
-			// This is useful to check characteristics of a resource without
-			// actually downloading it,thus saving bandwidth. Use HEAD when
-			// you don't actually need a file's contents.
+			// Check if resource is available without downloading it
 			httpUrlConn.setRequestMethod("HEAD");
-
-			// Set timeouts in milliseconds
 			httpUrlConn.setConnectTimeout(30000);
 			httpUrlConn.setReadTimeout(30000);
 
@@ -198,32 +202,32 @@ public class ConfigFileHandler {
 	}
 
 	private static void download(String stringURL, String destination) throws IOException {
-		// File name that is being downloaded
 		String downloadedFileName = stringURL.substring(stringURL.lastIndexOf(ADDRESS_SEPARATOR) + 1);
-		// Converts the input string to a Path object.
         Path inputPath = Paths.get(destination);
         
-		// Open connection to the file
 		URL url = new URL(stringURL);
-		InputStream inStream = url.openStream();
-		// Stream to the destination file
-		FileOutputStream fos = new FileOutputStream(inputPath.toAbsolutePath().toString());
+		BufferedInputStream inStream  = null;
+		FileOutputStream fos = null;
+		try {
+			inStream = new BufferedInputStream(url.openStream());
+			fos = new FileOutputStream(inputPath.toAbsolutePath().toString());
 
-		// Read bytes from URL to the local file
-		byte[] buffer = new byte[4096];
-		int bytesRead = 0;
-
-		System.out.print("Downloading " + downloadedFileName);
-		while ((bytesRead = inStream.read(buffer)) != -1) {
-			System.out.print(".");	// Progress bar
-			fos.write(buffer,0,bytesRead);
+			byte data[] = new byte[BUFFER_SIZE];
+			int bytesRead;
+			System.out.print("Downloading " + downloadedFileName);
+			while ((bytesRead = inStream.read(data, 0, BUFFER_SIZE)) != -1) {
+				System.out.print(".");	// Progress bar
+				fos.write(data, 0, bytesRead);
+			}
+			System.out.println("done!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (inStream != null)
+				inStream.close();
+			if (fos != null)
+				fos.close();
 		}
-		System.out.println("done!");
-
-		// Close destination stream
-		fos.close();
-		// Close URL stream
-		inStream.close();
 	}
 
 	public static void saveSessionConfig(SessionConfigurations config) {
