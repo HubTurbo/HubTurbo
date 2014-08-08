@@ -3,9 +3,6 @@ package ui;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -18,6 +15,9 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboLabel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	private static final Logger logger = LogManager.getLogger(ManageLabelsTreeCell.class.getName());
@@ -76,11 +76,8 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 				getTreeItem().setExpanded(true);
 	    	} else {
 	    		model.updateLabel(response, oldName);
-	    		// The tree view doesn't update automatically because there is;
-		    	// no binding; manually trigger the update
 		    	label.copyValues(response);
 		    	updateItem(label, false);
-		    	sidePanel.refreshSidebarLabels();
 	    	}
 			return true;
 		}).exceptionally(e -> {
