@@ -3,6 +3,9 @@ package ui;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -17,7 +20,8 @@ import model.Model;
 import model.TurboLabel;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
-
+	private static final Logger logger = LogManager.getLogger(ManageLabelsTreeCell.class.getName());
+	
 	private final Model model;
 	private final Stage stage;
 	private final SidePanel sidePanel;
@@ -80,7 +84,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	    	}
 			return true;
 		}).exceptionally(e -> {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return false;
 		});
 	}
@@ -141,7 +145,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 					return true;
 				})
 				.exceptionally(ex -> {
-					ex.printStackTrace();
+					logger.error(ex.getLocalizedMessage(), ex);
 					return false;
 				});
 		});
@@ -213,7 +217,7 @@ public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 
 				return true;
 			}).exceptionally(ex -> {
-				ex.printStackTrace();
+				logger.error(ex.getLocalizedMessage(), ex);
 				return false;
 			});
 	}

@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import model.Model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -36,6 +38,7 @@ import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
 
 public class ServiceManager {
+	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
 	public static final boolean isTestMode = false;
 	
 	protected static final String METHOD_PUT = "PUT";
@@ -356,8 +359,7 @@ public class ServiceManager {
 		try {
 			createComment(issueId, changeLog);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -376,8 +378,7 @@ public class ServiceManager {
 		try {
 			return getContentMarkup(comment.getBody());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return comment.getBody();
 		}
 	}

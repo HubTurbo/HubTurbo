@@ -2,6 +2,9 @@ package ui;
 
 import java.lang.ref.WeakReference;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -16,7 +19,7 @@ import model.Model;
 import model.TurboMilestone;
 
 public class MilestoneManagementComponent {
-	
+	private static final Logger logger = LogManager.getLogger(MilestoneManagementComponent.class.getName());
 	private final Stage parentStage;
 	private final Model model;
 	
@@ -68,7 +71,7 @@ public class MilestoneManagementComponent {
 				model.createMilestone(response);
 				return true;
 			}).exceptionally(exception -> {
-				exception.printStackTrace();
+				logger.error(exception.getLocalizedMessage(), exception);
 				return false;
 			});
 		});

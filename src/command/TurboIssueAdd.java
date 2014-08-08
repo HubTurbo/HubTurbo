@@ -1,21 +1,22 @@
 package command;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import javafx.application.Platform;
+import model.Model;
+import model.TurboIssue;
 
 import org.eclipse.egit.github.core.Issue;
 
 import service.ServiceManager;
-import model.Model;
-import model.TurboIssue;
+import util.DialogMessage;
 
 /**
  * Creates a new github issue on github and updates model with the created issue data
  * */
 
 public class TurboIssueAdd extends TurboIssueCommand{
-
 	private static String ADD_ISSUE_LOG = "Added issue: #%1d %2s \n";
 	TurboIssue addResult;
 	
@@ -29,8 +30,13 @@ public class TurboIssueAdd extends TurboIssueCommand{
 		Issue createdIssue = null;
 		try {
 			createdIssue = ServiceManager.getInstance().createIssue(ghIssue);
+		} catch (SocketTimeoutException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection Timeout", 
+						"Timeout adding issue in GitHub, please check your internet connection.");
+			});
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} 
 		TurboIssue returnedIssue = new TurboIssue(createdIssue, model.get());
 		return returnedIssue;

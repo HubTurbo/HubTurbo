@@ -2,6 +2,9 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.layout.HBox;
@@ -19,6 +22,7 @@ import command.TurboIssueCommand;
 import command.TurboIssueEdit;
 
 public class IssueDisplayPane extends HBox {
+	private static final Logger logger = LogManager.getLogger(IssueDisplayPane.class.getName());
 	protected static final int DETAILS_WIDTH = 350;
 	protected static final int ISSUE_WIDTH = 300;
 
@@ -132,7 +136,7 @@ public class IssueDisplayPane extends HBox {
 					}
 				}
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				logger.error(e1.getLocalizedMessage(), e1);
 			}
 
 		});

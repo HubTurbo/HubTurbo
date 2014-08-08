@@ -3,6 +3,9 @@ package ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -29,6 +32,7 @@ import model.TurboMilestone;
 
 
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
+	private static final Logger logger = LogManager.getLogger(ManageMilestonesListCell.class.getName());
 	private final Stage stage;
 	private final Model model;
 	private final MilestoneManagementComponent parentDialog;
@@ -177,7 +181,7 @@ public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 				model.updateMilestone(response);
 				return true;
 			}).exceptionally(e -> {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage(), e);
 				return false;
 			});
 		});

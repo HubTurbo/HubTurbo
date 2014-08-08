@@ -3,6 +3,9 @@ package ui;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import service.ServiceManager;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -19,6 +22,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class EditableMarkupPopup extends Stage{	
+	private static final Logger logger = LogManager.getLogger(EditableMarkupPopup.class.getName());
 	protected static final String EDIT_BTN_TXT = "\uf058";
 	protected static final String BACK_BTN_TXT = " \uf0a4 ";
 	protected static final String DEFAULT_CSS = "<style type=\"text/css\">"
@@ -63,7 +67,7 @@ public class EditableMarkupPopup extends Stage{
 		try {
 			return ServiceManager.getInstance().getContentMarkup(getText());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return getText();
 		}
 	}

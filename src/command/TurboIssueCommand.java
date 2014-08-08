@@ -3,6 +3,9 @@ package command;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Platform;
 import service.ServiceManager;
 import util.ProjectConfigurations;
@@ -11,6 +14,7 @@ import model.TurboIssue;
 import model.TurboLabel;
 
 public abstract class TurboIssueCommand {
+	protected static final Logger logger = LogManager.getLogger(TurboIssueCommand.class.getName());
 	protected TurboIssue issue;
 
 	protected WeakReference<Model> model;

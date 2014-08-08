@@ -2,6 +2,8 @@ package handler;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,12 +17,16 @@ import javafx.collections.WeakListChangeListener;
 import model.TurboComment;
 import model.TurboIssue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
 import service.updateservice.CommentUpdateService;
+import util.DialogMessage;
 
 public class IssueDetailsContentHandler {
+	private static final Logger logger = LogManager.getLogger(IssueDetailsContentHandler.class.getName());
 	private TurboIssue issue;
 	
 	private ObservableList<Comment> allGhContent = FXCollections.observableArrayList();
@@ -47,8 +53,13 @@ public class IssueDetailsContentHandler {
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
 			setGithubCommentsList(allItems);
 			updateData();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (SocketTimeoutException | UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection Timeout", 
+						"Timeout while loading comments from GitHub, please check your internet connection");
+			});
+		}catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -172,8 +183,14 @@ public class IssueDetailsContentHandler {
 			ServiceManager.getInstance().createComment(issue.getId(), text);			
 			restartContentUpdate();
 			return true;
+		} catch (SocketTimeoutException | UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection Timeout", 
+						"Timeout while adding comment to issue in GitHub, please check your internet connection.");
+			});
+			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return false;
 		}
 	}
@@ -186,8 +203,14 @@ public class IssueDetailsContentHandler {
 			ServiceManager.getInstance().editComment(ghComment);
 			startContentUpdate();
 			return true;
+		} catch (SocketTimeoutException | UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection Timeout", 
+						"Timeout while editing comment in GitHub, please check your internet connection.");
+			});
+			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return false;
 		}
 	}
@@ -198,8 +221,13 @@ public class IssueDetailsContentHandler {
 			ServiceManager.getInstance().deleteComment(comment.getId());
 			removeCachedComment(comment.getId());
 			startContentUpdate();
+		} catch (SocketTimeoutException | UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection Timeout", 
+						"Timeout while deleting comment to issue in GitHub, please check your internet connection.");
+			});
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	

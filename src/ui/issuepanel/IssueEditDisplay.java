@@ -4,6 +4,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -46,6 +49,7 @@ import ui.TraversableTextArea;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
+	private static final Logger logger = LogManager.getLogger(IssueEditDisplay.class.getName());
 	private static final int ELEMENT_SPACING = 5;
 	protected static final String DEFAULT_WEB_CSS = 
 			"<style type=\"text/css\">"
@@ -393,7 +397,7 @@ public class IssueEditDisplay extends VBox{
 						statusLabel.setAll(FXCollections.observableArrayList(response));
 						return true;
 					}).exceptionally(ex -> {
-						ex.printStackTrace();
+						logger.error(ex.getLocalizedMessage(), ex);
 						return false;
 					});
 		});
@@ -495,7 +499,7 @@ public class IssueEditDisplay extends VBox{
 						return true;
 					})
 					.exceptionally(ex -> {
-						ex.printStackTrace();
+						logger.error(ex.getLocalizedMessage(), ex);
 						return false;
 					});
 		});
@@ -531,7 +535,7 @@ public class IssueEditDisplay extends VBox{
 						return true;
 					})
 				.exceptionally(ex -> {
-					ex.printStackTrace();
+					logger.error(ex.getLocalizedMessage(), ex);
 					return false;
 				});
 		});
@@ -571,7 +575,7 @@ public class IssueEditDisplay extends VBox{
 							return true;
 						})
 					.exceptionally(ex -> {
-						ex.printStackTrace();
+						logger.error(ex.getLocalizedMessage(), ex);
 						return false;
 					});
 		});
@@ -611,7 +615,7 @@ public class IssueEditDisplay extends VBox{
 							return true;
 						})
 					.exceptionally(ex -> {
-						ex.printStackTrace();
+						logger.error(ex.getLocalizedMessage(), ex);
 						return false;
 					});
 		});

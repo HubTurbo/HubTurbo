@@ -1,12 +1,17 @@
 package command;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
+import javafx.application.Platform;
+
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import util.CollectionUtilities;
+import util.DialogMessage;
 import model.Model;
 import model.TurboIssue;
 
@@ -49,7 +54,19 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 			return true;
 		} catch (IOException e) {
 			setLocalIssueParent(parent, oldParent);
-			e.printStackTrace();
+			if(e instanceof SocketTimeoutException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("Internet Connection Timeout", 
+							"Timeout modifying parent for issue in GitHub, please check your internet connection.");
+				});
+			}else if(e instanceof RequestException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("No repository permissions", 
+							"Cannot modify issue parent.");
+				});
+			}else{
+				logger.error(e.getLocalizedMessage(), e);
+			}
 			return false;
 		}
 	}

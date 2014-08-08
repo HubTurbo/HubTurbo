@@ -1,13 +1,18 @@
 package command;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
+
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import util.CollectionUtilities;
+import util.DialogMessage;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -52,8 +57,20 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 			}
 			return result;
 		} catch (IOException e) {
-			e.printStackTrace();
 			issue.setLabels(oldLabels);
+			if(e instanceof SocketTimeoutException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("Internet Connection Timeout", 
+							"Timeout modifying labels for issue in GitHub, please check your internet connection.");
+				});
+			}else if(e instanceof RequestException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("No repository permissions", 
+							"Cannot modify issue labels.");
+				});
+			}else{
+				logger.error(e.getLocalizedMessage(), e);
+			}
 			return false;
 		}
 	}

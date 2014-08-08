@@ -15,6 +15,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
@@ -25,7 +27,7 @@ import util.ProjectConfigurations;
 
 
 public class TurboIssue implements Listable {
-	
+	private static final Logger logger = LogManager.getLogger(TurboIssue.class.getName());
 	private static final String STATE_CLOSED = "closed";
 	private static final String STATE_OPEN = "open";
 	private static final String REGEX_REPLACE_DESC = "^[^<>]*<hr>";
@@ -123,7 +125,7 @@ public class TurboIssue implements Listable {
         		cachedDescriptionMarkup = ServiceManager.getInstance().getContentMarkup(desc);
         	}
     	}catch(IOException e){
-    		e.printStackTrace();
+    		logger.error(e.getLocalizedMessage(), e);
     		return getDescription();
     	}
     	return cachedDescriptionMarkup;

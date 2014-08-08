@@ -5,6 +5,8 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PageIterator;
@@ -25,6 +29,7 @@ import service.GitHubClientExtended;
  * Base class for obtaining updates from Github for a repository object
  * */
 public class UpdateService<T> extends GitHubService{
+	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 	protected String apiSuffix;
 	protected GitHubClientExtended client;
 	protected String lastETag;
@@ -86,11 +91,12 @@ public class UpdateService<T> extends GitHubService{
 			updateLastETag(connection);
 			updateLastCheckTime(connection);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(!(e instanceof UnknownHostException || e instanceof SocketTimeoutException)){
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//should not happen
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return result;
 	}

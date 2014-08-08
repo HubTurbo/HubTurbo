@@ -1,12 +1,14 @@
 package command;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -143,7 +145,19 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			});
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(e instanceof SocketTimeoutException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("Internet Connection Timeout", 
+							"Timeout while editing issue in GitHub, please check your internet connection.");
+				});
+			}else if(e instanceof RequestException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("No repository permissions", 
+							"Cannot edit issue.");
+				});
+			}else{
+				logger.error(e.getLocalizedMessage(), e);
+			}
 			return false;
 		}
 	}

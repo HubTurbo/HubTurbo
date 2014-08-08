@@ -1,22 +1,26 @@
 package command;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Label;
-
-import service.ServiceManager;
-import util.CollectionUtilities;
+import javafx.application.Platform;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
+
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.client.RequestException;
+
+import service.ServiceManager;
+import util.CollectionUtilities;
+import util.DialogMessage;
 
 /**
  * Adds given list of labels to the issue on github. Also adds labels to the given TurboIssue object
  * */
 
 public class TurboIssueAddLabels extends TurboIssueCommand{
-	
 	private List<TurboLabel> addedLabels;
 	
 	public TurboIssueAddLabels(Model model, TurboIssue issue, List<TurboLabel> labels){
@@ -53,7 +57,19 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		} catch (IOException e) {
 			issue.removeLabels(addedLabels);
 			isSuccessful = false;
-			e.printStackTrace();
+			if(e instanceof SocketTimeoutException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("Internet Connection Timeout", 
+							"Timeout adding label(s) to issue in GitHub, please check your internet connection.");
+				});
+			}else if(e instanceof RequestException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("No repository permissions", 
+							"Cannot add label(s) to issue.");
+				});
+			}else{
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		}
 		
 		return isSuccessful;
@@ -71,8 +87,20 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 			isUndone = result;
 		} catch (IOException e) {
 			issue.addLabels(addedLabels);
-			e.printStackTrace();
 			isUndone = false;
+			if(e instanceof SocketTimeoutException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("Internet Connection Timeout", 
+							"Timeout modifying label(s) for issue in GitHub, please check your internet connection.");
+				});
+			}else if(e instanceof RequestException){
+				Platform.runLater(()->{
+					DialogMessage.showWarningDialog("No repository permissions", 
+							"Cannot modify issue labels.");
+				});
+			}else{
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		}
 		return isUndone;
 	}

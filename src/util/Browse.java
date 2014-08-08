@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Browse {
+	private static final Logger logger = LogManager.getLogger(Browse.class.getName());
 	public static void browse(String htmlUrl) {
 		
 		if (htmlUrl == null || htmlUrl.isEmpty()) return;
@@ -31,9 +35,9 @@ public class Browse {
 		        }
 	        }
 	    } catch (IOException ex) {
-	        ex.printStackTrace();
+	        logger.error(ex.getLocalizedMessage(), ex);
 	    } catch (URISyntaxException ex) {
-	        ex.printStackTrace();
+	        logger.info("Invalid URI syntax: " + ex.getInput());
 	    }
 	}
 
