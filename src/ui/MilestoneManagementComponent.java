@@ -1,6 +1,6 @@
 package ui;
 
-import handler.MilestoneHandler;
+import handler.MilestonesHandler;
 
 import java.lang.ref.WeakReference;
 
@@ -23,13 +23,13 @@ import model.TurboMilestone;
 public class MilestoneManagementComponent {
 	private static final Logger logger = LogManager.getLogger(MilestoneManagementComponent.class.getName());
 	private final Stage parentStage;
-	private final MilestoneHandler msHandler;
+	private final MilestonesHandler msHandler;
 	
 	private ListView<TurboMilestone> listView;
 
 	public MilestoneManagementComponent(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
-		this.msHandler = new MilestoneHandler(model);
+		this.msHandler = new MilestonesHandler(model);
 	}
 
 	public VBox initialise() {

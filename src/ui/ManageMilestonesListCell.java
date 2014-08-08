@@ -1,6 +1,6 @@
 package ui;
 
-import handler.MilestoneHandler;
+import handler.MilestonesHandler;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,12 +35,12 @@ import org.apache.logging.log4j.Logger;
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private static final Logger logger = LogManager.getLogger(ManageMilestonesListCell.class.getName());
 	private final Stage stage;
-	private final MilestoneHandler msHandler;
+	private final MilestonesHandler msHandler;
 	private final MilestoneManagementComponent parentDialog;
 	
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 
-    public ManageMilestonesListCell(Stage stage, MilestoneHandler handler, MilestoneManagementComponent parentDialog) {
+    public ManageMilestonesListCell(Stage stage, MilestonesHandler handler, MilestoneManagementComponent parentDialog) {
 		super();
 		this.stage = stage;
 		this.msHandler = handler;

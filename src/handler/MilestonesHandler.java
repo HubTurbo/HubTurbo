@@ -13,11 +13,11 @@ import org.eclipse.egit.github.core.Milestone;
 
 import service.ServiceManager;
 
-public class MilestoneHandler {
-	private static final Logger logger = LogManager.getLogger(MilestoneHandler.class.getName());
+public class MilestonesHandler {
+	private static final Logger logger = LogManager.getLogger(MilestonesHandler.class.getName());
 	WeakReference<Model> modelRef;
 	
-	public MilestoneHandler(Model model){
+	public MilestonesHandler(Model model){
 		modelRef = new WeakReference<>(model);
 	}
 	
