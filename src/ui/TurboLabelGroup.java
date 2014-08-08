@@ -1,11 +1,16 @@
 package ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import service.ServiceManager;
 import model.TurboLabel;
 
 public class TurboLabelGroup implements LabelTreeItem {
-	
+	private static final Logger logger = LogManager.getLogger(TurboLabelGroup.class.getName());
 	private String name;
 	private ArrayList<TurboLabel> labels;
 	private boolean exclusive = false;
@@ -75,7 +80,12 @@ public class TurboLabelGroup implements LabelTreeItem {
 			if(label.isExclusive() != ex){
 				String oldName = label.toGhName();
 				label.setExclusive(ex);
-				//TODO:
+				try {
+					//Update label in github so the label's delimiter corresponds with its new exclusivity status
+					ServiceManager.getInstance().editLabel(label.toGhResource(), oldName);
+				} catch (IOException e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
 			}
 		}
 	}
