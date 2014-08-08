@@ -60,14 +60,10 @@ public class Model {
 		this.repoId = repoId;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId) throws IOException{
-		this.repoId = repoId;
-		ConfigFileHandler.loadProjectConfig(getRepoId());
-		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
-		loadCollaborators(ServiceManager.getInstance().getCollaborators());
-		loadLabels(ServiceManager.getInstance().getLabels());
-		loadMilestones(ServiceManager.getInstance().getMilestones());
-		loadIssues(ServiceManager.getInstance().getAllIssues());
+		HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+		loadComponents(repoId, items);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
