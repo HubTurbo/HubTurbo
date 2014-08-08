@@ -45,7 +45,7 @@ public class ConfigFileHandler {
 	private static final String CHARSET = "UTF-8";
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
-	private static final String DIR_CONFIG_PROJECTS = "project-config";
+	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig";
 	private static final String ADDRESS_SEPARATOR = "/";
 	private static final String URL_SPACE = "%20";
 	private static final int BUFFER_SIZE = 1024;
