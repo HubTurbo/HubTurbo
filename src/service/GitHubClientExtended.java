@@ -13,6 +13,7 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 
 public class GitHubClientExtended extends GitHubClient{
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
+	protected static final int CONNECTION_TIMEOUT = 30000;
 	
 	public GitHubClientExtended(){
 		
@@ -104,5 +105,13 @@ public class GitHubClientExtended extends GitHubClient{
 			return null;
 		throw createException(getStream(request), code,
 				request.getResponseMessage());
+	}
+	
+	@Override
+	protected HttpURLConnection createConnection(String uri) throws IOException {
+		HttpURLConnection connection = super.createConnection(uri);
+		connection.setConnectTimeout(CONNECTION_TIMEOUT);
+		connection.setReadTimeout(CONNECTION_TIMEOUT);
+		return connection;
 	}
 }
