@@ -1,4 +1,4 @@
-package ui;
+package ui.sidepanel;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -28,8 +28,10 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
+import ui.StatusBar;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
-import ui.issuepanel.IssueDisplayPane;
+import ui.issuecolumn.ColumnControl;
+import ui.issuepanel.expanded.IssueDisplayPane;
 import ui.labelmanagement.LabelManagementComponent;
 import ui.milestonemanagement.MilestoneManagementComponent;
 import util.DialogMessage;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import ui.SidePanel;
 import ui.TurboLabelGroup;
+import ui.sidepanel.SidePanel;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;

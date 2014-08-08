@@ -13,6 +13,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
+import ui.issuecolumn.ColumnControl;
+import ui.sidepanel.SidePanel;
 
 public class MenuControl extends MenuBar {
 

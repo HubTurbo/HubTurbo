@@ -1,7 +1,7 @@
 package ui.issuepanel;
 
-import ui.ColumnControl;
-import ui.SidePanel;
+import ui.issuecolumn.ColumnControl;
+import ui.sidepanel.SidePanel;
 import util.Browse;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;

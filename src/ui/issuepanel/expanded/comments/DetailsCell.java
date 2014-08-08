@@ -1,4 +1,4 @@
-package ui.issuepanel.comments;
+package ui.issuepanel.expanded.comments;
 
 import handler.IssueDetailsContentHandler;
 import javafx.geometry.Pos;

@@ -1,4 +1,4 @@
-package ui.issuepanel;
+package ui.issuepanel.expanded;
 
 import java.lang.ref.WeakReference;
 
@@ -11,11 +11,11 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-import ui.ColumnControl;
-import ui.SidePanel;
-import ui.SidePanel.IssueEditMode;
 import ui.StatusBar;
-import ui.issuepanel.comments.IssueDetailsDisplay;
+import ui.issuecolumn.ColumnControl;
+import ui.issuepanel.expanded.comments.IssueDetailsDisplay;
+import ui.sidepanel.SidePanel;
+import ui.sidepanel.SidePanel.IssueEditMode;
 import util.DialogMessage;
 import command.TurboIssueAdd;
 import command.TurboIssueCommand;

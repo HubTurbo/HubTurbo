@@ -1,10 +1,15 @@
-package ui;
+package ui.issuecolumn;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import ui.DragData;
+import ui.FilterTextField;
+import ui.StatusBar;
+import ui.DragData.Source;
+import ui.sidepanel.SidePanel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;

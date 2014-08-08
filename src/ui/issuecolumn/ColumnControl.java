@@ -1,4 +1,4 @@
-package ui;
+package ui.issuecolumn;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -9,12 +9,12 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+import ui.StatusBar;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
+import ui.sidepanel.SidePanel;
 import util.SessionConfigurations;
-
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 

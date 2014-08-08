@@ -18,6 +18,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import service.ServiceManager;
+import ui.issuecolumn.ColumnControl;
+import ui.sidepanel.SidePanel;
 import util.ConfigFileHandler;
 import util.SessionConfigurations;
 

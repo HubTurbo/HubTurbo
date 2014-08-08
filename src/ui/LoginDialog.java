@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
 
 import service.ServiceManager;
+import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 
 public class LoginDialog extends Dialog<Boolean> {

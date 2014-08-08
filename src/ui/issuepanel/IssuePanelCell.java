@@ -11,10 +11,9 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
-import ui.ColumnControl;
 import ui.DragData;
-import ui.SidePanel;
-
+import ui.issuecolumn.ColumnControl;
+import ui.sidepanel.SidePanel;
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
 import command.TurboIssueSetMilestone;

@@ -10,10 +10,9 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
-import ui.Column;
-import ui.ColumnControl;
-import ui.SidePanel;
-
+import ui.issuecolumn.Column;
+import ui.issuecolumn.ColumnControl;
+import ui.sidepanel.SidePanel;
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends Column {
