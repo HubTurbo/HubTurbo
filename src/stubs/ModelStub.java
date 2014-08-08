@@ -34,9 +34,10 @@ public class ModelStub extends Model{
 		setupMilestoneStub();
 	}
 	
-	public void loadComponents(IRepositoryIdProvider repoId){
+	public boolean loadComponents(IRepositoryIdProvider repoId){
 		this.repoId = repoId;
 		System.out.println("model "+repoId);
+		return true;
 	}
 	
 	private void setupCollabStub(){

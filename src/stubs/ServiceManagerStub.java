@@ -34,12 +34,13 @@ public class ServiceManagerStub extends ServiceManager{
 		return true;
 	}
 	
-	public void setupRepository(String owner, String name){
+	public boolean setupRepository(String owner, String name){
 		try {
-			model.loadComponents(RepositoryId.create(owner, name));
+			return model.loadComponents(RepositoryId.create(owner, name));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 	}
 	

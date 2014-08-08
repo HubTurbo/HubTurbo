@@ -152,7 +152,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		    @Override
 		    protected Boolean call() throws Exception {
 		    	StatusBar.displayMessage("Signed in; loading data...");
-			    loadRepository(owner, repo);
+			    boolean loadSuccess = loadRepository(owner, repo);
 			    final CountDownLatch latch = new CountDownLatch(1);
 			    Platform.runLater(()->{
 			    	columns.resumeColumns();
@@ -163,7 +163,7 @@ public class LoginDialog extends Dialog<Boolean> {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} 
-		    	return true;
+		    	return loadSuccess;
 		    }
 		};
 		task.setOnSucceeded(wse -> {
@@ -207,8 +207,9 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField.setDisable(disable);
 	}
 	
-	private void loadRepository(String owner, String repoName) throws IOException {
-		ServiceManager.getInstance().setupRepository(owner, repoName);
+	private boolean loadRepository(String owner, String repoName) throws IOException {
+		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName);
 		ServiceManager.getInstance().setupAndStartModelUpdate();
+		return loaded;
 	}
 }

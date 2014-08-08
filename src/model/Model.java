@@ -64,15 +64,23 @@ public class Model {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void loadComponents(IRepositoryIdProvider repoId) throws IOException{
+	public boolean loadComponents(IRepositoryIdProvider repoId) throws IOException{
 		try{
 			HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
 			loadComponents(repoId, items);
+			return true;
 		}catch(UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection", "Please check your internet connection and try again");
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("No Internet Connection", 
+						"Please check your internet connection and try again");
+			});
+			return false;
 		}catch(SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection is down", 
-					"Timeout while loading items from github. Please check your internet connection.");
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection is down", 
+						"Timeout while loading items from github. Please check your internet connection.");
+			});
+			return false;
 		}
 	}
 	

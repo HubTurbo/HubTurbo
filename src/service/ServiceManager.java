@@ -142,10 +142,10 @@ public class ServiceManager {
 	}
 	
 	
-	public void setupRepository(String owner, String name) throws IOException{
+	public boolean setupRepository(String owner, String name) throws IOException{
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
-			model.loadComponents(repoId);
+			return model.loadComponents(repoId);
 		}else{
 			throw new IOException("Cannot access repository"); //TODO: create specific exception for this
 		}
