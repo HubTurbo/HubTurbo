@@ -1,4 +1,4 @@
-package ui;
+package ui.labelmanagement;
 
 import handler.LabelsHandler;
 
@@ -20,6 +20,9 @@ import model.TurboLabel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import ui.DragData;
+import ui.TurboLabelGroup;
 
 public class ManageLabelsTreeCell<T> extends TreeCell<LabelTreeItem> {
 	private static final Logger logger = LogManager.getLogger(ManageLabelsTreeCell.class.getName());

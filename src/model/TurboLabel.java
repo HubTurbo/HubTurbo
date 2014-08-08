@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Label;
 
-import ui.LabelTreeItem;
+import ui.labelmanagement.LabelTreeItem;
 
 public class TurboLabel implements Listable, LabelTreeItem {
 	

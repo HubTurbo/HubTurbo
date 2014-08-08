@@ -7,6 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
+import ui.labelmanagement.LabelManagementComponent;
+import ui.labelmanagement.LabelTreeItem;
 import model.TurboLabel;
 
 public class TurboLabelGroup implements LabelTreeItem {

@@ -23,6 +23,8 @@ import model.TurboLabel;
 
 import org.controlsfx.control.textfield.TextFields;
 
+import ui.labelmanagement.LabelManagementComponent;
+
 public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 
 	private static final double WINDOW_WIDTH = 250;

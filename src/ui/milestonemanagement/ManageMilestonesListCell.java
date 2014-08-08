@@ -1,4 +1,4 @@
-package ui;
+package ui.milestonemanagement;
 
 import handler.MilestonesHandler;
 
@@ -31,6 +31,7 @@ import model.TurboMilestone;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ui.DragData;
 
 public class ManageMilestonesListCell extends ListCell<TurboMilestone> {
 	private static final Logger logger = LogManager.getLogger(ManageMilestonesListCell.class.getName());

@@ -1,4 +1,4 @@
-package ui;
+package ui.collaboratormanagement;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -9,6 +9,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import model.TurboUser;
+import ui.DragData;
 
 public class ManageAssigneeListCell extends ListCell<TurboUser> {
 

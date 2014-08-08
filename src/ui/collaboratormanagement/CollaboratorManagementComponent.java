@@ -1,4 +1,4 @@
-package ui;
+package ui.collaboratormanagement;
 
 import java.lang.ref.WeakReference;
 

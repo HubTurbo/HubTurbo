@@ -1,4 +1,4 @@
-package ui;
+package ui.labelmanagement;
 
 public interface LabelTreeItem {
 	public String getValue();

@@ -1,5 +1,7 @@
-package ui;
+package ui.labelmanagement;
 
+import ui.Dialog;
+import ui.TurboLabelGroup;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

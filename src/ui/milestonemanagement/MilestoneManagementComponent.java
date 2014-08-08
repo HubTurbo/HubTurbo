@@ -1,4 +1,4 @@
-package ui;
+package ui.milestonemanagement;
 
 import handler.MilestonesHandler;
 

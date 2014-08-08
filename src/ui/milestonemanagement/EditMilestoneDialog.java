@@ -1,7 +1,8 @@
-package ui;
+package ui.milestonemanagement;
 
 import java.time.LocalDate;
 
+import ui.Dialog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

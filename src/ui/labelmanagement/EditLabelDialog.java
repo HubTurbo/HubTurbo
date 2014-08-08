@@ -1,7 +1,8 @@
-package ui;
+package ui.labelmanagement;
 
 import java.util.concurrent.CompletableFuture;
 
+import ui.Dialog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
