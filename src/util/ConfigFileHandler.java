@@ -126,11 +126,11 @@ public class ConfigFileHandler {
 			config = gson.fromJson(reader, ProjectConfigurations.class);
 			reader.close();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return config;
 	}
@@ -150,7 +150,7 @@ public class ConfigFileHandler {
 			configFile.createNewFile();
 			saveProjectConfig(config, repoId);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return config;
 	}
@@ -181,7 +181,7 @@ public class ConfigFileHandler {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return configFileName;
 	}
@@ -209,7 +209,7 @@ public class ConfigFileHandler {
 
 			return (httpUrlConn.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 			return false;
 		}
 	}
@@ -234,7 +234,7 @@ public class ConfigFileHandler {
 			}
 			System.out.println("done!");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		} finally {
 			if (inStream != null)
 				inStream.close();
