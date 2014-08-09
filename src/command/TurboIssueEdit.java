@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -145,7 +146,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			});
 			return true;
 		} catch (IOException e) {
-			if(e instanceof SocketTimeoutException){
+			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout while editing issue in GitHub, please check your internet connection.");

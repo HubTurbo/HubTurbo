@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class TurboIssueSetLabels extends TurboIssueCommand{
 			return result;
 		} catch (IOException e) {
 			issue.setLabels(oldLabels);
-			if(e instanceof SocketTimeoutException){
+			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying labels for issue in GitHub, please check your internet connection.");

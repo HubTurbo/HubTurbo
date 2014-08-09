@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import javafx.application.Platform;
 
@@ -41,7 +42,7 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 			isSuccessful = true;
 		} catch (IOException e) {
 			isSuccessful = false;
-			if(e instanceof SocketTimeoutException){
+			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying title for issue in GitHub, please check your internet connection.");

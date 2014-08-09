@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import javafx.application.Platform;
 import model.Model;
@@ -30,7 +31,7 @@ public class TurboIssueAdd extends TurboIssueCommand{
 		Issue createdIssue = null;
 		try {
 			createdIssue = ServiceManager.getInstance().createIssue(ghIssue);
-		} catch (SocketTimeoutException e){
+		} catch (SocketTimeoutException | UnknownHostException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("Internet Connection Timeout", 
 						"Timeout adding issue in GitHub, please check your internet connection.");

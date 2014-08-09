@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -88,7 +89,7 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 		} catch (IOException e) {
 			issue.addLabels(addedLabels);
 			isUndone = false;
-			if(e instanceof SocketTimeoutException){
+			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying label(s) for issue in GitHub, please check your internet connection.");

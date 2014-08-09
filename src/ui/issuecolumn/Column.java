@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import ui.DragData;
-import ui.FilterTextField;
-import ui.StatusBar;
-import ui.DragData.Source;
-import ui.sidepanel.SidePanel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -27,8 +22,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import ui.DragData;
+import ui.FilterTextField;
+import ui.StatusBar;
+import ui.sidepanel.SidePanel;
+
 import command.CommandType;
 import command.TurboCommandExecutor;
+
 import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;

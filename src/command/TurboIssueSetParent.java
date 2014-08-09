@@ -2,6 +2,7 @@ package command;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javafx.application.Platform;
@@ -54,7 +55,7 @@ public class TurboIssueSetParent extends TurboIssueCommand{
 			return true;
 		} catch (IOException e) {
 			setLocalIssueParent(parent, oldParent);
-			if(e instanceof SocketTimeoutException){
+			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying parent for issue in GitHub, please check your internet connection.");

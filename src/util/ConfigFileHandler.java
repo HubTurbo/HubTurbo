@@ -102,19 +102,18 @@ public class ConfigFileHandler {
 			try {
 				// Download config file from repo if available
 				download(generateFileURL(repoId), fileName);
-				File configFile = new File(fileName);
-				if (configFile.exists()) {
-					config = readConfigFile(fileName);
-				} else {
-					config = createConfigFile(repoId, fileName);
-				}
 			} catch (IOException e) {
 				logger.error(e.getLocalizedMessage(), e);
 			}
 		
+		} 
+		File configFile = new File(fileName);
+		if (configFile.exists()) {
+			config = readConfigFile(fileName);
 		} else {
 			config = createConfigFile(repoId, fileName);
 		}
+		config = createConfigFile(repoId, fileName);
 		
 		return config;
 	}
