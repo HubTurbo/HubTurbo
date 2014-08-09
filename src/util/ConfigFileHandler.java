@@ -112,9 +112,7 @@ public class ConfigFileHandler {
 			config = readConfigFile(fileName);
 		} else {
 			config = createConfigFile(repoId, fileName);
-		}
-		config = createConfigFile(repoId, fileName);
-		
+		}		
 		return config;
 	}
 
