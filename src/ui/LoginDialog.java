@@ -25,10 +25,12 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.SessionConfigurations;
 
 public class LoginDialog extends Dialog<Boolean> {
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
@@ -214,6 +216,11 @@ public class LoginDialog extends Dialog<Boolean> {
 	private boolean loadRepository(String owner, String repoName) throws IOException {
 		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName);
 		ServiceManager.getInstance().setupAndStartModelUpdate();
+		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
+		if (currRepo != null) {
+			String repoId = currRepo.generateId();
+			SessionConfigurations.addToLastViewedRepositories(repoId);
+		}
 		return loaded;
 	}
 }

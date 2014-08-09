@@ -51,12 +51,6 @@ public class TurboLabel implements Listable, LabelTreeItem {
 	/*
 	 * Constructors and Public Methods
 	 */
-	
-//	public TurboLabel(String name) {
-//		setName(name);
-//		setColour("000000");
-//	}
-	
 	public TurboLabel(){
 		setColour("000000");
 	}
@@ -66,19 +60,6 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		
 		String labelName = label.getName();
 		String[] tokens = TurboLabel.parseName(labelName);
-//		if (labelName.contains(".")) {
-//			tokens = labelName.split("\\.", 2);
-//			setGroup(tokens[0]);
-//			setName(tokens[1]);
-//			setExclusive(true);
-//		} else if (labelName.contains("-")) {
-//			tokens = labelName.split("-", 2);
-//			setGroup(tokens[0]);
-//			setName(tokens[1]);
-//			setExclusive(false);
-//		} else {
-//			setName(labelName);
-//		}
 		if(tokens == null){
 			setName(labelName);
 		}else{

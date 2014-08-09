@@ -9,14 +9,10 @@ import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -28,6 +24,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
+import ui.RepositorySelector;
 import ui.StatusBar;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
 import ui.issuecolumn.ColumnControl;
@@ -53,7 +50,7 @@ public class SidePanel extends VBox {
 	Tab labelsTab;
 	Tab milestonesTab;
 	Tab assigneesTab;
-	HBox repoFields;
+	RepositorySelector repoFields;
 	
 	private Layout layout;
 	private Stage parentStage;
@@ -118,8 +115,10 @@ public class SidePanel extends VBox {
 	}
 
 	public void refresh() {
-		resetRepoFields(); //TODO:
+		resetRepoFields();
 		refreshSidebar();
+		String repoStr = ServiceManager.getInstance().getRepoId().generateId();
+		repoFields.setValue(repoStr);
 	}
 	
 	public void refreshSidebar(){
@@ -188,7 +187,7 @@ public class SidePanel extends VBox {
 	}
 	
 	private void resetRepoFields(){
-		repoFields = null;
+		repoFields.refreshComboBoxContents();
 	}
 	
 	private Node tabLayout() {
@@ -218,30 +217,9 @@ public class SidePanel extends VBox {
 		return everything;
 	}
 	
-	private HBox createRepoFields() {
-		final ComboBox<String> comboBox = new ComboBox<String>();
-		comboBox.setFocusTraversable(false);
-		comboBox.setEditable(true);
-		
-		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
-		if (currRepo != null) {
-			String repoId = currRepo.generateId();
-			comboBox.setValue(repoId);
-			if (checkRepoAccess(currRepo)) {
-				List<String> items = SessionConfigurations.addToLastViewedRepositories(repoId);
-				comboBox.getItems().addAll(items);
-			}
-
-		}
-		
-		comboBox.valueProperty().addListener((a, b, c) -> loadRepo(comboBox));
-
-		HBox repoIdBox = new HBox();
-		repoIdBox.setSpacing(5);
-		repoIdBox.setPadding(new Insets(5));
-		repoIdBox.setAlignment(Pos.CENTER);
-		repoIdBox.getChildren().addAll(comboBox);
-		comboBox.prefWidthProperty().bind(repoIdBox.widthProperty());
+	private RepositorySelector createRepoFields() {
+		RepositorySelector repoIdBox = new RepositorySelector();
+		repoIdBox.setComboValueChangeMethod((val) -> loadRepo(val));
 		return repoIdBox;
 	}
 		
@@ -266,50 +244,51 @@ public class SidePanel extends VBox {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void loadRepo(final ComboBox<String> comboBox) {
-		RepositoryId repoId = RepositoryId.createFromId(comboBox.getValue());
-		if(!checkRepoAccess(repoId)){
+	private void loadRepo(String repoString) {
+		RepositoryId repoId = RepositoryId.createFromId(repoString);
+		if(repoId == null 
+		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
+		  || !checkRepoAccess(repoId)){
 			return;
 		}
 		
-		if (repoId != null) {
-			columns.saveSession();
-			SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
-			Task<Boolean> task = new Task<Boolean>(){
-				@Override
-				protected Boolean call() throws IOException {
-					ServiceManager.getInstance().stopModelUpdate();
-					HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
-					
-					final CountDownLatch latch = new CountDownLatch(1);
-					model.loadComponents(repoId, items);
-					Platform.runLater(()->{
-						columns.resumeColumns();
-						latch.countDown();
-					});
-					try {
-						latch.await();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} 
-					return true;
-					
+		columns.saveSession();
+		SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
+		Task<Boolean> task = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws IOException {
+				ServiceManager.getInstance().stopModelUpdate();
+				HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+			
+				final CountDownLatch latch = new CountDownLatch(1);
+				model.loadComponents(repoId, items);
+				Platform.runLater(()->{
+					columns.resumeColumns();
+					latch.countDown();
+				});
+				try {
+					latch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+				return true;
 				}
-			};
-			DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
-			Thread thread = new Thread(task);
-			thread.setDaemon(true);
-			thread.start();
+		};
+		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
+		Thread thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
 			
-			task.setOnSucceeded(wse -> {
-				StatusBar.displayMessage("Issues loaded successfully!");
-				ServiceManager.getInstance().setupAndStartModelUpdate();
-			});
+		task.setOnSucceeded(wse -> {
+			resetRepoFields();
+			StatusBar.displayMessage("Issues loaded successfully!");
+			ServiceManager.getInstance().setupAndStartModelUpdate();
+		});
 			
-			task.setOnFailed(wse -> {
-				StatusBar.displayMessage("An error occurred: " + task.getException());
-			});
-		}
+		task.setOnFailed(wse -> {
+			StatusBar.displayMessage("An error occurred: " + task.getException());
+		});
+
 	}
 
 	private Tab createCollaboratorsTab() {
