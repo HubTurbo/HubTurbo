@@ -56,7 +56,7 @@ public class IssueEditDisplay extends VBox{
 			+ "img{"
 			+ "max-width: 100%;"
 			+ "}"
-			+ "p {"
+			+ "body {"
 			+ "font-family: System;"
 			+ "font-size: 13px"
 			+ "}"

@@ -1,5 +1,7 @@
 package ui;
 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -15,6 +17,7 @@ import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
+import util.ConfigFileHandler;
 
 public class MenuControl extends MenuBar {
 
@@ -34,7 +37,7 @@ public class MenuControl extends MenuBar {
 		issues.getItems().addAll(createNewIssueMenuItem());
 
 		Menu view = new Menu("View");
-		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem());
+		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
 
 		getMenus().addAll(issues, view);
 	}
@@ -83,6 +86,23 @@ public class MenuControl extends MenuBar {
 		return cols;
 	}
 
+	private MenuItem createDocumentationMenuItem() {
+		MenuItem documentationMenuItem = new MenuItem("Documentation");
+		documentationMenuItem.setOnAction((e) -> {
+			EditableMarkupPopup popup = createDescPopup();
+			popup.show();
+		});
+		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
+		return documentationMenuItem;
+	}
+	
+	private EditableMarkupPopup createDescPopup(){
+		EditableMarkupPopup popup = new EditableMarkupPopup("Done");
+		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
+		ConfigFileHandler handler = new ConfigFileHandler();
+		popup.setDisplayedText(handler.getDocumentationMarkup(), handler.getDocumentation());
+		return popup;
+	}
 
 	private MenuItem createRefreshMenuItem() {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");

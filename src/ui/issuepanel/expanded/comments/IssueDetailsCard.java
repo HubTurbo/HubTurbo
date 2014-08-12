@@ -32,7 +32,7 @@ public class IssueDetailsCard extends VBox{
 			+ "img{"
 			+ "max-width: 100%;"
 			+ "}"
-			+ "p {"
+			+ "body {"
 			+ "font-family: System;"
 			+ "font-size: 12px"
 			+ "}"

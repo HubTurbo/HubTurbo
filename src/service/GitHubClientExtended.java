@@ -54,6 +54,7 @@ public class GitHubClientExtended extends GitHubClient{
 		String line;
 		while((line = reader.readLine()) != null){
 			content.append(line);
+			content.append("\n");
 		}
 		return content.toString();
 	}
