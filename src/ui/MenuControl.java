@@ -89,18 +89,17 @@ public class MenuControl extends MenuBar {
 	private MenuItem createDocumentationMenuItem() {
 		MenuItem documentationMenuItem = new MenuItem("Documentation");
 		documentationMenuItem.setOnAction((e) -> {
-			EditableMarkupPopup popup = createDescPopup();
+			MarkupPopup popup = createDescPopup();
 			popup.show();
 		});
 		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		return documentationMenuItem;
 	}
 	
-	private EditableMarkupPopup createDescPopup(){
-		EditableMarkupPopup popup = new EditableMarkupPopup("Done");
-		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
+	private MarkupPopup createDescPopup(){
+		MarkupPopup popup = new MarkupPopup("Done");
 		ConfigFileHandler handler = new ConfigFileHandler();
-		popup.setDisplayedText(handler.getDocumentationMarkup(), handler.getDocumentation());
+		popup.setDisplayedText(handler.getDocumentationMarkup());
 		return popup;
 	}
 

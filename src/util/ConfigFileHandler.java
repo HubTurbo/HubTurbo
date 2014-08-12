@@ -1,11 +1,13 @@
 package util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -39,18 +41,24 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import service.ServiceManager;
+import service.GitHubClientExtended;
 
 public class ConfigFileHandler {
 
 	private static final String CHARSET = "UTF-8";
+	
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
 	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig";
+	
 	private static final String ADDRESS_SEPARATOR = "/";
 	private static final String URL_SPACE = "%20";
-	private static final int BUFFER_SIZE = 1024;
+	private static final String HUBTURBO_STRING = "HubTurbo";
 	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
 	private static final String DEFAULT_BRANCH = "master";
+	private static final String DOCUMENTATION_FILE = "readme.md";
+	
+	private static final int BUFFER_SIZE = 1024;
 	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
 	private static Gson gson = new GsonBuilder()
@@ -92,7 +100,40 @@ public class ConfigFileHandler {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
-	
+
+	public String getDocumentation() {
+		String contents = "";
+		String url = generateDocumentationURL();
+		if (isValidURL(url)) {
+			try {
+				GitHubClientExtended ghClient = new GitHubClientExtended();
+				contents = ghClient.getHTMLResponseFromURLRequest(url);
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		} 
+		return contents;
+	}
+
+    public String getDocumentationMarkup() {
+    	String contents = getDocumentation();
+    	String documentationMarkup = contents;
+    	try {
+        	documentationMarkup = ServiceManager.getInstance().getContentMarkup(contents);
+    	} catch(IOException e) {
+    		logger.error(e.getLocalizedMessage(), e);
+    	}
+    	return documentationMarkup;
+    }
+
+	private static String generateDocumentationURL() {
+		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + HUBTURBO_STRING 
+										 + ADDRESS_SEPARATOR + HUBTURBO_STRING
+										 + ADDRESS_SEPARATOR + DEFAULT_BRANCH
+										 + ADDRESS_SEPARATOR + DOCUMENTATION_FILE; 
+		return urlString;
+	}
+
 	public static ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
 		directorySetup();
 		ProjectConfigurations config = null;
