@@ -25,6 +25,7 @@ import util.SessionConfigurations;
 
 public class UI extends Application {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
+	private static final String VERSION_NUMBER = " V0.7";
 	// Main UI elements
 	
 	private Stage mainStage;
@@ -87,7 +88,7 @@ public class UI extends Application {
 	}
 
 	private void setupMainStage(Scene scene) {
-		mainStage.setTitle("HubTurbo");
+		mainStage.setTitle("HubTurbo " + VERSION_NUMBER);
 		mainStage.setMinWidth(800);
 		mainStage.setMinHeight(600);
 		mainStage.setScene(scene);
