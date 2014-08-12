@@ -37,6 +37,15 @@ import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
 
+/**
+ * Singleton class that provides access to the GitHub API services required by HubTurbo
+ * 
+ * Only data from a single repository can be loaded at any point of time. 
+ * The currently loaded repository is stored in the application's ServiceManager instance
+ * 
+ * Also holds a reference to the application's current Model instance, which stores the repository's 
+ * labels, milestones, assignees and issues.
+ * */
 public class ServiceManager {
 	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
 	public static final boolean isTestMode = false;
