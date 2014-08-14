@@ -5,11 +5,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
-import util.ConfigFileHandler;
-import util.LocalConfigurations;
-import util.ProjectConfigurations;
-import util.SessionConfigurations;
-
 public class DataManager {
 	private static final DataManager dataManagerInstance = new DataManager();
 	private ConfigFileHandler fileHandler;

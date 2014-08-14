@@ -13,9 +13,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
+import storage.ConfigFileHandler;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
-import util.ConfigFileHandler;
 
 public class MenuControl extends MenuBar {
 
