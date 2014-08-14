@@ -151,6 +151,7 @@ public class ConfigFileHandler {
 		File configFile = new File(fileName);
 		if (configFile.exists()) {
 			config = readConfigFile(fileName);
+			System.out.println("intial conf" + ProjectConfigurations.getStatusLabels());
 		} else {
 			config = createConfigFile(repoId, fileName);
 		}		

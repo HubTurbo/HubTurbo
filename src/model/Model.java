@@ -352,13 +352,17 @@ public class Model {
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
 		List<String> defaultStatuses = ProjectConfigurations.getStatusLabels();
-		List<String> projectLabels =
-				new ArrayList<String>(ghLabels.stream()
-				.map(label -> label.getName())
-				.collect(Collectors.toList()));
+		List<String> projectLabels = ghLabels.stream()
+											 .map(label -> label.getName())
+											 .collect(Collectors.toList());
 		
 		defaultStatuses.removeAll(projectLabels);
+
 		for (String standardStatus : defaultStatuses) {
+			if(standardStatus == null){
+				//Check is required because status labels array serialised from json file can contain null
+				continue;
+			}
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
 			if (ProjectConfigurations.isOpenStatusLabel(standardStatus)) {

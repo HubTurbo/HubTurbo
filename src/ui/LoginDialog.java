@@ -182,6 +182,8 @@ public class LoginDialog extends Dialog<Boolean> {
 			}
 		});
 		task.setOnFailed(wse -> {
+			Throwable thrown = task.getException();
+			logger.error(thrown.getLocalizedMessage(), thrown);
 			handleError("An error occurred: " + task.getException());
 		});
 		

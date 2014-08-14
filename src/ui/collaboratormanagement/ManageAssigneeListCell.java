@@ -3,6 +3,7 @@ package ui.collaboratormanagement;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -36,7 +37,11 @@ public class ManageAssigneeListCell extends ListCell<TurboUser> {
 	}
 	
 	private HBox createAssigneeItem(TurboUser user) {
-		ImageView avatar = new ImageView(user.getAvatar());
+		Image userImage = user.getAvatar();
+		ImageView avatar = new ImageView();
+		if(userImage != null){
+			avatar.setImage(userImage);
+		}
 		
 		Label assigneeHandle = new Label((user.getAlias()));
 		assigneeHandle.getStyleClass().add("display-box-padding");

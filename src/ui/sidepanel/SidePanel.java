@@ -286,7 +286,9 @@ public class SidePanel extends VBox {
 		});
 			
 		task.setOnFailed(wse -> {
-			StatusBar.displayMessage("An error occurred: " + task.getException());
+			Throwable err = task.getException();
+			logger.error(err.getLocalizedMessage(), err);
+			StatusBar.displayMessage("An error occurred: " + err);
 		});
 
 	}
