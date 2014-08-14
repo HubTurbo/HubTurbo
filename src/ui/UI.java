@@ -25,7 +25,7 @@ import ui.sidepanel.SidePanel;
 
 public class UI extends Application {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
-	private static final String VERSION_NUMBER = " V0.7";
+	private static final String VERSION_NUMBER = " V0.7.1";
 	// Main UI elements
 	
 	private Stage mainStage;

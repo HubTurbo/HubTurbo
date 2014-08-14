@@ -14,10 +14,9 @@ public class DataManager {
 	
 	protected DataManager(){
 		fileHandler = new ConfigFileHandler();
+		projConfigurations = new ProjectConfigurations();
 		sessionConfigurations = fileHandler.loadSessionConfig();
 		localConfigurations = fileHandler.loadLocalConfig();
-		projConfigurations = new ProjectConfigurations();
-		
 	}
 	
 	public static DataManager getInstance(){
