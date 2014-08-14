@@ -1,13 +1,11 @@
 package util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -30,6 +28,9 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryContents;
 
+import service.GitHubClientExtended;
+import service.ServiceManager;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -39,9 +40,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import service.ServiceManager;
-import service.GitHubClientExtended;
 
 public class ConfigFileHandler {
 
@@ -87,7 +85,7 @@ public class ConfigFileHandler {
 								})
 								.create();
 	
-	private static void saveProjectConfig(ProjectConfigurations config, IRepositoryIdProvider repoId) {
+	private void saveProjectConfig(ProjectConfigurations config, IRepositoryIdProvider repoId) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)), CHARSET);
 			gson.toJson(config, ProjectConfigurations.class, writer);
@@ -134,7 +132,7 @@ public class ConfigFileHandler {
 		return urlString;
 	}
 
-	public static ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
+	public ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
 		directorySetup();
 		ProjectConfigurations config = null;
 		String fileName = generateFileName(repoId);
@@ -151,14 +149,13 @@ public class ConfigFileHandler {
 		File configFile = new File(fileName);
 		if (configFile.exists()) {
 			config = readConfigFile(fileName);
-			System.out.println("intial conf" + ProjectConfigurations.getStatusLabels());
 		} else {
 			config = createConfigFile(repoId, fileName);
 		}		
 		return config;
 	}
 
-	private static ProjectConfigurations readConfigFile(String fileName) {
+	private ProjectConfigurations readConfigFile(String fileName) {
 		ProjectConfigurations config = null;
 		try {
 			Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
@@ -174,7 +171,7 @@ public class ConfigFileHandler {
 		return config;
 	}
 
-	private static ProjectConfigurations createConfigFile(IRepositoryIdProvider repoId, String fileName) {
+	private ProjectConfigurations createConfigFile(IRepositoryIdProvider repoId, String fileName) {
 		ProjectConfigurations config = null;
 		List<String> nonInheritedLabels = new ArrayList<String>();
 		nonInheritedLabels.add("status.");
@@ -194,19 +191,19 @@ public class ConfigFileHandler {
 		return config;
 	}
 
-	private static void directorySetup() {
+	private void directorySetup() {
 		File directory = new File(DIR_CONFIG_PROJECTS);
 		if (!directory.exists()) {
 			directory.mkdir();
 		}
 	}
 
-	private static String generateFileName(IRepositoryIdProvider repoId) {
+	private String generateFileName(IRepositoryIdProvider repoId) {
 		String fileName = DIR_CONFIG_PROJECTS + File.separator + determineConfigFileName(repoId, " ");
 		return fileName;
 	}
 
-	private static String determineConfigFileName(IRepositoryIdProvider repoId, String space_char) {
+	private String determineConfigFileName(IRepositoryIdProvider repoId, String space_char) {
 		String[] repoIdTokens = repoId.generateId().split("/");
 		String expectedFileName = repoIdTokens[0] + space_char + repoIdTokens[1] + ".json";
 		String configFileName = expectedFileName;
@@ -225,7 +222,7 @@ public class ConfigFileHandler {
 		return configFileName;
 	}
 
-	private static String generateFileURL(IRepositoryIdProvider repoId) {
+	private String generateFileURL(IRepositoryIdProvider repoId) {
 		String[] repoIdTokens = repoId.generateId().split(ADDRESS_SEPARATOR);
 		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
 										 + ADDRESS_SEPARATOR + repoIdTokens[1]
@@ -235,7 +232,7 @@ public class ConfigFileHandler {
 		return urlString;
 	}
 
-	private static boolean isValidURL(String stringURL) {
+	private boolean isValidURL(String stringURL) {
 		HttpURLConnection httpUrlConn;
 		try {
 			httpUrlConn = (HttpURLConnection) new URL(stringURL)
@@ -253,7 +250,7 @@ public class ConfigFileHandler {
 		}
 	}
 
-	private static void download(String stringURL, String destination) throws IOException {
+	private void download(String stringURL, String destination) throws IOException {
 		String downloadedFileName = stringURL.substring(stringURL.lastIndexOf(ADDRESS_SEPARATOR) + 1);
         Path inputPath = Paths.get(destination);
         
@@ -282,7 +279,7 @@ public class ConfigFileHandler {
 		}
 	}
 
-	public static void saveSessionConfig(SessionConfigurations config) {
+	public void saveSessionConfig(SessionConfigurations config) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_SESSION) , CHARSET);
 			gson.toJson(config, SessionConfigurations.class, writer);
@@ -296,7 +293,7 @@ public class ConfigFileHandler {
 		}
 	}
 	
-	public static SessionConfigurations loadSessionConfig() {
+	public SessionConfigurations loadSessionConfig() {
 		SessionConfigurations config = null;
 		File configFile = new File(FILE_CONFIG_SESSION);
 		if (configFile.exists()) {
@@ -322,7 +319,7 @@ public class ConfigFileHandler {
 		return config;
 	}
 
-	public static void saveLocalConfig(LocalConfigurations config) {
+	public void saveLocalConfig(LocalConfigurations config) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_LOCAL) , CHARSET);
 			gson.toJson(config, LocalConfigurations.class, writer);
@@ -336,7 +333,7 @@ public class ConfigFileHandler {
 		}
 	}
 	
-	public static LocalConfigurations loadLocalConfig() {
+	public LocalConfigurations loadLocalConfig() {
 		LocalConfigurations config = null;
 		File configFile = new File(FILE_CONFIG_LOCAL);
 		if (configFile.exists()) {

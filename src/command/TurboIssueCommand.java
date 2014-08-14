@@ -3,15 +3,16 @@ package command;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.application.Platform;
-import service.ServiceManager;
-import util.ProjectConfigurations;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import service.ServiceManager;
+import storage.DataManager;
 
 public abstract class TurboIssueCommand {
 	protected static final Logger logger = LogManager.getLogger(TurboIssueCommand.class.getName());
@@ -84,7 +85,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for(TurboLabel label : addedParent.getLabels()){
-			if(!ProjectConfigurations.isNonInheritedLabel(label.toGhName())){
+			if(!DataManager.getInstance().isNonInheritedLabel(label.toGhName())){
 				issue.addLabel(label);
 			}
 		}
@@ -97,7 +98,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for (TurboLabel label : removedParent.getLabels()) {
-			if(!ProjectConfigurations.isNonInheritedLabel(label.toGhName())){
+			if(!DataManager.getInstance().isNonInheritedLabel(label.toGhName())){
 				issue.removeLabel(label);
 			}
 		}

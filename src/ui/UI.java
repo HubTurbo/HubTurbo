@@ -2,9 +2,6 @@ package ui;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -17,11 +14,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import service.ServiceManager;
+import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
-import util.ConfigFileHandler;
-import util.SessionConfigurations;
 
 public class UI extends Application {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
@@ -32,9 +32,7 @@ public class UI extends Application {
 	private ColumnControl columns;
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
-	
-	private SessionConfigurations sessionConfig;
-	
+		
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -47,7 +45,6 @@ public class UI extends Application {
         });
 		
 		initCSS();
-		sessionConfig = ConfigFileHandler.loadSessionConfig();
 		mainStage = stage;
 		stage.setMaximized(true);
 		Scene scene = new Scene(createRoot());
@@ -96,7 +93,7 @@ public class UI extends Application {
 		mainStage.setOnCloseRequest(e -> {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
-			ConfigFileHandler.saveSessionConfig(sessionConfig);
+			DataManager.getInstance().saveSessionConfig();
 			Platform.exit();
 			System.exit(0);
 		});

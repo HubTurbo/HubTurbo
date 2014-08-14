@@ -7,7 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
-import util.SessionConfigurations;
+import storage.DataManager;
 
 public class RepositorySelector extends HBox{
 	final ComboBox<String> comboBox = new ComboBox<String>();
@@ -46,7 +46,7 @@ public class RepositorySelector extends HBox{
 	}
 	
 	private void loadComboBoxContents(){
-		List<String> items = SessionConfigurations.getLastViewedRepositories();
+		List<String> items = DataManager.getInstance().getLastViewedRepositories();
 		comboBox.getItems().addAll(items);
 	}
 	

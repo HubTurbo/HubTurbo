@@ -6,34 +6,37 @@ import java.util.List;
 
 public class ProjectConfigurations {
 	
-	private static List<String> nonInheritedLabels;
+	private List<String> nonInheritedLabels = new ArrayList<String>();
 	
-	private static List<String> openStatusLabels;
-	private static List<String> getOpenStatusLabels() {
+	private List<String> openStatusLabels = new ArrayList<String>();
+	private List<String> getOpenStatusLabels() {
 		return Collections.unmodifiableList(openStatusLabels);
 	}
 	
-	private static List<String> closedStatusLabels;
-	private static List<String> getClosedStatusLabels() {
+	private List<String> closedStatusLabels = new ArrayList<String>();
+	private List<String> getClosedStatusLabels() {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
 	
-	public static List<String> getStatusLabels() {
+	public List<String> getStatusLabels() {
 		List<String> statusLabels = new ArrayList<String>();
 		statusLabels.addAll(getOpenStatusLabels());
 		statusLabels.addAll(getClosedStatusLabels());
 		return statusLabels;
 	}
 	
-	ProjectConfigurations(List<String> nonInheritedLabels, 
-			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		ProjectConfigurations.nonInheritedLabels = nonInheritedLabels;
-		ProjectConfigurations.openStatusLabels = openStatusLabels;
-		ProjectConfigurations.closedStatusLabels = closedStatusLabels;
+	public ProjectConfigurations(){
+		
 	}
 	
-	public static boolean isNonInheritedLabel(String label) {
-		assert nonInheritedLabels != null;
+	public ProjectConfigurations(List<String> nonInheritedLabels, 
+			List<String> openStatusLabels, List<String> closedStatusLabels) {
+		this.nonInheritedLabels = nonInheritedLabels;
+		this.openStatusLabels = openStatusLabels;
+		this.closedStatusLabels = closedStatusLabels;
+	}
+	
+	public boolean isNonInheritedLabel(String label) {
 		for (String nonInherited : nonInheritedLabels) {
 			if (label.contains(nonInherited)) {
 				return true;
@@ -42,11 +45,11 @@ public class ProjectConfigurations {
 		return false;
 	}
 	
-	public static boolean isStatusLabel(String label){
+	public boolean isStatusLabel(String label){
 		return isOpenStatusLabel(label) || isClosedStatusLabel(label);
 	}
 
-	public static boolean isOpenStatusLabel(String label) {
+	public boolean isOpenStatusLabel(String label) {
 		assert openStatusLabels != null;
 		for (String openLabel : openStatusLabels) {
 			if (label.equalsIgnoreCase(openLabel)) {
@@ -56,7 +59,7 @@ public class ProjectConfigurations {
 		return false;
 	}
 
-	public static boolean isClosedStatusLabel(String label) {
+	public boolean isClosedStatusLabel(String label) {
 		assert closedStatusLabels != null;
 		for (String closedLabel : closedStatusLabels) {
 			if (label.equalsIgnoreCase(closedLabel)) {

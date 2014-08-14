@@ -28,9 +28,9 @@ import org.controlsfx.control.NotificationPane;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import service.ServiceManager;
+import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
-import util.SessionConfigurations;
 
 public class LoginDialog extends Dialog<Boolean> {
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
@@ -221,7 +221,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
 		if (currRepo != null) {
 			String repoId = currRepo.generateId();
-			SessionConfigurations.addToLastViewedRepositories(repoId);
+			DataManager.getInstance().addToLastViewedRepositories(repoId);
 		}
 		return loaded;
 	}

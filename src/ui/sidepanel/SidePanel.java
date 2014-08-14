@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
+import storage.DataManager;
 import ui.RepositorySelector;
 import ui.StatusBar;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
@@ -32,7 +33,6 @@ import ui.issuepanel.expanded.IssueDisplayPane;
 import ui.labelmanagement.LabelManagementComponent;
 import ui.milestonemanagement.MilestoneManagementComponent;
 import util.DialogMessage;
-import util.SessionConfigurations;
 
 public class SidePanel extends VBox {
 	private static final Logger logger = LogManager.getLogger(SidePanel.class.getName());
@@ -253,7 +253,7 @@ public class SidePanel extends VBox {
 		}
 		
 		columns.saveSession();
-		SessionConfigurations.addToLastViewedRepositories(repoId.generateId());
+		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {

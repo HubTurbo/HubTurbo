@@ -9,12 +9,14 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
+import storage.DataManager;
 import ui.StatusBar;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
-import util.SessionConfigurations;
+
 import command.TurboCommandExecutor;
+
 import filter.FilterExpression;
 
 
@@ -45,7 +47,7 @@ public class ColumnControl extends HBox {
 	public void resumeColumns() {
 		getChildren().clear();
 		
-		List<String> filters = SessionConfigurations.getFiltersFromPreviousSession(model.getRepoId());
+		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
 				addColumn(false).filterByString(filter);
@@ -133,7 +135,7 @@ public class ColumnControl extends HBox {
 			String filter = ((Column) child).getCurrentFilterExpression().toString();
 			sessionFilters.add(filter);
 		});
-		SessionConfigurations.setFiltersForNextSession(model.getRepoId(), sessionFilters);
+		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {

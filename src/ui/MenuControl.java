@@ -1,7 +1,5 @@
 package ui;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;

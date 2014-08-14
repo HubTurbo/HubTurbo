@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;
 
-import util.LocalConfigurations;
+import storage.DataManager;
 
 public class TurboUser implements Listable {
 	
@@ -13,9 +13,7 @@ public class TurboUser implements Listable {
 	 */
 	
 	public String getAlias() {
-		// By the time this is first called, the local configuration file should have been loaded
-		assert LocalConfigurations.getInstance() != null;
-		String name = LocalConfigurations.getInstance().getUserAliases().get(getGithubName());
+		String name = DataManager.getInstance().getUserAliases().get(getGithubName());
 		return name == null ? getGithubName() : name;
 	}
 	

@@ -22,8 +22,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 
 import service.ServiceManager;
-import util.LocalConfigurations;
-import util.ProjectConfigurations;
+import storage.DataManager;
 
 
 public class TurboIssue implements Listable {
@@ -49,7 +48,7 @@ public class TurboIssue implements Listable {
 	
 	private String creator;
 	public String getCreator() {
-		String name = LocalConfigurations.getInstance().getUserAliases().get(creator);
+		String name = DataManager.getInstance().getUserAliases().get(creator);
 		if (name == null) {
 			name = creator;
 		}
@@ -243,7 +242,7 @@ public class TurboIssue implements Listable {
 	public boolean hasStatusLabel(){
 		for(TurboLabel label : labels){
 			String ghName = label.toGhName();
-			if(ProjectConfigurations.isStatusLabel(ghName)){
+			if(DataManager.getInstance().isStatusLabel(ghName)){
 				return true;
 			}
 		}
@@ -252,7 +251,7 @@ public class TurboIssue implements Listable {
 	
 	public TurboLabel getStatusLabel(){
 		List<TurboLabel> statusLabel = labels.stream()
-				.filter(l -> (ProjectConfigurations.isStatusLabel(l.toGhName())))
+				.filter(l -> (DataManager.getInstance().isStatusLabel(l.toGhName())))
 				.collect(Collectors.toList());
 		if(!statusLabel.isEmpty()){
 			return statusLabel.get(0);
@@ -263,7 +262,7 @@ public class TurboIssue implements Listable {
 	
 	public List<TurboLabel> getNonStatusLabel(){
 		return labels.stream()
-				.filter(l -> (!ProjectConfigurations.isStatusLabel(l.toGhName())))
+				.filter(l -> (!DataManager.getInstance().isStatusLabel(l.toGhName())))
 				.collect(Collectors.toList());
 	}
 	
@@ -278,9 +277,9 @@ public class TurboIssue implements Listable {
 		if(label.isExclusive()){
 			removeLabelsWithGroup(label.getGroup());
 		}
-		if (ProjectConfigurations.isClosedStatusLabel(label.toGhName())) {
+		if (DataManager.getInstance().isClosedStatusLabel(label.toGhName())) {
 			this.setOpen(false);
-		}else if(ProjectConfigurations.isOpenStatusLabel(label.toGhName())){
+		}else if(DataManager.getInstance().isOpenStatusLabel(label.toGhName())){
 			this.setOpen(true);
 		}
 		addToLabels(label);
@@ -307,7 +306,7 @@ public class TurboIssue implements Listable {
 		if(!labels.remove(label)){
 			return;
 		}
-		if (ProjectConfigurations.isClosedStatusLabel(label.toGhName())) {
+		if (DataManager.getInstance().isClosedStatusLabel(label.toGhName())) {
 			//Default status of the issue is open
 			this.setOpen(true);
 		}

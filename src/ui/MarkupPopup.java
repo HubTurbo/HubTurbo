@@ -3,16 +3,11 @@ package ui;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import service.ServiceManager;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -20,6 +15,11 @@ import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import service.ServiceManager;
 
 public class MarkupPopup extends Stage{	
 	private static final Logger logger = LogManager.getLogger(MarkupPopup.class.getName());
@@ -38,7 +38,6 @@ public class MarkupPopup extends Stage{
 	private WebView markupDisplay;
 	private VBox editableDisplayView;
 	private HTMLEditor editableDisplay;
-	private ToggleButton modeButton;
 	private VBox container;
 	private Runnable editModeCompletion;
 	private Button completionButton;

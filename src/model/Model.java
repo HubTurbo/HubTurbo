@@ -28,10 +28,9 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
+import storage.DataManager;
 import util.CollectionUtilities;
-import util.ConfigFileHandler;
 import util.DialogMessage;
-import util.ProjectConfigurations;
 
 
 public class Model {
@@ -87,7 +86,7 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources){
 		this.repoId = repoId;
-		ConfigFileHandler.loadProjectConfig(getRepoId());
+		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
 		loadLabels((List<Label>) ghResources.get(ServiceManager.KEY_LABELS));
@@ -337,8 +336,9 @@ public class Model {
 	}
 
 	private boolean isInconsistent(String state, String ghLabelName) {
-		return ((ProjectConfigurations.isOpenStatusLabel(ghLabelName) && state.equals(STATE_CLOSED)) ||
-				(ProjectConfigurations.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
+		DataManager dataManager = DataManager.getInstance();
+		return ((dataManager.isOpenStatusLabel(ghLabelName) && state.equals(STATE_CLOSED)) ||
+				(dataManager.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
 	}
 
 	public void loadLabels(List<Label> ghLabels){
@@ -351,7 +351,8 @@ public class Model {
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
-		List<String> defaultStatuses = ProjectConfigurations.getStatusLabels();
+		DataManager dataManager = DataManager.getInstance();
+		List<String> defaultStatuses = dataManager.getStatusLabels();
 		List<String> projectLabels = ghLabels.stream()
 											 .map(label -> label.getName())
 											 .collect(Collectors.toList());
@@ -365,7 +366,7 @@ public class Model {
 			}
 			Label statusLabel = new Label();
 			statusLabel.setName(standardStatus);
-			if (ProjectConfigurations.isOpenStatusLabel(standardStatus)) {
+			if (dataManager.isOpenStatusLabel(standardStatus)) {
 				statusLabel.setColor("009800");
 			} else {
 				statusLabel.setColor("0052cc");
