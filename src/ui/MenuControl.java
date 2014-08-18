@@ -49,7 +49,7 @@ public class MenuControl extends MenuBar {
 			columns.createNewSearchPanelAtStart();
 			columnsScroll.setHvalue(columnsScroll.getHmin());
 		});
-		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
 		MenuItem createRight = new MenuItem("Create Column");
 		createRight.setOnAction(e -> {
@@ -74,7 +74,7 @@ public class MenuControl extends MenuBar {
 			};
 			columns.widthProperty().addListener(listener);
 		});
-		createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
+		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
 		MenuItem closeColumn = new MenuItem("Close Column");
 		closeColumn.setOnAction(e -> columns.closeCurrentColumn());
