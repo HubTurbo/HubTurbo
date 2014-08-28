@@ -4,7 +4,7 @@
 
 **Development environment**
 
-- JDK 1.8
+- JDK 1.8u20 or later
 - Eclipse Kepler/Luna
 
 ## Filter Expressions
