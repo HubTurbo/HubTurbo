@@ -71,6 +71,10 @@ public class MarkupPopup extends Stage{
 		}
 	}
 	
+	public void loadURL(String url){
+		markupDisplay.getEngine().load(url);
+	}
+	
 	public void setDisplayedText(String markup){
 		loadContentForWebView(markup);
 		editableDisplay.setHtmlText(markup);

@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryContents;
 
-import service.GitHubClientExtended;
 import service.ServiceManager;
 
 import com.google.gson.Gson;
@@ -51,10 +50,8 @@ public class ConfigFileHandler {
 	
 	private static final String ADDRESS_SEPARATOR = "/";
 	private static final String URL_SPACE = "%20";
-	private static final String HUBTURBO_STRING = "HubTurbo";
 	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
 	private static final String DEFAULT_BRANCH = "master";
-	private static final String DOCUMENTATION_FILE = "readme.md";
 	
 	private static final int BUFFER_SIZE = 1024;
 	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
@@ -99,38 +96,30 @@ public class ConfigFileHandler {
 		}
 	}
 
-	public String getDocumentation() {
-		String contents = "";
-		String url = generateDocumentationURL();
-		if (isValidURL(url)) {
-			try {
-				GitHubClientExtended ghClient = new GitHubClientExtended();
-				contents = ghClient.getHTMLResponseFromURLRequest(url);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		} 
-		return contents;
-	}
+//	public String getDocumentation() {
+//		String contents = "";
+//		String url = generateDocumentationURL();
+//		if (isValidURL(url)) {
+//			try {
+//				GitHubClientExtended ghClient = new GitHubClientExtended();
+//				contents = ghClient.getHTMLResponseFromURLRequest(url);
+//			} catch (IOException e) {
+//				logger.error(e.getLocalizedMessage(), e);
+//			}
+//		} 
+//		return contents;
+//	}
 
-    public String getDocumentationMarkup() {
-    	String contents = getDocumentation();
-    	String documentationMarkup = contents;
-    	try {
-        	documentationMarkup = ServiceManager.getInstance().getContentMarkup(contents);
-    	} catch(IOException e) {
-    		logger.error(e.getLocalizedMessage(), e);
-    	}
-    	return documentationMarkup;
-    }
-
-	private static String generateDocumentationURL() {
-		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + HUBTURBO_STRING 
-										 + ADDRESS_SEPARATOR + HUBTURBO_STRING
-										 + ADDRESS_SEPARATOR + DEFAULT_BRANCH
-										 + ADDRESS_SEPARATOR + DOCUMENTATION_FILE; 
-		return urlString;
-	}
+//    public String getDocumentationMarkup() {
+//    	String contents = getDocumentation();
+//    	String documentationMarkup = contents;
+//    	try {
+//        	documentationMarkup = ServiceManager.getInstance().getContentMarkup(contents);
+//    	} catch(IOException e) {
+//    		logger.error(e.getLocalizedMessage(), e);
+//    	}
+//    	return documentationMarkup;
+//    }
 
 	public ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
 		directorySetup();

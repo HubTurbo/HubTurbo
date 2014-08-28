@@ -13,12 +13,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
-import storage.ConfigFileHandler;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
 
 public class MenuControl extends MenuBar {
-
+	private static final String USER_DOC_URL = "https://github.com/HubTurbo/HubTurbo/wiki";
 	private final ColumnControl columns;
 	private final SidePanel sidePanel;
 	private final ScrollPane columnsScroll;
@@ -96,8 +95,7 @@ public class MenuControl extends MenuBar {
 	
 	private MarkupPopup createDescPopup(){
 		MarkupPopup popup = new MarkupPopup("Done");
-		ConfigFileHandler handler = new ConfigFileHandler();
-		popup.setDisplayedText(handler.getDocumentationMarkup());
+		popup.loadURL(USER_DOC_URL);
 		return popup;
 	}
 

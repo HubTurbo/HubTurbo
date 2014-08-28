@@ -153,7 +153,6 @@ public class ServiceManager {
 		return githubClient.getUser();
 	}
 	
-	
 	public boolean setupRepository(String owner, String name) throws IOException{
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
