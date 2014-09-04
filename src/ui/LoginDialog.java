@@ -72,13 +72,13 @@ public class LoginDialog extends Dialog<Boolean> {
 		Label repoNameLabel = new Label("Repository:");
 		grid.add(repoNameLabel, 0, 0);
 
-		repoOwnerField = new TextField("HubTurbo");
+		repoOwnerField = new TextField("Owner");
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
-		repoNameField = new TextField("HubTurbo");
+		repoNameField = new TextField("RepoName");
 		grid.add(repoNameField, 3, 0);
 
 		Label usernameLabel = new Label("Username:");
