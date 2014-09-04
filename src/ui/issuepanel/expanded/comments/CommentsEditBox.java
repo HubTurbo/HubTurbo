@@ -33,6 +33,7 @@ public class CommentsEditBox extends VBox{
 	private TurboComment editedComment;
 	
 	protected String commentButtonText = "Comment";
+	private Runnable refreshDisplayMethod;
 	
 	public CommentsEditBox(IssueDetailsContentHandler handler){
 		this.commentHandler = handler;
@@ -41,9 +42,10 @@ public class CommentsEditBox extends VBox{
 		setupKeyboardShortcuts();
 	}
 	
-	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment){
+	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, Runnable refreshMethod){
 		this.commentHandler = handler;
 		this.editedComment = editedComment;
+		this.refreshDisplayMethod = refreshMethod;
 		if(editedComment != null){
 			initialText = editedComment.getBody();
 		}
@@ -51,8 +53,8 @@ public class CommentsEditBox extends VBox{
 		setupKeyboardShortcuts();
 	}
 	
-	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, String commentBtnTxt){
-		this(handler, editedComment);
+	public CommentsEditBox(IssueDetailsContentHandler handler, TurboComment editedComment, String commentBtnTxt, Runnable refreshMethod){
+		this(handler, editedComment, refreshMethod);
 		this.commentButtonText = commentBtnTxt;
 	}
 	
@@ -145,6 +147,9 @@ public class CommentsEditBox extends VBox{
 		boolean editRes = commentHandler.editComment(editedComment);
 		if(editRes){
 			commentHandler.setCommentEditStateFalse(editedComment);
+			if(refreshDisplayMethod != null){
+				refreshDisplayMethod.run();
+			}
 		}
 	}
 	

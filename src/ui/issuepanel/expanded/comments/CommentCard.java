@@ -95,7 +95,10 @@ public class CommentCard extends IssueDetailsCard{
 	
 	
 	private void initialiseEditableCommentsText(){
-		commentEditField = new CommentsEditBox(handler, editedComment, "Update");
+		Runnable refreshDisplay = ()->{
+			loadCommentsDisplay();
+		};
+		commentEditField = new CommentsEditBox(handler, editedComment, "Update", refreshDisplay);
 	}
 	
 	private HBox createControlsBox(){
