@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
 import com.google.gson.Gson;
@@ -47,14 +48,49 @@ public class GitHubEventsResponse {
 
 				switch (event.getType()) {
 				case Renamed:
+					// two string keys: from, to
 					parameters = (Map<String, String>) eventsWithParameters[i].get("rename");
 					for (String key : parameters.keySet()) {
 						String x = parameters.get(key);
 						event.getProperties().put(key, x);
 					}
 				    break;
+				case Milestoned:
+				case Demilestoned:
+					// one string key: title
+					parameters = (Map<String, String>) eventsWithParameters[i].get("milestone");
+					for (String key : parameters.keySet()) {
+						String x = parameters.get(key);
+						event.getProperties().put(key, x);
+					}
+				    break;
+				case Labeled:
+				case Unlabeled:
+					// two string keys: name, color (hex, without #)
+					parameters = (Map<String, String>) eventsWithParameters[i].get("label");
+					for (String key : parameters.keySet()) {
+						String x = parameters.get(key);
+						event.getProperties().put(key, x);
+					}
+				    break;
+				case Assigned:
+				case Unassigned:
+					User assignee = (User) eventsWithParameters[i].get("assignee");
+					break;
+				case Closed:
+				case Reopened:
+				case Locked:
+				case Unlocked:
+					// No need to do anything
+					break;
+				case Subscribed:
+				case Merged:
+				case HeadRefDeleted:
+				case HeadRefRestored:
+				case Referenced:
+				case Mentioned:
 				default:
-					// No action to be taken, or not yet implemented
+					// Not yet implemented, or no events triggered
 				}
 				turboIssueEvents.add(event);
 			}
