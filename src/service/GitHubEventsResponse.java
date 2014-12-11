@@ -44,38 +44,31 @@ public class GitHubEventsResponse {
 
 			Map<String, String> parameters;
 			for (int i=0; i<issueEvents.length; i++) {
-				TurboIssueEvent event = new TurboIssueEvent(IssueEventType.fromString(issueEvents[i].getEvent()));
+				TurboIssueEvent event = new TurboIssueEvent(issueEvents[i].getActor(), IssueEventType.fromString(issueEvents[i].getEvent()));
 
 				switch (event.getType()) {
 				case Renamed:
 					// two string keys: from, to
 					parameters = (Map<String, String>) eventsWithParameters[i].get("rename");
-					for (String key : parameters.keySet()) {
-						String x = parameters.get(key);
-						event.getProperties().put(key, x);
-					}
+					event.setRenamedFrom(parameters.get("from"));
+					event.setRenamedTo(parameters.get("to"));
 				    break;
 				case Milestoned:
 				case Demilestoned:
 					// one string key: title
 					parameters = (Map<String, String>) eventsWithParameters[i].get("milestone");
-					for (String key : parameters.keySet()) {
-						String x = parameters.get(key);
-						event.getProperties().put(key, x);
-					}
+					event.setMilestoneTitle(parameters.get("title"));
 				    break;
 				case Labeled:
 				case Unlabeled:
 					// two string keys: name, color (hex, without #)
 					parameters = (Map<String, String>) eventsWithParameters[i].get("label");
-					for (String key : parameters.keySet()) {
-						String x = parameters.get(key);
-						event.getProperties().put(key, x);
-					}
+					event.setLabelColour(parameters.get("color"));
+					event.setLabelName(parameters.get("name"));
 				    break;
 				case Assigned:
 				case Unassigned:
-					User assignee = (User) eventsWithParameters[i].get("assignee");
+					event.setAssignedUser((User) eventsWithParameters[i].get("assignee"));
 					break;
 				case Closed:
 				case Reopened:
