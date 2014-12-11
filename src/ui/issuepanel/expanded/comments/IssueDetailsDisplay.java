@@ -22,13 +22,10 @@ public class IssueDetailsDisplay extends VBox {
 //	private TabPane detailsTab;
 	
 	private IssueDetailsContentHandler contentHandler;
-	
 	private TurboIssue issue;
-	
 	private int loadFailCount = 0;
 	
 	DetailsPanel commentsDisplay;
-	
 	Thread backgroundThread;
 	
 	public IssueDetailsDisplay(TurboIssue issue){

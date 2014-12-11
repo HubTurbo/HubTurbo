@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.Repository;
@@ -391,6 +392,38 @@ public class ServiceManager {
 		}
 	}
 	
+	/**
+	 * Gets events for a issue from GitHub, or returns
+	 * a cached version if already present.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Comment> getEvents(int issueId) throws IOException{
+		if(repoId != null){
+			ArrayList<IssueEvent> events = issueService.getIssueEvents(repoId, issueId);
+			
+			int a = 1;
+			
+			List<Comment> comments = issueService.getComments(repoId, issueId);
+			List<Comment> list =  comments.stream()
+						   				  .map(c -> {
+						   					  			c.setBodyHtml(getMarkupForComment(c));
+						   					  			return c;})
+						   				  .collect(Collectors.toList());
+			model.cacheCommentsListForIssue(list, issueId);
+			return list;
+		}
+		return new ArrayList<Comment>();
+	}
+	
+	/**
+	 * Gets comments for a issue from GitHub, or returns
+	 * a cached version if already present.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
 	public List<Comment> getComments(int issueId) throws IOException{
 		if(repoId != null){
 			List<Comment> cached = model.getCommentsListForIssue(issueId);
@@ -403,7 +436,13 @@ public class ServiceManager {
 		return new ArrayList<Comment>();
 	}
 	
-	public List<Comment> getLatestComments(int issueId) throws IOException{
+	/**
+	 * Gets comments from an issue from GitHub and updates the cache.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
+	private List<Comment> getLatestComments(int issueId) throws IOException{
 		if(repoId != null){
 			List<Comment> comments = issueService.getComments(repoId, issueId);
 			List<Comment> list =  comments.stream()

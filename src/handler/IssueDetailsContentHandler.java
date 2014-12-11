@@ -44,13 +44,31 @@ public class IssueDetailsContentHandler {
 		this.issue = issue;
 	}
 	
+	/**
+	 * Synchronously gets HTML markup for all comments associated with an issue.
+	 * Caches in memory when possible.
+	 * 
+	 * Also sets up a polling service to update that issue's comments, and the UI
+	 * listeners necessary to trigger changes upon the comments being updated.
+	 */
+	private void setupContent() {
+		getDetailsContent();
+		setupContentUpdater();
+		setupCommentsChangeListener();
+	}
+	
 	private boolean isNotSetup(){
 		return commentsUpdater == null || commentsChangeListener == null;
 	}
-	
+
 	private void getDetailsContent(){
 		try {
+			// Get comments from GitHub
 			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
+			// Get events
+			List<Comment> events = ServiceManager.getInstance().getEvents(issue.getId());
+			
+			// Update UI
 			setGithubCommentsList(allItems);
 			updateData();
 		} catch (SocketTimeoutException | UnknownHostException e){
@@ -62,20 +80,13 @@ public class IssueDetailsContentHandler {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
-	
+
 	private void setGithubCommentsList(List<Comment> allItems){
 		//Reuse allGhContent instance to ensure that all observers get change signals
 		allGhContent.clear();
 		allGhContent.addAll(allItems);
 	}
-	
-	private void setupContent(){
-		//Computationally intensive as list of all comments and their html markup will be retrieved from github
-		getDetailsContent();
-		setupContentUpdater();
-		setupCommentsChangeListener();
-	}
-	
+
 	private void setupCommentsChangeListener(){
 		WeakReference<IssueDetailsContentHandler> selfRef = new WeakReference<>(this);
 		commentsChangeListener = new ListChangeListener<Comment>(){
@@ -107,7 +118,7 @@ public class IssueDetailsContentHandler {
 	
 	/**
 	 * Content Update Methods
-	 * */
+	 **/
 	
 	public void startContentUpdate(){
 		if(isNotSetup()){
@@ -132,7 +143,6 @@ public class IssueDetailsContentHandler {
 	private void updateData(){
 		updateCommentsList();
 		updateLogContents();
-
 	}
 	
 	private void updateLogContents(){
@@ -176,7 +186,7 @@ public class IssueDetailsContentHandler {
 	
 	/**
 	 * Methods to create/edit/delete comment
-	 * */
+	 **/
 	
 	public boolean createComment(String text){
 		try {
