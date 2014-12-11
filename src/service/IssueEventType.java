@@ -1,7 +1,6 @@
 package service;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import util.Utility;
 
 public enum IssueEventType {
 	Closed,
@@ -23,13 +22,6 @@ public enum IssueEventType {
 	HeadRefRestored;
 	
 	public static IssueEventType fromString(String str) {
-        Pattern p = Pattern.compile("(^|_)([a-z])" );
-        Matcher m = p.matcher(str);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            m.appendReplacement(sb, m.group(2).toUpperCase());
-        }
-        m.appendTail(sb);
-        return IssueEventType.valueOf(sb.toString());
+        return IssueEventType.valueOf(Utility.snakeCaseToCamelCase(str));
 	}
 }
