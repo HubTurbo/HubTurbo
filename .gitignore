@@ -4,3 +4,6 @@ credentials.txt
 SessionConfig.json
 session-config.json
 local-config.json
+hubturbo-log.log
+.hubturboconfig
+
