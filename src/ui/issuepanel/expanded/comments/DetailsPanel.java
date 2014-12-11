@@ -3,6 +3,7 @@ package ui.issuepanel.expanded.comments;
 import handler.IssueDetailsContentHandler;
 
 import java.lang.ref.WeakReference;
+import java.util.Comparator;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -35,7 +36,6 @@ public class DetailsPanel extends VBox {
 	private TurboIssue issue;
 			
 	private ObservableList<CommentListItem> commentsList;
-//	private ObservableList<TurboIssueEvent> eventsList;
 	private ChangeListener<Boolean> expandedChangeListener;
 	
 	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler){
@@ -59,7 +59,11 @@ public class DetailsPanel extends VBox {
 		commentsList.clear();
 		commentsList.addAll(handler.getComments());
 		commentsList.addAll(handler.getEvents());
-		// TODO sort according to time
+		FXCollections.sort(commentsList, new Comparator<CommentListItem>() {
+			public int compare(CommentListItem u1, CommentListItem u2) {
+				return u1.getDate().compareTo(u2.getDate());
+			}
+		});
 	}
 
 	private void loadDisplayElements(){

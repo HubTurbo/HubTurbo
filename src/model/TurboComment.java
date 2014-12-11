@@ -159,4 +159,8 @@ public class TurboComment implements CommentListItem {
 		Long idObj = new Long(id);
 		return idObj.hashCode();
 	}
+	
+	public Date getDate() {
+		return getCreatedAt();
+	}
 }

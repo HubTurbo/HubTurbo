@@ -44,7 +44,10 @@ public class GitHubEventsResponse {
 
 			Map<String, String> parameters;
 			for (int i=0; i<issueEvents.length; i++) {
-				TurboIssueEvent event = new TurboIssueEvent(issueEvents[i].getActor(), IssueEventType.fromString(issueEvents[i].getEvent()));
+				TurboIssueEvent event = new TurboIssueEvent(
+						issueEvents[i].getActor(),
+						IssueEventType.fromString(issueEvents[i].getEvent()),
+						issueEvents[i].getCreatedAt());
 
 				switch (event.getType()) {
 				case Renamed:

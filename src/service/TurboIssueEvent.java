@@ -1,5 +1,7 @@
 package service;
 
+import java.util.Date;
+
 import org.eclipse.egit.github.core.User;
 
 import ui.issuepanel.expanded.comments.CommentListItem;
@@ -8,6 +10,7 @@ import ui.issuepanel.expanded.comments.CommentListItem;
  * Models an event that could happen to an issue.
  */
 public class TurboIssueEvent implements CommentListItem {
+	private Date date;
 	private IssueEventType type;
 	private User actor;
 	private String labelName, labelColour;
@@ -15,9 +18,10 @@ public class TurboIssueEvent implements CommentListItem {
 	private String renamedFrom, renamedTo;
 	private User assignedUser;
 
-	public TurboIssueEvent(User actor, IssueEventType type) {
+	public TurboIssueEvent(User actor, IssueEventType type, Date date) {
 		this.type = type;
 		this.actor = actor;
+		this.date = date;
 	}
 	public IssueEventType getType() {
 		return type;
@@ -25,8 +29,8 @@ public class TurboIssueEvent implements CommentListItem {
 	public User getActor() {
 		return actor;
 	}
-	public void setActor(User actor) {
-		this.actor = actor;
+	public Date getDate() {
+		return date;
 	}
 	
 	public String getLabelName() {

@@ -14,6 +14,6 @@ public class IssueEventsCard extends VBox{
 	}
 	
 	private void initialiseUIComponents() {
-		getChildren().add(new Label(event.getActor().getLogin()));
+		getChildren().add(new Label(event.getActor().getLogin() + " " + event.getDate()));
 	}
 }
