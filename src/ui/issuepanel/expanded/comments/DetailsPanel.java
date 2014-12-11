@@ -1,8 +1,9 @@
 package ui.issuepanel.expanded.comments;
 
+import handler.IssueDetailsContentHandler;
+
 import java.lang.ref.WeakReference;
 
-import handler.IssueDetailsContentHandler;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import model.TurboComment;
 import model.TurboIssue;
+import service.TurboIssueEvent;
 
 public class DetailsPanel extends VBox {
 	protected static final int LIST_MAX_HEIGHT = 1000;
@@ -32,37 +34,41 @@ public class DetailsPanel extends VBox {
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
 			
-	private ObservableList<TurboComment> detailsList;
+	private ObservableList<TurboComment> commentsList;
+	private ObservableList<TurboIssueEvent> eventsList;
 	private ChangeListener<Boolean> expandedChangeListener;
 	
 	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
 		this.listView = new ListView<TurboComment>();
 		this.handler = handler;
-		detailsList = handler.getComments();
+		commentsList = handler.getComments();
+		eventsList = handler.getEvents();
 		setupLayout();
 		loadDisplayElements();
 	}
 	
 	private void loadDisplayElements(){
-		setupDetailsDisplay();
+		displayArea = createDetailsDisplayArea();
 		getChildren().add(displayArea);
 		TitledPane cBox = createNewCommentsBox();
 		getChildren().add(cBox);
 	}
 	
-	private void setupDetailsDisplay(){
-		displayArea = new StackPane();
+	private StackPane createDetailsDisplayArea(){
+		StackPane displayArea = new StackPane();
 		displayArea.setPrefHeight(LIST_MAX_HEIGHT);
-		setupListItems();
+		listView = setupListItems();
 		displayArea.getChildren().add(listView);
+		return displayArea;
 	}
 	
-	private void setupListItems(){
-		listView = new ListView<TurboComment>();
+	private ListView<TurboComment> setupListItems(){
+		ListView<TurboComment> listView = new ListView<TurboComment>();
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
 		listView.setCellFactory(commentCellFactory());
-		listView.setItems(detailsList);
+		listView.setItems(commentsList);
+		return listView;
 	}
 	
 	protected void addItemToDisplay(Node child){
@@ -80,7 +86,7 @@ public class DetailsPanel extends VBox {
 	
 	protected void scrollToBottom(){
 		if(!listView.getItems().isEmpty()){
-			listView.scrollTo(detailsList.size() - 1);
+			listView.scrollTo(commentsList.size() - 1);
 		}
 	}
 	

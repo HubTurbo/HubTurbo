@@ -398,20 +398,11 @@ public class ServiceManager {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Comment> getEvents(int issueId) throws IOException{
+	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException{
 		if(repoId != null){
-			GitHubEventsResponse events = issueService.getIssueEvents(repoId, issueId);
-
-			List<Comment> comments = issueService.getComments(repoId, issueId);
-			List<Comment> list =  comments.stream()
-						   				  .map(c -> {
-						   					  			c.setBodyHtml(getMarkupForComment(c));
-						   					  			return c;})
-						   				  .collect(Collectors.toList());
-			model.cacheCommentsListForIssue(list, issueId);
-			return list;
+			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
 		}
-		return new ArrayList<Comment>();
+		return new ArrayList<>();
 	}
 	
 	/**
