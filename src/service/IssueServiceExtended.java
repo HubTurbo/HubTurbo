@@ -6,8 +6,6 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -145,7 +143,7 @@ public class IssueServiceExtended extends IssueService{
 	 * @return list of issue events
 	 * @throws IOException
 	 */
-	public ArrayList<IssueEvent> getIssueEvents(IRepositoryIdProvider repository, int issueId) throws IOException {
+	public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId) throws IOException {
 		GitHubRequest request = createRequest();
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(repository.generateId());
@@ -154,7 +152,7 @@ public class IssueServiceExtended extends IssueService{
 		uri.append(SEGMENT_EVENTS);
 		request.setUri(uri);
 		request.setType(IssueEvent[].class);
-		GitHubEventResponse response = ghClient.getEvent(request);
-		return new ArrayList<IssueEvent>(Arrays.asList((IssueEvent[]) response.getResponse().getBody()));
+		GitHubEventsResponse response = ghClient.getEvent(request);
+		return response;
 	}
 }

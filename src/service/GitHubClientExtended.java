@@ -1,6 +1,8 @@
 package service;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +13,8 @@ import java.net.URL;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
+
+import util.IOUtilities;
 
 public class GitHubClientExtended extends GitHubClient{
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
@@ -127,7 +131,7 @@ public class GitHubClientExtended extends GitHubClient{
 	 * @return response
 	 * @throws IOException
 	 */
-	public GitHubEventResponse getEvent(GitHubRequest request) throws IOException {
+	public GitHubEventsResponse getEvent(GitHubRequest request) throws IOException {
 		HttpURLConnection httpRequest = createGet(request.generateUri());
 		String accept = request.getResponseContentType();
 		if (accept != null)
@@ -135,12 +139,22 @@ public class GitHubClientExtended extends GitHubClient{
 		final int code = httpRequest.getResponseCode();
 		updateRateLimits(httpRequest);
 		if (isOk(code)) {
-			GitHubResponse ghResponse = new GitHubResponse(httpRequest, getBody(request, getStream(httpRequest)));
-			return new GitHubEventResponse(ghResponse, getStream(httpRequest));
+			
+			// Copy the httpRequest input stream into a byte array
+			InputStream reqIS = getStream(httpRequest);
+			ByteArrayOutputStream buffer = IOUtilities.inputStreamToByteArrayOutputStream(reqIS);
+			InputStream reqIS2 = new ByteArrayInputStream(buffer.toByteArray());
+			InputStream reqIS3 = new ByteArrayInputStream(buffer.toByteArray());
+			
+			// The first copy is used to produce the GitHubResponse
+			GitHubResponse ghResponse = new GitHubResponse(httpRequest, getBody(request, reqIS2));
+			
+			// The second is parsed again for event-specific information
+			return new GitHubEventsResponse(ghResponse, reqIS3);
 		}
 		else if (isEmpty(code)) {
 			GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
-			return new GitHubEventResponse(ghResponse, null);
+			return new GitHubEventsResponse(ghResponse, null);
 		} else {
 			throw createException(getStream(httpRequest), code, httpRequest.getResponseMessage());
 		}

@@ -18,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.Repository;
@@ -401,10 +400,8 @@ public class ServiceManager {
 	 */
 	public List<Comment> getEvents(int issueId) throws IOException{
 		if(repoId != null){
-			ArrayList<IssueEvent> events = issueService.getIssueEvents(repoId, issueId);
-			
-			int a = 1;
-			
+			GitHubEventsResponse events = issueService.getIssueEvents(repoId, issueId);
+						
 			List<Comment> comments = issueService.getComments(repoId, issueId);
 			List<Comment> list =  comments.stream()
 						   				  .map(c -> {
