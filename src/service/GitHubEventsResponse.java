@@ -92,8 +92,7 @@ public class GitHubEventsResponse {
 		}
 	}
 
-	public GitHubResponse getResponse() {
-		return response;
+	public ArrayList<TurboIssueEvent> getTurboIssueEvents() {
+		return turboIssueEvents;
 	}
-
 }

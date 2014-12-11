@@ -401,7 +401,7 @@ public class ServiceManager {
 	public List<Comment> getEvents(int issueId) throws IOException{
 		if(repoId != null){
 			GitHubEventsResponse events = issueService.getIssueEvents(repoId, issueId);
-						
+
 			List<Comment> comments = issueService.getComments(repoId, issueId);
 			List<Comment> list =  comments.stream()
 						   				  .map(c -> {
