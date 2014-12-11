@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -17,9 +19,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import model.TurboComment;
 import model.TurboIssue;
-import service.TurboIssueEvent;
 
 public class DetailsPanel extends VBox {
 	protected static final int LIST_MAX_HEIGHT = 1000;
@@ -30,24 +30,38 @@ public class DetailsPanel extends VBox {
 	protected static final int DEFAULT_HEIGHT = 150;
 	
 	private StackPane displayArea;
-	private ListView<TurboComment> listView;
+	private ListView<CommentListItem> listView;
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
 			
-	private ObservableList<TurboComment> commentsList;
-	private ObservableList<TurboIssueEvent> eventsList;
+	private ObservableList<CommentListItem> commentsList;
+//	private ObservableList<TurboIssueEvent> eventsList;
 	private ChangeListener<Boolean> expandedChangeListener;
 	
 	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
-		this.listView = new ListView<TurboComment>();
+		this.listView = new ListView<>();
 		this.handler = handler;
-		commentsList = handler.getComments();
-		eventsList = handler.getEvents();
+		
+		commentsList = FXCollections.observableArrayList();
+		handler.getComments().addListener((ListChangeListener.Change<? extends CommentListItem> c) ->{
+			updateCommentsList();
+		});
+		handler.getEvents().addListener((ListChangeListener.Change<? extends CommentListItem> c) ->{
+			updateCommentsList();
+		});
+		
 		setupLayout();
 		loadDisplayElements();
 	}
 	
+	private void updateCommentsList() {
+		commentsList.clear();
+		commentsList.addAll(handler.getComments());
+		commentsList.addAll(handler.getEvents());
+		// TODO sort according to time
+	}
+
 	private void loadDisplayElements(){
 		displayArea = createDetailsDisplayArea();
 		getChildren().add(displayArea);
@@ -63,8 +77,8 @@ public class DetailsPanel extends VBox {
 		return displayArea;
 	}
 	
-	private ListView<TurboComment> setupListItems(){
-		ListView<TurboComment> listView = new ListView<TurboComment>();
+	private ListView<CommentListItem> setupListItems(){
+		ListView<CommentListItem> listView = new ListView<>();
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
 		listView.setCellFactory(commentCellFactory());
 		listView.setItems(commentsList);
@@ -90,10 +104,10 @@ public class DetailsPanel extends VBox {
 		}
 	}
 	
-	private Callback<ListView<TurboComment>, ListCell<TurboComment>> commentCellFactory(){
-		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
+	private Callback<ListView<CommentListItem>, ListCell<CommentListItem>> commentCellFactory(){
+		Callback<ListView<CommentListItem>, ListCell<CommentListItem>> factory = new Callback<ListView<CommentListItem>, ListCell<CommentListItem>>() {
 			@Override
-			public ListCell<TurboComment> call(ListView<TurboComment> list) {
+			public ListCell<CommentListItem> call(ListView<CommentListItem> list) {
 				return new DetailsCell(issue, handler);
 			}
 		};

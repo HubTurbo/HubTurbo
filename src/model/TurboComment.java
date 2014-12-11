@@ -8,8 +8,9 @@ import javafx.beans.property.StringProperty;
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
+import ui.issuepanel.expanded.comments.CommentListItem;
 
-public class TurboComment{
+public class TurboComment implements CommentListItem {
 	private Date createdAt;
 
 	private Date updatedAt;

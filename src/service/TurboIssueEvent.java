@@ -2,10 +2,12 @@ package service;
 
 import org.eclipse.egit.github.core.User;
 
+import ui.issuepanel.expanded.comments.CommentListItem;
+
 /**
  * Models an event that could happen to an issue.
  */
-public class TurboIssueEvent {
+public class TurboIssueEvent implements CommentListItem {
 	private IssueEventType type;
 	private User actor;
 	private String labelName, labelColour;
