@@ -68,7 +68,12 @@ public class GitHubEventsResponse {
 				    break;
 				case Assigned:
 				case Unassigned:
-					event.setAssignedUser((User) eventsWithParameters[i].get("assignee"));
+					// User object
+					// re-serialise it using Gson
+					Object assigneeMap = eventsWithParameters[i].get("assignee");
+					String json = new Gson().toJson(assigneeMap);
+					User user = gson.fromJson(json, User.class);
+					event.setAssignedUser(user);
 					break;
 				case Closed:
 				case Reopened:
