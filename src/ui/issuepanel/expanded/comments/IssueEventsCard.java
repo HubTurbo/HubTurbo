@@ -56,6 +56,7 @@ public class IssueEventsCard extends VBox{
             message = String.format("%s added the milestone '%s'.",
                     actorName,
                     event.getMilestoneTitle());
+            break;
         case Demilestoned:
             message = String.format("%s removed the milestone '%s'.",
                     actorName,
@@ -65,6 +66,7 @@ public class IssueEventsCard extends VBox{
             message = String.format("%s added the label '%s'.",
                     actorName,
                     event.getLabelName());
+            break;
         case Unlabeled:
             message = String.format("%s removed the label '%s'.",
                     actorName,
@@ -74,6 +76,7 @@ public class IssueEventsCard extends VBox{
             message = String.format("%s assigned %s to the issue.",
                     actorName,
                     event.getAssignedUser().getLogin());
+            break;
         case Unassigned:
             message = String.format("%s unassigned %s from the issue.",
                     actorName,
@@ -82,12 +85,15 @@ public class IssueEventsCard extends VBox{
         case Closed:
             message = String.format("%s closed the issue.",
                     actorName);
+            break;
         case Reopened:
             message = String.format("%s reopened the issue.",
                     actorName);
+            break;
         case Locked:
             message = String.format("%s locked the issue.",
                     actorName);
+            break;
         case Unlocked:
             message = String.format("%s unlocked the issue.",
                     actorName);
