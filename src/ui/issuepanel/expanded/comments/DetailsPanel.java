@@ -44,6 +44,8 @@ public class DetailsPanel extends VBox {
 		this.handler = handler;
 		
 		commentsList = FXCollections.observableArrayList();
+		commentsList.addAll(handler.getComments());
+		commentsList.addAll(handler.getEvents());
 		handler.getComments().addListener((ListChangeListener.Change<? extends CommentListItem> c) ->{
 			updateCommentsList();
 		});
