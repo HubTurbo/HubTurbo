@@ -1,6 +1,8 @@
 package ui;
 
+import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -22,6 +24,7 @@ import service.ServiceManager;
 import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
+import util.Utility;
 
 public class UI extends Application {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
@@ -46,7 +49,7 @@ public class UI extends Application {
 		
 		initCSS();
 		mainStage = stage;
-		stage.setMaximized(true);
+		stage.setMaximized(false);
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
@@ -86,8 +89,7 @@ public class UI extends Application {
 
 	private void setupMainStage(Scene scene) {
 		mainStage.setTitle("HubTurbo " + VERSION_NUMBER);
-		mainStage.setMinWidth(800);
-		mainStage.setMinHeight(600);
+		setDimensions(mainStage);
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
@@ -98,6 +100,23 @@ public class UI extends Application {
 			System.exit(0);
 		});
 		
+	}
+
+	/**
+	 * Sets the dimensions of the stage to the maximum usable size
+	 * of the desktop, or to the screen size if this fails.
+	 * @param mainStage
+	 */
+	private void setDimensions(Stage mainStage) {
+		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
+		if (dimensions.isPresent()) {
+			mainStage.setMinWidth(dimensions.get().getWidth());
+			mainStage.setMinHeight(dimensions.get().getHeight());
+		} else {
+			Rectangle dims = Utility.getScreenDimensions();
+			mainStage.setMinWidth(dims.getWidth());
+			mainStage.setMinHeight(dims.getHeight());
+		}
 	}
 
 	private Parent createRoot() throws IOException {
