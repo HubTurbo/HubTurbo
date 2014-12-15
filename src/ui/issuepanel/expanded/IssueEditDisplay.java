@@ -4,15 +4,13 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,20 +23,23 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import javafx.event.Event;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ui.CheckboxListDialog;
 import ui.EditableMarkupPopup;
 import ui.LabelCheckboxListDialog;
@@ -46,6 +47,7 @@ import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
 import ui.ParentIssuesDisplayBox;
 import ui.TraversableTextArea;
+import ui.UI;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{
@@ -89,12 +91,14 @@ public class IssueEditDisplay extends VBox{
 	private final TurboIssue issue;
 	private final Model model;
 	private final Stage parentStage;
+	private final UI ui;
 	private final WeakReference<IssueDisplayPane> parentContainer;
 	private boolean focusRequested;
 	
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
-	public IssueEditDisplay(TurboIssue displayedIssue, Stage parentStage, Model model, IssueDisplayPane parent, boolean focusRequested){
+	public IssueEditDisplay(UI ui, TurboIssue displayedIssue, Stage parentStage, Model model, IssueDisplayPane parent, boolean focusRequested){
+		this.ui = ui;
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
@@ -457,10 +461,11 @@ public class IssueEditDisplay extends VBox{
 		ToggleButton details = new ToggleButton(ISSUE_DETAILS_BTN_TXT);
 		HBox.setHgrow(details, Priority.ALWAYS);
 		details.setMaxWidth(Double.MAX_VALUE);
-		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
+//		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
 		details.setOnAction((ActionEvent e) -> {
-		    boolean selected = ref.get().selectedProperty().get();
-		    parentContainer.get().showIssueDetailsDisplay(selected);
+//		    boolean selected = ref.get().selectedProperty().get();
+//		    parentContainer.get().showIssueDetailsDisplay(selected);
+			ui.toggleExpandedWidth();
 		});
 		
 		details.setSelected(parentContainer.get().expandedIssueView);

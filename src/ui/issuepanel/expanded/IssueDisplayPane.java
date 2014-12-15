@@ -2,21 +2,24 @@ package ui.issuepanel.expanded;
 
 import java.lang.ref.WeakReference;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ui.StatusBar;
+import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.comments.IssueDetailsDisplay;
 import ui.sidepanel.SidePanel;
 import ui.sidepanel.SidePanel.IssueEditMode;
 import util.DialogMessage;
+
 import command.TurboIssueAdd;
 import command.TurboIssueCommand;
 import command.TurboIssueEdit;
@@ -30,7 +33,8 @@ public class IssueDisplayPane extends HBox {
 	private final TurboIssue displayedIssue;
 	private final Model model;
 	private final Stage parentStage;
-	private ColumnControl columns;
+	private final UI ui;
+	private final ColumnControl columns;
 	
 	private IssueDetailsDisplay issueDetailsDisplay;
 	private IssueEditDisplay issueEditDisplay;
@@ -39,7 +43,8 @@ public class IssueDisplayPane extends HBox {
 	private boolean focusRequested;
 	private IssueEditMode mode;
 			
-	public IssueDisplayPane(TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel, boolean focusRequested, IssueEditMode mode) {
+	public IssueDisplayPane(UI ui, TurboIssue displayedIssue, Stage parentStage, Model model, ColumnControl columns, SidePanel parentPanel, boolean focusRequested, IssueEditMode mode) {
+		this.ui = ui;
 		this.displayedIssue = displayedIssue;
 		this.originalIssue = new TurboIssue(displayedIssue);
 		this.model = model;
@@ -153,7 +158,7 @@ public class IssueDisplayPane extends HBox {
 	}
 	
 	private void setupIssueEditDisplay(){
-		this.issueEditDisplay = new IssueEditDisplay(displayedIssue, parentStage, model, this, focusRequested);
+		this.issueEditDisplay = new IssueEditDisplay(ui, displayedIssue, parentStage, model, this, focusRequested);
 		this.issueEditDisplay.setPrefWidth(ISSUE_WIDTH);
 		this.issueEditDisplay.setMinWidth(ISSUE_WIDTH);
 	}
