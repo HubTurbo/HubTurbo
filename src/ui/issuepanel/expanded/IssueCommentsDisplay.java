@@ -1,17 +1,22 @@
 package ui.issuepanel.expanded;
 
 import java.awt.Rectangle;
+import java.util.Optional;
 
 import javafx.concurrent.Task;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import ui.UI;
+import util.IOUtilities;
 
 public class IssueCommentsDisplay {
 
@@ -27,19 +32,24 @@ public class IssueCommentsDisplay {
 	}
 	
 //	private Thread seleniumThread;
-	private SeleniumTask task;
+//	private SeleniumTask task;
 	
 	public void toggle() {
 		boolean expanded = ui.toggleExpandedWidth();
 
 		if (!expanded) {
 			SeleniumTask task = new SeleniumTask();
-			Thread seleniumThread = new Thread(task);
-			seleniumThread.setDaemon(true);
-			seleniumThread.start();
+//			Thread seleniumThread = new Thread(task);
+//			seleniumThread.setDaemon(true);
+//			seleniumThread.start();
+			try {
+				task.call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 //			seleniumThread.interrupt();
-			task.stop();
+//			task.stop();
 		}
 	}
 
@@ -49,7 +59,10 @@ public class IssueCommentsDisplay {
 		
 		@Override
 		protected Boolean call() throws Exception {
-			driver = new ChromeDriver();
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("user-agent=\"Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36\"");
+
+			driver = new ChromeDriver(options);
 
 			driver.manage().window()
 					.setPosition(new Point((int) ui.getCollapsedX(), 0));
@@ -60,36 +73,30 @@ public class IssueCommentsDisplay {
 							new Dimension((int) availableDimensions.getWidth(),
 									(int) availableDimensions.getHeight()));
 
-			driver.get("http://www.google.com/xhtml");
-//			try {
-//				// Let the user actually see something!
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//				return false;
-//			}
-			WebElement searchBox = driver.findElement(By.name("q"));
-			searchBox.sendKeys("ChromeDriver");
-			System.out.println("sent keys");
-			searchBox.submit();
+			driver.get("https://github.com/login");
+			
+			try {
+				WebElement searchBox = driver.findElement(By.name("login"));
+				// username
+				searchBox = driver.findElement(By.name("password"));
+				// password
+				searchBox.submit();
+			} catch (NoSuchElementException e) {
+				// Do nothing
+			}
 
-//			try {
-//				// Let the user actually see something!
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//				return false;
-//			}
+			driver.get("https://github.com/hubturbo/hubturbo/issues/1");
 
-//			driver.quit();
-			System.out.println("returning");
+			if (driver instanceof JavascriptExecutor) {
+				Optional<String> file = IOUtilities.readResource("ui/issuepanel/expanded/hideUI.js");
+				if (file.isPresent()) {
+					((JavascriptExecutor) driver).executeScript(file.get());
+				} else {
+					System.out.println("Failed to read hideUI.js; did not execute");
+				}
+			}
+			
 			return true;
-		}
-		
-		public void stop() {
-			System.out.println("stopping " + driver);
-			driver.quit();
-			System.out.println("quit");
 		}
 	}
 }
