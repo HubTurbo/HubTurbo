@@ -31,6 +31,7 @@ public class UI extends Application {
 	private static final String VERSION_NUMBER = " V0.7.13";
 	// Main UI elements
 	
+	private static final double WINDOW_EXPANDED_WIDTH = 0.6;
 	private Stage mainStage;
 	private ColumnControl columns;
 	private SidePanel sidePanel;
@@ -89,7 +90,7 @@ public class UI extends Application {
 
 	private void setupMainStage(Scene scene) {
 		mainStage.setTitle("HubTurbo " + VERSION_NUMBER);
-		setDimensions(mainStage);
+		setExpandedWidth(true);
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
@@ -101,27 +102,10 @@ public class UI extends Application {
 		});
 		
 	}
-
-	/**
-	 * Sets the dimensions of the stage to the maximum usable size
-	 * of the desktop, or to the screen size if this fails.
-	 * @param mainStage
-	 */
-	private void setDimensions(Stage mainStage) {
-		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
-		if (dimensions.isPresent()) {
-			mainStage.setMinWidth(dimensions.get().getWidth());
-			mainStage.setMinHeight(dimensions.get().getHeight());
-		} else {
-			Rectangle dims = Utility.getScreenDimensions();
-			mainStage.setMinWidth(dims.getWidth());
-			mainStage.setMinHeight(dims.getHeight());
-		}
-	}
-
+	
 	private Parent createRoot() throws IOException {
 
-		sidePanel = new SidePanel(mainStage, ServiceManager.getInstance().getModel());
+		sidePanel = new SidePanel(this, mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(mainStage, ServiceManager.getInstance().getModel(), sidePanel);
 		sidePanel.setColumns(columns);
 
@@ -144,5 +128,53 @@ public class UI extends Application {
 		root.setBottom(StatusBar.getInstance());
 
 		return root;
+	}
+
+	/**
+	 * Sets the dimensions of the stage to the maximum usable size
+	 * of the desktop, or to the screen size if this fails.
+	 * @param mainStage
+	 */
+	private Rectangle getDimensions() {
+		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
+		if (dimensions.isPresent()) {
+			return dimensions.get();
+		} else {
+			return Utility.getScreenDimensions();
+		}
+	}
+	
+	/**
+	 * UI operations
+	 */
+
+	/**
+	 * Tracks whether or not the window is in an expanded state.
+	 */
+	private boolean expanded = true;
+
+	/**
+	 * Toggles the expansion state of the window.
+	 */
+	public void toggleExpandedWidth() {
+		expanded = !expanded;
+		setExpandedWidth(expanded);
+	}
+
+	/**
+	 * Controls whether or not the main window is expanded (occupying the
+	 * whole screen) or not (occupying a percentage).
+	 * @param expanded
+	 */
+	private void setExpandedWidth(boolean expanded) {
+		this.expanded = expanded;
+		Rectangle dimensions = getDimensions();
+		double width = expanded
+				? dimensions.getWidth()
+				: dimensions.getWidth() * WINDOW_EXPANDED_WIDTH;
+		mainStage.setMinWidth(width);
+		mainStage.setMinHeight(dimensions.getHeight());
+		mainStage.setMaxWidth(width);
+		mainStage.setMaxHeight(dimensions.getHeight());
 	}
 }
