@@ -94,10 +94,12 @@ public class IssueEditDisplay extends VBox{
 	private final UI ui;
 	private final WeakReference<IssueDisplayPane> parentContainer;
 	private boolean focusRequested;
+	private IssueCommentsDisplay issueCommentsDisplay;
 	
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
 	public IssueEditDisplay(UI ui, TurboIssue displayedIssue, Stage parentStage, Model model, IssueDisplayPane parent, boolean focusRequested){
+		this.issueCommentsDisplay = new IssueCommentsDisplay(ui);
 		this.ui = ui;
 		this.issue = displayedIssue;
 		this.model = model;
@@ -465,7 +467,7 @@ public class IssueEditDisplay extends VBox{
 		details.setOnAction((ActionEvent e) -> {
 //		    boolean selected = ref.get().selectedProperty().get();
 //		    parentContainer.get().showIssueDetailsDisplay(selected);
-			ui.toggleExpandedWidth();
+			issueCommentsDisplay.toggle();
 		});
 		
 		details.setSelected(parentContainer.get().expandedIssueView);

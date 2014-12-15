@@ -35,6 +35,10 @@ import ui.labelmanagement.LabelManagementComponent;
 import ui.milestonemanagement.MilestoneManagementComponent;
 import util.DialogMessage;
 
+/**
+ * Represents the panel on the left side.
+ * Encapsulates operations involving collapsing it and changing its layout.
+ */
 public class SidePanel extends VBox {
 	private static final Logger logger = LogManager.getLogger(SidePanel.class.getName());
 	

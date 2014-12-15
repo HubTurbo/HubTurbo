@@ -155,10 +155,30 @@ public class UI extends Application {
 
 	/**
 	 * Toggles the expansion state of the window.
+	 * Returns a boolean value indicating the state.
 	 */
-	public void toggleExpandedWidth() {
+	public boolean toggleExpandedWidth() {
 		expanded = !expanded;
 		setExpandedWidth(expanded);
+		return expanded;
+	}
+
+	/**
+	 * Returns the X position of the edge of the collapsed window.
+	 */
+	public double getCollapsedX() {
+		return getDimensions().getWidth() * WINDOW_EXPANDED_WIDTH;
+	}
+	
+	/**
+	 * Returns the dimensions of the screen available for use when
+	 * the main window is in a collapsed state.
+	 */
+	public Rectangle getAvailableDimensions() {
+		Rectangle dimensions = getDimensions();
+		return new Rectangle(
+				(int) (dimensions.getWidth() * (1 - WINDOW_EXPANDED_WIDTH)),
+				(int) dimensions.getHeight());
 	}
 
 	/**

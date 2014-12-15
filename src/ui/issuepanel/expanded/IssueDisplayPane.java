@@ -24,6 +24,11 @@ import command.TurboIssueAdd;
 import command.TurboIssueCommand;
 import command.TurboIssueEdit;
 
+/**
+ * Represents the form which comes up when an issue is created or edited.
+ * Mainly handles the expanding and collapsing of the issue comments form, IssueDetailsDisplay.
+ * Operations involving the editing of issues are delegated to IssueEditDisplay.
+ */
 public class IssueDisplayPane extends HBox {
 	private static final Logger logger = LogManager.getLogger(IssueDisplayPane.class.getName());
 	protected static final int DETAILS_WIDTH = 350;
