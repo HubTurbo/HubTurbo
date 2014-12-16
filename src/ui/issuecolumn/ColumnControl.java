@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import model.Model;
 import storage.DataManager;
 import ui.StatusBar;
+import ui.UI;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
@@ -22,13 +23,15 @@ import filter.FilterExpression;
 
 public class ColumnControl extends HBox {
 
+	private final UI ui;
 	private final Stage stage;
 	private final Model model;
 	private final SidePanel sidePanel;
 	
 	private TurboCommandExecutor dragAndDropExecutor;
 
-	public ColumnControl(Stage stage, Model model, SidePanel sidePanel) {
+	public ColumnControl(UI ui, Stage stage, Model model, SidePanel sidePanel) {
+		this.ui = ui;
 		this.stage = stage;
 		this.model = model;
 		this.sidePanel = sidePanel;
@@ -77,14 +80,14 @@ public class ColumnControl extends HBox {
 	}
 	
 	private Column addColumn(boolean isSearchPanel) {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
+		Column panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		return panel;
 	}
 
 	public Column addColumnAt(boolean isSearchPanel, int index) {
-		Column panel = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
+		Column panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -112,7 +115,7 @@ public class ColumnControl extends HBox {
 		Column current = (Column) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
 		if (current instanceof HierarchicalIssuePanel) {
-			column = new IssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
+			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		} else {
 			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		}

@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import ui.UI;
 import ui.issuecolumn.Column;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
@@ -22,16 +23,18 @@ public class IssuePanel extends Column {
 	private final ColumnControl parentColumnControl;
 	private final int columnIndex;
 	private final SidePanel sidePanel;
+	private final UI ui;
 
 	private ListView<TurboIssue> listView;
 	
-	public IssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
 		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
+		this.ui = ui;
 		
 		listView = new ListView<>();
 		setupListView();
@@ -55,7 +58,7 @@ public class IssuePanel extends Column {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(mainStage, model, that.get(), columnIndex, sidePanel, parentColumnControl);
+					return new IssuePanelCell(ui, mainStage, model, that.get(), columnIndex, sidePanel, parentColumnControl);
 				} else{
 					return null;
 				}

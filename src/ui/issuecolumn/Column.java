@@ -35,14 +35,16 @@ import filter.ParseException;
 import filter.Parser;
 import filter.PredicateApplicationException;
 
+/**
+ * A Column is a JavaFX node that is contained by a ColumnControl.
+ * It is in charge of displaying a list of issues and providing functions
+ * to filter it. It does not, however, specify how the list is to be
+ * displayed -- that is the job of its subclasses.
+ */
 public abstract class Column extends VBox {
 	
-	// A Column is a JavaFX node that is contained by a ColumnControl.
-	// It is in charge of displaying a list of issues and providing functions
-	// to filter it. It does not, however, specify how the list is to be
-	// displayed -- that is the job of its subclasses.
+	private static final int COLUMN_WIDTH = 400;
 	
-private static final int COLUMN_WIDTH = 400;
 	//	private static final String TOGGLE_HIERARCHY = "\u27A5";
 	private static final String CLOSE_LIST = "\u2716";
 	private static final String ADD_ISSUE = "\u271A";
