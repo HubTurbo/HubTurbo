@@ -44,7 +44,7 @@ public class TurboUser implements Listable {
 		}
 	}
 	
-	private Image avatar;
+	private transient Image avatar;
 	public Image getAvatar() {
 		if(avatarUrl == ""){
 			return null;

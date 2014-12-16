@@ -15,9 +15,10 @@ import com.google.gson.reflect.TypeToken;
 
 public class CollaboratorUpdateService extends UpdateService<User>{	
 
-	public CollaboratorUpdateService(GitHubClientExtended client){
+	public CollaboratorUpdateService(GitHubClientExtended client, String collabsETag){
 		super(client);
 		apiSuffix = SEGMENT_COLLABORATORS;
+		super.setLastETag(collabsETag);
 	}
 	
 	@Override
