@@ -22,5 +22,6 @@
 	<classpathentry kind="lib" path="lib/controlsfx-8.0.6_20.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-java-2.44.0.jar" sourcepath="lib/selenium-java-2.44.0-srcs.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-server-standalone-2.44.0.jar"/>
+	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
