@@ -15,6 +15,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import service.ServiceManager;
 import ui.UI;
 import util.IOUtilities;
 
@@ -77,9 +78,9 @@ public class IssueCommentsDisplay {
 			
 			try {
 				WebElement searchBox = driver.findElement(By.name("login"));
-				// username
+				searchBox.sendKeys(ServiceManager.getInstance().getUserId());
 				searchBox = driver.findElement(By.name("password"));
-				// password
+				searchBox.sendKeys(ServiceManager.getInstance().getPassword());
 				searchBox.submit();
 			} catch (NoSuchElementException e) {
 				// Do nothing
