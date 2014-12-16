@@ -73,12 +73,16 @@ public class ServiceManager {
 	private ModelUpdater modelUpdater;
 	private Model model;
 	private IRepositoryIdProvider repoId;
-	private String password;
 	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
-	
+
+	// Login state
+	private String password;
+	private String repoOwner;
+	private String repoName;
+
 	protected ServiceManager(){
 		githubClient = new GitHubClientExtended();
 		collabService = new CollaboratorService(githubClient);
@@ -161,6 +165,8 @@ public class ServiceManager {
 	}
 
 	public boolean setupRepository(String owner, String name) throws IOException{
+		repoOwner = owner;
+		repoName = name;
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
 			return model.loadComponents(repoId);
@@ -168,6 +174,14 @@ public class ServiceManager {
 			throw new IOException("Cannot access repository"); //TODO: create specific exception for this
 		}
 		
+	}
+	
+	public String getRepoOwner() {
+		return repoOwner;
+	}
+	
+	public String getRepoName() {
+		return repoName;
 	}
 	
 	public boolean checkRepository(String repo) throws IOException{

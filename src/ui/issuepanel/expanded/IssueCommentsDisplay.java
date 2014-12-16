@@ -17,6 +17,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import service.ServiceManager;
 import ui.UI;
+import util.GitHubURL;
 import util.IOUtilities;
 
 public class IssueCommentsDisplay {
@@ -83,7 +84,7 @@ public class IssueCommentsDisplay {
 							new Dimension((int) availableDimensions.getWidth(),
 									(int) availableDimensions.getHeight()));
 
-			driver.get("https://github.com/login");
+			driver.get(GitHubURL.LOGIN_PAGE);
 //			driver.getCurrentUrl()
 //			driver.close(); // what do?
 			
@@ -97,7 +98,7 @@ public class IssueCommentsDisplay {
 				// Already logged in; do nothing
 			}
 
-			driver.get("https://github.com/hubturbo/hubturbo/issues/1");
+			driver.get(GitHubURL.getPathForIssue(1));
 
 			if (driver instanceof JavascriptExecutor) {
 				Optional<String> file = IOUtilities.readResource(HIDE_ELEMENTS_SCRIPT_PATH);
@@ -110,5 +111,6 @@ public class IssueCommentsDisplay {
 			
 			return true;
 		}
+
 	}
 }
