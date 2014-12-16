@@ -73,6 +73,7 @@ public class ServiceManager {
 	private ModelUpdater modelUpdater;
 	private Model model;
 	private IRepositoryIdProvider repoId;
+	private String password;
 	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -137,6 +138,7 @@ public class ServiceManager {
 	}
 	
 	public boolean login(String userId, String password){
+		this.password = password;
 		githubClient.setCredentials(userId, password);
 		try {
 			GitHubRequest request = new GitHubRequest();
@@ -153,6 +155,11 @@ public class ServiceManager {
 		return githubClient.getUser();
 	}
 	
+	public String getPassword(){
+		assert password != null;
+		return password;
+	}
+
 	public boolean setupRepository(String owner, String name) throws IOException{
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
