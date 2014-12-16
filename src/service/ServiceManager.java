@@ -42,6 +42,7 @@ import org.markdown4j.Markdown4jProcessor;
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
+import ui.StatusBar;
 
 /**
  * Singleton class that provides access to the GitHub API services required by HubTurbo
@@ -164,6 +165,7 @@ public class ServiceManager {
 	}
 	
 	public boolean setupRepository(String owner, String name) throws IOException{
+		StatusBar.displayMessage("Authenticating...");
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
 			return model.loadComponents(repoId);
@@ -437,6 +439,27 @@ public class ServiceManager {
 		}
 	}
 	
+	/**
+	 * Gets events for a issue from GitHub, or returns
+	 * a cached version if already present.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
+	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException{
+		if(repoId != null){
+			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
+		}
+		return new ArrayList<>();
+	}
+	
+	/**
+	 * Gets comments for a issue from GitHub, or returns
+	 * a cached version if already present.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
 	public List<Comment> getComments(int issueId) throws IOException{
 		if(repoId != null){
 			List<Comment> cached = model.getCommentsListForIssue(issueId);
@@ -449,7 +472,13 @@ public class ServiceManager {
 		return new ArrayList<Comment>();
 	}
 	
-	public List<Comment> getLatestComments(int issueId) throws IOException{
+	/**
+	 * Gets comments from an issue from GitHub and updates the cache.
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
+	private List<Comment> getLatestComments(int issueId) throws IOException{
 		if(repoId != null){
 			List<Comment> comments = issueService.getComments(repoId, issueId);
 			List<Comment> list =  comments.stream()

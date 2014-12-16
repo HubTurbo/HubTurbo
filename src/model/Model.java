@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,7 @@ import org.eclipse.egit.github.core.client.RequestException;
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
 import storage.DataManager;
+import ui.StatusBar;
 import storage.TurboRepoData;
 import util.CollectionUtilities;
 import util.DialogMessage;
@@ -95,6 +97,7 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources){
 		this.repoId = repoId;
+		StatusBar.displayMessage("Loading project configuration...");
 		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
@@ -105,14 +108,22 @@ public class Model {
 		}
 		
 		if (isTurboResource) {
+			StatusBar.displayMessage("Loading collaborators...");
 			loadTurboCollaborators((List<TurboUser>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
+			StatusBar.displayMessage("Loading labels...");
 			loadTurboLabels((List<TurboLabel>) ghResources.get(ServiceManager.KEY_LABELS));
+			StatusBar.displayMessage("Loading milestones...");
 			loadTurboMilestones((List<TurboMilestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
+			StatusBar.displayMessage("Loading issues...");
 			loadTurboIssues((List<TurboIssue>)ghResources.get(ServiceManager.KEY_ISSUES));
 		} else {
+			StatusBar.displayMessage("Loading collaborators...");
 			loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
+			StatusBar.displayMessage("Loading labels...");
 			loadLabels((List<Label>) ghResources.get(ServiceManager.KEY_LABELS));
+			StatusBar.displayMessage("Loading milestones...");
 			loadMilestones((List<Milestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
+			StatusBar.displayMessage("Loading issues...");
 			loadIssues((List<Issue>)ghResources.get(ServiceManager.KEY_ISSUES));
 		}
 	}

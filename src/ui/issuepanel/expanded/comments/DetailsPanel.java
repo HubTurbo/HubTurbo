@@ -1,12 +1,16 @@
 package ui.issuepanel.expanded.comments;
 
-import java.lang.ref.WeakReference;
-
 import handler.IssueDetailsContentHandler;
+
+import java.lang.ref.WeakReference;
+import java.util.Comparator;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -16,7 +20,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import model.TurboComment;
 import model.TurboIssue;
 
 public class DetailsPanel extends VBox {
@@ -28,41 +31,64 @@ public class DetailsPanel extends VBox {
 	protected static final int DEFAULT_HEIGHT = 150;
 	
 	private StackPane displayArea;
-	private ListView<TurboComment> listView;
+	private ListView<CommentListItem> listView;
 	private IssueDetailsContentHandler handler;
 	private TurboIssue issue;
 			
-	private ObservableList<TurboComment> detailsList;
+	private ObservableList<CommentListItem> commentsList;
 	private ChangeListener<Boolean> expandedChangeListener;
 	
 	public DetailsPanel(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
-		this.listView = new ListView<TurboComment>();
+		this.listView = new ListView<>();
 		this.handler = handler;
-		detailsList = handler.getComments();
+		
+		commentsList = FXCollections.observableArrayList();
+		commentsList.addAll(handler.getComments());
+		commentsList.addAll(handler.getEvents());
+		handler.getComments().addListener((ListChangeListener.Change<? extends CommentListItem> c) ->{
+			updateCommentsList();
+		});
+		handler.getEvents().addListener((ListChangeListener.Change<? extends CommentListItem> c) ->{
+			updateCommentsList();
+		});
+		
 		setupLayout();
 		loadDisplayElements();
 	}
 	
+	private void updateCommentsList() {
+		commentsList.clear();
+		commentsList.addAll(handler.getComments());
+		commentsList.addAll(handler.getEvents());
+		FXCollections.sort(commentsList, new Comparator<CommentListItem>() {
+			public int compare(CommentListItem u1, CommentListItem u2) {
+				return u1.getDate().compareTo(u2.getDate());
+			}
+		});
+	}
+
 	private void loadDisplayElements(){
-		setupDetailsDisplay();
+		displayArea = createDetailsDisplayArea();
 		getChildren().add(displayArea);
 		TitledPane cBox = createNewCommentsBox();
 		getChildren().add(cBox);
 	}
 	
-	private void setupDetailsDisplay(){
-		displayArea = new StackPane();
+	private StackPane createDetailsDisplayArea(){
+		StackPane displayArea = new StackPane();
 		displayArea.setPrefHeight(LIST_MAX_HEIGHT);
-		setupListItems();
+		listView = setupListItems();
 		displayArea.getChildren().add(listView);
+		return displayArea;
 	}
 	
-	private void setupListItems(){
-		listView = new ListView<TurboComment>();
+	private ListView<CommentListItem> setupListItems(){
+		ListView<CommentListItem> listView = new ListView<>();
 		listView.setPrefWidth(COMMENTS_CELL_WIDTH);
 		listView.setCellFactory(commentCellFactory());
-		listView.setItems(detailsList);
+		listView.setItems(commentsList);
+		return listView;
 	}
 	
 	protected void addItemToDisplay(Node child){
@@ -80,14 +106,14 @@ public class DetailsPanel extends VBox {
 	
 	protected void scrollToBottom(){
 		if(!listView.getItems().isEmpty()){
-			listView.scrollTo(detailsList.size() - 1);
+			listView.scrollTo(commentsList.size() - 1);
 		}
 	}
 	
-	private Callback<ListView<TurboComment>, ListCell<TurboComment>> commentCellFactory(){
-		Callback<ListView<TurboComment>, ListCell<TurboComment>> factory = new Callback<ListView<TurboComment>, ListCell<TurboComment>>() {
+	private Callback<ListView<CommentListItem>, ListCell<CommentListItem>> commentCellFactory(){
+		Callback<ListView<CommentListItem>, ListCell<CommentListItem>> factory = new Callback<ListView<CommentListItem>, ListCell<CommentListItem>>() {
 			@Override
-			public ListCell<TurboComment> call(ListView<TurboComment> list) {
+			public ListCell<CommentListItem> call(ListView<CommentListItem> list) {
 				return new DetailsCell(issue, handler);
 			}
 		};

@@ -1,5 +1,9 @@
 package service;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_EVENTS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
@@ -7,14 +11,12 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 import org.eclipse.egit.github.core.service.IssueService;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 public class IssueServiceExtended extends IssueService{
 	private GitHubClientExtended ghClient;
@@ -133,5 +135,24 @@ public class IssueServiceExtended extends IssueService{
 		}
 		return ghClient.sendJson(connection, data, Issue.class);
 	}
-
+	
+	/**
+	 * Retrieves a list of all issue events.
+	 * @param user
+	 * @param repository
+	 * @return list of issue events
+	 * @throws IOException
+	 */
+	public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId) throws IOException {
+		GitHubRequest request = createRequest();
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repository.generateId());
+		uri.append(SEGMENT_ISSUES);
+		uri.append('/').append(issueId);
+		uri.append(SEGMENT_EVENTS);
+		request.setUri(uri);
+		request.setType(IssueEvent[].class);
+		GitHubEventsResponse response = ghClient.getEvent(request);
+		return response;
+	}
 }

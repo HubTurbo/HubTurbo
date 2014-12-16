@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
+import service.TurboIssueEvent;
 import service.updateservice.CommentUpdateService;
 import util.DialogMessage;
 
@@ -29,7 +30,8 @@ public class IssueDetailsContentHandler {
 	private static final Logger logger = LogManager.getLogger(IssueDetailsContentHandler.class.getName());
 	private TurboIssue issue;
 	
-	private ObservableList<Comment> allGhContent = FXCollections.observableArrayList();
+	private ObservableList<Comment> ghCommentsAndLogs = FXCollections.observableArrayList();
+	private ObservableList<TurboIssueEvent> ghEvents = FXCollections.observableArrayList();
 	private ObservableList<TurboComment> comments = FXCollections.observableArrayList();
 	private ObservableList<TurboComment> log = FXCollections.observableArrayList();
 	
@@ -44,14 +46,33 @@ public class IssueDetailsContentHandler {
 		this.issue = issue;
 	}
 	
+	/**
+	 * Synchronously gets HTML markup for all comments associated with an issue.
+	 * Caches in memory when possible.
+	 * 
+	 * Also sets up a polling service to update that issue's comments, and the UI
+	 * listeners necessary to trigger changes upon the comments being updated.
+	 */
+	private void setupContent() {
+		getDetailsContent();
+		setupContentUpdater();
+		setupCommentsChangeListener();
+	}
+	
 	private boolean isNotSetup(){
 		return commentsUpdater == null || commentsChangeListener == null;
 	}
-	
+
 	private void getDetailsContent(){
 		try {
-			List<Comment> allItems = ServiceManager.getInstance().getComments(issue.getId());
-			setGithubCommentsList(allItems);
+			// Get comments from GitHub
+			List<Comment> comments = ServiceManager.getInstance().getComments(issue.getId());
+			// Get events
+			List<TurboIssueEvent> events = ServiceManager.getInstance().getEvents(issue.getId());
+			
+			// Update UI
+			setGithubCommentsList(comments);
+			setGithubEventsList(events);
 			updateData();
 		} catch (SocketTimeoutException | UnknownHostException e){
 			Platform.runLater(()->{
@@ -62,20 +83,19 @@ public class IssueDetailsContentHandler {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
-	
-	private void setGithubCommentsList(List<Comment> allItems){
+
+	private void setGithubCommentsList(List<Comment> comments){
 		//Reuse allGhContent instance to ensure that all observers get change signals
-		allGhContent.clear();
-		allGhContent.addAll(allItems);
+		ghCommentsAndLogs.clear();
+		ghCommentsAndLogs.addAll(comments);
 	}
-	
-	private void setupContent(){
-		//Computationally intensive as list of all comments and their html markup will be retrieved from github
-		getDetailsContent();
-		setupContentUpdater();
-		setupCommentsChangeListener();
+
+	// There is no change listener set up for events at the moment
+	private void setGithubEventsList(List<TurboIssueEvent> events){
+		ghEvents.clear();
+		ghEvents.addAll(events);
 	}
-	
+
 	private void setupCommentsChangeListener(){
 		WeakReference<IssueDetailsContentHandler> selfRef = new WeakReference<>(this);
 		commentsChangeListener = new ListChangeListener<Comment>(){
@@ -90,24 +110,28 @@ public class IssueDetailsContentHandler {
 			}
 		};
 		WeakListChangeListener<Comment> listener = new WeakListChangeListener<>(commentsChangeListener);
-		allGhContent.addListener(listener);
+		ghCommentsAndLogs.addListener(listener);
 	}
 
 	private void setupContentUpdater(){
-		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), allGhContent);
+		commentsUpdater = ServiceManager.getInstance().getCommentUpdateService(issue.getId(), ghCommentsAndLogs);
 	}
 	
 	public ObservableList<TurboComment> getComments(){
 		return comments;
 	}
 	
-	public ObservableList<TurboComment> getIssueHistory(){
+	public ObservableList<TurboComment> getLogComments(){
 		return log;
 	}
 	
+	public ObservableList<TurboIssueEvent> getEvents(){
+		return FXCollections.observableArrayList(ghEvents);
+	}
+
 	/**
 	 * Content Update Methods
-	 * */
+	 **/
 	
 	public void startContentUpdate(){
 		if(isNotSetup()){
@@ -132,11 +156,10 @@ public class IssueDetailsContentHandler {
 	private void updateData(){
 		updateCommentsList();
 		updateLogContents();
-
 	}
 	
 	private void updateLogContents(){
-		List<TurboComment> logItems = allGhContent.stream()
+		List<TurboComment> logItems = ghCommentsAndLogs.stream()
 										   .map(item -> new TurboComment(item))
 				   						   .filter(item -> item.isIssueLog())
 				   						   .collect(Collectors.toList());
@@ -145,7 +168,7 @@ public class IssueDetailsContentHandler {
 	}
 	
 	private void updateCommentsList(){
-		List<TurboComment> filteredComments = allGhContent.stream()
+		List<TurboComment> filteredComments = ghCommentsAndLogs.stream()
 												   .map(item -> new TurboComment(item))
 												   .collect(Collectors.toList());
 		for(TurboComment item : filteredComments){
@@ -176,7 +199,7 @@ public class IssueDetailsContentHandler {
 	
 	/**
 	 * Methods to create/edit/delete comment
-	 * */
+	 **/
 	
 	public boolean createComment(String text){
 		try {

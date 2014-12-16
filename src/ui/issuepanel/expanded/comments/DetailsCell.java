@@ -5,24 +5,32 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import model.TurboComment;
 import model.TurboIssue;
+import service.TurboIssueEvent;
 
-public class DetailsCell extends ListCell<TurboComment>{
+public class DetailsCell extends ListCell<CommentListItem>{
 	TurboIssue issue;
-	IssueDetailsCard display;
+	IssueDetailsCard commentDisplay;
+	IssueEventsCard eventDisplay;
 	
 	public DetailsCell(TurboIssue issue, IssueDetailsContentHandler handler){
 		this.issue = issue;
-		display = new CommentCard(handler);
+		commentDisplay = new CommentCard(handler);
 		this.getStyleClass().add("comments-list-cell");
 	}
 	
 	@Override
-	public void updateItem(TurboComment item, boolean empty){
- 		super.updateItem(item, empty);
- 		setAlignment(Pos.CENTER);
+	public void updateItem(CommentListItem item, boolean empty){
  		if(item != null){
- 			display.setDisplayedItem(item);
- 			setGraphic(display);
+ 	 		super.updateItem(item, empty);
+ 	 		setAlignment(Pos.CENTER);
+ 			if (item instanceof TurboComment) {
+ 	 			commentDisplay.setDisplayedItem((TurboComment) item);
+ 	 			setGraphic(commentDisplay);
+ 			} else {
+ 				assert item instanceof TurboIssueEvent;
+ 				eventDisplay = new IssueEventsCard((TurboIssueEvent) item);
+ 	 			setGraphic(eventDisplay);
+ 			}
  		}
 	}
 }
