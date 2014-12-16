@@ -21,6 +21,15 @@ import util.IOUtilities;
 
 public class IssueCommentsDisplay {
 
+	private static final boolean USE_MOBILE_USER_AGENT = true;
+	
+	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
+			? "ui/issuepanel/expanded/hideUI.js"
+			: "ui/issuepanel/expanded/mobileHideUI.js";
+	
+	// Chrome, Android 4.2.2, Samsung Galaxy S4
+	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
+
 	private UI ui;
 
 	static {
@@ -61,7 +70,7 @@ public class IssueCommentsDisplay {
 		@Override
 		protected Boolean call() throws Exception {
 			ChromeOptions options = new ChromeOptions();
-			options.addArguments("user-agent=\"Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36\"");
+			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 
 			driver = new ChromeDriver(options);
 
@@ -75,6 +84,8 @@ public class IssueCommentsDisplay {
 									(int) availableDimensions.getHeight()));
 
 			driver.get("https://github.com/login");
+//			driver.getCurrentUrl()
+//			driver.close(); // what do?
 			
 			try {
 				WebElement searchBox = driver.findElement(By.name("login"));
@@ -83,17 +94,17 @@ public class IssueCommentsDisplay {
 				searchBox.sendKeys(ServiceManager.getInstance().getPassword());
 				searchBox.submit();
 			} catch (NoSuchElementException e) {
-				// Do nothing
+				// Already logged in; do nothing
 			}
 
 			driver.get("https://github.com/hubturbo/hubturbo/issues/1");
 
 			if (driver instanceof JavascriptExecutor) {
-				Optional<String> file = IOUtilities.readResource("ui/issuepanel/expanded/hideUI.js");
+				Optional<String> file = IOUtilities.readResource(HIDE_ELEMENTS_SCRIPT_PATH);
 				if (file.isPresent()) {
 					((JavascriptExecutor) driver).executeScript(file.get());
 				} else {
-					System.out.println("Failed to read hideUI.js; did not execute");
+					System.out.println("Failed to read script for hiding elements; did not execute");
 				}
 			}
 			
