@@ -17,6 +17,7 @@ import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
+import util.events.IssueSelectedEvent;
 
 public class IssueCommentsDisplay {
 
@@ -38,28 +39,37 @@ public class IssueCommentsDisplay {
 	private UI ui;
 	private WebDriver driver;
 	private boolean loggedIn = false;
+	private boolean expanded = true;
 
 	public IssueCommentsDisplay(UI ui) {
 		this.ui = ui;
 		this.driver = setupDriver();
+		
+		System.out.println("created issue comments display");
+		
+		ui.registerEvent((IssueSelectedEvent e) -> {
+			if (!expanded) {
+				driverShowIssue(e.id);
+			}
+		});
 	}
 
 	public void toggle() {
-		boolean expanded = ui.toggleExpandedWidth();
+		expanded = ui.toggleExpandedWidth();
 
 		// Show the driver
 		if (!expanded) {
-
-			if (!loggedIn) {
-				driverLogin();
-				loggedIn = true;
-			}
-
-			driver.get(GitHubURL.getPathForIssue(1));
-			hidePageElements();
-
+			// TODO needs ref to current issue to do stuff
+			driverShowIssue(1);
 		} else {
 			// Do nothing; leave the driver in the background
+		}
+	}
+
+	private void driverLoginTest() {
+		if (!loggedIn) {
+			driverLogin();
+			loggedIn = true;
 		}
 	}
 
@@ -72,6 +82,12 @@ public class IssueCommentsDisplay {
 		}
 	}
 
+	private void driverShowIssue(int id) {
+		driverLoginTest();
+		driver.get(GitHubURL.getPathForIssue(id));
+		hidePageElements();
+	}
+	
 	private void driverLogin() {
 		driver.get(GitHubURL.LOGIN_PAGE);
 		// driver.getCurrentUrl()

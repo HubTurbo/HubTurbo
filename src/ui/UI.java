@@ -25,17 +25,28 @@ import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
 import util.Utility;
+import util.events.Event;
+import util.events.EventHandler;
+
+import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
-	private static final Logger logger = LogManager.getLogger(UI.class.getName());
+
 	private static final String VERSION_NUMBER = " V0.7.13";
+	private static final double WINDOW_EXPANDED_WIDTH = 0.6;
+
+	private static final Logger logger = LogManager.getLogger(UI.class.getName());
+
 	// Main UI elements
 	
-	private static final double WINDOW_EXPANDED_WIDTH = 0.6;
 	private Stage mainStage;
 	private ColumnControl columns;
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
+	
+	// Events
+	
+	private EventBus events;
 		
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -47,6 +58,8 @@ public class UI extends Application {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
             logger.error(throwable.getMessage(), throwable);
         });
+		
+		events = new EventBus();
 		
 		initCSS();
 		mainStage = stage;
@@ -148,6 +161,26 @@ public class UI extends Application {
 	 * UI operations
 	 */
 
+	/**
+	 * Publish/subscribe API making use of Guava's EventBus.
+	 * Takes a lambda expression to be called upon an event being fired.
+	 * @param handler
+	 */
+	public <T extends Event> void registerEvent(EventHandler<T> handler) {
+		events.register(handler);
+	}
+	
+	/**
+	 * Publish/subscribe API making use of Guava's EventBus.
+	 * Triggers all events of a certain type. EventBus will ensure that the
+	 * event is fired for all subscribers whose parameter is either the same
+	 * or a super type.
+	 * @param handler
+	 */
+	public <T extends Event> void triggerEvent(T event) {
+		events.post(event);
+	}
+	
 	/**
 	 * Tracks whether or not the window is in an expanded state.
 	 */
