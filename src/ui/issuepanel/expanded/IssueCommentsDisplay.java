@@ -37,28 +37,30 @@ public class IssueCommentsDisplay {
 	// Component state
 
 	private UI ui;
-	private WebDriver driver;
-	private boolean loggedIn = false;
-	private boolean expanded = true;
+
+	// Only one instance of the WebDriver is used, and its lifetime is equal to that
+	// of the app. This component may be arbitrarily recreated by anything that owns
+	// it, so the driver (and all of its state) is static.
+	
+	private static WebDriver driver = null;
+	private static boolean loggedIn = false;
 
 	public IssueCommentsDisplay(UI ui) {
 		this.ui = ui;
-		this.driver = setupDriver();
 		
-		System.out.println("created issue comments display");
-		
-		ui.registerEvent((IssueSelectedEvent e) -> {
-			if (!expanded) {
-				driverShowIssue(e.id);
-			}
-		});
+		if (driver == null) {
+			driver = setupDriver();
+			ui.registerEvent((IssueSelectedEvent e) -> {
+				if (!ui.isExpanded()) {
+					driverShowIssue(e.id);
+				}
+			});
+		}
 	}
 
 	public void toggle() {
-		expanded = ui.toggleExpandedWidth();
-
 		// Show the driver
-		if (!expanded) {
+		if (!ui.toggleExpandedWidth()) {
 			// TODO needs ref to current issue to do stuff
 			driverShowIssue(1);
 		} else {

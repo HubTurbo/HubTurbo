@@ -185,6 +185,10 @@ public class UI extends Application {
 	 * Tracks whether or not the window is in an expanded state.
 	 */
 	private boolean expanded = true;
+	
+	public boolean isExpanded() {
+		return expanded;
+	}
 
 	/**
 	 * Toggles the expansion state of the window.
