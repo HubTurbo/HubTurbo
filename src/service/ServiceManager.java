@@ -36,6 +36,7 @@ import org.markdown4j.Markdown4jProcessor;
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
+import ui.StatusBar;
 
 /**
  * Singleton class that provides access to the GitHub API services required by HubTurbo
@@ -154,6 +155,7 @@ public class ServiceManager {
 	}
 	
 	public boolean setupRepository(String owner, String name) throws IOException{
+		StatusBar.displayMessage("Authenticating...");
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
 			return model.loadComponents(repoId);
