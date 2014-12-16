@@ -3,6 +3,8 @@ package ui.issuepanel.expanded;
 import java.awt.Rectangle;
 import java.util.Optional;
 
+import javafx.concurrent.Task;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -68,13 +70,9 @@ public class IssueCommentsDisplay {
 		}
 	}
 
-	private void driverLoginTest() {
-		if (!loggedIn) {
-			driverLogin();
-			loggedIn = true;
-		}
-	}
-
+	/**
+	 * Runs a script in the currently-active driver window to hide GitHub UI elements.
+	 */
 	private void hidePageElements() {
 		Optional<String> file = IOUtilities.readResource(HIDE_ELEMENTS_SCRIPT_PATH);
 		if (file.isPresent()) {
@@ -84,27 +82,69 @@ public class IssueCommentsDisplay {
 		}
 	}
 
+	/**
+	 * Navigates to the GitHub page for the given issue in the currently-active
+	 * driver window.
+	 * Run on a separate thread.
+	 */
 	private void driverShowIssue(int id) {
-		driverLoginTest();
-		driver.get(GitHubURL.getPathForIssue(id));
-		hidePageElements();
+		Thread th = new Thread(new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				driverLoginTest();
+				driver.get(GitHubURL.getPathForIssue(id));
+				hidePageElements();
+				return null;
+			}
+		});
+		th.setDaemon(true);
+		th.start();
 	}
 	
-	private void driverLogin() {
-		driver.get(GitHubURL.LOGIN_PAGE);
-		// driver.getCurrentUrl()
-		// driver.close(); // what do?
-		try {
-			WebElement searchBox = driver.findElement(By.name("login"));
-			searchBox.sendKeys(ServiceManager.getInstance().getUserId());
-			searchBox = driver.findElement(By.name("password"));
-			searchBox.sendKeys(ServiceManager.getInstance().getPassword());
-			searchBox.submit();
-		} catch (NoSuchElementException e) {
-			// Already logged in; do nothing
+	/**
+	 * Logs in in the currently-active driver window, if that hasn't been done. 
+	 */
+	private void driverLoginTest() {
+		if (!loggedIn) {
+			driverLogin();
+			loggedIn = true;
 		}
 	}
 
+	/**
+	 * Logs in the currently-active driver window using the credentials
+	 * supplied by the user on login to the app.
+	 * Run on a separate thread.
+	 */
+	private void driverLogin() {
+		Thread th = new Thread(new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				driver.get(GitHubURL.LOGIN_PAGE);
+				// driver.getCurrentUrl()
+				// driver.close(); // what do?
+				try {
+					WebElement searchBox = driver.findElement(By.name("login"));
+					searchBox.sendKeys(ServiceManager.getInstance().getUserId());
+					searchBox = driver.findElement(By.name("password"));
+					searchBox.sendKeys(ServiceManager.getInstance().getPassword());
+					searchBox.submit();
+				} catch (NoSuchElementException e) {
+					// Already logged in; do nothing
+				}
+				return null;
+			}
+		});
+		th.setDaemon(true);
+		th.start();
+	}
+
+	/**
+	 * Executes Javascript in the currently-active driver window.
+	 * Run on the UI thread (will block until execution is complete,
+	 * i.e. change implementation if long-running scripts must be run).
+	 * @param script
+	 */
 	private void driverExecuteJavaScript(String script) {
 		if (driver instanceof JavascriptExecutor) {
 			((JavascriptExecutor) driver).executeScript(script);
@@ -113,6 +153,10 @@ public class IssueCommentsDisplay {
 		}
 	}
 
+	/**
+	 * Creates, initialises, and returns a ChromeDriver.
+	 * @return
+	 */
 	private ChromeDriver setupDriver() {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
