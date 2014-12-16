@@ -12,6 +12,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import model.Model;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import model.TurboUser;
+import storage.DataCacheFileHandler;
+import storage.TurboRepoData;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,6 +80,10 @@ public class ServiceManager {
 	private ModelUpdater modelUpdater;
 	private Model model;
 	private IRepositoryIdProvider repoId;
+	private String issuesETag = null;
+	private String collabsETag = null;
+	private String labelsETag = null;
+	private String milestonesETag = null;
 	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -111,7 +121,7 @@ public class ServiceManager {
 			stopModelUpdate();
 		}
 		if(repoId != null){
-			modelUpdater = new ModelUpdater(githubClient, model);
+			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag);
 			modelUpdater.startModelUpdate();
 		}
 	}
@@ -198,17 +208,53 @@ public class ServiceManager {
 	public HashMap<String, List> getGitHubResources(IRepositoryIdProvider repoId) throws IOException {
 		this.repoId = repoId;
 		model.setRepoId(repoId);
-		List<User> ghCollaborators = getCollaborators();
-		List<Label> ghLabels = getLabels();
-		List<Milestone> ghMilestones = getMilestones();
-		List<Issue> ghIssues = getAllIssues();
 		
-		HashMap<String, List> map = new HashMap<String, List>();
-		map.put(KEY_COLLABORATORS, ghCollaborators);
-		map.put(KEY_LABELS, ghLabels);
-		map.put(KEY_MILESTONES, ghMilestones);
-		map.put(KEY_ISSUES, ghIssues);
-		return map;
+		boolean needToGetResources = true;
+		String repoIdString = repoId.toString();
+
+		DataCacheFileHandler dcHandler = DataCacheFileHandler.getInstance();
+		TurboRepoData repo = dcHandler.getRepoGivenId(repoIdString);
+		if (repo != null) {
+			needToGetResources = false;
+		}
+
+		if (!needToGetResources) {
+			//TODO: remove print line
+			System.out.println("yay, don't load again!");
+			issuesETag = repo.getIssuesETag();
+			collabsETag = repo.getCollaboratorsETag();
+			labelsETag = repo.getLabelsETag();
+			milestonesETag = repo.getMilestonesETag();
+			List<TurboUser> collaborators = repo.getCollaborators();
+			List<TurboLabel> labels = repo.getLabels();
+			List<TurboMilestone> milestones = repo.getMilestones();
+			List<TurboIssue> issues = repo.getIssues(model);
+			
+			HashMap<String, List> map = new HashMap<String, List>();
+			map.put(KEY_COLLABORATORS, collaborators);
+			map.put(KEY_LABELS, labels);
+			map.put(KEY_MILESTONES, milestones);
+			map.put(KEY_ISSUES, issues);
+			return map;
+		} else {
+			// get resources
+			List<User> ghCollaborators = null;
+			List<Label> ghLabels = null;
+			List<Milestone> ghMilestones = null;
+			List<Issue> ghIssues = null;
+			
+			ghCollaborators = getCollaborators();
+			ghLabels = getLabels();
+			ghMilestones = getMilestones();
+			ghIssues = getAllIssues();
+			
+			HashMap<String, List> map = new HashMap<String, List>();
+			map.put(KEY_COLLABORATORS, ghCollaborators);
+			map.put(KEY_LABELS, ghLabels);
+			map.put(KEY_MILESTONES, ghMilestones);
+			map.put(KEY_ISSUES, ghIssues);
+			return map;
+		}
 	}
 	
 	/**

@@ -54,7 +54,7 @@ public class TurboIssue implements Listable {
 		}
 		return name;
 	}
-	private void setCreator(String creator) {
+	public void setCreator(String creator) {
 		this.creator = creator;
 	}
 	
@@ -62,7 +62,7 @@ public class TurboIssue implements Listable {
 	public String getCreatedAt() {
 		return this.createdAt;
 	}
-	private void setCreatedAt(String createdAt) {
+	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
 	
@@ -128,6 +128,9 @@ public class TurboIssue implements Listable {
     		return getDescription();
     	}
     	return cachedDescriptionMarkup;
+    }
+    public void setDescriptionMarkup(String descMarkup) {
+    	this.cachedDescriptionMarkup = descMarkup;
     }
     
     private IntegerProperty parentIssue = new SimpleIntegerProperty();
@@ -195,7 +198,7 @@ public class TurboIssue implements Listable {
     public String getHtmlUrl() {
     	return htmlUrl;
     }
-	private void setHtmlUrl(String htmlUrl) {
+	public void setHtmlUrl(String htmlUrl) {
 		this.htmlUrl = htmlUrl;
 	}
 	
