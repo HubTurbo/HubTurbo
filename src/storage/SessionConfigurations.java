@@ -23,11 +23,15 @@ public class SessionConfigurations {
 	}
 	
 	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
-		projectFilters.put(project.generateId(), filter);
+		if (project != null) {
+			projectFilters.put(project.generateId(), filter);
+		}
 	}
 	
 	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
-		System.out.println(project);
+		if (project == null) {
+			return new ArrayList<>();
+		}
 		return projectFilters.get(project.generateId());
 	}
 	
