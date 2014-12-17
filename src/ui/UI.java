@@ -43,7 +43,8 @@ public class UI extends Application {
 	private ColumnControl columns;
 	private SidePanel sidePanel;
 	private MenuControl menuBar;
-	
+	private BrowserComponent browserComponent;
+
 	// Events
 	
 	private EventBus events;
@@ -61,6 +62,8 @@ public class UI extends Application {
 		
 		events = new EventBus();
 		
+		browserComponent = new BrowserComponent(this);
+		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -181,11 +184,15 @@ public class UI extends Application {
 		events.post(event);
 	}
 	
+	public BrowserComponent getBrowserComponent() {
+		return browserComponent;
+	}
+	
 	/**
 	 * Tracks whether or not the window is in an expanded state.
 	 */
 	private boolean expanded = true;
-	
+
 	public boolean isExpanded() {
 		return expanded;
 	}
