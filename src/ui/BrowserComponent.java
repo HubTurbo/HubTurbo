@@ -99,7 +99,9 @@ public class BrowserComponent {
 	 */
 	private ChromeDriver setupChromeDriver() {
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
+		if (USE_MOBILE_USER_AGENT) {
+			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
+		}
 		ChromeDriver driver = new ChromeDriver(options);
 		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
