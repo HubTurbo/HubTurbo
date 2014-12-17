@@ -1,6 +1,6 @@
 var paths = [
     // header
-    "body > header > div > div",
+    "body > header > div",
 
     // footer
     "body > footer > div > ul > li > form > button",
