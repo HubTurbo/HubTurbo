@@ -463,10 +463,7 @@ public class IssueEditDisplay extends VBox{
 		ToggleButton details = new ToggleButton(ISSUE_DETAILS_BTN_TXT);
 		HBox.setHgrow(details, Priority.ALWAYS);
 		details.setMaxWidth(Double.MAX_VALUE);
-//		WeakReference<ToggleButton> ref = new WeakReference<ToggleButton>(details);
-		details.setOnAction((ActionEvent e) -> {
-//		    boolean selected = ref.get().selectedProperty().get();
-//		    parentContainer.get().showIssueDetailsDisplay(selected);
+		details.setOnAction(e -> {
 			issueCommentsDisplay.toggle();
 		});
 		

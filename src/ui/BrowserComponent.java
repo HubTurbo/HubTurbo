@@ -23,6 +23,9 @@ import util.IOUtilities;
 import util.events.IssueSelectedEvent;
 import util.events.LoginEvent;
 
+/**
+ * An abstraction for the functions of the Selenium web driver.
+ */
 public class BrowserComponent {
 	
 	private static final boolean USE_MOBILE_USER_AGENT = true;
@@ -40,6 +43,17 @@ public class BrowserComponent {
 	
 	private final UI ui;
 	private WebDriver driver = null;
+	
+	// We want browser commands to be run on a separate thread, but not to
+	// interfere with each other. This executor is limited to a single instance,
+	// so it ensures that browser commands are queued and executed in sequence.
+
+	// The alternatives would be to:
+	// - allow race conditions
+	// - interrupt the blocking WebDriver::get method
+	
+	// The first is not desirable and the second does not seem to be possible
+	// at the moment.
 	private Executor executor;
 	
 	public BrowserComponent(UI ui) {
