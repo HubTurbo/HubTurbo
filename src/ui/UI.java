@@ -27,6 +27,7 @@ import ui.sidepanel.SidePanel;
 import util.Utility;
 import util.events.Event;
 import util.events.EventHandler;
+import util.events.LoginEvent;
 
 import com.google.common.eventbus.EventBus;
 
@@ -81,6 +82,7 @@ public class UI extends Application {
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
+				triggerEvent(new LoginEvent());
 			}
 			return true;
 		}).exceptionally(e -> {

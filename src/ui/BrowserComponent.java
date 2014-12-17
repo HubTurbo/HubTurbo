@@ -18,6 +18,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import service.ServiceManager;
 import util.GitHubURL;
 import util.IOUtilities;
+import util.events.LoginEvent;
 
 public class BrowserComponent {
 	
@@ -47,6 +48,9 @@ public class BrowserComponent {
 	public void initialise() {
 		if (driver != null) assert false;
 		driver = setupChromeDriver();
+		ui.registerEvent((LoginEvent e) -> {
+			login();
+		});
 	}
 	
 	/**
