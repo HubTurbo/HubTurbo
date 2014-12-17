@@ -13,6 +13,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -44,7 +45,7 @@ public class BrowserComponent {
 	}
 	
 	private final UI ui;
-	private WebDriver driver = null;
+	private ChromeDriver driver = null;
 	
 	// We want browser commands to be run on a separate thread, but not to
 	// interfere with each other. This executor is limited to a single instance,
@@ -147,9 +148,15 @@ public class BrowserComponent {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
-				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-					driver.get(GitHubURL.getPathForIssue(id));
-					hidePageElements();
+				try {
+					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+						driver.get(GitHubURL.getPathForIssue(id));
+						hidePageElements();
+					}
+				} catch (WebDriverException e) {
+					// Chrome was closed; recreate it
+					driver = setupChromeDriver();
+					return call(); // Recurse and repeat
 				}
 				return null;
 			}
