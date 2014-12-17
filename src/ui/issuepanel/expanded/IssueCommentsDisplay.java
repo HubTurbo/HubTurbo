@@ -1,22 +1,24 @@
 package ui.issuepanel.expanded;
 
+import model.TurboIssue;
 import ui.UI;
 
 public class IssueCommentsDisplay {
 
-	private UI ui;	
+	private UI ui;
+	private TurboIssue issue;
 
-	public IssueCommentsDisplay(UI ui) {
+	public IssueCommentsDisplay(UI ui, TurboIssue current) {
 		this.ui = ui;
+		this.issue = current;
 	}
 
 	public void toggle() {
 		// Show the driver
 		if (!ui.toggleExpandedWidth()) {
-			// TODO needs ref to current issue to do stuff
-			ui.getBrowserComponent().showIssue(1);
+			ui.getBrowserComponent().showIssue(issue.getId());
 		} else {
-			// Do nothing; leave the driver in the background
+			// Do nothing
 		}
 	}
 }

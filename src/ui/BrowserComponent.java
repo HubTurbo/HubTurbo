@@ -116,7 +116,6 @@ public class BrowserComponent {
 		Thread th = new Thread(new Task<Void>() {
 			@Override
 			protected Void call() {
-				login();
 				driver.get(GitHubURL.getPathForIssue(id));
 				hidePageElements();
 				return null;

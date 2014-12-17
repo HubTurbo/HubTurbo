@@ -99,13 +99,13 @@ public class IssueEditDisplay extends VBox{
 	private ArrayList<ChangeListener<?>> changeListeners = new ArrayList<ChangeListener<?>>();
 	
 	public IssueEditDisplay(UI ui, TurboIssue displayedIssue, Stage parentStage, Model model, IssueDisplayPane parent, boolean focusRequested){
-		this.issueCommentsDisplay = new IssueCommentsDisplay(ui);
 		this.ui = ui;
 		this.issue = displayedIssue;
 		this.model = model;
 		this.parentStage = parentStage;
 		this.parentContainer = new WeakReference<IssueDisplayPane>(parent);
 		this.focusRequested = focusRequested;
+		this.issueCommentsDisplay = new IssueCommentsDisplay(ui, issue);
 		setup();
 		setupKeyboardShortcuts();
 	}
