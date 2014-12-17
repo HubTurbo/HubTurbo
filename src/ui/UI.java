@@ -115,6 +115,7 @@ public class UI extends Application {
 			ServiceManager.getInstance().stopModelUpdate();
 			columns.saveSession();
 			DataManager.getInstance().saveSessionConfig();
+			browserComponent.quit();
 			Platform.exit();
 			System.exit(0);
 		});

@@ -81,6 +81,14 @@ public class BrowserComponent {
 		});
 
 	}
+
+	/**
+	 * Called when application quits. Guaranteed to only happen once.
+	 */
+	public void quit() {
+		assert driver != null;
+		driver.close();
+	}
 	
 	/**
 	 * Creates, initialises, and returns a ChromeDriver.
