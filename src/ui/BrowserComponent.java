@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.Rectangle;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javafx.concurrent.Task;
 
@@ -31,16 +33,18 @@ public class BrowserComponent {
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
-
+	
 	static {
 		System.setProperty("webdriver.chrome.driver", "/Users/darius/Downloads/chromedriver");
 	}
 	
 	private final UI ui;
 	private WebDriver driver = null;
+	private Executor executor;
 	
 	public BrowserComponent(UI ui) {
 		this.ui = ui;
+		this.executor = Executors.newSingleThreadExecutor();
 	}
 	
 	/**
@@ -113,16 +117,16 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void showIssue(int id) {
-		Thread th = new Thread(new Task<Void>() {
+		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
-				driver.get(GitHubURL.getPathForIssue(id));
-				hidePageElements();
+				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+					driver.get(GitHubURL.getPathForIssue(id));
+					hidePageElements();
+				}
 				return null;
 			}
 		});
-		th.setDaemon(true);
-		th.start();
 	}
 
 	/**
@@ -131,7 +135,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void login() {
-		Thread th = new Thread(new Task<Void>() {
+		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
 				driver.get(GitHubURL.LOGIN_PAGE);
@@ -149,8 +153,6 @@ public class BrowserComponent {
 				return null;
 			}
 		});
-		th.setDaemon(true);
-		th.start();
 	}
 	
 }
