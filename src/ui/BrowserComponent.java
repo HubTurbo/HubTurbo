@@ -18,6 +18,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import service.ServiceManager;
 import util.GitHubURL;
 import util.IOUtilities;
+import util.events.IssueSelectedEvent;
 import util.events.LoginEvent;
 
 public class BrowserComponent {
@@ -44,13 +45,23 @@ public class BrowserComponent {
 	
 	/**
 	 * Called on application startup. Blocks until the driver is created.
+	 * Guaranteed to only happen once.
 	 */
 	public void initialise() {
-		if (driver != null) assert false;
+		assert driver == null;
 		driver = setupChromeDriver();
 		ui.registerEvent((LoginEvent e) -> {
 			login();
 		});
+		ui.registerEvent((IssueSelectedEvent e) -> {
+			// Triggers error logging from EventBus for an unknown reason.
+			// No functionality seems to be affected, however... this block
+			// always runs.
+			if (!ui.isExpanded()) {
+				ui.getBrowserComponent().showIssue(e.id);
+			}
+		});
+
 	}
 	
 	/**
@@ -104,7 +115,7 @@ public class BrowserComponent {
 	public void showIssue(int id) {
 		Thread th = new Thread(new Task<Void>() {
 			@Override
-			protected Void call() throws Exception {
+			protected Void call() {
 				login();
 				driver.get(GitHubURL.getPathForIssue(id));
 				hidePageElements();
@@ -123,7 +134,7 @@ public class BrowserComponent {
 	public void login() {
 		Thread th = new Thread(new Task<Void>() {
 			@Override
-			protected Void call() throws Exception {
+			protected Void call() {
 				driver.get(GitHubURL.LOGIN_PAGE);
 				// driver.getCurrentUrl()
 				// driver.close(); // what do?

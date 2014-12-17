@@ -1,7 +1,6 @@
 package ui.issuepanel.expanded;
 
 import ui.UI;
-import util.events.IssueSelectedEvent;
 
 public class IssueCommentsDisplay {
 
@@ -9,12 +8,6 @@ public class IssueCommentsDisplay {
 
 	public IssueCommentsDisplay(UI ui) {
 		this.ui = ui;
-		
-		ui.registerEvent((IssueSelectedEvent e) -> {
-			if (!ui.isExpanded()) {
-				ui.getBrowserComponent().showIssue(e.id);
-			}
-		});
 	}
 
 	public void toggle() {
