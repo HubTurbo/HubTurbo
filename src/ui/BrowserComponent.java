@@ -21,7 +21,9 @@ import service.ServiceManager;
 import util.GitHubURL;
 import util.IOUtilities;
 import util.events.IssueSelectedEvent;
+import util.events.IssueSelectedEventHandler;
 import util.events.LoginEvent;
+import util.events.LoginEventHandler;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -68,15 +70,16 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = setupChromeDriver();
-		ui.registerEvent((LoginEvent e) -> {
-			login();
+		ui.registerEvent(new LoginEventHandler() {
+			@Override public void handle(LoginEvent e) {
+				login();
+			}
 		});
-		ui.registerEvent((IssueSelectedEvent e) -> {
-			// Triggers error logging from EventBus for an unknown reason.
-			// No functionality seems to be affected, however... this block
-			// always runs.
-			if (!ui.isExpanded()) {
-				ui.getBrowserComponent().showIssue(e.id);
+		ui.registerEvent(new IssueSelectedEventHandler() {
+			@Override public void handle(IssueSelectedEvent e) {
+				if (!ui.isExpanded()) {
+					ui.getBrowserComponent().showIssue(e.id);
+				}
 			}
 		});
 

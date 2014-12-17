@@ -172,7 +172,7 @@ public class UI extends Application {
 	 * Takes a lambda expression to be called upon an event being fired.
 	 * @param handler
 	 */
-	public <T extends Event> void registerEvent(EventHandler<T> handler) {
+	public <T extends Event> void registerEvent(EventHandler handler) {
 		events.register(handler);
 	}
 	
