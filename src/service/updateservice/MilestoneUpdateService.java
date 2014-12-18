@@ -17,9 +17,10 @@ import com.google.gson.reflect.TypeToken;
 public class MilestoneUpdateService extends UpdateService<Milestone>{
 	
 	
-	public MilestoneUpdateService(GitHubClientExtended client){
+	public MilestoneUpdateService(GitHubClientExtended client, String milestonesETag){
 		super(client);
 		apiSuffix = SEGMENT_MILESTONES;
+		super.setLastETag(milestonesETag);
 	}
 	
 	private Map<String, String> createUpdatedMilestonesParams(){

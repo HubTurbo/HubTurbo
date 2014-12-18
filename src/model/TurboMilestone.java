@@ -24,6 +24,9 @@ public class TurboMilestone implements Listable {
 	
 	private int number = -1;
 	public int getNumber() {return number;}
+	public void setNumber(int number) {
+		this.number = number;
+	}
 	
 	private StringProperty title = new SimpleStringProperty();
     public final String getTitle() {return title.get();}
@@ -32,6 +35,9 @@ public class TurboMilestone implements Listable {
 	
 	private String state;
 	public String getState() {return state;}
+	public void setState(String state) {
+		this.state = state;
+	}
 	
 	private String description;
 	public String getDescription() {return description;}
@@ -45,20 +51,27 @@ public class TurboMilestone implements Listable {
 			setDueOnString(getDueOn().format(DateTimeFormatter.ofPattern(CUSTOM_DATETIME_PATTERN)));
 		}
 	}
+	public void setDueOn(String dueOnString) {
+		if (dueOnString == null) {
+			this.dueOn = null;
+		} else {
+			this.dueOn = LocalDate.parse(dueOnString, DateTimeFormatter.ofPattern(CUSTOM_DATETIME_PATTERN));
+		}
+	}
 
 	private StringProperty dueOnString = new SimpleStringProperty();
     public final String getDueOnString() {return dueOnString.get();}
-    private final void setDueOnString(String value) {dueOnString.set(value);}
+    public final void setDueOnString(String value) {dueOnString.set(value);}
     public StringProperty dueOnStringProperty() {return dueOnString;}
 	
 	private IntegerProperty closed = new SimpleIntegerProperty();
     public final Integer getClosed() {return closed.get();}
-    private final void setClosed(Integer value) {closed.set(value);}
+    public final void setClosed(Integer value) {closed.set(value);}
     public IntegerProperty closedProperty() {return closed;}
     
     private IntegerProperty open = new SimpleIntegerProperty();
     public final Integer getOpen() {return open.get();}
-    private final void setOpen(Integer value) {open.set(value);}
+    public final void setOpen(Integer value) {open.set(value);}
     public IntegerProperty openProperty() {return open;}
 	
 	/*

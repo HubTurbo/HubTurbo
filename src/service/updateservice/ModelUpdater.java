@@ -23,12 +23,12 @@ public class ModelUpdater {
 	private Timer pollTimer;
 	private Date lastUpdateTime = new Date();
 	
-	public ModelUpdater(GitHubClientExtended client, Model model){
+	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag){
 		this.model = model;
-		this.issueUpdateService = new IssueUpdateService(client);
-		this.collaboratorUpdateService = new CollaboratorUpdateService(client);
-		this.labelUpdateService = new LabelUpdateService(client);
-		this.milestoneUpdateService = new MilestoneUpdateService(client);
+		this.issueUpdateService = new IssueUpdateService(client, issuesETag);
+		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);
+		this.labelUpdateService = new LabelUpdateService(client, labelsETag);
+		this.milestoneUpdateService = new MilestoneUpdateService(client, milestonesETag);
 	}
 	
 	public Date getLastUpdateTime(){
@@ -45,11 +45,13 @@ public class ModelUpdater {
 	
 	private void updateModelIssues(){
 		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());
+		model.updateIssuesETag(issueUpdateService.getLastETag());
 		model.updateCachedIssues(updatedIssues);
 	}
 	
 	private void updateModelCollaborators(){
 		List<User> collaborators = collaboratorUpdateService.getUpdatedItems(model.getRepoId());
+		model.updateCollabsETag(collaboratorUpdateService.getLastETag());
 		if(collaborators.size() > 0){
 			model.updateCachedCollaborators(collaborators);
 		}
@@ -57,6 +59,7 @@ public class ModelUpdater {
 	
 	private void updateModelLabels(){
 		List<Label> labels = labelUpdateService.getUpdatedItems(model.getRepoId());
+		model.updateLabelsETag(labelUpdateService.getLastETag());
 		if(labels.size() > 0){
 			model.updateCachedLabels(labels);
 		}
@@ -64,6 +67,7 @@ public class ModelUpdater {
 	
 	private void updateModelMilestones(){
 		List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(model.getRepoId());
+		model.updateMilestonesETag(milestoneUpdateService.getLastETag());
 		if(milestones.size() > 0){
 			model.updateCachedMilestones(milestones);
 		}
