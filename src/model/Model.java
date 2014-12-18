@@ -203,6 +203,8 @@ public class Model {
 	public void updateCachedIssues(List<Issue> issueList){
 		if(issueList.size() == 0){
 			return;
+		} else {
+			enforceStatusStateConsistency(issueList);
 		}
 		WeakReference<Model> selfRef = new WeakReference<Model>(this);
 		for(int i = issueList.size() - 1; i >= 0; i--){
