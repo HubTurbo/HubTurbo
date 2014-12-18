@@ -1,24 +1,30 @@
-package ui;
+package ui.issuepanel.expanded;
 
 import java.awt.Rectangle;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javafx.concurrent.Task;
 
+import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import service.ServiceManager;
+import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
 import util.events.IssueSelectedEvent;
@@ -41,7 +47,9 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 	
 	static {
-		System.setProperty("webdriver.chrome.driver", "/Users/darius/Downloads/chromedriver");
+		
+		setupChromeDriverExecutable();
+		
 	}
 	
 	private final UI ui;
@@ -64,6 +72,35 @@ public class BrowserComponent {
 		this.executor = Executors.newSingleThreadExecutor();
 	}
 	
+	private static void setupChromeDriverExecutable() {
+		
+		String osName = System.getProperty("os.name");
+		String binaryPath =
+				osName.startsWith("Mac OS") ? "chromedriver"
+				: osName.startsWith("Windows") ? "chromedriver.exe"
+				: "chromedriver_linux";
+		
+		File f = new File(binaryPath);
+		if(!f.exists()) {
+			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream("ui/issuepanel/expanded/chromedriver");
+			OutputStream out;
+			try {
+				out = new FileOutputStream(binaryPath);
+				IOUtils.copy(in, out);
+				out.close();
+				f.setExecutable(true);
+			} catch (IOException e) {
+				System.out.println("Could not load Chrome driver binary!");
+				e.printStackTrace();
+			}
+			System.out.println("Could not find " + binaryPath + "; extracted it from jar");
+		} else {
+			System.out.println("Located " + binaryPath);
+		}
+		
+		System.setProperty("webdriver.chrome.driver", binaryPath);
+	}
+
 	/**
 	 * Called on application startup. Blocks until the driver is created.
 	 * Guaranteed to only happen once.
