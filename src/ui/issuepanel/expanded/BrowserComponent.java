@@ -47,9 +47,7 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 	
 	static {
-		
 		setupChromeDriverExecutable();
-		
 	}
 	
 	private final UI ui;
@@ -70,35 +68,6 @@ public class BrowserComponent {
 	public BrowserComponent(UI ui) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
-	}
-	
-	private static void setupChromeDriverExecutable() {
-		
-		String osName = System.getProperty("os.name");
-		String binaryFileName =
-				osName.startsWith("Mac OS") ? "chromedriver"
-				: osName.startsWith("Windows") ? "chromedriver.exe"
-				: "chromedriver_linux";
-		
-		File f = new File(binaryFileName);
-		if(!f.exists()) {
-			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream("ui/issuepanel/expanded/" + binaryFileName);
-			OutputStream out;
-			try {
-				out = new FileOutputStream(binaryFileName);
-				IOUtils.copy(in, out);
-				out.close();
-				f.setExecutable(true);
-			} catch (IOException e) {
-				System.out.println("Could not load Chrome driver binary!");
-				e.printStackTrace();
-			}
-			System.out.println("Could not find " + binaryFileName + "; extracted it from jar");
-		} else {
-			System.out.println("Located " + binaryFileName);
-		}
-		
-		System.setProperty("webdriver.chrome.driver", binaryFileName);
 	}
 
 	/**
@@ -128,7 +97,11 @@ public class BrowserComponent {
 	 */
 	public void quit() {
 		assert driver != null;
-		driver.close();
+		try {
+			driver.close();
+		} catch (WebDriverException e) {
+			// Chrome was closed; do nothing
+		}
 	}
 	
 	/**
@@ -209,8 +182,6 @@ public class BrowserComponent {
 			@Override
 			protected Void call() {
 				driver.get(GitHubURL.LOGIN_PAGE);
-				// driver.getCurrentUrl()
-				// driver.close(); // what do?
 				try {
 					WebElement searchBox = driver.findElement(By.name("login"));
 					searchBox.sendKeys(ServiceManager.getInstance().getUserId());
@@ -225,4 +196,37 @@ public class BrowserComponent {
 		});
 	}
 	
+	/**
+	 * Ensures that the chromedriver executable is in the project root before
+	 * initialisation. Since executables are packaged for all platforms, this also
+	 * picks the right version to use.
+	 */
+	private static void setupChromeDriverExecutable() {
+		
+		String osName = System.getProperty("os.name");
+		String binaryFileName =
+				osName.startsWith("Mac OS") ? "chromedriver"
+				: osName.startsWith("Windows") ? "chromedriver.exe"
+				: "chromedriver_linux";
+		
+		File f = new File(binaryFileName);
+		if(!f.exists()) {
+			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream("ui/issuepanel/expanded/" + binaryFileName);
+			OutputStream out;
+			try {
+				out = new FileOutputStream(binaryFileName);
+				IOUtils.copy(in, out);
+				out.close();
+				f.setExecutable(true);
+			} catch (IOException e) {
+				System.out.println("Could not load Chrome driver binary!");
+				e.printStackTrace();
+			}
+			System.out.println("Could not find " + binaryFileName + "; extracted it from jar");
+		} else {
+			System.out.println("Located " + binaryFileName);
+		}
+		
+		System.setProperty("webdriver.chrome.driver", binaryFileName);
+	}
 }
