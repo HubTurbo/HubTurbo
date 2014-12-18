@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.logging.log4j.LogManager;
@@ -85,6 +86,15 @@ public class UpdateService<T> extends GitHubService{
 		try {
 
 			PagedRequest<T> request = createUpdatedRequest(repoId);
+			
+			// This is to remove params: "since" for issues request that was added automatically since we 
+			// do not want to retrieve issues since the time the request was made, but instead the last modified ETag.
+			if (apiSuffix == "/issues") {
+				Map<String, String> temp = request.getParams();
+				temp.remove("since");
+				request.setParams(temp);
+			}
+
 			PageIterator<T> requestIterator = new PageIterator<T>(request, client);
 			HttpURLConnection connection = createUpdatedConnection(request);
 			int responseCode = connection.getResponseCode();
@@ -92,7 +102,7 @@ public class UpdateService<T> extends GitHubService{
 			if(client.isError(responseCode)){
 				return new ArrayList<T>();
 			}
-			
+
 			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
 				result = (ArrayList<T>)getAll(requestIterator);
 			}

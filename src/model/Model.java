@@ -16,7 +16,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +41,11 @@ public class Model {
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
+	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
+	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
+	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
+	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
+	private static final String MESSAGE_LOADING_PROJECT_CONFIG = "Loading project configuration...";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -97,7 +101,7 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources){
 		this.repoId = repoId;
-		StatusBar.displayMessage("Loading project configuration...");
+		StatusBar.displayMessage(MESSAGE_LOADING_PROJECT_CONFIG);
 		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
@@ -108,22 +112,22 @@ public class Model {
 		}
 		
 		if (isTurboResource) {
-			StatusBar.displayMessage("Loading collaborators...");
+			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadTurboCollaborators((List<TurboUser>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
-			StatusBar.displayMessage("Loading labels...");
+			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
 			loadTurboLabels((List<TurboLabel>) ghResources.get(ServiceManager.KEY_LABELS));
-			StatusBar.displayMessage("Loading milestones...");
+			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
 			loadTurboMilestones((List<TurboMilestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
-			StatusBar.displayMessage("Loading issues...");
+			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
 			loadTurboIssues((List<TurboIssue>)ghResources.get(ServiceManager.KEY_ISSUES));
 		} else {
-			StatusBar.displayMessage("Loading collaborators...");
+			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
-			StatusBar.displayMessage("Loading labels...");
+			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
 			loadLabels((List<Label>) ghResources.get(ServiceManager.KEY_LABELS));
-			StatusBar.displayMessage("Loading milestones...");
+			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
 			loadMilestones((List<Milestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
-			StatusBar.displayMessage("Loading issues...");
+			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
 			loadIssues((List<Issue>)ghResources.get(ServiceManager.KEY_ISSUES));
 		}
 	}
@@ -195,8 +199,7 @@ public class Model {
 		}
 		return true;
 	}
-	
-	
+
 	public void updateCachedIssues(List<Issue> issueList){
 		if(issueList.size() == 0){
 			return;
@@ -212,7 +215,7 @@ public class Model {
 		        }
 		   });
 		}
-
+		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 		
 	public void updateCachedIssue(TurboIssue issue){
@@ -221,8 +224,7 @@ public class Model {
 			tIssue.copyValues(issue);
 		}else{
 			issues.add(0, issue);
-		}
-		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		}	
 	}
 	
 	public void addLabel(TurboLabel label){
@@ -312,7 +314,6 @@ public class Model {
 	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
 	        }
 	   });
-		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -468,7 +469,6 @@ public class Model {
 			milestones.clear();
 			milestones.addAll(list);
 		});
-		
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.collections.ObservableList;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -22,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class DataCacheFileHandler {
 
+	private static final Logger logger = LogManager.getLogger(DataCacheFileHandler.class.getName());
 	private static DataCacheFileHandler dataCacheFileHandlerInstance = null;
 	private static final String FILE_DATA_CACHE = "data-cache.json";
 	private static final String FILE_DATA_CACHE_TEMP = "data-cache-temp.json";
@@ -49,8 +53,12 @@ public class DataCacheFileHandler {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(FILE_DATA_CACHE));
 
 			repoDataList = gson.fromJson(bufferedReader, new TypeToken<List<TurboRepoData>>(){}.getType());
+			
+			bufferedReader.close();
 		} catch (FileNotFoundException e){
 			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -81,9 +89,8 @@ public class DataCacheFileHandler {
 		this.issues = issues;
 	}
 	
-	@SuppressWarnings("unused")
 	public void writeToFile(String repoId, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
-		System.out.println("Writing to file...");
+		//System.out.println("Writing to file...");
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
 		this.labels = labels.stream().collect(Collectors.toList());
@@ -93,17 +100,14 @@ public class DataCacheFileHandler {
 		if (repoDataList == null) {
 			repoDataList = new ArrayList<TurboRepoData>();
 		} else {
-			for (int i = 0; i < repoDataList.size(); i++) {
-				if (repoDataList.get(i).getRepoId().equals(repoId)) {
-					repoDataList.remove(i);
-					break;
-				}
-			}
+			removeEntryIfExists(repoId);
 		}
 		repoDataList.add(currentRepoData);
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(repoDataList);
+		
+		// Save to temp file first to mitigate corruption of data. Once writing is done, rename it to main cache file
 		try {
 			FileWriter writer = new FileWriter(FILE_DATA_CACHE_TEMP);
 			writer.write(json);
@@ -112,13 +116,30 @@ public class DataCacheFileHandler {
 			File file = new File(FILE_DATA_CACHE);
 			
 			if (file.exists()) {
-				boolean deleted = file.delete();
+				if (file.delete()) {
+					//System.out.println("Cache file is deleted");
+				} else {
+					logger.error("Failed to delete cache file");
+				}
 			} 
 			
 			File newFile = new File(FILE_DATA_CACHE_TEMP);
-			boolean renamed = newFile.renameTo(file);
+			if (newFile.renameTo(file)) {
+				//System.out.println("Temp cache file is renamed!");
+			} else {
+				logger.error("Failed to rename temp cache file");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void removeEntryIfExists(String repoId) {
+		for (int i = 0; i < repoDataList.size(); i++) {
+			if (repoDataList.get(i).getRepoId().equals(repoId)) {
+				repoDataList.remove(i);
+				break;
+			}
 		}
 	}
 }
