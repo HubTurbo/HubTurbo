@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import service.ServiceManager;
 import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
+import ui.issuepanel.expanded.BrowserComponent;
 import ui.sidepanel.SidePanel;
 import util.Utility;
 import util.events.Event;
