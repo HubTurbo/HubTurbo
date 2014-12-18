@@ -240,8 +240,7 @@ public class ServiceManager {
 		}
 
 		if (!needToGetResources) {
-			//TODO: remove print line
-			System.out.println("yay, don't load again!");
+			System.out.println("loading from cache...");
 			issuesETag = repo.getIssuesETag();
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
