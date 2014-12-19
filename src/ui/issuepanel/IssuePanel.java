@@ -14,6 +14,8 @@ import ui.UI;
 import ui.issuecolumn.Column;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
+import util.events.IssueSelectedEvent;
+
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends Column {
@@ -74,11 +76,10 @@ public class IssuePanel extends Column {
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
 		setOnKeyReleased((e) -> {
-			if (e.getCode().equals(KeyCode.DOWN) ||
-					e.getCode().equals(KeyCode.UP)) {
+			if (e.getCode().equals(KeyCode.ENTER)) {
 				TurboIssue selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
 				if (selectedIssue != null) {
-					sidePanel.triggerIssueEdit(selectedIssue, false);
+					ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getId()));
 				}
 			}
 		}); 
