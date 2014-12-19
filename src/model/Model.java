@@ -56,13 +56,13 @@ public class Model {
 	
 	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
 	
-	private TurboRepoData repo;
 	protected IRepositoryIdProvider repoId;
 	
 	private String issuesETag = null;
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
+	private DataCacheFileHandler dcHandler = null;
 			
 	public Model(){
 		setupModelChangeListeners();
@@ -74,7 +74,10 @@ public class Model {
 	
 	public void setRepoId(IRepositoryIdProvider repoId) {
 		this.repoId = repoId;
-		repo = DataCacheFileHandler.getInstance().getRepoGivenId(repoId.toString());
+	}
+	
+	public void setDataCacheFileHandler(DataCacheFileHandler dcHandler) {
+		this.dcHandler  = dcHandler;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -110,7 +113,7 @@ public class Model {
 				isTurboResource = true;
 			}
 		}
-		WeakReference<Model> selfRef = new WeakReference<>(this);
+		
 		if (isTurboResource) {
 			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadTurboCollaborators((List<TurboUser>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
@@ -120,9 +123,11 @@ public class Model {
 			loadTurboMilestones((List<TurboMilestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
 			
 			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
-			List<TurboIssue> issues = repo.getIssues(ServiceManager.getInstance().getModel());
-			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
-			loadTurboIssues(issues);
+			Platform.runLater(()-> {
+				List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
+				StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
+				loadTurboIssues(issues);
+			});
 		} else {
 			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
@@ -220,7 +225,7 @@ public class Model {
 		        }
 		   });
 		}
-		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 		
 	public void updateCachedIssue(TurboIssue issue){
@@ -349,7 +354,7 @@ public class Model {
 	public void updateCachedCollaborators(List<User> ghCollaborators){
 		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 		updateCachedList(collaborators, newCollaborators);
-		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 	
 	public void loadIssues(List<Issue> ghIssues) {
@@ -364,7 +369,7 @@ public class Model {
 			// Add them all at once, so this hopefully propagates only one change
 			issues.addAll(buffer);
 			
-			DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 		});
 	}
 	
@@ -458,7 +463,7 @@ public class Model {
 	public void updateCachedLabels(List<Label> ghLabels){
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		updateCachedList(labels, newLabels);
-		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 	
 	public void loadMilestones(List<Milestone> ghMilestones){
@@ -479,7 +484,7 @@ public class Model {
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		updateCachedList(milestones, newMilestones);
-		DataCacheFileHandler.getInstance().writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 	
 	public void refresh(){
