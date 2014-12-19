@@ -15,6 +15,7 @@ import ui.UI;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
+import util.events.ColumnChangeEvent;
 
 import command.TurboCommandExecutor;
 
@@ -85,6 +86,7 @@ public class ColumnControl extends HBox {
 		Column panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
+		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
@@ -93,6 +95,7 @@ public class ColumnControl extends HBox {
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
+		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
@@ -103,6 +106,7 @@ public class ColumnControl extends HBox {
 	public void closeColumn(int index) {
 		getChildren().remove(index);
 		updateColumnIndices();
+		ui.triggerEvent(new ColumnChangeEvent());
 	}
 
 	private void updateColumnIndices() {
@@ -182,9 +186,13 @@ public class ColumnControl extends HBox {
 	}
 	
 	public double getColumnWidth() {
-		return 40 + (
-				(getChildren() == null || getChildren().size() == 0)
+		return (getChildren() == null || getChildren().size() == 0)
 				? 0
-				: ((Column) getChildren().get(0)).getWidth());
+				: 40 + Column.COLUMN_WIDTH;
+		// COLUMN_WIDTH is used instead of
+		// ((Column) getChildren().get(0)).getWidth();
+		// because when this function is called, columns may not have been sized yet.
+		// In any case column width is set to COLUMN_WIDTH at minimum, so we can assume
+		// that they are that large.
 	}
 }

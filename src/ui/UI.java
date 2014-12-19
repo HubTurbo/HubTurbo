@@ -26,6 +26,8 @@ import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.BrowserComponent;
 import ui.sidepanel.SidePanel;
 import util.Utility;
+import util.events.ColumnChangeEvent;
+import util.events.ColumnChangeEventHandler;
 import util.events.Event;
 import util.events.EventHandler;
 import util.events.LoginEvent;
@@ -123,6 +125,12 @@ public class UI extends Application {
 		});
 		mainStage.widthProperty().addListener(c -> {
 			browserComponent.resize(mainStage.getWidth());
+		});
+		registerEvent(new ColumnChangeEventHandler() {
+			@Override
+			public void handle(ColumnChangeEvent e) {
+				setExpandedWidth(false);
+			}
 		});
 	}
 	

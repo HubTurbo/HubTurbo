@@ -45,7 +45,7 @@ import filter.PredicateApplicationException;
  */
 public abstract class Column extends VBox {
 	
-	private static final int COLUMN_WIDTH = 400;
+	public static final int COLUMN_WIDTH = 400;
 	
 	//	private static final String TOGGLE_HIERARCHY = "\u27A5";
 	private static final String CLOSE_LIST = "\u2716";
