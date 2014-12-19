@@ -9,48 +9,48 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import storage.DataManager;
 
-public class RepositorySelector extends HBox{
-	final ComboBox<String> comboBox = new ComboBox<String>();
+public class RepositorySelector extends HBox {
+	private final ComboBox<String> comboBox = new ComboBox<>();
 	private Consumer<String> methodOnValueChange;
-	
-	public RepositorySelector(){
+
+	public RepositorySelector() {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
 		comboBox.prefWidthProperty().bind(widthProperty());
 	}
-	
-	private void setupLayout(){
+
+	private void setupLayout() {
 		setSpacing(5);
 		setPadding(new Insets(5));
 		setAlignment(Pos.CENTER);
 	}
-	
-	private void setupComboBox(){
+
+	private void setupComboBox() {
 		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
 		loadComboBoxContents();
-		comboBox.valueProperty().addListener((observable, old, newVal) ->{
-			if(methodOnValueChange != null){
+		comboBox.valueProperty().addListener((observable, old, newVal) -> {
+			if (methodOnValueChange != null) {
 				methodOnValueChange.accept(newVal);
 			}
 		});
 	}
-	
-	public void setValue(String val){
+
+	public void setValue(String val) {
 		comboBox.setValue(val);
 	}
-	
-	public void setComboValueChangeMethod(Consumer<String> method){
+
+	public void setComboValueChangeMethod(Consumer<String> method) {
 		methodOnValueChange = method;
 	}
-	
-	private void loadComboBoxContents(){
+
+	private void loadComboBoxContents() {
 		List<String> items = DataManager.getInstance().getLastViewedRepositories();
 		comboBox.getItems().addAll(items);
 	}
-	
-	public void refreshComboBoxContents(){
+
+	public void refreshComboBoxContents() {
 		comboBox.getItems().clear();
 		loadComboBoxContents();
 	}

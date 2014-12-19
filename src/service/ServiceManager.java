@@ -90,8 +90,6 @@ public class ServiceManager {
 
 	// Login state
 	private String password;
-	private String repoOwner;
-	private String repoName;
 
 	protected ServiceManager(){
 		githubClient = new GitHubClientExtended();
@@ -175,8 +173,6 @@ public class ServiceManager {
 	}
 
 	public boolean setupRepository(String owner, String name) throws IOException{
-		repoOwner = owner;
-		repoName = name;
 		StatusBar.displayMessage("Authenticating...");
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
@@ -188,11 +184,15 @@ public class ServiceManager {
 	}
 	
 	public String getRepoOwner() {
-		return repoOwner;
+		String[] segments = repoId.generateId().split("\\/");
+		assert segments.length == 2;
+		return segments[0];
 	}
 	
 	public String getRepoName() {
-		return repoName;
+		String[] segments = repoId.generateId().split("\\/");
+		assert segments.length == 2;
+		return segments[1];
 	}
 	
 	public boolean checkRepository(String repo) throws IOException{
