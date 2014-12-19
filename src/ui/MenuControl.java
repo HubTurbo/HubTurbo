@@ -15,6 +15,8 @@ import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
 import util.events.IssueCreatedEvent;
+import util.events.LabelCreatedEvent;
+import util.events.MilestoneCreatedEvent;
 
 public class MenuControl extends MenuBar {
 	private static final String USER_DOC_URL = "https://github.com/HubTurbo/HubTurbo/wiki";
@@ -30,13 +32,13 @@ public class MenuControl extends MenuBar {
 	}
 	
 	private void createMenuItems() {
-		Menu issues = new Menu("Issues");
-		issues.getItems().addAll(createNewIssueMenuItem());
+		Menu newMenu = new Menu("New");
+		newMenu.getItems().addAll(createNewMenuItems());
 
 		Menu view = new Menu("View");
 		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
 
-		getMenus().addAll(issues, view);
+		getMenus().addAll(newMenu, view);
 	}
 
 
@@ -109,10 +111,19 @@ public class MenuControl extends MenuBar {
 		return refreshMenuItem;
 	}
 
-	private MenuItem createNewIssueMenuItem() {
-		MenuItem newIssueMenuItem = new MenuItem("New Issue");
+	private MenuItem[] createNewMenuItems() {
+		MenuItem newIssueMenuItem = new MenuItem("Issue");
 		newIssueMenuItem.setOnAction(e -> ui.triggerEvent(new IssueCreatedEvent()));
 		newIssueMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN));
-		return newIssueMenuItem;
+
+		MenuItem newLabelMenuItem = new MenuItem("Label");
+		newLabelMenuItem.setOnAction(e -> ui.triggerEvent(new LabelCreatedEvent()));
+		newLabelMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
+
+		MenuItem newMilestoneMenuItem = new MenuItem("Milestone");
+		newMilestoneMenuItem.setOnAction(e -> ui.triggerEvent(new MilestoneCreatedEvent()));
+		newMilestoneMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
+
+		return new MenuItem[] {newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem};
 	}
 }
