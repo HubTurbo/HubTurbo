@@ -102,42 +102,48 @@ public class Model {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> ghResources){
+	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
 		StatusBar.displayMessage(MESSAGE_LOADING_PROJECT_CONFIG);
 		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
-		if (ghResources.get(ServiceManager.KEY_COLLABORATORS) != null) {
-			if (ghResources.get(ServiceManager.KEY_COLLABORATORS).get(0).getClass() == TurboUser.class) {
+		if (resources.get(ServiceManager.KEY_COLLABORATORS) != null) {
+			if (resources.get(ServiceManager.KEY_COLLABORATORS).get(0).getClass() == TurboUser.class) {
 				isTurboResource = true;
 			}
 		}
 		
 		if (isTurboResource) {
-			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
-			loadTurboCollaborators((List<TurboUser>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
-			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
-			loadTurboLabels((List<TurboLabel>) ghResources.get(ServiceManager.KEY_LABELS));
-			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
-			loadTurboMilestones((List<TurboMilestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
-			
-			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
-			Platform.runLater(()-> {
-				List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
-				StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
-				loadTurboIssues(issues);
-			});
+			loadTurboResources(resources);	
 		} else {
+			// is Github Resource
 			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
-			loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
+			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
 			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
-			loadLabels((List<Label>) ghResources.get(ServiceManager.KEY_LABELS));
+			loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
 			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
-			loadMilestones((List<Milestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
+			loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
 			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
-			loadIssues((List<Issue>)ghResources.get(ServiceManager.KEY_ISSUES));
+			loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void loadTurboResources(HashMap<String, List> turboResources) {
+		Platform.runLater(()-> {
+			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
+			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
+			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
+			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
+			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
+			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
+
+			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
+			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
+			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
+			loadTurboIssues(issues);
+		});
 	}
 
 	public void applyMethodOnModelChange(Runnable method){
@@ -345,10 +351,8 @@ public class Model {
 	}
 	
 	public void loadTurboCollaborators(List<TurboUser> list) {
-		Platform.runLater(()->{
-			collaborators.clear();
-			collaborators.addAll(list);
-		});
+		collaborators.clear();
+		collaborators.addAll(list);
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators){
@@ -374,10 +378,8 @@ public class Model {
 	}
 	
 	public void loadTurboIssues(List<TurboIssue> list) {
-		Platform.runLater(()->{
-			issues.clear();
-			issues.addAll(list);
-		});
+		issues.clear();
+		issues.addAll(list);
 	}
 
 	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
@@ -416,10 +418,10 @@ public class Model {
 	}
 	
 	public void loadTurboLabels(List<TurboLabel> list) {
-		Platform.runLater(()->{
+		//Platform.runLater(()->{
 			labels.clear();
 			labels.addAll(list);
-		});
+		//});
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
@@ -475,10 +477,8 @@ public class Model {
 	}
 	
 	public void loadTurboMilestones(List<TurboMilestone> list) {
-		Platform.runLater(()->{
-			milestones.clear();
-			milestones.addAll(list);
-		});
+		milestones.clear();
+		milestones.addAll(list);
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
