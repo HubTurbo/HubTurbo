@@ -8,3 +8,4 @@ hubturbo-log.log
 .hubturboconfig/
 chromedriver
 data-cache.json
+.hubturbocache/
