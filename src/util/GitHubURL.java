@@ -12,4 +12,12 @@ public class GitHubURL {
 	public static String getPathForNewIssue() {
 		return String.format("https://github.com/%s/%s/issues/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
 	}
+
+	public static String getPathForNewLabel() {
+		return String.format("https://github.com/%s/%s/labels", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
+
+	public static String getPathForNewMilestone() {
+		return String.format("https://github.com/%s/%s/milestones/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
 }

@@ -30,6 +30,7 @@ import util.IOUtilities;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
+ * It depends minimally on UI for width adjustments.
  */
 public class BrowserComponent {
 	
@@ -129,6 +130,52 @@ public class BrowserComponent {
 		} else {
 			System.out.println("Failed to read script for hiding elements; did not execute");
 		}
+	}
+
+	/**
+	 * Navigates to the New Label page on GitHub.
+	 * Run on a separate thread.
+	 */
+	public void newLabel() {
+		executor.execute(new Task<Void>() {
+			@Override
+			protected Void call() {
+				try {
+					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
+						driver.get(GitHubURL.getPathForNewLabel());
+						hidePageElements();
+					}
+				} catch (WebDriverException e) {
+					// Chrome was closed; recreate it
+					driver = setupChromeDriver();
+					return call(); // Recurse and repeat
+				}
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * Navigates to the New Milestone page on GitHub.
+	 * Run on a separate thread.
+	 */
+	public void newMilestone() {
+		executor.execute(new Task<Void>() {
+			@Override
+			protected Void call() {
+				try {
+					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
+						driver.get(GitHubURL.getPathForNewMilestone());
+						hidePageElements();
+					}
+				} catch (WebDriverException e) {
+					// Chrome was closed; recreate it
+					driver = setupChromeDriver();
+					return call(); // Recurse and repeat
+				}
+				return null;
+			}
+		});
 	}
 
 	/**
