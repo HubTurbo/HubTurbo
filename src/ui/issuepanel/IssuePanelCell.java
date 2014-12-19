@@ -16,6 +16,7 @@ import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
 import util.events.IssueSelectedEvent;
+import util.events.IssueViewedEvent;
 
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
@@ -128,9 +129,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			if (e.getButton().equals(MouseButton.PRIMARY)) {
 				if (e.getClickCount() == 1) {
 					onSingleClick(issue);
-					ui.triggerEvent(new IssueSelectedEvent(issue.getId()));
-				}
-				if (e.getClickCount() == 2) {
+				} else if (e.getClickCount() == 2) {
 					onDoubleClick(issue);
 				}
 			}
@@ -138,10 +137,11 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 	
 	private void onSingleClick(TurboIssue issue) {
-		sidePanel.triggerIssueEdit(issue, false);
+		ui.triggerEvent(new IssueSelectedEvent(issue.getId()));
+
 	}
 
 	private void onDoubleClick(TurboIssue issue) {
-		sidePanel.triggerIssueEdit(issue, true);
+		ui.triggerEvent(new IssueViewedEvent(issue.getId()));
 	}
 }
