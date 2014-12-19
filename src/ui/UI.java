@@ -35,7 +35,7 @@ import com.google.common.eventbus.EventBus;
 public class UI extends Application {
 
 	private static final String VERSION_NUMBER = " V0.7.14";
-	private static final double WINDOW_EXPANDED_WIDTH = 0.6;
+	private static final double WINDOW_COLLAPSED_WIDTH = 0.6;
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 
@@ -109,7 +109,7 @@ public class UI extends Application {
 
 	private void setupMainStage(Scene scene) {
 		mainStage.setTitle("HubTurbo " + VERSION_NUMBER);
-		setExpandedWidth(true);
+		setExpandedWidth(false);
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> {
@@ -195,7 +195,7 @@ public class UI extends Application {
 	/**
 	 * Tracks whether or not the window is in an expanded state.
 	 */
-	private boolean expanded = true;
+	private boolean expanded = false;
 
 	public boolean isExpanded() {
 		return expanded;
@@ -215,7 +215,7 @@ public class UI extends Application {
 	 * Returns the X position of the edge of the collapsed window.
 	 */
 	public double getCollapsedX() {
-		return getDimensions().getWidth() * WINDOW_EXPANDED_WIDTH;
+		return getDimensions().getWidth() * WINDOW_COLLAPSED_WIDTH;
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public class UI extends Application {
 	public Rectangle getAvailableDimensions() {
 		Rectangle dimensions = getDimensions();
 		return new Rectangle(
-				(int) (dimensions.getWidth() * (1 - WINDOW_EXPANDED_WIDTH)),
+				(int) (dimensions.getWidth() * (1 - WINDOW_COLLAPSED_WIDTH)),
 				(int) dimensions.getHeight());
 	}
 
@@ -239,10 +239,12 @@ public class UI extends Application {
 		Rectangle dimensions = getDimensions();
 		double width = expanded
 				? dimensions.getWidth()
-				: dimensions.getWidth() * WINDOW_EXPANDED_WIDTH;
+				: dimensions.getWidth() * WINDOW_COLLAPSED_WIDTH;
 		mainStage.setMinWidth(width);
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
+		mainStage.setX(0);
+		mainStage.setY(0);
 	}
 }

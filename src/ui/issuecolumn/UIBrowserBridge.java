@@ -29,7 +29,7 @@ public class UIBrowserBridge {
 		this.ui = ui;
 		ui.registerEvent(new IssueSelectedEventHandler() {
 			@Override public void handle(IssueSelectedEvent e) {
-				showIssue(e.id);
+				ui.getBrowserComponent().showIssue(e.id);
 			}
 		});
 		ui.registerEvent(new IssueCreatedEventHandler() {
@@ -52,12 +52,5 @@ public class UIBrowserBridge {
 				ui.getBrowserComponent().newMilestone();
 			}
 		});
-	}
-
-	private void showIssue(int id) {
-		if (ui.isExpanded()) {
-			ui.toggleExpandedWidth();
-		}
-		ui.getBrowserComponent().showIssue(id);
 	}
 }
