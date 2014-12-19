@@ -110,7 +110,7 @@ public class Model {
 				isTurboResource = true;
 			}
 		}
-		
+		WeakReference<Model> selfRef = new WeakReference<>(this);
 		if (isTurboResource) {
 			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadTurboCollaborators((List<TurboUser>) ghResources.get(ServiceManager.KEY_COLLABORATORS));
@@ -118,8 +118,11 @@ public class Model {
 			loadTurboLabels((List<TurboLabel>) ghResources.get(ServiceManager.KEY_LABELS));
 			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
 			loadTurboMilestones((List<TurboMilestone>) ghResources.get(ServiceManager.KEY_MILESTONES));
+			
+			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
+			List<TurboIssue> issues = repo.getIssues(ServiceManager.getInstance().getModel());
 			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
-			loadTurboIssues((List<TurboIssue>)ghResources.get(ServiceManager.KEY_ISSUES));
+			loadTurboIssues(issues);
 		} else {
 			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) ghResources.get(ServiceManager.KEY_COLLABORATORS));

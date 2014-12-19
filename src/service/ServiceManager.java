@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import model.Model;
-import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
@@ -240,7 +239,7 @@ public class ServiceManager {
 		}
 
 		if (!needToGetResources) {
-			System.out.println("loading from cache...");
+			System.out.println("Loading from cache...");
 			issuesETag = repo.getIssuesETag();
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
@@ -248,13 +247,12 @@ public class ServiceManager {
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
-			List<TurboIssue> issues = repo.getIssues(model);
+			// Delay getting of issues until labels and milestones are loaded in Model
 			
 			HashMap<String, List> map = new HashMap<String, List>();
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
-			map.put(KEY_ISSUES, issues);
 			return map;
 		} else {
 			// get resources
