@@ -14,18 +14,18 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
-import ui.sidepanel.SidePanel;
+import util.events.IssueCreatedEvent;
 
 public class MenuControl extends MenuBar {
 	private static final String USER_DOC_URL = "https://github.com/HubTurbo/HubTurbo/wiki";
 	private final ColumnControl columns;
-	private final SidePanel sidePanel;
 	private final ScrollPane columnsScroll;
+	private final UI ui;
 
-	public MenuControl(ColumnControl columns, SidePanel sidePanel, ScrollPane columnsScroll) {
+	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScroll) {
 		this.columns = columns;
-		this.sidePanel = sidePanel;
 		this.columnsScroll = columnsScroll;
+		this.ui = ui;
 		createMenuItems();
 	}
 	
@@ -111,7 +111,7 @@ public class MenuControl extends MenuBar {
 
 	private MenuItem createNewIssueMenuItem() {
 		MenuItem newIssueMenuItem = new MenuItem("New Issue");
-		newIssueMenuItem.setOnAction(e -> sidePanel.onCreateIssueHotkey());
+		newIssueMenuItem.setOnAction(e -> ui.triggerEvent(new IssueCreatedEvent()));
 		newIssueMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN));
 		return newIssueMenuItem;
 	}

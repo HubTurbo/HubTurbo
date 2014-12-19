@@ -119,7 +119,7 @@ public class ColumnControl extends HBox {
 		if (current instanceof HierarchicalIssuePanel) {
 			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		} else {
-			column = new HierarchicalIssuePanel(stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
+			column = new HierarchicalIssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
 		}
 		column.setItems(model.getIssues());
 		column.filter(currentFilterExpr);

@@ -12,9 +12,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import ui.UI;
 import ui.issuecolumn.Column;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
+
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends Column {
@@ -24,17 +26,19 @@ public class HierarchicalIssuePanel extends Column {
 	private final ColumnControl parentColumnControl;
 //	private final int columnIndex;
 	private final SidePanel sidePanel;
+	private final UI ui;
 	
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
 	
-	public HierarchicalIssuePanel(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
-		super(mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
+	public HierarchicalIssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
 //		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 //		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
+		this.ui = ui;
 
 		VBox.setVgrow(scrollPane, Priority.ALWAYS);
 		scrollPane.setContent(content);

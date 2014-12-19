@@ -135,7 +135,7 @@ public class UI extends Application {
 		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
 		
-		menuBar = new MenuControl(columns, sidePanel, columnsScroll);
+		menuBar = new MenuControl(this, columns, columnsScroll);
 
 		HBox centerContainer = new HBox();
 		centerContainer.setPadding(new Insets(5,0,5,0));

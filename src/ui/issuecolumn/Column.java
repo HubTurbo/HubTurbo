@@ -25,7 +25,9 @@ import model.TurboIssue;
 import ui.DragData;
 import ui.FilterTextField;
 import ui.StatusBar;
+import ui.UI;
 import ui.sidepanel.SidePanel;
+import util.events.IssueCreatedEvent;
 
 import command.CommandType;
 import command.TurboCommandExecutor;
@@ -55,6 +57,7 @@ public abstract class Column extends VBox {
 	private final Model model;
 	private final ColumnControl parentColumnControl;
 	private int columnIndex;
+	private final UI ui;
 	private final SidePanel sidePanel;
 	private boolean isSearchPanel = false;
 	
@@ -71,13 +74,14 @@ public abstract class Column extends VBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+	public Column(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = dragAndDropExecutor;
 		this.isSearchPanel = isSearchPanel;
+		this.ui = ui;
 		
 		getChildren().add(createFilterBox());
 		setupColumn();
@@ -132,9 +136,7 @@ public abstract class Column extends VBox {
 		Label addIssue = new Label(ADD_ISSUE);
 		addIssue.getStyleClass().add("label-button");
 		addIssue.setOnMouseClicked((e) -> {
-			TurboIssue issue = new TurboIssue("", "", model);
-			applyCurrentFilterExpressionToIssue(issue, false);
-			sidePanel.triggerIssueCreate(issue);
+			ui.triggerEvent(new IssueCreatedEvent());
 		});
 		
 		Label closeList = new Label(CLOSE_LIST);

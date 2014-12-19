@@ -29,14 +29,14 @@ public class IssuePanelContextMenu {
 		viewOnGitHub.setOnAction(e -> {
 			Browse.browse(issue.getHtmlUrl());
 		});
-		MenuItem newChild = new MenuItem("New Child Issue");
-		newChild.setOnAction(e -> {
-			TurboIssue newIssue = new TurboIssue("", "", model);
-			assert issue != null;
-			newIssue.setParentIssue(issue.getId());
-			sidePanel.triggerIssueCreate(newIssue);
-		});
-		menu.getItems().addAll(viewOnGitHub, newChild);
+//		MenuItem newChild = new MenuItem("New Child Issue");
+//		newChild.setOnAction(e -> {
+//			TurboIssue newIssue = new TurboIssue("", "", model);
+//			assert issue != null;
+//			newIssue.setParentIssue(issue.getId());
+//			sidePanel.triggerIssueCreate(newIssue);
+//		});
+		menu.getItems().addAll(viewOnGitHub);
 		
 		return menu;
 	}
