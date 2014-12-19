@@ -7,7 +7,6 @@ import java.util.List;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import model.Model;
 import storage.DataManager;
@@ -16,7 +15,9 @@ import ui.UI;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
+
 import command.TurboCommandExecutor;
+
 import filter.FilterExpression;
 
 

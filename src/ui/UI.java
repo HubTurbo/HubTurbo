@@ -35,7 +35,7 @@ import com.google.common.eventbus.EventBus;
 public class UI extends Application {
 
 	private static final String VERSION_NUMBER = " V0.7.14";
-	private static final double WINDOW_COLLAPSED_WIDTH = 0.6;
+	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 
@@ -121,7 +121,9 @@ public class UI extends Application {
 			Platform.exit();
 			System.exit(0);
 		});
-		
+		mainStage.widthProperty().addListener(c -> {
+			browserComponent.resize(mainStage.getWidth());
+		});
 	}
 	
 	private Parent createRoot() throws IOException {
@@ -214,19 +216,31 @@ public class UI extends Application {
 
 	/**
 	 * Returns the X position of the edge of the collapsed window.
+	 * This function may be called before the main stage is initialised, in
+	 * which case it simply returns a reasonable default.
 	 */
 	public double getCollapsedX() {
-		return getDimensions().getWidth() * WINDOW_COLLAPSED_WIDTH;
+		if (mainStage == null) {
+			return getDimensions().getWidth() * WINDOW_DEFAULT_PROPORTION;
+		}
+		return mainStage.getWidth();
 	}
 	
 	/**
 	 * Returns the dimensions of the screen available for use when
 	 * the main window is in a collapsed state.
+	 * This function may be called before the main stage is initialised, in
+	 * which case it simply returns a reasonable default.
 	 */
 	public Rectangle getAvailableDimensions() {
 		Rectangle dimensions = getDimensions();
+		if (mainStage == null) {
+			return new Rectangle(
+					(int) (dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION),
+					(int) dimensions.getHeight());
+		}
 		return new Rectangle(
-				(int) (dimensions.getWidth() * (1 - WINDOW_COLLAPSED_WIDTH)),
+				(int) (dimensions.getWidth() - mainStage.getWidth()),
 				(int) dimensions.getHeight());
 	}
 
@@ -240,7 +254,7 @@ public class UI extends Application {
 		Rectangle dimensions = getDimensions();
 		double width = expanded
 				? dimensions.getWidth()
-				: dimensions.getWidth() * WINDOW_COLLAPSED_WIDTH;
+				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
 		mainStage.setMinWidth(sidePanel.getWidth() + columns.getColumnWidth());
 		mainStage.setMinHeight(dimensions.getHeight());

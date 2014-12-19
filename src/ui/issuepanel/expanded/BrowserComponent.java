@@ -282,4 +282,12 @@ public class BrowserComponent {
 		
 		System.setProperty("webdriver.chrome.driver", binaryFileName);
 	}
+
+	public void resize(double width) {
+		driver.manage().window().setPosition(new Point((int) width, 0));
+		Rectangle availableDimensions = ui.getAvailableDimensions();
+		driver.manage().window().setSize(new Dimension(
+				(int) availableDimensions.getWidth(),
+				(int) availableDimensions.getHeight()));
+	}
 }
