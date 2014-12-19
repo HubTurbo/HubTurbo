@@ -8,4 +8,8 @@ public class GitHubURL {
 	public static String getPathForIssue(int id) {
 		return String.format("https://github.com/%s/%s/issues/%d", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName(), id);
 	}
+	
+	public static String getPathForNewIssue() {
+		return String.format("https://github.com/%s/%s/issues/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
 }

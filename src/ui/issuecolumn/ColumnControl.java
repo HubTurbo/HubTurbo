@@ -27,7 +27,7 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final Model model;
 	private final SidePanel sidePanel;
-	private final IssueDetailsDisplay issueDetailsDisplay;
+	private final IssueDetailsComponent issueDetailsDisplay;
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
@@ -37,7 +37,7 @@ public class ColumnControl extends HBox {
 		this.model = model;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
-		this.issueDetailsDisplay = new IssueDetailsDisplay(ui);
+		this.issueDetailsDisplay = new IssueDetailsComponent(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
 		setupModelChangeResponse();

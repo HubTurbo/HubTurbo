@@ -149,6 +149,29 @@ public class BrowserComponent {
 	}
 
 	/**
+	 * Navigates to the New Issue page on GitHub.
+	 * Run on a separate thread.
+	 */
+	public void newIssue() {
+		executor.execute(new Task<Void>() {
+			@Override
+			protected Void call() {
+				try {
+					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
+						driver.get(GitHubURL.getPathForNewIssue());
+						hidePageElements();
+					}
+				} catch (WebDriverException e) {
+					// Chrome was closed; recreate it
+					driver = setupChromeDriver();
+					return call(); // Recurse and repeat
+				}
+				return null;
+			}
+		});
+	}
+	
+	/**
 	 * Navigates to the GitHub page for the given issue in the currently-active
 	 * driver window.
 	 * Run on a separate thread.
