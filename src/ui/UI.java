@@ -6,9 +6,7 @@ import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -16,7 +14,6 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -87,6 +84,7 @@ public class UI extends Application {
 				columns.loadIssues();
 				sidePanel.refresh();
 				triggerEvent(new LoginEvent());
+				setExpandedWidth(false);
 			}
 			return true;
 		}).exceptionally(e -> {
@@ -243,22 +241,12 @@ public class UI extends Application {
 		double width = expanded
 				? dimensions.getWidth()
 				: dimensions.getWidth() * WINDOW_COLLAPSED_WIDTH;
-		mainStage.setMinWidth(width);
+
+		mainStage.setMinWidth(sidePanel.getWidth() + columns.getColumnWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);
-/*		
-		Platform.runLater(() -> {
-			ObservableList<Node> children = columns.getChildren();
-			double columnWidth = 0;
-			if (children != null) {
-				columnWidth = ((Region) children.get(0)).getWidth();
-			}
-			mainStage.setMinWidth(sidePanel.getWidth() + columnWidth + 40);
-		});
-		
-		*/
 	}
 }

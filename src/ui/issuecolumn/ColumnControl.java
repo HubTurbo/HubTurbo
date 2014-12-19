@@ -7,6 +7,7 @@ import java.util.List;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import model.Model;
 import storage.DataManager;
@@ -15,9 +16,7 @@ import ui.UI;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
-
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 
@@ -27,7 +26,7 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final Model model;
 	private final SidePanel sidePanel;
-	private final UIBrowserBridge issueDetailsDisplay;
+	private final UIBrowserBridge uiBrowserBridge;
 
 	private TurboCommandExecutor dragAndDropExecutor;
 
@@ -37,7 +36,7 @@ public class ColumnControl extends HBox {
 		this.model = model;
 		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
-		this.issueDetailsDisplay = new UIBrowserBridge(ui);
+		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
 		setupModelChangeResponse();
@@ -179,5 +178,12 @@ public class ColumnControl extends HBox {
 			closeColumn(currentlyFocusedColumnIndex);
 			currentlyFocusedColumnIndex = -1;
 		}
+	}
+	
+	public double getColumnWidth() {
+		return 40 + (
+				(getChildren() == null || getChildren().size() == 0)
+				? 0
+				: ((Column) getChildren().get(0)).getWidth());
 	}
 }
