@@ -31,10 +31,13 @@ import service.GitHubClientExtended;
  * */
 public class UpdateService<T> extends GitHubService{
 	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
+	private static final String SINCE = "since";
+	private static final String SUFFIX_ISSUES = "/issues";
 	protected String apiSuffix;
 	protected GitHubClientExtended client;
 	private String lastETag;
 	protected Date lastCheckTime;
+	protected String lastIssueCheckTime;
 	
 	public UpdateService(GitHubClientExtended client){
 		this.client = client;
@@ -52,6 +55,14 @@ public class UpdateService<T> extends GitHubService{
 		return this.lastETag;
 	}
 	
+	protected void setLastIssueCheckTime(String date) {
+		this.lastIssueCheckTime = date;
+	}
+	
+	protected String getLastIssueCheckTime() {
+		return this.lastIssueCheckTime;
+	}
+	
 	protected String getFormattedDate(Date date){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
@@ -63,6 +74,9 @@ public class UpdateService<T> extends GitHubService{
 	private void updateLastCheckTime(HttpURLConnection connection) throws ParseException{
 		String date = connection.getHeaderField("Date");
 		lastCheckTime = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(date);
+		if (apiSuffix == SUFFIX_ISSUES) {
+			lastIssueCheckTime = getFormattedDate(lastCheckTime);
+		}
 	}
 	
 	protected HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
@@ -87,12 +101,17 @@ public class UpdateService<T> extends GitHubService{
 
 			PagedRequest<T> request = createUpdatedRequest(repoId);
 			
-			// This is to remove params: "since" for issues request that was added automatically since we 
-			// do not want to retrieve issues since the time the request was made, but instead the last modified ETag.
-			if (apiSuffix == "/issues") {
+			// This is to modify the param "since" for issues request that was added automatically. This is because we 
+			// do not want to retrieve issues since the time the request was made; but instead the last modified time.
+			if (apiSuffix == SUFFIX_ISSUES) {
 				Map<String, String> temp = request.getParams();
-				temp.remove("since");
-				request.setParams(temp);
+				if (lastIssueCheckTime == null) {
+					temp.remove(SINCE);
+					request.setParams(temp);
+				} else {
+					temp.put(SINCE, lastIssueCheckTime);
+					request.setParams(temp);
+				}
 			}
 
 			PageIterator<T> requestIterator = new PageIterator<T>(request, client);

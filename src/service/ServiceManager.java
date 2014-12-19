@@ -83,6 +83,7 @@ public class ServiceManager {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
+	private String issueCheckTime = null;
 	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -123,7 +124,7 @@ public class ServiceManager {
 			stopModelUpdate();
 		}
 		if(repoId != null){
-			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag);
+			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime);
 			modelUpdater.startModelUpdate();
 		}
 	}
@@ -246,6 +247,7 @@ public class ServiceManager {
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
 			milestonesETag = repo.getMilestonesETag();
+			issueCheckTime = repo.getIssueCheckTime();
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();

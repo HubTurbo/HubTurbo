@@ -23,9 +23,9 @@ public class ModelUpdater {
 	private Timer pollTimer;
 	private Date lastUpdateTime = new Date();
 	
-	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag){
+	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime){
 		this.model = model;
-		this.issueUpdateService = new IssueUpdateService(client, issuesETag);
+		this.issueUpdateService = new IssueUpdateService(client, issuesETag, issueCheckTime);
 		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);
 		this.labelUpdateService = new LabelUpdateService(client, labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, milestonesETag);
@@ -36,17 +36,18 @@ public class ModelUpdater {
 	}
 	
 	private void updateModel(){
-	    updateModelIssues();
 	    updateModelCollaborators();
 	   	updateModelLabels();
 	  	updateModelMilestones();
+	  	updateModelIssues();
 	  	lastUpdateTime = issueUpdateService.lastCheckTime;
 	}
 	
 	private void updateModelIssues(){
-		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());
-		model.updateIssuesETag(issueUpdateService.getLastETag());
+		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());	
 		model.updateCachedIssues(updatedIssues);
+		model.updateIssuesETag(issueUpdateService.getLastETag());
+		model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
 	}
 	
 	private void updateModelCollaborators(){

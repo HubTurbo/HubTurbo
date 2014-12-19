@@ -90,14 +90,14 @@ public class DataCacheFileHandler {
 		this.issues = issues;
 	}
 	
-	public void writeToFile(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
+	public void writeToFile(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
 		//System.out.println("Writing to file...");
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
 		this.labels = labels.stream().collect(Collectors.toList());
 		this.milestones = milestones.stream().collect(Collectors.toList());
 		
-		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, this.collaborators, this.labels, this.milestones, this.issues);
+		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(currentRepoData);

@@ -61,6 +61,7 @@ public class Model {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
+	private String issueCheckTime = null;
 	private DataCacheFileHandler dcHandler = null;
 			
 	public Model(){
@@ -225,17 +226,17 @@ public class Model {
 			enforceStatusStateConsistency(issueList);
 		}
 		WeakReference<Model> selfRef = new WeakReference<Model>(this);
-		for(int i = issueList.size() - 1; i >= 0; i--){
-			Issue issue = issueList.get(i);
-			Platform.runLater(new Runnable() {
-		        @Override
-		        public void run() {
-		        	TurboIssue newCached = new TurboIssue(issue, selfRef.get());
-		        	updateCachedIssue(newCached);
-		        }
-		   });
-		}
-		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {		
+				for (int i = issueList.size() - 1; i >= 0; i--) {
+					Issue issue = issueList.get(i);
+					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
+					updateCachedIssue(newCached);
+				}
+				dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
+			}
+		});
 	}
 		
 	public void updateCachedIssue(TurboIssue issue){
@@ -332,6 +333,7 @@ public class Model {
 	        	list.removeAll(removed);
 	        	newList.stream()
 	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
+	        	dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 	        }
 	   });
 	}
@@ -362,7 +364,6 @@ public class Model {
 	public void updateCachedCollaborators(List<User> ghCollaborators){
 		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 		updateCachedList(collaborators, newCollaborators);
-		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 	
 	public void loadIssues(List<Issue> ghIssues) {
@@ -377,7 +378,7 @@ public class Model {
 			// Add them all at once, so this hopefully propagates only one change
 			issues.addAll(buffer);
 			
-			dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 		});
 	}
 	
@@ -466,8 +467,7 @@ public class Model {
 
 	public void updateCachedLabels(List<Label> ghLabels){
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		updateCachedList(labels, newLabels);
-		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
+		updateCachedList(labels, newLabels);	
 	}
 	
 	public void loadMilestones(List<Milestone> ghMilestones){
@@ -486,7 +486,6 @@ public class Model {
 	public void updateCachedMilestones(List<Milestone> ghMilestones){
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		updateCachedList(milestones, newMilestones);
-		dcHandler.writeToFile(issuesETag, collabsETag, labelsETag, milestonesETag, collaborators, labels, milestones, issues);
 	}
 	
 	public void refresh(){
@@ -508,5 +507,9 @@ public class Model {
 	
 	public void updateMilestonesETag(String ETag) {
 		this.milestonesETag = ETag;
+	}
+	
+	public void updateIssueCheckTime(String date) {
+		this.issueCheckTime = date;
 	}
 }

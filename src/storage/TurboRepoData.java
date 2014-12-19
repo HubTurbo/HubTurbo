@@ -16,16 +16,19 @@ public class TurboRepoData {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
+	private String issueCheckTime = null;
 	private List<TurboUser> collaborators = null;
 	private List<TurboSerializableLabel> labels = null;
 	private List<TurboSerializableMilestone> milestones = null; 
 	private List<TurboSerializableIssue> issues = null;
 	
-	public TurboRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public TurboRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
 		this.issuesETag = issuesETag;
 		this.collabsETag = collabsETag;
 		this.labelsETag = labelsETag;
 		this.milestonesETag = milestonesETag;
+		this.issueCheckTime = issueCheckTime;
+		
 		this.collaborators = collaborators;
 		
 		this.labels = new ArrayList<TurboSerializableLabel>();
@@ -58,6 +61,10 @@ public class TurboRepoData {
 	
 	public String getMilestonesETag() {
 		return milestonesETag;
+	}
+	
+	public String getIssueCheckTime() {
+		return issueCheckTime;
 	}
 	
 	public List<TurboUser> getCollaborators() {
