@@ -37,7 +37,7 @@ import util.events.LoginEventHandler;
  */
 public class BrowserComponent {
 	
-	private static final boolean USE_MOBILE_USER_AGENT = true;
+	private static final boolean USE_MOBILE_USER_AGENT = false;
 
 	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
 			? "ui/issuepanel/expanded/mobileHideUI.js"
