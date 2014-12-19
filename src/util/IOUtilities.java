@@ -2,10 +2,9 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Optional;
 
 import ui.UI;
@@ -24,11 +23,11 @@ public class IOUtilities {
 	
 	public static Optional<String> readResource(String packagePath) {
 		ClassLoader classLoader = UI.class.getClassLoader();
-		File file = new File(classLoader.getResource(packagePath).getFile());
 		BufferedReader reader;
+		InputStream inputStream = classLoader.getResourceAsStream(packagePath);
 		StringBuilder sb = new StringBuilder();
 		try {
-			reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(new InputStreamReader(inputStream));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				sb.append(line);
