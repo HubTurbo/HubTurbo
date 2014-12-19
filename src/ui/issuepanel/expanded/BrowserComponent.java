@@ -27,10 +27,6 @@ import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
-import util.events.IssueSelectedEvent;
-import util.events.IssueSelectedEventHandler;
-import util.events.LoginEvent;
-import util.events.LoginEventHandler;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -77,19 +73,6 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = setupChromeDriver();
-		ui.registerEvent(new LoginEventHandler() {
-			@Override public void handle(LoginEvent e) {
-				login();
-			}
-		});
-		ui.registerEvent(new IssueSelectedEventHandler() {
-			@Override public void handle(IssueSelectedEvent e) {
-				if (!ui.isExpanded()) {
-					ui.getBrowserComponent().showIssue(e.id);
-				}
-			}
-		});
-
 	}
 
 	/**
