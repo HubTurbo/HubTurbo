@@ -279,7 +279,7 @@ public class SidePanel extends VBox {
 					e.printStackTrace();
 				} 
 				return true;
-				}
+			}
 		};
 		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
 		Thread thread = new Thread(task);
