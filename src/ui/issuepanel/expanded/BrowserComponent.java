@@ -283,11 +283,21 @@ public class BrowserComponent {
 		System.setProperty("webdriver.chrome.driver", binaryFileName);
 	}
 
+	/**
+	 * Resizes the browser window based on the given width.
+	 * Executed on another thread.
+	 */
 	public void resize(double width) {
-		driver.manage().window().setPosition(new Point((int) width, 0));
-		Rectangle availableDimensions = ui.getAvailableDimensions();
-		driver.manage().window().setSize(new Dimension(
-				(int) availableDimensions.getWidth(),
-				(int) availableDimensions.getHeight()));
+		executor.execute(new Task<Void>() {
+			@Override
+			protected Void call() {
+				driver.manage().window().setPosition(new Point((int) width, 0));
+				Rectangle availableDimensions = ui.getAvailableDimensions();
+				driver.manage().window().setSize(new Dimension(
+						(int) availableDimensions.getWidth(),
+						(int) availableDimensions.getHeight()));
+				return null;
+			}
+		});
 	}
 }
