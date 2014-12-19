@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,38 +20,41 @@ import model.TurboUser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 public class DataCacheFileHandler {
 
 	private static final Logger logger = LogManager.getLogger(DataCacheFileHandler.class.getName());
-	private static DataCacheFileHandler dataCacheFileHandlerInstance = null;
-	private static final String FILE_DATA_CACHE = "data-cache.json";
-	private static final String FILE_DATA_CACHE_TEMP = "data-cache-temp.json";
+	private static final String DIR_CACHE = ".hubturbocache";
+	private static final String FILE_DATA_CACHE = "-cache.json";
+	private static final String FILE_DATA_CACHE_TEMP = "-cache-temp.json";
 
 	private List<TurboUser> collaborators = null;
 	private List<TurboLabel> labels = null;
 	private List<TurboMilestone> milestones = null;
 	private List<TurboIssue> issues = null;
-	private List<TurboRepoData> repoDataList = null;	
 	
-	private DataCacheFileHandler() {
+	private TurboRepoData repo = null;
+	private String repoId = null;
+	
+	public DataCacheFileHandler(String repoId) {
+		this.repoId = repoId;
+		directorySetup();
 		readFromFile();
 	}
 	
-	public static DataCacheFileHandler getInstance() {
-		if (dataCacheFileHandlerInstance == null) {
-			dataCacheFileHandlerInstance = new DataCacheFileHandler();
+	private void directorySetup() {
+		File directory = new File(DIR_CACHE);
+		if (!directory.exists()) {
+			directory.mkdir();
 		}
-		return dataCacheFileHandlerInstance;
 	}
 
 	public void readFromFile() {
 		Gson gson = new Gson();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(FILE_DATA_CACHE));
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE)));
 
-			repoDataList = gson.fromJson(bufferedReader, new TypeToken<List<TurboRepoData>>(){}.getType());
+			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
 			
 			bufferedReader.close();
 		} catch (FileNotFoundException e){
@@ -62,17 +64,16 @@ public class DataCacheFileHandler {
 		}
 	}
 	
-	public TurboRepoData getRepoGivenId(String repoId) {
-		if (repoDataList != null) {
-			for (TurboRepoData repo : repoDataList) {
-				if (repo.getRepoId().equals(repoId)) {
-					return repo;
-				}
-			}
-		}
-		return null;
+	private String getFileName(String givenFileName) {
+		String[] repoIdTokens = repoId.split("/");
+		String repoFileName = repoIdTokens[0] + "_" + repoIdTokens[1];
+		return DIR_CACHE + File.separator + repoFileName + givenFileName;
 	}
 	
+	public TurboRepoData getRepo() {
+		return repo;
+	}
+
 	public void setCollaborators(List<TurboUser> collaborators) {
 		this.collaborators = collaborators;
 	}
@@ -89,31 +90,25 @@ public class DataCacheFileHandler {
 		this.issues = issues;
 	}
 	
-	public void writeToFile(String repoId, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
+	public void writeToFile(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
 		//System.out.println("Writing to file...");
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
 		this.labels = labels.stream().collect(Collectors.toList());
 		this.milestones = milestones.stream().collect(Collectors.toList());
 		
-		TurboRepoData currentRepoData = new TurboRepoData(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, this.collaborators, this.labels, this.milestones, this.issues);
-		if (repoDataList == null) {
-			repoDataList = new ArrayList<TurboRepoData>();
-		} else {
-			removeEntryIfExists(repoId);
-		}
-		repoDataList.add(currentRepoData);
-		
+		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, this.collaborators, this.labels, this.milestones, this.issues);
+
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(repoDataList);
+		String json = gson.toJson(currentRepoData);
 		
 		// Save to temp file first to mitigate corruption of data. Once writing is done, rename it to main cache file
 		try {
-			FileWriter writer = new FileWriter(FILE_DATA_CACHE_TEMP);
+			FileWriter writer = new FileWriter(getFileName(FILE_DATA_CACHE_TEMP));
 			writer.write(json);
 			writer.close();
 			
-			File file = new File(FILE_DATA_CACHE);
+			File file = new File(getFileName(FILE_DATA_CACHE));
 			
 			if (file.exists()) {
 				if (file.delete()) {
@@ -123,7 +118,7 @@ public class DataCacheFileHandler {
 				}
 			} 
 			
-			File newFile = new File(FILE_DATA_CACHE_TEMP);
+			File newFile = new File(getFileName(FILE_DATA_CACHE_TEMP));
 			if (newFile.renameTo(file)) {
 				//System.out.println("Temp cache file is renamed!");
 			} else {
@@ -131,15 +126,6 @@ public class DataCacheFileHandler {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private void removeEntryIfExists(String repoId) {
-		for (int i = 0; i < repoDataList.size(); i++) {
-			if (repoDataList.get(i).getRepoId().equals(repoId)) {
-				repoDataList.remove(i);
-				break;
-			}
 		}
 	}
 }

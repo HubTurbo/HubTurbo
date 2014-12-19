@@ -227,13 +227,15 @@ public class ServiceManager {
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getGitHubResources(IRepositoryIdProvider repoId) throws IOException {
 		this.repoId = repoId;
-		model.setRepoId(repoId);
-		
+
 		boolean needToGetResources = true;
 		String repoIdString = repoId.toString();
 
-		DataCacheFileHandler dcHandler = DataCacheFileHandler.getInstance();
-		TurboRepoData repo = dcHandler.getRepoGivenId(repoIdString);
+		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoIdString);
+		model.setDataCacheFileHandler(dcHandler);
+		model.setRepoId(repoId);
+
+		TurboRepoData repo = dcHandler.getRepo();
 		if (repo != null) {
 			needToGetResources = false;
 		}

@@ -11,7 +11,6 @@ import model.TurboUser;
 
 public class TurboRepoData {
 	
-	private String repoId = null;
 	//last ETags
 	private String issuesETag = null;
 	private String collabsETag = null;
@@ -22,8 +21,7 @@ public class TurboRepoData {
 	private List<TurboSerializableMilestone> milestones = null; 
 	private List<TurboSerializableIssue> issues = null;
 	
-	public TurboRepoData(String repoId, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
-		this.repoId = repoId;
+	public TurboRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
 		this.issuesETag = issuesETag;
 		this.collabsETag = collabsETag;
 		this.labelsETag = labelsETag;
@@ -44,10 +42,6 @@ public class TurboRepoData {
 		for (TurboIssue issue : issues) {
 			this.issues.add(new TurboSerializableIssue(issue));
 		}
-	}
-	
-	public String getRepoId() {
-		return repoId;
 	}
 	
 	public String getIssuesETag() {
@@ -96,6 +90,6 @@ public class TurboRepoData {
 
 	@Override
 	public String toString() {
-	   return "RepoId = " + repoId + ", Collaborators = " + collaborators + ", Labels = " + labels + ", Milestones = " + milestones + ", Issues = " + issues;
+		return "Collaborators = " + collaborators + ", Labels = " + labels + ", Milestones = " + milestones + ", Issues = " + issues;
 	}
 }
