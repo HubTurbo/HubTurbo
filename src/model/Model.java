@@ -100,8 +100,8 @@ public class Model {
 			return false;
 		}
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
+	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
 		StatusBar.displayMessage(MESSAGE_LOADING_PROJECT_CONFIG);
@@ -118,14 +118,7 @@ public class Model {
 			loadTurboResources(resources);	
 		} else {
 			// is Github Resource
-			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
-			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
-			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
-			loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
-			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
-			loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
-			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
-			loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
+			loadGitHubResources(resources);
 		}
 	}
 
@@ -144,6 +137,18 @@ public class Model {
 			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
 			loadTurboIssues(issues);
 		});
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void loadGitHubResources(HashMap<String, List> resources) {
+		StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
+		loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+		StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
+		loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
+		StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
+		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
+		StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
+		loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 
 	public void applyMethodOnModelChange(Runnable method){
@@ -418,10 +423,8 @@ public class Model {
 	}
 	
 	public void loadTurboLabels(List<TurboLabel> list) {
-		//Platform.runLater(()->{
-			labels.clear();
-			labels.addAll(list);
-		//});
+		labels.clear();
+		labels.addAll(list);
 	}
 	
 	private void standardiseStatusLabels(List<Label> ghLabels) {
