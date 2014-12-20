@@ -226,7 +226,7 @@ public class ServiceManager {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getGitHubResources(IRepositoryIdProvider repoId) throws IOException {
+	public HashMap<String, List> getResources(IRepositoryIdProvider repoId) throws IOException {
 		this.repoId = repoId;
 
 		boolean needToGetResources = true;
@@ -259,24 +259,34 @@ public class ServiceManager {
 			map.put(KEY_MILESTONES, milestones);
 			return map;
 		} else {
-			// get resources
-			List<User> ghCollaborators = null;
-			List<Label> ghLabels = null;
-			List<Milestone> ghMilestones = null;
-			List<Issue> ghIssues = null;
-			
-			ghCollaborators = getCollaborators();
-			ghLabels = getLabels();
-			ghMilestones = getMilestones();
-			ghIssues = getAllIssues();
-			
-			HashMap<String, List> map = new HashMap<String, List>();
-			map.put(KEY_COLLABORATORS, ghCollaborators);
-			map.put(KEY_LABELS, ghLabels);
-			map.put(KEY_MILESTONES, ghMilestones);
-			map.put(KEY_ISSUES, ghIssues);
-			return map;
+			return getGitHubResources();
 		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public HashMap<String, List> getGitHubResources() throws IOException {
+		issuesETag = null;
+		collabsETag = null;
+		labelsETag = null;
+		milestonesETag = null;
+		issueCheckTime = null;
+		
+		List<User> ghCollaborators = null;
+		List<Label> ghLabels = null;
+		List<Milestone> ghMilestones = null;
+		List<Issue> ghIssues = null;
+		
+		ghCollaborators = getCollaborators();
+		ghLabels = getLabels();
+		ghMilestones = getMilestones();
+		ghIssues = getAllIssues();
+		
+		HashMap<String, List> map = new HashMap<String, List>();
+		map.put(KEY_COLLABORATORS, ghCollaborators);
+		map.put(KEY_LABELS, ghLabels);
+		map.put(KEY_MILESTONES, ghMilestones);
+		map.put(KEY_ISSUES, ghIssues);
+		return map;
 	}
 	
 	/**

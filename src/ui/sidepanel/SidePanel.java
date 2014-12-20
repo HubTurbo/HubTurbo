@@ -265,7 +265,7 @@ public class SidePanel extends VBox {
 			@Override
 			protected Boolean call() throws IOException {
 				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
 			
 				final CountDownLatch latch = new CountDownLatch(1);
 				model.loadComponents(repoId, items);

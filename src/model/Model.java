@@ -83,7 +83,28 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public boolean loadComponents(IRepositoryIdProvider repoId) throws IOException{
 		try{
-			HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources(repoId);
+			HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
+			loadComponents(repoId, items);
+			return true;
+		} catch(SocketTimeoutException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("Internet Connection is down", 
+						"Timeout while loading items from github. Please check your internet connection.");
+			});
+			return false;
+		} catch(UnknownHostException e){
+			Platform.runLater(()->{
+				DialogMessage.showWarningDialog("No Internet Connection", 
+						"Please check your internet connection and try again");
+			});
+			return false;
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public boolean forceReloadComponents() throws IOException{
+		try{
+			HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources();
 			loadComponents(repoId, items);
 			return true;
 		} catch(SocketTimeoutException e){

@@ -36,7 +36,7 @@ public class MenuControl extends MenuBar {
 		newMenu.getItems().addAll(createNewMenuItems());
 
 		Menu view = new Menu("View");
-		view.getItems().addAll(createRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
+		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
 
 		getMenus().addAll(newMenu, view);
 	}
@@ -109,6 +109,20 @@ public class MenuControl extends MenuBar {
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
+	}
+	
+	private MenuItem createForceRefreshMenuItem() {
+		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
+		forceRefreshMenuItem.setOnAction((e) -> {
+			try {
+				ServiceManager.getInstance().getModel().forceReloadComponents();
+				ServiceManager.getInstance().restartModelUpdate();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		});
+		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
+		return forceRefreshMenuItem;
 	}
 
 	private MenuItem[] createNewMenuItems() {
