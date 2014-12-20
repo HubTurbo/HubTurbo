@@ -11,6 +11,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
+import ui.StatusBar;
 import model.Model;
 
 public class ModelUpdater {
@@ -21,6 +22,10 @@ public class ModelUpdater {
 	private MilestoneUpdateService milestoneUpdateService;
 	private long pollInterval = 60000; //time between polls in ms
 	private Timer pollTimer;
+	private int stopwatchInterval = 1000;
+	private int timeRemaining = 60;
+	private static final int SECS = 60;
+	private Timer stopwatch;
 	private Date lastUpdateTime = new Date();
 	
 	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime){
@@ -86,12 +91,33 @@ public class ModelUpdater {
 			}
 		};
 		pollTimer.scheduleAtFixedRate(pollTask, 0, pollInterval);
+		
+		stopwatch = new Timer();
+		TimerTask countdown = new TimerTask() {
+			@Override
+			public void run() {
+				StatusBar.displayMessage("Next refresh in " + getTime());
+			}
+		};
+		stopwatch.scheduleAtFixedRate(countdown, 0, stopwatchInterval);
+	}
+	
+	private int getTime() {
+	    if (timeRemaining == 1) {
+	        timeRemaining = SECS;
+	    } else {
+	    	--timeRemaining;
+	    }
+	    return timeRemaining;
 	}
 	
 	public void stopModelUpdate(){
 		if(pollTimer != null){
 			pollTimer.cancel();
 			pollTimer = null;
+			stopwatch.cancel();
+			timeRemaining = SECS;
+			stopwatch = null;
 		}
 	}
 }
