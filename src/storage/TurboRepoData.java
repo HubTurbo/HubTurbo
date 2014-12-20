@@ -32,18 +32,24 @@ public class TurboRepoData {
 		this.collaborators = collaborators;
 		
 		this.labels = new ArrayList<TurboSerializableLabel>();
-		for (TurboLabel label : labels) {
-			this.labels.add(new TurboSerializableLabel(label));
+		if (this.labels != null) {
+			for (TurboLabel label : labels) {
+				this.labels.add(new TurboSerializableLabel(label));
+			}
 		}
 		
 		this.milestones = new ArrayList<TurboSerializableMilestone>();
-		for (TurboMilestone milestone : milestones) {
-			this.milestones.add(new TurboSerializableMilestone(milestone));
+		if (this.milestones != null) {
+			for (TurboMilestone milestone : milestones) {
+				this.milestones.add(new TurboSerializableMilestone(milestone));
+			}
 		}
 
 		this.issues = new ArrayList<TurboSerializableIssue>();
-		for (TurboIssue issue : issues) {
-			this.issues.add(new TurboSerializableIssue(issue));
+		if (this.issues != null) {
+			for (TurboIssue issue : issues) {
+				this.issues.add(new TurboSerializableIssue(issue));
+			}
 		}
 	}
 	
@@ -73,24 +79,30 @@ public class TurboRepoData {
 	
 	public List<TurboLabel> getLabels() {
 		List<TurboLabel> turboLabelList = new ArrayList<TurboLabel>();
-		for (TurboSerializableLabel label: this.labels) {
-			turboLabelList.add(label.toTurboLabel());
+		if (this.labels != null) {
+			for (TurboSerializableLabel label: this.labels) {
+				turboLabelList.add(label.toTurboLabel());
+			}
 		}
 		return turboLabelList;
 	}
 	
 	public List<TurboMilestone> getMilestones() {
 		List<TurboMilestone> turboMilestoneList = new ArrayList<TurboMilestone>();
-		for (TurboSerializableMilestone milestone: this.milestones) {
-			turboMilestoneList.add(milestone.toTurboMilestone());
+		if (this.milestones != null) {
+			for (TurboSerializableMilestone milestone: this.milestones) {
+				turboMilestoneList.add(milestone.toTurboMilestone());
+			}
 		}
 		return turboMilestoneList;
 	}
 	
 	public List<TurboIssue> getIssues(Model model) {
 		List<TurboIssue> turboIssueList = new ArrayList<TurboIssue>();
-		for (TurboSerializableIssue issue: this.issues) {
-			turboIssueList.add(issue.toTurboIssue(model));
+		if (this.issues != null) {
+			for (TurboSerializableIssue issue: this.issues) {
+				turboIssueList.add(issue.toTurboIssue(model));
+			}
 		}
 		return turboIssueList;
 	}
