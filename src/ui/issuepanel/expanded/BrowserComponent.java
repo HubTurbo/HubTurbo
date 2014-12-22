@@ -27,6 +27,7 @@ import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
+import util.PlatformSpecific;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -238,10 +239,9 @@ public class BrowserComponent {
 	 */
 	private static void setupChromeDriverExecutable() {
 		
-		String osName = System.getProperty("os.name");
 		String binaryFileName =
-				osName.startsWith("Mac OS") ? "chromedriver"
-				: osName.startsWith("Windows") ? "chromedriver.exe"
+				PlatformSpecific.isOnMac() ? "chromedriver"
+				: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
 				: "chromedriver_linux";
 		
 		File f = new File(binaryFileName);

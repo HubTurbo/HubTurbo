@@ -14,9 +14,7 @@ public class Browse {
 		
 		if (htmlUrl == null || htmlUrl.isEmpty()) return;
 
-		final String osName = System.getProperty("os.name");
-		
-		if (osName.startsWith("Mac OS") || osName.startsWith("Windows")) {
+		if (PlatformSpecific.isOnMac() || PlatformSpecific.isOnWindows()) {
 			browseWithDesktop(htmlUrl);
 		} else {
 			// Assume *nix
