@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -125,6 +127,14 @@ public class UI extends Application {
 		});
 		mainStage.widthProperty().addListener(c -> {
 			browserComponent.resize(mainStage.getWidth());
+		});
+		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
+				if (is) {
+					ServiceManager.getInstance().getModel().refresh();
+				}
+			}
 		});
 		registerEvent(new ColumnChangeEventHandler() {
 			@Override
