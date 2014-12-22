@@ -73,6 +73,7 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
+		System.out.println("initialise");
 		driver = setupChromeDriver();
 	}
 
@@ -137,20 +138,10 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newLabel() {
-		executor.execute(new Task<Void>() {
-			@Override
-			protected Void call() {
-				try {
-					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
-						driver.get(GitHubURL.getPathForNewLabel());
-						hidePageElements();
-					}
-				} catch (WebDriverException e) {
-					// Chrome was closed; recreate it
-					driver = setupChromeDriver();
-					return call(); // Recurse and repeat
-				}
-				return null;
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
+				driver.get(GitHubURL.getPathForNewLabel());
+				hidePageElements();
 			}
 		});
 	}
@@ -160,20 +151,10 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newMilestone() {
-		executor.execute(new Task<Void>() {
-			@Override
-			protected Void call() {
-				try {
-					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
-						driver.get(GitHubURL.getPathForNewMilestone());
-						hidePageElements();
-					}
-				} catch (WebDriverException e) {
-					// Chrome was closed; recreate it
-					driver = setupChromeDriver();
-					return call(); // Recurse and repeat
-				}
-				return null;
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
+				driver.get(GitHubURL.getPathForNewMilestone());
+				hidePageElements();
 			}
 		});
 	}
@@ -183,20 +164,10 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newIssue() {
-		executor.execute(new Task<Void>() {
-			@Override
-			protected Void call() {
-				try {
-					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
-						driver.get(GitHubURL.getPathForNewIssue());
-						hidePageElements();
-					}
-				} catch (WebDriverException e) {
-					// Chrome was closed; recreate it
-					driver = setupChromeDriver();
-					return call(); // Recurse and repeat
-				}
-				return null;
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
+				driver.get(GitHubURL.getPathForNewIssue());
+				hidePageElements();
 			}
 		});
 	}
@@ -207,18 +178,38 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void showIssue(int id) {
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+				driver.get(GitHubURL.getPathForIssue(id));
+				hidePageElements();
+//				driver.findElement(By.id("#issue_title")).click();
+			}
+		});
+	}
+	
+	/**
+	 * A helper function for running browser operations.
+	 * Takes care of running it on a separate thread, and normalises error-handling across
+	 * all types of code.
+	 */
+	private void runBrowserOperation (Runnable operation) {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
 				try {
-					if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-						driver.get(GitHubURL.getPathForIssue(id));
-						hidePageElements();
-					}
+					operation.run();
 				} catch (WebDriverException e) {
-					// Chrome was closed; recreate it
-					driver = setupChromeDriver();
-					return call(); // Recurse and repeat
+					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+					case NoSuchWindow:
+						System.out.println("Chrome was closed; recreating window...");
+						driver = setupChromeDriver();
+						return call(); // Recurse and repeat
+					case NoSuchElement:
+						System.out.println("Warning: no such element!");
+						break;
+					default:
+						break;
+					}
 				}
 				return null;
 			}
