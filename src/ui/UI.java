@@ -277,5 +277,9 @@ public class UI extends Application {
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);
+		
+		Platform.runLater(() -> {
+			mainStage.setMaxWidth(dimensions.getWidth());
+		});
 	}
 }
