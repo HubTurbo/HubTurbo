@@ -282,6 +282,7 @@ public class UI extends Application {
 		
 		Platform.runLater(() -> {
 			mainStage.setMaxWidth(dimensions.getWidth());
+			browserComponent.resize(mainStage.getWidth());
 		});
 	}
 }
