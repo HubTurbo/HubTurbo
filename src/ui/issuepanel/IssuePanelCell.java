@@ -51,7 +51,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 		
-		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
+//		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
 		registerDragEvents(issue);
 		
