@@ -125,9 +125,6 @@ public class UI extends Application {
 			Platform.exit();
 			System.exit(0);
 		});
-		mainStage.widthProperty().addListener(c -> {
-			browserComponent.resize(mainStage.getWidth());
-		});
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
