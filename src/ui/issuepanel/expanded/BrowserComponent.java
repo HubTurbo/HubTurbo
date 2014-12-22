@@ -73,7 +73,6 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
-		System.out.println("initialise");
 		driver = setupChromeDriver();
 	}
 
@@ -141,7 +140,6 @@ public class BrowserComponent {
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
 				driver.get(GitHubURL.getPathForNewLabel());
-				hidePageElements();
 			}
 		});
 	}
@@ -154,7 +152,6 @@ public class BrowserComponent {
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
 				driver.get(GitHubURL.getPathForNewMilestone());
-				hidePageElements();
 			}
 		});
 	}
@@ -167,7 +164,6 @@ public class BrowserComponent {
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
 				driver.get(GitHubURL.getPathForNewIssue());
-				hidePageElements();
 			}
 		});
 	}
@@ -181,8 +177,6 @@ public class BrowserComponent {
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
 				driver.get(GitHubURL.getPathForIssue(id));
-				hidePageElements();
-//				driver.findElement(By.id("#issue_title")).click();
 			}
 		});
 	}
