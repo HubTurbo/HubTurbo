@@ -12,6 +12,8 @@ import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
 import ui.StatusBar;
+import ui.UIReference;
+import util.events.RefreshDoneEvent;
 import model.Model;
 
 public class ModelUpdater {
@@ -88,6 +90,7 @@ public class ModelUpdater {
 			@Override
 			public void run() {
 				updateModel();
+				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
 			}
 		};
 		pollTimer.scheduleAtFixedRate(pollTask, 0, pollInterval);

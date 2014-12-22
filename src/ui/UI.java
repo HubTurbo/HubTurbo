@@ -146,6 +146,8 @@ public class UI extends Application {
 		sidePanel = new SidePanel(this, mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel(), sidePanel);
 		sidePanel.setColumns(columns);
+		
+		UIReference.getInstance().setUI(this);
 
 		ScrollPane columnsScroll = new ScrollPane(columns);
 		columnsScroll.getStyleClass().add("transparent-bg");

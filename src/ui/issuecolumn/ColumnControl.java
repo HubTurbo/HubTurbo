@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -16,9 +17,11 @@ import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
 import util.events.ColumnChangeEvent;
-
+import util.events.IssueSelectedEvent;
+import util.events.IssueSelectedEventHandler;
+import util.events.RefreshDoneEvent;
+import util.events.RefreshDoneEventHandler;
 import command.TurboCommandExecutor;
-
 import filter.FilterExpression;
 
 
@@ -42,6 +45,15 @@ public class ColumnControl extends HBox {
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
 		setupModelChangeResponse();
+		
+		ui.registerEvent(new RefreshDoneEventHandler() {
+			@Override
+			public void handle(RefreshDoneEvent e) {
+				Platform.runLater(()-> {
+					refresh();
+				});	
+			}
+		});
 	}
 	
 	private void setupModelChangeResponse(){
