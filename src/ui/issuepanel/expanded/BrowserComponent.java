@@ -197,7 +197,8 @@ public class BrowserComponent {
 					case NoSuchWindow:
 						System.out.println("Chrome was closed; recreating window...");
 						driver = setupChromeDriver();
-						return call(); // Recurse and repeat
+						login();
+						runBrowserOperation(operation); // Recurse and repeat
 					case NoSuchElement:
 						System.out.println("Warning: no such element!");
 						break;
@@ -216,20 +217,16 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void login() {
-		executor.execute(new Task<Void>() {
-			@Override
-			protected Void call() {
-				driver.get(GitHubURL.LOGIN_PAGE);
-				try {
-					WebElement searchBox = driver.findElement(By.name("login"));
-					searchBox.sendKeys(ServiceManager.getInstance().getUserId());
-					searchBox = driver.findElement(By.name("password"));
-					searchBox.sendKeys(ServiceManager.getInstance().getPassword());
-					searchBox.submit();
-				} catch (NoSuchElementException e) {
-					// Already logged in; do nothing
-				}
-				return null;
+		runBrowserOperation(() -> {
+			driver.get(GitHubURL.LOGIN_PAGE);
+			try {
+				WebElement searchBox = driver.findElement(By.name("login"));
+				searchBox.sendKeys(ServiceManager.getInstance().getUserId());
+				searchBox = driver.findElement(By.name("password"));
+				searchBox.sendKeys(ServiceManager.getInstance().getPassword());
+				searchBox.submit();
+			} catch (NoSuchElementException e) {
+				// Already logged in; do nothing
 			}
 		});
 	}
