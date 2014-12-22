@@ -84,8 +84,15 @@ public class BrowserComponent {
 		assert driver != null;
 		try {
 			driver.close();
+			if (PlatformSpecific.isOnWindows()) {
+				Runtime.getRuntime().exec("taskkill.exe /im chromedriver.exe");
+			} else {
+				Runtime.getRuntime().exec("killall chromedriver");
+			}
 		} catch (WebDriverException e) {
 			// Chrome was closed; do nothing
+		} catch (IOException e) {
+			// Could not kill processes; do nothing
 		}
 	}
 	
