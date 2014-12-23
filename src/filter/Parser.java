@@ -14,7 +14,7 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		String input = "assignee    :    darius   ";
+		String input = "(a:b OR c:d) e:f";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
@@ -106,6 +106,7 @@ public class Parser {
 				consume();
 				left = parseDisjunction(left, token);
 				break;
+			case QUALIFIER:
 			case SYMBOL:
 			case NOT:
 			case LBRACKET:
@@ -128,6 +129,7 @@ public class Parser {
 	private int getInfixPrecedence(Token token) {
 		switch (token.getType()) {
 		case AND:
+		case QUALIFIER:
 		case SYMBOL: // Implicit conjunction
 		case LBRACKET:
 			return Precedence.CONJUNCTION;

@@ -42,50 +42,52 @@ public class Tests {
     
     @Test
     public void operators() {
-        assertEquals(Parser.parse("a(b) OR c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a(b) | c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a(b) || c(d)"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b OR c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b | c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b || c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 
-        assertEquals(Parser.parse("a(b) c(d)"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a(b) AND c(d)"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a(b) & c(d)"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a(b) && c(d)"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b AND c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b & c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b && c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
 
-        assertEquals(Parser.parse("!a(b)"), new Negation(new Predicate("a", "b")));
-        assertEquals(Parser.parse("-a(b)"), new Negation(new Predicate("a", "b")));
-        assertEquals(Parser.parse("~a(b)"), new Negation(new Predicate("a", "b")));
+        assertEquals(Parser.parse("!a:b"), new Negation(new Predicate("a", "b")));
+        assertEquals(Parser.parse("-a:b"), new Negation(new Predicate("a", "b")));
+        assertEquals(Parser.parse("~a:b"), new Negation(new Predicate("a", "b")));
         
-        assertEquals(Parser.parse("milestone(0.4) state(open) OR label(urgent)"),
+        // Implicit conjunction
+        
+        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
                 new Disjunction(new Conjunction(new Predicate("milestone", "0.4"), new Predicate("state", "open")), new Predicate("label", "urgent")));
-        assertEquals(Parser.parse("milestone(0.4) state(open) OR label(urgent)"), Parser.parse("milestone(0.4) AND state(open) OR label(urgent)"));
+        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"), Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
     
     @Test
     public void associativity() {
-        assertEquals(Parser.parse("a:b OR c:d OR e(f)"),
+        assertEquals(Parser.parse("a:b OR c:d OR e:f"),
                 new Disjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
 
-        assertEquals(Parser.parse("a(b) AND c:d AND e(f)"),
+        assertEquals(Parser.parse("a:b AND c:d AND e:f"),
                 new Conjunction(new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
     }
     
     @Test
     public void precedence() {
-        assertEquals(Parser.parse("a(b) OR c(d) AND e(f)"),
+        assertEquals(Parser.parse("a:b OR c:d AND e:f"),
                 new Disjunction(new Predicate("a", "b"), new Conjunction(new Predicate("c", "d"), new Predicate("e", "f"))));
-        assertEquals(Parser.parse("~a(b) OR c(d) AND e(f)"),
+        assertEquals(Parser.parse("~a:b OR c:d AND e:f"),
                 new Disjunction(new Negation(new Predicate("a", "b")), new Conjunction(new Predicate("c", "d"), new Predicate("e", "f"))));
         
-        assertEquals(Parser.parse("a(b) ~c(d)"), new Conjunction(new Predicate("a", "b"), new Negation(new Predicate("c", "d"))));
+        assertEquals(Parser.parse("a:b ~c:d"), new Conjunction(new Predicate("a", "b"), new Negation(new Predicate("c", "d"))));
     }
 
     @Test
     public void grouping() {
-        assertEquals(Parser.parse("(a(b) OR c(d)) AND e(f)"),
+        assertEquals(Parser.parse("(a:b OR c:d) AND e:f"),
                 new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
-        assertEquals(Parser.parse("(a(b) OR c(d)) e(f)"),
+        assertEquals(Parser.parse("(a:b OR c:d) e:f"),
                 new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
-        assertEquals(Parser.parse("e(f) ~(a(b) OR c(d))"),
+        assertEquals(Parser.parse("e:f ~(a:b OR c:d)"),
                 new Conjunction(new Predicate("e", "f"), new Negation(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")))));
     }
     
