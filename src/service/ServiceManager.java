@@ -271,12 +271,17 @@ public class ServiceManager {
 		milestonesETag = null;
 		issueCheckTime = null;
 		
-		List<User> ghCollaborators = null;
-		List<Label> ghLabels = null;
-		List<Milestone> ghMilestones = null;
-		List<Issue> ghIssues = null;
+		List<User> ghCollaborators = new ArrayList<User>();
+		List<Label> ghLabels = new ArrayList<Label>();
+		List<Milestone> ghMilestones = new ArrayList<Milestone>();
+		List<Issue> ghIssues = new ArrayList<Issue>();
 		
-		ghCollaborators = getCollaborators();
+		try {
+			ghCollaborators = getCollaborators();
+		} catch (Exception e) {
+			// unable to access collaborators if user does not have a push access
+			// this case is being handled in model's load components
+		}
 		ghLabels = getLabels();
 		ghMilestones = getMilestones();
 		ghIssues = getAllIssues();
