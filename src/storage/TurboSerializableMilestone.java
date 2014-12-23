@@ -4,15 +4,9 @@ import model.TurboMilestone;
 
 class TurboSerializableMilestone {
 	private int number;
-	
-	//TODO
-	// Problem
 	private String title;
-	
 	private String state;
 	private String description;
-	
-	/** Problems **/
 	private String dueOnString;
 	private int closed;
 	private int open;

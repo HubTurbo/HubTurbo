@@ -20,26 +20,19 @@ class TurboSerializableIssue {
 	private int numOfComments;
 	private PullRequest pullRequest;
 	
-	//TODO
-	/** problem**/
 	private int id;
 	private String title;
 	private String description;
 	
-	private String cachedDescriptionMarkup;
-	
-	/** problem**/
+	// for comments, but not used for current version
+	//private String cachedDescriptionMarkup;
+
 	private int parentIssue;
 	private boolean state;
 	
 	private TurboUser assignee;
-	
-	/** problem within **/
 	private TurboSerializableMilestone milestone;
-	
 	private String htmlUrl;
-	
-	/** problem within **/
 	private List<TurboSerializableLabel> labels;
 	
 	public TurboSerializableIssue(TurboIssue issue) {
@@ -51,7 +44,7 @@ class TurboSerializableIssue {
 		this.id = issue.getId();
 		this.title = issue.getTitle();
 		this.description = issue.getDescription();
-		this.cachedDescriptionMarkup = issue.getDescriptionMarkup();
+		//this.cachedDescriptionMarkup = issue.getDescriptionMarkup();
 		
 		this.parentIssue = issue.getParentIssue();
 		this.state = issue.getOpen();
@@ -92,7 +85,7 @@ class TurboSerializableIssue {
 		tI.setPullRequest(pullRequest);
 		
 		tI.setId(id);
-		tI.setDescriptionMarkup(cachedDescriptionMarkup);
+		//tI.setDescriptionMarkup(cachedDescriptionMarkup);
 		
 		tI.setParentIssue(parentIssue);
 		tI.setOpen(state);

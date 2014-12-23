@@ -3,11 +3,9 @@ package storage;
 import model.TurboLabel;
 
 class TurboSerializableLabel {
-	/** Problems**/ 
 	private String name;
 	private String colour;
 	private String group;
-	
 	private boolean isExclusive;
 	
 	public TurboSerializableLabel(TurboLabel label) {
