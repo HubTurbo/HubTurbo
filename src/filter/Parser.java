@@ -218,9 +218,11 @@ public class Parser {
 				// Date
 				switch (token.getType()) {
 				case GT:
+					return new Predicate(name, new DateRange(date.get(), null, true));
 				case GTE:
 					return new Predicate(name, new DateRange(date.get(), null));
 				case LT:
+					return new Predicate(name, new DateRange(null, date.get(), true));
 				case LTE:
 					return new Predicate(name, new DateRange(null, date.get()));
 				default:

@@ -5,36 +5,31 @@ import java.time.LocalDate;
 public class DateRange {
 	private final LocalDate start;
 	private final LocalDate end;
+	private final boolean strictly;
 	
 	public DateRange(LocalDate start, LocalDate end) {
 		this.start = start;
 		this.end = end;
+		this.strictly = false;
 	}
 	
+	public DateRange(LocalDate start, LocalDate end, boolean strict) {
+		this.start = start;
+		this.end = end;
+		this.strictly = strict;
+	}
+
 	public boolean encloses(LocalDate date) {
 		if (start == null) {
 			// * .. end
-			return date.isBefore(start);
+			return date.isBefore(start) && (!strictly || !date.isEqual(start));
 		} else if (end == null) {
 			// start .. *
-			return date.isAfter(start);
-		} else {
-			// start .. end
-			return date.isAfter(start) && date.isBefore(end);
-		}
-	}
-	
-	public boolean enclosesStrict(LocalDate date) {
-		if (start == null) {
-			// * .. end
-			return date.isBefore(start) && !date.isEqual(start);
-		} else if (end == null) {
-			// start .. *
-			return date.isAfter(start) && !date.isEqual(end);
+			return date.isAfter(start) && (!strictly || !date.isEqual(end));
 		} else {
 			// start .. end
 			return date.isAfter(start) && date.isBefore(end)
-					&& !date.isEqual(start) && !date.isEqual(end);
+					&& (!strictly || (!date.isEqual(start) && !date.isEqual(end)));
 		}
 	}
 
@@ -44,6 +39,7 @@ public class DateRange {
 		int result = 1;
 		result = prime * result + ((end == null) ? 0 : end.hashCode());
 		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + (strictly ? 1231 : 1237);
 		return result;
 	}
 
@@ -66,6 +62,13 @@ public class DateRange {
 				return false;
 		} else if (!start.equals(other.start))
 			return false;
+		if (strictly != other.strictly)
+			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DateRange [start=" + start + ", end=" + end + ", strictly=" + strictly + "]";
 	}
 }
