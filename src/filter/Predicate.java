@@ -52,6 +52,9 @@ public class Predicate implements FilterExpression {
         switch (name) {
         case "id":
             return idSatisfies(issue);
+        case "keyword":
+        	// TODO temporary implementation pending in: qualifier
+            return titleSatisfies(issue);
         case "title":
             return titleSatisfies(issue);
         case "milestone":
