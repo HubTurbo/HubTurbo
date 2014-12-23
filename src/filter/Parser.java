@@ -15,8 +15,8 @@ public class Parser {
 
 	public static void main(String[] args) {
 		String input = "assignee    :    darius   ";
-//		FilterExpression p = Parser.parse(input);
-		ArrayList<Token> p = new Lexer(input).lex();
+		FilterExpression p = Parser.parse(input);
+//		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
 	}
 	
@@ -155,7 +155,7 @@ public class Parser {
 
 	private FilterExpression parseQualifier(Token token) {
 		String name = token.getValue();
-		name = name.substring(0, name.length()-1);
+		name = name.substring(0, name.length()-1).trim();
 		
 		TokenType type = lookAhead().getType();
 

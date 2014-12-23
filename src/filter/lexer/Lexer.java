@@ -35,8 +35,13 @@ public class Lexer {
 	private int position;
 	
 	public Lexer(String input) {
-		this.input = input;
+		this.input = stripTrailingWhitespace(input);
 		this.position = 0;
+	}
+
+	private Pattern trailingWhitespace = Pattern.compile("\\s+$");
+	private String stripTrailingWhitespace(String input) {
+		return trailingWhitespace.matcher(input).replaceAll("");
 	}
 
 	private Token nextToken() {
