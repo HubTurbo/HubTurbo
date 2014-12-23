@@ -54,6 +54,8 @@ public class Predicate implements FilterExpression {
 			return parentSatisfies(issue, model);
 		case "label":
 			return labelsSatisfy(issue);
+		case "author":
+			return authorSatisfies(issue);
 		case "assignee":
 			return assigneeSatisfies(issue);
 		case "state":
@@ -91,6 +93,8 @@ public class Predicate implements FilterExpression {
 		case "assignee":
 			applyAssignee(issue, model);
 			break;
+		case "author":
+			throw new PredicateApplicationException("Unnecessary filter: cannot change author of issue");
 		case "state":
 		case "status":
 			applyState(issue);
@@ -213,12 +217,20 @@ public class Predicate implements FilterExpression {
 	}
 
 	private boolean assigneeSatisfies(TurboIssue issue) {
-		if (issue.getAssignee() == null) return false;
-		return issue.getAssignee().getAlias().toLowerCase().contains(content.toLowerCase())
-				|| issue.getAssignee().getGithubName().toLowerCase().contains(content.toLowerCase())
-				|| (issue.getAssignee().getRealName() != null && issue.getAssignee().getRealName().toLowerCase().contains(content.toLowerCase()));
+	    TurboUser assignee = issue.getAssignee();
+	    String content = this.content.toLowerCase();
+	
+	    if (assignee == null) return false;
+	    return assignee.getAlias().toLowerCase().contains(content)
+	            || assignee.getGithubName().toLowerCase().contains(content)
+	            || (assignee.getRealName() != null && assignee.getRealName().toLowerCase().contains(content));
 	}
 	
+	private boolean authorSatisfies(TurboIssue issue) {
+	    String creator = issue.getCreator().toLowerCase();
+	    return creator != null && creator.contains(content.toLowerCase());
+	}
+
 	private boolean labelsSatisfy(TurboIssue issue) {
 		String group = "";
 		String labelName = content.toLowerCase();
