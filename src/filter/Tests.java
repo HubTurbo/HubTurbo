@@ -90,6 +90,51 @@ public class Tests {
     }
 
     @Test
+    public void dateRangeUsage() {
+    	
+    	// date .. date
+    	DateRange dr = new DateRange(LocalDate.of(2014, 1, 1), LocalDate.of(2014, 6, 3));
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 2, 2)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 7, 1)), false);
+
+    	// date .. date
+    	// strict inequality
+    	dr = new DateRange(LocalDate.of(2014, 1, 1), LocalDate.of(2014, 6, 3), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 2, 2)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 7, 1)), false);
+
+    	// date .. *
+    	dr = new DateRange(LocalDate.of(2014, 1, 1), null);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2013, 2, 2)), false);
+
+    	// date .. *
+    	// strict inequality
+    	dr = new DateRange(LocalDate.of(2014, 1, 1), null, true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2013, 2, 2)), false);
+
+    	// * .. date
+    	dr = new DateRange(null, LocalDate.of(2014, 1, 1));
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2013, 2, 2)), true);
+
+    	// * .. date
+    	// strict inequality
+    	dr = new DateRange(null, LocalDate.of(2014, 1, 1), true);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 1, 1)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2014, 6, 3)), false);
+    	assertEquals(dr.encloses(LocalDate.of(2013, 2, 2)), true);
+    }
+    
+    @Test
     public void dateRangeOperators() {
         assertEquals(Parser.parse("created:<2014-06-01"),
                 new Predicate("created", new DateRange(null, LocalDate.of(2014, 6, 1), true)));
