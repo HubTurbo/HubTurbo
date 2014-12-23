@@ -1,4 +1,4 @@
-package filter;
+package filter.lexer;
 
 public class Token {
 	private TokenType type;
