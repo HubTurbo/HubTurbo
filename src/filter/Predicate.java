@@ -129,8 +129,18 @@ public class Predicate implements FilterExpression {
 			return "";
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
 
-	// TODO update
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -145,6 +155,16 @@ public class Predicate implements FilterExpression {
 				return false;
 		} else if (!content.equals(other.content))
 			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (dateRange == null) {
+			if (other.dateRange != null)
+				return false;
+		} else if (!dateRange.equals(other.dateRange))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -152,7 +172,7 @@ public class Predicate implements FilterExpression {
 			return false;
 		return true;
 	}
-	
+
 	private int parseIdString(String id) {
 		if (id.startsWith("#")) {
 			return Integer.parseInt(id.substring(1));
