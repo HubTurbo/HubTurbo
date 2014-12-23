@@ -3,6 +3,7 @@ package filter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -70,7 +71,20 @@ public class Tests {
         assertEquals(Parser.parse("a:b AND c:d AND e:f"),
                 new Conjunction(new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
     }
-    
+
+    @Test
+    public void dates() {
+        assertEquals(Parser.parse("created   :   2014-06-01"),
+                new Predicate("created", LocalDate.of(2014, 06, 02)));
+        
+        assertEquals(Parser.parse("a created   :   2014-06-01 b"),
+        		new Conjunction(
+        				new Conjunction(
+        						new Predicate("keyword", "a"),
+        						new Predicate("created", LocalDate.of(2014, 06, 02))),
+						new Predicate("keyword", "b")));
+    } 
+
     @Test
     public void precedence() {
         assertEquals(Parser.parse("a:b OR c:d AND e:f"),

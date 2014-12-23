@@ -14,7 +14,7 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		String input = "(a:b OR c:d) e:f";
+		String input = "created:2014-06-01";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);

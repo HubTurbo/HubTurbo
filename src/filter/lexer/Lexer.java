@@ -17,7 +17,11 @@ public class Lexer {
 			new Rule("AND|&&?", TokenType.AND),
 			new Rule("OR|\\|\\|?", TokenType.OR),
 			new Rule("NOT|~|!|-", TokenType.NOT),
-			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER), // This must be before Symbol
+			
+			// These have higher priority than Symbol
+			new Rule("\\d{4}-\\d{2}-\\d{2}", TokenType.DATE), // YYYY-MM-DD
+			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER),
+
 			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),
@@ -27,8 +31,7 @@ public class Lexer {
 			new Rule("<=", TokenType.LTE),
 			new Rule(">", TokenType.GT),
 			new Rule(">=", TokenType.GTE),
-			new Rule("\\*", TokenType.STAR),
-			new Rule("\\d{4}-\\d{2}-\\d{2}", TokenType.DATE) // YYYY-MM-DD
+			new Rule("\\*", TokenType.STAR)
 		);
 
 	private String input;

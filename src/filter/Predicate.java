@@ -114,10 +114,19 @@ public class Predicate implements FilterExpression {
 	public String toString() {
 		if (this == EMPTY) {
 			return "<empty predicate>";
-		} else if (name.equals("keyword")) {
-			return content;
+		} else if (content != null) {
+			if (name.equals("keyword")) {
+				return content;
+			} else {
+				return name + ":" + content;
+			}
+		} else if (date != null) {
+			return name + ":" + date.toString();
+		} else if (dateRange != null) {
+			return name + ":" + dateRange.toString();
 		} else {
-			return name + ":" + content;
+			assert false : "Should not happen";
+			return "";
 		}
 	}
 
