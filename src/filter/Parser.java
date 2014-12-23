@@ -216,7 +216,18 @@ public class Parser {
 			Optional<LocalDate> date = parseDate(dateToken);
 			if (date.isPresent()) {
 				// Date
-				return new Predicate(name, date.get());
+				switch (token.getType()) {
+				case GT:
+				case GTE:
+					return new Predicate(name, new DateRange(date.get(), null));
+				case LT:
+				case LTE:
+					return new Predicate(name, new DateRange(null, date.get()));
+				default:
+					assert false : "Should not happen";
+				}
+				assert false : "Should not happen";
+				return null;
 			} else {
 				// Number
 				try {

@@ -19,7 +19,7 @@ public class Lexer {
 			new Rule("NOT|~|!|-", TokenType.NOT),
 			
 			// These have higher priority than Symbol
-			new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM-DD
+			new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
 			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER),
 
 			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
