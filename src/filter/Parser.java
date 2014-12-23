@@ -14,7 +14,7 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		FilterExpression p = Parser.parse("in:title hello");
+		FilterExpression p = Parser.parse("what hello");
 //		ArrayList<Token> p = new Lexer("in:title hello").lex();
 		System.out.println(p);
 	}
@@ -85,7 +85,7 @@ public class Parser {
 			left = parseQualifier(token);
 			break;
 		case SYMBOL:
-			left = null;//parsePredicate(token);
+			left = parseKeyword(token);
 			break;
 		default:
 			throw new ParseException("Invalid prefix token " + token);
@@ -118,6 +118,10 @@ public class Parser {
 		}
 		
 		return left;
+	}
+
+	private FilterExpression parseKeyword(Token token) {
+		return new Predicate("keyword", token.getValue());
 	}
 
 	private int getInfixPrecedence(Token token) {

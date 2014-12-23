@@ -17,7 +17,7 @@ public class Lexer {
 			new Rule("AND|&&?", TokenType.AND),
 			new Rule("OR|\\|\\|?", TokenType.OR),
 			new Rule("NOT|~|!|-", TokenType.NOT),
-			new Rule("[A-Za-z]+:", TokenType.QUALIFIER), // This must be before Symbol
+			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER), // This must be before Symbol
 			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),
