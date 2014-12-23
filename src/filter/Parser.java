@@ -14,7 +14,7 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		String input = "created:2014-06-01";
+		String input = "created:2014-6-01";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
@@ -142,7 +142,7 @@ public class Parser {
 		}
 	}
 	
-	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
+	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
 	private static Optional<LocalDate> parseDate(Token token) {
 		Matcher matcher = datePattern.matcher(token.getValue());
 		if (matcher.find()) {

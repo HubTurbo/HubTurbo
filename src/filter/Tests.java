@@ -88,8 +88,11 @@ public class Tests {
 
     @Test
     public void dates() {
+        assertEquals(Parser.parse("created   :   2014-6-1"),
+                new Predicate("created", LocalDate.of(2014, 6, 1)));
+
         assertEquals(Parser.parse("created   :   2014-06-01"),
-                new Predicate("created", LocalDate.of(2014, 06, 02)));
+                new Predicate("created", LocalDate.of(2014, 6, 2)));
         
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
         		new Conjunction(
