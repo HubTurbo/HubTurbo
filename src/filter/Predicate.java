@@ -143,15 +143,15 @@ public class Predicate implements FilterExpression {
     public String toString() {
         if (this == EMPTY) {
             return "";
-        } else if (content != null) {
+        } else if (content.isPresent()) {
             if (name.equals("keyword")) {
                 return content.get();
             } else {
                 return name + ":" + content.get().toString();
             }
-        } else if (date != null) {
+        } else if (date.isPresent()) {
             return name + ":" + date.get().toString();
-        } else if (dateRange != null) {
+        } else if (dateRange.isPresent()) {
             return name + ":" + dateRange.get().toString();
         } else {
             assert false : "Should not happen";
