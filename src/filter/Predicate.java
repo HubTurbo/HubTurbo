@@ -112,10 +112,16 @@ public class Predicate implements FilterExpression {
 
 	@Override
 	public String toString() {
-		if (this == EMPTY) return "";
-		else return name + "(" + content + ")";
+		if (this == EMPTY) {
+			return "<empty predicate>";
+		} else if (name.equals("keyword")) {
+			return content;
+		} else {
+			return name + ":" + content;
+		}
 	}
 
+	// TODO update
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

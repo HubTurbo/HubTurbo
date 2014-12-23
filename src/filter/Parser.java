@@ -14,8 +14,9 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		FilterExpression p = Parser.parse("what hello");
-//		ArrayList<Token> p = new Lexer("in:title hello").lex();
+		String input = "assignee    :    darius   ";
+//		FilterExpression p = Parser.parse(input);
+		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
 	}
 	

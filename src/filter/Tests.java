@@ -21,15 +21,11 @@ public class Tests {
     }
     
     @Test
-    public void predicates() {
-        assertEquals(Parser.parse("a(b)"), new Predicate("a", "b"));
-        assertEquals(Parser.parse("    a   (   b   )   "), new Predicate("a", "b"));
-        assertEquals(Parser.parse("a(dar ius)"), new Predicate("a", "dar ius"));
-
-        try {
-            Parser.parse("c a(b)");
-            fail("c is a predicate without parentheses -- that should fail");
-        } catch (ParseException e) {}
+    public void keywords() {
+        assertEquals(Parser.parse("a(b)"), new Conjunction(new Predicate("keyword", "a"), new Predicate("keyword", "b")));
+        assertEquals(Parser.parse("    a   (   b   )   "), new Conjunction(new Predicate("keyword", "a"), new Predicate("keyword", "b")));
+        assertEquals(Parser.parse("a(b c)"), new Conjunction(new Predicate("keyword", "a"), new Conjunction(new Predicate("keyword", "b"), new Predicate("keyword", "c"))));
+        assertEquals(Parser.parse("c a(b)"), new Conjunction(new Conjunction(new Predicate("keyword", "c"), new Predicate("keyword", "a")), new Predicate("keyword", "b")));
     }
     
     @Test
@@ -97,10 +93,10 @@ public class Tests {
     public void colon() {
         assertEquals(Parser.parse("assignee:darius"),
                 new Predicate("assignee", "darius"));
-        assertEquals(Parser.parse("assignee:    darius   "),
+        assertEquals(Parser.parse("assignee    :    darius   "),
                 new Predicate("assignee", "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
-                new Conjunction(new Predicate("assignee", "dar"), new Predicate("ius", "one")));
+                new Conjunction(new Conjunction(new Predicate("assignee", "dar"), new Predicate("keyword", "ius")), new Predicate("keyword", "one")));
     }
     
     @Test
