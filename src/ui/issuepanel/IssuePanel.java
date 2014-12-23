@@ -76,10 +76,12 @@ public class IssuePanel extends Column {
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
 		setOnKeyReleased((e) -> {
-			if (e.getCode().equals(KeyCode.ENTER)) {
-				TurboIssue selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
-				if (selectedIssue != null) {
-					ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getId()));
+			if (e.getCode().equals(KeyCode.DOWN) || e.getCode().equals(KeyCode.UP)) {
+				if (!e.isShiftDown()) {
+					TurboIssue selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
+					if (selectedIssue != null) {
+						ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getId()));
+					}
 				}
 			}
 		}); 
