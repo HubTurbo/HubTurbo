@@ -1,7 +1,11 @@
 package filter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import filter.lexer.Lexer;
 import filter.lexer.Token;
@@ -10,7 +14,8 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		FilterExpression p = Parser.parse("~");
+		FilterExpression p = Parser.parse("in:title hello");
+//		ArrayList<Token> p = new Lexer("in:title hello").lex();
 		System.out.println(p);
 	}
 	
@@ -76,8 +81,11 @@ public class Parser {
 		case NOT:
 			left = parseNegation(token);
 			break;
+		case QUALIFIER:
+			left = parseQualifier(token);
+			break;
 		case SYMBOL:
-			left = parsePredicate(token);
+			left = null;//parsePredicate(token);
 			break;
 		default:
 			throw new ParseException("Invalid prefix token " + token);
@@ -126,34 +134,99 @@ public class Parser {
 			return 0;
 		}
 	}
+	
+	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
+	private static Optional<LocalDate> parseDate(Token token) {
+		Matcher matcher = datePattern.matcher(token.getValue());
+		if (matcher.find()) {
+			int year = Integer.parseInt(matcher.group(1));
+			int month = Integer.parseInt(matcher.group(2));
+			int day = Integer.parseInt(matcher.group(3));
+			return Optional.of(LocalDate.of(year, month, day));
+		} else {
+			return Optional.empty();
+		}
+	}
 
-	private FilterExpression parsePredicate(Token token) {
+	private FilterExpression parseQualifier(Token token) {
 		String name = token.getValue();
-		String content = "";
+		name = name.substring(0, name.length()-1);
 		
-		// Predicates look like the following:
+		TokenType type = lookAhead().getType();
 
-		// symbol(content with spaces)
-		// symbol: contentWithoutSpaces
+		if (type == TokenType.GT || type == TokenType.LT || type == TokenType.LTE || type == TokenType.GTE) {
+			// < > <= >= [number | date range]
+			return parseRangeOperator(name, lookAhead());
+		} else if (isNumberOrDateToken(lookAhead())) {
+			// [date] | [date] .. [date]
+			return parseDateOrDateRange(name);
+		} else {
+			// Keyword
+			Token t = consume();
+			return new Predicate(name, t.getValue());
+		}
+	}
+	
+	private FilterExpression parseDateOrDateRange(String name) {
+		Token left = consume();
+		Optional<LocalDate> leftDate = parseDate(left);
+		if (!leftDate.isPresent()) {
+			throw new ParseException("Left operand of .. must be a date");
+		}
 		
-		if (lookAhead().getType() == TokenType.COLON) {
-			consume(TokenType.COLON);
+		if (lookAhead().getType() == TokenType.DOTDOT) {
+			// [date] .. [date]
+			consume(TokenType.DOTDOT);
+			Token right = consume();
 			
-			// Consume one symbol after the colon
-			content = consume(TokenType.SYMBOL).getValue();
+			if (isNumberOrDateToken(right)) {
+				Optional<LocalDate> rightDate = parseDate(right);
+				if (rightDate.isPresent()) {
+					return new Predicate(name, new DateRange(leftDate.get(), rightDate.get()));
+				} else {
+					assert false : "Possible problem with lexer processing date";
+				}
+			} else if (right.getType() == TokenType.STAR) {
+				return new Predicate(name, new DateRange(leftDate.get(), null));
+			} else {
+				throw new ParseException("Right operand of .. must be a date or *");
+			}
 		}
 		else {
-			consume(TokenType.LBRACKET);
-			
-			// Consume any number of space-delimited symbols
-			while (lookAhead().getType() == TokenType.SYMBOL) {
-				content += consume(TokenType.SYMBOL).getValue() + " ";
-			}
-			content = content.trim();
-			
-			consume(TokenType.RBRACKET);
+			// Just one date, not a range
+			return new Predicate(name, leftDate.get());
 		}
-		return new Predicate(name, content);
+		assert false : "Should never reach here";
+		return null;
+	}
+
+	private FilterExpression parseRangeOperator(String name, Token token) {
+		String operator = token.getValue();
+		
+		consume(token.getType());
+		if (isNumberOrDateToken(lookAhead())) {
+			Token dateToken = consume();
+			Optional<LocalDate> date = parseDate(dateToken);
+			if (date.isPresent()) {
+				// Date
+				return new Predicate(name, date.get());
+			} else {
+				// Number
+				try {
+//					int num = Integer.parseInt(info.getValue());
+//					return new Predicate(name, num);
+					throw new ParseException("Not yet implemented");
+				} catch (NumberFormatException e) {
+					throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
+				}
+			}
+		} else {
+			throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
+		}
+	}
+	
+	private boolean isNumberOrDateToken(Token token) {
+		return token.getType() == TokenType.NUMBER || token.getType() == TokenType.DATE;
 	}
 	
 	private FilterExpression parseGroup(Token token) {

@@ -1,5 +1,6 @@
 package filter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,16 +17,30 @@ public class Predicate implements FilterExpression {
 	public static final Predicate EMPTY = new filter.Predicate("", "");
 
 	private final String name;
-	private final String content;
+	
+	private String content = null;
+	private DateRange dateRange = null;
+	private LocalDate date = null;
 
 	public Predicate(String name, String content) {
 		this.name = name;
 		this.content = content;
 	}
 	
+	public Predicate(String name, DateRange dateRange) {
+		this.name = name;
+		this.dateRange = dateRange;
+	}
+
+	public Predicate(String name, LocalDate date) {
+		this.name = name;
+		this.date = date;
+	}
+
 	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
-		// The empty predicate is satisfied by anything
 		assert name != null && content != null;
+
+		// The empty predicate is satisfied by anything
 		if (name.isEmpty() && content.isEmpty()) return true;
 
 		switch (name) {
