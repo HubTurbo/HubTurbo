@@ -1,5 +1,22 @@
 package filter;
 
 public enum TokenType {
-	LBRACKET, RBRACKET, SYMBOL, NUMBER, EOF, NEGATE, AND, OR, COLON
+	EOF,
+	LBRACKET,
+	RBRACKET,
+	SYMBOL,
+	NUMBER,
+	NOT,
+	AND,
+	OR,
+	COLON,
+	QUOTE,
+	DOTDOT,
+	LT,
+	LTE,
+	GT,
+	GTE,
+	QUALIFIER,
+	STAR,
+	DATE
 }

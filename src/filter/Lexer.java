@@ -12,13 +12,21 @@ public class Lexer {
 	private final Pattern NO_WHITESPACE = Pattern.compile("\\S");
 	
 	private List<Rule> rules = Arrays.asList(
-			new Rule("and|&&?", TokenType.AND),
-			new Rule("or|\\|\\|?", TokenType.OR),
-			new Rule("~|!|-", TokenType.NEGATE),
-			new Rule("[A-Za-z0-9#][A-Za-z0-9.'\\-]*", TokenType.SYMBOL),
+			new Rule("AND|&&?", TokenType.AND),
+			new Rule("OR|\\|\\|?", TokenType.OR),
+			new Rule("NOT|~|!|-", TokenType.NOT),
+			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
+			new Rule("[A-Za-z]+:", TokenType.QUALIFIER),
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),
-			new Rule(":", TokenType.COLON)
+			new Rule("\\\"", TokenType.QUOTE),
+			new Rule("\\.\\.", TokenType.DOTDOT),
+			new Rule("<", TokenType.LT),
+			new Rule("<=", TokenType.LTE),
+			new Rule(">", TokenType.GT),
+			new Rule(">=", TokenType.GTE),
+			new Rule("\\*", TokenType.STAR),
+			new Rule("\\d{4}-\\d{2}-\\d{2}", TokenType.DATE) // YYYY-MM-DD
 		);
 
 	private String input;

@@ -69,7 +69,7 @@ public class Parser {
 		case LBRACKET:
 			left = parseGroup(token);
 			break;
-		case NEGATE:
+		case NOT:
 			left = parseNegation(token);
 			break;
 		case SYMBOL:
@@ -94,7 +94,7 @@ public class Parser {
 				left = parseDisjunction(left, token);
 				break;
 			case SYMBOL:
-			case NEGATE:
+			case NOT:
 			case LBRACKET:
 				// Implicit conjunction
 				// Every token that could appear in a prefix position will trigger this path
@@ -116,7 +116,7 @@ public class Parser {
 			return Precedence.CONJUNCTION;
 		case OR:
 			return Precedence.DISJUNCTION;
-		case NEGATE:
+		case NOT:
 			return Precedence.PREFIX;
 		default:
 			return 0;
