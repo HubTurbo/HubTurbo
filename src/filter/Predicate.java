@@ -77,6 +77,8 @@ public class Predicate implements FilterExpression {
             return satisfiesHasConditions(issue);
         case "no":
             return satisfiesNoConditions(issue);
+        case "is":
+            return satisfiesIsConditions(issue);
         default:
             return false;
         }
@@ -97,9 +99,9 @@ public class Predicate implements FilterExpression {
         case "id":
             throw new PredicateApplicationException("Unnecessary filter: id is immutable");
         case "has":
-            throw new PredicateApplicationException("Ambiguous filter: has");
         case "no":
-            throw new PredicateApplicationException("Ambiguous filter: no");
+        case "is":
+            throw new PredicateApplicationException("Ambiguous filter: " + name);
         case "milestone":
             applyMilestone(issue, model);
             break;
@@ -240,6 +242,23 @@ public class Predicate implements FilterExpression {
         return !satisfiesHasConditions(issue);
     }
 
+	private boolean satisfiesIsConditions(TurboIssue issue) {
+    	if (!content.isPresent()) return false;
+        switch (content.get()) {
+        case "open":
+        case "closed":
+            return stateSatisfies(issue);
+        case "pr":
+        case "issue":
+            return typeSatisfies(issue);
+        case "merged":
+        case "unmerged":
+        	return isPullRequest(issue) && !issue.getOpen();
+        default:
+            return false;
+        }
+    }
+
 	private boolean stateSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
     	String content = this.content.get().toLowerCase();
@@ -337,13 +356,17 @@ public class Predicate implements FilterExpression {
         return issue.getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
 
+    private boolean isPullRequest(TurboIssue issue) {
+    	return issue.getPullRequest() != null;
+    }
+    
     private boolean typeSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
     	String content = this.content.get().toLowerCase();
     	if (content.equals("issue")) {
-            return issue.getPullRequest() == null;
+            return !isPullRequest(issue);
     	} else if (content.equals("pr") || content.equals("pullrequest")) {
-    		return issue.getPullRequest() != null;
+    		return isPullRequest(issue);
     	} else {
     		return false;
     	}
