@@ -64,6 +64,8 @@ public class Predicate implements FilterExpression {
             return authorSatisfies(issue);
         case "assignee":
             return assigneeSatisfies(issue);
+        case "type":
+            return typeSatisfies(issue);
         case "state":
         case "status":
             return stateSatisfies(issue);
@@ -311,7 +313,19 @@ public class Predicate implements FilterExpression {
         return issue.getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private void applyMilestone(TurboIssue issue, Model model) throws PredicateApplicationException {
+    private boolean typeSatisfies(TurboIssue issue) {
+    	if (!content.isPresent()) return false;
+    	String content = this.content.get().toLowerCase();
+    	if (content.equals("issue")) {
+            return issue.getPullRequest() == null;
+    	} else if (content.equals("pr") || content.equals("pullrequest")) {
+    		return issue.getPullRequest() != null;
+    	} else {
+    		return false;
+    	}
+	}
+
+	private void applyMilestone(TurboIssue issue, Model model) throws PredicateApplicationException {
     	if (!content.isPresent()) {
     		throw new PredicateApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
