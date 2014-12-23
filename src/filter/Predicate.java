@@ -1,6 +1,7 @@
 package filter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import model.TurboUser;
 
 public class Predicate implements FilterExpression {
 	
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yy, h:mm a");
 	public static final Predicate EMPTY = new filter.Predicate("", "");
 
 	private final String name;
@@ -79,6 +81,8 @@ public class Predicate implements FilterExpression {
             return satisfiesNoConditions(issue);
         case "is":
             return satisfiesIsConditions(issue);
+        case "created":
+            return satisfiesCreationDate(issue);
         default:
             return false;
         }
@@ -98,6 +102,8 @@ public class Predicate implements FilterExpression {
             throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
         case "id":
             throw new PredicateApplicationException("Unnecessary filter: id is immutable");
+        case "created":
+            throw new PredicateApplicationException("Unnecessary filter: cannot change issue creation date");
         case "has":
         case "no":
         case "is":
@@ -217,7 +223,18 @@ public class Predicate implements FilterExpression {
         return issue.getId() == parseIdString(content.get());
     }
 
-    private boolean satisfiesHasConditions(TurboIssue issue) {
+    private boolean satisfiesCreationDate(TurboIssue issue) {
+    	LocalDate creationDate = LocalDate.parse(issue.getCreatedAt(), formatter);
+    	if (date.isPresent()) {
+    		return creationDate.isEqual(date.get());
+    	} else if (dateRange.isPresent()) {
+    		return dateRange.get().encloses(creationDate);
+    	} else {
+    		return false;
+    	}
+	}
+
+	private boolean satisfiesHasConditions(TurboIssue issue) {
     	if (!content.isPresent()) return false;
         switch (content.get()) {
         case "label":
