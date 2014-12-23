@@ -129,9 +129,15 @@ public class Model {
 		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
-		if (resources.get(ServiceManager.KEY_COLLABORATORS) != null) {
-			if (resources.get(ServiceManager.KEY_COLLABORATORS).get(0).getClass() == TurboUser.class) {
+		boolean isPublicRepo = false;
+		
+		// This is made with the assumption that labels of repos will not be empty (even a fresh copy of a repo)
+		if (!resources.get(ServiceManager.KEY_LABELS).isEmpty()) {
+			if (resources.get(ServiceManager.KEY_LABELS).get(0).getClass() == TurboLabel.class) {
 				isTurboResource = true;
+			}
+			if (resources.get(ServiceManager.KEY_COLLABORATORS).isEmpty()) {
+				isPublicRepo = true;
 			}
 		}
 		
@@ -139,7 +145,7 @@ public class Model {
 			loadTurboResources(resources);	
 		} else {
 			// is Github Resource
-			loadGitHubResources(resources);
+			loadGitHubResources(resources, isPublicRepo);
 		}
 	}
 
@@ -161,9 +167,15 @@ public class Model {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadGitHubResources(HashMap<String, List> resources) {
-		StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
-		loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
+		if (!isPublicRepo) {
+			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
+			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+		} else {
+			// Unable to get collaborators for public repo, so there's no point doing the above
+			// This is to remove any collaborators from previous repo (from repo-switching)
+			clearCollaborators();
+		}
 		StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
 		loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
 		StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
@@ -374,6 +386,12 @@ public class Model {
 		Platform.runLater(()->{
 			collaborators.clear();
 			collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+		});
+	}
+	
+	public void clearCollaborators() {	
+		Platform.runLater(()->{
+			collaborators.clear();
 		});
 	}
 	

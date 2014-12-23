@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
@@ -55,6 +56,8 @@ public class SidePanel extends VBox {
 	private Tab labelsTab;
 	private Tab milestonesTab;
 	private Tab assigneesTab;
+	private TabPane tabs;
+	private SingleSelectionModel<Tab> selectionModel;
 	private RepositorySelector repoFields;
 	
 	private UI ui;
@@ -170,6 +173,16 @@ public class SidePanel extends VBox {
 	}
 	
 	private void changeLayout() {
+		// on repo switching, this sets the selected tab back to the first tab
+		if (tabs != null) {
+			Tab selectedTab = selectionModel.getSelectedItem();
+			if (selectedTab.equals(milestonesTab)) {
+				selectionModel.selectFirst();
+			} else if (selectedTab.equals(assigneesTab)) {
+				selectionModel.selectFirst();
+			} 
+		}
+		
 		getChildren().clear();
 		switch (layout) {
 		case TABS:
@@ -201,8 +214,8 @@ public class SidePanel extends VBox {
 		
 		VBox everything = new VBox();
 		
-		TabPane tabs = new TabPane();
-		
+		tabs = new TabPane();
+
 		if (labelsTab ==  null) {
 			labelsTab = createLabelsTab();
 		}
@@ -214,11 +227,13 @@ public class SidePanel extends VBox {
 		}
 		
 		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
+
+		selectionModel = tabs.getSelectionModel();
 		
 		if (repoFields == null) {
 			repoFields = createRepoFields();
 		}
-
+		
 		everything.getChildren().addAll(repoFields, tabs);
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;

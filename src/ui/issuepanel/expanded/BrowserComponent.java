@@ -39,7 +39,7 @@ public class BrowserComponent {
 
 	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
 			? "ui/issuepanel/expanded/mobileHideUI.js"
-			: "ui/issuepanel/expanded/hideUI.js";
+			: "ui/issuepanel/expanded/hideUI.js";	
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
@@ -85,7 +85,7 @@ public class BrowserComponent {
 		try {
 			driver.close();
 			if (PlatformSpecific.isOnWindows()) {
-				Runtime.getRuntime().exec("taskkill.exe /im chromedriver.exe");
+				Runtime.getRuntime().exec("taskkill.exe /F /im chromedriver.exe");
 			} else {
 				Runtime.getRuntime().exec("killall chromedriver");
 			}
