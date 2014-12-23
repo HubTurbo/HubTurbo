@@ -56,6 +56,7 @@ public class Predicate implements FilterExpression {
         	// TODO temporary implementation pending in: qualifier
             return titleSatisfies(issue);
         case "title":
+        	// TODO remove this once in: qualifier is implemented
             return titleSatisfies(issue);
         case "milestone":
             return milestoneSatisfies(issue);
@@ -74,6 +75,8 @@ public class Predicate implements FilterExpression {
             return stateSatisfies(issue);
         case "has":
             return satisfiesHasConditions(issue);
+        case "no":
+            return satisfiesNoConditions(issue);
         default:
             return false;
         }
@@ -88,11 +91,15 @@ public class Predicate implements FilterExpression {
 
         switch (name) {
         case "title":
+        	// TODO remove this when in: qualifier is implemented
+        case "keyword":
             throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
         case "id":
             throw new PredicateApplicationException("Unnecessary filter: id is immutable");
         case "has":
             throw new PredicateApplicationException("Ambiguous filter: has");
+        case "no":
+            throw new PredicateApplicationException("Ambiguous filter: no");
         case "milestone":
             applyMilestone(issue, model);
             break;
@@ -212,23 +219,33 @@ public class Predicate implements FilterExpression {
     	if (!content.isPresent()) return false;
         switch (content.get()) {
         case "label":
+        case "labels":
             return issue.getLabels().size() > 0;
         case "milestone":
+        case "milestones":
             return issue.getMilestone() != null;
         case "assignee":
+        case "assignees":
             return issue.getAssignee() != null;
         case "parent":
+        case "parents":
             return issue.getParentIssue() != -1;
         default:
             return false;
         }
     }
 
-    private boolean stateSatisfies(TurboIssue issue) {
+    private boolean satisfiesNoConditions(TurboIssue issue) {
     	if (!content.isPresent()) return false;
-        if (content.get().toLowerCase().contains("open")) {
+        return !satisfiesHasConditions(issue);
+    }
+
+	private boolean stateSatisfies(TurboIssue issue) {
+    	if (!content.isPresent()) return false;
+    	String content = this.content.get().toLowerCase();
+        if (content.contains("open")) {
             return issue.getOpen();
-        } else if (content.get().toLowerCase().contains("closed")) {
+        } else if (content.contains("closed")) {
             return !issue.getOpen();
         } else {
             return false;
