@@ -62,7 +62,7 @@ public class Parser {
 	}
 
 	private Token lookAhead() {
-		return input.get(position);
+		return input.get(Math.min(position, input.size()-1));
 	}
 		
 	private FilterExpression parseExpression(int precedence) {
