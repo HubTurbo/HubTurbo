@@ -205,12 +205,4 @@ public class Tests {
                 new Token(TokenType.SYMBOL, "c'", 0),
                 new Token(TokenType.EOF, "", 0))));
     }
-    
-    @Test
-    public void listsOfSymbols() {
-        assertEquals(Parser.isListOfSymbols("a' b c'"), true);
-        assertEquals(Parser.isListOfSymbols("a b c("), false);
-        assertEquals(Parser.isListOfSymbols("a(d) c(b)"), false);
-    }
-
 }

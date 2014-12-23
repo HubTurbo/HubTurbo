@@ -2,7 +2,6 @@ package filter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,23 +26,6 @@ public class Parser {
 		if (input == null) return null;
 		else if (input.isEmpty()) return Predicate.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
-	}
-	public static boolean isListOfSymbols(String input) {
-		assert input != null;
-		if (input.isEmpty()) return false;
-		
-		List<Token> tokens = new Lexer(input).lex();
-		
-		// Last token should be an EOF; get rid of it
-		assert tokens.get(tokens.size()-1).getType() == TokenType.EOF;
-		tokens.remove(tokens.size()-1);
-		
-		for (int i=0; i<tokens.size(); i++) {
-			if (tokens.get(i).getType() != TokenType.SYMBOL) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	private ArrayList<Token> input;

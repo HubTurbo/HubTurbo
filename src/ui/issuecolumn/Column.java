@@ -93,9 +93,6 @@ public abstract class Column extends VBox {
 		
 		filterTextField = new FilterTextField("", 0)
 			.setOnConfirm((text) -> {
-				if (Parser.isListOfSymbols(text)) {
-					text = "title(" + text + ")";
-				}
 				applyStringFilter(text);
 				return text;
 			})
