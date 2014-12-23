@@ -1,4 +1,4 @@
-package filter;
+package filter.lexer;
 
 import java.util.regex.Pattern;
 

@@ -1,4 +1,4 @@
-package filter;
+package filter.lexer;
 
 public enum TokenType {
 	EOF,

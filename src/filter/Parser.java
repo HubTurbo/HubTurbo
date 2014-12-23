@@ -3,6 +3,10 @@ package filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import filter.lexer.Lexer;
+import filter.lexer.Token;
+import filter.lexer.TokenType;
+
 public class Parser {
 
 	public static void main(String[] args) {

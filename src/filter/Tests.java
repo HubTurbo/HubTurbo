@@ -8,6 +8,10 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import filter.lexer.Lexer;
+import filter.lexer.Token;
+import filter.lexer.TokenType;
+
 public class Tests {
 
     @Test
