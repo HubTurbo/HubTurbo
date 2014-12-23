@@ -126,10 +126,14 @@ public class Predicate implements FilterExpression {
         return new ArrayList<String>(Arrays.asList(name));
     }
 
+    /**
+     * This method is used to serialise predicates. Thus whatever form returned
+     * should be syntactically valid.
+     */
     @Override
     public String toString() {
         if (this == EMPTY) {
-            return "<empty predicate>";
+            return "";
         } else if (content != null) {
             if (name.equals("keyword")) {
                 return content.get();
