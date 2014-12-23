@@ -21,16 +21,19 @@ public class Lexer {
 			// These have higher priority than Symbol
 			new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
 			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER),
-
 			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
+
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),
 			new Rule("\\\"", TokenType.QUOTE),
 			new Rule("\\.\\.", TokenType.DOTDOT),
-			new Rule("<", TokenType.LT),
+			
+			// These have higher priority than < and >
 			new Rule("<=", TokenType.LTE),
-			new Rule(">", TokenType.GT),
 			new Rule(">=", TokenType.GTE),
+			new Rule("<", TokenType.LT),
+			new Rule(">", TokenType.GT),
+			
 			new Rule("\\*", TokenType.STAR)
 		);
 

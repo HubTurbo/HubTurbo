@@ -77,6 +77,9 @@ public class Tests {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
                 new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15))));
 
+        assertEquals(Parser.parse("created:2014-06-01 .. *"),
+                new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), null)));
+
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
         		new Conjunction(
         				new Conjunction(
@@ -87,18 +90,33 @@ public class Tests {
     }
 
     @Test
+    public void dateRangeOperators() {
+        assertEquals(Parser.parse("created:<2014-06-01"),
+                new Predicate("created", new DateRange(null, LocalDate.of(2014, 6, 1), true)));
+        
+        assertEquals(Parser.parse("created : <= 2014-06-01"),
+                new Predicate("created", new DateRange(null, LocalDate.of(2014, 6, 1))));
+
+        assertEquals(Parser.parse("created : > 2014-06-01"),
+                new Predicate("created", new DateRange(LocalDate.of(2014, 6, 1), null, true)));
+        
+        assertEquals(Parser.parse("created : >= 2014-06-01"),
+                new Predicate("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+    }
+    
+    @Test
     public void dates() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
                 new Predicate("created", LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("created   :   2014-06-01"),
-                new Predicate("created", LocalDate.of(2014, 6, 2)));
+                new Predicate("created", LocalDate.of(2014, 6, 1)));
         
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
         		new Conjunction(
         				new Conjunction(
         						new Predicate("keyword", "a"),
-        						new Predicate("created", LocalDate.of(2014, 06, 02))),
+        						new Predicate("created", LocalDate.of(2014, 06, 01))),
 						new Predicate("keyword", "b")));
     }
 
