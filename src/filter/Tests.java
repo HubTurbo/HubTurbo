@@ -73,6 +73,20 @@ public class Tests {
     }
 
     @Test
+    public void dateRanges() {
+        assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
+                new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15))));
+
+        assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
+        		new Conjunction(
+        				new Conjunction(
+        						new Predicate("keyword", "a"),
+        						new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15)))),
+        				new Predicate("keyword", "b"))
+        );
+    }
+
+    @Test
     public void dates() {
         assertEquals(Parser.parse("created   :   2014-06-01"),
                 new Predicate("created", LocalDate.of(2014, 06, 02)));
@@ -83,7 +97,7 @@ public class Tests {
         						new Predicate("keyword", "a"),
         						new Predicate("created", LocalDate.of(2014, 06, 02))),
 						new Predicate("keyword", "b")));
-    } 
+    }
 
     @Test
     public void precedence() {
