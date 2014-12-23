@@ -131,12 +131,12 @@ public class Predicate implements FilterExpression {
             if (name.equals("keyword")) {
                 return content.get();
             } else {
-                return name + ":" + content;
+                return name + ":" + content.get().toString();
             }
         } else if (date != null) {
-            return name + ":" + date.toString();
+            return name + ":" + date.get().toString();
         } else if (dateRange != null) {
-            return name + ":" + dateRange.toString();
+            return name + ":" + dateRange.get().toString();
         } else {
             assert false : "Should not happen";
             return "";
