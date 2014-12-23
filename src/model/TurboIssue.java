@@ -168,7 +168,7 @@ public class TurboIssue implements Listable {
     }
     
     private BooleanProperty state = new SimpleBooleanProperty();
-    public final Boolean getOpen() {
+    public final Boolean isOpen() {
     	return state.get();
     }
     public final void setOpen(Boolean value) {
@@ -386,7 +386,7 @@ public class TurboIssue implements Listable {
 		ghIssue.setHtmlUrl(getHtmlUrl());
 		ghIssue.setNumber(getId());
 		ghIssue.setTitle(getTitle());
-		ghIssue.setState(getOpen() ? STATE_OPEN : STATE_CLOSED);
+		ghIssue.setState(isOpen() ? STATE_OPEN : STATE_CLOSED);
 		if (assignee != null) ghIssue.setAssignee(assignee.toGhResource());
 		if (milestone != null) ghIssue.setMilestone(milestone.toGhResource());
 		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
@@ -402,7 +402,7 @@ public class TurboIssue implements Listable {
 			
 			setHtmlUrl(obj.getHtmlUrl());
 			setTitle(obj.getTitle());
-			setOpen(obj.getOpen());
+			setOpen(obj.isOpen());
 			setId(obj.getId());
 			setDescription(obj.getDescription());
 			setAssignee(obj.getAssignee());

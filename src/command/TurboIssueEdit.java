@@ -228,8 +228,8 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	}
 	
 	private void mergeOpen(TurboIssue original, TurboIssue edited, TurboIssue latest) {
-		Boolean originalState = original.getOpen();
-		Boolean editedState = edited.getOpen();
+		Boolean originalState = original.isOpen();
+		Boolean editedState = edited.isOpen();
 		if (!editedState.equals(originalState)) {
 			latest.setOpen(editedState);
 		}

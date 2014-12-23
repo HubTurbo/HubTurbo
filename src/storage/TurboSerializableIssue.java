@@ -47,7 +47,7 @@ class TurboSerializableIssue {
 		//this.cachedDescriptionMarkup = issue.getDescriptionMarkup();
 		
 		this.parentIssue = issue.getParentIssue();
-		this.state = issue.getOpen();
+		this.state = issue.isOpen();
 		this.assignee = issue.getAssignee();
 		
 		TurboMilestone turboMilestone = issue.getMilestone();

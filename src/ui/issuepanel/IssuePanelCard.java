@@ -42,7 +42,7 @@ public class IssuePanelCard extends VBox {
 		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueTitle.setWrappingWidth(CARD_WIDTH);
 		issueTitle.getStyleClass().add("issue-panel-name");
-		if (!issue.getOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
+		if (!issue.isOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
 	
 		setupIssueDetailsBox();

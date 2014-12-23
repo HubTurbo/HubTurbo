@@ -253,7 +253,7 @@ public class Predicate implements FilterExpression {
             return typeSatisfies(issue);
         case "merged":
         case "unmerged":
-        	return isPullRequest(issue) && !issue.getOpen();
+        	return isPullRequest(issue) && !issue.isOpen();
         default:
             return false;
         }
@@ -263,9 +263,9 @@ public class Predicate implements FilterExpression {
     	if (!content.isPresent()) return false;
     	String content = this.content.get().toLowerCase();
         if (content.contains("open")) {
-            return issue.getOpen();
+            return issue.isOpen();
         } else if (content.contains("closed")) {
-            return !issue.getOpen();
+            return !issue.isOpen();
         } else {
             return false;
         }

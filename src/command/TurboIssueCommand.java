@@ -66,7 +66,7 @@ public abstract class TurboIssueCommand {
 	
 	protected void updateGithubIssueState() throws IOException{
 		ServiceManager service = ServiceManager.getInstance();
-		if(issue.getOpen() == true){
+		if(issue.isOpen() == true){
 			service.openIssue(issue.getId());
 		}else{
 			service.closeIssue(issue.getId());
