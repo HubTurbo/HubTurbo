@@ -2,7 +2,6 @@ package ui.issuecolumn;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
@@ -28,12 +27,15 @@ import ui.StatusBar;
 import ui.UI;
 import ui.sidepanel.SidePanel;
 import util.events.IssueCreatedEvent;
+
 import command.CommandType;
 import command.TurboCommandExecutor;
+
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
 import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 
 /**
  * A Column is a JavaFX node that is contained by a ColumnControl.
@@ -319,9 +321,7 @@ public abstract class Column extends VBox {
 //			statusBar.setText("Panel " + (columnIndex+1) + ": " + filter.toString());
 //		}
 
-		// This cast utilises a functional interface
-		final BiFunction<TurboIssue, Model, Boolean> temp = filter::isSatisfiedBy;
-		predicate = i -> temp.apply(i, model);
+		predicate = issue -> Qualifier.process(filter, issue);
 		
 		refreshItems();
 	}

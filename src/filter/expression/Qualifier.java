@@ -14,6 +14,7 @@ import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
 public class Qualifier implements FilterExpression {
@@ -54,11 +55,24 @@ public class Qualifier implements FilterExpression {
 		this.date = Optional.of(date);
 	}
 	
+	/**
+	 * Helper function for testing a filter expression against an issue.
+	 * Ensures that meta-qualifiers are taken care of.
+	 * Should always be used over isSatisfiedBy.
+	 */
+	public static boolean process(FilterExpression expr, TurboIssue issue) {
+		
+		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::isNotMetaQualifier);
+		List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
+		
+		return exprWithNormalQualifiers.isSatisfiedBy(issue, new MetaQualifierInfo(metaQualifiers));
+	}
+	
 	public boolean isEmptyQualifier() {
 		return name.isEmpty() && content.isPresent() && content.get().isEmpty();
 	}
 
-    public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+    public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
         assert name != null && content != null;
 
         // The empty qualifier is satisfied by anything
@@ -76,7 +90,7 @@ public class Qualifier implements FilterExpression {
         case "milestone":
             return milestoneSatisfies(issue);
         case "parent":
-            return parentSatisfies(issue, model);
+            return parentSatisfies(issue);
         case "label":
             return labelsSatisfy(issue);
         case "author":
@@ -112,7 +126,7 @@ public class Qualifier implements FilterExpression {
         case "title":
         	// TODO remove this when in: qualifier is implemented
         case "keyword":
-            throw new QualifierApplicationException("Unnecessary filter: title cannot be changed by dragging");
+            throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
         case "id":
             throw new QualifierApplicationException("Unnecessary filter: id is immutable");
         case "created":
@@ -241,6 +255,19 @@ public class Qualifier implements FilterExpression {
         return true;
     }
 
+	private static boolean isNotMetaQualifier(Qualifier q) {
+		return !isMetaQualifier(q);
+	}
+
+	private static boolean isMetaQualifier(Qualifier q) {
+		switch (q.getName()) {
+		case "in":
+			return true;
+		default:
+			return false;
+		}
+	}
+	
     private int parseIdString(String id) {
         if (id.startsWith("#")) {
             return Integer.parseInt(id.substring(1));
@@ -378,7 +405,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean parentSatisfies(TurboIssue issue, Model model) {
+    private boolean parentSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
     	String parent = content.get().toLowerCase();
         int index = parseIdString(parent);

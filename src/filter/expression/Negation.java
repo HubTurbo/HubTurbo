@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
 
 public class Negation implements FilterExpression {
 	private FilterExpression expr;
@@ -37,8 +38,8 @@ public class Negation implements FilterExpression {
 		return true;
 	}
 	
-	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
-		return !expr.isSatisfiedBy(issue, model);
+	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
+		return !expr.isSatisfiedBy(issue, info);
 	}
 
 	@Override
