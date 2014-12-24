@@ -6,6 +6,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import filter.expression.Conjunction;
+import filter.expression.DateRange;
+import filter.expression.Disjunction;
+import filter.expression.FilterExpression;
+import filter.expression.Negation;
+import filter.expression.Predicate;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;

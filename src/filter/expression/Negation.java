@@ -1,7 +1,8 @@
-package filter;
+package filter.expression;
 
 import java.util.List;
 
+import filter.PredicateApplicationException;
 import model.Model;
 import model.TurboIssue;
 

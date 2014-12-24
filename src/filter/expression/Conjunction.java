@@ -1,23 +1,26 @@
-package filter;
+package filter.expression;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import filter.PredicateApplicationException;
 import model.Model;
 import model.TurboIssue;
 
-public class Disjunction implements FilterExpression {
+public class Conjunction implements FilterExpression {
 	private FilterExpression left;
 	private FilterExpression right;
 
-	public Disjunction(FilterExpression left, FilterExpression right) {
+	public Conjunction(FilterExpression left, FilterExpression right) {
 		this.left = left;
 		this.right = right;
 	}
 
 	@Override
 	public String toString() {
-		return "(" + left + " OR " + right + ")";
+		return "(" + left + " " + right + ")";
 	}
 
 	@Override
@@ -28,7 +31,7 @@ public class Disjunction implements FilterExpression {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Disjunction other = (Disjunction) obj;
+		Conjunction other = (Conjunction) obj;
 		if (left == null) {
 			if (other.left != null)
 				return false;
@@ -41,21 +44,30 @@ public class Disjunction implements FilterExpression {
 			return false;
 		return true;
 	}
-	
-	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
-		return left.isSatisfiedBy(issue, model) || right.isSatisfiedBy(issue, model);
-	}
 
+	public boolean isSatisfiedBy(TurboIssue issue, Model model) {
+		return left.isSatisfiedBy(issue, model) && right.isSatisfiedBy(issue, model);
+	}
+	
+	private boolean containsDuplicatePredicateNames() {
+		List<String> nonLabelPredicateNames = getPredicateNames().stream().filter(pn -> !pn.equals("label")).collect(Collectors.toList());
+		HashSet<String> noDuplicates = new HashSet<>(nonLabelPredicateNames);
+		return noDuplicates.size() != nonLabelPredicateNames.size();
+	}
+	
 	@Override
 	public boolean canBeAppliedToIssue() {
-		return false;
+		return !containsDuplicatePredicateNames()
+				&& left.canBeAppliedToIssue()
+				&& right.canBeAppliedToIssue();
 	}
 
 	@Override
 	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
-		assert false;
+		left.applyTo(issue, model);
+		right.applyTo(issue, model);
 	}
-	
+
 	@Override
 	public List<String> getPredicateNames() {
 		ArrayList<String> list = new ArrayList<>();

@@ -28,14 +28,12 @@ import ui.StatusBar;
 import ui.UI;
 import ui.sidepanel.SidePanel;
 import util.events.IssueCreatedEvent;
-
 import command.CommandType;
 import command.TurboCommandExecutor;
-
-import filter.FilterExpression;
 import filter.ParseException;
 import filter.Parser;
 import filter.PredicateApplicationException;
+import filter.expression.FilterExpression;
 
 /**
  * A Column is a JavaFX node that is contained by a ColumnControl.
@@ -52,7 +50,7 @@ public abstract class Column extends VBox {
 	private static final String ADD_ISSUE = "\u271A";
 	
 	public static final String NO_FILTER = "No Filter";
-	public static final FilterExpression EMPTY = filter.Predicate.EMPTY;
+	public static final FilterExpression EMPTY = filter.expression.Predicate.EMPTY;
 
 	private final Model model;
 	private final ColumnControl parentColumnControl;
@@ -389,8 +387,8 @@ public abstract class Column extends VBox {
 	public void refreshItems() {
 		transformedIssueList = new FilteredList<TurboIssue>(issues, predicate);
 
-		if (currentFilterExpression instanceof filter.Predicate) {
-			List<String> names = ((filter.Predicate) currentFilterExpression).getPredicateNames();
+		if (currentFilterExpression instanceof filter.expression.Predicate) {
+			List<String> names = ((filter.expression.Predicate) currentFilterExpression).getPredicateNames();
 			if (names.size() == 1 && names.get(0).equals("parent")) {
 				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
 				    @Override

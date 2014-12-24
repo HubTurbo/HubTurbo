@@ -9,6 +9,11 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import filter.expression.Conjunction;
+import filter.expression.DateRange;
+import filter.expression.Disjunction;
+import filter.expression.Negation;
+import filter.expression.Predicate;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;

@@ -1,4 +1,4 @@
-package filter;
+package filter.expression;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import filter.PredicateApplicationException;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -17,7 +18,7 @@ import model.TurboUser;
 public class Predicate implements FilterExpression {
 	
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yy, h:mm a");
-	public static final Predicate EMPTY = new filter.Predicate("", "");
+	public static final Predicate EMPTY = new filter.expression.Predicate("", "");
 
 	private final String name;
 	

@@ -22,7 +22,7 @@ import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
 import command.TurboCommandExecutor;
-import filter.FilterExpression;
+import filter.expression.FilterExpression;
 
 
 public class ColumnControl extends HBox {
