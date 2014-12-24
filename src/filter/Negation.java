@@ -14,7 +14,7 @@ public class Negation implements FilterExpression {
 
 	@Override
 	public String toString() {
-		return "~" + expr;
+		return "NOT" + expr;
 	}
 
 	@Override

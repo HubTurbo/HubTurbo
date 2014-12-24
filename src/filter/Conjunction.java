@@ -19,7 +19,7 @@ public class Conjunction implements FilterExpression {
 
 	@Override
 	public String toString() {
-		return "(" + left + " and " + right + ")";
+		return "(" + left + " " + right + ")";
 	}
 
 	@Override

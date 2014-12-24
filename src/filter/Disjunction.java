@@ -17,7 +17,7 @@ public class Disjunction implements FilterExpression {
 
 	@Override
 	public String toString() {
-		return "(" + left + " or " + right + ")";
+		return "(" + left + " OR " + right + ")";
 	}
 
 	@Override
