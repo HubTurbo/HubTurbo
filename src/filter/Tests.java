@@ -31,9 +31,13 @@ public class Tests {
     
     @Test
     public void quotes() {
+    	// Quoted qualifier content
     	assertEquals(Parser.parse("created:\"a b\""), new Predicate("created", "a b"));
     	assertEquals(Parser.parse("created:\" > 2014-5-1 \""), new Predicate("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
     	assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""), new Predicate("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
+    	
+    	// Prefix quotes
+    	assertEquals(Parser.parse("\"a b\""), new Predicate("keyword", "a b"));
     }
     
     @Test

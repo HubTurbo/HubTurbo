@@ -13,8 +13,8 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-//		String input = "\"a\""; // TODO do this
-		String input = "created:\"a b\"";
+		String input = "\"a b\"";
+		input = "assignee:darius";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
@@ -68,6 +68,9 @@ public class Parser {
 		case QUALIFIER:
 			left = parseQualifier(token);
 			break;
+		case QUOTE:
+			left = parseQuotedKeywords(token);
+			break;
 		case SYMBOL:
 			left = parseKeyword(token);
 			break;
@@ -105,6 +108,24 @@ public class Parser {
 		return left;
 	}
 
+	private FilterExpression parseQuotedKeywords(Token token) {
+		FilterExpression result = parseKeywords();
+		consume(TokenType.QUOTE);
+		return result;
+	}
+
+	private FilterExpression parseKeywords() {
+		return parseKeywords("keyword");
+	}
+	
+	private FilterExpression parseKeywords(String qualifierName) {
+		StringBuilder sb = new StringBuilder();
+		while (!isQuoteToken(lookAhead())) {
+			sb.append(consume().getValue()).append(" ");
+		}
+		return new Predicate(qualifierName, sb.toString().trim());
+	}
+
 	private FilterExpression parseKeyword(Token token) {
 		return new Predicate("keyword", token.getValue());
 	}
@@ -139,41 +160,36 @@ public class Parser {
 	}
 
 	private FilterExpression parseQualifier(Token token) {
-		String name = token.getValue();
+		String qualifierName = token.getValue();
 
 		// Strip the : at the end, then trim
-		name = name.substring(0, name.length()-1).trim();
+		qualifierName = qualifierName.substring(0, qualifierName.length()-1).trim();
 
-		return parseQualifierContent(name, false);
+		return parseQualifierContent(qualifierName, false);
 	}
 
-	private FilterExpression parseQualifierContent(String name, boolean allowMultipleKeywords) {
+	private FilterExpression parseQualifierContent(String qualifierName, boolean allowMultipleKeywords) {
 		if (isRangeOperatorToken(lookAhead())) {
 			// < > <= >= [number | date range]
-			return parseRangeOperator(name, lookAhead());
+			return parseRangeOperator(qualifierName, lookAhead());
 		}
 		else if (isNumberOrDateToken(lookAhead())) {
 			// [date] | [date] .. [date]
-			return parseDateOrDateRange(name);
+			return parseDateOrDateRange(qualifierName);
 		}
 		else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
 			// " [content] "
 			consume(TokenType.QUOTE);
-			FilterExpression result = parseQualifierContent(name, true);
+			FilterExpression result = parseQualifierContent(qualifierName, true);
 			consume(TokenType.QUOTE);
 			return result;
 		}
 		else {
 			// Keyword(s)
 			if (allowMultipleKeywords) {
-				StringBuilder sb = new StringBuilder();
-				while (!isQuoteToken(lookAhead())) {
-					sb.append(consume().getValue()).append(" ");
-				}
-				return new Predicate(name, sb.toString().trim());
+				return parseKeywords(qualifierName);
 			} else {
-				Token t = consume();
-				return new Predicate(name, t.getValue());
+				return new Predicate(qualifierName, consume().getValue());
 			}
 		}
 	}
