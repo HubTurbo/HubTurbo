@@ -97,6 +97,9 @@ public class Qualifier implements FilterExpression {
             return authorSatisfies(issue);
         case "assignee":
             return assigneeSatisfies(issue);
+        case "involves":
+        case "user":
+            return involvesSatisfies(issue);
         case "type":
             return typeSatisfies(issue);
         case "state":
@@ -150,6 +153,9 @@ public class Qualifier implements FilterExpression {
             break;
         case "author":
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
+        case "involves":
+        case "user":
+            throw new QualifierApplicationException("Ambiguous filter: cannot change users involved with issue");
         case "state":
         case "status":
             applyState(issue);
@@ -364,6 +370,10 @@ public class Qualifier implements FilterExpression {
     	if (!content.isPresent()) return false;
         String creator = issue.getCreator().toLowerCase();
         return creator != null && creator.contains(content.get().toLowerCase());
+    }
+    
+    private boolean involvesSatisfies(TurboIssue issue) {
+    	return authorSatisfies(issue) || assigneeSatisfies(issue);
     }
 
     private boolean labelsSatisfy(TurboIssue issue) {
