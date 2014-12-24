@@ -162,6 +162,17 @@ public class Qualifier implements FilterExpression {
 			return EMPTY;
 		}
 	}
+	
+	@Override
+	public List<Qualifier> find(Predicate<Qualifier> pred) {
+		if (pred.test(this)) {
+			ArrayList<Qualifier> result = new ArrayList<>();
+			result.add(this);
+			return result;
+		} else {
+			return new ArrayList<>();
+		}
+	}
 
 	/**
      * This method is used to serialise qualifiers. Thus whatever form returned

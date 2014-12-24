@@ -78,4 +78,14 @@ public class Disjunction implements FilterExpression {
 			return new Disjunction(left, right);
 		}
 	}
+	
+	@Override
+	public List<Qualifier> find(Predicate<Qualifier> pred) {
+		List<Qualifier> left = this.left.find(pred);
+		List<Qualifier> right = this.right.find(pred);
+		ArrayList<Qualifier> result = new ArrayList<>();
+		result.addAll(left);
+		result.addAll(right);
+		return result;
+	}
 }

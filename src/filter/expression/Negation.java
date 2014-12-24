@@ -1,5 +1,6 @@
 package filter.expression;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -63,5 +64,13 @@ public class Negation implements FilterExpression {
 		} else {
 			return new Negation(expr);
 		}
+	}
+	
+	@Override
+	public List<Qualifier> find(Predicate<Qualifier> pred) {
+		List<Qualifier> expr = this.expr.find(pred);
+		ArrayList<Qualifier> result = new ArrayList<>();
+		result.addAll(expr);
+		return result;
 	}
 }

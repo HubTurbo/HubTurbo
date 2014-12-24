@@ -41,4 +41,8 @@ public interface FilterExpression {
 	// New FilterExpressions are copied shallowly.
 	
 	public FilterExpression filter(Predicate<Qualifier> pred);
+
+	// Gets references to all qualifiers in a syntax tree matching a given predicate.
+	
+	public List<Qualifier> find(Predicate<Qualifier> pred);
 }
