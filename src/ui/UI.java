@@ -133,10 +133,17 @@ public class UI extends Application {
 				}
 			}
 		});
+		
 		registerEvent(new ColumnChangeEventHandler() {
 			@Override
 			public void handle(ColumnChangeEvent e) {
+				// We let this event fire once so the browser window is resized
+				// as soon as the issues are loaded into a column.
+				// We don't want this to happen more than once, however, as it
+				// would cause the browser window to resize when switching project,
+				// and when making changes to columns.
 				setExpandedWidth(false);
+				events.unregister(this);
 			}
 		});
 	}
