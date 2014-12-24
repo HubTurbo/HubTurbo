@@ -84,8 +84,9 @@ public class Qualifier implements FilterExpression {
         case "keyword":
             return keywordSatisfies(issue, info);
         case "title":
-        	// TODO remove this once in: qualifier is implemented
             return titleSatisfies(issue);
+        case "body":
+            return bodySatisfies(issue);
         case "milestone":
             return milestoneSatisfies(issue);
         case "parent":
@@ -123,7 +124,8 @@ public class Qualifier implements FilterExpression {
 
         switch (name) {
         case "title":
-        	// TODO remove this when in: qualifier is implemented
+        case "desc":
+        case "body":
         case "keyword":
             throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
         case "id":
@@ -428,25 +430,26 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
-    	if (!content.isPresent()) return false;
-    	
-    	String content = this.content.get().toLowerCase();
     	
     	if (info.getIn().isPresent()) {
     		switch (info.getIn().get()) {
     		case "title":
-    	        return issue.getTitle().toLowerCase().contains(content);
+    	        return titleSatisfies(issue);
     		case "body":
     		case "desc":
-    	        return issue.getDescription().toLowerCase().contains(content);
+    	        return bodySatisfies(issue);
     	    default:
     	    	return false;
     		}
     	} else {
-	        return issue.getTitle().toLowerCase().contains(content)
-	        		|| issue.getDescription().toLowerCase().contains(content);
+	        return titleSatisfies(issue) || bodySatisfies(issue);
     	}
 	}
+
+	private boolean bodySatisfies(TurboIssue issue) {
+    	if (!content.isPresent()) return false;
+        return issue.getDescription().toLowerCase().contains(content.get().toLowerCase());
+    }
 
 	private boolean titleSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
