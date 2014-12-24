@@ -2,6 +2,8 @@ package filter.expression;
 
 import java.util.List;
 
+import java.util.function.Predicate;
+
 import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
@@ -34,4 +36,9 @@ public interface FilterExpression {
 	// be used to serialise FilterExpressions.
 	
 	public String toString();
+	
+	// Filters the syntax tree with a given predicate, returning a new FilterExpression.
+	// New FilterExpressions are copied shallowly.
+	
+	public FilterExpression filter(Predicate<Qualifier> pred);
 }

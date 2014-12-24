@@ -1,6 +1,7 @@
 package filter.expression;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import filter.QualifierApplicationException;
 import model.Model;
@@ -52,5 +53,15 @@ public class Negation implements FilterExpression {
 	@Override
 	public List<String> getQualifierNames() {
 		return expr.getQualifierNames();
+	}
+	
+	@Override
+	public FilterExpression filter(Predicate<Qualifier> pred) {
+		FilterExpression expr = this.expr.filter(pred);
+		if (expr == Qualifier.EMPTY) {
+			return Qualifier.EMPTY;
+		} else {
+			return new Negation(expr);
+		}
 	}
 }

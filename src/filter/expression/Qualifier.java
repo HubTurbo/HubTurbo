@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+import filter.QualifierApplicationException;
 
 public class Qualifier implements FilterExpression {
 	
@@ -27,6 +28,17 @@ public class Qualifier implements FilterExpression {
 	private Optional<String> content = Optional.empty();
 	private Optional<LocalDate> date = Optional.empty();
 
+	public Qualifier(Qualifier other) {
+		this.name = other.getName();
+		if (other.getDateRange().isPresent()) {
+			this.dateRange = other.getDateRange();
+		} else if (other.getDate().isPresent()) {
+			this.date = other.getDate();
+		} else if (other.getContent().isPresent()) {
+			this.content = other.getContent();
+		}
+	}
+	
 	public Qualifier(String name, String content) {
 		this.name = name;
 		this.content = Optional.of(content);
@@ -142,7 +154,16 @@ public class Qualifier implements FilterExpression {
         return new ArrayList<String>(Arrays.asList(name));
     }
 
-    /**
+	@Override
+	public FilterExpression filter(Predicate<Qualifier> pred) {
+		if (pred.test(this)) {
+			return new Qualifier(this);
+		} else {
+			return EMPTY;
+		}
+	}
+
+	/**
      * This method is used to serialise qualifiers. Thus whatever form returned
      * should be syntactically valid.
      */
@@ -464,4 +485,32 @@ public class Qualifier implements FilterExpression {
             issue.setOpen(false);
         }
     }
+    
+	public Optional<DateRange> getDateRange() {
+		return dateRange;
+	}
+
+	public void setDateRange(Optional<DateRange> dateRange) {
+		this.dateRange = dateRange;
+	}
+
+	public Optional<String> getContent() {
+		return content;
+	}
+
+	public void setContent(Optional<String> content) {
+		this.content = content;
+	}
+
+	public Optional<LocalDate> getDate() {
+		return date;
+	}
+
+	public void setDate(Optional<LocalDate> date) {
+		this.date = date;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

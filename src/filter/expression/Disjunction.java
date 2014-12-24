@@ -2,6 +2,7 @@ package filter.expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import filter.QualifierApplicationException;
 import model.Model;
@@ -63,5 +64,18 @@ public class Disjunction implements FilterExpression {
 		list.addAll(left.getQualifierNames());
 		list.addAll(right.getQualifierNames());
 		return list;
+	}
+	
+	@Override
+	public FilterExpression filter(Predicate<Qualifier> pred) {
+		FilterExpression left = this.left.filter(pred);
+		FilterExpression right = this.right.filter(pred);
+		if (left == Qualifier.EMPTY) {
+			return right;
+		} else if (right == Qualifier.EMPTY) {
+			return left;
+		} else {
+			return new Disjunction(left, right);
+		}
 	}
 }
