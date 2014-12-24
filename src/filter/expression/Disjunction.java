@@ -18,6 +18,12 @@ public class Disjunction implements FilterExpression {
 		this.right = right;
 	}
 
+	/**
+     * This method is used to serialise qualifiers. Thus whatever form returned
+     * should be syntactically valid.
+     * Since OR has lower precedence than AND, the parentheses are needed to
+     * disambiguate expressions like: (a OR b) AND c
+     */
 	@Override
 	public String toString() {
 		return "(" + left + " OR " + right + ")";

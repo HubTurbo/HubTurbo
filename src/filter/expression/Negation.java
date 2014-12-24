@@ -16,6 +16,10 @@ public class Negation implements FilterExpression {
 		this.expr = expr;
 	}
 
+	/**
+     * This method is used to serialise qualifiers. Thus whatever form returned
+     * should be syntactically valid.
+     */
 	@Override
 	public String toString() {
 		return "NOT" + expr;

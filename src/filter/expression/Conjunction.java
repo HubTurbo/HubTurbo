@@ -20,9 +20,14 @@ public class Conjunction implements FilterExpression {
 		this.right = right;
 	}
 
+	/**
+     * This method is used to serialise qualifiers. Thus whatever form returned
+     * should be syntactically valid.
+     * Since AND has the highest precedence, the parentheses here aren't needed.
+     */
 	@Override
 	public String toString() {
-		return "(" + left + " " + right + ")";
+		return left + " " + right;
 	}
 
 	@Override
