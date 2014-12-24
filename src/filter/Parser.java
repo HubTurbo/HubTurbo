@@ -13,9 +13,10 @@ import filter.lexer.TokenType;
 public class Parser {
 
 	public static void main(String[] args) {
-		String input = "created : <= 2014-06-01";
-//		FilterExpression p = Parser.parse(input);
-		ArrayList<Token> p = new Lexer(input).lex();
+//		String input = "\"a\""; // TODO do this
+		String input = "created:\"a b\"";
+		FilterExpression p = Parser.parse(input);
+//		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
 	}
 	
@@ -139,23 +140,70 @@ public class Parser {
 
 	private FilterExpression parseQualifier(Token token) {
 		String name = token.getValue();
-		name = name.substring(0, name.length()-1).trim();
-		
-		TokenType type = lookAhead().getType();
 
-		if (type == TokenType.GT || type == TokenType.LT || type == TokenType.LTE || type == TokenType.GTE) {
+		// Strip the : at the end, then trim
+		name = name.substring(0, name.length()-1).trim();
+
+		return parseQualifierContent(name, false);
+	}
+
+	private FilterExpression parseQualifierContent(String name, boolean allowMultipleKeywords) {
+		if (isRangeOperatorToken(lookAhead())) {
 			// < > <= >= [number | date range]
 			return parseRangeOperator(name, lookAhead());
-		} else if (isNumberOrDateToken(lookAhead())) {
+		}
+		else if (isNumberOrDateToken(lookAhead())) {
 			// [date] | [date] .. [date]
 			return parseDateOrDateRange(name);
-		} else {
-			// Keyword
-			Token t = consume();
-			return new Predicate(name, t.getValue());
+		}
+		else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
+			// " [content] "
+			consume(TokenType.QUOTE);
+			FilterExpression result = parseQualifierContent(name, true);
+			consume(TokenType.QUOTE);
+			return result;
+		}
+		else {
+			// Keyword(s)
+			if (allowMultipleKeywords) {
+				StringBuilder sb = new StringBuilder();
+				while (!isQuoteToken(lookAhead())) {
+					sb.append(consume().getValue()).append(" ");
+				}
+				return new Predicate(name, sb.toString().trim());
+			} else {
+				Token t = consume();
+				return new Predicate(name, t.getValue());
+			}
+		}
+	}
+
+	private boolean isQuoteToken(Token token) {
+		return token.getType() == TokenType.QUOTE;
+	}
+
+	private boolean isRangeOperatorToken(Token token) {
+		switch (token.getType()) {
+		case GT:
+		case LT:
+		case GTE:
+		case LTE:
+			return true;
+		default:
+			return false;
 		}
 	}
 	
+	private boolean isNumberOrDateToken(Token token) {
+		switch (token.getType()) {
+		case NUMBER:
+		case DATE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	private FilterExpression parseDateOrDateRange(String name) {
 		Token left = consume();
 		Optional<LocalDate> leftDate = parseDate(left);
@@ -225,10 +273,6 @@ public class Parser {
 		} else {
 			throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
 		}
-	}
-	
-	private boolean isNumberOrDateToken(Token token) {
-		return token.getType() == TokenType.NUMBER || token.getType() == TokenType.DATE;
 	}
 	
 	private FilterExpression parseGroup(Token token) {
