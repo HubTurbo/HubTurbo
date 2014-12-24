@@ -38,7 +38,7 @@ import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
 
-	private static final String VERSION_NUMBER = "V0.7.18";
+	private static final String VERSION_NUMBER = "V0.7.19";
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
