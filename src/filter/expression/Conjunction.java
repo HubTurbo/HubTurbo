@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import filter.PredicateApplicationException;
+import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
 
@@ -49,30 +49,30 @@ public class Conjunction implements FilterExpression {
 		return left.isSatisfiedBy(issue, model) && right.isSatisfiedBy(issue, model);
 	}
 	
-	private boolean containsDuplicatePredicateNames() {
-		List<String> nonLabelPredicateNames = getPredicateNames().stream().filter(pn -> !pn.equals("label")).collect(Collectors.toList());
-		HashSet<String> noDuplicates = new HashSet<>(nonLabelPredicateNames);
-		return noDuplicates.size() != nonLabelPredicateNames.size();
+	private boolean containsDuplicateQualifierNames() {
+		List<String> nonLabelQualifierNames = getQualifierNames().stream().filter(pn -> !pn.equals("label")).collect(Collectors.toList());
+		HashSet<String> noDuplicates = new HashSet<>(nonLabelQualifierNames);
+		return noDuplicates.size() != nonLabelQualifierNames.size();
 	}
 	
 	@Override
 	public boolean canBeAppliedToIssue() {
-		return !containsDuplicatePredicateNames()
+		return !containsDuplicateQualifierNames()
 				&& left.canBeAppliedToIssue()
 				&& right.canBeAppliedToIssue();
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
 		left.applyTo(issue, model);
 		right.applyTo(issue, model);
 	}
 
 	@Override
-	public List<String> getPredicateNames() {
+	public List<String> getQualifierNames() {
 		ArrayList<String> list = new ArrayList<>();
-		list.addAll(left.getPredicateNames());
-		list.addAll(right.getPredicateNames());
+		list.addAll(left.getQualifierNames());
+		list.addAll(right.getQualifierNames());
 		return list;
 	}
 }

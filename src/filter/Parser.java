@@ -11,7 +11,7 @@ import filter.expression.DateRange;
 import filter.expression.Disjunction;
 import filter.expression.FilterExpression;
 import filter.expression.Negation;
-import filter.expression.Predicate;
+import filter.expression.Qualifier;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
@@ -31,7 +31,7 @@ public class Parser {
 	}
 	public static FilterExpression parse(String input) {
 		if (input == null) return null;
-		else if (input.isEmpty()) return Predicate.EMPTY;
+		else if (input.isEmpty()) return Qualifier.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
 	}
 
@@ -129,11 +129,11 @@ public class Parser {
 		while (!isQuoteToken(lookAhead())) {
 			sb.append(consume().getValue()).append(" ");
 		}
-		return new Predicate(qualifierName, sb.toString().trim());
+		return new Qualifier(qualifierName, sb.toString().trim());
 	}
 
 	private FilterExpression parseKeyword(Token token) {
-		return new Predicate("keyword", token.getValue());
+		return new Qualifier("keyword", token.getValue());
 	}
 
 	private int getInfixPrecedence(Token token) {
@@ -195,7 +195,7 @@ public class Parser {
 			if (allowMultipleKeywords) {
 				return parseKeywords(qualifierName);
 			} else {
-				return new Predicate(qualifierName, consume().getValue());
+				return new Qualifier(qualifierName, consume().getValue());
 			}
 		}
 	}
@@ -241,19 +241,19 @@ public class Parser {
 			if (isNumberOrDateToken(right)) {
 				Optional<LocalDate> rightDate = parseDate(right);
 				if (rightDate.isPresent()) {
-					return new Predicate(name, new DateRange(leftDate.get(), rightDate.get()));
+					return new Qualifier(name, new DateRange(leftDate.get(), rightDate.get()));
 				} else {
 					assert false : "Possible problem with lexer processing date";
 				}
 			} else if (right.getType() == TokenType.STAR) {
-				return new Predicate(name, new DateRange(leftDate.get(), null));
+				return new Qualifier(name, new DateRange(leftDate.get(), null));
 			} else {
 				throw new ParseException("Right operand of .. must be a date or *");
 			}
 		}
 		else {
 			// Just one date, not a range
-			return new Predicate(name, leftDate.get());
+			return new Qualifier(name, leftDate.get());
 		}
 		assert false : "Should never reach here";
 		return null;
@@ -270,13 +270,13 @@ public class Parser {
 				// Date
 				switch (token.getType()) {
 				case GT:
-					return new Predicate(name, new DateRange(date.get(), null, true));
+					return new Qualifier(name, new DateRange(date.get(), null, true));
 				case GTE:
-					return new Predicate(name, new DateRange(date.get(), null));
+					return new Qualifier(name, new DateRange(date.get(), null));
 				case LT:
-					return new Predicate(name, new DateRange(null, date.get(), true));
+					return new Qualifier(name, new DateRange(null, date.get(), true));
 				case LTE:
-					return new Predicate(name, new DateRange(null, date.get()));
+					return new Qualifier(name, new DateRange(null, date.get()));
 				default:
 					assert false : "Should not happen";
 				}
@@ -286,7 +286,7 @@ public class Parser {
 				// Number
 				try {
 //					int num = Integer.parseInt(info.getValue());
-//					return new Predicate(name, num);
+//					return new Qualifier(name, num);
 					throw new ParseException("Not yet implemented");
 				} catch (NumberFormatException e) {
 					throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));

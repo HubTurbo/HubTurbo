@@ -13,7 +13,7 @@ import filter.expression.Conjunction;
 import filter.expression.DateRange;
 import filter.expression.Disjunction;
 import filter.expression.Negation;
-import filter.expression.Predicate;
+import filter.expression.Qualifier;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
@@ -23,26 +23,26 @@ public class Tests {
     @Test
     public void basics() {
         assertEquals(Parser.parse(null), null);
-        assertEquals(Parser.parse(""), Predicate.EMPTY);
+        assertEquals(Parser.parse(""), Qualifier.EMPTY);
     }
     
     @Test
     public void keywords() {
-        assertEquals(Parser.parse("a(b)"), new Conjunction(new Predicate("keyword", "a"), new Predicate("keyword", "b")));
-        assertEquals(Parser.parse("    a   (   b   )   "), new Conjunction(new Predicate("keyword", "a"), new Predicate("keyword", "b")));
-        assertEquals(Parser.parse("a(b c)"), new Conjunction(new Predicate("keyword", "a"), new Conjunction(new Predicate("keyword", "b"), new Predicate("keyword", "c"))));
-        assertEquals(Parser.parse("c a(b)"), new Conjunction(new Conjunction(new Predicate("keyword", "c"), new Predicate("keyword", "a")), new Predicate("keyword", "b")));
+        assertEquals(Parser.parse("a(b)"), new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+        assertEquals(Parser.parse("    a   (   b   )   "), new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+        assertEquals(Parser.parse("a(b c)"), new Conjunction(new Qualifier("keyword", "a"), new Conjunction(new Qualifier("keyword", "b"), new Qualifier("keyword", "c"))));
+        assertEquals(Parser.parse("c a(b)"), new Conjunction(new Conjunction(new Qualifier("keyword", "c"), new Qualifier("keyword", "a")), new Qualifier("keyword", "b")));
     }
     
     @Test
     public void quotes() {
     	// Quoted qualifier content
-    	assertEquals(Parser.parse("created:\"a b\""), new Predicate("created", "a b"));
-    	assertEquals(Parser.parse("created:\" > 2014-5-1 \""), new Predicate("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
-    	assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""), new Predicate("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
+    	assertEquals(Parser.parse("created:\"a b\""), new Qualifier("created", "a b"));
+    	assertEquals(Parser.parse("created:\" > 2014-5-1 \""), new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
+    	assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""), new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
     	
     	// Prefix quotes
-    	assertEquals(Parser.parse("\"a b\""), new Predicate("keyword", "a b"));
+    	assertEquals(Parser.parse("\"a b\""), new Qualifier("keyword", "a b"));
     }
     
     @Test
@@ -59,49 +59,49 @@ public class Tests {
     
     @Test
     public void operators() {
-        assertEquals(Parser.parse("a:b OR c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a:b | c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a:b || c:d"), new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b OR c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("a:b | c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("a:b || c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
 
-        assertEquals(Parser.parse("a:b c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a:b AND c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a:b & c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
-        assertEquals(Parser.parse("a:b && c:d"), new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")));
+        assertEquals(Parser.parse("a:b c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("a:b AND c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("a:b & c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("a:b && c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
 
-        assertEquals(Parser.parse("!a:b"), new Negation(new Predicate("a", "b")));
-        assertEquals(Parser.parse("-a:b"), new Negation(new Predicate("a", "b")));
-        assertEquals(Parser.parse("~a:b"), new Negation(new Predicate("a", "b")));
+        assertEquals(Parser.parse("!a:b"), new Negation(new Qualifier("a", "b")));
+        assertEquals(Parser.parse("-a:b"), new Negation(new Qualifier("a", "b")));
+        assertEquals(Parser.parse("~a:b"), new Negation(new Qualifier("a", "b")));
         
         // Implicit conjunction
         
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
-                new Disjunction(new Conjunction(new Predicate("milestone", "0.4"), new Predicate("state", "open")), new Predicate("label", "urgent")));
+                new Disjunction(new Conjunction(new Qualifier("milestone", "0.4"), new Qualifier("state", "open")), new Qualifier("label", "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"), Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
     
     @Test
     public void associativity() {
         assertEquals(Parser.parse("a:b OR c:d OR e:f"),
-                new Disjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+                new Disjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
 
         assertEquals(Parser.parse("a:b AND c:d AND e:f"),
-                new Conjunction(new Conjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+                new Conjunction(new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
     }
 
     @Test
     public void dateRanges() {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
-                new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15))));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15))));
 
         assertEquals(Parser.parse("created:2014-06-01 .. *"),
-                new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), null)));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), null)));
 
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
         		new Conjunction(
         				new Conjunction(
-        						new Predicate("keyword", "a"),
-        						new Predicate("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15)))),
-        				new Predicate("keyword", "b"))
+        						new Qualifier("keyword", "a"),
+        						new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15)))),
+        				new Qualifier("keyword", "b"))
         );
     }
 
@@ -153,62 +153,62 @@ public class Tests {
     @Test
     public void dateRangeOperators() {
         assertEquals(Parser.parse("created:<2014-06-01"),
-                new Predicate("created", new DateRange(null, LocalDate.of(2014, 6, 1), true)));
+                new Qualifier("created", new DateRange(null, LocalDate.of(2014, 6, 1), true)));
         
         assertEquals(Parser.parse("created : <= 2014-06-01"),
-                new Predicate("created", new DateRange(null, LocalDate.of(2014, 6, 1))));
+                new Qualifier("created", new DateRange(null, LocalDate.of(2014, 6, 1))));
 
         assertEquals(Parser.parse("created : > 2014-06-01"),
-                new Predicate("created", new DateRange(LocalDate.of(2014, 6, 1), null, true)));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null, true)));
         
         assertEquals(Parser.parse("created : >= 2014-06-01"),
-                new Predicate("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
     }
     
     @Test
     public void dates() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
-                new Predicate("created", LocalDate.of(2014, 6, 1)));
+                new Qualifier("created", LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("created   :   2014-06-01"),
-                new Predicate("created", LocalDate.of(2014, 6, 1)));
+                new Qualifier("created", LocalDate.of(2014, 6, 1)));
         
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
         		new Conjunction(
         				new Conjunction(
-        						new Predicate("keyword", "a"),
-        						new Predicate("created", LocalDate.of(2014, 06, 01))),
-						new Predicate("keyword", "b")));
+        						new Qualifier("keyword", "a"),
+        						new Qualifier("created", LocalDate.of(2014, 06, 01))),
+						new Qualifier("keyword", "b")));
     }
 
     @Test
     public void precedence() {
         assertEquals(Parser.parse("a:b OR c:d AND e:f"),
-                new Disjunction(new Predicate("a", "b"), new Conjunction(new Predicate("c", "d"), new Predicate("e", "f"))));
+                new Disjunction(new Qualifier("a", "b"), new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
         assertEquals(Parser.parse("~a:b OR c:d AND e:f"),
-                new Disjunction(new Negation(new Predicate("a", "b")), new Conjunction(new Predicate("c", "d"), new Predicate("e", "f"))));
+                new Disjunction(new Negation(new Qualifier("a", "b")), new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
         
-        assertEquals(Parser.parse("a:b ~c:d"), new Conjunction(new Predicate("a", "b"), new Negation(new Predicate("c", "d"))));
+        assertEquals(Parser.parse("a:b ~c:d"), new Conjunction(new Qualifier("a", "b"), new Negation(new Qualifier("c", "d"))));
     }
 
     @Test
     public void grouping() {
         assertEquals(Parser.parse("(a:b OR c:d) AND e:f"),
-                new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+                new Conjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
         assertEquals(Parser.parse("(a:b OR c:d) e:f"),
-                new Conjunction(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")), new Predicate("e", "f")));
+                new Conjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
         assertEquals(Parser.parse("e:f ~(a:b OR c:d)"),
-                new Conjunction(new Predicate("e", "f"), new Negation(new Disjunction(new Predicate("a", "b"), new Predicate("c", "d")))));
+                new Conjunction(new Qualifier("e", "f"), new Negation(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")))));
     }
     
     @Test
     public void colon() {
         assertEquals(Parser.parse("assignee:darius"),
-                new Predicate("assignee", "darius"));
+                new Qualifier("assignee", "darius"));
         assertEquals(Parser.parse("assignee    :    darius   "),
-                new Predicate("assignee", "darius"));
+                new Qualifier("assignee", "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
-                new Conjunction(new Conjunction(new Predicate("assignee", "dar"), new Predicate("keyword", "ius")), new Predicate("keyword", "one")));
+                new Conjunction(new Conjunction(new Qualifier("assignee", "dar"), new Qualifier("keyword", "ius")), new Qualifier("keyword", "one")));
     }
     
     @Test

@@ -3,7 +3,7 @@ package filter.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import filter.PredicateApplicationException;
+import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
 
@@ -53,15 +53,15 @@ public class Disjunction implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
 		assert false;
 	}
 	
 	@Override
-	public List<String> getPredicateNames() {
+	public List<String> getQualifierNames() {
 		ArrayList<String> list = new ArrayList<>();
-		list.addAll(left.getPredicateNames());
-		list.addAll(right.getPredicateNames());
+		list.addAll(left.getQualifierNames());
+		list.addAll(right.getQualifierNames());
 		return list;
 	}
 }

@@ -2,7 +2,7 @@ package filter.expression;
 
 import java.util.List;
 
-import filter.PredicateApplicationException;
+import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
 
@@ -45,12 +45,12 @@ public class Negation implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
 		assert false;
 	}
 	
 	@Override
-	public List<String> getPredicateNames() {
-		return expr.getPredicateNames();
+	public List<String> getQualifierNames() {
+		return expr.getQualifierNames();
 	}
 }

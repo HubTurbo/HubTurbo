@@ -32,7 +32,7 @@ import command.CommandType;
 import command.TurboCommandExecutor;
 import filter.ParseException;
 import filter.Parser;
-import filter.PredicateApplicationException;
+import filter.QualifierApplicationException;
 import filter.expression.FilterExpression;
 
 /**
@@ -50,7 +50,7 @@ public abstract class Column extends VBox {
 	private static final String ADD_ISSUE = "\u271A";
 	
 	public static final String NO_FILTER = "No Filter";
-	public static final FilterExpression EMPTY = filter.expression.Predicate.EMPTY;
+	public static final FilterExpression EMPTY = filter.expression.Qualifier.EMPTY;
 
 	private final Model model;
 	private final ColumnControl parentColumnControl;
@@ -354,9 +354,9 @@ public abstract class Column extends VBox {
 					}
 					parentColumnControl.refresh();
 				} else {
-					throw new PredicateApplicationException("Could not apply predicate " + currentFilterExpression + ".");
+					throw new QualifierApplicationException("Could not apply predicate " + currentFilterExpression + ".");
 				}
-			} catch (PredicateApplicationException ex) {
+			} catch (QualifierApplicationException ex) {
 				parentColumnControl.displayMessage(ex.getMessage());
 			}
 		}
@@ -387,8 +387,8 @@ public abstract class Column extends VBox {
 	public void refreshItems() {
 		transformedIssueList = new FilteredList<TurboIssue>(issues, predicate);
 
-		if (currentFilterExpression instanceof filter.expression.Predicate) {
-			List<String> names = ((filter.expression.Predicate) currentFilterExpression).getPredicateNames();
+		if (currentFilterExpression instanceof filter.expression.Qualifier) {
+			List<String> names = ((filter.expression.Qualifier) currentFilterExpression).getQualifierNames();
 			if (names.size() == 1 && names.get(0).equals("parent")) {
 				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
 				    @Override

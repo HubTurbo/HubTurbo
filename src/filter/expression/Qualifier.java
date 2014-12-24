@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import filter.PredicateApplicationException;
+import filter.QualifierApplicationException;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
-public class Predicate implements FilterExpression {
+public class Qualifier implements FilterExpression {
 	
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yy, h:mm a");
-	public static final Predicate EMPTY = new filter.expression.Predicate("", "");
+	public static final Qualifier EMPTY = new Qualifier("", "");
 
 	private final String name;
 	
@@ -27,30 +27,30 @@ public class Predicate implements FilterExpression {
 	private Optional<String> content = Optional.empty();
 	private Optional<LocalDate> date = Optional.empty();
 
-	public Predicate(String name, String content) {
+	public Qualifier(String name, String content) {
 		this.name = name;
 		this.content = Optional.of(content);
 	}
 	
-	public Predicate(String name, DateRange dateRange) {
+	public Qualifier(String name, DateRange dateRange) {
 		this.name = name;
 		this.dateRange = Optional.of(dateRange);
 	}
 
-	public Predicate(String name, LocalDate date) {
+	public Qualifier(String name, LocalDate date) {
 		this.name = name;
 		this.date = Optional.of(date);
 	}
 	
-	public boolean isEmptyPredicate() {
+	public boolean isEmptyQualifier() {
 		return name.isEmpty() && content.isPresent() && content.get().isEmpty();
 	}
 
     public boolean isSatisfiedBy(TurboIssue issue, Model model) {
         assert name != null && content != null;
 
-        // The empty predicate is satisfied by anything
-        if (isEmptyPredicate()) return true;
+        // The empty qualifier is satisfied by anything
+        if (isEmptyQualifier()) return true;
 
         switch (name) {
         case "id":
@@ -90,25 +90,25 @@ public class Predicate implements FilterExpression {
     }
 
     @Override
-    public void applyTo(TurboIssue issue, Model model) throws PredicateApplicationException {
+    public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
         assert name != null && content != null;
         
-        // The empty predicate should not be applied to anything
-        assert !isEmptyPredicate();
+        // The empty qualifier should not be applied to anything
+        assert !isEmptyQualifier();
 
         switch (name) {
         case "title":
         	// TODO remove this when in: qualifier is implemented
         case "keyword":
-            throw new PredicateApplicationException("Unnecessary filter: title cannot be changed by dragging");
+            throw new QualifierApplicationException("Unnecessary filter: title cannot be changed by dragging");
         case "id":
-            throw new PredicateApplicationException("Unnecessary filter: id is immutable");
+            throw new QualifierApplicationException("Unnecessary filter: id is immutable");
         case "created":
-            throw new PredicateApplicationException("Unnecessary filter: cannot change issue creation date");
+            throw new QualifierApplicationException("Unnecessary filter: cannot change issue creation date");
         case "has":
         case "no":
         case "is":
-            throw new PredicateApplicationException("Ambiguous filter: " + name);
+            throw new QualifierApplicationException("Ambiguous filter: " + name);
         case "milestone":
             applyMilestone(issue, model);
             break;
@@ -122,7 +122,7 @@ public class Predicate implements FilterExpression {
             applyAssignee(issue, model);
             break;
         case "author":
-            throw new PredicateApplicationException("Unnecessary filter: cannot change author of issue");
+            throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
         case "state":
         case "status":
             applyState(issue);
@@ -138,12 +138,12 @@ public class Predicate implements FilterExpression {
     }
 
     @Override
-    public List<String> getPredicateNames() {
+    public List<String> getQualifierNames() {
         return new ArrayList<String>(Arrays.asList(name));
     }
 
     /**
-     * This method is used to serialise predicates. Thus whatever form returned
+     * This method is used to serialise qualifiers. Thus whatever form returned
      * should be syntactically valid.
      */
     @Override
@@ -185,7 +185,7 @@ public class Predicate implements FilterExpression {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Predicate other = (Predicate) obj;
+        Qualifier other = (Qualifier) obj;
         if (content == null) {
             if (other.content != null)
                 return false;
@@ -390,23 +390,23 @@ public class Predicate implements FilterExpression {
     	}
 	}
 
-	private void applyMilestone(TurboIssue issue, Model model) throws PredicateApplicationException {
+	private void applyMilestone(TurboIssue issue, Model model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new PredicateApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
     	
         // Find milestones containing the partial title
         List<TurboMilestone> milestones = model.getMilestones().stream().filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase())).collect(Collectors.toList());
         if (milestones.size() > 1) {
-            throw new PredicateApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
+            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
         } else {
             issue.setMilestone(milestones.get(0));
         }
     }
 
-    private void applyParent(TurboIssue issue, Model model) throws PredicateApplicationException {
+    private void applyParent(TurboIssue issue, Model model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new PredicateApplicationException("Invalid parent " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Invalid parent " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
         String parent = content.get().toLowerCase();
         int index = parseIdString(parent);
@@ -416,16 +416,16 @@ public class Predicate implements FilterExpression {
             // Find parents containing the partial title
             List<TurboIssue> parents = model.getIssues().stream().filter(i -> i.getTitle().toLowerCase().contains(parent.toLowerCase())).collect(Collectors.toList());
             if (parents.size() > 1) {
-                throw new PredicateApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
+                throw new QualifierApplicationException("Ambiguous filter: can apply any of the following parents: " + parents.toString());
             } else {
                 issue.setParentIssue(parents.get(0).getId());
             }
         }
     }
 
-    private void applyLabel(TurboIssue issue, Model model) throws PredicateApplicationException {
+    private void applyLabel(TurboIssue issue, Model model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new PredicateApplicationException("Invalid label " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Invalid label " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
 
         // Find labels containing the label name
@@ -433,29 +433,29 @@ public class Predicate implements FilterExpression {
                                        .stream()
                                        .filter(l -> l.toGhName().toLowerCase().contains(content.get().toLowerCase())).collect(Collectors.toList());
         if (labels.size() > 1) {
-            throw new PredicateApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
+            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
         } else {
             issue.addLabel(labels.get(0));
         }
     }
 
-    private void applyAssignee(TurboIssue issue, Model model) throws PredicateApplicationException {
+    private void applyAssignee(TurboIssue issue, Model model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new PredicateApplicationException("Invalid assignee " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Invalid assignee " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
 
         // Find assignees containing the partial title
         List<TurboUser> assignees = model.getCollaborators().stream().filter(c -> c.getGithubName().toLowerCase().contains(content.get().toLowerCase())).collect(Collectors.toList());
         if (assignees.size() > 1) {
-            throw new PredicateApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
+            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
         } else {
             issue.setAssignee(assignees.get(0));
         }
     }
 
-    private void applyState(TurboIssue issue) throws PredicateApplicationException {
+    private void applyState(TurboIssue issue) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new PredicateApplicationException("Invalid state " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Invalid state " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
 
         if (content.get().toLowerCase().contains("open")) {
