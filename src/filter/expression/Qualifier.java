@@ -82,8 +82,7 @@ public class Qualifier implements FilterExpression {
         case "id":
             return idSatisfies(issue);
         case "keyword":
-        	// TODO temporary implementation pending in: qualifier
-            return titleSatisfies(issue);
+            return keywordSatisfies(issue, info);
         case "title":
         	// TODO remove this once in: qualifier is implemented
             return titleSatisfies(issue);
@@ -428,7 +427,28 @@ public class Qualifier implements FilterExpression {
         return issue.getMilestone().getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private boolean titleSatisfies(TurboIssue issue) {
+    private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
+    	if (!content.isPresent()) return false;
+    	
+    	String content = this.content.get().toLowerCase();
+    	
+    	if (info.getIn().isPresent()) {
+    		switch (info.getIn().get()) {
+    		case "title":
+    	        return issue.getTitle().toLowerCase().contains(content);
+    		case "body":
+    		case "desc":
+    	        return issue.getDescription().toLowerCase().contains(content);
+    	    default:
+    	    	return false;
+    		}
+    	} else {
+	        return issue.getTitle().toLowerCase().contains(content)
+	        		|| issue.getDescription().toLowerCase().contains(content);
+    	}
+	}
+
+	private boolean titleSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
         return issue.getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
