@@ -219,7 +219,9 @@ public class FilterTextField extends TextField {
 	private void confirmEdit() {
 		previousText = getText();
 		String newText = confirm.apply(getText());
+		int caretPosition = getCaretPosition();
 		setText(newText);
+		positionCaret(caretPosition);
 	}
 	
 	public void setFilterText(String text) {
