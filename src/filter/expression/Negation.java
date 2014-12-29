@@ -22,7 +22,7 @@ public class Negation implements FilterExpression {
      */
 	@Override
 	public String toString() {
-		return "NOT" + expr;
+		return "NOT " + expr;
 	}
 
 	@Override
