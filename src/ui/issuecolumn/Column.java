@@ -130,11 +130,11 @@ public abstract class Column extends VBox {
 	}
 
 	private Label[] createButtons() {
-		Label addIssue = new Label(ADD_ISSUE);
-		addIssue.getStyleClass().add("label-button");
-		addIssue.setOnMouseClicked((e) -> {
-			ui.triggerEvent(new IssueCreatedEvent());
-		});
+//		Label addIssue = new Label(ADD_ISSUE);
+//		addIssue.getStyleClass().add("label-button");
+//		addIssue.setOnMouseClicked((e) -> {
+//			ui.triggerEvent(new IssueCreatedEvent());
+//		});
 		
 		Label closeList = new Label(CLOSE_LIST);
 		closeList.getStyleClass().add("label-button");
@@ -148,7 +148,7 @@ public abstract class Column extends VBox {
 //			parentColumnControl.toggleColumn(columnIndex);
 //		});
 		
-		return new Label[] {addIssue, closeList};
+		return new Label[] {closeList};
 	}
 
 	private void setupColumn() {
