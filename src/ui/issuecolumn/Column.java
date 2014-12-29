@@ -366,6 +366,10 @@ public abstract class Column extends VBox {
 		return currentFilterExpression;
 	}
 	
+	public String getCurrentFilterString() {
+		return filterTextField.getText();
+	}
+	
 	public boolean isSearchPanel() {
 		return isSearchPanel;
 	}

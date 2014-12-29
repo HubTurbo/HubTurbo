@@ -17,11 +17,11 @@ import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
 import util.events.ColumnChangeEvent;
-import util.events.IssueSelectedEvent;
-import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
+
 import command.TurboCommandExecutor;
+
 import filter.expression.FilterExpression;
 
 
@@ -153,7 +153,7 @@ public class ColumnControl extends HBox {
 	public void saveSession() {
 		List<String> sessionFilters = new ArrayList<String>();
 		getChildren().forEach(child -> {
-			String filter = ((Column) child).getCurrentFilterExpression().toString();
+			String filter = ((Column) child).getCurrentFilterString();
 			sessionFilters.add(filter);
 		});
 		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
