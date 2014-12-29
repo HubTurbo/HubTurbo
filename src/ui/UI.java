@@ -81,14 +81,16 @@ public class UI extends Application {
 	}
 	
 	private void getUserCredentials() {
+		mainStage.close();
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (!success) {
-				mainStage.close();
+				quit();
 			} else {
 				columns.loadIssues();
 				sidePanel.refresh();
 				triggerEvent(new LoginEvent());
 				setExpandedWidth(false);
+				
 			}
 			return true;
 		}).exceptionally(e -> {
@@ -117,14 +119,7 @@ public class UI extends Application {
 		setExpandedWidth(false);
 		mainStage.setScene(scene);
 		mainStage.show();
-		mainStage.setOnCloseRequest(e -> {
-			ServiceManager.getInstance().stopModelUpdate();
-			columns.saveSession();
-			DataManager.getInstance().saveSessionConfig();
-			browserComponent.quit();
-			Platform.exit();
-			System.exit(0);
-		});
+		mainStage.setOnCloseRequest(e -> quit());
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
@@ -146,6 +141,15 @@ public class UI extends Application {
 				events.unregister(this);
 			}
 		});
+	}
+	
+	private void quit() {
+		ServiceManager.getInstance().stopModelUpdate();
+		columns.saveSession();
+		DataManager.getInstance().saveSessionConfig();
+		browserComponent.quit();
+		Platform.exit();
+		System.exit(0);
 	}
 	
 	private Parent createRoot() throws IOException {
