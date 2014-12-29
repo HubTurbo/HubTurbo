@@ -81,16 +81,14 @@ public class UI extends Application {
 	}
 	
 	private void getUserCredentials() {
-		mainStage.close();
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
-			if (!success) {
-				quit();
-			} else {
+			if (success) {
 				columns.loadIssues();
 				sidePanel.refresh();
 				triggerEvent(new LoginEvent());
 				setExpandedWidth(false);
-				
+			} else {
+				quit();
 			}
 			return true;
 		}).exceptionally(e -> {
