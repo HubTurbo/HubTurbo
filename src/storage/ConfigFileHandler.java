@@ -3,13 +3,11 @@ package storage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -20,7 +18,6 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +40,7 @@ import com.google.gson.JsonSerializer;
 public class ConfigFileHandler {
 
 	private static final String CHARSET = "UTF-8";
+	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
@@ -52,9 +50,7 @@ public class ConfigFileHandler {
 	private static final String URL_SPACE = "%20";
 	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
 	private static final String DEFAULT_BRANCH = "master";
-	
 	private static final int BUFFER_SIZE = 1024;
-	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
 	private static Gson gson = new GsonBuilder()
 								.setPrettyPrinting()
@@ -81,49 +77,110 @@ public class ConfigFileHandler {
 									}								
 								})
 								.create();
+
+	/**
+	 * Local and session configuration
+	 */
 	
-	private void saveProjectConfig(ProjectConfigurations config, IRepositoryIdProvider repoId) {
+	/**
+	 * Writes to the session configuration file.
+	 */
+	public void saveSessionConfig(SessionConfiguration config) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)), CHARSET);
-			gson.toJson(config, ProjectConfigurations.class, writer);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_SESSION) , CHARSET);
+			gson.toJson(config, SessionConfiguration.class, writer);
 			writer.close();
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 
-//	public String getDocumentation() {
-//		String contents = "";
-//		String url = generateDocumentationURL();
-//		if (isValidURL(url)) {
-//			try {
-//				GitHubClientExtended ghClient = new GitHubClientExtended();
-//				contents = ghClient.getHTMLResponseFromURLRequest(url);
-//			} catch (IOException e) {
-//				logger.error(e.getLocalizedMessage(), e);
-//			}
-//		} 
-//		return contents;
-//	}
+	/**
+	 * Locals session configuration file, creating it if it doesn't exist.
+	 */
+	public SessionConfiguration loadSessionConfig() {
+		
+		// Default to an empty configuration
+		SessionConfiguration config = new SessionConfiguration();
+		
+		File configFile = new File(FILE_CONFIG_SESSION);
+		if (configFile.exists()) {
+			try {
+				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_SESSION), CHARSET);
+				config = gson.fromJson(reader, SessionConfiguration.class);
+				reader.close();
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		} else {
+			try {
+				configFile.createNewFile();
+				saveSessionConfig(config);
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		}
+		return config;
+	}
 
-//    public String getDocumentationMarkup() {
-//    	String contents = getDocumentation();
-//    	String documentationMarkup = contents;
-//    	try {
-//        	documentationMarkup = ServiceManager.getInstance().getContentMarkup(contents);
-//    	} catch(IOException e) {
-//    		logger.error(e.getLocalizedMessage(), e);
-//    	}
-//    	return documentationMarkup;
-//    }
+	/**
+	 * Writes to the local configuration file.
+	 */
+	public void saveLocalConfig(LocalConfiguration config) {
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_LOCAL) , CHARSET);
+			gson.toJson(config, LocalConfiguration.class, writer);
+			writer.close();
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
+	
+	/**
+	 * Locals local configuration file, creating it if it doesn't exist.
+	 */
+	public LocalConfiguration loadLocalConfig() {
+		
+		// Default to an empty configuration
+		LocalConfiguration config = new LocalConfiguration();
+		
+		File configFile = new File(FILE_CONFIG_LOCAL);
+		if (configFile.exists()) {
+			try {
+				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_LOCAL), CHARSET);
+				config = gson.fromJson(reader, LocalConfiguration.class);
+				reader.close();
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		} else {
+			try {
+				configFile.createNewFile();
+				saveLocalConfig(config);
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		}
+		return config;
+	}
+	
+	/**
+	 * Project configuration
+	 */
+	
+	private void saveProjectConfig(ProjectConfiguration config, IRepositoryIdProvider repoId) {
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)), CHARSET);
+			gson.toJson(config, ProjectConfiguration.class, writer);
+			writer.close();
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
 
-	public ProjectConfigurations loadProjectConfig(IRepositoryIdProvider repoId) {
+	public ProjectConfiguration loadProjectConfig(IRepositoryIdProvider repoId) {
 		directorySetup();
-		ProjectConfigurations config = null;
+		ProjectConfiguration config = new ProjectConfiguration();
 		String fileName = generateFileName(repoId);
 
 		if (isValidURL(generateFileURL(repoId))) {
@@ -137,39 +194,30 @@ public class ConfigFileHandler {
 		} 
 		File configFile = new File(fileName);
 		if (configFile.exists()) {
-			config = readConfigFile(fileName);
+			config = readProjectConfigFile(fileName);
 		} else {
-			config = createConfigFile(repoId, fileName);
+			config = createProjectConfigFile(repoId, fileName);
 		}		
 		return config;
 	}
 
-	private ProjectConfigurations readConfigFile(String fileName) {
-		ProjectConfigurations config = null;
+	private ProjectConfiguration readProjectConfigFile(String fileName) {
+		ProjectConfiguration config = null;
 		try {
 			Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
-			config = gson.fromJson(reader, ProjectConfigurations.class);
+			config = gson.fromJson(reader, ProjectConfiguration.class);
 			reader.close();
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			logger.error(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		return config;
 	}
 
-	private ProjectConfigurations createConfigFile(IRepositoryIdProvider repoId, String fileName) {
-		ProjectConfigurations config = null;
-		List<String> nonInheritedLabels = new ArrayList<String>();
-		nonInheritedLabels.add("status.");
-		List<String> openStatusLabels = new ArrayList<String>();
-		openStatusLabels.add("status.open");
-		List<String> closedStatusLabels = new ArrayList<String>();
-		closedStatusLabels.add("status.closed");
+	private ProjectConfiguration createProjectConfigFile(IRepositoryIdProvider repoId, String fileName) {
+
 		// Default project configuration file
-		config = new ProjectConfigurations(nonInheritedLabels, openStatusLabels, closedStatusLabels);
+		ProjectConfiguration config = new ProjectConfiguration();
+		
 		File configFile = new File(fileName);
 		try {
 			configFile.createNewFile();
@@ -224,8 +272,7 @@ public class ConfigFileHandler {
 	private boolean isValidURL(String stringURL) {
 		HttpURLConnection httpUrlConn;
 		try {
-			httpUrlConn = (HttpURLConnection) new URL(stringURL)
-			.openConnection();
+			httpUrlConn = (HttpURLConnection) new URL(stringURL).openConnection();
 
 			// Check if resource is available without downloading it
 			httpUrlConn.setRequestMethod("HEAD");
@@ -254,7 +301,7 @@ public class ConfigFileHandler {
 			int bytesRead;
 			System.out.print("Downloading " + downloadedFileName);
 			while ((bytesRead = inStream.read(data, 0, BUFFER_SIZE)) != -1) {
-				System.out.print(".");	// Progress bar
+				System.out.print(".");// Progress bar
 				fos.write(data, 0, bytesRead);
 			}
 			System.out.println("done!");
@@ -266,86 +313,5 @@ public class ConfigFileHandler {
 			if (fos != null)
 				fos.close();
 		}
-	}
-
-	public void saveSessionConfig(SessionConfigurations config) {
-		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_SESSION) , CHARSET);
-			gson.toJson(config, SessionConfigurations.class, writer);
-			writer.close();
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	public SessionConfigurations loadSessionConfig() {
-		SessionConfigurations config = null;
-		File configFile = new File(FILE_CONFIG_SESSION);
-		if (configFile.exists()) {
-			try {
-				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_SESSION), CHARSET);
-				config = gson.fromJson(reader, SessionConfigurations.class);
-				reader.close();
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			} catch (FileNotFoundException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		} else {
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		}
-		if (config == null) config = new SessionConfigurations();
-		return config;
-	}
-
-	public void saveLocalConfig(LocalConfigurations config) {
-		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_LOCAL) , CHARSET);
-			gson.toJson(config, LocalConfigurations.class, writer);
-			writer.close();
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	public LocalConfigurations loadLocalConfig() {
-		LocalConfigurations config = null;
-		File configFile = new File(FILE_CONFIG_LOCAL);
-		if (configFile.exists()) {
-			try {
-				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_LOCAL), CHARSET);
-				config = gson.fromJson(reader, LocalConfigurations.class);
-				reader.close();
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			} catch (FileNotFoundException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		} else {
-			try {
-				configFile.createNewFile();
-				config = new LocalConfigurations();
-				saveLocalConfig(config);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		}
-		return config;
 	}
 }

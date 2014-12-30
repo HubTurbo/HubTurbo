@@ -7,13 +7,18 @@ import java.util.List;
 /**
  * Abstractions for the contents of the project configuration file.
  */
-public class ProjectConfigurations {
+public class ProjectConfiguration {
 	
 	private List<String> nonInheritedLabels = new ArrayList<String>();
 	private List<String> openStatusLabels = new ArrayList<String>();
 	private List<String> closedStatusLabels = new ArrayList<String>();
 	
-	public ProjectConfigurations() {
+	public ProjectConfiguration() {
+
+		// Defaults for every repository
+		nonInheritedLabels.add("status.");
+		openStatusLabels.add("status.open");
+		closedStatusLabels.add("status.closed");
 	}
 
 	private List<String> getOpenStatusLabels() {
@@ -30,14 +35,7 @@ public class ProjectConfigurations {
 		statusLabels.addAll(getClosedStatusLabels());
 		return statusLabels;
 	}
-		
-	public ProjectConfigurations(List<String> nonInheritedLabels, 
-			List<String> openStatusLabels, List<String> closedStatusLabels) {
-		this.nonInheritedLabels = nonInheritedLabels;
-		this.openStatusLabels = openStatusLabels;
-		this.closedStatusLabels = closedStatusLabels;
-	}
-	
+
 	public boolean isNonInheritedLabel(String label) {
 		for (String nonInherited : nonInheritedLabels) {
 			if (label.contains(nonInherited)) {
