@@ -28,7 +28,7 @@ public class SessionConfigurations {
 	
 	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
 		if (project != null) {
-			projectFilters.put(project.generateId(), filter);
+			projectFilters.put(project.generateId().toLowerCase(), filter);
 		}
 	}
 	
@@ -36,7 +36,7 @@ public class SessionConfigurations {
 		if (project == null) {
 			return new ArrayList<>();
 		}
-		return projectFilters.get(project.generateId());
+		return projectFilters.get(project.generateId().toLowerCase());
 	}
 	
 	/**
@@ -44,6 +44,8 @@ public class SessionConfigurations {
 	 * The list will always have 10 or fewer items.
 	 */
 	public void addToLastViewedRepositories(String repository) {
+		repository = repository.toLowerCase();
+		
 		// Create record for this repository
 		RepoViewRecord latestRepoView = new RepoViewRecord(repository);
 		int index = lastViewedRepositories.indexOf(latestRepoView);
