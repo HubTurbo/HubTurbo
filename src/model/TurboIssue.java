@@ -48,7 +48,7 @@ public class TurboIssue implements Listable {
 	
 	private String creator;
 	public String getCreator() {
-		String name = DataManager.getInstance().getUserAliases().get(creator);
+		String name = DataManager.getInstance().getUserAlias(creator);
 		if (name == null) {
 			name = creator;
 		}

@@ -12,12 +12,10 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
  * Abstractions for the contents of the session file.
  */
 public class SessionConfigurations {
-	private HashMap<String, List<String>> projectFilters;
-	private List<RepoViewRecord> lastViewedRepositories; 
+	private HashMap<String, List<String>> projectFilters = new HashMap<>();
+	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>(); 
 	
 	public SessionConfigurations() {
-		projectFilters = new HashMap<>();
-		lastViewedRepositories = new ArrayList<>();
 	}
 	
 	public SessionConfigurations(HashMap<String, List<String>> projectFilters,

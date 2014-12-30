@@ -13,7 +13,7 @@ public class TurboUser implements Listable {
 	 */
 	
 	public String getAlias() {
-		String name = DataManager.getInstance().getUserAliases().get(getGithubName());
+		String name = DataManager.getInstance().getUserAlias(getGithubName());
 		return name == null ? getGithubName() : name;
 	}
 	

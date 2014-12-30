@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Abstractions for the contents of the project configuration file.
+ */
 public class ProjectConfigurations {
 	
 	private List<String> nonInheritedLabels = new ArrayList<String>();
-	
 	private List<String> openStatusLabels = new ArrayList<String>();
+	private List<String> closedStatusLabels = new ArrayList<String>();
+	
+	public ProjectConfigurations() {
+	}
+
 	private List<String> getOpenStatusLabels() {
 		return Collections.unmodifiableList(openStatusLabels);
 	}
 	
-	private List<String> closedStatusLabels = new ArrayList<String>();
 	private List<String> getClosedStatusLabels() {
 		return Collections.unmodifiableList(closedStatusLabels);
 	}
@@ -24,11 +30,7 @@ public class ProjectConfigurations {
 		statusLabels.addAll(getClosedStatusLabels());
 		return statusLabels;
 	}
-	
-	public ProjectConfigurations(){
 		
-	}
-	
 	public ProjectConfigurations(List<String> nonInheritedLabels, 
 			List<String> openStatusLabels, List<String> closedStatusLabels) {
 		this.nonInheritedLabels = nonInheritedLabels;
@@ -68,5 +70,4 @@ public class ProjectConfigurations {
 		}
 		return false;
 	}
-
 }

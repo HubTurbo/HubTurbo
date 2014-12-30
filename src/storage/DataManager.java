@@ -1,6 +1,5 @@
 package storage;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
@@ -57,8 +56,8 @@ public class DataManager {
 	 * Local configuration
 	 */
 	
-	public HashMap<String, String> getUserAliases(){
-		return localConfigurations.getUserAliases();
+	public String getUserAlias(String user){
+		return localConfigurations.getAlias(user);
 	}
 	
 	/**
