@@ -35,9 +35,10 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 
 /**
- * An IssueColumn is a Column meant for containing issues. The main addition to
- * Column is filtering functionality. The IssueColumn does not specify how the
- * list is to be displayed. Subclasses override methods which determine that.
+ * An IssueColumn is a Column meant for containing issues. The main additions to
+ * Column are filtering functionality and a list of issues to be maintained.
+ * The IssueColumn does not specify how the list is to be displayed -- subclasses
+ * override methods which determine that.
  */
 public abstract class IssueColumn extends Column {
 
@@ -295,8 +296,13 @@ public abstract class IssueColumn extends Column {
 	}
 
 	/**
-	 * To be overridden by subclasses
+	 * To be overridden by subclasses.
+	 * 
+	 * See docs in Column for refreshItems.
+	 * 
 	 */
+
+	// deselect is not overriden
 
 	@Override
 	public void refreshItems() {

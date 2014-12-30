@@ -15,6 +15,9 @@ import command.TurboCommandExecutor;
  * A Column is a JavaFX node that is contained by a ColumnControl.
  * It is in charge of displaying arbitrary content and provides
  * functionality for being added, removed, and reordered (via dragging).
+ * 
+ * Since objects of this class are JavaFX nodes, content can be displayed 
+ * simply by adding child nodes to them.
  */
 public abstract class Column extends VBox {
 	
@@ -74,8 +77,6 @@ public abstract class Column extends VBox {
 		});
 		
 		setOnDragDone((event) -> {
-//			if (event.getTransferMode() == TransferMode.MOVE) {
-//			}
 			event.consume();
 		});
 	}
@@ -89,9 +90,18 @@ public abstract class Column extends VBox {
 	}
 
 	/**
-	 * To be overridden by subclasses
+	 * To be overridden by subclasses.
 	 */
 	
+	/**
+	 * This method is called when the item list is to be refreshed. This mainly happens
+	 * when the user selects Refresh from the menu. Subclasses may also require it.
+	 */
 	public abstract void refreshItems();
+	
+	/**
+	 * This method is called when the column control is deselected. It used to happen when
+	 * the issue panel was closed.
+	 */
 	public abstract void deselect();
 }
