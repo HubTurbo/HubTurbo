@@ -13,13 +13,13 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 import ui.UI;
-import ui.issuecolumn.Column;
 import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.IssueColumn;
 import ui.sidepanel.SidePanel;
 
 import command.TurboCommandExecutor;
 
-public class HierarchicalIssuePanel extends Column {
+public class HierarchicalIssuePanel extends IssueColumn {
 
 //	private final Stage mainStage;
 	private final Model model;

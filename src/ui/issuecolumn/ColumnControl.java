@@ -19,9 +19,7 @@ import ui.sidepanel.SidePanel;
 import util.events.ColumnChangeEvent;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
-
 import command.TurboCommandExecutor;
-
 import filter.expression.FilterExpression;
 
 
@@ -31,6 +29,8 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private final Model model;
 	private final SidePanel sidePanel;
+	
+	@SuppressWarnings("unused")
 	private final UIBrowserBridge uiBrowserBridge;
 
 	private TurboCommandExecutor dragAndDropExecutor;
@@ -89,21 +89,23 @@ public class ColumnControl extends HBox {
 
 	public void loadIssues() {
 		for (Node node : getChildren()) {
-			Column panel = (Column) node;
-			panel.setItems(model.getIssues());
+			if (node instanceof IssueColumn) {
+				IssueColumn panel = (IssueColumn) node;
+				panel.setItems(model.getIssues());
+			}
 		}
 	}
 	
-	private Column addColumn(boolean isSearchPanel) {
-		Column panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
+	private IssueColumn addColumn(boolean isSearchPanel) {
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
-	public Column addColumnAt(boolean isSearchPanel, int index) {
-		Column panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
+	public IssueColumn addColumnAt(boolean isSearchPanel, int index) {
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -129,8 +131,8 @@ public class ColumnControl extends HBox {
 	}
 	
 	public void toggleColumn(int index) {
-		Column column;
-		Column current = (Column) getChildren().get(index);
+		IssueColumn column;
+		IssueColumn current = (IssueColumn) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
 		if (current instanceof HierarchicalIssuePanel) {
 			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
@@ -153,8 +155,10 @@ public class ColumnControl extends HBox {
 	public void saveSession() {
 		List<String> sessionFilters = new ArrayList<String>();
 		getChildren().forEach(child -> {
-			String filter = ((Column) child).getCurrentFilterString();
-			sessionFilters.add(filter);
+			if (child instanceof IssueColumn) {
+				String filter = ((IssueColumn) child).getCurrentFilterString();
+				sessionFilters.add(filter);
+			}
 		});
 		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
 	}
