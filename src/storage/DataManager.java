@@ -5,8 +5,14 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
+/**
+ * A singleton for managing all local files used by HubTurbo.
+ * It provides facilities for saving and loading all files and
+ * methods for accessing them.
+ */
 public class DataManager {
 	private static final DataManager dataManagerInstance = new DataManager();
+	
 	private ConfigFileHandler fileHandler;
 	private SessionConfigurations sessionConfigurations;
 	private ProjectConfigurations projConfigurations;
@@ -23,22 +29,42 @@ public class DataManager {
 		return dataManagerInstance;
 	}
 	
+	/**
+	 * Operations
+	 */
+	
+	public void saveLocalConfig(){
+		fileHandler.saveLocalConfig(localConfigurations);
+	}
+	
+	public void loadProjectConfig(IRepositoryIdProvider repoId){
+		projConfigurations = fileHandler.loadProjectConfig(repoId);
+	}
+
+	public void saveSessionConfig(){
+		fileHandler.saveSessionConfig(sessionConfigurations);
+	}
+	
 	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter){
 		sessionConfigurations.setFiltersForNextSession(project, filter);
 	}
+
+	/**
+	 * Interface to configuration files
+	 */
+
+	/**
+	 * Local configuration
+	 */
 	
-	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
-		return sessionConfigurations.getFiltersFromPreviousSession(project);
+	public HashMap<String, String> getUserAliases(){
+		return localConfigurations.getUserAliases();
 	}
 	
-	public List<String> addToLastViewedRepositories(String repository){
-		return sessionConfigurations.addToLastViewedRepositories(repository);
-	}
-	
-	public List<String> getLastViewedRepositories(){
-		return sessionConfigurations.getLastViewedRepositories();
-	}
-	
+	/**
+	 * Project configuration
+	 */
+
 	public List<String> getStatusLabels(){
 		return projConfigurations.getStatusLabels();
 	}
@@ -58,20 +84,20 @@ public class DataManager {
 	public boolean isClosedStatusLabel(String label){
 		return projConfigurations.isClosedStatusLabel(label);
 	}
-	
-	public void loadProjectConfig(IRepositoryIdProvider repoId){
-		projConfigurations = fileHandler.loadProjectConfig(repoId);
+
+	/**
+	 * Session configuration
+	 */
+
+	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
+		return sessionConfigurations.getFiltersFromPreviousSession(project);
 	}
 	
-	public void saveSessionConfig(){
-		fileHandler.saveSessionConfig(sessionConfigurations);
+	public void addToLastViewedRepositories(String repository){
+		sessionConfigurations.addToLastViewedRepositories(repository);
 	}
 	
-	public void saveLocalConfig(){
-		fileHandler.saveLocalConfig(localConfigurations);
-	}
-	
-	public HashMap<String, String> getUserAliases(){
-		return localConfigurations.getUserAliases();
+	public List<String> getLastViewedRepositories(){
+		return sessionConfigurations.getLastViewedRepositories();
 	}
 }
