@@ -13,8 +13,8 @@ import command.TurboCommandExecutor;
 
 /**
  * A Column is a JavaFX node that is contained by a ColumnControl.
- * It is in charge of displaying arbitrary content and provides functionality
- * for being reordered via dragging.
+ * It is in charge of displaying arbitrary content and provides
+ * functionality for being added, removed, and reordered (via dragging).
  */
 public abstract class Column extends VBox {
 	
@@ -81,7 +81,7 @@ public abstract class Column extends VBox {
 	}
 	
 	/**
-	 * To be called by ColumnControl in order to update indices.
+	 * To be called by ColumnControl in order to have indices updated.
 	 * Should not be called externally.
 	 */
 	void updateIndex(int updated) {
