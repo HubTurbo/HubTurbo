@@ -57,8 +57,8 @@ public abstract class IssueColumn extends Column {
 	private FilterExpression currentFilterExpression = EMPTY;
 	private FilterTextField filterTextField;
 
-	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
-		super(mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor, isSearchPanel);
+	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+		super(mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
 		
 		getChildren().add(createFilterBox());
 		setupIssueColumnDragEvents(model, columnIndex);
@@ -93,16 +93,10 @@ public abstract class IssueColumn extends Column {
 	}
 	
 	private Node createFilterBox() {
-	//		String initialText = isSearchPanel ? "title()" : "";
-	//		int initialPosition = isSearchPanel ? 6 : 0;
-			
 			filterTextField = new FilterTextField("", 0)
 				.setOnConfirm((text) -> {
 					applyStringFilter(text);
 					return text;
-				})
-				.setOnCancel(() -> {
-	//				parentColumnControl.closeColumn(columnIndex);
 				});
 	
 			setupIssueDragEvents(filterTextField);

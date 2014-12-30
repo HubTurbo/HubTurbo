@@ -31,8 +31,8 @@ public class HierarchicalIssuePanel extends IssueColumn {
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
 	
-	public HierarchicalIssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
-		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor, isSearchPanel);
+	public HierarchicalIssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 //		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;

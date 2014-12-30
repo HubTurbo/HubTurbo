@@ -68,10 +68,10 @@ public class ColumnControl extends HBox {
 		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
 		if (filters != null && !filters.isEmpty()) {
 			for (String filter : filters) {
-				addColumn(false).filterByString(filter);
+				addColumn().filterByString(filter);
 			}
 		} else {
-			addColumn(false);
+			addColumn();
 		}
 	}
 
@@ -96,16 +96,16 @@ public class ColumnControl extends HBox {
 		}
 	}
 	
-	private IssueColumn addColumn(boolean isSearchPanel) {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor, isSearchPanel);
+	private IssueColumn addColumn() {
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
-	public IssueColumn addColumnAt(boolean isSearchPanel, int index) {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, isSearchPanel);
+	public IssueColumn addColumnAt(int index) {
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -135,21 +135,21 @@ public class ColumnControl extends HBox {
 		IssueColumn current = (IssueColumn) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
 		if (current instanceof HierarchicalIssuePanel) {
-			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
+			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
 		} else {
-			column = new HierarchicalIssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor, current.isSearchPanel());
+			column = new HierarchicalIssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
 		}
 		column.setItems(model.getIssues());
 		column.filter(currentFilterExpr);
 		getChildren().set(index, column);
 	}
 		
-	public void createNewSearchPanelAtStart() {
-		addColumnAt(true, 0);
+	public void createNewPanelAtStart() {
+		addColumnAt(0);
 	}
 
-	public void createNewSearchPanelAtEnd() {
-		addColumn(true);
+	public void createNewPanelAtEnd() {
+		addColumn();
 	}
 
 	public void saveSession() {

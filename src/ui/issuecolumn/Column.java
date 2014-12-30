@@ -25,16 +25,14 @@ public abstract class Column extends VBox {
 	protected final Model model;
 	protected final ColumnControl parentColumnControl;
 	protected int columnIndex;
-	private boolean isSearchPanel = false;
 	
 	protected TurboCommandExecutor dragAndDropExecutor;
 
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor, boolean isSearchPanel) {
+	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
 		this.dragAndDropExecutor = dragAndDropExecutor;
-		this.isSearchPanel = isSearchPanel;
 		
 		setupColumn();
 		setupColumnDragEvents();
@@ -80,10 +78,6 @@ public abstract class Column extends VBox {
 //			}
 			event.consume();
 		});
-	}
-	
-	public boolean isSearchPanel() {
-		return isSearchPanel;
 	}
 	
 	/**

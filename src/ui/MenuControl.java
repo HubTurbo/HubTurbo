@@ -47,14 +47,14 @@ public class MenuControl extends MenuBar {
 
 		MenuItem createLeft = new MenuItem("Create Column (Left)");
 		createLeft.setOnAction(e -> {
-			columns.createNewSearchPanelAtStart();
+			columns.createNewPanelAtStart();
 			columnsScroll.setHvalue(columnsScroll.getHmin());
 		});
 		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
 		MenuItem createRight = new MenuItem("Create Column");
 		createRight.setOnAction(e -> {
-			columns.createNewSearchPanelAtEnd();
+			columns.createNewPanelAtEnd();
 			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
 				@Override
