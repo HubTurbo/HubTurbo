@@ -30,6 +30,7 @@ import ui.RepositorySelector;
 import ui.StatusBar;
 import ui.UI;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
+import ui.feedmanagement.FeedManagementComponent;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.IssueDisplayPane;
 import ui.labelmanagement.LabelManagementComponent;
@@ -53,6 +54,7 @@ public class SidePanel extends VBox {
 	protected static final int PANEL_PREF_WIDTH = 300;
 	public boolean expandedIssueView = false;
 	
+	private Tab feedTab;
 	private Tab labelsTab;
 	private Tab milestonesTab;
 	private Tab assigneesTab;
@@ -201,6 +203,7 @@ public class SidePanel extends VBox {
 	}
 
 	private void resetTabs(){
+		feedTab = null;
 		labelsTab = null;
 		milestonesTab = null;
 		assigneesTab = null;
@@ -216,6 +219,9 @@ public class SidePanel extends VBox {
 		
 		tabs = new TabPane();
 
+		if (feedTab == null) {
+			feedTab = createFeedTab();
+		}
 		if (labelsTab ==  null) {
 			labelsTab = createLabelsTab();
 		}
@@ -226,8 +232,9 @@ public class SidePanel extends VBox {
 			assigneesTab = createCollaboratorsTab();
 		}
 		
-		tabs.getTabs().addAll(labelsTab, milestonesTab, assigneesTab);
-
+		tabs.getTabs().addAll(feedTab, labelsTab, milestonesTab, assigneesTab);
+		//tabs.getTabs().addAll(assigneesTab);
+		
 		selectionModel = tabs.getSelectionModel();
 		
 		if (repoFields == null) {
@@ -313,6 +320,14 @@ public class SidePanel extends VBox {
 			StatusBar.displayMessage("An error occurred: " + err);
 		});
 
+	}
+
+	private Tab createFeedTab() {
+		Tab tab = new Tab();
+		tab.setClosable(false);
+		tab.setText("Feed");
+		tab.setContent(new FeedManagementComponent(model).initialise());
+		return tab;
 	}
 
 	private Tab createCollaboratorsTab() {

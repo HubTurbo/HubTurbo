@@ -5,6 +5,7 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.Repository;
@@ -31,6 +33,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -42,6 +45,8 @@ import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
 import ui.StatusBar;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Singleton class that provides access to the GitHub API services required by HubTurbo
@@ -64,7 +69,8 @@ public class ServiceManager {
 	public static final String KEY_MILESTONES = "milestones";
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
-	
+	public static final String KEY_FEEDS = "feeds";
+	public static final int MAX_FEED = 20;
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
 	
@@ -251,9 +257,20 @@ public class ServiceManager {
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
+
+			List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
+			try {
+				ghFeeds = getFeeds();
+			} catch (Exception e) {
+				System.out.println(e.getLocalizedMessage());
+				// unable to access collaborators if user does not have a push access
+				// this case is being handled in model's load components
+			}
+
 			// Delay getting of issues until labels and milestones are loaded in Model
 			
 			HashMap<String, List> map = new HashMap<String, List>();
+			map.put(KEY_FEEDS, ghFeeds);
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
@@ -271,14 +288,17 @@ public class ServiceManager {
 		milestonesETag = null;
 		issueCheckTime = null;
 		
+		List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
 		List<User> ghCollaborators = new ArrayList<User>();
 		List<Label> ghLabels = new ArrayList<Label>();
 		List<Milestone> ghMilestones = new ArrayList<Milestone>();
 		List<Issue> ghIssues = new ArrayList<Issue>();
 		
 		try {
+			ghFeeds = getFeeds();
 			ghCollaborators = getCollaborators();
 		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
 			// unable to access collaborators if user does not have a push access
 			// this case is being handled in model's load components
 		}
@@ -287,6 +307,7 @@ public class ServiceManager {
 		ghIssues = getAllIssues();
 		
 		HashMap<String, List> map = new HashMap<String, List>();
+		map.put(KEY_FEEDS, ghFeeds);
 		map.put(KEY_COLLABORATORS, ghCollaborators);
 		map.put(KEY_LABELS, ghLabels);
 		map.put(KEY_MILESTONES, ghMilestones);
@@ -355,6 +376,40 @@ public class ServiceManager {
 		return null;
 	}
 	
+	
+	/**
+	 * Services for IssueEvent
+	 * */
+	public List<IssueEvent> getFeeds() throws IOException{
+		ArrayList<IssueEvent> eventList = new ArrayList<IssueEvent>();
+		String user = getRepoOwner();
+		String repo = getRepoName();
+		boolean toContinue = true;
+		PageIterator<IssueEvent> iter = issueService.pageEvents(user, repo);
+		assertNotNull(iter);
+		assertTrue(iter.hasNext());
+		for (Collection<IssueEvent> currentPage : iter) {
+			if (!currentPage.isEmpty()) {
+				for (IssueEvent event : currentPage) {
+					if (event != null) {
+						IssueEvent fetched = issueService.getIssueEvent(user, repo, event.getId());
+						if (fetched != null) {
+							if (eventList.size() < MAX_FEED) { 
+								eventList.add(fetched);
+							} else {
+								toContinue = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if (!toContinue) {
+				break;
+			}
+		}
+		return eventList;
+	}
 	
 	/**
 	 * Collaborator Services 

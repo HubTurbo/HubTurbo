@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import model.TurboFeed;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
@@ -59,6 +61,14 @@ public class CollectionUtilities {
 		ArrayList<TurboMilestone> buffer = new ArrayList<>();
 		for(Milestone ghMilestone : milestones){
 			buffer.add(new TurboMilestone(ghMilestone));
+		}
+		return buffer;
+	}
+
+	public static ArrayList<TurboFeed> getHubTurboFeed (List<IssueEvent> feeds){
+		ArrayList<TurboFeed> buffer = new ArrayList<>();
+		for(IssueEvent ghFeed: feeds){
+			buffer.add(new TurboFeed(ghFeed));
 		}
 		return buffer;
 	}
