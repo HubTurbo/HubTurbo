@@ -123,7 +123,9 @@ public class IssuePanel extends IssueColumn {
 	 * tell us.
 	 */
 	private void handleUpDownNavigation(boolean down, boolean shiftPressed) {
-		if (selectedId.isPresent()) {
+		if (selectedId.isPresent()
+			&& parentColumnControl.getCurrentlySelectedColumn().isPresent()
+			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex) {
 			
 			// Compute the next index based on the direction key, then clamp it to the size of the list
 			int correctIndex = getIndexOfIssue(selectedId.get()) + (down ? 1 : -1);

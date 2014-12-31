@@ -3,6 +3,7 @@ package ui.issuecolumn;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -21,7 +22,9 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
+
 import command.TurboCommandExecutor;
+
 import filter.expression.FilterExpression;
 
 
@@ -36,7 +39,7 @@ public class ColumnControl extends HBox {
 	private final UIBrowserBridge uiBrowserBridge;
 
 	private TurboCommandExecutor dragAndDropExecutor;
-	public int currentlySelectedColumn = -1;
+	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
 	public ColumnControl(UI ui, Stage stage, Model model, SidePanel sidePanel) {
 		this.ui = ui;
@@ -62,7 +65,7 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new IssueSelectedEventHandler() {
 			@Override
 			public void handle(IssueSelectedEvent e) {
-				currentlySelectedColumn = e.columnIndex;
+				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
 	}
@@ -187,6 +190,10 @@ public class ColumnControl extends HBox {
 		getChildren().set(columnIndex2, new HBox());
 		getChildren().set(columnIndex, two);
 		getChildren().set(columnIndex2, one);
+	}
+	
+	public Optional<Integer> getCurrentlySelectedColumn() {
+		return currentlySelectedColumn;
 	}
 	
 	private int currentlyDraggedColumnIndex = -1;
