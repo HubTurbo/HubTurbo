@@ -110,10 +110,10 @@ public class IssuePanel extends IssueColumn {
 	}
 
 	/**
-	 * This method was written to deal with the problem of list view selection 'jumping'
-	 * to the top of the list when the list refreshes. The reason for this is that the data
-	 * structure backing the list is cleared when the refresh happens and the list cells recreated,
-	 * so the selection model is reset.
+	 * This method deals with the problem of list view selection 'jumping' to the top of the 
+	 * list when the list refreshes. The reason for this is that the data structure backing
+	 * the list is cleared when the refresh happens and the list cells recreated, so the
+	 * selection model is reset.
 	 * 
 	 * The problem is fixed by maintaining our own 'selection model': the selectedId field.
 	 * It tracks where the selection should be at any point in time. This allows us to set it if
@@ -122,39 +122,45 @@ public class IssuePanel extends IssueColumn {
 	 * The rest of it is dealing with edge cases and interpreting what the list view is trying to
 	 * tell us.
 	 */
-	private void handleUpDownNavigation(boolean down, boolean shiftPressed) {
-		if (selectedId.isPresent()
+	private void handleUpDownNavigation(boolean isDownKey, boolean isShiftPressed) {
+		
+		// This panel is only considered to be selected if there was a previously-selected
+		// id, and if it's the currently-selected column.
+		// Otherwise it is not selected.
+		boolean panelNotSelected = !(selectedId.isPresent()
 			&& parentColumnControl.getCurrentlySelectedColumn().isPresent()
-			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex) {
-			
-			// Compute the next index based on the direction key, then clamp it to the size of the list
-			int correctIndex = getIndexOfIssue(selectedId.get()) + (down ? 1 : -1);
-			correctIndex = Math.max(0, Math.min(getIssueList().size()-1, correctIndex));
-			
-			// Model index is inconsistent with correct one => selection has jumped to the top.
-			// Select the correct item.
-			int modelIndex = listView.getSelectionModel().getSelectedIndex();
-			if (modelIndex != correctIndex) {
-				listView.getSelectionModel().clearAndSelect(correctIndex);
-			}
-			
-			// If jump happened, the selected item may be null
-			if (listView.getSelectionModel().getSelectedItem() != null) {
-				// If it's not, the selection model can be trusted, so we use that to update
-				// the selected id
-				selectedId = Optional.of(listView.getSelectionModel().getSelectedItem().getId());
-			} else {
-				// If it's null, we keep the previous selected id and do nothing
-			}
-			
-			// Trigger selection event for the right issue
-			if (!shiftPressed) {
-				ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
-			}
-
+			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex);
+		
+		if (panelNotSelected) {
+			// Do nothing
+			assert listView.getSelectionModel().getSelectedItem() == null
+				: "There can't be a selected item if there is no previous selectedId";
+			return;
+		}
+		
+		// Compute the next index based on the direction key, then clamp it to the size of the list
+		int correctIndex = getIndexOfIssue(selectedId.get()) + (isDownKey ? 1 : -1);
+		correctIndex = Math.max(0, Math.min(getIssueList().size()-1, correctIndex));
+		
+		// Model index is inconsistent with correct index => selection has jumped to the top.
+		// Select the correct item.
+		int modelIndex = listView.getSelectionModel().getSelectedIndex();
+		if (modelIndex != correctIndex) {
+			listView.getSelectionModel().clearAndSelect(correctIndex);
+		}
+		
+		// If jump happened, the selected item may be null
+		if (listView.getSelectionModel().getSelectedItem() != null) {
+			// If it's not, the selection model can be trusted, so we use that to update
+			// the selected id
+			selectedId = Optional.of(listView.getSelectionModel().getSelectedItem().getId());
 		} else {
-			// Nothing is selected; do nothing
-			assert listView.getSelectionModel().getSelectedItem() == null : "There can't be a selected item if there is a previous selectedId";
+			// If it's null, we keep the previous selected id and do nothing
+		}
+		
+		// Trigger selection event for the right issue
+		if (!isShiftPressed) {
+			ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
 		}
 	}
 }
