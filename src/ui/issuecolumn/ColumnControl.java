@@ -17,6 +17,8 @@ import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
 import util.events.ColumnChangeEvent;
+import util.events.IssueSelectedEvent;
+import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
 import command.TurboCommandExecutor;
@@ -34,7 +36,8 @@ public class ColumnControl extends HBox {
 	private final UIBrowserBridge uiBrowserBridge;
 
 	private TurboCommandExecutor dragAndDropExecutor;
-
+	public int currentlySelectedColumn = -1;
+	
 	public ColumnControl(UI ui, Stage stage, Model model, SidePanel sidePanel) {
 		this.ui = ui;
 		this.stage = stage;
@@ -49,9 +52,17 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new RefreshDoneEventHandler() {
 			@Override
 			public void handle(RefreshDoneEvent e) {
+				// We need this because this is triggered from a Timer thread
 				Platform.runLater(()-> {
 					refresh();
 				});	
+			}
+		});
+		
+		ui.registerEvent(new IssueSelectedEventHandler() {
+			@Override
+			public void handle(IssueSelectedEvent e) {
+				currentlySelectedColumn = e.columnIndex;
 			}
 		});
 	}

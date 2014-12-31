@@ -137,7 +137,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 	
 	private void onSingleClick(TurboIssue issue) {
-		ui.triggerEvent(new IssueSelectedEvent(issue.getId()));
+		ui.triggerEvent(new IssueSelectedEvent(issue.getId(), parentColumnIndex));
 
 	}
 
