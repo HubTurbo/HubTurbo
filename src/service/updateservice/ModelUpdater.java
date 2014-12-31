@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
@@ -42,42 +43,50 @@ public class ModelUpdater {
 		return lastUpdateTime;
 	}
 	
-	private void updateModel(){
-	    updateModelCollaborators();
-	   	updateModelLabels();
-	  	updateModelMilestones();
-	  	updateModelIssues();
+	private void updateModel(IRepositoryIdProvider repoId){
+	    updateModelCollaborators(repoId);
+	   	updateModelLabels(repoId);
+	  	updateModelMilestones(repoId);
+	  	updateModelIssues(repoId);
 	  	lastUpdateTime = issueUpdateService.lastCheckTime;
 	}
 	
-	private void updateModelIssues(){
-		List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(model.getRepoId());	
-		model.updateCachedIssues(updatedIssues);
-		model.updateIssuesETag(issueUpdateService.getLastETag());
-		model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
-	}
-	
-	private void updateModelCollaborators(){
-		List<User> collaborators = collaboratorUpdateService.getUpdatedItems(model.getRepoId());
-		model.updateCollabsETag(collaboratorUpdateService.getLastETag());
-		if(collaborators.size() > 0){
-			model.updateCachedCollaborators(collaborators);
+	private void updateModelIssues(IRepositoryIdProvider repoId){
+		if (model.getRepoId().equals(repoId)) {
+			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(repoId);	
+			model.updateCachedIssues(updatedIssues, repoId.toString());
+			model.updateIssuesETag(issueUpdateService.getLastETag());
+			model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
 		}
 	}
 	
-	private void updateModelLabels(){
-		List<Label> labels = labelUpdateService.getUpdatedItems(model.getRepoId());
-		model.updateLabelsETag(labelUpdateService.getLastETag());
-		if(labels.size() > 0){
-			model.updateCachedLabels(labels);
+	private void updateModelCollaborators(IRepositoryIdProvider repoId){
+		if (model.getRepoId().equals(repoId)) {
+			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(repoId);
+			model.updateCollabsETag(collaboratorUpdateService.getLastETag());
+			if(collaborators.size() > 0){
+				model.updateCachedCollaborators(collaborators, repoId.toString());
+			}
 		}
 	}
 	
-	private void updateModelMilestones(){
-		List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(model.getRepoId());
-		model.updateMilestonesETag(milestoneUpdateService.getLastETag());
-		if(milestones.size() > 0){
-			model.updateCachedMilestones(milestones);
+	private void updateModelLabels(IRepositoryIdProvider repoId){
+		if (model.getRepoId().equals(repoId)) {
+			List<Label> labels = labelUpdateService.getUpdatedItems(repoId);
+			model.updateLabelsETag(labelUpdateService.getLastETag());
+			if(labels.size() > 0){
+				model.updateCachedLabels(labels, repoId.toString());
+			}
+		}
+	}
+	
+	private void updateModelMilestones(IRepositoryIdProvider repoId){
+		if (model.getRepoId().equals(repoId)) {
+			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(repoId);
+			model.updateMilestonesETag(milestoneUpdateService.getLastETag());
+			if(milestones.size() > 0){
+				model.updateCachedMilestones(milestones, repoId.toString());
+			}
 		}
 	}
 	
@@ -86,10 +95,11 @@ public class ModelUpdater {
 			stopModelUpdate();
 		}
 		pollTimer = new Timer();
+		final IRepositoryIdProvider repoId = model.getRepoId();
 		TimerTask pollTask = new TimerTask(){
 			@Override
 			public void run() {
-				updateModel();
+				updateModel(repoId);
 				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
 			}
 		};

@@ -52,8 +52,8 @@ public class DataCacheFileHandler {
 	public void readFromFile() {
 		Gson gson = new Gson();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE)));
-
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
+			
 			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
 			
 			bufferedReader.close();
@@ -64,8 +64,8 @@ public class DataCacheFileHandler {
 		}
 	}
 	
-	private String getFileName(String givenFileName) {
-		String[] repoIdTokens = repoId.split("/");
+	private String getFileName(String givenFileName, String repoIdString) {
+		String[] repoIdTokens = repoIdString.split("/");
 		String repoFileName = repoIdTokens[0] + "_" + repoIdTokens[1];
 		return DIR_CACHE + File.separator + repoFileName + givenFileName;
 	}
@@ -90,7 +90,7 @@ public class DataCacheFileHandler {
 		this.issues = issues;
 	}
 	
-	public void writeToFile(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
+	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
 		//System.out.println("Writing to file...");
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
@@ -104,11 +104,11 @@ public class DataCacheFileHandler {
 		
 		// Save to temp file first to mitigate corruption of data. Once writing is done, rename it to main cache file
 		try {
-			FileWriter writer = new FileWriter(getFileName(FILE_DATA_CACHE_TEMP));
+			FileWriter writer = new FileWriter(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
 			writer.write(json);
 			writer.close();
 			
-			File file = new File(getFileName(FILE_DATA_CACHE));
+			File file = new File(getFileName(FILE_DATA_CACHE, repoIdString));
 			
 			if (file.exists()) {
 				if (file.delete()) {
@@ -118,7 +118,7 @@ public class DataCacheFileHandler {
 				}
 			} 
 			
-			File newFile = new File(getFileName(FILE_DATA_CACHE_TEMP));
+			File newFile = new File(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
 			if (newFile.renameTo(file)) {
 				//System.out.println("Temp cache file is renamed!");
 			} else {
