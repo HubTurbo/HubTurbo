@@ -23,5 +23,10 @@
 	<classpathentry kind="lib" path="lib/selenium-java-2.44.0.jar" sourcepath="lib/selenium-java-2.44.0-srcs.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-server-standalone-2.44.0.jar"/>
 	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="lib/prettytime-3.2.7.Final.jar" sourcepath="lib/prettytime-3.2.7.Final-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/prettytime-3.2.7.Final-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
