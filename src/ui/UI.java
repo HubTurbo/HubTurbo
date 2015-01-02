@@ -39,8 +39,8 @@ import com.google.common.eventbus.EventBus;
 public class UI extends Application {
 
 	private static final int VERSION_MAJOR = 0;
-	private static final int VERSION_MINOR = 7;
-	private static final int VERSION_PATCH = 21;
+	private static final int VERSION_MINOR = 8;
+	private static final int VERSION_PATCH = 0;
 	
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
