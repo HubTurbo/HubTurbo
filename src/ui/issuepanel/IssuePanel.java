@@ -54,10 +54,14 @@ public class IssuePanel extends IssueColumn {
 			public void handle(IssueSelectedEvent e) {
 				selectedId = Optional.of(e.id);
 				
-				Optional<Integer> selectedIndex = getIndexOfIssue(e.id);
-				assert selectedIndex.isPresent()
-					: "Index is not present in this column despite it being just selected";
-				IssuePanel.this.selectedIndex = selectedIndex.get();
+				if (parentColumnControl.getCurrentlySelectedColumn().isPresent()
+					&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex) {
+
+					Optional<Integer> selectedIndex = getIndexOfIssue(e.id);
+					assert selectedIndex.isPresent()
+						: "Index is not present in this column despite it being just selected";
+					IssuePanel.this.selectedIndex = selectedIndex.get();
+				}
 			}
 		});
 		
