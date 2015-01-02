@@ -30,7 +30,11 @@ public class IssuePanel extends IssueColumn {
 	private final UI ui;
 
 	private ListView<TurboIssue> listView;
+
 	private Optional<Integer> selectedId = Optional.empty();
+	
+	// Will be set if selectedId is set. Stores the position of the selected issue in case it disappears
+	private int selectedIndex = -1;
 	
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
@@ -49,6 +53,11 @@ public class IssuePanel extends IssueColumn {
 			@Override
 			public void handle(IssueSelectedEvent e) {
 				selectedId = Optional.of(e.id);
+				
+				Optional<Integer> selectedIndex = getIndexOfIssue(e.id);
+				assert selectedIndex.isPresent()
+					: "Index is not present in this column despite it being just selected";
+				IssuePanel.this.selectedIndex = selectedIndex.get();
 			}
 		});
 		
@@ -59,6 +68,7 @@ public class IssuePanel extends IssueColumn {
 	public void deselect() {
 		listView.getSelectionModel().clearSelection();
 		selectedId = Optional.empty();
+		selectedIndex = -1;
 	}
 	
 	@Override
@@ -87,17 +97,16 @@ public class IssuePanel extends IssueColumn {
 	/**
 	 * Given an issue id, returns the index of that issue's cell in this panel.
 	 */
-	private int getIndexOfIssue(int issueId) {
+	private Optional<Integer> getIndexOfIssue(int issueId) {
 		assert selectedId.isPresent() : "There has to be a previously selected id by this point";
 		int i = 0;
 		for (TurboIssue issue : getIssueList()) {
 			if (issue.getId() == selectedId.get()) {
-				return  i;
+				return  Optional.of(i);
 			}
 			i++;
 		}
-		assert false : "This method should be called with an issue index that is in this panel! " + issueId;
-		return -1;
+		return Optional.empty();
 	}
 
 	private void setupListView() {
@@ -128,6 +137,7 @@ public class IssuePanel extends IssueColumn {
 		// id, and if it's the currently-selected column.
 		// Otherwise it is not selected.
 		boolean panelNotSelected = !(selectedId.isPresent()
+			&& selectedIndex != -1
 			&& parentColumnControl.getCurrentlySelectedColumn().isPresent()
 			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex);
 		
@@ -138,8 +148,14 @@ public class IssuePanel extends IssueColumn {
 			return;
 		}
 		
+		// In the event that the selected issue has disappeared, stay at the index it was at
+		Optional<Integer> indexOfSelected = getIndexOfIssue(selectedId.get());
+		if (!indexOfSelected.isPresent()) {
+			indexOfSelected = Optional.of(selectedIndex);
+		}
+		
 		// Compute the next index based on the direction key, then clamp it to the size of the list
-		int correctIndex = getIndexOfIssue(selectedId.get()) + (isDownKey ? 1 : -1);
+		int correctIndex = indexOfSelected.get() + (isDownKey ? 1 : -1);
 		correctIndex = Math.max(0, Math.min(getIssueList().size()-1, correctIndex));
 		
 		// Model index is inconsistent with correct index => selection has jumped to the top.
@@ -154,6 +170,7 @@ public class IssuePanel extends IssueColumn {
 			// If it's not, the selection model can be trusted, so we use that to update
 			// the selected id
 			selectedId = Optional.of(listView.getSelectionModel().getSelectedItem().getId());
+			selectedIndex = listView.getSelectionModel().getSelectedIndex();
 		} else {
 			// If it's null, we keep the previous selected id and do nothing
 		}
