@@ -24,15 +24,10 @@ public class TurboFeed implements Listable {
 	
 	public static final FilterExpression EMPTY = Qualifier.EMPTY;
 	
-	private Predicate<TurboIssue> predicate = p -> true;
-	private FilterExpression currentFilterExpression = EMPTY;
-	private FilterTextField filterTextField;
-	
 	private IssueEvent issueEvent;
 	
 	public TurboFeed() {
 		super();
-//		getChildren().add(createFilterBox());
 	}
 	
 	public TurboFeed(IssueEvent issueEvent) {
@@ -41,10 +36,14 @@ public class TurboFeed implements Listable {
 		this.issueEvent = issueEvent;
 	}
 	
+	public int getIssueNum(){
+        Issue currIssue = this.issueEvent.getIssue();
+        return currIssue.getNumber();
+	}
+
 	public IssueEvent getIssueEvent(){
 		return issueEvent;
 	}
-
 	public void setIssueEvent(IssueEvent ie){
 		this.issueEvent = ie;
 	}
@@ -53,9 +52,8 @@ public class TurboFeed implements Listable {
 	public String getListName() {
     	PrettyTime pt = new PrettyTime();
         String milestoneTitle = "";
-
         Issue currIssue = this.issueEvent.getIssue();
-        int issueNum = currIssue.getNumber();
+        int issueNum = getIssueNum();
         
         TurboIssueEvent event = new TurboIssueEvent(this.issueEvent.getActor(), 
         		IssueEventType.fromString(this.issueEvent.getEvent()), 
@@ -133,58 +131,15 @@ public class TurboFeed implements Listable {
         if (message.length() == 0) {
         	return "";
         } else {
-    		return pt.format(this.issueEvent.getCreatedAt()) + "\n" + message
-    				+ "\n" + this.issueEvent.getEvent();
+    		return pt.format(this.issueEvent.getCreatedAt()) + "\n" + message;
+//    				+ "\n" + this.issueEvent.getEvent();
         }
     }
 
 	@Override
 	public void copyValues(Object other) {
 		// TODO Auto-generated method stub
+		
 	}
 	
-	private Node createFilterBox() {
-//		String initialText = isSearchPanel ? "title()" : "";
-//		int initialPosition = isSearchPanel ? 6 : 0;
-		
-		filterTextField = new FilterTextField("", 0)
-			.setOnConfirm((text) -> {
-//				if (Parser.isListOfSymbols(text)) {
-//					text = "title(" + text + ")";
-//				}
-//				applyStringFilter(text);
-				return text;
-			})
-			.setOnCancel(() -> {
-//				parentColumnControl.closeColumn(columnIndex);
-			});
-
-//		setupIssueDragEvents(filterTextField);
-		setupIssueFocusEvents(filterTextField);
-	
-		HBox buttonsBox = new HBox();
-		buttonsBox.setSpacing(5);
-		buttonsBox.setAlignment(Pos.TOP_RIGHT);
-		buttonsBox.setMinWidth(50);
-//		buttonsBox.getChildren().addAll(createButtons());
-		
-		HBox layout = new HBox();
-		layout.getChildren().addAll(filterTextField, buttonsBox);
-		layout.setPadding(new Insets(0,0,3,0));		
-		
-//		setupColumnDragEvents(layout);
-		return layout;
-	}
-	
-	private void setupIssueFocusEvents(FilterTextField field) {
-		field.focusedProperty().addListener((obs, old, newValue) -> {
-			if (newValue) {
-				// Gained focus
-//				parentColumnControl.setCurrentlyFocusedColumnIndex(columnIndex);
-			} else {
-				// Lost focus
-				// Do nothing
-			}
-		});
-	}
 }

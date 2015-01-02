@@ -326,7 +326,7 @@ public class SidePanel extends VBox {
 		Tab tab = new Tab();
 		tab.setClosable(false);
 		tab.setText("Feed");
-		tab.setContent(new FeedManagementComponent(model).initialise());
+		tab.setContent(new FeedManagementComponent(ui, model).initialise());
 		return tab;
 	}
 
