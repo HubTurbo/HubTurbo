@@ -1,6 +1,5 @@
 package model;
 
-import java.util.Date;
 import java.util.function.Predicate;
 
 import javafx.geometry.Insets;
@@ -8,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
@@ -15,10 +15,8 @@ import org.eclipse.egit.github.core.User;
 import service.IssueEventType;
 import service.TurboIssueEvent;
 import ui.FilterTextField;
-import util.Utility;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import filter.Parser;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -54,72 +52,79 @@ public class TurboFeed implements Listable {
 	@Override
 	public String getListName() {
     	PrettyTime pt = new PrettyTime();
+        String milestoneTitle = "";
+
+        Issue currIssue = this.issueEvent.getIssue();
+        int issueNum = currIssue.getNumber();
+        
         TurboIssueEvent event = new TurboIssueEvent(this.issueEvent.getActor(), 
         		IssueEventType.fromString(this.issueEvent.getEvent()), 
         		this.issueEvent.getCreatedAt());
-        /*
-        event.setAssignedUser(assignedUser);
-        event.setLabelColour(labelColour);
-        event.setLabelName(labelName);
-        event.setMilestoneTitle(milestoneTitle);
-        event.setRenamedFrom(renamedFrom);
-        event.setRenamedTo(renamedTo);
-        */
 
         String message = "";
         String actorName = event.getActor().getLogin();
         switch (event.getType()) {
         case Renamed:
-            message = String.format("%s renamed the issue.",
-                    actorName);
+            message = String.format("%s renamed issue #%d.",
+                    actorName, issueNum);
             break;
         case Milestoned:
-            message = String.format("%s added the milestone.",
-                    actorName);
+            if (currIssue.getMilestone() != null) {
+            	milestoneTitle = currIssue.getMilestone().getTitle();
+            }
+            message = String.format("%s added issue #%d to %s milestone.",
+                    actorName, issueNum, milestoneTitle);
             break;
         case Demilestoned:
-            message = String.format("%s removed the milestone.",
-                    actorName);
+            if (currIssue.getMilestone() != null) {
+            	milestoneTitle = currIssue.getMilestone().getTitle();
+            }
+            message = String.format("%s removed issue #%d from %s milestone.",
+                    actorName, issueNum, milestoneTitle);
             break;
         case Labeled:
-            message = String.format("%s added the label.",
-                    actorName);
+            message = String.format("%s added label to issue #%d.",
+                    actorName, issueNum);
             break;
         case Unlabeled:
-            message = String.format("%s removed the label.",
-                    actorName);
+            message = String.format("%s removed label from issue #%d.",
+                    actorName, issueNum);
             break;
         case Assigned:
-            message = String.format("%s assigned to the issue.",
-                    actorName);
+        	String assignee = "";
+        	if (currIssue.getAssignee() != null) {
+        		assignee = currIssue.getAssignee().getLogin();
+        	}
+            message = String.format("%s was assigned to issue #%d.",
+            		assignee, issueNum);
             break;
         case Unassigned:
-            message = String.format("%s unassigned from the issue.",
-                    actorName);
+            message = String.format("%s was unassigned from issue #%d.",
+                    actorName, issueNum);
             break;
         case Closed:
-            message = String.format("%s closed the issue.",
-                    actorName);
+            message = String.format("%s closed issue #%d.",
+                    actorName, issueNum);
             break;
         case Reopened:
-            message = String.format("%s reopened the issue.",
-                    actorName);
+            message = String.format("%s reopened issue #%d.",
+                    actorName, issueNum);
             break;
         case Locked:
-            message = String.format("%s locked the issue.",
-                    actorName);
+            message = String.format("%s locked issue #%d.",
+                    actorName, issueNum);
             break;
         case Unlocked:
-            message = String.format("%s unlocked the issue.",
-                    actorName);
+            message = String.format("%s unlocked issue #%d.",
+                    actorName, issueNum);
             break;
         case Subscribed:
         case Merged:
         case HeadRefDeleted:
         case HeadRefRestored:
         case Referenced:
-            message = String.format("%s referenced the issue.",
-                    actorName);
+            message = String.format("%s referenced issue #%d.",
+                    actorName, issueNum);
             break;
         case Mentioned:
         default:
@@ -128,7 +133,8 @@ public class TurboFeed implements Listable {
         if (message.length() == 0) {
         	return "";
         } else {
-    		return pt.format(this.issueEvent.getCreatedAt()) + "\n" + message;
+    		return pt.format(this.issueEvent.getCreatedAt()) + "\n" + message
+    				+ "\n" + this.issueEvent.getEvent();
         }
     }
 
