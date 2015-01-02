@@ -116,10 +116,18 @@ public class IssuePanel extends IssueColumn {
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
 		setOnKeyReleased((e) -> {
-			if (e.getCode().equals(KeyCode.DOWN) || e.getCode().equals(KeyCode.UP)) {
+			switch(e.getCode()) {
+			case DOWN:
+			case UP:
 				handleUpDownNavigation(e.getCode().equals(KeyCode.DOWN), e.isShiftDown());
+				break;
+			case ENTER:
+				ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
+				break;
+			default:
+				// Do nothing
 			}
-		}); 
+		});
 	}
 
 	/**
