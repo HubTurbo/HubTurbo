@@ -38,7 +38,10 @@ import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
 
-	private static final String VERSION_NUMBER = "V0.7.21";
+	private static final int VERSION_MAJOR = 0;
+	private static final int VERSION_MINOR = 7;
+	private static final int VERSION_PATCH = 21;
+	
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
@@ -111,9 +114,10 @@ public class UI extends Application {
 	public static void loadFonts(){
 		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
-
+	
 	private void setupMainStage(Scene scene) {
-		mainStage.setTitle("HubTurbo " + VERSION_NUMBER);
+		
+		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
 		setExpandedWidth(false);
 		mainStage.setScene(scene);
 		mainStage.show();
@@ -140,7 +144,7 @@ public class UI extends Application {
 			}
 		});
 	}
-	
+
 	private void quit() {
 		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();

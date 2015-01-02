@@ -12,6 +12,10 @@ import javax.swing.UIManager;
 
 public class Utility {
 	
+	public static String version(int major, int minor, int patch) {
+		return String.format("V%d.%d.%d", major, minor, patch);
+	}
+	
 	public static String snakeCaseToCamelCase(String str) {
         Pattern p = Pattern.compile("(^|_)([a-z])" );
         Matcher m = p.matcher(str);
