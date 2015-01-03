@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 import javafx.application.Platform;
@@ -24,6 +25,8 @@ public class ScrollingListView<T> extends ListView<T> {
 	private Optional<Integer> selectedIndex = Optional.empty();
 	private Executor executor = Executors.newSingleThreadExecutor();;
 	
+	private IntConsumer onItemSelected = i -> {};
+	
 	public ScrollingListView() {
 		setupKeyEvents();
 		setupMouseEvents();
@@ -32,6 +35,7 @@ public class ScrollingListView<T> extends ListView<T> {
 	private void setupMouseEvents() {
 		setOnMouseClicked(e -> {
 			selectedIndex = Optional.of(getSelectionModel().getSelectedIndex());
+			onItemSelected.accept(selectedIndex.get());
 		});
 	}
 
@@ -42,6 +46,17 @@ public class ScrollingListView<T> extends ListView<T> {
 			case DOWN:
 				e.consume();
 				handleUpDownKeys(e.getCode() == KeyCode.DOWN);
+				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
+				if (!e.isShiftDown()) {
+					onItemSelected.accept(selectedIndex.get());
+				}
+				break;
+			case ENTER:
+				e.consume();
+				if (selectedIndex.isPresent()) {
+					onItemSelected.accept(selectedIndex.get());	
+				}
+				break;
 			default:
 				break;
 			}
@@ -66,6 +81,10 @@ public class ScrollingListView<T> extends ListView<T> {
 		scrollAndShow(newIndex);
 	}
 
+	public void setOnItemSelected(IntConsumer callback) {
+		onItemSelected = callback;
+	}
+	
 	/**
 	 * Scrolls until the item with the given index is visible.
 	 * @param newIndex

@@ -55,7 +55,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		
 		registerDragEvents(issue);
 		
-		registerClickEvents(issue);
+//		registerClickEvents(issue);
 		
 		
 	}
@@ -124,24 +124,24 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	}
 	
 	
-	private void registerClickEvents(TurboIssue issue) {
-		setOnMouseClicked(e -> {
-			if (e.getButton().equals(MouseButton.PRIMARY)) {
-				if (e.getClickCount() == 1) {
-					onSingleClick(issue);
-				} else if (e.getClickCount() == 2) {
-					onDoubleClick(issue);
-				}
-			}
-		});
-	}
-	
-	private void onSingleClick(TurboIssue issue) {
-		ui.triggerEvent(new IssueSelectedEvent(issue.getId(), parentColumnIndex));
-
-	}
-
-	private void onDoubleClick(TurboIssue issue) {
-		ui.triggerEvent(new IssueViewedEvent(issue.getId()));
-	}
+//	private void registerClickEvents(TurboIssue issue) {
+//		setOnMouseClicked(e -> {
+//			if (e.getButton().equals(MouseButton.PRIMARY)) {
+//				if (e.getClickCount() == 1) {
+//					onSingleClick(issue);
+//				} else if (e.getClickCount() == 2) {
+//					onDoubleClick(issue);
+//				}
+//			}
+//		});
+//	}
+//	
+//	private void onSingleClick(TurboIssue issue) {
+//		ui.triggerEvent(new IssueSelectedEvent(issue.getId(), parentColumnIndex));
+//
+//	}
+//
+//	private void onDoubleClick(TurboIssue issue) {
+//		ui.triggerEvent(new IssueViewedEvent(issue.getId()));
+//	}
 }

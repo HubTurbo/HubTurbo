@@ -11,13 +11,13 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import ui.ScrollingListView;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import ui.sidepanel.SidePanel;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
-
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {
@@ -29,7 +29,7 @@ public class IssuePanel extends IssueColumn {
 	private final SidePanel sidePanel;
 	private final UI ui;
 
-	private ListView<TurboIssue> listView;
+	private ScrollingListView<TurboIssue> listView;
 
 	private Optional<Integer> selectedId = Optional.empty();
 	
@@ -41,11 +41,12 @@ public class IssuePanel extends IssueColumn {
 		this.mainStage = mainStage;
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
+		// TODO move this to super
 		this.columnIndex = columnIndex;
 		this.sidePanel = sidePanel;
 		this.ui = ui;
 		
-		listView = new ListView<>();
+		listView = new ScrollingListView<>();
 		setupListView();
 		getChildren().add(listView);
 		
@@ -54,8 +55,7 @@ public class IssuePanel extends IssueColumn {
 			public void handle(IssueSelectedEvent e) {
 				selectedId = Optional.of(e.id);
 				
-				if (parentColumnControl.getCurrentlySelectedColumn().isPresent()
-					&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex) {
+				if (isThisColumnSelected()) {
 
 					Optional<Integer> selectedIndex = getIndexOfIssue(e.id);
 					assert selectedIndex.isPresent()
@@ -63,9 +63,17 @@ public class IssuePanel extends IssueColumn {
 					IssuePanel.this.selectedIndex = selectedIndex.get();
 				}
 			}
+
+			
 		});
 		
 		refreshItems();
+	}
+	
+	// TODO move this to super
+	private boolean isThisColumnSelected() {
+		return parentColumnControl.getCurrentlySelectedColumn().isPresent()
+			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex;
 	}
 	
 	@Override
@@ -115,81 +123,84 @@ public class IssuePanel extends IssueColumn {
 
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
-		setOnKeyReleased((e) -> {
-			switch(e.getCode()) {
-			case DOWN:
-			case UP:
-				handleUpDownNavigation(e.getCode().equals(KeyCode.DOWN), e.isShiftDown());
-				break;
-			case ENTER:
-				ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
-				break;
-			default:
-				// Do nothing
-			}
+		listView.setOnItemSelected(i -> {
+			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
 		});
+//		setOnKeyReleased((e) -> {
+//			switch(e.getCode()) {
+//			case DOWN:
+//			case UP:
+//				handleUpDownNavigation(e.getCode().equals(KeyCode.DOWN), e.isShiftDown());
+//				break;
+//			case ENTER:
+//				ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
+//				break;
+//			default:
+//				// Do nothing
+//			}
+//		});
 	}
 
-	/**
-	 * This method deals with the problem of list view selection 'jumping' to the top of the 
-	 * list when the list refreshes. The reason for this is that the data structure backing
-	 * the list is cleared when the refresh happens and the list cells recreated, so the
-	 * selection model is reset.
-	 * 
-	 * The problem is fixed by maintaining our own 'selection model': the selectedId field.
-	 * It tracks where the selection should be at any point in time. This allows us to set it if
-	 * it ever jumps to the top.
-	 * 
-	 * The rest of it is dealing with edge cases and interpreting what the list view is trying to
-	 * tell us.
-	 */
-	private void handleUpDownNavigation(boolean isDownKey, boolean isShiftPressed) {
-		
-		// This panel is only considered to be selected if there was a previously-selected
-		// id, and if it's the currently-selected column.
-		// Otherwise it is not selected.
-		boolean panelNotSelected = !(selectedId.isPresent()
-			&& selectedIndex != -1
-			&& parentColumnControl.getCurrentlySelectedColumn().isPresent()
-			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex);
-		
-		if (panelNotSelected) {
-			// Do nothing
-			assert listView.getSelectionModel().getSelectedItem() == null
-				: "There can't be a selected item if there is no previous selectedId";
-			return;
-		}
-		
-		// In the event that the selected issue has disappeared, stay at the index it was at
-		Optional<Integer> indexOfSelected = getIndexOfIssue(selectedId.get());
-		if (!indexOfSelected.isPresent()) {
-			indexOfSelected = Optional.of(selectedIndex);
-		}
-		
-		// Compute the next index based on the direction key, then clamp it to the size of the list
-		int correctIndex = indexOfSelected.get() + (isDownKey ? 1 : -1);
-		correctIndex = Math.max(0, Math.min(getIssueList().size()-1, correctIndex));
-		
-		// Model index is inconsistent with correct index => selection has jumped to the top.
-		// Select the correct item.
-		int modelIndex = listView.getSelectionModel().getSelectedIndex();
-		if (modelIndex != correctIndex) {
-			listView.getSelectionModel().clearAndSelect(correctIndex);
-		}
-		
-		// If jump happened, the selected item may be null
-		if (listView.getSelectionModel().getSelectedItem() != null) {
-			// If it's not, the selection model can be trusted, so we use that to update
-			// the selected id
-			selectedId = Optional.of(listView.getSelectionModel().getSelectedItem().getId());
-			selectedIndex = listView.getSelectionModel().getSelectedIndex();
-		} else {
-			// If it's null, we keep the previous selected id and do nothing
-		}
-		
-		// Trigger selection event for the right issue
-		if (!isShiftPressed) {
-			ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
-		}
-	}
+//	/**
+//	 * This method deals with the problem of list view selection 'jumping' to the top of the 
+//	 * list when the list refreshes. The reason for this is that the data structure backing
+//	 * the list is cleared when the refresh happens and the list cells recreated, so the
+//	 * selection model is reset.
+//	 * 
+//	 * The problem is fixed by maintaining our own 'selection model': the selectedId field.
+//	 * It tracks where the selection should be at any point in time. This allows us to set it if
+//	 * it ever jumps to the top.
+//	 * 
+//	 * The rest of it is dealing with edge cases and interpreting what the list view is trying to
+//	 * tell us.
+//	 */
+//	private void handleUpDownNavigation(boolean isDownKey, boolean isShiftPressed) {
+//		
+//		// This panel is only considered to be selected if there was a previously-selected
+//		// id, and if it's the currently-selected column.
+//		// Otherwise it is not selected.
+//		boolean panelNotSelected = !(selectedId.isPresent()
+//			&& selectedIndex != -1
+//			&& parentColumnControl.getCurrentlySelectedColumn().isPresent()
+//			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex);
+//		
+//		if (panelNotSelected) {
+//			// Do nothing
+//			assert listView.getSelectionModel().getSelectedItem() == null
+//				: "There can't be a selected item if there is no previous selectedId";
+//			return;
+//		}
+//		
+//		// In the event that the selected issue has disappeared, stay at the index it was at
+//		Optional<Integer> indexOfSelected = getIndexOfIssue(selectedId.get());
+//		if (!indexOfSelected.isPresent()) {
+//			indexOfSelected = Optional.of(selectedIndex);
+//		}
+//		
+//		// Compute the next index based on the direction key, then clamp it to the size of the list
+//		int correctIndex = indexOfSelected.get() + (isDownKey ? 1 : -1);
+//		correctIndex = Math.max(0, Math.min(getIssueList().size()-1, correctIndex));
+//		
+//		// Model index is inconsistent with correct index => selection has jumped to the top.
+//		// Select the correct item.
+//		int modelIndex = listView.getSelectionModel().getSelectedIndex();
+//		if (modelIndex != correctIndex) {
+//			listView.getSelectionModel().clearAndSelect(correctIndex);
+//		}
+//		
+//		// If jump happened, the selected item may be null
+//		if (listView.getSelectionModel().getSelectedItem() != null) {
+//			// If it's not, the selection model can be trusted, so we use that to update
+//			// the selected id
+//			selectedId = Optional.of(listView.getSelectionModel().getSelectedItem().getId());
+//			selectedIndex = listView.getSelectionModel().getSelectedIndex();
+//		} else {
+//			// If it's null, we keep the previous selected id and do nothing
+//		}
+//		
+//		// Trigger selection event for the right issue
+//		if (!isShiftPressed) {
+//			ui.triggerEvent(new IssueSelectedEvent(selectedId.get(), columnIndex));
+//		}
+//	}
 }
