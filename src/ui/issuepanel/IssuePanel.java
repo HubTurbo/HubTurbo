@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
-import ui.ScrollingListView;
+import ui.NavigableListView;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
@@ -23,14 +23,14 @@ public class IssuePanel extends IssueColumn {
 	private final Model model;
 	private final UI ui;
 
-	private ScrollingListView<TurboIssue> listView;
+	private NavigableListView<TurboIssue> listView;
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
 		this.model = model;
 		this.ui = ui;
 		
-		listView = new ScrollingListView<>();
+		listView = new NavigableListView<>();
 		setupListView();
 		getChildren().add(listView);
 		

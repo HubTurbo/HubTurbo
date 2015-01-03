@@ -1,90 +1,47 @@
 package ui;
 
-import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BooleanSupplier;
-import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
-import javafx.scene.input.KeyCode;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 
-public class ScrollingListView<T> extends ListView<T> {
+/**
+ * A ListView subclass that can be programmatically scrolled.
+ * 
+ * It builds on the functionality of the vanilla ListView by adding
+ * methods for scrolling in different ways and can be easily extended
+ * to support other kinds of scrolling.
+ */
+public class ScrollableListView<T> extends ListView<T> {
 
-	public static final int Y_OFFSET = 10;
-	public static final int SCROLL_THREAD_SLEEP_INTERVAL = 15;
+	// The distance in pixels that will be scrolled per interval.
+	// This is a reasonable default for the general case. Can be increased
+	// if the speed of scrolling is to be increased, but must not exceed the
+	// height of the ListView item, or it may scroll right past the target
+	// item and become unable to terminate.
+	private static final int Y_OFFSET = 10;
 	
-	public static final int DIRECTION_NONE = 0;
-	public static final int DIRECTION_UP = -1;
-	public static final int DIRECTION_DOWN = 1;
+	// The interval for scrolling in ms. Subject to system-specific granularity
+	// so it should not be too low.
+	private static final int SCROLL_THREAD_SLEEP_INTERVAL = 15;
 	
-	private Optional<Integer> selectedIndex = Optional.empty();
-	private Executor executor = Executors.newSingleThreadExecutor();;
+	// Constants to indicate which direction to scroll. NONE is not meant to be
+	// used and serves as a no-op in the event that it is actually used.
+	private static final int DIRECTION_NONE = 0;
+	private static final int DIRECTION_UP = -1;
+	private static final int DIRECTION_DOWN = 1;
 	
-	private IntConsumer onItemSelected = i -> {};
+	// Scroll events are queued, and only one will be active at a time.
+	private Executor executor = Executors.newSingleThreadExecutor();
 	
-	public ScrollingListView() {
-		setupKeyEvents();
-		setupMouseEvents();
-	}
-
-	private void setupMouseEvents() {
-		setOnMouseClicked(e -> {
-			selectedIndex = Optional.of(getSelectionModel().getSelectedIndex());
-			onItemSelected.accept(selectedIndex.get());
-		});
-	}
-
-	private void setupKeyEvents() {
-		setOnKeyPressed(e -> {
-			switch (e.getCode()) {
-			case UP:
-			case DOWN:
-				e.consume();
-				handleUpDownKeys(e.getCode() == KeyCode.DOWN);
-				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
-				if (!e.isShiftDown()) {
-					onItemSelected.accept(selectedIndex.get());
-				}
-				break;
-			case ENTER:
-				e.consume();
-				if (selectedIndex.isPresent()) {
-					onItemSelected.accept(selectedIndex.get());	
-				}
-				break;
-			default:
-				break;
-			}
-		});
-	}
-	
-	private void handleUpDownKeys(boolean isDownKey) {
-		
-		// Nothing is selected or the list is empty; do nothing
-		if (!selectedIndex.isPresent()) return;
-		if (getItems().size() == 0) return;
-		
-		// Compute new index and clamp it within range
-		int newIndex = selectedIndex.get() + (isDownKey ? 1 : -1);
-		newIndex = Math.min(Math.max(0, newIndex), getItems().size()-1);
-		
-		// Update selection state and our selection model
-		getSelectionModel().clearAndSelect(newIndex);
-		selectedIndex = Optional.of(newIndex);
-		
-		// Ensure that the newly-selected item is in view
-		scrollAndShow(newIndex);
+	public ScrollableListView() {
 	}
 
-	public void setOnItemSelected(IntConsumer callback) {
-		onItemSelected = callback;
-	}
-	
 	/**
 	 * Scrolls until the item with the given index is visible.
 	 * @param newIndex
@@ -119,7 +76,7 @@ public class ScrollingListView<T> extends ListView<T> {
 					|| flow.getLastVisibleCellWithinViewPort() == null) {
 				// These are null for an unknown reason; no direction to indicate
 				// here. The condition predicate should stop this in any case.
-				return DIRECTION_NONE; // whatever
+				return DIRECTION_NONE;
 			}
 			
 			int firstIndex = flow.getFirstVisibleCellWithinViewPort().getIndex();
@@ -143,7 +100,7 @@ public class ScrollingListView<T> extends ListView<T> {
 		return (VirtualFlow<?>) lookup("VirtualFlow");
 	}
 
-	class ScrollThread extends Thread {
+	private class ScrollThread extends Thread {
 		
 		private BooleanSupplier continueRunning;
 		private IntSupplier direction;
@@ -166,14 +123,12 @@ public class ScrollingListView<T> extends ListView<T> {
 
 			while (continueRunning.getAsBoolean()) {
 
-				Platform.runLater(() -> {
-					scrollY();
-				});
+				Platform.runLater(() -> scrollY());
 
 				try {
 					sleep(SCROLL_THREAD_SLEEP_INTERVAL);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					// Do nothing
 				}
 			}
 		}
