@@ -384,23 +384,36 @@ public class Model {
 	        @Override
 	        public void run() {
 	        	list.removeAll(removed);
-	        	newList.stream()
-	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
+	        	
+	        	ArrayList<Object> buffer = new ArrayList<>();
+	        	for (Object item : newList) {
+					int index = list.indexOf(item);
+					if(index != -1){
+						Listable old = (Listable)list.get(index);
+						old.copyValues(item);
+					}else{
+						buffer.add(item);
+					}
+	        	}
+	        	list.addAll(buffer);
+	        	
+//	        	newList.stream()
+//	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
 	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 	        }
 	   });
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") List list){
-		int index = list.indexOf(updated);
-		if(index != -1){
-			Listable old = (Listable)list.get(index);
-			old.copyValues(updated);
-		}else{
-			list.add(updated);
-		}
-	}
+//	@SuppressWarnings("unchecked")
+//	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") List list){
+//		int index = list.indexOf(updated);
+//		if(index != -1){
+//			Listable old = (Listable)list.get(index);
+//			old.copyValues(updated);
+//		}else{
+//			list.add(updated);
+//		}
+//	}
 	
 	public void loadFeeds(List<IssueEvent> ghFeeds) {	
 		Platform.runLater(()->{
