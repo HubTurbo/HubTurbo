@@ -257,7 +257,8 @@ public class ServiceManager {
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
-
+			// Delay getting of issues until labels and milestones are loaded in Model
+			
 			List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
 			try {
 				ghFeeds = getFeeds();
@@ -267,8 +268,6 @@ public class ServiceManager {
 				// this case is being handled in model's load components
 			}
 
-			// Delay getting of issues until labels and milestones are loaded in Model
-			
 			HashMap<String, List> map = new HashMap<String, List>();
 			map.put(KEY_FEEDS, ghFeeds);
 			map.put(KEY_COLLABORATORS, collaborators);

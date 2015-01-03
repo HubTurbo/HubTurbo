@@ -74,7 +74,11 @@ public class TurboRepoData {
 	}
 	
 	public List<TurboUser> getCollaborators() {
-		return collaborators;
+		if (this.collaborators == null) {
+			return new ArrayList<TurboUser>();
+		} else {
+			return this.collaborators;
+		}
 	}
 	
 	public List<TurboLabel> getLabels() {
