@@ -48,10 +48,10 @@ public abstract class IssueColumn extends Column {
 	// Collection-related
 
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
 
 	// Filter-related
 
+	private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
 	public static final FilterExpression EMPTY = filter.expression.Qualifier.EMPTY;
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;

@@ -20,23 +20,14 @@ import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {
 
-	private final Stage mainStage;
 	private final Model model;
-	private final ColumnControl parentColumnControl;
-	private final int columnIndex;
-	private final SidePanel sidePanel;
 	private final UI ui;
 
 	private ScrollingListView<TurboIssue> listView;
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
-		this.mainStage = mainStage;
 		this.model = model;
-		this.parentColumnControl = parentColumnControl;
-		// TODO move this to super
-		this.columnIndex = columnIndex;
-		this.sidePanel = sidePanel;
 		this.ui = ui;
 		
 		listView = new ScrollingListView<>();
@@ -44,12 +35,6 @@ public class IssuePanel extends IssueColumn {
 		getChildren().add(listView);
 		
 		refreshItems();
-	}
-	
-	// TODO move this to super
-	private boolean isThisColumnSelected() {
-		return parentColumnControl.getCurrentlySelectedColumn().isPresent()
-			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex;
 	}
 	
 	@Override
@@ -67,7 +52,7 @@ public class IssuePanel extends IssueColumn {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(ui, mainStage, model, that.get(), columnIndex, sidePanel, parentColumnControl);
+					return new IssuePanelCell(ui, model, that.get(), columnIndex);
 				} else{
 					return null;
 				}

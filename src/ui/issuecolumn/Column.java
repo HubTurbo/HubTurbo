@@ -81,6 +81,11 @@ public abstract class Column extends VBox {
 		});
 	}
 	
+	public boolean isThisColumnSelected() {
+		return parentColumnControl.getCurrentlySelectedColumn().isPresent()
+			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex;
+	}
+
 	/**
 	 * To be called by ColumnControl in order to have indices updated.
 	 * Should not be called externally.
