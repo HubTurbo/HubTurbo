@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import model.Model;
@@ -15,8 +14,6 @@ import ui.DragData;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.sidepanel.SidePanel;
-import util.events.IssueSelectedEvent;
-import util.events.IssueViewedEvent;
 
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
@@ -54,10 +51,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 //		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
 		registerDragEvents(issue);
-		
-//		registerClickEvents(issue);
-		
-		
 	}
 
 	private void registerDragEvents(TurboIssue issue) {
@@ -122,26 +115,4 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			e.consume();
 		});
 	}
-	
-	
-//	private void registerClickEvents(TurboIssue issue) {
-//		setOnMouseClicked(e -> {
-//			if (e.getButton().equals(MouseButton.PRIMARY)) {
-//				if (e.getClickCount() == 1) {
-//					onSingleClick(issue);
-//				} else if (e.getClickCount() == 2) {
-//					onDoubleClick(issue);
-//				}
-//			}
-//		});
-//	}
-//	
-//	private void onSingleClick(TurboIssue issue) {
-//		ui.triggerEvent(new IssueSelectedEvent(issue.getId(), parentColumnIndex));
-//
-//	}
-//
-//	private void onDoubleClick(TurboIssue issue) {
-//		ui.triggerEvent(new IssueViewedEvent(issue.getId()));
-//	}
 }
