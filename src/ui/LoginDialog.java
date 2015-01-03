@@ -15,16 +15,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.NotificationPane;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import service.ServiceManager;
@@ -39,10 +39,8 @@ public class LoginDialog extends Dialog<Boolean> {
 	private TextField repoNameField;
 	private TextField usernameField;
 	private PasswordField passwordField;
-	private NotificationPane notificationPane;
 	private ColumnControl columns;
 	private Button loginButton;
-	private Label statusLabel;
 
 	public LoginDialog(Stage parentStage, ColumnControl columns) {
 		super(parentStage);
@@ -58,27 +56,46 @@ public class LoginDialog extends Dialog<Boolean> {
 	protected Parent content() {
 
 		setTitle("GitHub Login");
-		setSize(320, 200);
+		setSize(440, 200);
 		setStageStyle(StageStyle.UTILITY);
-		
-		notificationPane = new NotificationPane();
 		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
+		grid.setHgap(7);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(25, 25, 25, 25));
+		grid.setPadding(new Insets(25));
 
+		ColumnConstraints column = new ColumnConstraints();
+	    column.setPercentWidth(20);
+	    grid.getColumnConstraints().add(column);
+	    
+	    column = new ColumnConstraints();
+	    column.setPercentWidth(30);
+	    grid.getColumnConstraints().add(column);
+
+	    column = new ColumnConstraints();
+	    column.setPercentWidth(2);
+	    grid.getColumnConstraints().add(column);
+
+	    column = new ColumnConstraints();
+	    column.setPercentWidth(48);
+	    grid.getColumnConstraints().add(column);
+
+	    grid.setPrefSize(390, 100);
+	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+	    
 		Label repoNameLabel = new Label("Repository:");
 		grid.add(repoNameLabel, 0, 0);
 
-		repoOwnerField = new TextField("Owner");
+		repoOwnerField = new TextField("<owner>");
+		repoOwnerField.setPrefWidth(140);
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
-		repoNameField = new TextField("RepoName");
+		repoNameField = new TextField("<repository>");
+		repoNameField.setPrefWidth(250);
 		grid.add(repoNameField, 3, 0);
 
 		Label usernameLabel = new Label("Username:");
@@ -93,16 +110,6 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 3, 1);
 
-		statusLabel = new Label();
-		HBox.setHgrow(statusLabel, Priority.ALWAYS);
-		grid.add(statusLabel, 0, 3);
-		
-		repoOwnerField.setMaxWidth(80);
-		repoNameField.setMaxWidth(80);
-
-		loginButton = new Button("Sign in");
-		loginButton.setOnAction(this::login);
-
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
 		usernameField.setOnAction(this::login);
@@ -110,12 +117,12 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		HBox buttons = new HBox(10);
 		buttons.setAlignment(Pos.BOTTOM_RIGHT);
+		loginButton = new Button("Sign in");
+		loginButton.setOnAction(this::login);
 		buttons.getChildren().add(loginButton);
 		grid.add(buttons, 3, 3);
 		
-		notificationPane.setContent(grid);
-		
-		return notificationPane;
+		return grid;
 	}
 	
 	private void login(Event e) {
