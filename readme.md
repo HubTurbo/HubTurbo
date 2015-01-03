@@ -1,16 +1,8 @@
 # HubTurbo
 
-## Getting Started
+Check out the [user guide](https://github.com/HubTurbo/HubTurbo/wiki/Getting-Started) here.
 
-**Development environment**
-
-- JDK 1.8u20 or later
-- Eclipse Kepler (with [Java 8 support package](http://eclipse.org/downloads/java8/)) or later
-- Google Chrome
-
-Please see the [wiki](https://github.com/hubturbo/hubturbo/wiki) for more information.
-
-Developer documentation is not publicly available yet.
+Developer documentation is currently internal.
 
 ## License
 
