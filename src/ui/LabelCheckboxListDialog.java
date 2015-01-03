@@ -23,6 +23,8 @@ import model.TurboLabel;
 
 import org.controlsfx.control.textfield.TextFields;
 
+import ui.components.BetterCheckListView;
+import ui.components.Dialog;
 import ui.labelmanagement.LabelManagementComponent;
 
 public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {

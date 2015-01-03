@@ -31,7 +31,7 @@ import org.eclipse.egit.github.core.IssueEvent;
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
 import storage.DataManager;
-import ui.StatusBar;
+import ui.components.StatusBar;
 import util.CollectionUtilities;
 import util.DialogMessage;
 

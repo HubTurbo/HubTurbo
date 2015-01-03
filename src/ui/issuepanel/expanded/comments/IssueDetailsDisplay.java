@@ -11,7 +11,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import model.TurboIssue;
-import ui.StatusBar;
+import ui.components.StatusBar;
 
 public class IssueDetailsDisplay extends VBox {
 

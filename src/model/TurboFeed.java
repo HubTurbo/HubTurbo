@@ -14,7 +14,7 @@ import org.eclipse.egit.github.core.User;
 
 import service.IssueEventType;
 import service.TurboIssueEvent;
-import ui.FilterTextField;
+import ui.components.FilterTextField;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 

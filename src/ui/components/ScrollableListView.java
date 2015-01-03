@@ -1,4 +1,4 @@
-package ui;
+package ui.components;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;

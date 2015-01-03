@@ -12,14 +12,13 @@ import model.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ui.StatusBar;
 import ui.UI;
+import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.comments.IssueDetailsDisplay;
 import ui.sidepanel.SidePanel;
 import ui.sidepanel.SidePanel.IssueEditMode;
 import util.DialogMessage;
-
 import command.TurboIssueAdd;
 import command.TurboIssueCommand;
 import command.TurboIssueEdit;

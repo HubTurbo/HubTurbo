@@ -2,7 +2,7 @@ package ui.issuepanel.expanded.comments;
 
 import java.lang.ref.WeakReference;
 
-import ui.StatusBar;
+import ui.components.StatusBar;
 import util.DialogMessage;
 import model.TurboComment;
 import handler.IssueDetailsContentHandler;

@@ -9,13 +9,12 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
-import ui.NavigableListView;
 import ui.UI;
+import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import ui.sidepanel.SidePanel;
 import util.events.IssueSelectedEvent;
-
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {

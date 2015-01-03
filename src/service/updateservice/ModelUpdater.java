@@ -12,8 +12,8 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
-import ui.StatusBar;
 import ui.UIReference;
+import ui.components.StatusBar;
 import util.events.RefreshDoneEvent;
 import model.Model;
 

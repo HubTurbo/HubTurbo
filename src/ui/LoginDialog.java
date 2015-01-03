@@ -29,6 +29,8 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 import service.ServiceManager;
 import storage.DataManager;
+import ui.components.Dialog;
+import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 

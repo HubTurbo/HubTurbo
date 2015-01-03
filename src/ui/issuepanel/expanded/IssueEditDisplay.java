@@ -40,14 +40,14 @@ import model.TurboUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ui.CheckboxListDialog;
 import ui.EditableMarkupPopup;
 import ui.LabelCheckboxListDialog;
 import ui.LabelDisplayBox;
 import ui.ListableDisplayBox;
 import ui.ParentIssuesDisplayBox;
-import ui.TraversableTextArea;
 import ui.UI;
+import ui.components.CheckboxListDialog;
+import ui.components.TraversableTextArea;
 import util.Browse;
 
 public class IssueEditDisplay extends VBox{

@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
 import storage.DataManager;
+import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.BrowserComponent;
 import ui.sidepanel.SidePanel;

@@ -12,8 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import storage.DataManager;
-import ui.StatusBar;
 import ui.UI;
+import ui.components.StatusBar;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import ui.sidepanel.SidePanel;
@@ -22,9 +22,7 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
-
 import command.TurboCommandExecutor;
-
 import filter.expression.FilterExpression;
 
 

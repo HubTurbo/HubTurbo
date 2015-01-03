@@ -44,7 +44,7 @@ import org.markdown4j.Markdown4jProcessor;
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import stubs.ServiceManagerStub;
-import ui.StatusBar;
+import ui.components.StatusBar;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 

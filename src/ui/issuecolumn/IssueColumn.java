@@ -20,14 +20,12 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 import ui.DragData;
-import ui.FilterTextField;
-import ui.StatusBar;
 import ui.UI;
+import ui.components.FilterTextField;
+import ui.components.StatusBar;
 import ui.sidepanel.SidePanel;
-
 import command.CommandType;
 import command.TurboCommandExecutor;
-
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;

@@ -2,7 +2,7 @@ package ui.labelmanagement;
 
 import java.util.concurrent.CompletableFuture;
 
-import ui.Dialog;
+import ui.components.Dialog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
