@@ -25,11 +25,7 @@ public class IssueChangeLogger {
 	protected static final String ASSIGNEE_CHANGE_LOG = "*Assignee changed:* %1s ~> **%2s**\n";
 	protected static final String UNGROUPED_LABELS_TAG = "Ungrouped";
 	protected static final String ADDITIONAL_COMMENTS_FORMAT = "\n [Remarks] %1s \n";
-	
-	private static void logChangesInGithub(TurboIssue issue, String changeLog){
-		ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog);
-	}
-	
+		
 	public static String logLabelsChange(Model model, TurboIssue issue, List<TurboLabel> original, List<TurboLabel> edited){
 		String changeLog = getLabelsChangeLog(model, original, edited);
 //		logChangesInGithub(issue, changeLog);
@@ -124,9 +120,7 @@ public class IssueChangeLogger {
 	}
 	
 	public static String logDescriptionChange(TurboIssue issue, String original, String edited){
-		String changeLog = IssueChangeLogger.getDescriptionChangeLog(original, edited);
-		logChangesInGithub(issue, changeLog);
-		return changeLog;
+		return IssueChangeLogger.getDescriptionChangeLog(original, edited);
 	}
 	
 	public static String getDescriptionChangeLog(String original, String edited){
@@ -134,9 +128,7 @@ public class IssueChangeLogger {
 	}
 	
 	public static String logMilestoneChange(TurboIssue issue, TurboMilestone original, TurboMilestone edited){
-		String changeLog = IssueChangeLogger.getMilestoneChangeLog(original, edited);
-		logChangesInGithub(issue, changeLog);
-		return changeLog;
+		return IssueChangeLogger.getMilestoneChangeLog(original, edited);
 	}
 	
 	public static String getMilestoneChangeLog(TurboMilestone original, TurboMilestone edited){
@@ -170,9 +162,7 @@ public class IssueChangeLogger {
 	}
 	
 	public static String logParentChange(TurboIssue issue, Integer original, Integer edited){
-		String changeLog = getParentChangeLog(original, edited);
-		logChangesInGithub(issue, changeLog);
-		return changeLog;
+		return getParentChangeLog(original, edited);
 	}
 	
 	public static String getParentChangeLog(Integer original, Integer edited){

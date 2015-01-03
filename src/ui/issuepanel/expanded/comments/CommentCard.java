@@ -112,7 +112,7 @@ public class CommentCard extends IssueDetailsCard{
 	@Override
 	protected void loadTopBar(){
 		//show comment editing options only when the comment is not a change log
-		if(originalComment != null && !originalComment.isIssueLog()){
+		if(originalComment != null){
 			HBox commentsDetailsDisp = createCommentsDetailsDisplay();
 			HBox controlsBox = createControlsBox();
 			HBox.setHgrow(controlsBox, Priority.ALWAYS);

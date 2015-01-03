@@ -161,7 +161,6 @@ public class IssueDetailsContentHandler {
 	private void updateLogContents(){
 		List<TurboComment> logItems = ghCommentsAndLogs.stream()
 										   .map(item -> new TurboComment(item))
-				   						   .filter(item -> item.isIssueLog())
 				   						   .collect(Collectors.toList());
 		
 		setObservedLog(logItems);

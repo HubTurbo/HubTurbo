@@ -112,14 +112,7 @@ public class ServiceManagerStub extends ServiceManager{
 		comment2.setUser(anotherUser);
 		comment2.setCreatedAt(new Date());
 		
-		Comment log1 = new Comment();
-		log1.setBody(ServiceManager.CHANGELOG_TAG+ "log");
-		log1.setId(2);
-		log1.setUser(testUser);
-		log1.setCreatedAt(new Date());
-		
 		comments.add(comment1);
-		comments.add(log1);
 		comments.add(comment2);
 		
 		return comments;

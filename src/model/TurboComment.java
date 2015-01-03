@@ -42,14 +42,6 @@ public class TurboComment implements CommentListItem {
 		copyValues(comment);
 	}
 	
-	public boolean isIssueLog(){
-		String text = getBodyText();
-		if(text == null){
-			text = getBody();
-		}
-		return text.startsWith(ServiceManager.CHANGELOG_TAG);
-	}
-	
 	public void setCreatedAt(Date date){
 		createdAt = date;
 	}

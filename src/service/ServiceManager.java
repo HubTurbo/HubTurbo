@@ -63,7 +63,6 @@ public class ServiceManager {
 	
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
-	public static final String CHANGELOG_TAG = "[Change Log]";
 	
 	public static final String KEY_ISSUES = "issues";
 	public static final String KEY_MILESTONES = "milestones";
@@ -500,16 +499,7 @@ public class ServiceManager {
 	/**
 	 * Methods to work with comments data from github
 	 * */
-	
-	public void logIssueChanges(int issueId, String changes){
-		String changeLog = CHANGELOG_TAG + "\n" + changes;
-		try {
-			createComment(issueId, changeLog);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
+		
 	public CommentUpdateService getCommentUpdateService(int id, List<Comment> list){
 		return new CommentUpdateService(githubClient, id, list);
 	}

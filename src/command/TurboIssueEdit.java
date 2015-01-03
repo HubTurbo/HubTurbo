@@ -6,21 +6,20 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.RequestException;
-
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import service.ServiceManager;
-import util.CollectionUtilities;
-import util.DialogMessage;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.RequestException;
+
+import service.ServiceManager;
+import util.CollectionUtilities;
+import util.DialogMessage;
 
 public class TurboIssueEdit extends TurboIssueCommand{
 	protected static final String TITLE_FIELD = "title";
@@ -31,7 +30,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	protected static final String PARENT_FIELD = "parent";
 	
 	private TurboIssue editedIssue;
-	private HashMap<String, String> changeLogs = new HashMap<>();
 	
 	public TurboIssueEdit(Model model, TurboIssue originalIssue, TurboIssue editedIssue){
 		super(model, originalIssue);
@@ -52,72 +50,9 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	public boolean performUndoAction() {
 		return true;
 	}
-	
-	private void checkTitleChange(Issue sent, Issue result){
-		if(!result.getTitle().equals(sent.getTitle())){
-			changeLogs.put(TITLE_FIELD, "");
-		}
-	}
-	
-	private void checkLabelsChange(Issue sent, Issue result){
-		if(!result.getLabels().containsAll(sent.getLabels())){
-			changeLogs.put(LABEL_FIELD, "");
-		}
-	}
-	
-	private void checkAssigneeChange(Issue sent, Issue result){
-		User assignee = result.getAssignee();
-		User intended = sent.getAssignee();
-		boolean assigneeChanged;
-		if(assignee == null){
-			assigneeChanged = ((intended == null) || (intended.getLogin().isEmpty()));
-		}else{
-			assigneeChanged = assignee.getLogin().equals(intended.getLogin());
-		}
-		if(!assigneeChanged){
-			changeLogs.put(ASSIGNEE_FIELD, "");
-		}
-	}
-	
-	private void checkMilestoneChange(Issue sent, Issue result){
-		Milestone milestone = result.getMilestone();
-		Milestone intendedMs = sent.getMilestone();
-		boolean milestoneChanged;
-		if(milestone == null){
-			milestoneChanged = ((intendedMs == null) || (intendedMs.getNumber() == -1));
-		}else{
-			milestoneChanged = intendedMs.getNumber() == milestone.getNumber();
-		}
-		if(!milestoneChanged){
-			changeLogs.put(MILESTONE_FIELD, "");
-		}
-	}
-	
-	private void checkDescriptionChange(Issue sent, Issue result){
-		String body = result.getBody();
-		String iBody = sent.getBody();
-		if(!TurboIssue.extractDescription(body).equals(TurboIssue.extractDescription(iBody))){
-			changeLogs.put(DESCRIPTION_FIELD, "");
-		}
-	}
-	
-	private void checkParentChange(Issue sent, Issue result){
-		String body = result.getBody();
-		String iBody = sent.getBody();
-		if(TurboIssue.extractIssueParent(body) != TurboIssue.extractIssueParent(iBody)){
-			changeLogs.put(PARENT_FIELD, "");
-		}
-	}
-	
-	private void updateIssueInGithub(Issue sent, String dateModified) throws IOException{
-		Issue result = ServiceManager.getInstance().editIssue(sent, dateModified);
 		
-		checkTitleChange(sent, result);
-		checkLabelsChange(sent, result);
-		checkAssigneeChange(sent, result);
-		checkMilestoneChange(sent, result);
-		checkDescriptionChange(sent, result);
-		checkParentChange(sent, result);
+	private void updateIssueInGithub(Issue sent, String dateModified) throws IOException{
+		ServiceManager.getInstance().editIssue(sent, dateModified);
 	}
 	
 	private boolean updateIssue(TurboIssue originalIssue, TurboIssue editedIssue){
@@ -132,9 +67,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 			boolean descUpdated = mergeIssues(originalIssue, editedIssue, latestIssue);
 			Issue latest = latestIssue.toGhResource();
 			updateIssueInGithub(latest, dateModified);
-			
-			logChanges();
-			
+						
 			if(!descUpdated){
 				DialogMessage.showWarningDialog("Issue description not updated", "The issue description has been concurrently modified. "
 						+ "Please reload and enter your descripton again.");
@@ -160,18 +93,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				logger.error(e.getLocalizedMessage(), e);
 			}
 			return false;
-		}
-	}
-	
-	private void logChanges(){
-		StringBuilder changeLog = new StringBuilder();
-		for(String log : changeLogs.values()){
-			changeLog.append(log);
-		}
-		
-		if(changeLog.length() > 0){
-			lastOperationExecuted = changeLog.toString();
-			ServiceManager.getInstance().logIssueChanges(issue.getId(), changeLog.toString());
 		}
 	}
 	
@@ -223,7 +144,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				originalMilestone = new TurboMilestone();
 			}
 			latest.setMilestone(editedMilestone);
-			changeLogs.put(MILESTONE_FIELD, IssueChangeLogger.getMilestoneChangeLog(originalMilestone, editedMilestone));
 		}
 	}
 	
@@ -247,7 +167,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		} 
 		if (!originalAssignee.equals(editedAssignee)) {
 			latest.setAssignee(editedAssignee);
-//			changeLogs.put(ASSIGNEE_FIELD, IssueChangeLogger.getAssigneeChangeLog(originalAssignee, editedAssignee));
 		}
 	}
 
@@ -264,7 +183,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 				return false;
 			}
 			latest.setDescription(editedDesc);
-			changeLogs.put(DESCRIPTION_FIELD, IssueChangeLogger.getDescriptionChangeLog(originalDesc, editedDesc));
 		}
 		return true;
 	}
@@ -276,7 +194,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		if(originalParent != editedParent){
 			latest.setParentIssue(editedParent);
 			processInheritedLabels(originalParent, editedParent, edited);
-			changeLogs.put(PARENT_FIELD, IssueChangeLogger.getParentChangeLog(originalParent, editedParent));
 		}
 	}
 
@@ -285,7 +202,6 @@ public class TurboIssueEdit extends TurboIssueCommand{
 		String editedTitle = edited.getTitle();
 		if (!editedTitle.equals(originalTitle)) {
 			latest.setTitle(editedTitle);
-//			changeLogs.put(TITLE_FIELD, IssueChangeLogger.getTitleChangeLog(originalTitle, editedTitle));
 		}
 	}
 }

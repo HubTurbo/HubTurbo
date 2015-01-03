@@ -148,7 +148,7 @@ public class IssueDetailsCard extends VBox{
 	
 	private void setDisplayedCommentText(){
 		String text = originalComment.getBodyHtml();
-		String displayedText = DEFAULT_CSS + String.format(HTML_CONTENT_WRAPPER, stripChangeLogHeader(text));
+		String displayedText = DEFAULT_CSS + String.format(HTML_CONTENT_WRAPPER, text);
 		commentsBody.getEngine().loadContent(displayedText);	
 	}
 	
@@ -172,14 +172,5 @@ public class IssueDetailsCard extends VBox{
 		}catch(Exception e){
 		}
 		return;
-	}
-	
-	
-	private String stripChangeLogHeader(String text){
-		if(text == null || !originalComment.isIssueLog()){
-			return text;
-		}
-		String regex = Pattern.quote(ServiceManager.CHANGELOG_TAG);
-		return text.replaceFirst(regex, "").trim();
 	}
 }
