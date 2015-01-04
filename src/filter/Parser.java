@@ -20,7 +20,7 @@ public class Parser {
 
 	public static void main(String[] args) {
 		String input = "\"a b\"";
-		input = "assignee:darius";
+		input = "state:open -milestone: label:priority.high";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);
@@ -190,14 +190,20 @@ public class Parser {
 			consume(TokenType.QUOTE);
 			return result;
 		}
-		else {
+		else if (isKeywordToken(lookAhead())) {
 			// Keyword(s)
 			if (allowMultipleKeywords) {
 				return parseKeywords(qualifierName);
 			} else {
 				return new Qualifier(qualifierName, consume().getValue());
 			}
+		} else {
+			throw new ParseException(String.format("Invalid content for qualifier %s: %s", qualifierName, lookAhead()));
 		}
+	}
+
+	private boolean isKeywordToken(Token token) {
+		return token.getType() == TokenType.SYMBOL;
 	}
 
 	private boolean isQuoteToken(Token token) {
