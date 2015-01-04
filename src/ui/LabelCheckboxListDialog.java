@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -71,16 +72,16 @@ public class LabelCheckboxListDialog extends Dialog<List<TurboLabel>> {
 	}
 	
 	private boolean checkLabelWithGhName(String name){
-		String[] tokens = TurboLabel.parseName(name);
+		Optional<String[]> tokens = TurboLabel.parseName(name);
 		BetterCheckListView checklist;
 		String labelName;
 		String groupName;
-		if(tokens == null){
+		if(!tokens.isPresent()){
 			groupName = LabelManagementComponent.UNGROUPED_NAME;
 			labelName = name;
 		}else{
-			groupName = tokens[0];
-			labelName = tokens[1];
+			groupName = tokens.get()[0];
+			labelName = tokens.get()[1];
 		}
 		checklist = controls.get(groupName);
 		boolean result = checklist.checkItem(labelName);

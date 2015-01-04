@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -59,13 +60,13 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		assert label != null;
 		
 		String labelName = label.getName();
-		String[] tokens = TurboLabel.parseName(labelName);
-		if(tokens == null){
+		Optional<String[]> tokens = TurboLabel.parseName(labelName);
+		if(!tokens.isPresent()){
 			setName(labelName);
 		}else{
-			setGroup(tokens[0]);
-			setName(tokens[1]);
-			setExclusive(tokens[2].equals(EXCLUSIVE_DELIM));
+			setGroup(tokens.get()[0]);
+			setName(tokens.get()[1]);
+			setExclusive(tokens.get()[2].equals(EXCLUSIVE_DELIM));
 		}
 		setColour(label.getColor());
 	}
@@ -123,9 +124,18 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
 	}
 	
-	//Returns an array in the format {label group, label name, separator : the delimiter used to separate group and name}
-	//Returns null if given string is not in the format: group.name or group-name
-	public static String[] parseName(String name) {
+	/**
+	 * Returns an array in the format:
+	 * 
+	 * {
+	 *     label group,
+	 *     label name,
+	 *     separator
+	 * }
+	 * 
+	 * May fail if the string is not in the format group.name or group-name.
+	 */
+	public static Optional<String[]> parseName(String name) {
 		String[] result = new String[3];
 		int dotPos = name.indexOf(EXCLUSIVE_DELIM);
 		int dashPos = name.indexOf(NONEXCLUSIVE_DELIM);
@@ -139,12 +149,12 @@ public class TurboLabel implements Listable, LabelTreeItem {
 		}
 		
 		if (pos == -1) {
-			return null;
+			return Optional.empty();
 		} else {
 			result[0] = name.substring(0, pos);
 			result[1] = name.substring(pos+1);
 			result[2] = name.substring(pos, pos+1);
-			return result;
+			return Optional.of(result);
 		}
 	}
 	

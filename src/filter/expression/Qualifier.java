@@ -381,25 +381,14 @@ public class Qualifier implements FilterExpression {
         String group = "";
         String labelName = content.get().toLowerCase();
         
-//      if (content.contains(".")) {
-//          if (content.length() == 1) {
-//              // It's just a dot
-//              return true;
-//          }
-//          int pos = content.indexOf('.');
-//          group = content.substring(0, pos);
-//          labelName = content.substring(pos+1);
-//      }else if(content.contains("-")){
-//          int pos = content.indexOf('-');
-//          group = content.substring(0, pos);
-//          labelName = content.substring(pos+1);
-//      }
-        
-        String[] tokens = TurboLabel.parseName(labelName);
-        if(tokens != null){
-            group = tokens[0];
-            labelName = tokens[1];
-        }
+        Optional<String[]> tokens = TurboLabel.parseName(labelName);
+		if (tokens.isPresent()) {
+			group = tokens.get()[0];
+			labelName = tokens.get()[1];
+		} else {
+			// The name isn't in the format group.name or group.
+			// Take the entire thing to be the label name
+		}
         
         // Both can't be null
         assert group != null && labelName != null;
