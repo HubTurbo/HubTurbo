@@ -58,6 +58,20 @@ public class Tests {
     }
     
     @Test
+    public void emptyQualifiers() {
+    	
+        try {
+        	Parser.parse("-milestone: label:priority.high");
+            fail("'label:' can't be the input to a qualifier => empty qualifier => parse exception");
+        } catch (ParseException e) {}
+    	
+        try {
+        	Parser.parse("label:priority.high -milestone:");
+            fail("Empty qualifiers should cause a parse exception");
+        } catch (ParseException e) {}
+    }
+    
+    @Test
     public void operators() {
         assertEquals(Parser.parse("a:b OR c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
         assertEquals(Parser.parse("a:b | c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
