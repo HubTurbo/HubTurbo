@@ -276,7 +276,7 @@ public class Model {
 			// should not happen
 			return;
 		} else {
-			enforceStatusStateConsistency(issueList);
+			//enforceStatusStateConsistency(issueList);
 		}
 		WeakReference<Model> selfRef = new WeakReference<Model>(this);
 		Platform.runLater(new Runnable() {
@@ -447,7 +447,7 @@ public class Model {
 	
 	public void loadIssues(List<Issue> ghIssues) {
 		if (ghIssues != null) {
-			enforceStatusStateConsistency(ghIssues);
+			//enforceStatusStateConsistency(ghIssues);
 		}
 		Platform.runLater(()->{
 			issues.clear();
@@ -465,25 +465,25 @@ public class Model {
 		issues.addAll(list);
 	}
 
-	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
-		for (Issue ghIssue : ghIssues) {
-			Set<Label> toBeRemovedLabels = new HashSet<Label>();
-			for (Label ghLabel : ghIssue.getLabels()) {
-				if (isInconsistent(ghIssue.getState(), ghLabel.getName())) {
-					toBeRemovedLabels.add(ghLabel);
-				}
-			}
-			ghIssue.getLabels().removeAll(toBeRemovedLabels);
-			
-			if (!toBeRemovedLabels.isEmpty()) {
-				try {
-					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
-				} catch (IOException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-			}
-		}
-	}
+//	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
+//		for (Issue ghIssue : ghIssues) {
+//			Set<Label> toBeRemovedLabels = new HashSet<Label>();
+//			for (Label ghLabel : ghIssue.getLabels()) {
+//				if (isInconsistent(ghIssue.getState(), ghLabel.getName())) {
+//					toBeRemovedLabels.add(ghLabel);
+//				}
+//			}
+//			ghIssue.getLabels().removeAll(toBeRemovedLabels);
+//			
+//			if (!toBeRemovedLabels.isEmpty()) {
+//				try {
+//					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
+//				} catch (IOException e) {
+//					logger.error(e.getLocalizedMessage(), e);
+//				}
+//			}
+//		}
+//	}
 
 	private boolean isInconsistent(String state, String ghLabelName) {
 		DataManager dataManager = DataManager.getInstance();

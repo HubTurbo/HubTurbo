@@ -280,11 +280,7 @@ public class TurboIssue implements Listable {
 		if(label.isExclusive()){
 			removeLabelsWithGroup(label.getGroup());
 		}
-		if (DataManager.getInstance().isClosedStatusLabel(label.toGhName())) {
-			this.setOpen(false);
-		}else if(DataManager.getInstance().isOpenStatusLabel(label.toGhName())){
-			this.setOpen(true);
-		}
+		
 		addToLabels(label);
 	}
 	
@@ -309,10 +305,6 @@ public class TurboIssue implements Listable {
 		if(!labels.remove(label)){
 			return;
 		}
-		if (DataManager.getInstance().isClosedStatusLabel(label.toGhName())) {
-			//Default status of the issue is open
-			this.setOpen(true);
-		}
 	}
 	
 	public void removeLabels(List<TurboLabel> labList){
@@ -327,18 +319,11 @@ public class TurboIssue implements Listable {
 	
 	public void setLabels(List<TurboLabel> labels) {
 		if(this.labels != labels){
-			clearAllLabels();
+			this.labels.clear();
 			for(TurboLabel label : labels){
 				addLabel(label);
 			}
 		}
-	}
-	
-	public void clearAllLabels(){
-		if(this.hasStatusLabel()){
-			this.setOpen(true);
-		}
-		this.labels.clear();
 	}
 
 	/*
