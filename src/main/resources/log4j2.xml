@@ -3,16 +3,19 @@
   <Properties>
     <Property name="filename">hubturbo-log.log</Property>
   </Properties>
+
+  <!-- TRACE, DEBUG, INFO, WARN, ERROR, FATAL -->
   <Filter type="ThresholdFilter" level="trace"/>
  
+  <!-- http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html -->
   <Appenders>
     <Console name="STDOUT">
-        <PatternLayout pattern="%m%n"/>
+        <!-- relative time, date, level, class, thread - msg -->
+        <PatternLayout pattern="%r %d{dd MMM yyyy HH:mm:ss} %p %C{1} [%t] - %m%n" />
     </Console>
     <File name="File" fileName="${filename}">
-        <PatternLayout>
-            <pattern>%d %p %C{1.} [%t] %m%n</pattern>
-        </PatternLayout>
+        <!-- relative time, date, level, class, thread - msg -->
+        <PatternLayout pattern="%r %d{dd MMM yyyy HH:mm:ss} %p %C{1} [%t] - %m%n" />
     </File>
 </Appenders>
  
