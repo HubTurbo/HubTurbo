@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import javafx.concurrent.Task;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -34,6 +36,8 @@ import util.PlatformSpecific;
  * It depends minimally on UI for width adjustments.
  */
 public class BrowserComponent {
+	
+	private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 	
 	private static final boolean USE_MOBILE_USER_AGENT = false;
 
@@ -75,12 +79,14 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = setupChromeDriver();
+		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
 
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
 	public void quit() {
+		logger.info("Quitting browser component");
 		assert driver != null;
 		try {
 			driver.close();
@@ -126,6 +132,7 @@ public class BrowserComponent {
 		} else {
 			assert false : "Driver cannot execute JS";
 		}
+		logger.info("Executed JavaScript " + script.substring(0, Math.min(script.length(), 10)));
 	}
 	
 	/**
@@ -145,6 +152,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newLabel() {
+		logger.info("Navigating to New Label page");
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
 				driver.get(GitHubURL.getPathForNewLabel());
@@ -157,6 +165,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newMilestone() {
+		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
 				driver.get(GitHubURL.getPathForNewMilestone());
@@ -169,6 +178,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void newIssue() {
+		logger.info("Navigating to New Issue page");
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
 				driver.get(GitHubURL.getPathForNewIssue());
@@ -182,6 +192,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void showIssue(int id) {
+		logger.info("Showing issue #" + id);
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
 				driver.get(GitHubURL.getPathForIssue(id));
@@ -203,12 +214,12 @@ public class BrowserComponent {
 				} catch (WebDriverException e) {
 					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 					case NoSuchWindow:
-						System.out.println("Chrome was closed; recreating window...");
+						logger.info("Chrome was closed; recreating window...");
 						driver = setupChromeDriver();
 						login();
 						runBrowserOperation(operation); // Recurse and repeat
 					case NoSuchElement:
-						System.out.println("Warning: no such element!");
+						logger.info("Warning: no such element!");
 						break;
 					default:
 						break;
@@ -225,6 +236,7 @@ public class BrowserComponent {
 	 * Run on a separate thread.
 	 */
 	public void login() {
+		logger.info("Logging in on GitHub...");
 		runBrowserOperation(() -> {
 			driver.get(GitHubURL.LOGIN_PAGE);
 			try {
