@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 
@@ -246,11 +247,22 @@ public class ConfigFileHandler {
 		String configFileName = expectedFileName;
 		try {
 			ServiceManager service = ServiceManager.getInstance();
-			List<RepositoryContents> repoContents = service.getContents(repoId, DIR_CONFIG_PROJECTS);
-			for (RepositoryContents content : repoContents) {
-				if (content.getName().equalsIgnoreCase(expectedFileName)) {
-					configFileName = content.getName();
-					break;
+			List<RepositoryContents> repoContents = null;
+			try {
+				repoContents = service.getContents(repoId, DIR_CONFIG_PROJECTS);
+			} catch (RequestException e) {
+				// Config file was not found; do nothing
+				logger.info(String.format("Config file in repo %s, directory %s not found", repoId, DIR_CONFIG_PROJECTS));
+			}
+			
+			// Do nothing if the config file wasn't found
+			if (repoContents != null) {
+				for (RepositoryContents content : repoContents) {
+					System.out.println(content.getName());
+					if (content.getName().equalsIgnoreCase(expectedFileName)) {
+						configFileName = content.getName();
+						break;
+					}
 				}
 			}
 		} catch (IOException e) {
