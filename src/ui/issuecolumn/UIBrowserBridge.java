@@ -40,6 +40,9 @@ public class UIBrowserBridge {
 		ui.registerEvent(new LoginEventHandler() {
 			@Override public void handle(LoginEvent e) {
 				ui.getBrowserComponent().login();
+				if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
+					ui.getBrowserComponent().showChangelog(ui.getCommandLineArgs().get(UI.ARG_UPDATED_TO));
+				}
 			}
 		});
 		ui.registerEvent(new LabelCreatedEventHandler() {
