@@ -10,7 +10,7 @@ import javafx.scene.input.KeyCode;
  * 
  * - can be navigated with the arrow keys and Enter
  * - supports an event for item selection
- * - correctly retains selection after its contents are cleared
+ * - provides methods for retaining selection after its contents are changed
  * 
  * It depends on the functionality of ScrollableListView to ensure that
  * navigation scrolls the list properly. The Up, Down, and Enter key events
@@ -24,13 +24,69 @@ import javafx.scene.input.KeyCode;
  */
 public class NavigableListView<T> extends ScrollableListView<T> {
 
+	// Tracks the index of the list which should be currently selected
 	private Optional<Integer> selectedIndex = Optional.empty();
 	
+	// Used for saving and restoring selection
+	private Optional<T> selectedItem = Optional.empty();
+	
+	// Indicates that saveSelection was called, in the event that saveSelection itself fails
+	// (when nothing is selected, both should be no-ops)
+	private boolean saveSelectionCalled = false;
+
 	private IntConsumer onItemSelected = i -> {};
 	
 	public NavigableListView() {
 		setupKeyEvents();
 		setupMouseEvents();
+	}
+	
+	/**
+	 * Should be called before making changes to the item list of this list view if
+	 * it's important that selection is retained after.
+	 */
+	public void saveSelection() {
+		if (getSelectionModel().getSelectedItem() != null) {
+			selectedItem = Optional.of(getSelectionModel().getSelectedItem());
+		}
+		saveSelectionCalled = true;
+	}
+	
+	/**
+	 * Should be called to restore selection after making changes to the item list
+	 * of this list view. Must be called after saveSelection is.
+	 * @throws IllegalStateException if called before saveSelection is
+	 */
+	public void restoreSelection() {
+		if (!selectedItem.isPresent()) {
+			if (!saveSelectionCalled) {
+				throw new IllegalStateException("saveSelection must be called before restoreSelection");
+			} else {
+				saveSelectionCalled = false;
+				return; // No-op
+			}
+		}
+		saveSelectionCalled = false;
+		
+		// Find index of previously-selected item
+		int index = -1;
+		int i = 0;
+		for (T item : getItems()) {
+			if (item.equals(selectedItem)) {
+				index = i;
+				break;
+			}
+			i++;
+		}
+		
+		if (index == -1) {
+			// The item disappeared; do nothing, as selection will be resolved on its own
+		} else {
+			// Select that item
+			getSelectionModel().clearAndSelect(index);
+			selectedIndex = Optional.of(index);
+			// Do not trigger event
+		}
 	}
 
 	private void setupMouseEvents() {
