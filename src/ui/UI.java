@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -58,6 +60,10 @@ public class UI extends Application {
 	// Events
 	
 	private EventBus events;
+	
+	// Application argumnets
+	
+	private HashMap<String, String> commandLineArgs;
 		
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -82,8 +88,9 @@ public class UI extends Application {
 		loadFonts();
 		applyCSS(scene);
 		getUserCredentials();
+		commandLineArgs = initialiseCommandLineArguments();
 	}
-	
+
 	private void getUserCredentials() {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
@@ -144,6 +151,17 @@ public class UI extends Application {
 				events.unregister(this);
 			}
 		});
+	}
+	
+	private HashMap<String, String> initialiseCommandLineArguments() {
+		Parameters params = getParameters();
+		final List<String> parameters = params.getRaw();
+		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
+		HashMap<String, String> commandLineArgs = new HashMap<>();
+		for (int i=0; i<parameters.size(); i+=2) {
+			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
+		}
+		return commandLineArgs;
 	}
 
 	private void quit() {
@@ -301,5 +319,9 @@ public class UI extends Application {
 			mainStage.setMaxWidth(dimensions.getWidth());
 			browserComponent.resize(mainStage.getWidth());
 		});
+	}
+
+	public HashMap<String, String> getCommandLineArgs() {
+		return commandLineArgs;
 	}
 }
