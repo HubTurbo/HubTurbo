@@ -209,6 +209,7 @@ public class UI extends Application {
 	 */
 	public <T extends Event> void registerEvent(EventHandler handler) {
 		events.register(handler);
+		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 	
 	/**
@@ -219,7 +220,9 @@ public class UI extends Application {
 	 * @param handler
 	 */
 	public <T extends Event> void triggerEvent(T event) {
+		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
+		logger.info("Triggered event " + event.getClass().getSimpleName());
 	}
 	
 	public BrowserComponent getBrowserComponent() {
