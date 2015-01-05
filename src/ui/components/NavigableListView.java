@@ -5,6 +5,9 @@ import java.util.function.IntConsumer;
 
 import javafx.scene.input.KeyCode;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * A very specialized ListView subclass that:
  * 
@@ -23,6 +26,8 @@ import javafx.scene.input.KeyCode;
  * - it is clicked
  */
 public class NavigableListView<T> extends ScrollableListView<T> {
+
+	private static final Logger logger = LogManager.getLogger(NavigableListView.class.getName());
 
 	// Tracks the index of the list which should be currently selected
 	private Optional<Integer> selectedIndex = Optional.empty();
@@ -91,7 +96,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 
 	private void setupMouseEvents() {
 		setOnMouseClicked(e -> {
-			selectedIndex = Optional.of(getSelectionModel().getSelectedIndex());
+			logger.info("Mouse click on issue " + selectedIndex.get());
 			onItemSelected.accept(selectedIndex.get());
 		});
 	}
@@ -105,12 +110,14 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 				handleUpDownKeys(e.getCode() == KeyCode.DOWN);
 				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
 				if (!e.isShiftDown()) {
+					logger.info("Arrow key navigation to issue " + selectedIndex.get());
 					onItemSelected.accept(selectedIndex.get());
 				}
 				break;
 			case ENTER:
 				e.consume();
 				if (selectedIndex.isPresent()) {
+					logger.info("Enter key selection on issue " + selectedIndex.get());
 					onItemSelected.accept(selectedIndex.get());	
 				}
 				break;
