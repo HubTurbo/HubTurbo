@@ -22,16 +22,15 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.IssueEvent;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
 import storage.DataManager;
-import ui.components.StatusBar;
 import util.CollectionUtilities;
 import util.DialogMessage;
 
@@ -128,7 +127,7 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
-		StatusBar.displayMessage(MESSAGE_LOADING_PROJECT_CONFIG);
+		logger.info(MESSAGE_LOADING_PROJECT_CONFIG);
 		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
@@ -160,7 +159,7 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadIssueEvents(HashMap<String, List> resources) {
 		Platform.runLater(()-> {
-			StatusBar.displayMessage(MESSAGE_LOADING_FEEDS);
+			logger.info(MESSAGE_LOADING_FEEDS);
 			loadFeeds((List<IssueEvent>) resources.get(ServiceManager.KEY_FEEDS));
 		});
 	}
@@ -168,16 +167,16 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadTurboResources(HashMap<String, List> turboResources) {
 		Platform.runLater(()-> {
-			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
+			logger.info(MESSAGE_LOADING_COLLABS);
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
-			StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
+			logger.info(MESSAGE_LOADING_LABELS);
 			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
-			StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
+			logger.info(MESSAGE_LOADING_MILESTONES);
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
 			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
 			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
-			StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
+			logger.info(MESSAGE_LOADING_ISSUES);
 			loadTurboIssues(issues);
 		});
 	}
@@ -185,18 +184,18 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
 		if (!isPublicRepo) {
-			StatusBar.displayMessage(MESSAGE_LOADING_COLLABS);
+			logger.info(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
 		} else {
 			// Unable to get collaborators for public repo, so there's no point doing the above
 			// This is to remove any collaborators from previous repo (from repo-switching)
 			clearCollaborators();
 		}
-		StatusBar.displayMessage(MESSAGE_LOADING_LABELS);
+		logger.info(MESSAGE_LOADING_LABELS);
 		loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
-		StatusBar.displayMessage(MESSAGE_LOADING_MILESTONES);
+		logger.info(MESSAGE_LOADING_MILESTONES);
 		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
-		StatusBar.displayMessage(MESSAGE_LOADING_ISSUES);
+		logger.info(MESSAGE_LOADING_ISSUES);
 		loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 

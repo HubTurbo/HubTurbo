@@ -1,6 +1,8 @@
 package service;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -16,8 +18,6 @@ import model.Model;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
-import storage.DataCacheFileHandler;
-import storage.TurboRepoData;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,8 +32,8 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -43,10 +43,9 @@ import org.markdown4j.Markdown4jProcessor;
 
 import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
+import storage.DataCacheFileHandler;
+import storage.TurboRepoData;
 import stubs.ServiceManagerStub;
-import ui.components.StatusBar;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Singleton class that provides access to the GitHub API services required by HubTurbo
@@ -179,7 +178,7 @@ public class ServiceManager {
 	}
 
 	public boolean setupRepository(String owner, String name) throws IOException{
-		StatusBar.displayMessage("Authenticating...");
+		logger.info("Authenticating...");
 		repoId = RepositoryId.create(owner, name);
 		if(checkRepository(repoId)){
 			return model.loadComponents(repoId);
@@ -247,7 +246,7 @@ public class ServiceManager {
 		}
 
 		if (!needToGetResources) {
-			System.out.println("Loading from cache...");
+			logger.info("Loading from cache...");
 			issuesETag = repo.getIssuesETag();
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
@@ -274,6 +273,7 @@ public class ServiceManager {
 			map.put(KEY_MILESTONES, milestones);
 			return map;
 		} else {
+			logger.info("Cache not found, loading data from GitHub...");
 			return getGitHubResources();
 		}
 	}
