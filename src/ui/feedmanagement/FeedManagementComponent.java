@@ -19,7 +19,7 @@ public class FeedManagementComponent {
 	private final UI ui;
 	private final Model model;
 	private ListView<TurboFeed> listView;
-	
+
 	public FeedManagementComponent(UI ui, Model model) {
 		this.model = model;
 		this.ui = ui;
@@ -32,39 +32,43 @@ public class FeedManagementComponent {
 		Node node = createListView();
 		node.setOnKeyReleased(((e) -> {
 			if (e.getCode().equals(KeyCode.ENTER)) {
-				TurboFeed selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
-				if (selectedIssue != null) {
-					ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getIssueNum(), -1));
-				}
+				showIssue();
 			}
 		}));
 		node.setOnMouseClicked(((e) -> {
-				TurboFeed selectedIssue = listView.getSelectionModel().selectedItemProperty().get();
-				if (selectedIssue != null) {
-					ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getIssueNum(), -1));
-				}
+			showIssue();
 		}));
 		layout.getChildren().addAll(node);
 		VBox.setVgrow(listView, Priority.ALWAYS);
 		return layout;
 	}
-	
+
+	private void showIssue() {
+		TurboFeed selectedIssue = listView.getSelectionModel()
+				.selectedItemProperty().get();
+		if (selectedIssue != null) {
+			ui.triggerEvent(new IssueSelectedEvent(selectedIssue.getIssueNum(),
+					-1));
+		}
+	}
+
 	private Node createListView() {
 		listView = new ListView<>();
-		
-		WeakReference<FeedManagementComponent> that = new WeakReference<FeedManagementComponent>(this);
-		
+
+		WeakReference<FeedManagementComponent> that = new WeakReference<FeedManagementComponent>(
+				this);
+
 		listView.setCellFactory(new Callback<ListView<TurboFeed>, ListCell<TurboFeed>>() {
 			@Override
 			public ListCell<TurboFeed> call(ListView<TurboFeed> list) {
-				if(that.get() != null){
-					return new ManageFeedListCell();
-				} else{
+				if (that.get() != null) {
+					return new ManageFeedListCell(model);
+				} else {
 					return null;
 				}
 			}
 		});
-		
+
 		listView.setItems(null);
 		listView.setItems(model.getFeeds());
 

@@ -25,10 +25,12 @@ public class CollectionUtilities {
 
 	/**
 	 * Gets the changes made to the a list of items
-	 * @return HashMap the a list of items removed from the original list
-	 * 			and a list of items added to the original list
+	 * 
+	 * @return HashMap the a list of items removed from the original list and a
+	 *         list of items added to the original list
 	 * */
-	public static <T> HashMap<String, HashSet<T>> getChangesToList(List<T> original, List<T> edited){
+	public static <T> HashMap<String, HashSet<T>> getChangesToList(
+			List<T> original, List<T> edited) {
 		HashMap<String, HashSet<T>> changeSet = new HashMap<String, HashSet<T>>();
 		HashSet<T> removed = new HashSet<T>(original);
 		HashSet<T> added = new HashSet<T>(edited);
@@ -41,15 +43,16 @@ public class CollectionUtilities {
 		return changeSet;
 	}
 
-	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues){
+	public static ArrayList<TurboIssue> getHubTurboIssueList(List<Issue> issues) {
 		ArrayList<TurboIssue> buffer = new ArrayList<>();
 		for (Issue ghIssue : issues) {
-			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance().getModel()));
+			buffer.add(new TurboIssue(ghIssue, ServiceManager.getInstance()
+					.getModel()));
 		}
 		return buffer;
 	}
 
-	public static ArrayList<TurboLabel> getHubTurboLabelList(List<Label> labels){
+	public static ArrayList<TurboLabel> getHubTurboLabelList(List<Label> labels) {
 		ArrayList<TurboLabel> buffer = new ArrayList<>();
 		for (Label ghLabel : labels) {
 			buffer.add(new TurboLabel(ghLabel));
@@ -57,33 +60,44 @@ public class CollectionUtilities {
 		return buffer;
 	}
 
-	public static ArrayList<TurboMilestone> getHubTurboMilestoneList(List<Milestone> milestones){
+	public static ArrayList<TurboMilestone> getHubTurboMilestoneList(
+			List<Milestone> milestones) {
 		ArrayList<TurboMilestone> buffer = new ArrayList<>();
-		for(Milestone ghMilestone : milestones){
+		for (Milestone ghMilestone : milestones) {
 			buffer.add(new TurboMilestone(ghMilestone));
 		}
 		return buffer;
 	}
 
-	public static ArrayList<TurboFeed> getHubTurboFeed (List<IssueEvent> feeds){
+	public static ArrayList<TurboFeed> getHubTurboFeed(List<IssueEvent> feeds) {
 		ArrayList<TurboFeed> buffer = new ArrayList<>();
-		for(IssueEvent ghFeed: feeds){
-			buffer.add(new TurboFeed(ghFeed));
+		ArrayList<Integer> issueNumList = new ArrayList<>();
+		int issueNum;
+
+		for (IssueEvent ghFeed : feeds) {
+			issueNum = ghFeed.getIssue().getNumber();
+			if (issueNumList.contains(issueNum)) {
+				buffer.get(issueNumList.indexOf(issueNum))
+						.addIssueEvent(ghFeed);
+			} else {
+				issueNumList.add(issueNum);
+				buffer.add(new TurboFeed(ghFeed));
+			}
 		}
 		return buffer;
 	}
 
-	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users){
+	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users) {
 		ArrayList<TurboUser> buffer = new ArrayList<>();
-		for(User ghUser: users){
+		for (User ghUser : users) {
 			buffer.add(new TurboUser(ghUser));
 		}
 		return buffer;
 	}
 
-	public static ArrayList<Label> getGithubLabelList(List<TurboLabel> labels){
+	public static ArrayList<Label> getGithubLabelList(List<TurboLabel> labels) {
 		ArrayList<Label> githubLabels = new ArrayList<Label>();
-		for(TurboLabel label : labels){
+		for (TurboLabel label : labels) {
 			githubLabels.add(label.toGhResource());
 		}
 		return githubLabels;
