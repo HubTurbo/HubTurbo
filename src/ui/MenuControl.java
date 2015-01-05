@@ -115,6 +115,7 @@ public class MenuControl extends MenuBar {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
 			try {
+				ServiceManager.getInstance().stopModelUpdate();
 				ServiceManager.getInstance().getModel().forceReloadComponents();
 				ServiceManager.getInstance().restartModelUpdate();
 			} catch (Exception e1) {
