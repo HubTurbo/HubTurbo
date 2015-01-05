@@ -272,7 +272,8 @@ public class Model {
 	}
 
 	public void updateCachedIssues(List<Issue> issueList, String repoId){
-		if(issueList.size() == 0){
+		if (issueList.size() == 0){
+			// should not happen
 			return;
 		} else {
 			enforceStatusStateConsistency(issueList);

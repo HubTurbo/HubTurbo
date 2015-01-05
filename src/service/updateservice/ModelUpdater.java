@@ -58,17 +58,21 @@ public class ModelUpdater {
 		// we don't get updated items or write them to file for the old repo. This prevents cache corruption.
 		if (model.getRepoId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(repoId);	
-			model.updateCachedIssues(updatedIssues, repoId.toString());
-			model.updateIssuesETag(issueUpdateService.getLastETag());
-			model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
+			
+			// if there are updates
+			if (updatedIssues.size() > 0) {
+				model.updateIssuesETag(issueUpdateService.getLastETag());
+				model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
+				model.updateCachedIssues(updatedIssues, repoId.toString());
+			}
 		}
 	}
 	
 	private void updateModelCollaborators(IRepositoryIdProvider repoId){
 		if (model.getRepoId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(repoId);
-			model.updateCollabsETag(collaboratorUpdateService.getLastETag());
 			if(collaborators.size() > 0){
+				model.updateCollabsETag(collaboratorUpdateService.getLastETag());
 				model.updateCachedCollaborators(collaborators, repoId.toString());
 			}
 		}
@@ -77,8 +81,8 @@ public class ModelUpdater {
 	private void updateModelLabels(IRepositoryIdProvider repoId){
 		if (model.getRepoId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(repoId);
-			model.updateLabelsETag(labelUpdateService.getLastETag());
 			if(labels.size() > 0){
+				model.updateLabelsETag(labelUpdateService.getLastETag());
 				model.updateCachedLabels(labels, repoId.toString());
 			}
 		}
@@ -87,8 +91,8 @@ public class ModelUpdater {
 	private void updateModelMilestones(IRepositoryIdProvider repoId){
 		if (model.getRepoId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(repoId);
-			model.updateMilestonesETag(milestoneUpdateService.getLastETag());
 			if(milestones.size() > 0){
+				model.updateMilestonesETag(milestoneUpdateService.getLastETag());
 				model.updateCachedMilestones(milestones, repoId.toString());
 			}
 		}
