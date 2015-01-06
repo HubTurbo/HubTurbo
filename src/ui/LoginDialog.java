@@ -58,7 +58,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	protected Parent content() {
 
 		setTitle("GitHub Login");
-		setSize(440, 200);
+		setSize(470, 200);
 		setStageStyle(StageStyle.UTILITY);
 		
 		GridPane grid = new GridPane();
@@ -72,7 +72,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	    grid.getColumnConstraints().add(column);
 	    
 	    column = new ColumnConstraints();
-	    column.setPercentWidth(30);
+	    column.setPercentWidth(39);
 	    grid.getColumnConstraints().add(column);
 
 	    column = new ColumnConstraints();
@@ -80,7 +80,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	    grid.getColumnConstraints().add(column);
 
 	    column = new ColumnConstraints();
-	    column.setPercentWidth(48);
+	    column.setPercentWidth(39);
 	    grid.getColumnConstraints().add(column);
 
 	    grid.setPrefSize(390, 100);
@@ -89,7 +89,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		Label repoNameLabel = new Label("Repository:");
 		grid.add(repoNameLabel, 0, 0);
 
-		repoOwnerField = new TextField("<owner>");
+		repoOwnerField = new TextField("<owner/organization>");
 		repoOwnerField.setPrefWidth(140);
 		grid.add(repoOwnerField, 1, 0);
 
