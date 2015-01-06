@@ -41,8 +41,8 @@ import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
 
-	private static final int VERSION_MAJOR = 0;
-	private static final int VERSION_MINOR = 9;
+	private static final int VERSION_MAJOR = 1;
+	private static final int VERSION_MINOR = 0;
 	private static final int VERSION_PATCH = 0;
 	
 	public static final String ARG_UPDATED_TO = "--updated-to";
