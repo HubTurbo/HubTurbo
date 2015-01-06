@@ -12,6 +12,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
 import util.events.IssueCreatedEvent;
@@ -19,6 +23,9 @@ import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
 
 public class MenuControl extends MenuBar {
+
+	private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
+
 	private final ColumnControl columns;
 	private final ScrollPane columnsScroll;
 	private final UI ui;
@@ -46,6 +53,7 @@ public class MenuControl extends MenuBar {
 
 		MenuItem createLeft = new MenuItem("Create Column (Left)");
 		createLeft.setOnAction(e -> {
+			logger.info("Menu: View > Columns > Create Column (Left)");
 			columns.createNewPanelAtStart();
 			columnsScroll.setHvalue(columnsScroll.getHmin());
 		});
@@ -53,6 +61,7 @@ public class MenuControl extends MenuBar {
 
 		MenuItem createRight = new MenuItem("Create Column");
 		createRight.setOnAction(e -> {
+			logger.info("Menu: View > Columns > Create Column");
 			columns.createNewPanelAtEnd();
 			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
@@ -77,7 +86,10 @@ public class MenuControl extends MenuBar {
 		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
 		MenuItem closeColumn = new MenuItem("Close Column");
-		closeColumn.setOnAction(e -> columns.closeCurrentColumn());
+		closeColumn.setOnAction(e -> {
+			logger.info("Menu: View > Columns > Close Column");
+			columns.closeCurrentColumn();
+		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 
 		cols.getItems().addAll(createRight, createLeft, closeColumn);
@@ -87,6 +99,7 @@ public class MenuControl extends MenuBar {
 	private MenuItem createDocumentationMenuItem() {
 		MenuItem documentationMenuItem = new MenuItem("Documentation");
 		documentationMenuItem.setOnAction((e) -> {
+			logger.info("Menu: View > Documentation");
 			ui.getBrowserComponent().showDocs();
 		});
 		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
@@ -96,6 +109,7 @@ public class MenuControl extends MenuBar {
 	private MenuItem createRefreshMenuItem() {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
+			logger.info("Menu: View > Refresh");
 			ServiceManager.getInstance().restartModelUpdate();
 			columns.refresh();
 		});
@@ -107,12 +121,14 @@ public class MenuControl extends MenuBar {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
 			try {
+				logger.info("Menu: View > Force Refresh");
 				ServiceManager.getInstance().stopModelUpdate();
 				ServiceManager.getInstance().getModel().forceReloadComponents();
 				ServiceManager.getInstance().restartModelUpdate();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			logger.info("Menu: View > Force Refresh completed");
 		});
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
@@ -120,15 +136,24 @@ public class MenuControl extends MenuBar {
 
 	private MenuItem[] createNewMenuItems() {
 		MenuItem newIssueMenuItem = new MenuItem("Issue");
-		newIssueMenuItem.setOnAction(e -> ui.triggerEvent(new IssueCreatedEvent()));
+		newIssueMenuItem.setOnAction(e -> {
+			logger.info("Menu: New > Issue");
+			ui.triggerEvent(new IssueCreatedEvent());
+		});
 		newIssueMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN));
 
 		MenuItem newLabelMenuItem = new MenuItem("Label");
-		newLabelMenuItem.setOnAction(e -> ui.triggerEvent(new LabelCreatedEvent()));
+		newLabelMenuItem.setOnAction(e -> {
+			logger.info("Menu: New > Label");
+			ui.triggerEvent(new LabelCreatedEvent());
+		});
 		newLabelMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
 
 		MenuItem newMilestoneMenuItem = new MenuItem("Milestone");
-		newMilestoneMenuItem.setOnAction(e -> ui.triggerEvent(new MilestoneCreatedEvent()));
+		newMilestoneMenuItem.setOnAction(e -> {
+			logger.info("Menu: New > Milestone");
+			ui.triggerEvent(new MilestoneCreatedEvent());
+		});
 		newMilestoneMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
 
 		return new MenuItem[] {newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem};
