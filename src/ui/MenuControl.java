@@ -19,7 +19,6 @@ import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
 
 public class MenuControl extends MenuBar {
-	private static final String USER_DOC_URL = "https://github.com/HubTurbo/HubTurbo/wiki";
 	private final ColumnControl columns;
 	private final ScrollPane columnsScroll;
 	private final UI ui;
@@ -88,19 +87,12 @@ public class MenuControl extends MenuBar {
 	private MenuItem createDocumentationMenuItem() {
 		MenuItem documentationMenuItem = new MenuItem("Documentation");
 		documentationMenuItem.setOnAction((e) -> {
-			MarkupPopup popup = createDescPopup();
-			popup.show();
+			ui.getBrowserComponent().showDocs();
 		});
 		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		return documentationMenuItem;
 	}
 	
-	private MarkupPopup createDescPopup(){
-		MarkupPopup popup = new MarkupPopup("Done");
-		popup.loadURL(USER_DOC_URL);
-		return popup;
-	}
-
 	private MenuItem createRefreshMenuItem() {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
