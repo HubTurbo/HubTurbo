@@ -35,6 +35,18 @@ import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 
 public class LoginDialog extends Dialog<Boolean> {
+	
+	private static final String DIALOG_TITLE = "GitHub Login";
+	private static final int DIALOG_HEIGHT = 200;
+	private static final int DIALOG_WIDTH = 470;
+	
+	private static final String LABEL_REPO_NAME = "Repository:";
+	private static final String FIELD_DEFAULT_REPO_OWNER = "<owner/organization>";
+	private static final String FIELD_DEFAULT_REPO_NAME = "<repository>";
+	private static final String PASSWORD_LABEL = "Password:";
+	private static final String USERNAME_LABEL = "Username:";
+	private static final String BUTTON_SIGN_IN = "Sign in";
+
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
 	
 	private TextField repoOwnerField;
@@ -57,56 +69,34 @@ public class LoginDialog extends Dialog<Boolean> {
 	@Override
 	protected Parent content() {
 
-		setTitle("GitHub Login");
-		setSize(440, 200);
+		setTitle(DIALOG_TITLE);
+		setSize(DIALOG_WIDTH, DIALOG_HEIGHT);
 		setStageStyle(StageStyle.UTILITY);
 		
 		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(7);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25));
-
-		ColumnConstraints column = new ColumnConstraints();
-	    column.setPercentWidth(20);
-	    grid.getColumnConstraints().add(column);
+		setupGridPane(grid);
 	    
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(30);
-	    grid.getColumnConstraints().add(column);
-
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(2);
-	    grid.getColumnConstraints().add(column);
-
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(48);
-	    grid.getColumnConstraints().add(column);
-
-	    grid.setPrefSize(390, 100);
-	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-	    
-		Label repoNameLabel = new Label("Repository:");
+		Label repoNameLabel = new Label(LABEL_REPO_NAME);
 		grid.add(repoNameLabel, 0, 0);
 
-		repoOwnerField = new TextField("<owner>");
+		repoOwnerField = new TextField(FIELD_DEFAULT_REPO_OWNER);
 		repoOwnerField.setPrefWidth(140);
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
-		repoNameField = new TextField("<repository>");
+		repoNameField = new TextField(FIELD_DEFAULT_REPO_NAME);
 		repoNameField.setPrefWidth(250);
 		grid.add(repoNameField, 3, 0);
 
-		Label usernameLabel = new Label("Username:");
+		Label usernameLabel = new Label(USERNAME_LABEL);
 		grid.add(usernameLabel, 0, 1);
 
 		usernameField = new TextField();
 		grid.add(usernameField, 1, 1, 3, 1);
 
-		Label passwordLabel = new Label("Password:");
+		Label passwordLabel = new Label(PASSWORD_LABEL);
 		grid.add(passwordLabel, 0, 2);
 
 		passwordField = new PasswordField();
@@ -119,14 +109,53 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		HBox buttons = new HBox(10);
 		buttons.setAlignment(Pos.BOTTOM_RIGHT);
-		loginButton = new Button("Sign in");
+		loginButton = new Button(BUTTON_SIGN_IN);
 		loginButton.setOnAction(this::login);
 		buttons.getChildren().add(loginButton);
 		grid.add(buttons, 3, 3);
 		
 		return grid;
 	}
+
+	/**
+	 * Configures the central grid pane before it's used.
+	 * @param grid
+	 */
+	private static void setupGridPane(GridPane grid) {
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(7);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(25));
+	    grid.setPrefSize(390, 100);
+	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+	    
+	    applyColumnConstraints(grid, 20, 39, 2, 39);
+	}
 	
+	/**
+	 * A variadic function that applies percentage-width column constraints to
+	 * the given grid pane.
+	 * @param grid the grid pane to apply column constraints to
+	 * @param values an array of integer values which should add up to 100
+	 */
+	private static void applyColumnConstraints(GridPane grid, int... values) {
+		
+		// The values should sum up to 100%
+		int sum = 0;
+		for (int i=0; i<values.length; i++) {
+			sum += values[i];
+		}
+		assert sum == 100 : "Column constraints should sum up to 100%!";
+		
+		// Apply constraints to grid
+		ColumnConstraints column;
+		for (int i=0; i<values.length; i++) {
+			column = new ColumnConstraints();
+			column.setPercentWidth(values[i]);
+			grid.getColumnConstraints().add(column);
+		}
+	}
+
 	private void login(Event e) {
 		
 		// Resolve username and password
