@@ -74,29 +74,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		setStageStyle(StageStyle.UTILITY);
 		
 		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(7);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25));
-
-		ColumnConstraints column = new ColumnConstraints();
-	    column.setPercentWidth(20);
-	    grid.getColumnConstraints().add(column);
-	    
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(39);
-	    grid.getColumnConstraints().add(column);
-
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(2);
-	    grid.getColumnConstraints().add(column);
-
-	    column = new ColumnConstraints();
-	    column.setPercentWidth(39);
-	    grid.getColumnConstraints().add(column);
-
-	    grid.setPrefSize(390, 100);
-	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+		setupGridPane(grid);
 	    
 		Label repoNameLabel = new Label(LABEL_REPO_NAME);
 		grid.add(repoNameLabel, 0, 0);
@@ -138,7 +116,46 @@ public class LoginDialog extends Dialog<Boolean> {
 		
 		return grid;
 	}
+
+	/**
+	 * Configures the central grid pane before it's used.
+	 * @param grid
+	 */
+	private static void setupGridPane(GridPane grid) {
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(7);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(25));
+	    grid.setPrefSize(390, 100);
+	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+	    
+	    applyColumnConstraints(grid, 20, 39, 2, 39);
+	}
 	
+	/**
+	 * A variadic function that applies percentage-width column constraints to
+	 * the given grid pane.
+	 * @param grid the grid pane to apply column constraints to
+	 * @param values an array of integer values which should add up to 100
+	 */
+	private static void applyColumnConstraints(GridPane grid, int... values) {
+		
+		// The values should sum up to 100%
+		int sum = 0;
+		for (int i=0; i<values.length; i++) {
+			sum += values[i];
+		}
+		assert sum == 100 : "Column constraints should sum up to 100%!";
+		
+		// Apply constraints to grid
+		ColumnConstraints column;
+		for (int i=0; i<values.length; i++) {
+			column = new ColumnConstraints();
+			column.setPercentWidth(values[i]);
+			grid.getColumnConstraints().add(column);
+		}
+	}
+
 	private void login(Event e) {
 		
 		// Resolve username and password
