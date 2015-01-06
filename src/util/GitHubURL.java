@@ -11,6 +11,7 @@ public class GitHubURL {
 	private static final Logger logger = LogManager.getLogger(GitHubURL.class.getName());
 	
 	public static final String LOGIN_PAGE = "https://github.com/login";
+	public static final String DOCS_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Getting-Started";
 	public static final String CHANGELOG_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog";
 	public static final String CHANGELOG_PAGE_FORMAT = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
 	
@@ -28,6 +29,10 @@ public class GitHubURL {
 
 	public static String getPathForNewMilestone() {
 		return String.format("https://github.com/%s/%s/milestones/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
+
+	public static String getPathForDocsPage() {
+		return DOCS_PAGE;
 	}
 
 	public static String getChangelogForVersion(String version) {
