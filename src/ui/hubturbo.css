@@ -81,6 +81,15 @@
 	-fx-font-size: 13pt;
 }
 
+.octicon {
+	-fx-font-family: github-octicons;
+}
+
+.issue-pull-request-icon {
+	-fx-font-size: 16px;
+	-fx-padding: -2 0 2 3;
+}
+
 .button-github-octicon {
 	-fx-padding: 0;
 	-fx-font-family: github-octicons;
