@@ -35,6 +35,18 @@ import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 
 public class LoginDialog extends Dialog<Boolean> {
+	
+	private static final String DIALOG_TITLE = "GitHub Login";
+	private static final int DIALOG_HEIGHT = 200;
+	private static final int DIALOG_WIDTH = 470;
+	
+	private static final String LABEL_REPO_NAME = "Repository:";
+	private static final String FIELD_DEFAULT_REPO_OWNER = "<owner/organization>";
+	private static final String FIELD_DEFAULT_REPO_NAME = "<repository>";
+	private static final String PASSWORD_LABEL = "Password:";
+	private static final String USERNAME_LABEL = "Username:";
+	private static final String BUTTON_SIGN_IN = "Sign in";
+
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
 	
 	private TextField repoOwnerField;
@@ -57,8 +69,8 @@ public class LoginDialog extends Dialog<Boolean> {
 	@Override
 	protected Parent content() {
 
-		setTitle("GitHub Login");
-		setSize(470, 200);
+		setTitle(DIALOG_TITLE);
+		setSize(DIALOG_WIDTH, DIALOG_HEIGHT);
 		setStageStyle(StageStyle.UTILITY);
 		
 		GridPane grid = new GridPane();
@@ -86,27 +98,27 @@ public class LoginDialog extends Dialog<Boolean> {
 	    grid.setPrefSize(390, 100);
 	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 	    
-		Label repoNameLabel = new Label("Repository:");
+		Label repoNameLabel = new Label(LABEL_REPO_NAME);
 		grid.add(repoNameLabel, 0, 0);
 
-		repoOwnerField = new TextField("<owner/organization>");
+		repoOwnerField = new TextField(FIELD_DEFAULT_REPO_OWNER);
 		repoOwnerField.setPrefWidth(140);
 		grid.add(repoOwnerField, 1, 0);
 
 		Label slash = new Label("/");
 		grid.add(slash, 2, 0);
 
-		repoNameField = new TextField("<repository>");
+		repoNameField = new TextField(FIELD_DEFAULT_REPO_NAME);
 		repoNameField.setPrefWidth(250);
 		grid.add(repoNameField, 3, 0);
 
-		Label usernameLabel = new Label("Username:");
+		Label usernameLabel = new Label(USERNAME_LABEL);
 		grid.add(usernameLabel, 0, 1);
 
 		usernameField = new TextField();
 		grid.add(usernameField, 1, 1, 3, 1);
 
-		Label passwordLabel = new Label("Password:");
+		Label passwordLabel = new Label(PASSWORD_LABEL);
 		grid.add(passwordLabel, 0, 2);
 
 		passwordField = new PasswordField();
@@ -119,7 +131,7 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		HBox buttons = new HBox(10);
 		buttons.setAlignment(Pos.BOTTOM_RIGHT);
-		loginButton = new Button("Sign in");
+		loginButton = new Button(BUTTON_SIGN_IN);
 		loginButton.setOnAction(this::login);
 		buttons.getChildren().add(loginButton);
 		grid.add(buttons, 3, 3);
