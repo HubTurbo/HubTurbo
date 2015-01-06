@@ -281,7 +281,8 @@ public class Model {
 		WeakReference<Model> selfRef = new WeakReference<Model>(this);
 		Platform.runLater(new Runnable() {
 			@Override
-			public void run() {		
+			public void run() {	
+				logger.info(issueList.size() + " issues changed/added since last sync");
 				for (int i = issueList.size() - 1; i >= 0; i--) {
 					Issue issue = issueList.get(i);
 					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
@@ -296,8 +297,10 @@ public class Model {
 		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if(tIssue != null){
 			tIssue.copyValues(issue);
-		}else{
+			logger.info("Updated issue: " + issue.getId());
+		}else{		
 			issues.add(0, issue);
+			logger.info("Added issue: " + issue.getId());
 		}	
 	}
 	
@@ -384,6 +387,15 @@ public class Model {
 	        @Override
 	        public void run() {
 	        	list.removeAll(removed);
+  	
+	        	Listable listItem = (Listable)newList.get(0);
+	        	if (listItem.getClass() == TurboMilestone.class) {
+	        		logNumOfUpdates(newList, "milestone(s)");
+	        	} else if (listItem.getClass() == TurboLabel.class) {
+	        		logNumOfUpdates(newList, "label(s)");
+	        	} else if (listItem.getClass() == TurboUser.class) {
+	        		logNumOfUpdates(newList, "collaborator(s)");
+	        	}
 	        	
 	        	ArrayList<Object> buffer = new ArrayList<>();
 	        	for (Object item : newList) {
@@ -397,23 +409,14 @@ public class Model {
 	        	}
 	        	list.addAll(buffer);
 	        	
-//	        	newList.stream()
-//	        	       .forEachOrdered(item -> updateCachedListItem((Listable)item, list));
 	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 	        }
+
+			private void logNumOfUpdates(List newList, String type) {
+				logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
+			}
 	   });
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	private void updateCachedListItem(Listable updated, @SuppressWarnings("rawtypes") List list){
-//		int index = list.indexOf(updated);
-//		if(index != -1){
-//			Listable old = (Listable)list.get(index);
-//			old.copyValues(updated);
-//		}else{
-//			list.add(updated);
-//		}
-//	}
 	
 	public void loadFeeds(List<IssueEvent> ghFeeds) {	
 		Platform.runLater(()->{
