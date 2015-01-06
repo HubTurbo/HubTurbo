@@ -4,18 +4,12 @@
     "type."
   ],
   "openStatusLabels": [
-    "status.new",
     "status.accepted",
-    "status.started",
-    "status.reopened"
+    "status.ongoing",
+    "status.toReview",
+    "status.toMerge"
   ],
   "closedStatusLabels": [
-    "status.closed",
-    "status.fixed",
-    "status.verified",
-    "status.invalid",
-    "status.duplicate",
-    "status.wontfix",
-    "status.done"
+
   ]
 }
