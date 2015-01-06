@@ -91,7 +91,7 @@ public class DataCacheFileHandler {
 	}
 	
 	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
-		logger.info("About to write to file for repo: " + repoIdString);
+		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
 		this.labels = labels.stream().collect(Collectors.toList());

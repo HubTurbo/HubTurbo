@@ -282,7 +282,7 @@ public class Model {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {	
-				logger.info(issueList.size() + " issues changed/added since last sync");
+				logger.debug(issueList.size() + " issues changed/added since last sync");
 				for (int i = issueList.size() - 1; i >= 0; i--) {
 					Issue issue = issueList.get(i);
 					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
@@ -297,7 +297,7 @@ public class Model {
 		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if(tIssue != null){
 			tIssue.copyValues(issue);
-			logger.info("Updated issue: " + issue.getId());
+			logger.debug("Updated issue: " + issue.getId());
 		}else{		
 			issues.add(0, issue);
 			logger.info("Added issue: " + issue.getId());
