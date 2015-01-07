@@ -96,6 +96,10 @@ public class TurboIssue implements Listable {
 		this.pullRequest = pr;
 	}
 	
+	public boolean isPullRequest() {
+		return pullRequest != null && pullRequest.getUrl() != null;
+	}
+	
 	private IntegerProperty id = new SimpleIntegerProperty();
     public final int getId() {
     	return id.get();
