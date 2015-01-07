@@ -3,6 +3,11 @@ package model;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +28,7 @@ import org.eclipse.egit.github.core.PullRequest;
 
 import service.ServiceManager;
 import storage.DataManager;
+import util.CollectionUtilities;
 
 
 public class TurboIssue implements Listable {
@@ -58,6 +64,14 @@ public class TurboIssue implements Listable {
 		this.creator = creator;
 	}
 	
+	private LocalDateTime updatedAt;
+	public LocalDateTime getUpdatedAt() {
+		return this.updatedAt;
+	}
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
 	private String createdAt;
 	public String getCreatedAt() {
 		return this.createdAt;
@@ -80,6 +94,10 @@ public class TurboIssue implements Listable {
 	}
 	public void setPullRequest(PullRequest pr){
 		this.pullRequest = pr;
+	}
+	
+	public boolean isPullRequest() {
+		return pullRequest != null && pullRequest.getUrl() != null;
 	}
 	
 	private IntegerProperty id = new SimpleIntegerProperty();
@@ -364,6 +382,7 @@ public class TurboIssue implements Listable {
 		setNumOfComments(issue.getComments());
 		setCreator(issue.getUser().getLogin());
 		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue.getCreatedAt()));
+		setUpdatedAt(LocalDateTime.ofInstant(issue.getUpdatedAt().toInstant(), ZoneId.systemDefault()));
 	}
 
 	public Issue toGhResource() {
@@ -379,6 +398,7 @@ public class TurboIssue implements Listable {
 		return ghIssue;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void copyValues(Object other) {
 		assert other != null;
 		if(other.getClass() == TurboIssue.class){
@@ -386,18 +406,74 @@ public class TurboIssue implements Listable {
 			model = obj.getModel();
 			
 			setHtmlUrl(obj.getHtmlUrl());
+			
+			// Logging is done with the assumption that this method is used for updating the values of TurboIssue in mind
+			if (!obj.getTitle().equals(this.getTitle())) {
+				logger.info("Issue " + this.getId() + "; Title was '" + this.getTitle() + "'. Now it's '" + obj.getTitle() + "'");
+			}
 			setTitle(obj.getTitle());
 			setOpen(obj.isOpen());
 			setId(obj.getId());
+			
+			if (obj.getDescription() != null && this.getDescription() != null) {
+				if (!obj.getDescription().equals(this.getDescription())) {
+					logger.info("Issue " + this.getId() + "; Description was '" + this.getDescription() + "'. Now it's '" + obj.getDescription() + "'");
+				}
+			} else if (obj.getDescription() == null && this.getDescription() != null) {
+				logger.info("Description was removed for Issue " + this.getId());	
+			} else if (obj.getDescription() != null && this.getDescription() == null) {
+				logger.info("Description was added for Issue " + this.getId());
+			}
 			setDescription(obj.getDescription());
+			
+			if (obj.getAssignee() != null && this.getAssignee() != null) {
+				if (!obj.getAssignee().equals(this.getAssignee())) {
+					logger.info("Issue " + this.getId() + "; Assignee was '" + this.getAssignee() + "'. Now it's '" + obj.getAssignee() + "'");
+				}
+			} else if (obj.getAssignee() == null && this.getAssignee() != null) {
+				logger.info("Assignee was removed for Issue " + this.getId());	
+			} else if (obj.getAssignee() != null && this.getAssignee() == null) {
+				logger.info("Assignee was added for Issue " + this.getId());
+			}
 			setAssignee(obj.getAssignee());
+			
+			if (obj.getMilestone() != null && this.getMilestone() != null) {
+				if (!obj.getMilestone().equals(this.getMilestone())) {
+					logger.info("Issue " + this.getId() + "; Milestone was '" + this.getMilestone() + "'. Now it's '" + obj.getMilestone() + "'");
+				}
+			} else if (obj.getMilestone() == null && this.getMilestone() != null) {
+				logger.info("Milestone was removed for Issue " + this.getId());	
+			} else if (obj.getMilestone() != null && this.getMilestone() == null) {
+				logger.info("Milestone was added for Issue " + this.getId());
+			}
 			setMilestone(obj.getMilestone());
+			
+			List oldList = new ArrayList<TurboLabel>();
+			List newList = new ArrayList<TurboLabel>();
+			for (TurboLabel label : this.getLabels()) {
+				oldList.add(label);
+			}
+			for (TurboLabel label : obj.getLabels()) {
+				newList.add(label);
+			}
+			HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(oldList, newList);
+			HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
+			HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
+			if (removed.size() > 0) {
+				logger.info(removed.size() + " label(s) removed. Label name(s):");
+				removed.forEach(System.out::println);
+			}
+			if (added.size() > 0) {
+				logger.info(added.size() + " label(s) added. Label name(s):");
+				added.forEach(System.out::println);
+			}
 			setLabels(obj.getLabels());
 			setParentIssue(obj.getParentIssue());
 			setPullRequest(obj.getPullRequest());
 			setNumOfComments(obj.getNumOfComments());
 			setCreator(obj.getCreator());
 			setCreatedAt(obj.getCreatedAt());
+			setUpdatedAt(obj.getUpdatedAt());
 		}
 	}
 	
