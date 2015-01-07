@@ -51,7 +51,10 @@ public class DataCacheFileHandler {
 	}
 
 	public void readFromFile() {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.create();
+
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
 			
