@@ -143,20 +143,11 @@ public class MenuControl extends MenuBar {
 					ServiceManager.getInstance().stopModelUpdate();
 					ServiceManager.getInstance().getModel().forceReloadComponents();
 					ServiceManager.getInstance().restartModelUpdate();
-				} catch(SocketTimeoutException e){
-					Platform.runLater(()->{
-						logger.error("Menu: View > Force Refresh unsuccessful due to SocketTimeoutException");
-						DialogMessage.showWarningDialog("Internet Connection is down", 
-								"Timeout while loading items from github. Please check your internet connection.");
-						
-					});
+				} catch(SocketTimeoutException e) {
+					handleSocketTimeoutException();
 					return false;
-				} catch(UnknownHostException e){
-					Platform.runLater(()->{
-						logger.error("Menu: View > Force Refresh unsuccessful due to UnknownHostException");
-						DialogMessage.showWarningDialog("No Internet Connection", 
-								"Please check your internet connection and try again");
-					});
+				} catch(UnknownHostException e) {
+					handleUnknownHostException();
 					return false;
 				} catch (Exception e) {
 					logger.error("Menu: View > Force Refresh unsuccessful due to " + e);
@@ -165,6 +156,23 @@ public class MenuControl extends MenuBar {
 				}
 				logger.info("Menu: View > Force Refresh completed");
 				return true;
+			}
+
+			private void handleSocketTimeoutException() {
+				Platform.runLater(()->{
+					logger.error("Menu: View > Force Refresh unsuccessful due to SocketTimeoutException");
+					DialogMessage.showWarningDialog("Internet Connection is down", 
+							"Timeout while loading items from github. Please check your internet connection.");
+					
+				});
+			}
+
+			private void handleUnknownHostException() {
+				Platform.runLater(()->{
+					logger.error("Menu: View > Force Refresh unsuccessful due to UnknownHostException");
+					DialogMessage.showWarningDialog("No Internet Connection", 
+							"Please check your internet connection and try again");
+				});
 			}
 		};
 		DialogMessage.showProgressDialog(task, "Reloading issues for current repo... This may take awhile, please wait.");
