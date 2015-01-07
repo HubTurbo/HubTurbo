@@ -143,10 +143,10 @@ public class MenuControl extends MenuBar {
 					ServiceManager.getInstance().stopModelUpdate();
 					ServiceManager.getInstance().getModel().forceReloadComponents();
 					ServiceManager.getInstance().restartModelUpdate();
-				} catch(SocketTimeoutException e) {
+				} catch (SocketTimeoutException e) {
 					handleSocketTimeoutException();
 					return false;
-				} catch(UnknownHostException e) {
+				} catch (UnknownHostException e) {
 					handleUnknownHostException();
 					return false;
 				} catch (Exception e) {
@@ -159,7 +159,7 @@ public class MenuControl extends MenuBar {
 			}
 
 			private void handleSocketTimeoutException() {
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					logger.error("Menu: View > Force Refresh unsuccessful due to SocketTimeoutException");
 					DialogMessage.showWarningDialog("Internet Connection is down", 
 							"Timeout while loading items from github. Please check your internet connection.");
@@ -168,7 +168,7 @@ public class MenuControl extends MenuBar {
 			}
 
 			private void handleUnknownHostException() {
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					logger.error("Menu: View > Force Refresh unsuccessful due to UnknownHostException");
 					DialogMessage.showWarningDialog("No Internet Connection", 
 							"Please check your internet connection and try again");
