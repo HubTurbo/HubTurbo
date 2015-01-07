@@ -389,11 +389,11 @@ public class Model {
 	        	list.removeAll(removed);
   	
 	        	Listable listItem = (Listable)newList.get(0);
-	        	if (listItem.getClass() == TurboMilestone.class) {
+	        	if (listItem instanceof TurboMilestone) {
 	        		logNumOfUpdates(newList, "milestone(s)");
-	        	} else if (listItem.getClass() == TurboLabel.class) {
+	        	} else if (listItem instanceof TurboLabel) {
 	        		logNumOfUpdates(newList, "label(s)");
-	        	} else if (listItem.getClass() == TurboUser.class) {
+	        	} else if (listItem instanceof TurboUser) {
 	        		logNumOfUpdates(newList, "collaborator(s)");
 	        	}
 	        	
