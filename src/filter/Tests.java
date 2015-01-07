@@ -13,6 +13,7 @@ import filter.expression.Conjunction;
 import filter.expression.DateRange;
 import filter.expression.Disjunction;
 import filter.expression.Negation;
+import filter.expression.NumberRange;
 import filter.expression.Qualifier;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
@@ -100,6 +101,18 @@ public class Tests {
 
         assertEquals(Parser.parse("a:b AND c:d AND e:f"),
                 new Conjunction(new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+    }
+
+    @Test
+    public void numberRanges() {
+        assertEquals(Parser.parse("updated:<24"),
+        		new Qualifier("updated", new NumberRange(null, 24, true)));
+        assertEquals(Parser.parse("updated:<=24"),
+        		new Qualifier("updated", new NumberRange(null, 24)));
+        assertEquals(Parser.parse("updated:>=24"),
+        		new Qualifier("updated", new NumberRange(24, null)));
+        assertEquals(Parser.parse("updated:>24"),
+        		new Qualifier("updated", new NumberRange(24, null, true)));
     }
 
     @Test
