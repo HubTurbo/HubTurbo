@@ -1,7 +1,10 @@
 package ui;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -140,8 +143,25 @@ public class MenuControl extends MenuBar {
 					ServiceManager.getInstance().stopModelUpdate();
 					ServiceManager.getInstance().getModel().forceReloadComponents();
 					ServiceManager.getInstance().restartModelUpdate();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch(SocketTimeoutException e){
+					Platform.runLater(()->{
+						logger.error("Menu: View > Force Refresh unsuccessful due to SocketTimeoutException");
+						DialogMessage.showWarningDialog("Internet Connection is down", 
+								"Timeout while loading items from github. Please check your internet connection.");
+						
+					});
+					return false;
+				} catch(UnknownHostException e){
+					Platform.runLater(()->{
+						logger.error("Menu: View > Force Refresh unsuccessful due to UnknownHostException");
+						DialogMessage.showWarningDialog("No Internet Connection", 
+								"Please check your internet connection and try again");
+					});
+					return false;
+				} catch (Exception e) {
+					logger.error("Menu: View > Force Refresh unsuccessful due to " + e);
+					e.printStackTrace();
+					return false;
 				}
 				logger.info("Menu: View > Force Refresh completed");
 				return true;
