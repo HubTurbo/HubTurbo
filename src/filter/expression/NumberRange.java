@@ -1,17 +1,24 @@
 package filter.expression;
 
+/**
+ * Represents an open numerical interval. It may be strict, in which case it
+ * excludes both endpoints. Provides an encloses method to check if a number
+ * falls within it.
+ */
 public class NumberRange {
 	private final Integer start;
 	private final Integer end;
 	private final boolean strictly;
 	
 	public NumberRange(Integer start, Integer end) {
+		assert !(start != null && end != null) : "Both cannot contain values, as number ranges like .. aren't implemented yet";
 		this.start = start;
 		this.end = end;
 		this.strictly = false;
 	}
 	
 	public NumberRange(Integer start, Integer end, boolean strict) {
+		assert !(start != null && end != null) : "Both cannot contain values, as number ranges like .. aren't implemented yet";
 		this.start = start;
 		this.end = end;
 		this.strictly = strict;

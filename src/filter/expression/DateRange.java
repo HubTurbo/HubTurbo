@@ -2,6 +2,11 @@ package filter.expression;
 
 import java.time.LocalDate;
 
+/**
+ * Represents an open date interval. It may be strict, in which case it
+ * excludes one or both endpoints. Provides an encloses method to check if a date
+ * falls within it.
+ */
 public class DateRange {
 	private final LocalDate start;
 	private final LocalDate end;
