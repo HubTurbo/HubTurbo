@@ -69,7 +69,7 @@ public class IssuePanelCard extends VBox {
 	private void updateDetails() {
 		issueDetails.getChildren().clear();
 		
-		if (issue.hasPullRequest()) {
+		if (issue.isPullRequest()) {
 			Label icon = new Label(OCTICON_PULL_REQUEST);
 			icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
 			issueDetails.getChildren().add(icon);

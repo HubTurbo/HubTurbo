@@ -82,7 +82,7 @@ public class TurboIssue implements Listable {
 		this.pullRequest = pr;
 	}
 	
-	public boolean hasPullRequest() {
+	public boolean isPullRequest() {
 		return pullRequest != null && pullRequest.getUrl() != null;
 	}
 	
