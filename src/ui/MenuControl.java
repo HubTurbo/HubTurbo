@@ -1,7 +1,14 @@
 package ui;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
@@ -17,7 +24,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
+import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
+import util.DialogMessage;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
@@ -120,18 +129,33 @@ public class MenuControl extends MenuBar {
 	private MenuItem createForceRefreshMenuItem() {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
-			try {
-				logger.info("Menu: View > Force Refresh");
-				ServiceManager.getInstance().stopModelUpdate();
-				ServiceManager.getInstance().getModel().forceReloadComponents();
-				ServiceManager.getInstance().restartModelUpdate();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-			logger.info("Menu: View > Force Refresh completed");
+			triggerForceRefreshProgressDialog();
 		});
+		
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
+	}
+	
+	private void triggerForceRefreshProgressDialog() {
+		Task<Boolean> task = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws IOException {
+				try {
+					logger.info("Menu: View > Force Refresh");
+					ServiceManager.getInstance().stopModelUpdate();
+					ServiceManager.getInstance().getModel().forceReloadComponents();
+					ServiceManager.getInstance().restartModelUpdate();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				logger.info("Menu: View > Force Refresh completed");
+				return true;
+			}
+		};
+		DialogMessage.showProgressDialog(task, "Reloading issues for current repo. This may take awhile, please wait...");
+		Thread thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	private MenuItem[] createNewMenuItems() {
