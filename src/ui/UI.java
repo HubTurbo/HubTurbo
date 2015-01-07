@@ -63,7 +63,7 @@ public class UI extends Application {
 	
 	private EventBus events;
 	
-	// Application argumnets
+	// Application arguments
 	
 	private HashMap<String, String> commandLineArgs;
 		

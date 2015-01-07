@@ -5,7 +5,6 @@ public enum TokenType {
 	LBRACKET,
 	RBRACKET,
 	SYMBOL,
-	NUMBER,
 	NOT,
 	AND,
 	OR,

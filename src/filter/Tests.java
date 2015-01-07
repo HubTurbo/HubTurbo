@@ -13,6 +13,7 @@ import filter.expression.Conjunction;
 import filter.expression.DateRange;
 import filter.expression.Disjunction;
 import filter.expression.Negation;
+import filter.expression.NumberRange;
 import filter.expression.Qualifier;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
@@ -100,6 +101,18 @@ public class Tests {
 
         assertEquals(Parser.parse("a:b AND c:d AND e:f"),
                 new Conjunction(new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+    }
+
+    @Test
+    public void numberRanges() {
+        assertEquals(Parser.parse("updated:<24"),
+        		new Qualifier("updated", new NumberRange(null, 24, true)));
+        assertEquals(Parser.parse("updated:<=24"),
+        		new Qualifier("updated", new NumberRange(null, 24)));
+        assertEquals(Parser.parse("updated:>=24"),
+        		new Qualifier("updated", new NumberRange(24, null)));
+        assertEquals(Parser.parse("updated:>24"),
+        		new Qualifier("updated", new NumberRange(24, null, true)));
     }
 
     @Test
@@ -234,5 +247,37 @@ public class Tests {
                 new Token(TokenType.SYMBOL, "b'", 0),
                 new Token(TokenType.SYMBOL, "c'", 0),
                 new Token(TokenType.EOF, "", 0))));
+    }
+    
+    @Test
+    public void serialisation() {
+    	
+    	String[] tests = {
+    		"abcdefg:hijkl",
+    		"!abcdefg:hijkl", // NOT
+    		"abcdefg:hijkl || zxc:aksljd", // OR
+    		"abcdefg:hijkl && zxc:aksljd", // AND
+    		"abcdefg:hijkl && zxc:aksljd || alsk:asl", // OR and AND precedence
+    		"abcdefg:hijkl || zxc:aksljd && alsk:asl",
+    		"(abcdefg:hijkl || zxc:aksljd) && alsk:asl", // Grouping
+    		"(abcdefg:hijkl && zxc:aksljd) || alsk:asl",
+    		"abcdefg:hijkl && !zxc:aksljd || !alsk:asl", // OR, AND, NOT
+    		"abcdefg:hijkl || !zxc:aksljd && !alsk:asl",
+			"updated:>24", // Number ranges
+			"updated:>=24",
+			"updated:<24",
+			"updated:<=24",
+			"created:<=2014-12-4", // Date operators
+			"created:>=2014-12-4",
+			"created:<2014-12-4",
+			"created:>2014-12-4",
+			"created:2014-12-4 .. 2014-12-6", // Date ranges
+    	};
+
+    	// We want to ensure that parsing some filter, and parsing the serialised version
+    	// of that filter, results in the same data structure.
+    	for (int i=0; i<tests.length; i++) {
+        	assertEquals(Parser.parse(Parser.parse(tests[i]).toString()), Parser.parse(tests[i]));
+    	}
     }
 }

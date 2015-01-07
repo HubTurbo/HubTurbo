@@ -3,6 +3,8 @@ package model;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,14 @@ public class TurboIssue implements Listable {
 		this.creator = creator;
 	}
 	
+	private LocalDateTime updatedAt;
+	public LocalDateTime getUpdatedAt() {
+		return this.updatedAt;
+	}
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
 	private String createdAt;
 	public String getCreatedAt() {
 		return this.createdAt;
@@ -364,6 +374,7 @@ public class TurboIssue implements Listable {
 		setNumOfComments(issue.getComments());
 		setCreator(issue.getUser().getLogin());
 		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue.getCreatedAt()));
+		setUpdatedAt(LocalDateTime.ofInstant(issue.getUpdatedAt().toInstant(), ZoneId.systemDefault()));
 	}
 
 	public Issue toGhResource() {
@@ -398,6 +409,7 @@ public class TurboIssue implements Listable {
 			setNumOfComments(obj.getNumOfComments());
 			setCreator(obj.getCreator());
 			setCreatedAt(obj.getCreatedAt());
+			setUpdatedAt(obj.getUpdatedAt());
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package storage;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.eclipse.egit.github.core.PullRequest;
 class TurboSerializableIssue {
 	private String creator;
 	private String createdAt;
+	private LocalDateTime updatedAt;
 	private int numOfComments;
 	private PullRequest pullRequest;
 	
@@ -38,6 +40,7 @@ class TurboSerializableIssue {
 	public TurboSerializableIssue(TurboIssue issue) {
 		this.creator = issue.getCreator();
 		this.createdAt = issue.getCreatedAt();
+		this.updatedAt = issue.getUpdatedAt();
 		this.numOfComments = issue.getNumOfComments();
 		this.pullRequest = issue.getPullRequest();
 		
@@ -81,6 +84,7 @@ class TurboSerializableIssue {
 		
 		tI.setCreator(creator);
 		tI.setCreatedAt(createdAt);
+		tI.setUpdatedAt(updatedAt);
 		tI.setNumOfComments(numOfComments);
 		tI.setPullRequest(pullRequest);
 		
