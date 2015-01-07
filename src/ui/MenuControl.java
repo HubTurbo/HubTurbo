@@ -1,11 +1,7 @@
 package ui;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -24,7 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
-import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.events.IssueCreatedEvent;
@@ -152,7 +147,7 @@ public class MenuControl extends MenuBar {
 				return true;
 			}
 		};
-		DialogMessage.showProgressDialog(task, "Reloading issues for current repo. This may take awhile, please wait...");
+		DialogMessage.showProgressDialog(task, "Reloading issues for current repo... This may take awhile, please wait.");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
