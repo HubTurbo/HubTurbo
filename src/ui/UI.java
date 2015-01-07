@@ -178,7 +178,7 @@ public class UI extends Application {
 	private Parent createRoot() throws IOException {
 
 		sidePanel = new SidePanel(this, mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel(), sidePanel);
+		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
 		sidePanel.setColumns(columns);
 		
 		UIReference.getInstance().setUI(this);

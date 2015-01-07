@@ -16,7 +16,6 @@ import ui.UI;
 import ui.components.StatusBar;
 import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
-import ui.sidepanel.SidePanel;
 import util.events.ColumnChangeEvent;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
@@ -31,7 +30,6 @@ public class ColumnControl extends HBox {
 	private final UI ui;
 	private final Stage stage;
 	private final Model model;
-	private final SidePanel sidePanel;
 	
 	@SuppressWarnings("unused")
 	private final UIBrowserBridge uiBrowserBridge;
@@ -39,11 +37,10 @@ public class ColumnControl extends HBox {
 	private TurboCommandExecutor dragAndDropExecutor;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
-	public ColumnControl(UI ui, Stage stage, Model model, SidePanel sidePanel) {
+	public ColumnControl(UI ui, Stage stage, Model model) {
 		this.ui = ui;
 		this.stage = stage;
 		this.model = model;
-		this.sidePanel = sidePanel;
 		this.dragAndDropExecutor = new TurboCommandExecutor();
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
@@ -109,7 +106,7 @@ public class ColumnControl extends HBox {
 	}
 	
 	private IssueColumn addColumn() {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, getChildren().size(), dragAndDropExecutor);
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
 		panel.setItems(model.getIssues());
 		ui.triggerEvent(new ColumnChangeEvent());
@@ -117,7 +114,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public IssueColumn addColumnAt(int index) {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
+		IssueColumn panel = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -147,9 +144,9 @@ public class ColumnControl extends HBox {
 		IssueColumn current = (IssueColumn) getChildren().get(index);
 		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
 		if (current instanceof HierarchicalIssuePanel) {
-			column = new IssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
+			column = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
 		} else {
-			column = new HierarchicalIssuePanel(ui, stage, model, this, sidePanel, index, dragAndDropExecutor);
+			column = new HierarchicalIssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
 		}
 		column.setItems(model.getIssues());
 		column.filter(currentFilterExpr);

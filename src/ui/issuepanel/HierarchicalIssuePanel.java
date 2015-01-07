@@ -15,29 +15,22 @@ import model.TurboIssue;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
-import ui.sidepanel.SidePanel;
 
 import command.TurboCommandExecutor;
 
 public class HierarchicalIssuePanel extends IssueColumn {
 
-//	private final Stage mainStage;
 	private final Model model;
 	private final ColumnControl parentColumnControl;
-//	private final int columnIndex;
-	private final SidePanel sidePanel;
 	private final UI ui;
 	
 	VBox content = new VBox();
 	ScrollPane scrollPane = new ScrollPane();
 	
-	public HierarchicalIssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
-		super(ui, mainStage, model, parentColumnControl, sidePanel, columnIndex, dragAndDropExecutor);
-//		this.mainStage = mainStage;
+	public HierarchicalIssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
-//		this.columnIndex = columnIndex;
-		this.sidePanel = sidePanel;
 		this.ui = ui;
 
 		VBox.setVgrow(scrollPane, Priority.ALWAYS);
@@ -86,7 +79,6 @@ public class HierarchicalIssuePanel extends IssueColumn {
 		ArrayList<TurboIssue> created = new ArrayList<>();
 		
 		for (TurboIssue issue : filteredIssues) {
-//			System.out.println("at issue " + issue.getId());
 			// Do parents
 			TurboIssue current = issue;
 			do {
@@ -94,7 +86,6 @@ public class HierarchicalIssuePanel extends IssueColumn {
 					items.put(current.getId(), new HierarchicalIssuePanelItem(current));
 					created.add(current);
 				}
-//				if (current.getId() != issue.getId()) System.out.println("parent " + current.getId());
 				current = model.getIssueWithId(current.getParentIssue());
 			} while (current != null);
 			
@@ -103,7 +94,6 @@ public class HierarchicalIssuePanel extends IssueColumn {
 			stack.push(issue);
 			while (stack.size() > 0) {
 				TurboIssue ish = stack.pop();
-//				if (ish.getId() != issue.getId()) System.out.println("child " + ish.getId());
 				if (!items.containsKey(ish.getId())) {
 					items.put(ish.getId(), new HierarchicalIssuePanelItem(ish));
 					created.add(ish);
@@ -115,25 +105,19 @@ public class HierarchicalIssuePanel extends IssueColumn {
 				}
 			}
 		}
-//		System.out.println("created " + created.size() + " " + created);
 		
 		// Make another pass, add those that are children to their parents
 		for (TurboIssue issue : created) {
 			if (issue.getParentIssue() == -1) {
-//				System.out.println("added " + issue.getId());
 				content.getChildren().add(items.get(issue.getId()));
 			}
 			else {
-//				System.out.println("parented " + issue.getId());
 				assert items.get(issue.getParentIssue()) != null;
 				items.get(issue.getParentIssue()).addChild(items.get(issue.getId()));
 			}
 			
 			HierarchicalIssuePanelItem item = items.get(issue.getId());
 			item.setExpanded(true);
-			final TurboIssue thisIssue = issue;
-			item.setOnMouseClicked(e -> sidePanel.triggerIssueEdit(thisIssue, true));
-//			item.setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		}
 	}
 }
