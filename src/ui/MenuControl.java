@@ -1,7 +1,13 @@
 package ui;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
@@ -18,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
 import ui.issuecolumn.ColumnControl;
+import util.DialogMessage;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
@@ -120,18 +127,58 @@ public class MenuControl extends MenuBar {
 	private MenuItem createForceRefreshMenuItem() {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
-			try {
-				logger.info("Menu: View > Force Refresh");
-				ServiceManager.getInstance().stopModelUpdate();
-				ServiceManager.getInstance().getModel().forceReloadComponents();
-				ServiceManager.getInstance().restartModelUpdate();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-			logger.info("Menu: View > Force Refresh completed");
+			triggerForceRefreshProgressDialog();
 		});
+		
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
+	}
+	
+	private void triggerForceRefreshProgressDialog() {
+		Task<Boolean> task = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws IOException {
+				try {
+					logger.info("Menu: View > Force Refresh");
+					ServiceManager.getInstance().stopModelUpdate();
+					ServiceManager.getInstance().getModel().forceReloadComponents();
+					ServiceManager.getInstance().restartModelUpdate();
+				} catch (SocketTimeoutException e) {
+					handleSocketTimeoutException(e);
+					return false;
+				} catch (UnknownHostException e) {
+					handleUnknownHostException(e);
+					return false;
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					e.printStackTrace();
+					return false;
+				}
+				logger.info("Menu: View > Force Refresh completed");
+				return true;
+			}
+
+			private void handleSocketTimeoutException(Exception e) {
+				Platform.runLater(() -> {
+					logger.error(e.getMessage(), e);
+					DialogMessage.showWarningDialog("Internet Connection is down", 
+							"Timeout while loading items from github. Please check your internet connection.");
+					
+				});
+			}
+
+			private void handleUnknownHostException(Exception e) {
+				Platform.runLater(() -> {
+					logger.error(e.getMessage(), e);
+					DialogMessage.showWarningDialog("No Internet Connection", 
+							"Please check your internet connection and try again");
+				});
+			}
+		};
+		DialogMessage.showProgressDialog(task, "Reloading issues for current repo... This may take awhile, please wait.");
+		Thread thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	private MenuItem[] createNewMenuItems() {
