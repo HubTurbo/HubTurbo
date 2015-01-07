@@ -1,7 +1,9 @@
 package filter.expression;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import util.Utility;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -28,7 +31,9 @@ public class Qualifier implements FilterExpression {
 	private Optional<DateRange> dateRange = Optional.empty();
 	private Optional<String> content = Optional.empty();
 	private Optional<LocalDate> date = Optional.empty();
+	private Optional<NumberRange> numberRange = Optional.empty();
 
+	// Copy constructor
 	public Qualifier(Qualifier other) {
 		this.name = other.getName();
 		if (other.getDateRange().isPresent()) {
@@ -45,6 +50,11 @@ public class Qualifier implements FilterExpression {
 		this.content = Optional.of(content);
 	}
 	
+	public Qualifier(String name, NumberRange numberRange) {
+		this.name = name;
+		this.numberRange = Optional.of(numberRange);
+	}
+
 	public Qualifier(String name, DateRange dateRange) {
 		this.name = name;
 		this.dateRange = Optional.of(dateRange);
@@ -113,12 +123,14 @@ public class Qualifier implements FilterExpression {
             return satisfiesIsConditions(issue);
         case "created":
             return satisfiesCreationDate(issue);
+        case "updated":
+            return satisfiesUpdatedHours(issue);
         default:
             return false;
         }
     }
 
-    @Override
+	@Override
     public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
         assert name != null && content != null;
         
@@ -290,6 +302,12 @@ public class Qualifier implements FilterExpression {
         return issue.getId() == parseIdString(content.get());
     }
 
+    private boolean satisfiesUpdatedHours(TurboIssue issue) {
+    	if (!numberRange.isPresent()) return false;
+    	long hours = LocalDateTime.now().until(issue.getUpdatedAt(), ChronoUnit.HOURS);
+		return numberRange.get().encloses(Utility.safeLongToInt(hours));
+	}
+    
     private boolean satisfiesCreationDate(TurboIssue issue) {
     	LocalDate creationDate = LocalDate.parse(issue.getCreatedAt(), formatter);
     	if (date.isPresent()) {

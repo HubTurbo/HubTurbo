@@ -11,6 +11,7 @@ import filter.expression.DateRange;
 import filter.expression.Disjunction;
 import filter.expression.FilterExpression;
 import filter.expression.Negation;
+import filter.expression.NumberRange;
 import filter.expression.Qualifier;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
@@ -176,7 +177,7 @@ public class Parser {
 
 	private FilterExpression parseQualifierContent(String qualifierName, boolean allowMultipleKeywords) {
 		if (isRangeOperatorToken(lookAhead())) {
-			// < > <= >= [number | date range]
+			// < > <= >= [number range | date range]
 			return parseRangeOperator(qualifierName, lookAhead());
 		}
 		else if (isNumberOrDateToken(lookAhead())) {
@@ -270,8 +271,8 @@ public class Parser {
 		
 		consume(token.getType());
 		if (isNumberOrDateToken(lookAhead())) {
-			Token dateToken = consume();
-			Optional<LocalDate> date = parseDate(dateToken);
+			Token contentToken = consume();
+			Optional<LocalDate> date = parseDate(contentToken);
 			if (date.isPresent()) {
 				// Date
 				switch (token.getType()) {
@@ -289,14 +290,31 @@ public class Parser {
 				assert false : "Should not happen";
 				return null;
 			} else {
-				// Number
+				// May a number or something else
 				try {
-//					int num = Integer.parseInt(info.getValue());
-//					return new Qualifier(name, num);
-					throw new ParseException("Not yet implemented");
+					Integer.parseInt(contentToken.getValue());
 				} catch (NumberFormatException e) {
+					// Exit with an exception if it's not a number
 					throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
 				}
+				
+				// Number
+                int num = Integer.parseInt(contentToken.getValue());
+                		
+				switch (token.getType()) {
+				case GT:
+					return new Qualifier(name, new NumberRange(num, null, true));
+				case GTE:
+					return new Qualifier(name, new NumberRange(num, null));
+				case LT:
+					return new Qualifier(name, new NumberRange(null, num, true));
+				case LTE:
+					return new Qualifier(name, new NumberRange(null, num));
+				default:
+					assert false : "Should not happen";
+				}
+				assert false : "Should not happen";
+				return null;
 			}
 		} else {
 			throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
