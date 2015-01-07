@@ -10,7 +10,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -29,7 +28,6 @@ import storage.DataManager;
 import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.BrowserComponent;
-import ui.sidepanel.SidePanel;
 import util.Utility;
 import util.events.ColumnChangeEvent;
 import util.events.ColumnChangeEventHandler;
@@ -55,7 +53,6 @@ public class UI extends Application {
 	
 	private Stage mainStage;
 	private ColumnControl columns;
-	private SidePanel sidePanel;
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
 
@@ -97,7 +94,6 @@ public class UI extends Application {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
 				columns.loadIssues();
-				sidePanel.refresh();
 				triggerEvent(new LoginEvent());
 				setExpandedWidth(false);
 			} else {
@@ -177,9 +173,7 @@ public class UI extends Application {
 	
 	private Parent createRoot() throws IOException {
 
-		sidePanel = new SidePanel(this, mainStage, ServiceManager.getInstance().getModel());
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
-		sidePanel.setColumns(columns);
 		
 		UIReference.getInstance().setUI(this);
 
@@ -191,14 +185,9 @@ public class UI extends Application {
 		
 		menuBar = new MenuControl(this, columns, columnsScroll);
 
-		HBox centerContainer = new HBox();
-		centerContainer.setPadding(new Insets(5,0,5,0));
-		centerContainer.getChildren().addAll(sidePanel.getControlLabel(), columnsScroll);
-
 		BorderPane root = new BorderPane();
 		root.setTop(menuBar);
-		root.setLeft(sidePanel);
-		root.setCenter(centerContainer);
+		root.setCenter(columnsScroll);
 		root.setBottom(StatusBar.getInstance());
 
 		return root;
@@ -310,7 +299,7 @@ public class UI extends Application {
 				? dimensions.getWidth()
 				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-		mainStage.setMinWidth(sidePanel.getWidth() + columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getColumnWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
