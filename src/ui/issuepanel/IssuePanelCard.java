@@ -23,6 +23,7 @@ import model.TurboLabel;
 
 public class IssuePanelCard extends VBox {
 
+	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
 	/**
 	 * A card that is constructed with an issue as argument. Its components
@@ -67,6 +68,12 @@ public class IssuePanelCard extends VBox {
 	
 	private void updateDetails() {
 		issueDetails.getChildren().clear();
+		
+		if (issue.isPullRequest()) {
+			Label icon = new Label(OCTICON_PULL_REQUEST);
+			icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
+			issueDetails.getChildren().add(icon);
+		}
 		
 		for (TurboLabel label : issue.getLabels()) {
 			Label labelText = new Label(label.getName());

@@ -277,12 +277,10 @@ public class ServiceManager {
 
 			List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
 			try {
+				logger.info("Getting feed from GitHub...");
 				ghFeeds = getFeeds();
 			} catch (Exception e) {
 				System.out.println(e.getLocalizedMessage());
-				// unable to access collaborators if user does not have a push
-				// access
-				// this case is being handled in model's load components
 			}
 
 			HashMap<String, List> map = new HashMap<String, List>();

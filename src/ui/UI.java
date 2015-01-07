@@ -41,9 +41,9 @@ import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
 
-	private static final int VERSION_MAJOR = 0;
-	private static final int VERSION_MINOR = 8;
-	private static final int VERSION_PATCH = 1;
+	private static final int VERSION_MAJOR = 1;
+	private static final int VERSION_MINOR = 0;
+	private static final int VERSION_PATCH = 0;
 	
 	public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -63,7 +63,7 @@ public class UI extends Application {
 	
 	private EventBus events;
 	
-	// Application argumnets
+	// Application arguments
 	
 	private HashMap<String, String> commandLineArgs;
 		
