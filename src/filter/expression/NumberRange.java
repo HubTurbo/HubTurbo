@@ -11,17 +11,17 @@ public class NumberRange {
 	private final boolean strictly;
 	
 	public NumberRange(Integer start, Integer end) {
-		assert !(start != null && end != null) : "Both cannot contain values, as number ranges like .. aren't implemented yet";
 		this.start = start;
 		this.end = end;
 		this.strictly = false;
+		checkIntervalValidity();
 	}
-	
+
 	public NumberRange(Integer start, Integer end, boolean strict) {
-		assert !(start != null && end != null) : "Both cannot contain values, as number ranges like .. aren't implemented yet";
 		this.start = start;
 		this.end = end;
 		this.strictly = strict;
+		checkIntervalValidity();
 	}
 
 	public boolean encloses(int number) {
@@ -39,6 +39,16 @@ public class NumberRange {
 		}
 	}
 
+	/**
+	 * Checks if an interval is valid. A valid interval should contain either
+	 * start or end, as number ranges with .. aren't implemented yet.
+	 * TODO change once .. is implemented
+	 */
+	private void checkIntervalValidity() {
+		assert !(start == null && end == null) : "Both can't be null";
+		assert !(start != null && end != null) : "Both cannot contain values";
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -75,6 +85,21 @@ public class NumberRange {
 
 	@Override
 	public String toString() {
-		return "NumberRange [start=" + start + ", end=" + end + ", strictly=" + strictly + "]";
+		checkIntervalValidity();
+
+		if (start != null) {
+			if (strictly) {
+				return ">" + start;
+			} else {
+				return ">=" + start;
+			}
+		} else {
+			assert end != null;
+			if (strictly) {
+				return "<" + end;
+			} else {
+				return "<=" + end;
+			}
+		}
 	}
 }

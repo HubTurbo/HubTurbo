@@ -16,12 +16,14 @@ public class DateRange {
 		this.start = start;
 		this.end = end;
 		this.strictly = false;
+		checkIntervalValidity();
 	}
-	
+
 	public DateRange(LocalDate start, LocalDate end, boolean strict) {
 		this.start = start;
 		this.end = end;
 		this.strictly = strict;
+		checkIntervalValidity();
 	}
 
 	public boolean encloses(LocalDate date) {
@@ -38,6 +40,13 @@ public class DateRange {
 		}
 	}
 
+	/**
+	 * A valid interval has either a start and end, or both.
+	 */
+	private void checkIntervalValidity() {
+		assert !(start == null && end == null);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -74,6 +83,25 @@ public class DateRange {
 
 	@Override
 	public String toString() {
-		return "DateRange [start=" + start + ", end=" + end + ", strictly=" + strictly + "]";
+		checkIntervalValidity();
+		
+		if (end == null) {
+			assert start != null;
+			if (strictly) {
+				return ">" + start;
+			} else {
+				return ">=" + start;
+			}
+		} else if (start == null) {
+			assert end != null;
+			if (strictly) {
+				return "<" + end;
+			} else {
+				return "<=" + end;
+			}
+		} else {
+			assert start != null && end != null;
+			return start + " .. " + end;
+		}
 	}
 }
