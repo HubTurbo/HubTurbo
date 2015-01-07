@@ -4,6 +4,10 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +15,15 @@ import java.util.regex.Pattern;
 import javax.swing.UIManager;
 
 public class Utility {
+	
+	public static long localDateTimeToLong(LocalDateTime t) {
+		return t.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+	}
+	
+	public static LocalDateTime longToLocalDateTime(long epochMilli) {
+		Instant instant = new Date(epochMilli).toInstant();
+		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+	}
 	
 	public static Optional<int[]> parseVersionNumberString(String version) {
 		// Strip non-digits
