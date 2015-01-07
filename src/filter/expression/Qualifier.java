@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import util.Utility;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+import util.Utility;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
@@ -42,6 +42,10 @@ public class Qualifier implements FilterExpression {
 			this.date = other.getDate();
 		} else if (other.getContent().isPresent()) {
 			this.content = other.getContent();
+		} else if (other.getNumberRange().isPresent()) {
+			this.numberRange = other.getNumberRange();
+		} else {
+			assert false : "Unrecognised content type! You may have forgotten to add it above";
 		}
 	}
 	
@@ -225,6 +229,8 @@ public class Qualifier implements FilterExpression {
             return name + ":" + date.get().toString();
         } else if (dateRange.isPresent()) {
             return name + ":" + dateRange.get().toString();
+        } else if (numberRange.isPresent()) {
+        	return name + ":" + numberRange.get().toString();
         } else {
             assert false : "Should not happen";
             return "";
@@ -304,7 +310,7 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
     	if (!numberRange.isPresent()) return false;
-    	long hours = LocalDateTime.now().until(issue.getUpdatedAt(), ChronoUnit.HOURS);
+    	long hours = issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS);
 		return numberRange.get().encloses(Utility.safeLongToInt(hours));
 	}
     
@@ -564,28 +570,20 @@ public class Qualifier implements FilterExpression {
         }
     }
     
-	public Optional<DateRange> getDateRange() {
-		return dateRange;
+	public Optional<NumberRange> getNumberRange() {
+		return numberRange;
 	}
 
-	public void setDateRange(Optional<DateRange> dateRange) {
-		this.dateRange = dateRange;
+	public Optional<DateRange> getDateRange() {
+		return dateRange;
 	}
 
 	public Optional<String> getContent() {
 		return content;
 	}
 
-	public void setContent(Optional<String> content) {
-		this.content = content;
-	}
-
 	public Optional<LocalDate> getDate() {
 		return date;
-	}
-
-	public void setDate(Optional<LocalDate> date) {
-		this.date = date;
 	}
 
 	public String getName() {
