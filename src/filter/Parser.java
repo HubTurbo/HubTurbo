@@ -296,7 +296,7 @@ public class Parser {
 				assert false : "Should not happen";
 				return null;
 			} else {
-				// May a number or something else
+				// May be a number or something else
 				try {
 					Integer.parseInt(contentToken.getValue());
 				} catch (NumberFormatException e) {
@@ -304,7 +304,7 @@ public class Parser {
 					throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
 				}
 				
-				// Number
+				// Must be a number
                 int num = Integer.parseInt(contentToken.getValue());
                 		
 				switch (token.getType()) {
