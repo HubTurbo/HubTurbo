@@ -69,12 +69,12 @@ public class IssuePanelCard extends VBox {
 	private void updateDetails() {
 		issueDetails.getChildren().clear();
 		
-		if (issue.getPullRequest() != null) {
+		if (issue.hasPullRequest()) {
 			Label icon = new Label(OCTICON_PULL_REQUEST);
 			icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
 			issueDetails.getChildren().add(icon);
 		}
-		
+		// has pull request function
 		for (TurboLabel label : issue.getLabels()) {
 			Label labelText = new Label(label.getName());
 			labelText.getStyleClass().add("labels");
