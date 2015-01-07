@@ -1,14 +1,5 @@
 package ui.sidepanel;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SingleSelectionModel;
@@ -19,31 +10,21 @@ import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
-
 import service.ServiceManager;
-import storage.DataManager;
 import ui.RepositorySelector;
 import ui.UI;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
-import ui.components.StatusBar;
 import ui.feedmanagement.FeedManagementComponent;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.IssueDisplayPane;
 import ui.labelmanagement.LabelManagementComponent;
 import ui.milestonemanagement.MilestoneManagementComponent;
-import util.DialogMessage;
 
 /**
  * Represents the panel on the left side.
  * Encapsulates operations involving collapsing it and changing its layout.
  */
 public class SidePanel extends VBox {
-	private static final Logger logger = LogManager.getLogger(SidePanel.class.getName());
-	
 	public enum IssueEditMode{
 		NIL, CREATE, EDIT
 	};
@@ -127,7 +108,6 @@ public class SidePanel extends VBox {
 	}
 
 	public void refresh() {
-		resetRepoFields();
 		refreshSidebar();
 		String repoStr = ServiceManager.getInstance().getRepoId().generateId();
 		repoFields.setValue(repoStr);
@@ -209,10 +189,6 @@ public class SidePanel extends VBox {
 		assigneesTab = null;
 	}
 	
-	private void resetRepoFields(){
-		repoFields.refreshComboBoxContents();
-	}
-	
 	private Node tabLayout() {
 		
 		VBox everything = new VBox();
@@ -237,91 +213,11 @@ public class SidePanel extends VBox {
 		
 		selectionModel = tabs.getSelectionModel();
 		
-		if (repoFields == null) {
-			repoFields = createRepoFields();
-		}
-		
 		everything.getChildren().addAll(repoFields, tabs);
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
 	}
 	
-	private RepositorySelector createRepoFields() {
-		RepositorySelector repoIdBox = new RepositorySelector();
-		repoIdBox.setComboValueChangeMethod(this::loadRepo);
-		return repoIdBox;
-	}
-		
-	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
-		try {
-			if(!ServiceManager.getInstance().checkRepository(currRepo)){
-				Platform.runLater(() -> {
-					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
-				});
-				return false;
-			}
-		} catch (SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection Timeout", 
-					"Timeout while connecting to GitHub, please check your internet connection.");
-		} catch (UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection", 
-					"Please check your internet connection and try again.");
-		}catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		return true;
-	}
-
-	@SuppressWarnings("rawtypes")
-	private void loadRepo(String repoString) {
-		RepositoryId repoId = RepositoryId.createFromId(repoString);
-		if(repoId == null 
-		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
-		  || !checkRepoAccess(repoId)){
-			return;
-		}
-		
-		columns.saveSession();
-		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
-		Task<Boolean> task = new Task<Boolean>(){
-			@Override
-			protected Boolean call() throws IOException {
-				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
-			
-				final CountDownLatch latch = new CountDownLatch(1);
-				model.loadComponents(repoId, items);
-				Platform.runLater(()->{
-					columns.resumeColumns();
-					latch.countDown();
-				});
-				try {
-					latch.await();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} 
-				return true;
-			}
-		};
-		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
-		Thread thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
-			
-		task.setOnSucceeded(wse -> {
-			resetRepoFields();
-			StatusBar.displayMessage("Issues loaded successfully!");
-			ServiceManager.getInstance().setupAndStartModelUpdate();
-		});
-			
-		task.setOnFailed(wse -> {
-			Throwable err = task.getException();
-			logger.error(err.getLocalizedMessage(), err);
-			StatusBar.displayMessage("An error occurred: " + err);
-		});
-
-	}
-
 	private Tab createFeedTab() {
 		Tab tab = new Tab();
 		tab.setClosable(false);
