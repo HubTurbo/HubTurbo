@@ -225,9 +225,15 @@ public class Parser {
 	
 	private boolean isNumberOrDateToken(Token token) {
 		switch (token.getType()) {
-		case NUMBER:
 		case DATE:
 			return true;
+		case SYMBOL:
+			try {
+				Integer.parseInt(token.getValue());
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
 		default:
 			return false;
 		}
@@ -317,7 +323,7 @@ public class Parser {
 				return null;
 			}
 		} else {
-			throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
+			throw new ParseException(String.format("Operator %s can only be applied to number or date, got %s", operator, lookAhead()));
 		}
 	}
 	
