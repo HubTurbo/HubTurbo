@@ -319,9 +319,14 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
+    	int hours = Utility.safeLongToInt(issue.getUpdatedAt()
+    			.until(LocalDateTime.now(), ChronoUnit.HOURS));
+
     	if (numberRange.isPresent()) {
-        	long hours = issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS);
-    		return numberRange.get().encloses(Utility.safeLongToInt(hours));
+    		return numberRange.get().encloses(hours);
+    	} else if (number.isPresent()) {
+    		// Treat it as <
+    		return new NumberRange(null, number.get(), true).encloses(hours);
     	} else {
     		return false;
     	}
