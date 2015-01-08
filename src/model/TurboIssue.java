@@ -48,9 +48,6 @@ public class TurboIssue implements Listable {
 	 */
 
 	private WeakReference<Model> model;
-	private WeakReference<Model> getModel(){
-		return model;
-	}
 	
 	private String creator;
 	public String getCreator() {
@@ -403,7 +400,7 @@ public class TurboIssue implements Listable {
 		assert other != null;
 		if(other.getClass() == TurboIssue.class){
 			TurboIssue obj = (TurboIssue)other;
-			model = obj.getModel();
+			model = obj.model;
 			
 			setHtmlUrl(obj.getHtmlUrl());
 			
