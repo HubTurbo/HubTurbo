@@ -192,23 +192,19 @@ public class Parser {
 		if (isRangeOperatorToken(lookAhead())) {
 			// < > <= >= [number range | date range]
 			return parseRangeOperator(qualifierName, lookAhead());
-		}
-		else if (isDateToken(lookAhead())) {
+		} else if (isDateToken(lookAhead())) {
 			// [date] | [date] .. [date]
 			return parseDateOrDateRange(qualifierName);
-		}
-		else if (isNumberToken(lookAhead())) {
+		} else if (isNumberToken(lookAhead())) {
 			// [number] | [number] .. [number]
 			return parseNumberOrNumberRange(qualifierName);
-		}
-		else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
+		} else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
 			// " [content] "
 			consume(TokenType.QUOTE);
 			FilterExpression result = parseQualifierContent(qualifierName, true);
 			consume(TokenType.QUOTE);
 			return result;
-		}
-		else if (isKeywordToken(lookAhead())) {
+		} else if (isKeywordToken(lookAhead())) {
 			// Keyword(s)
 			if (allowMultipleKeywords) {
 				return parseKeywords(qualifierName);
@@ -292,8 +288,7 @@ public class Parser {
 			} else {
 				throw new ParseException("Right operand of .. must be a number or *");
 			}
-		}
-		else {
+		} else {
 			// Just one number, not a range
 			return new Qualifier(qualifierName, leftDate.get());
 		}

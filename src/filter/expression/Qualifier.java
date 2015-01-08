@@ -318,20 +318,19 @@ public class Qualifier implements FilterExpression {
         return issue.getId() == parseIdString(content.get());
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue) {
-    	int hours = Utility.safeLongToInt(issue.getUpdatedAt()
-    			.until(LocalDateTime.now(), ChronoUnit.HOURS));
+	private boolean satisfiesUpdatedHours(TurboIssue issue) {
+		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS));
 
-    	if (numberRange.isPresent()) {
-    		return numberRange.get().encloses(hours);
-    	} else if (number.isPresent()) {
-    		// Treat it as <
-    		return new NumberRange(null, number.get(), true).encloses(hours);
-    	} else {
-    		return false;
-    	}
+		if (numberRange.isPresent()) {
+			return numberRange.get().encloses(hours);
+		} else if (number.isPresent()) {
+			// Treat it as <
+			return new NumberRange(null, number.get(), true).encloses(hours);
+		} else {
+			return false;
+		}
 	}
-    
+
     private boolean satisfiesCreationDate(TurboIssue issue) {
     	LocalDate creationDate = LocalDate.parse(issue.getCreatedAt(), formatter);
     	if (date.isPresent()) {
