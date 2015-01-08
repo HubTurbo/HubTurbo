@@ -165,6 +165,19 @@ public class Parser {
 			return Optional.empty();
 		}
 	}
+	
+	private Optional<Integer> parseNumber(Token token) {
+		switch (token.getType()) {
+		case SYMBOL:
+			if (isNumberToken(token)) {
+				return Optional.of(Integer.parseInt(token.getValue()));
+			} else {
+				return Optional.empty();
+			}
+		default:
+			return Optional.empty();
+		}
+	}
 
 	private FilterExpression parseQualifier(Token token) {
 		String qualifierName = token.getValue();
@@ -179,19 +192,19 @@ public class Parser {
 		if (isRangeOperatorToken(lookAhead())) {
 			// < > <= >= [number range | date range]
 			return parseRangeOperator(qualifierName, lookAhead());
-		}
-		else if (isNumberOrDateToken(lookAhead())) {
+		} else if (isDateToken(lookAhead())) {
 			// [date] | [date] .. [date]
 			return parseDateOrDateRange(qualifierName);
-		}
-		else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
+		} else if (isNumberToken(lookAhead())) {
+			// [number] | [number] .. [number]
+			return parseNumberOrNumberRange(qualifierName);
+		} else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
 			// " [content] "
 			consume(TokenType.QUOTE);
 			FilterExpression result = parseQualifierContent(qualifierName, true);
 			consume(TokenType.QUOTE);
 			return result;
-		}
-		else if (isKeywordToken(lookAhead())) {
+		} else if (isKeywordToken(lookAhead())) {
 			// Keyword(s)
 			if (allowMultipleKeywords) {
 				return parseKeywords(qualifierName);
@@ -223,10 +236,8 @@ public class Parser {
 		}
 	}
 	
-	private boolean isNumberOrDateToken(Token token) {
+	private boolean isNumberToken(Token token) {
 		switch (token.getType()) {
-		case DATE:
-			return true;
 		case SYMBOL:
 			try {
 				Integer.parseInt(token.getValue());
@@ -239,11 +250,57 @@ public class Parser {
 		}
 	}
 
-	private FilterExpression parseDateOrDateRange(String name) {
+	private boolean isDateToken(Token token) {
+		switch (token.getType()) {
+		case DATE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	private boolean isNumberOrDateToken(Token token) {
+		return isNumberToken(token) || isDateToken(token);
+	}
+
+	private FilterExpression parseNumberOrNumberRange(String qualifierName) {
+		Token left = consume();
+		
+		Optional<Integer> leftDate = parseNumber(left);
+		if (!leftDate.isPresent()) {
+			throw new ParseException("Expected a number as the input to " + qualifierName);
+		}
+		
+		if (lookAhead().getType() == TokenType.DOTDOT) {
+			// [number] .. [number]
+			consume(TokenType.DOTDOT);
+			Token right = consume();
+			
+			if (isNumberToken(right)) {
+				Optional<Integer> rightNumber = parseNumber(right);
+				if (rightNumber.isPresent()) {
+					return new Qualifier(qualifierName, new NumberRange(leftDate.get(), rightNumber.get()));
+				} else {
+					assert false : "Possible problem with lexer processing number";
+				}
+			} else if (right.getType() == TokenType.STAR) {
+				return new Qualifier(qualifierName, new NumberRange(leftDate.get(), null));
+			} else {
+				throw new ParseException("Right operand of .. must be a number or *");
+			}
+		} else {
+			// Just one number, not a range
+			return new Qualifier(qualifierName, leftDate.get());
+		}
+		assert false : "Should never reach here";
+		return null;
+	}
+
+	private FilterExpression parseDateOrDateRange(String qualifierName) {
 		Token left = consume();
 		Optional<LocalDate> leftDate = parseDate(left);
 		if (!leftDate.isPresent()) {
-			throw new ParseException("Left operand of .. must be a date");
+			throw new ParseException("Expected a date as the input to " + qualifierName);
 		}
 		
 		if (lookAhead().getType() == TokenType.DOTDOT) {
@@ -251,22 +308,22 @@ public class Parser {
 			consume(TokenType.DOTDOT);
 			Token right = consume();
 			
-			if (isNumberOrDateToken(right)) {
+			if (isDateToken(right)) {
 				Optional<LocalDate> rightDate = parseDate(right);
 				if (rightDate.isPresent()) {
-					return new Qualifier(name, new DateRange(leftDate.get(), rightDate.get()));
+					return new Qualifier(qualifierName, new DateRange(leftDate.get(), rightDate.get()));
 				} else {
 					assert false : "Possible problem with lexer processing date";
 				}
 			} else if (right.getType() == TokenType.STAR) {
-				return new Qualifier(name, new DateRange(leftDate.get(), null));
+				return new Qualifier(qualifierName, new DateRange(leftDate.get(), null));
 			} else {
 				throw new ParseException("Right operand of .. must be a date or *");
 			}
 		}
 		else {
 			// Just one date, not a range
-			return new Qualifier(name, leftDate.get());
+			return new Qualifier(qualifierName, leftDate.get());
 		}
 		assert false : "Should never reach here";
 		return null;
