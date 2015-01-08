@@ -367,8 +367,9 @@ public class Qualifier implements FilterExpression {
         case "issue":
             return typeSatisfies(issue);
         case "merged":
-        case "unmerged":
         	return isPullRequest(issue) && !issue.isOpen();
+        case "unmerged":
+        	return isPullRequest(issue) && issue.isOpen();
         default:
             return false;
         }
