@@ -2,6 +2,11 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -11,6 +16,7 @@ import org.eclipse.egit.github.core.PullRequest;
 import org.junit.Test;
 
 import stubs.ModelStub;
+import util.Utility;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.Qualifier;
@@ -281,14 +287,51 @@ public class EvalTests {
 
 	@Test
 	public void is() {
+		PullRequest pr = new PullRequest();
+		pr.setUrl("something");
+
+		TurboIssue issue = new TurboIssue("", "", model);
+		issue.setPullRequest(pr);
+		issue.setOpen(false);
+		
+		assertEquals(Qualifier.process(Parser.parse("is:merged"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("is:unmerged"), issue), false);
+
+		issue.setOpen(true);
+		
+		assertEquals(Qualifier.process(Parser.parse("is:merged"), issue), false);
+		assertEquals(Qualifier.process(Parser.parse("is:unmerged"), issue), true);
+		
+		// The rest are delegated to state and type, so this should pass if they pass
 	}
 
 	@Test
 	public void created() {
+		TurboIssue issue = new TurboIssue("", "", model);
+		Date date = new Date(Utility.localDateTimeToLong(LocalDateTime.of(2014, 12, 2, 12, 0)));
+		issue.setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(date));
+		
+		assertEquals(Qualifier.process(Parser.parse("created:<2014-12-1"), issue), false);
+		assertEquals(Qualifier.process(Parser.parse("created:<=2014-12-1"), issue), false);
+		assertEquals(Qualifier.process(Parser.parse("created:>2014-12-1"), issue), true);
 	}
 
 	@Test
 	public void updated() {
+		LocalDateTime now = LocalDateTime.now();
+		Qualifier.setCurrentTime(now);
+		
+		TurboIssue issue = new TurboIssue("", "", model);
+		issue.setUpdatedAt(now.minusDays(2));
+		
+		assertEquals(Qualifier.process(Parser.parse("updated:<24"), issue), false);
+		assertEquals(Qualifier.process(Parser.parse("updated:>24"), issue), true);
+		
+		issue = new TurboIssue("", "", model);
+		issue.setUpdatedAt(now.minusDays(1));
+		
+		assertEquals(Qualifier.process(Parser.parse("updated:<26"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("updated:>26"), issue), false);
 	}
 
 }
