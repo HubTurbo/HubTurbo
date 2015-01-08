@@ -30,7 +30,7 @@ public class NumberRange {
 			return strictly ? number < end : number <= end;
 		} else if (end == null) {
 			// start .. *
-			return strictly ? number > end : number >= end;
+			return strictly ? number > start : number >= start;
 		} else {
 			// start .. end
 			return strictly
