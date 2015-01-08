@@ -303,19 +303,9 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 	
-    private int parseIdString(String id) {
-        if (id.startsWith("#")) {
-            return Integer.parseInt(id.substring(1));
-        } else if (Character.isDigit(id.charAt(0))) {
-            return Integer.parseInt(id);
-        } else {
-            return -1;
-        }
-    }
-
     private boolean idSatisfies(TurboIssue issue) {
-        if (!content.isPresent()) return false;
-        return issue.getId() == parseIdString(content.get());
+        if (!number.isPresent()) return false;
+        return issue.getId() == number.get();
     }
 
 	private boolean satisfiesUpdatedHours(TurboIssue issue) {
@@ -447,17 +437,16 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean parentSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
-    	String parent = content.get().toLowerCase();
-        int index = parseIdString(parent);
-        if (index > 0) {
+    	if (!number.isPresent()) return false;
+        int parentIndex = number.get();
+        if (parentIndex > 0) {
             TurboIssue current = issue;
             
             // The parent itself should show
-            if (current.getId() == index) return true;
+            if (current.getId() == parentIndex) return true;
             
             // Descendants should show too
-            return current.hasAncestor(index);
+            return current.hasAncestor(parentIndex);
         }
         // Invalid issue number
         return false;
@@ -527,11 +516,11 @@ public class Qualifier implements FilterExpression {
     }
 
     private void applyParent(TurboIssue issue, Model model) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
+    	if (!number.isPresent()) {
     		throw new QualifierApplicationException("Invalid parent " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
         String parent = content.get().toLowerCase();
-        int index = parseIdString(parent);
+        int index = number.get();
         if (index != -1) {
             issue.setParentIssue(index);
         } else {
