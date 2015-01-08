@@ -90,6 +90,24 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(issue, new MetaQualifierInfo(metaQualifiers));
 	}
 	
+	private static LocalDateTime currentTime = null;
+	
+	private static LocalDateTime getCurrentTime() {
+		if (currentTime == null) {
+			return LocalDateTime.now();
+		} else {
+			return currentTime;
+		}
+	}
+	
+	/**
+	 * For testing. Stubs the current time so time-related qualifiers work properly.
+	 * @param dateTime
+	 */
+	public static void setCurrentTime(LocalDateTime dateTime) {
+		currentTime = dateTime;
+	}
+
 	public boolean isEmptyQualifier() {
 		return name.isEmpty() && content.isPresent() && content.get().isEmpty();
 	}
@@ -309,7 +327,7 @@ public class Qualifier implements FilterExpression {
     }
 
 	private boolean satisfiesUpdatedHours(TurboIssue issue) {
-		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS));
+		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
 
 		if (numberRange.isPresent()) {
 			return numberRange.get().encloses(hours);
