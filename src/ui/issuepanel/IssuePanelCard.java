@@ -47,10 +47,14 @@ public class IssuePanelCard extends VBox {
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
 	
 		setupIssueDetailsBox();
+		Text issueFeed = new Text(issue.getFeeds(24, 0, 0));
+		issueFeed.setWrappingWidth(CARD_WIDTH);
+		issueFeed.getStyleClass().add("issue-panel-name");
+		if (!issue.isOpen()) issueTitle.getStyleClass().add("display-box-padding");
 		
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
-		getChildren().addAll(issueTitle, issueDetails);
+		getChildren().addAll(issueTitle, issueDetails, issueFeed);
 	}
 	
 	private void setupIssueDetailsBox() {
@@ -88,7 +92,7 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(labelText);
 		}
 		
-		if(issue.getParentIssue() >= 0){
+		if (issue.getParentIssue() >= 0){
 			String parentString = "#" + issue.getParentIssue();
 			Label parent = new Label(parentString);
 			parent.getStyleClass().addAll("display-box-padding");

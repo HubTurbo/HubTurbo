@@ -5,14 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import model.TurboFeed;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
@@ -69,25 +67,7 @@ public class CollectionUtilities {
 		return buffer;
 	}
 
-	public static ArrayList<TurboFeed> getHubTurboFeed(List<IssueEvent> feeds) {
-		ArrayList<TurboFeed> buffer = new ArrayList<>();
-		ArrayList<Integer> issueNumList = new ArrayList<>();
-		int issueNum;
-
-		for (IssueEvent ghFeed : feeds) {
-			issueNum = ghFeed.getIssue().getNumber();
-			if (issueNumList.contains(issueNum)) {
-				buffer.get(issueNumList.indexOf(issueNum))
-						.addIssueEvent(ghFeed);
-			} else {
-				issueNumList.add(issueNum);
-				buffer.add(new TurboFeed(ghFeed));
-			}
-		}
-		return buffer;
-	}
-
-	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users) {
+	public static ArrayList<TurboUser> getHubTurboUserList(List<User> users){
 		ArrayList<TurboUser> buffer = new ArrayList<>();
 		for (User ghUser : users) {
 			buffer.add(new TurboUser(ghUser));

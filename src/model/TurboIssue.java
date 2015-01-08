@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,12 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
+import org.ocpsoft.prettytime.PrettyTime;
 
+import service.IssueEventType;
 import service.ServiceManager;
 import storage.DataManager;
 import util.CollectionUtilities;
@@ -42,7 +46,8 @@ public class TurboIssue implements Listable {
 	private static final String OLD_METADATA_HEADER_PARENT = "* Parent(s): ";
 	private static final String METADATA_PARENT = "#%1d \n";
 	private static final String METADATA_SEPERATOR = "<hr>";
-	
+	private static final String NEW_LINE = "\n";
+	private List<IssueEvent> issueFeeds = new ArrayList<IssueEvent>();
 	/*
 	 * Attributes, Getters & Setters
 	 */
@@ -514,10 +519,121 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 	
+	public String getFeeds(int hours, int minutes, int seconds) {
+		ArrayList<String> feedMessages = new ArrayList<String>();
+       
+		Date cutoffTime = new Date(System.currentTimeMillis() 
+				- (hours * 60 * 60 * 1000) - (minutes * 60 * 1000) - (seconds * 1000));
+		
+		issueFeeds.clear();
+		issueFeeds.addAll(getGithubFeed());
+		for (IssueEvent event: issueFeeds) {
+			if (event.getCreatedAt().after(cutoffTime)) {
+				feedMessages.add(formatMessage(event));
+			}
+		}
+		
+		StringBuffer stringBuffer = new StringBuffer();
+		for (int i = feedMessages.size(); i > 0; i--) {
+			stringBuffer.append(NEW_LINE + feedMessages.get(i-1));
+		}
+    	return stringBuffer.toString();
+	}
+
 	/*
 	 * Private Methods
 	 */
-	
+	public List<IssueEvent> getGithubFeed() {
+		List<IssueEvent> feeds = new ArrayList<IssueEvent>();
+		try {
+			feeds = ServiceManager.getInstance().getFeeds(getId());
+		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		return feeds;
+	}
+
+	private String formatMessage(IssueEvent issueEvent) {
+    	PrettyTime pt = new PrettyTime();
+		String timeString = pt.format(issueEvent.getCreatedAt());
+        String actorName = issueEvent.getActor().getLogin();
+		Issue issue = issueEvent.getIssue();
+        String milestoneTitle = "";
+        String message = "";
+        
+        switch (IssueEventType.fromString(issueEvent.getEvent())) {
+        case Renamed:
+            message = String.format("%s renamed issue %s.",
+                    actorName, timeString);
+            break;
+        case Milestoned:
+            if (issue.getMilestone() != null) {
+            	milestoneTitle = issue.getMilestone().getTitle();
+            }
+            message = String.format("%s added this issue to %s milestone %s.",
+                    actorName, milestoneTitle, timeString);
+            break;
+        case Demilestoned:
+            if (issue.getMilestone() != null) {
+            	milestoneTitle = issue.getMilestone().getTitle();
+            }
+            message = String.format("%s removed this issue from %s milestone %s.",
+                    actorName, milestoneTitle, timeString);
+            break;
+        case Labeled:
+            message = String.format("%s added a label %s.",
+                    actorName, timeString);
+            break;
+        case Unlabeled:
+            message = String.format("%s removed a label %s.",
+                    actorName, timeString);
+            break;
+        case Assigned:
+        	String assignee = "";
+        	if (issue.getAssignee() != null) {
+        		assignee = issue.getAssignee().getLogin();
+        	}
+            message = String.format("%s was assigned to this issue %s.",
+            		assignee, timeString);
+            break;
+        case Unassigned:
+            message = String.format("%s was unassigned from this issue %s.",
+                    actorName, timeString);
+            break;
+        case Closed:
+            message = String.format("%s closed this issue %s.",
+                    actorName, timeString);
+            break;
+        case Reopened:
+            message = String.format("%s reopened this issue %s.",
+                    actorName, timeString);
+            break;
+        case Locked:
+            message = String.format("%s locked issue %s.",
+                    actorName, timeString);
+            break;
+        case Unlocked:
+            message = String.format("%s unlocked this issue %s.",
+                    actorName, timeString);
+            break;
+        case Referenced:
+            message = String.format("%s referenced this issue %s.",
+                    actorName, timeString);
+            break;
+        case Subscribed:
+        case Mentioned:
+            message = String.format("%s commented on this issue %s.",
+                    actorName, timeString);
+        	break;
+        case Merged:
+        case HeadRefDeleted:
+        case HeadRefRestored:
+        default:
+            // Not yet implemented, or no events triggered
+        }
+    	return message;
+    }
+
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		if (labels == null) return turboLabels;
