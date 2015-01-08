@@ -176,7 +176,7 @@ public class UI extends Application {
 	}
 
 	private void quit() {
-		ServiceManager.getInstance().stopModelUpdate();
+		ServiceManager.getInstance().shutdownModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveSessionConfig();
 		browserComponent.quit();
@@ -360,6 +360,7 @@ public class UI extends Application {
 
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
+		System.out.println("Hi, i'm here!");
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
 		if(repoId == null 
 		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
