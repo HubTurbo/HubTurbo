@@ -41,12 +41,10 @@ public class NumberRange {
 
 	/**
 	 * Checks if an interval is valid. A valid interval should contain either
-	 * start or end, as number ranges with .. aren't implemented yet.
-	 * TODO change once .. is implemented
+	 * at least a start or end.
 	 */
 	private void checkIntervalValidity() {
 		assert !(start == null && end == null) : "Both can't be null";
-		assert !(start != null && end != null) : "Both cannot contain values";
 	}
 	
 	@Override
@@ -87,19 +85,21 @@ public class NumberRange {
 	public String toString() {
 		checkIntervalValidity();
 
-		if (start != null) {
+		if (start == null) {
+			if (strictly) {
+				return "<" + end;
+			} else {
+				return "<=" + end;
+			}
+		} else if (end == null) {
 			if (strictly) {
 				return ">" + start;
 			} else {
 				return ">=" + start;
 			}
 		} else {
-			assert end != null;
-			if (strictly) {
-				return "<" + end;
-			} else {
-				return "<=" + end;
-			}
+			assert start != null && end != null;
+			return start + " .. " + end;
 		}
 	}
 }

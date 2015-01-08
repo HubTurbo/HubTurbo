@@ -104,7 +104,7 @@ public class ParserTests {
     }
 
     @Test
-    public void numberRanges() {
+    public void numberOperators() {
         assertEquals(Parser.parse("updated:<24"),
         		new Qualifier("updated", new NumberRange(null, 24, true)));
         assertEquals(Parser.parse("updated:<=24"),
@@ -113,7 +113,24 @@ public class ParserTests {
         		new Qualifier("updated", new NumberRange(24, null)));
         assertEquals(Parser.parse("updated:>24"),
         		new Qualifier("updated", new NumberRange(24, null, true)));
+
+        assertEquals(Parser.parse("updated:24"),
+        		new Qualifier("updated", new NumberRange(null, 24, true)));
+        assertEquals(Parser.parse("updated:<24"),
+        		Parser.parse("updated:24"));
     }
+
+    @Test
+    public void numberRanges() {
+    	assertEquals(Parser.parse("updated:1 .. 24"),
+    			new Qualifier("updated", new NumberRange(1, 24, true)));
+    	assertEquals(Parser.parse("updated:1 .. *"),
+    			new Qualifier("updated", new NumberRange(1, null)));
+
+    	// Parsing currently requires a space between operand and operator
+    	assertEquals(Parser.parse("updated:1..2"),
+    			new Qualifier("updated", "1..2"));
+	}
 
     @Test
     public void dateRanges() {
