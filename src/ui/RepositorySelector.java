@@ -17,13 +17,13 @@ public class RepositorySelector extends HBox {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
-		comboBox.prefWidthProperty().bind(widthProperty());
 	}
 
 	private void setupLayout() {
 		setSpacing(5);
 		setPadding(new Insets(5));
-		setAlignment(Pos.CENTER);
+		setAlignment(Pos.BASELINE_LEFT);
+		comboBox.setPrefWidth(250);
 	}
 
 	private void setupComboBox() {

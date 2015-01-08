@@ -1,50 +1,52 @@
 package filter.expression;
 
-import java.time.LocalDate;
-
 /**
- * Represents an open date interval. It may be strict, in which case it
- * excludes one or both endpoints. Provides an encloses method to check if a date
+ * Represents an open numerical interval. It may be strict, in which case it
+ * excludes both endpoints. Provides an encloses method to check if a number
  * falls within it.
  */
-public class DateRange {
-	private final LocalDate start;
-	private final LocalDate end;
+public class NumberRange {
+	private final Integer start;
+	private final Integer end;
 	private final boolean strictly;
 	
-	public DateRange(LocalDate start, LocalDate end) {
+	public NumberRange(Integer start, Integer end) {
 		this.start = start;
 		this.end = end;
 		this.strictly = false;
 		checkIntervalValidity();
 	}
 
-	public DateRange(LocalDate start, LocalDate end, boolean strict) {
+	public NumberRange(Integer start, Integer end, boolean strict) {
 		this.start = start;
 		this.end = end;
 		this.strictly = strict;
 		checkIntervalValidity();
 	}
 
-	public boolean encloses(LocalDate date) {
+	public boolean encloses(int number) {
 		if (start == null) {
 			// * .. end
-			return date.isBefore(end) || (!strictly && date.isEqual(end));
+			return strictly ? number < end : number <= end;
 		} else if (end == null) {
 			// start .. *
-			return date.isAfter(start) || (!strictly && date.isEqual(start));
+			return strictly ? number > end : number >= end;
 		} else {
 			// start .. end
-			return date.isAfter(start) && date.isBefore(end)
-					|| (!strictly && (date.isEqual(start) || date.isEqual(end)));
+			return strictly
+					? number > start && number < end
+					: number >= start && number <= end;
 		}
 	}
 
 	/**
-	 * A valid interval has either a start and end, or both.
+	 * Checks if an interval is valid. A valid interval should contain either
+	 * start or end, as number ranges with .. aren't implemented yet.
+	 * TODO change once .. is implemented
 	 */
 	private void checkIntervalValidity() {
-		assert !(start == null && end == null);
+		assert !(start == null && end == null) : "Both can't be null";
+		assert !(start != null && end != null) : "Both cannot contain values";
 	}
 	
 	@Override
@@ -65,7 +67,7 @@ public class DateRange {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DateRange other = (DateRange) obj;
+		NumberRange other = (NumberRange) obj;
 		if (end == null) {
 			if (other.end != null)
 				return false;
@@ -84,24 +86,20 @@ public class DateRange {
 	@Override
 	public String toString() {
 		checkIntervalValidity();
-		
-		if (end == null) {
-			assert start != null;
+
+		if (start != null) {
 			if (strictly) {
 				return ">" + start;
 			} else {
 				return ">=" + start;
 			}
-		} else if (start == null) {
+		} else {
 			assert end != null;
 			if (strictly) {
 				return "<" + end;
 			} else {
 				return "<=" + end;
 			}
-		} else {
-			assert start != null && end != null;
-			return start + " .. " + end;
 		}
 	}
 }

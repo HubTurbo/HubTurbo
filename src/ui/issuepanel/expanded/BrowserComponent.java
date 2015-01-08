@@ -187,6 +187,17 @@ public class BrowserComponent {
 	}
 	
 	/**
+	 * Navigates to the HubTurbo documentation page.
+	 * Run on a separate thread.
+	 */
+	public void showDocs() {
+		logger.info("Showing documentation page");
+		runBrowserOperation(() -> {
+			driver.get(GitHubURL.getPathForDocsPage());
+		});
+	}
+
+	/**
 	 * Navigates to the GitHub changelog page.
 	 * Run on a separate thread.
 	 */

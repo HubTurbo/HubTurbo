@@ -6,17 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javafx.collections.ObservableList;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -50,7 +51,10 @@ public class DataCacheFileHandler {
 	}
 
 	public void readFromFile() {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.create();
+
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
 			
@@ -91,7 +95,7 @@ public class DataCacheFileHandler {
 	}
 	
 	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
-		logger.info("About to write to file...");
+		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
 		this.issues = issues.stream().collect(Collectors.toList());
 		this.collaborators = collaborators.stream().collect(Collectors.toList());
 		this.labels = labels.stream().collect(Collectors.toList());
@@ -99,7 +103,11 @@ public class DataCacheFileHandler {
 		
 		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.create();
+
 		String json = gson.toJson(currentRepoData);
 		
 		// Save to temp file first to mitigate corruption of data. Once writing is done, rename it to main cache file
@@ -107,7 +115,7 @@ public class DataCacheFileHandler {
 			FileWriter writer = new FileWriter(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
 			writer.write(json);
 			writer.close();
-			logger.info("Done writing to file");
+			logger.info("Done writing to file for repo: " + repoIdString);
 			
 			File file = new File(getFileName(FILE_DATA_CACHE, repoIdString));
 			
