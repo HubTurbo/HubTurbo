@@ -19,7 +19,7 @@ import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
 
-public class Tests {
+public class ParserTests {
 
     @Test
     public void basics() {
