@@ -32,6 +32,7 @@ public class Qualifier implements FilterExpression {
 	private Optional<String> content = Optional.empty();
 	private Optional<LocalDate> date = Optional.empty();
 	private Optional<NumberRange> numberRange = Optional.empty();
+	private Optional<Integer> number = Optional.empty();
 
 	// Copy constructor
 	public Qualifier(Qualifier other) {
@@ -44,6 +45,8 @@ public class Qualifier implements FilterExpression {
 			this.content = other.getContent();
 		} else if (other.getNumberRange().isPresent()) {
 			this.numberRange = other.getNumberRange();
+		} else if (other.getNumber().isPresent()) {
+			this.number = other.getNumber();
 		} else {
 			assert false : "Unrecognised content type! You may have forgotten to add it above";
 		}
@@ -67,6 +70,11 @@ public class Qualifier implements FilterExpression {
 	public Qualifier(String name, LocalDate date) {
 		this.name = name;
 		this.date = Optional.of(date);
+	}
+	
+	public Qualifier(String name, int number) {
+		this.name = name;
+		this.number = Optional.of(number);
 	}
 	
 	/**
@@ -231,6 +239,8 @@ public class Qualifier implements FilterExpression {
             return name + ":" + dateRange.get().toString();
         } else if (numberRange.isPresent()) {
         	return name + ":" + numberRange.get().toString();
+        } else if (number.isPresent()) {
+        	return name + ":" + number.get().toString();
         } else {
             assert false : "Should not happen";
             return "";
@@ -309,9 +319,12 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
-    	if (!numberRange.isPresent()) return false;
-    	long hours = issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS);
-		return numberRange.get().encloses(Utility.safeLongToInt(hours));
+    	if (numberRange.isPresent()) {
+        	long hours = issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS);
+    		return numberRange.get().encloses(Utility.safeLongToInt(hours));
+    	} else {
+    		return false;
+    	}
 	}
     
     private boolean satisfiesCreationDate(TurboIssue issue) {
@@ -570,6 +583,10 @@ public class Qualifier implements FilterExpression {
         }
     }
     
+	public Optional<Integer> getNumber() {
+		return number;
+	}
+
 	public Optional<NumberRange> getNumberRange() {
 		return numberRange;
 	}
