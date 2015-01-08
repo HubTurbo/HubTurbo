@@ -2,15 +2,18 @@ package ui;
 
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
+import javafx.concurrent.Task;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -18,18 +21,21 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
 import storage.DataManager;
 import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.BrowserComponent;
-import ui.sidepanel.SidePanel;
+import util.DialogMessage;
 import util.Utility;
 import util.events.ColumnChangeEvent;
 import util.events.ColumnChangeEventHandler;
@@ -55,9 +61,9 @@ public class UI extends Application {
 	
 	private Stage mainStage;
 	private ColumnControl columns;
-	private SidePanel sidePanel;
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
+	private RepositorySelector repoSelector;
 
 	// Events
 	
@@ -80,6 +86,8 @@ public class UI extends Application {
 		
 		events = new EventBus();
 		
+		repoSelector = createRepoFields();
+		
 		browserComponent = new BrowserComponent(this);
 		browserComponent.initialise();
 		initCSS();
@@ -97,8 +105,9 @@ public class UI extends Application {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
 				columns.loadIssues();
-				sidePanel.refresh();
 				triggerEvent(new LoginEvent());
+				repoSelector.refreshComboBoxContents();
+				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
 				setExpandedWidth(false);
 			} else {
 				quit();
@@ -177,28 +186,24 @@ public class UI extends Application {
 	
 	private Parent createRoot() throws IOException {
 
-		sidePanel = new SidePanel(this, mainStage, ServiceManager.getInstance().getModel());
-		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel(), sidePanel);
-		sidePanel.setColumns(columns);
+		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
 		
 		UIReference.getInstance().setUI(this);
 
-		ScrollPane columnsScroll = new ScrollPane(columns);
-		columnsScroll.getStyleClass().add("transparent-bg");
-		columnsScroll.setFitToHeight(true);
-		columnsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
-		HBox.setHgrow(columnsScroll, Priority.ALWAYS);
-		
-		menuBar = new MenuControl(this, columns, columnsScroll);
+		VBox top = new VBox();
 
-		HBox centerContainer = new HBox();
-		centerContainer.setPadding(new Insets(5,0,5,0));
-		centerContainer.getChildren().addAll(sidePanel.getControlLabel(), columnsScroll);
+		ScrollPane columnsScrollPane = new ScrollPane(columns);
+		columnsScrollPane.getStyleClass().add("transparent-bg");
+		columnsScrollPane.setFitToHeight(true);
+		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
+		
+		menuBar = new MenuControl(this, columns, columnsScrollPane);
+		top.getChildren().addAll(menuBar, repoSelector);
 
 		BorderPane root = new BorderPane();
-		root.setTop(menuBar);
-		root.setLeft(sidePanel);
-		root.setCenter(centerContainer);
+		root.setTop(top);
+		root.setCenter(columnsScrollPane);
 		root.setBottom(StatusBar.getInstance());
 
 		return root;
@@ -310,7 +315,7 @@ public class UI extends Application {
 				? dimensions.getWidth()
 				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-		mainStage.setMinWidth(sidePanel.getWidth() + columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getColumnWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
@@ -325,5 +330,81 @@ public class UI extends Application {
 
 	public HashMap<String, String> getCommandLineArgs() {
 		return commandLineArgs;
+	}
+	
+	private RepositorySelector createRepoFields() {
+		RepositorySelector repoIdBox = new RepositorySelector();
+		repoIdBox.setComboValueChangeMethod(this::loadRepo);
+		return repoIdBox;
+	}
+	
+	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
+		try {
+			if(!ServiceManager.getInstance().checkRepository(currRepo)){
+				Platform.runLater(() -> {
+					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
+				});
+				return false;
+			}
+		} catch (SocketTimeoutException e){
+			DialogMessage.showWarningDialog("Internet Connection Timeout", 
+					"Timeout while connecting to GitHub, please check your internet connection.");
+		} catch (UnknownHostException e){
+			DialogMessage.showWarningDialog("No Internet Connection", 
+					"Please check your internet connection and try again.");
+		}catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		return true;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void loadRepo(String repoString) {
+		RepositoryId repoId = RepositoryId.createFromId(repoString);
+		if(repoId == null 
+		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
+		  || !checkRepoAccess(repoId)){
+			return;
+		}
+		
+		columns.saveSession();
+		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+		Task<Boolean> task = new Task<Boolean>(){
+			@Override
+			protected Boolean call() throws IOException {
+				ServiceManager.getInstance().stopModelUpdate();
+				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
+			
+				final CountDownLatch latch = new CountDownLatch(1);
+				ServiceManager.getInstance().getModel().loadComponents(repoId, items);
+				Platform.runLater(()->{
+					columns.resumeColumns();
+					latch.countDown();
+				});
+				try {
+					latch.await();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+				return true;
+			}
+		};
+		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
+		Thread thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
+			
+		task.setOnSucceeded(wse -> {
+			repoSelector.refreshComboBoxContents();
+			StatusBar.displayMessage("Issues loaded successfully!");
+			ServiceManager.getInstance().setupAndStartModelUpdate();
+		});
+			
+		task.setOnFailed(wse -> {
+			Throwable err = task.getException();
+			logger.error(err.getLocalizedMessage(), err);
+			StatusBar.displayMessage("An error occurred: " + err);
+		});
+
 	}
 }

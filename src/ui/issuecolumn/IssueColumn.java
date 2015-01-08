@@ -23,9 +23,10 @@ import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.StatusBar;
-import ui.sidepanel.SidePanel;
+
 import command.CommandType;
 import command.TurboCommandExecutor;
+
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
@@ -55,7 +56,7 @@ public abstract class IssueColumn extends Column {
 	private FilterExpression currentFilterExpression = EMPTY;
 	private FilterTextField filterTextField;
 
-	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, SidePanel sidePanel,
+	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl,
 			int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
 
