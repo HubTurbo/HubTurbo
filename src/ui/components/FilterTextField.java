@@ -2,6 +2,7 @@ package ui.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -237,5 +238,13 @@ public class FilterTextField extends TextField {
 	public FilterTextField setOnConfirm(Function<String, String> confirm) {
 		this.confirm = confirm;
 		return this;
+	}
+	
+	public void addKeywords(String ... keywords) {
+		words.addAll(Arrays.asList(keywords));
+	}
+	
+	public void addKeywords(List<String> keywords) {
+		words.addAll(keywords);
 	}
 }

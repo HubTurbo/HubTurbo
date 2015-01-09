@@ -3,6 +3,7 @@ package ui.issuecolumn;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,14 +20,13 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+import service.ServiceManager;
 import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.StatusBar;
-
 import command.CommandType;
 import command.TurboCommandExecutor;
-
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
@@ -97,6 +97,11 @@ public abstract class IssueColumn extends Column {
 			applyStringFilter(text);
 			return text;
 		});
+		
+		List<String> collaboratorNames = ServiceManager.getInstance().getModel().getCollaborators()
+			.stream().map(c -> c.getGithubName()).collect(Collectors.toList());
+		
+		filterTextField.addKeywords(collaboratorNames);
 
 		setupIssueDragEvents(filterTextField);
 		setupIssueFocusEvents(filterTextField);
