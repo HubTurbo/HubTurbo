@@ -217,9 +217,6 @@ public class LoginDialog extends Dialog<Boolean> {
 			}
 		}
 		
-		// Save login details
-		DataManager.getInstance().setLastLoginUsername(username);
-		
 		// Update UI
 
 		enableElements(false);
@@ -263,6 +260,10 @@ public class LoginDialog extends Dialog<Boolean> {
 		});
 		
 		if (couldLogIn) {
+
+			// Save login details only on successful login
+			DataManager.getInstance().setLastLoginUsername(username);
+		
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
 			th.setDaemon(true);
