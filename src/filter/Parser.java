@@ -31,7 +31,6 @@ public class Parser {
 		this.input = input;
 	}
 	public static FilterExpression parse(String input) {
-		Qualifier.setUpdateFilter(false);
 		if (input == null) return null;
 		else if (input.isEmpty()) return Qualifier.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
