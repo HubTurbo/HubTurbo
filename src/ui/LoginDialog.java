@@ -203,6 +203,9 @@ public class LoginDialog extends Dialog<Boolean> {
 			}
 		}
 		
+		// Save login details
+		DataManager.getInstance().setLastLoginUsername(username);
+		
 		// Update UI
 
 		enableElements(false);
