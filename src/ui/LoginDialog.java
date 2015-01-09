@@ -125,16 +125,25 @@ public class LoginDialog extends Dialog<Boolean> {
 	 * Fills in fields which have values at this point.
 	 */
 	private void populateSavedFields() {
-		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
-		if (!lastLoginName.isEmpty()) {
-			repoOwnerField.setText(lastLoginName);
-		}
-		
 		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
 		if (lastViewed.isPresent()) {
 			repoOwnerField.setText(lastViewed.get().getOwner());
 			repoNameField.setText(lastViewed.get().getName());
 		}
+
+		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
+		if (!lastLoginName.isEmpty()) {
+			usernameField.setText(lastLoginName);
+		}
+		
+		// Change focus depending on what fields are present
+		Platform.runLater(() -> {
+			if (!lastLoginName.isEmpty()) {
+				passwordField.requestFocus();
+			} else if (lastViewed.isPresent()) {
+				usernameField.requestFocus();
+			}
+		});
 	}
 
 	/**
