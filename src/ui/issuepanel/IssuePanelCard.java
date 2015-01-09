@@ -25,6 +25,9 @@ public class IssuePanelCard extends VBox {
 
 	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
+	private static final int HOURS_AGO = 24;
+	private static final int MINUTES_AGO = 0;
+	private static final int SECONDS_AGO = 0;
 	/**
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
@@ -47,14 +50,20 @@ public class IssuePanelCard extends VBox {
 		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
 	
 		setupIssueDetailsBox();
-		Text issueFeed = new Text(issue.getFeeds(24, 0, 0));
-		issueFeed.setWrappingWidth(CARD_WIDTH);
-		issueFeed.getStyleClass().add("issue-panel-name");
-		if (!issue.isOpen()) issueTitle.getStyleClass().add("display-box-padding");
 		
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
-		getChildren().addAll(issueTitle, issueDetails, issueFeed);
+
+		String feed = issue.getFeeds(HOURS_AGO, MINUTES_AGO, SECONDS_AGO);
+		if (feed != null && !feed.isEmpty()) {
+			Text issueFeed = new Text(feed);
+			issueFeed.setWrappingWidth(CARD_WIDTH);
+			issueFeed.getStyleClass().add("issue-panel-feed");
+			issue.activityFeedProperty().addListener(new WeakChangeListener<String>(createIssueFeedListener(issue, issueFeed)));
+			getChildren().addAll(issueTitle, issueDetails, issueFeed);
+		} else {
+			getChildren().addAll(issueTitle, issueDetails);
+		}
 	}
 	
 	private void setupIssueDetailsBox() {
@@ -92,7 +101,7 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(labelText);
 		}
 		
-		if (issue.getParentIssue() >= 0){
+		if(issue.getParentIssue() >= 0){
 			String parentString = "#" + issue.getParentIssue();
 			Label parent = new Label(parentString);
 			parent.getStyleClass().addAll("display-box-padding");
@@ -215,5 +224,22 @@ public class IssuePanelCard extends VBox {
 		};
 		changeListeners.add(titleChangeListener);
 		return titleChangeListener;
+	}
+
+	private ChangeListener<String> createIssueFeedListener(TurboIssue issue, Text issueFeed){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<String> feedChangeListener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> stringProperty,
+					String oldValue, String newValue) {
+				TurboIssue issue = issueRef.get();
+				if(issue != null){
+					issueFeed.setText(issue.getActivityFeed());
+				}
+			}
+		};
+		changeListeners.add(feedChangeListener);
+		return feedChangeListener;
 	}
 }

@@ -8,7 +8,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +46,12 @@ public class TurboIssue implements Listable {
 	private static final String METADATA_PARENT = "#%1d \n";
 	private static final String METADATA_SEPERATOR = "<hr>";
 	private static final String NEW_LINE = "\n";
+	private static final int REFRESH_FEED_MINUTES = 15;
+	
 	private List<IssueEvent> issueFeeds = new ArrayList<IssueEvent>();
+	private boolean hasAddedFeeds = false;
+	private LocalDateTime lastModifiedTime;
+
 	/*
 	 * Attributes, Getters & Setters
 	 */
@@ -126,7 +130,19 @@ public class TurboIssue implements Listable {
     public StringProperty titleProperty() {
     	return title;
     }
-	
+
+	private StringProperty activityFeed = new SimpleStringProperty();
+    public final String getActivityFeed() {
+    	return activityFeed.get();
+    }
+    public final void setActivityFeed(String value, LocalDateTime time) {
+    	lastModifiedTime = time;
+    	activityFeed.set(value);
+    }
+    public StringProperty activityFeedProperty() {
+    	return activityFeed;
+    }
+
     private StringProperty description = new SimpleStringProperty();
     public final String getDescription() {
     	return description.get();
@@ -520,30 +536,43 @@ public class TurboIssue implements Listable {
 	}
 	
 	public String getFeeds(int hours, int minutes, int seconds) {
-		ArrayList<String> feedMessages = new ArrayList<String>();
-       
-		Date cutoffTime = new Date(System.currentTimeMillis() 
-				- (hours * 60 * 60 * 1000) - (minutes * 60 * 1000) - (seconds * 1000));
-		
-		issueFeeds.clear();
-		issueFeeds.addAll(getGithubFeed());
-		for (IssueEvent event: issueFeeds) {
-			if (event.getCreatedAt().after(cutoffTime)) {
-				feedMessages.add(formatMessage(event));
+		LocalDateTime currentTime = LocalDateTime.now();
+		LocalDateTime cutoffTime;
+		if (!hasAddedFeeds) {
+			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
+			if (cutoffTime.isAfter(getUpdatedAt())) {
+				// No activity feed to display
+				setActivityFeed("", currentTime);
+			} else {
+				issueFeeds.clear();
+				issueFeeds.addAll(getGithubFeed());
+				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
+			}
+			hasAddedFeeds = true;
+		} else {
+			cutoffTime = lastModifiedTime;
+			if (cutoffTime.isAfter(getUpdatedAt())) {
+				// No new activity for this issue
+				LocalDateTime refreshTime = currentTime.minusMinutes(REFRESH_FEED_MINUTES);
+				if (refreshTime.isAfter(lastModifiedTime)) {
+					// Check to update pretty time
+					setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
+				}
+			} else {
+				issueFeeds.clear();
+				issueFeeds.addAll(getGithubFeed());
+				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 			}
 		}
-		
-		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = feedMessages.size(); i > 0; i--) {
-			stringBuffer.append(NEW_LINE + feedMessages.get(i-1));
-		}
-    	return stringBuffer.toString();
+		return getActivityFeed();
 	}
 
 	/*
 	 * Private Methods
 	 */
-	public List<IssueEvent> getGithubFeed() {
+
+	
+	private List<IssueEvent> getGithubFeed() {
 		List<IssueEvent> feeds = new ArrayList<IssueEvent>();
 		try {
 			feeds = ServiceManager.getInstance().getFeeds(getId());
@@ -551,6 +580,40 @@ public class TurboIssue implements Listable {
 			System.out.println(e.getLocalizedMessage());
 		}
 		return feeds;
+	}
+
+	private String formatFeeds(int hours, int minutes, int seconds) {
+		LocalDateTime currentTime = LocalDateTime.now();
+		LocalDateTime cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
+
+		ArrayList<String> feedMessages = new ArrayList<String>();
+		String previousMessage = "";
+		String currentMessage = "";
+		boolean isFirstEvent = true;
+		for (IssueEvent event: issueFeeds) {
+			if (LocalDateTime.ofInstant(event.getCreatedAt().toInstant(), 
+					ZoneId.systemDefault()).isAfter(cutoffTime)) {
+				currentMessage = formatMessage(event);
+				if (isFirstEvent) {
+					feedMessages.add(currentMessage);
+					isFirstEvent = false;
+					previousMessage = currentMessage;
+				} else if (!currentMessage.equals(previousMessage)) {
+					feedMessages.add(currentMessage);
+					previousMessage = currentMessage;
+				}
+			}
+		}
+		
+		StringBuffer stringBuffer = new StringBuffer();
+		for (int i = feedMessages.size() - 1; i > 0; i--) {
+			if (i == feedMessages.size()) {
+				stringBuffer.append(feedMessages.get(i-1));
+			} else {
+				stringBuffer.append(NEW_LINE + feedMessages.get(i-1));
+			}
+		}
+    	return stringBuffer.toString();
 	}
 
 	private String formatMessage(IssueEvent issueEvent) {
@@ -563,7 +626,7 @@ public class TurboIssue implements Listable {
         
         switch (IssueEventType.fromString(issueEvent.getEvent())) {
         case Renamed:
-            message = String.format("%s renamed issue %s.",
+            message = String.format("%s renamed this issue %s.",
                     actorName, timeString);
             break;
         case Milestoned:
@@ -581,11 +644,11 @@ public class TurboIssue implements Listable {
                     actorName, milestoneTitle, timeString);
             break;
         case Labeled:
-            message = String.format("%s added a label %s.",
+            message = String.format("%s added label(s) %s.",
                     actorName, timeString);
             break;
         case Unlabeled:
-            message = String.format("%s removed a label %s.",
+            message = String.format("%s removed label(s) %s.",
                     actorName, timeString);
             break;
         case Assigned:
@@ -593,8 +656,13 @@ public class TurboIssue implements Listable {
         	if (issue.getAssignee() != null) {
         		assignee = issue.getAssignee().getLogin();
         	}
-            message = String.format("%s was assigned to this issue %s.",
-            		assignee, timeString);
+        	if (actorName.equalsIgnoreCase(assignee)) {
+                message = String.format("%s self-assigned this issue %s.",
+                		assignee, timeString);
+        	} else {
+        		message = String.format("%s was assigned by %s to this issue %s.",
+        				assignee, actorName, timeString);
+        	}
             break;
         case Unassigned:
             message = String.format("%s was unassigned from this issue %s.",
@@ -622,14 +690,17 @@ public class TurboIssue implements Listable {
             break;
         case Subscribed:
         case Mentioned:
-            message = String.format("%s commented on this issue %s.",
-                    actorName, timeString);
-        	break;
+//            message = String.format("%s commented on this issue %s.",
+//                    actorName, timeString);
+//        	break;
         case Merged:
         case HeadRefDeleted:
         case HeadRefRestored:
         default:
             // Not yet implemented, or no events triggered
+            message = String.format("%s %s %s.",
+                    actorName, issueEvent.getEvent(), timeString);
+        	break;
         }
     	return message;
     }
