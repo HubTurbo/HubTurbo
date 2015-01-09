@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import model.TurboIssue;
 import model.TurboLabel;
+import ui.issuecolumn.IssueColumn;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 
@@ -39,9 +40,9 @@ public class IssuePanelCard extends VBox {
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
-	private IssuePanel parentPanel;
+	private IssueColumn parentPanel;
 
-	public IssuePanelCard(TurboIssue issue, IssuePanel parentPanel) {
+	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel) {
 		this.issue = issue;
 		this.parentPanel = parentPanel;
 		setup();
