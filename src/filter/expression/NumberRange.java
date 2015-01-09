@@ -23,6 +23,14 @@ public class NumberRange {
 		this.strictly = strict;
 		checkIntervalValidity();
 	}
+	
+	public Integer getStart() {
+		return start;
+	}
+
+	public Integer getEnd() {
+		return end;
+	}
 
 	public boolean encloses(int number) {
 		if (start == null) {
