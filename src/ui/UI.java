@@ -360,7 +360,6 @@ public class UI extends Application {
 
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
-		System.out.println("Hi, i'm here!");
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
 		if(repoId == null 
 		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 

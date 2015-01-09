@@ -96,12 +96,12 @@ public class ServiceManager {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 	
+	private static final int SECS_BETWEEN_POLLS = 60;
 	private final ScheduledExecutorService pollExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> pollHandler;
-	private long pollInterval = 60000; //time between polls in ms
-	private int stopwatchInterval = 1000;
+	
+	private static final int COUNTDOWN_INTERVAL = 1;
 	private int timeRemaining = 60;
-	private static final int SECS = 60;
 	private final ScheduledExecutorService stopwatchExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> stopwatchHandler;
 	
@@ -160,7 +160,7 @@ public class ServiceManager {
 				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
 			}
 		};
-		pollHandler = pollExecutor.scheduleAtFixedRate(pollTask, 0, pollInterval, TimeUnit.MILLISECONDS);
+		pollHandler = pollExecutor.scheduleAtFixedRate(pollTask, 0, SECS_BETWEEN_POLLS, TimeUnit.SECONDS);
 		
 		Runnable countdown = new Runnable() {
 			@Override
@@ -168,18 +168,18 @@ public class ServiceManager {
 				StatusBar.displayMessage("Next refresh in " + getTime());
 			}
 		};
-		stopwatchHandler = stopwatchExecutor.scheduleAtFixedRate(countdown, 0, stopwatchInterval, TimeUnit.MILLISECONDS);
+		stopwatchHandler = stopwatchExecutor.scheduleAtFixedRate(countdown, 0, COUNTDOWN_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	public void stopModelUpdate(){
 		pollHandler.cancel(true);
 		stopwatchHandler.cancel(true);
-		timeRemaining = SECS;
+		timeRemaining = SECS_BETWEEN_POLLS;
 	}
 	
 	private int getTime() {
 	    if (timeRemaining == 1) {
-	        timeRemaining = SECS;
+	        timeRemaining = SECS_BETWEEN_POLLS;
 	    } else {
 	    	--timeRemaining;
 	    }
