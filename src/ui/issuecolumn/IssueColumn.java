@@ -104,7 +104,6 @@ public abstract class IssueColumn extends Column {
 		filterTextField.addKeywords(collaboratorNames);
 
 		setupIssueDragEvents(filterTextField);
-		setupIssueFocusEvents(filterTextField);
 
 		HBox buttonsBox = new HBox();
 		buttonsBox.setSpacing(5);
@@ -117,17 +116,6 @@ public abstract class IssueColumn extends Column {
 		layout.setPadding(new Insets(0, 0, 3, 0));
 
 		return layout;
-	}
-
-	private void setupIssueFocusEvents(FilterTextField field) {
-		field.focusedProperty().addListener((obs, old, newValue) -> {
-			if (newValue) {
-				// Gained focus
-				parentColumnControl.setCurrentlyFocusedColumnIndex(columnIndex);
-			} else {
-				// Lost focus; do nothing
-			}
-		});
 	}
 
 	private Label[] createButtons() {
