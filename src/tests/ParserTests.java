@@ -1,4 +1,4 @@
-package filter;
+package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -9,6 +9,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import filter.ParseException;
+import filter.Parser;
 import filter.expression.Conjunction;
 import filter.expression.DateRange;
 import filter.expression.Disjunction;
@@ -19,7 +21,7 @@ import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
 
-public class Tests {
+public class ParserTests {
 
     @Test
     public void basics() {
