@@ -198,7 +198,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		String username = usernameField.getText();
 		String password = passwordField.getText();
 		
-		if (username.isEmpty() && password.isEmpty()) {
+		// If either field is empty, try to load credentials.txt
+		if (username.isEmpty() || password.isEmpty()) {
 			BufferedReader reader;
 			try {
 				reader = new BufferedReader(new FileReader("credentials.txt"));
