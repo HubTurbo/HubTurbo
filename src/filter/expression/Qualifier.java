@@ -114,7 +114,7 @@ public class Qualifier implements FilterExpression {
 
     public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
         assert name != null && content != null;
-
+		
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;
 

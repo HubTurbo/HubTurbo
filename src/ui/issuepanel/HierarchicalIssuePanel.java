@@ -83,7 +83,7 @@ public class HierarchicalIssuePanel extends IssueColumn {
 			TurboIssue current = issue;
 			do {
 				if (!items.containsKey(current.getId())) {
-					items.put(current.getId(), new HierarchicalIssuePanelItem(current));
+					items.put(current.getId(), new HierarchicalIssuePanelItem(this, current));
 					created.add(current);
 				}
 				current = model.getIssueWithId(current.getParentIssue());
@@ -95,7 +95,7 @@ public class HierarchicalIssuePanel extends IssueColumn {
 			while (stack.size() > 0) {
 				TurboIssue ish = stack.pop();
 				if (!items.containsKey(ish.getId())) {
-					items.put(ish.getId(), new HierarchicalIssuePanelItem(ish));
+					items.put(ish.getId(), new HierarchicalIssuePanelItem(this, ish));
 					created.add(ish);
 				}
 				if (childrenAdjList.containsKey(ish.getId())) {

@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -40,14 +39,12 @@ public class Model {
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
-	private static final String MESSAGE_LOADING_FEEDS = "Loading feeds...";
 	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 	private static final String MESSAGE_LOADING_PROJECT_CONFIG = "Loading project configuration...";
 	
-	private ObservableList<TurboFeed> feeds = FXCollections.observableArrayList();
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
@@ -117,11 +114,6 @@ public class Model {
 		boolean isTurboResource = false;
 		boolean isPublicRepo = false;
 		
-		if (resources.get(ServiceManager.KEY_FEEDS) != null &&
-		   !resources.get(ServiceManager.KEY_FEEDS).isEmpty()) {
-			loadIssueEvents(resources);
-		}
-
 		// This is made with the assumption that labels of repos will not be empty (even a fresh copy of a repo)
 		if (!resources.get(ServiceManager.KEY_LABELS).isEmpty()) {
 			if (resources.get(ServiceManager.KEY_LABELS).get(0).getClass() == TurboLabel.class) {
@@ -140,14 +132,6 @@ public class Model {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadIssueEvents(HashMap<String, List> resources) {
-		Platform.runLater(()-> {
-			logger.info(MESSAGE_LOADING_FEEDS);
-			loadFeeds((List<IssueEvent>) resources.get(ServiceManager.KEY_FEEDS));
-		});
-	}
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadTurboResources(HashMap<String, List> turboResources) {
 		Platform.runLater(()-> {
@@ -214,10 +198,6 @@ public class Model {
 		return issues;
 	}
 	
-	public ObservableList<TurboFeed> getFeeds() {
-		return feeds;
-	}
-
 	public ObservableList<TurboUser> getCollaborators() {
 		return collaborators;
 	}
@@ -400,13 +380,6 @@ public class Model {
 				logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
 			}
 	   });
-	}
-	
-	public void loadFeeds(List<IssueEvent> ghFeeds) {	
-		Platform.runLater(()->{
-			feeds.clear();
-			feeds.addAll(CollectionUtilities.getHubTurboFeed(ghFeeds));
-		});
 	}
 	
 	public void loadCollaborators(List<User> ghCollaborators) {	

@@ -1,8 +1,6 @@
 package service;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -74,8 +72,7 @@ public class ServiceManager {
 	public static final String KEY_MILESTONES = "milestones";
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
-	public static final String KEY_FEEDS = "feeds";
-	public static final int MAX_FEED = 20;
+	public static final int MAX_FEED = 10;
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
 	
@@ -306,16 +303,7 @@ public class ServiceManager {
 			List<TurboMilestone> milestones = repo.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
 			
-			List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
-			try {
-				logger.info("Getting feed from GitHub...");
-				ghFeeds = getFeeds();
-			} catch (Exception e) {
-				System.out.println(e.getLocalizedMessage());
-			}
-
 			HashMap<String, List> map = new HashMap<String, List>();
-			map.put(KEY_FEEDS, ghFeeds);
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
@@ -334,26 +322,16 @@ public class ServiceManager {
 		milestonesETag = null;
 		issueCheckTime = null;
 		
-		List<IssueEvent> ghFeeds = new ArrayList<IssueEvent>();
 		List<User> ghCollaborators = new ArrayList<User>();
 		List<Label> ghLabels = new ArrayList<Label>();
 		List<Milestone> ghMilestones = new ArrayList<Milestone>();
 		List<Issue> ghIssues = new ArrayList<Issue>();
 		
-		try {
-			ghFeeds = getFeeds();
-			ghCollaborators = getCollaborators();
-		} catch (Exception e) {
-			System.out.println(e.getLocalizedMessage());
-			// unable to access collaborators if user does not have a push access
-			// this case is being handled in model's load components
-		}
 		ghLabels = getLabels();
 		ghMilestones = getMilestones();
 		ghIssues = getAllIssues();
 		
 		HashMap<String, List> map = new HashMap<String, List>();
-		map.put(KEY_FEEDS, ghFeeds);
 		map.put(KEY_COLLABORATORS, ghCollaborators);
 		map.put(KEY_LABELS, ghLabels);
 		map.put(KEY_MILESTONES, ghMilestones);
@@ -426,37 +404,37 @@ public class ServiceManager {
 	/**
 	 * Services for IssueEvent
 	 * */
-	public List<IssueEvent> getFeeds() throws IOException{
+	public List<IssueEvent> getFeeds(int issueNum) throws IOException{
 		ArrayList<IssueEvent> eventList = new ArrayList<IssueEvent>();
 		String user = getRepoOwner();
 		String repo = getRepoName();
 		boolean toContinue = true;
-		PageIterator<IssueEvent> iter = issueService.pageEvents(user, repo);
-		assertNotNull(iter);
-		assertTrue(iter.hasNext());
-		for (Collection<IssueEvent> currentPage : iter) {
-			if (!currentPage.isEmpty()) {
-				for (IssueEvent event : currentPage) {
-					if (event != null) {
-						IssueEvent fetched = issueService.getIssueEvent(user, repo, event.getId());
-						if (fetched != null) {
-							if (eventList.size() < MAX_FEED) { 
-								eventList.add(fetched);
-							} else {
-								toContinue = false;
-								break;
+		PageIterator<IssueEvent> iter = issueService.pageIssueEvents(user, repo, issueNum);
+		if (iter != null && iter.hasNext()) {
+			for (Collection<IssueEvent> currentPage : iter) {
+				if (!currentPage.isEmpty()) {
+					for (IssueEvent event : currentPage) {
+						if (event != null) {
+							IssueEvent fetched = issueService.getIssueEvent(user, repo, event.getId());
+							if (fetched != null) {
+								if (eventList.size() < MAX_FEED) { 
+									eventList.add(fetched);
+								} else {
+									toContinue = false;
+									break;
+								}
 							}
 						}
 					}
 				}
-			}
-			if (!toContinue) {
-				break;
+				if (!toContinue) {
+					break;
+				}
 			}
 		}
 		return eventList;
 	}
-	
+
 	/**
 	 * Collaborator Services 
 	 * */

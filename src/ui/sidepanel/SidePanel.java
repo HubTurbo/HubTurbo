@@ -14,7 +14,6 @@ import service.ServiceManager;
 import ui.RepositorySelector;
 import ui.UI;
 import ui.collaboratormanagement.CollaboratorManagementComponent;
-import ui.feedmanagement.FeedManagementComponent;
 import ui.issuecolumn.ColumnControl;
 import ui.issuepanel.expanded.IssueDisplayPane;
 import ui.labelmanagement.LabelManagementComponent;
@@ -195,9 +194,6 @@ public class SidePanel extends VBox {
 		
 		tabs = new TabPane();
 
-		if (feedTab == null) {
-			feedTab = createFeedTab();
-		}
 		if (labelsTab ==  null) {
 			labelsTab = createLabelsTab();
 		}
@@ -216,14 +212,6 @@ public class SidePanel extends VBox {
 		everything.getChildren().addAll(repoFields, tabs);
 		everything.setPrefWidth(PANEL_PREF_WIDTH);
 		return everything;
-	}
-	
-	private Tab createFeedTab() {
-		Tab tab = new Tab();
-		tab.setClosable(false);
-		tab.setText("Feed");
-		tab.setContent(new FeedManagementComponent(ui, model).initialise());
-		return tab;
 	}
 
 	private Tab createCollaboratorsTab() {

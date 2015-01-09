@@ -2,6 +2,7 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -20,11 +21,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import model.TurboIssue;
 import model.TurboLabel;
+import ui.issuecolumn.IssueColumn;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 
 public class IssuePanelCard extends VBox {
 
 	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
+	private static final int HOURS_AGO = 24;
+	private static final int MINUTES_AGO = 0;
+	private static final int SECONDS_AGO = 0;
 	/**
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
@@ -33,9 +40,11 @@ public class IssuePanelCard extends VBox {
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
-	
-	public IssuePanelCard(TurboIssue issue) {
+	private IssueColumn parentPanel;
+
+	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel) {
 		this.issue = issue;
+		this.parentPanel = parentPanel;
 		setup();
 	}
 	
@@ -50,9 +59,49 @@ public class IssuePanelCard extends VBox {
 		
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
-		getChildren().addAll(issueTitle, issueDetails);
+
+		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
+			String feed = issue.getFeeds(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()), MINUTES_AGO, SECONDS_AGO);
+			if (feed != null && !feed.isEmpty()) {
+				Text issueFeed = new Text(feed);
+				issueFeed.setWrappingWidth(CARD_WIDTH);
+				issueFeed.getStyleClass().add("issue-panel-feed");
+				issue.activityFeedProperty().addListener(new WeakChangeListener<String>(createIssueFeedListener(issue, issueFeed)));
+				getChildren().addAll(issueTitle, issueDetails, issueFeed);
+			} else {
+				getChildren().addAll(issueTitle, issueDetails);
+			}
+		} else {
+			getChildren().addAll(issueTitle, issueDetails);
+		}
 	}
 	
+	private boolean isUpdateFilter(FilterExpression currentFilterExpression) {
+		return currentFilterExpression.getQualifierNames().contains("updated");
+	}
+	
+	private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
+		List<Qualifier> filters = currentFilterExpression.find(q -> q.getName().equals("updated"));
+		assert filters.size() > 0 : "Problem with isUpdateFilter";
+
+		// Return the first of the updated qualifiers, if there are multiple
+		Qualifier qualifier = filters.get(0);
+		
+		// Currently we show 24 hours or less only, clamping ranges
+		if (qualifier.getNumber().isPresent()) {
+			return Math.min(qualifier.getNumber().get(), HOURS_AGO);
+		} else {
+			assert qualifier.getNumberRange().isPresent();
+			if (qualifier.getNumberRange().get().getStart() == null) {
+				return Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO);
+			} else if (qualifier.getNumberRange().get().getEnd() == null) {
+				return Math.min(qualifier.getNumberRange().get().getStart(), HOURS_AGO);
+			} else {
+				return Math.min(qualifier.getNumberRange().get().getStart(), Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO));
+			}
+		}
+	}
+
 	private void setupIssueDetailsBox() {
 		issueDetails.setMaxWidth(CARD_WIDTH);
 		issueDetails.setPrefWrapLength(CARD_WIDTH);
@@ -211,5 +260,22 @@ public class IssuePanelCard extends VBox {
 		};
 		changeListeners.add(titleChangeListener);
 		return titleChangeListener;
+	}
+
+	private ChangeListener<String> createIssueFeedListener(TurboIssue issue, Text issueFeed){
+		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
+		ChangeListener<String> feedChangeListener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> stringProperty,
+					String oldValue, String newValue) {
+				TurboIssue issue = issueRef.get();
+				if(issue != null){
+					issueFeed.setText(issue.getActivityFeed());
+				}
+			}
+		};
+		changeListeners.add(feedChangeListener);
+		return feedChangeListener;
 	}
 }

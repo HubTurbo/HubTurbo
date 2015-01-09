@@ -57,6 +57,10 @@
 	-fx-strikethrough: true;
 }
 
+.issue-panel-feed {
+	-fx-font-size: 12px;
+}
+
 .issue-creator {
 	-fx-font-style: italic;
 	-fx-text-fill: grey;
