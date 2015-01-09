@@ -192,7 +192,30 @@ public class EvalTests {
 
 	@Test
 	public void involves() {
-		// Succeeds if author and assignee succeed
+		// involves = assignee || author
+
+		// assignee
+		TurboUser user = createUser("bob", "alice");
+		model.addCollaborator(user);
+
+		TurboIssue issue = new TurboIssue("", "", model);
+		issue.setAssignee(user);
+
+		assertEquals(Qualifier.process(Parser.parse("involves:BOB"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:bob"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:alice"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:o"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:lic"), issue), true);
+
+		// author
+		issue = new TurboIssue("", "", model);
+		issue.setCreator("bob");
+
+		assertEquals(Qualifier.process(Parser.parse("involves:BOB"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:bob"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:alice"), issue), false);
+		assertEquals(Qualifier.process(Parser.parse("involves:o"), issue), true);
+		assertEquals(Qualifier.process(Parser.parse("involves:lic"), issue), false);
 	}
 
 	@Test
