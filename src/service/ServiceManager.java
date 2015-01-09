@@ -65,7 +65,7 @@ public class ServiceManager {
 	public static final String KEY_MILESTONES = "milestones";
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
-	public static final int MAX_FEED = 100;
+	public static final int MAX_FEED = 10;
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
 	
