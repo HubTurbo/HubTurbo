@@ -554,7 +554,6 @@ public class Model {
 	}
 	
 	public void refresh(){
-		System.out.println("Refreshing...");
 		ServiceManager.getInstance().restartModelUpdate();
 		applyChangeMethods();
 	}
