@@ -19,10 +19,12 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 
 	private final Model model;
 	private final int parentColumnIndex;
+	private final IssuePanel parent;
 		
 	public IssuePanelCell(UI ui, Model model, IssuePanel parent, int parentColumnIndex) {
 		super();
 		this.model = model;
+		this.parent = parent;
 		this.parentColumnIndex = parentColumnIndex;
 	}
 
@@ -32,7 +34,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		if (issue == null)
 			return;
 		
-		setGraphic(new IssuePanelCard(issue));
+		setGraphic(new IssuePanelCard(issue, parent));
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 		

@@ -2,8 +2,8 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
-import filter.expression.Qualifier;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -21,6 +21,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import model.TurboIssue;
 import model.TurboLabel;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 
 public class IssuePanelCard extends VBox {
 
@@ -37,9 +39,11 @@ public class IssuePanelCard extends VBox {
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
+	private IssuePanel parentPanel;
 
-	public IssuePanelCard(TurboIssue issue) {
+	public IssuePanelCard(TurboIssue issue, IssuePanel parentPanel) {
 		this.issue = issue;
+		this.parentPanel = parentPanel;
 		setup();
 	}
 	
@@ -55,8 +59,8 @@ public class IssuePanelCard extends VBox {
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
 
-		if (Qualifier.isUpdateFilter()) {
-			String feed = issue.getFeeds(Qualifier.getFilterHours(), MINUTES_AGO, SECONDS_AGO);
+		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
+			String feed = issue.getFeeds(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()), MINUTES_AGO, SECONDS_AGO);
 			if (feed != null && !feed.isEmpty()) {
 				Text issueFeed = new Text(feed);
 				issueFeed.setWrappingWidth(CARD_WIDTH);
@@ -71,6 +75,32 @@ public class IssuePanelCard extends VBox {
 		}
 	}
 	
+	private boolean isUpdateFilter(FilterExpression currentFilterExpression) {
+		return currentFilterExpression.getQualifierNames().contains("updated");
+	}
+	
+	private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
+		List<Qualifier> filters = currentFilterExpression.find(q -> q.getName().equals("updated"));
+		assert filters.size() > 0 : "Problem with isUpdateFilter";
+
+		// Return the first of the updated qualifiers, if there are multiple
+		Qualifier qualifier = filters.get(0);
+		
+		// Currently we show 24 hours or less only, clamping ranges
+		if (qualifier.getNumber().isPresent()) {
+			return Math.min(qualifier.getNumber().get(), HOURS_AGO);
+		} else {
+			assert qualifier.getNumberRange().isPresent();
+			if (qualifier.getNumberRange().get().getStart() == null) {
+				return Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO);
+			} else if (qualifier.getNumberRange().get().getEnd() == null) {
+				return Math.min(qualifier.getNumberRange().get().getStart(), HOURS_AGO);
+			} else {
+				return Math.min(qualifier.getNumberRange().get().getStart(), Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO));
+			}
+		}
+	}
+
 	private void setupIssueDetailsBox() {
 		issueDetails.setMaxWidth(CARD_WIDTH);
 		issueDetails.setPrefWrapLength(CARD_WIDTH);
