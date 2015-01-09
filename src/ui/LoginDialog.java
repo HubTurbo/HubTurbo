@@ -198,7 +198,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		String username = usernameField.getText();
 		String password = passwordField.getText();
 		
-		if (username.isEmpty() && password.isEmpty()) {
+		// If either field is empty, try to load credentials.txt
+		if (username.isEmpty() || password.isEmpty()) {
 			BufferedReader reader;
 			try {
 				reader = new BufferedReader(new FileReader("credentials.txt"));
@@ -215,9 +216,6 @@ public class LoginDialog extends Dialog<Boolean> {
 				logger.info("Failed to find or open credentials.txt");
 			}
 		}
-		
-		// Save login details
-		DataManager.getInstance().setLastLoginUsername(username);
 		
 		// Update UI
 
@@ -262,6 +260,10 @@ public class LoginDialog extends Dialog<Boolean> {
 		});
 		
 		if (couldLogIn) {
+
+			// Save login details only on successful login
+			DataManager.getInstance().setLastLoginUsername(username);
+		
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
 			th.setDaemon(true);

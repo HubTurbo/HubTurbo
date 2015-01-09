@@ -214,6 +214,7 @@ public class ServiceManager {
 			request.setUri("/");
 			githubClient.get(request);
 		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
 			// Login failed
 			return false;
 		}
