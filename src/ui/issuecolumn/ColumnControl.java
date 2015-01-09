@@ -199,18 +199,10 @@ public class ColumnControl extends HBox {
 		currentlyDraggedColumnIndex = i;
 	}
 	
-	private int currentlyFocusedColumnIndex = -1;
-	public int getCurrentlyFocusedColumnIndex() {
-		return currentlyFocusedColumnIndex;
-	}
-	public void setCurrentlyFocusedColumnIndex(int i) {
-		currentlyFocusedColumnIndex = i;
-	}
-
 	public void closeCurrentColumn() {
-		if (currentlyFocusedColumnIndex != -1) {
-			closeColumn(currentlyFocusedColumnIndex);
-			currentlyFocusedColumnIndex = -1;
+		if (currentlySelectedColumn.isPresent()) {
+			closeColumn(currentlySelectedColumn.get());
+			currentlySelectedColumn = Optional.empty();
 		}
 	}
 	

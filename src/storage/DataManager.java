@@ -1,8 +1,10 @@
 package storage;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 
 /**
  * A singleton for managing all local files used by HubTurbo. It provides
@@ -48,6 +50,10 @@ public class DataManager {
 
 	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
 		sessionConfiguration.setFiltersForNextSession(project, filter);
+	}
+	
+	public void setLastLoginUsername(String name) {
+		sessionConfiguration.setLastLoginUsername(name);
 	}
 
 	/**
@@ -98,7 +104,26 @@ public class DataManager {
 		sessionConfiguration.addToLastViewedRepositories(repository);
 	}
 
+	/**
+	 * Helper method to get the most recently viewed repository,
+	 * allowing for failure if there are none (on first run)
+	 * @return
+	 */
+	public Optional<RepositoryId> getLastViewedRepository() {
+		List<String> lastViewed = sessionConfiguration.getLastViewedRepositories();
+		if (lastViewed.isEmpty()) {
+			return Optional.empty();
+		} else {
+			String id = lastViewed.get(lastViewed.size()-1);
+			return Optional.of(RepositoryId.createFromId(id));
+		}
+	}
+
 	public List<String> getLastViewedRepositories() {
 		return sessionConfiguration.getLastViewedRepositories();
+	}
+
+	public String getLastLoginUsername() {
+		return sessionConfiguration.getLastLoginUsername();
 	}
 }

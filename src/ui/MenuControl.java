@@ -56,19 +56,19 @@ public class MenuControl extends MenuBar {
 
 
 	private MenuItem createColumnsMenuItem() {
-		Menu cols = new Menu("Columns");
+		Menu cols = new Menu("Panels");
 
-		MenuItem createLeft = new MenuItem("Create Column (Left)");
+		MenuItem createLeft = new MenuItem("Create Panel (Left)");
 		createLeft.setOnAction(e -> {
-			logger.info("Menu: View > Columns > Create Column (Left)");
+			logger.info("Menu: View > Panels > Create Panel (Left)");
 			columns.createNewPanelAtStart();
 			columnsScroll.setHvalue(columnsScroll.getHmin());
 		});
 		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
-		MenuItem createRight = new MenuItem("Create Column");
+		MenuItem createRight = new MenuItem("Create Panel");
 		createRight.setOnAction(e -> {
-			logger.info("Menu: View > Columns > Create Column");
+			logger.info("Menu: View > Panels > Create Panel");
 			columns.createNewPanelAtEnd();
 			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
@@ -92,9 +92,9 @@ public class MenuControl extends MenuBar {
 		});
 		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
-		MenuItem closeColumn = new MenuItem("Close Column");
+		MenuItem closeColumn = new MenuItem("Close Panel");
 		closeColumn.setOnAction(e -> {
-			logger.info("Menu: View > Columns > Close Column");
+			logger.info("Menu: View > Panels > Close Panel");
 			columns.closeCurrentColumn();
 		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));

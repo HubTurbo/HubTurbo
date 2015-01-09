@@ -96,16 +96,17 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 
 	private void setupMouseEvents() {
 		setOnMouseClicked(e -> {
-			
 			int currentlySelected = getSelectionModel().getSelectedIndex();
 
-			// For some reason, the currently-selected index is -1 when clicking repeatedly on an issue
+			// The currently-selected index is sometimes -1 when an issue is clicked.
+			// When this happens we ignore this event.
+			
 			if (currentlySelected != -1) {
 				selectedIndex = Optional.of(currentlySelected);
+				
+				logger.info("Mouse click on issue " + selectedIndex.get());
+				onItemSelected.accept(selectedIndex.get());
 			}
-			
-			logger.info("Mouse click on issue " + selectedIndex.get());
-			onItemSelected.accept(selectedIndex.get());
 		});
 	}
 

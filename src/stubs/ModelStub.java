@@ -80,7 +80,23 @@ public class ModelStub extends Model{
 		return milestones;
 	}
 	
+	@Override
+	public void addMilestone(TurboMilestone milestone){
+		// The overridden version of this doesn't run on the JavaFX Application Thread
+		milestones.add(milestone);
+	}
 	
+	@Override
+	public void addLabel(TurboLabel label){
+		// The overridedn version of this doesn't run on the JavaFX Application Thread
+		labels.add(label);
+	}
+
+	public void addCollaborator(TurboUser user){
+		// This isn't overridden
+		collaborators.add(user);
+	}
+
 	public TurboIssue createIssue(TurboIssue newIssue) {
 		appendToCachedIssues(newIssue);
 		return newIssue;

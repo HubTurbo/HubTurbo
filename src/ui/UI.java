@@ -48,7 +48,7 @@ import com.google.common.eventbus.EventBus;
 public class UI extends Application {
 
 	private static final int VERSION_MAJOR = 1;
-	private static final int VERSION_MINOR = 1;
+	private static final int VERSION_MINOR = 2;
 	private static final int VERSION_PATCH = 0;
 	
 	public static final String ARG_UPDATED_TO = "--updated-to";
@@ -176,7 +176,7 @@ public class UI extends Application {
 	}
 
 	private void quit() {
-		ServiceManager.getInstance().stopModelUpdate();
+		ServiceManager.getInstance().shutdownModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveSessionConfig();
 		browserComponent.quit();

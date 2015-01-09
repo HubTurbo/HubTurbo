@@ -2,6 +2,7 @@ package ui.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,9 +26,14 @@ public class FilterTextField extends TextField {
     private ValidationSupport validationSupport = new ValidationSupport();
     private String previousText;
     private ArrayList<String> words = new ArrayList<>(Arrays.asList(
-    		"assignee", "milestone", "title", "id",
-    		"parent", "label", "has", "state",
-    		"open", "closed"));
+    		"label", "milestone",
+    		"involves", "assignee", "author",
+    		"title", "body",
+    		"is", "issue", "pr", "merged", "unmerged",
+    		"no", "type", "has",
+    		"state", "open", "closed",
+    		"created",
+    		"updated"));
 
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
@@ -237,5 +243,13 @@ public class FilterTextField extends TextField {
 	public FilterTextField setOnConfirm(Function<String, String> confirm) {
 		this.confirm = confirm;
 		return this;
+	}
+	
+	public void addKeywords(String ... keywords) {
+		words.addAll(Arrays.asList(keywords));
+	}
+	
+	public void addKeywords(List<String> keywords) {
+		words.addAll(keywords);
 	}
 }

@@ -201,6 +201,8 @@ public class TurboMilestone implements Listable {
 		TurboMilestone other = (TurboMilestone) obj;
 		if (number != other.number)
 			return false;
+		if (title != other.title)
+			return false;
 		return true;
 	}
 	

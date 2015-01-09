@@ -58,10 +58,6 @@ public class TurboIssue implements Listable {
 
 	private WeakReference<Model> model;
 
-	private WeakReference<Model> getModel() {
-		return model;
-	}
-
 	private String creator;
 
 	public String getCreator() {
@@ -477,9 +473,9 @@ public class TurboIssue implements Listable {
 	public void copyValues(Object other) {
 		assert other != null;
 		if (other.getClass() == TurboIssue.class) {
-			TurboIssue obj = (TurboIssue) other;
-			model = obj.getModel();
-
+			TurboIssue obj = (TurboIssue)other;
+			model = obj.model;
+			
 			setHtmlUrl(obj.getHtmlUrl());
 
 			// Logging is done with the assumption that this method is used for

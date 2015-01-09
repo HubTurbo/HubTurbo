@@ -21,7 +21,7 @@ public class Parser {
 
 	public static void main(String[] args) {
 		String input = "\"a b\"";
-		input = "state:open -milestone: label:priority.high";
+		input = "id:1";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
 		System.out.println(p);

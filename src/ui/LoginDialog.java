@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
@@ -26,6 +27,7 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
 import storage.DataManager;
@@ -38,9 +40,10 @@ public class LoginDialog extends Dialog<Boolean> {
 	
 	private static final String DIALOG_TITLE = "GitHub Login";
 	private static final int DIALOG_HEIGHT = 200;
-	private static final int DIALOG_WIDTH = 470;
+	private static final int DIALOG_WIDTH = 570;
 	
-	private static final String LABEL_REPO_NAME = "Repository:";
+	private static final String LABEL_REPO = "Repository:";
+	private static final String LABEL_GITHUB = "github.com /";
 	private static final String FIELD_DEFAULT_REPO_OWNER = "<owner/organization>";
 	private static final String FIELD_DEFAULT_REPO_NAME = "<repository>";
 	private static final String PASSWORD_LABEL = "Password:";
@@ -76,31 +79,36 @@ public class LoginDialog extends Dialog<Boolean> {
 		GridPane grid = new GridPane();
 		setupGridPane(grid);
 	    
-		Label repoNameLabel = new Label(LABEL_REPO_NAME);
-		grid.add(repoNameLabel, 0, 0);
+		Label repoLabel = new Label(LABEL_REPO);
+		grid.add(repoLabel, 0, 0);
+		
+		Label githubLabel = new Label(LABEL_GITHUB);
+		grid.add(githubLabel, 1, 0);
 
 		repoOwnerField = new TextField(FIELD_DEFAULT_REPO_OWNER);
 		repoOwnerField.setPrefWidth(140);
-		grid.add(repoOwnerField, 1, 0);
+		grid.add(repoOwnerField, 2, 0);
 
 		Label slash = new Label("/");
-		grid.add(slash, 2, 0);
+		grid.add(slash, 3, 0);
 
 		repoNameField = new TextField(FIELD_DEFAULT_REPO_NAME);
 		repoNameField.setPrefWidth(250);
-		grid.add(repoNameField, 3, 0);
+		grid.add(repoNameField, 4, 0);
 
 		Label usernameLabel = new Label(USERNAME_LABEL);
 		grid.add(usernameLabel, 0, 1);
 
 		usernameField = new TextField();
-		grid.add(usernameField, 1, 1, 3, 1);
+		grid.add(usernameField, 1, 1, 4, 1);
 
 		Label passwordLabel = new Label(PASSWORD_LABEL);
 		grid.add(passwordLabel, 0, 2);
 
 		passwordField = new PasswordField();
-		grid.add(passwordField, 1, 2, 3, 1);
+		grid.add(passwordField, 1, 2, 4, 1);
+		
+		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
@@ -112,9 +120,34 @@ public class LoginDialog extends Dialog<Boolean> {
 		loginButton = new Button(BUTTON_SIGN_IN);
 		loginButton.setOnAction(this::login);
 		buttons.getChildren().add(loginButton);
-		grid.add(buttons, 3, 3);
+		grid.add(buttons, 4, 3);
 		
 		return grid;
+	}
+
+	/**
+	 * Fills in fields which have values at this point.
+	 */
+	private void populateSavedFields() {
+		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
+		if (lastViewed.isPresent()) {
+			repoOwnerField.setText(lastViewed.get().getOwner());
+			repoNameField.setText(lastViewed.get().getName());
+		}
+
+		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
+		if (!lastLoginName.isEmpty()) {
+			usernameField.setText(lastLoginName);
+		}
+		
+		// Change focus depending on what fields are present
+		Platform.runLater(() -> {
+			if (!lastLoginName.isEmpty()) {
+				passwordField.requestFocus();
+			} else if (lastViewed.isPresent()) {
+				usernameField.requestFocus();
+			}
+		});
 	}
 
 	/**
@@ -129,7 +162,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	    grid.setPrefSize(390, 100);
 	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 	    
-	    applyColumnConstraints(grid, 20, 39, 2, 39);
+	    applyColumnConstraints(grid, 20, 16, 33, 2, 29);
 	}
 	
 	/**
@@ -165,7 +198,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		String username = usernameField.getText();
 		String password = passwordField.getText();
 		
-		if (username.isEmpty() && password.isEmpty()) {
+		// If either field is empty, try to load credentials.txt
+		if (username.isEmpty() || password.isEmpty()) {
 			BufferedReader reader;
 			try {
 				reader = new BufferedReader(new FileReader("credentials.txt"));
@@ -226,6 +260,10 @@ public class LoginDialog extends Dialog<Boolean> {
 		});
 		
 		if (couldLogIn) {
+
+			// Save login details only on successful login
+			DataManager.getInstance().setLastLoginUsername(username);
+		
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
 			th.setDaemon(true);

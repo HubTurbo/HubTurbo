@@ -93,6 +93,7 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(issue, new MetaQualifierInfo(metaQualifiers));
 	}
 	
+
 	public static void setUpdateFilter(boolean status) {
 		updateFilter = status;
 	}
@@ -107,6 +108,24 @@ public class Qualifier implements FilterExpression {
 		} else {
 			return MAX_HOURS;
 		}
+	}
+	
+	private static LocalDateTime currentTime = null;
+	
+	private static LocalDateTime getCurrentTime() {
+		if (currentTime == null) {
+			return LocalDateTime.now();
+		} else {
+			return currentTime;
+		}
+	}
+	
+	/**
+	 * For testing. Stubs the current time so time-related qualifiers work properly.
+	 * @param dateTime
+	 */
+	public static void setCurrentTime(LocalDateTime dateTime) {
+		currentTime = dateTime;
 	}
 
 	public boolean isEmptyQualifier() {
@@ -322,23 +341,13 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 	
-    private int parseIdString(String id) {
-        if (id.startsWith("#")) {
-            return Integer.parseInt(id.substring(1));
-        } else if (Character.isDigit(id.charAt(0))) {
-            return Integer.parseInt(id);
-        } else {
-            return -1;
-        }
-    }
-
     private boolean idSatisfies(TurboIssue issue) {
-        if (!content.isPresent()) return false;
-        return issue.getId() == parseIdString(content.get());
+        if (!number.isPresent()) return false;
+        return issue.getId() == number.get();
     }
 
 	private boolean satisfiesUpdatedHours(TurboIssue issue) {
-		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS));
+		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
 
 		if (numberRange.isPresent()) {
 			if (hours < MAX_HOURS) {
@@ -404,8 +413,9 @@ public class Qualifier implements FilterExpression {
         case "issue":
             return typeSatisfies(issue);
         case "merged":
-        case "unmerged":
         	return isPullRequest(issue) && !issue.isOpen();
+        case "unmerged":
+        	return isPullRequest(issue) && issue.isOpen();
         default:
             return false;
         }
@@ -436,8 +446,11 @@ public class Qualifier implements FilterExpression {
     
     private boolean authorSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
-        String creator = issue.getCreator().toLowerCase();
-        return creator != null && creator.contains(content.get().toLowerCase());
+
+        String creator = issue.getCreator();
+    	if (creator == null) return false;
+
+        return creator.toLowerCase().contains(content.get().toLowerCase());
     }
     
     private boolean involvesSatisfies(TurboIssue issue) {
@@ -474,17 +487,16 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean parentSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
-    	String parent = content.get().toLowerCase();
-        int index = parseIdString(parent);
-        if (index > 0) {
+    	if (!number.isPresent()) return false;
+        int parentIndex = number.get();
+        if (parentIndex > 0) {
             TurboIssue current = issue;
             
             // The parent itself should show
-            if (current.getId() == index) return true;
+            if (current.getId() == parentIndex) return true;
             
             // Descendants should show too
-            return current.hasAncestor(index);
+            return current.hasAncestor(parentIndex);
         }
         // Invalid issue number
         return false;
@@ -554,11 +566,11 @@ public class Qualifier implements FilterExpression {
     }
 
     private void applyParent(TurboIssue issue, Model model) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
+    	if (!number.isPresent()) {
     		throw new QualifierApplicationException("Invalid parent " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
         String parent = content.get().toLowerCase();
-        int index = parseIdString(parent);
+        int index = number.get();
         if (index != -1) {
             issue.setParentIssue(index);
         } else {
