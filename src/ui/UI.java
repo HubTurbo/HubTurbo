@@ -176,7 +176,7 @@ public class UI extends Application {
 	}
 
 	private void quit() {
-		ServiceManager.getInstance().stopModelUpdate();
+		ServiceManager.getInstance().shutdownModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveSessionConfig();
 		browserComponent.quit();

@@ -12,6 +12,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import model.Model;
@@ -46,6 +50,9 @@ import service.updateservice.ModelUpdater;
 import storage.DataCacheFileHandler;
 import storage.TurboRepoData;
 import stubs.ServiceManagerStub;
+import ui.UIReference;
+import ui.components.StatusBar;
+import util.events.RefreshDoneEvent;
 
 /**
  * Singleton class that provides access to the GitHub API services required by HubTurbo
@@ -89,6 +96,15 @@ public class ServiceManager {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 	
+	private static final int SECS_BETWEEN_POLLS = 60;
+	private final ScheduledExecutorService pollExecutor = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> pollHandler;
+	
+	private static final int COUNTDOWN_INTERVAL = 1;
+	private int timeRemaining = 60;
+	private final ScheduledExecutorService stopwatchExecutor = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> stopwatchHandler;
+	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
 	public static final String STATE_CLOSED = "closed";
@@ -124,26 +140,62 @@ public class ServiceManager {
 	}
 	
 	public void setupAndStartModelUpdate() {
-		if(modelUpdater != null){
-			stopModelUpdate();
-		}
 		if(repoId != null){
 			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime);
-			modelUpdater.startModelUpdate();
+			startModelUpdate();
 		}
 	}
 	
-	public void restartModelUpdate(){
-		if(modelUpdater != null){
-			modelUpdater.stopModelUpdate();
-			modelUpdater.startModelUpdate();
+	public void startModelUpdate(){
+		if (pollHandler != null && !pollHandler.isCancelled()) {
+			stopModelUpdate();
 		}
+
+		// get the current repo id from the model now so that the updates done will correspond with the current id in case of project switching
+		final IRepositoryIdProvider repoId = model.getRepoId();
+		Runnable pollTask = new Runnable() {
+			@Override
+			public void run() {
+				modelUpdater.updateModel(repoId);
+				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
+			}
+		};
+		pollHandler = pollExecutor.scheduleAtFixedRate(pollTask, 0, SECS_BETWEEN_POLLS, TimeUnit.SECONDS);
+		
+		Runnable countdown = new Runnable() {
+			@Override
+			public void run() {
+				StatusBar.displayMessage("Next refresh in " + getTime());
+			}
+		};
+		stopwatchHandler = stopwatchExecutor.scheduleAtFixedRate(countdown, 0, COUNTDOWN_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	public void stopModelUpdate(){
-		if(modelUpdater !=  null){
-			modelUpdater.stopModelUpdate();
-		}
+		pollHandler.cancel(true);
+		stopwatchHandler.cancel(true);
+		timeRemaining = SECS_BETWEEN_POLLS;
+	}
+	
+	private int getTime() {
+	    if (timeRemaining == 1) {
+	        timeRemaining = SECS_BETWEEN_POLLS;
+	    } else {
+	    	--timeRemaining;
+	    }
+	    return timeRemaining;
+	}
+	
+	// Terminates threads
+	public void shutdownModelUpdate() {
+		stopModelUpdate();
+		pollExecutor.shutdown();
+		stopwatchExecutor.shutdown();
+	}
+	
+	public void restartModelUpdate(){
+		stopModelUpdate();
+		startModelUpdate();
 	}
 	
 	public static ServiceManager getInstance(){
