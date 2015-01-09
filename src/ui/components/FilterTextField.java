@@ -26,9 +26,14 @@ public class FilterTextField extends TextField {
     private ValidationSupport validationSupport = new ValidationSupport();
     private String previousText;
     private ArrayList<String> words = new ArrayList<>(Arrays.asList(
-    		"assignee", "milestone", "title", "id",
-    		"parent", "label", "has", "state",
-    		"open", "closed"));
+    		"label", "milestone",
+    		"involves", "assignee", "author",
+    		"title", "body",
+    		"is", "issue", "pr", "merged", "unmerged",
+    		"no", "type", "has",
+    		"state", "open", "closed",
+    		"created",
+    		"updated"));
 
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
