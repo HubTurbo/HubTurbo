@@ -418,8 +418,11 @@ public class Qualifier implements FilterExpression {
     
     private boolean authorSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
-        String creator = issue.getCreator().toLowerCase();
-        return creator != null && creator.contains(content.get().toLowerCase());
+
+        String creator = issue.getCreator();
+    	if (creator == null) return false;
+
+        return creator.toLowerCase().contains(content.get().toLowerCase());
     }
     
     private boolean involvesSatisfies(TurboIssue issue) {
