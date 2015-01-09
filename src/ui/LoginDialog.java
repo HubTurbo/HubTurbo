@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
@@ -26,6 +27,7 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
 import storage.DataManager;
@@ -101,6 +103,8 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 3, 1);
+		
+		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
@@ -115,6 +119,22 @@ public class LoginDialog extends Dialog<Boolean> {
 		grid.add(buttons, 3, 3);
 		
 		return grid;
+	}
+
+	/**
+	 * Fills in fields which have values at this point.
+	 */
+	private void populateSavedFields() {
+		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
+		if (!lastLoginName.isEmpty()) {
+			repoOwnerField.setText(lastLoginName);
+		}
+		
+		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
+		if (lastViewed.isPresent()) {
+			repoOwnerField.setText(lastViewed.get().getOwner());
+			repoNameField.setText(lastViewed.get().getName());
+		}
 	}
 
 	/**
