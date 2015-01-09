@@ -3,6 +3,7 @@ package ui.issuepanel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import filter.expression.Qualifier;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -36,7 +37,7 @@ public class IssuePanelCard extends VBox {
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
 	private ArrayList<Object> changeListeners = new ArrayList<Object>();
-	
+
 	public IssuePanelCard(TurboIssue issue) {
 		this.issue = issue;
 		setup();
@@ -54,13 +55,17 @@ public class IssuePanelCard extends VBox {
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
 
-		String feed = issue.getFeeds(HOURS_AGO, MINUTES_AGO, SECONDS_AGO);
-		if (feed != null && !feed.isEmpty()) {
-			Text issueFeed = new Text(feed);
-			issueFeed.setWrappingWidth(CARD_WIDTH);
-			issueFeed.getStyleClass().add("issue-panel-feed");
-			issue.activityFeedProperty().addListener(new WeakChangeListener<String>(createIssueFeedListener(issue, issueFeed)));
-			getChildren().addAll(issueTitle, issueDetails, issueFeed);
+		if (Qualifier.isUpdateFilter()) {
+			String feed = issue.getFeeds(Qualifier.getFilterHours(), MINUTES_AGO, SECONDS_AGO);
+			if (feed != null && !feed.isEmpty()) {
+				Text issueFeed = new Text(feed);
+				issueFeed.setWrappingWidth(CARD_WIDTH);
+				issueFeed.getStyleClass().add("issue-panel-feed");
+				issue.activityFeedProperty().addListener(new WeakChangeListener<String>(createIssueFeedListener(issue, issueFeed)));
+				getChildren().addAll(issueTitle, issueDetails, issueFeed);
+			} else {
+				getChildren().addAll(issueTitle, issueDetails);
+			}
 		} else {
 			getChildren().addAll(issueTitle, issueDetails);
 		}

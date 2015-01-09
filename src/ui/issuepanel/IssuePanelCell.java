@@ -11,7 +11,6 @@ import model.Model;
 import model.TurboIssue;
 import ui.DragData;
 import ui.UI;
-
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
 import command.TurboIssueSetMilestone;

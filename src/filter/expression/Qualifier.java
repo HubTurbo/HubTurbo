@@ -33,6 +33,9 @@ public class Qualifier implements FilterExpression {
 	private Optional<LocalDate> date = Optional.empty();
 	private Optional<NumberRange> numberRange = Optional.empty();
 	private Optional<Integer> number = Optional.empty();
+	private static final int MAX_HOURS = 24;
+	private static boolean updateFilter;
+	private static int filterHours = MAX_HOURS;
 
 	// Copy constructor
 	public Qualifier(Qualifier other) {
@@ -90,13 +93,29 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(issue, new MetaQualifierInfo(metaQualifiers));
 	}
 	
+	public static void setUpdateFilter(boolean status) {
+		updateFilter = status;
+	}
+
+	public static boolean isUpdateFilter() {
+		return updateFilter;
+	}
+
+	public static int getFilterHours() {
+		if (isUpdateFilter()) {
+			return filterHours;
+		} else {
+			return MAX_HOURS;
+		}
+	}
+
 	public boolean isEmptyQualifier() {
 		return name.isEmpty() && content.isPresent() && content.get().isEmpty();
 	}
 
     public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
         assert name != null && content != null;
-
+		
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;
 
@@ -322,9 +341,17 @@ public class Qualifier implements FilterExpression {
 		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(LocalDateTime.now(), ChronoUnit.HOURS));
 
 		if (numberRange.isPresent()) {
+			if (hours < MAX_HOURS) {
+				filterHours = hours;
+			}
+			updateFilter = true;
 			return numberRange.get().encloses(hours);
 		} else if (number.isPresent()) {
 			// Treat it as <
+			if (hours < MAX_HOURS) {
+				filterHours = hours;
+			}
+			updateFilter = true;
 			return new NumberRange(null, number.get(), true).encloses(hours);
 		} else {
 			return false;
