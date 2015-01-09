@@ -49,6 +49,10 @@ public class DataManager {
 	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
 		sessionConfiguration.setFiltersForNextSession(project, filter);
 	}
+	
+	public void setLastLoginUsername(String name) {
+		sessionConfiguration.setLastLoginUsername(name);
+	}
 
 	/**
 	 * Interface to configuration files
@@ -100,5 +104,9 @@ public class DataManager {
 
 	public List<String> getLastViewedRepositories() {
 		return sessionConfiguration.getLastViewedRepositories();
+	}
+
+	public String getLastLoginUsername() {
+		return sessionConfiguration.getLastLoginUsername();
 	}
 }

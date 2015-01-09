@@ -13,7 +13,8 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
  */
 public class SessionConfiguration {
 	private HashMap<String, List<String>> projectFilters = new HashMap<>();
-	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>(); 
+	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
+	private String lastLoginUsername = "";
 	
 	public SessionConfiguration() {
 	}
@@ -62,5 +63,13 @@ public class SessionConfiguration {
 		return lastViewedRepositories.stream()
 				.map(repoViewRecord -> repoViewRecord.getRepository())
 				.collect(Collectors.toList());
+	}
+
+	public String getLastLoginUsername() {
+		return lastLoginUsername;
+	}
+
+	public void setLastLoginUsername(String lastLoginUsername) {
+		this.lastLoginUsername = lastLoginUsername;
 	}
 }
