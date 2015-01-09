@@ -58,6 +58,7 @@ public class SessionConfiguration {
 	
 	/**
 	 * Returns last-viewed repositories in owner/name format.
+	 * They are sorted by access date, latest first.
 	 */
 	public List<String> getLastViewedRepositories() {
 		return lastViewedRepositories.stream()
