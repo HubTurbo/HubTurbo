@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import model.Model;
+
 import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
-import model.Model;
 import service.ServiceManager;
 import service.updateservice.CommentUpdateService;
 
@@ -60,7 +60,7 @@ public class ServiceManagerStub extends ServiceManager{
 	
 	}
 	
-	public IRepositoryIdProvider getRepoId(){
+	public RepositoryId getRepoId(){
 		return RepositoryId.create(TEST_GH_USERNAME, TEST_REPO_NAME);
 	}
 	

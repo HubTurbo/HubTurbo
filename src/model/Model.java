@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.RequestException;
 
@@ -83,7 +83,7 @@ public class Model {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public boolean loadComponents(IRepositoryIdProvider repoId) throws IOException{
+	public boolean loadComponents(RepositoryId repoId) throws IOException{
 		try{
 			HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
 			loadComponents(repoId, items);

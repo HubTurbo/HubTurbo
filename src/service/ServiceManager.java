@@ -82,7 +82,7 @@ public class ServiceManager {
 	
 	private ModelUpdater modelUpdater;
 	private Model model;
-	private IRepositoryIdProvider repoId;
+	private RepositoryId repoId;
 	private String issuesETag = null;
 	private String collabsETag = null;
 	private String labelsETag = null;
@@ -189,15 +189,11 @@ public class ServiceManager {
 	}
 	
 	public String getRepoOwner() {
-		String[] segments = repoId.generateId().split("\\/");
-		assert segments.length == 2;
-		return segments[0];
+		return repoId.getOwner();
 	}
 	
 	public String getRepoName() {
-		String[] segments = repoId.generateId().split("\\/");
-		assert segments.length == 2;
-		return segments[1];
+		return repoId.getName();
 	}
 	
 	public boolean checkRepository(String repo) throws IOException{
@@ -230,7 +226,7 @@ public class ServiceManager {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getResources(IRepositoryIdProvider repoId) throws IOException {
+	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
 
 		boolean needToGetResources = true;

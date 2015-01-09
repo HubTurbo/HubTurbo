@@ -3,6 +3,7 @@ package ui;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
@@ -26,6 +27,7 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
 import storage.DataManager;
@@ -105,6 +107,8 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
+		
+		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
@@ -119,6 +123,31 @@ public class LoginDialog extends Dialog<Boolean> {
 		grid.add(buttons, 4, 3);
 		
 		return grid;
+	}
+
+	/**
+	 * Fills in fields which have values at this point.
+	 */
+	private void populateSavedFields() {
+		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
+		if (lastViewed.isPresent()) {
+			repoOwnerField.setText(lastViewed.get().getOwner());
+			repoNameField.setText(lastViewed.get().getName());
+		}
+
+		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
+		if (!lastLoginName.isEmpty()) {
+			usernameField.setText(lastLoginName);
+		}
+		
+		// Change focus depending on what fields are present
+		Platform.runLater(() -> {
+			if (!lastLoginName.isEmpty()) {
+				passwordField.requestFocus();
+			} else if (lastViewed.isPresent()) {
+				usernameField.requestFocus();
+			}
+		});
 	}
 
 	/**
@@ -186,6 +215,9 @@ public class LoginDialog extends Dialog<Boolean> {
 				logger.info("Failed to find or open credentials.txt");
 			}
 		}
+		
+		// Save login details
+		DataManager.getInstance().setLastLoginUsername(username);
 		
 		// Update UI
 
