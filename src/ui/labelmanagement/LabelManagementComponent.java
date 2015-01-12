@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import ui.TurboLabelGroup;
-import ui.sidepanel.SidePanel;
-import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -23,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboLabel;
+import ui.TurboLabelGroup;
 
 public class LabelManagementComponent {
 
@@ -31,15 +27,12 @@ public class LabelManagementComponent {
 	
 	private final Stage parentStage;
 	private final Model model;
-	private final SidePanel sidePanel;
 	private TreeView<LabelTreeItem> treeView;
 	private ObservableList<TurboLabel> labels;
-	private ListChangeListener<TurboLabel> listChangeListener;
 
-	public LabelManagementComponent(Stage parentStage, Model model, SidePanel sidePanel) {
+	public LabelManagementComponent(Stage parentStage, Model model) {
 		this.parentStage = parentStage;
 		this.model = model;
-		this.sidePanel = sidePanel;
 	}
 
 	public VBox initialise() {
@@ -91,22 +84,7 @@ public class LabelManagementComponent {
 
 		treeView.setCellFactory(createLabelCellFactory(stage));
 		
-		setupLabelsListChangeListener();
-		
 		return treeView;
-	}
-	
-	private void setupLabelsListChangeListener(){
-		listChangeListener = new ListChangeListener<TurboLabel>(){
-
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends TurboLabel> arg0) {
-				Platform.runLater(()->sidePanel.refreshSidebarLabels());
-			}
-			
-		};
-		labels.addListener(new WeakListChangeListener<TurboLabel>(listChangeListener));
 	}
 	
 	private void populateTree(TreeItem<LabelTreeItem> treeRoot) {
