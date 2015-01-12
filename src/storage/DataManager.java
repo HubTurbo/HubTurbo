@@ -11,25 +11,37 @@ import org.eclipse.egit.github.core.RepositoryId;
  * facilities for saving and loading all files and methods for accessing them.
  */
 public class DataManager {
+
 	private static final DataManager dataManagerInstance = new DataManager();
+	
+	public static DataManager getInstance() {
+		return dataManagerInstance;
+	}
+
+	private static final String FILE_CONFIG_SESSION = "session-config.json";
+	private static final String FILE_CONFIG_LOCAL = "local-config.json";
+	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig";
 
 	private ConfigFileHandler fileHandler;
 	private SessionConfiguration sessionConfiguration;
 	private ProjectConfiguration projConfiguration;
 	private LocalConfiguration localConfiguration;
 
-	protected DataManager() {
-		fileHandler = new ConfigFileHandler();
-
+	public DataManager() {
+		fileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL, DIR_CONFIG_PROJECTS);
+		initialiseConfigFiles();
+	}
+	
+	/**
+	 * Initialises and/or loads all configuration files, except project configuration,
+	 * which will be loaded later.
+	 */
+	private void initialiseConfigFiles() {
 		sessionConfiguration = fileHandler.loadSessionConfig();
 		localConfiguration = fileHandler.loadLocalConfig();
 
 		// Actually loaded later via loadProjectConfig
 		projConfiguration = new ProjectConfiguration();
-	}
-
-	public static DataManager getInstance() {
-		return dataManagerInstance;
 	}
 
 	/**
@@ -109,5 +121,14 @@ public class DataManager {
 
 	public String getLastLoginUsername() {
 		return sessionConfiguration.getLastLoginUsername();
+	}
+	
+	/**
+	 * Testing
+	 */
+	
+	public void setConfigFileHandler(ConfigFileHandler handler) {
+		this.fileHandler = handler;
+		initialiseConfigFiles();
 	}
 }

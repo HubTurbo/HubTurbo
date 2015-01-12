@@ -43,41 +43,26 @@ public class ConfigFileHandler {
 	private static final String CHARSET = "UTF-8";
 	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
-	private static final String FILE_CONFIG_SESSION = "session-config.json";
-	private static final String FILE_CONFIG_LOCAL = "local-config.json";
-	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig";
-	
 	private static final String ADDRESS_SEPARATOR = "/";
 	private static final String URL_SPACE = "%20";
 	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
 	private static final String DEFAULT_BRANCH = "master";
 	private static final int BUFFER_SIZE = 1024;
 	
-	private static Gson gson = new GsonBuilder()
-								.setPrettyPrinting()
-								.excludeFieldsWithModifiers(Modifier.TRANSIENT)
-								.registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
-									@Override
-									public JsonElement serialize(
-											LocalDateTime src, Type typeOfSrc,
-											JsonSerializationContext context) {
-										Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
-										long epochMilli = instant.toEpochMilli();
-										return new JsonPrimitive(epochMilli);
-									}
-									
-								})
-								.registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-									@Override
-									public LocalDateTime deserialize(
-											JsonElement json, Type typeOfT,
-											JsonDeserializationContext context)
-											throws JsonParseException {
-										Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-								        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-									}								
-								})
-								.create();
+	private Gson gson;
+
+	private final String sessionConfigFilePath;
+	private final String localConfigFilePath;
+	private final String projectConfigDirPath;
+
+	public ConfigFileHandler(String sessionConfigFilePath, String localConfigFilePath, String projectConfigDir) {
+
+		this.localConfigFilePath = localConfigFilePath;
+		this.sessionConfigFilePath = sessionConfigFilePath;
+		this.projectConfigDirPath = projectConfigDir;
+
+		setupGson();
+	}
 
 	/**
 	 * Local and session configuration
@@ -88,7 +73,7 @@ public class ConfigFileHandler {
 	 */
 	public void saveSessionConfig(SessionConfiguration config) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_SESSION) , CHARSET);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(sessionConfigFilePath) , CHARSET);
 			gson.toJson(config, SessionConfiguration.class, writer);
 			writer.close();
 		} catch (IOException e) {
@@ -104,10 +89,10 @@ public class ConfigFileHandler {
 		// Default to an empty configuration
 		SessionConfiguration config = new SessionConfiguration();
 		
-		File configFile = new File(FILE_CONFIG_SESSION);
+		File configFile = new File(sessionConfigFilePath);
 		if (configFile.exists()) {
 			try {
-				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_SESSION), CHARSET);
+				Reader reader = new InputStreamReader(new FileInputStream(sessionConfigFilePath), CHARSET);
 				config = gson.fromJson(reader, SessionConfiguration.class);
 				reader.close();
 			} catch (IOException e) {
@@ -129,7 +114,7 @@ public class ConfigFileHandler {
 	 */
 	public void saveLocalConfig(LocalConfiguration config) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(FILE_CONFIG_LOCAL) , CHARSET);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(localConfigFilePath) , CHARSET);
 			gson.toJson(config, LocalConfiguration.class, writer);
 			writer.close();
 		} catch (IOException e) {
@@ -145,10 +130,10 @@ public class ConfigFileHandler {
 		// Default to an empty configuration
 		LocalConfiguration config = new LocalConfiguration();
 		
-		File configFile = new File(FILE_CONFIG_LOCAL);
+		File configFile = new File(localConfigFilePath);
 		if (configFile.exists()) {
 			try {
-				Reader reader = new InputStreamReader(new FileInputStream(FILE_CONFIG_LOCAL), CHARSET);
+				Reader reader = new InputStreamReader(new FileInputStream(localConfigFilePath), CHARSET);
 				config = gson.fromJson(reader, LocalConfiguration.class);
 				reader.close();
 			} catch (IOException e) {
@@ -230,14 +215,14 @@ public class ConfigFileHandler {
 	}
 
 	private void directorySetup() {
-		File directory = new File(DIR_CONFIG_PROJECTS);
+		File directory = new File(projectConfigDirPath);
 		if (!directory.exists()) {
 			directory.mkdir();
 		}
 	}
 
 	private String generateFileName(IRepositoryIdProvider repoId) {
-		String fileName = DIR_CONFIG_PROJECTS + File.separator + determineConfigFileName(repoId, " ");
+		String fileName = projectConfigDirPath + File.separator + determineConfigFileName(repoId, " ");
 		return fileName;
 	}
 
@@ -249,10 +234,10 @@ public class ConfigFileHandler {
 			ServiceManager service = ServiceManager.getInstance();
 			List<RepositoryContents> repoContents = null;
 			try {
-				repoContents = service.getContents(repoId, DIR_CONFIG_PROJECTS);
+				repoContents = service.getContents(repoId, projectConfigDirPath);
 			} catch (RequestException e) {
 				// Config file was not found; do nothing
-				logger.info(String.format("Config file in repo %s, directory %s not found", repoId, DIR_CONFIG_PROJECTS));
+				logger.info(String.format("Config file in repo %s, directory %s not found", repoId, projectConfigDirPath));
 			}
 			
 			// Do nothing if the config file wasn't found
@@ -276,7 +261,7 @@ public class ConfigFileHandler {
 		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
 										 + ADDRESS_SEPARATOR + repoIdTokens[1]
 										 + ADDRESS_SEPARATOR + DEFAULT_BRANCH
-										 + ADDRESS_SEPARATOR + DIR_CONFIG_PROJECTS
+										 + ADDRESS_SEPARATOR + projectConfigDirPath
 										 + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE);
 		return urlString;
 	}
@@ -325,5 +310,33 @@ public class ConfigFileHandler {
 			if (fos != null)
 				fos.close();
 		}
+	}
+
+	private void setupGson() {
+		 gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.excludeFieldsWithModifiers(Modifier.TRANSIENT)
+			.registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+				@Override
+				public JsonElement serialize(
+						LocalDateTime src, Type typeOfSrc,
+						JsonSerializationContext context) {
+					Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
+					long epochMilli = instant.toEpochMilli();
+					return new JsonPrimitive(epochMilli);
+				}
+				
+			})
+			.registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+				@Override
+				public LocalDateTime deserialize(
+						JsonElement json, Type typeOfT,
+						JsonDeserializationContext context)
+						throws JsonParseException {
+					Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
+			        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+				}								
+			})
+			.create();
 	}
 }
