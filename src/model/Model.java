@@ -425,32 +425,6 @@ public class Model {
 		issues.addAll(list);
 	}
 
-//	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
-//		for (Issue ghIssue : ghIssues) {
-//			Set<Label> toBeRemovedLabels = new HashSet<Label>();
-//			for (Label ghLabel : ghIssue.getLabels()) {
-//				if (isInconsistent(ghIssue.getState(), ghLabel.getName())) {
-//					toBeRemovedLabels.add(ghLabel);
-//				}
-//			}
-//			ghIssue.getLabels().removeAll(toBeRemovedLabels);
-//			
-//			if (!toBeRemovedLabels.isEmpty()) {
-//				try {
-//					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
-//				} catch (IOException e) {
-//					logger.error(e.getLocalizedMessage(), e);
-//				}
-//			}
-//		}
-//	}
-
-	private boolean isInconsistent(String state, String ghLabelName) {
-		DataManager dataManager = DataManager.getInstance();
-		return ((dataManager.isOpenStatusLabel(ghLabelName) && state.equals(STATE_CLOSED)) ||
-				(dataManager.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
-	}
-
 	public void loadLabels(List<Label> ghLabels){
 		standardiseStatusLabels(ghLabels);
 		Platform.runLater(()->{
