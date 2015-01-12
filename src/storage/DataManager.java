@@ -72,24 +72,8 @@ public class DataManager {
 	 * Project configuration
 	 */
 
-	public List<String> getStatusLabels() {
-		return projConfiguration.getStatusLabels();
-	}
-
 	public boolean isNonInheritedLabel(String label) {
 		return projConfiguration.isNonInheritedLabel(label);
-	}
-
-	public boolean isStatusLabel(String label) {
-		return projConfiguration.isStatusLabel(label);
-	}
-
-	public boolean isOpenStatusLabel(String label) {
-		return projConfiguration.isOpenStatusLabel(label);
-	}
-
-	public boolean isClosedStatusLabel(String label) {
-		return projConfiguration.isClosedStatusLabel(label);
 	}
 
 	/**
