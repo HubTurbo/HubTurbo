@@ -34,7 +34,6 @@ import service.ServiceManager;
 import storage.DataManager;
 import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
-import ui.issuepanel.expanded.BrowserComponent;
 import util.DialogMessage;
 import util.Utility;
 import util.events.ColumnChangeEvent;
@@ -42,6 +41,7 @@ import util.events.ColumnChangeEventHandler;
 import util.events.Event;
 import util.events.EventHandler;
 import util.events.LoginEvent;
+import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
 

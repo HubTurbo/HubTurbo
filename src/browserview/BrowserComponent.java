@@ -1,4 +1,4 @@
-package ui.issuepanel.expanded;
+package browserview;
 
 import java.awt.Rectangle;
 import java.io.File;
