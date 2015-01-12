@@ -20,15 +20,13 @@ public class DataManager {
 
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config.json";
-	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig";
 
 	private ConfigFileHandler fileHandler;
 	private SessionConfiguration sessionConfiguration;
-	private ProjectConfiguration projConfiguration;
 	private LocalConfiguration localConfiguration;
 
 	public DataManager() {
-		fileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL, DIR_CONFIG_PROJECTS);
+		fileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL);
 		initialiseConfigFiles();
 	}
 	
@@ -39,18 +37,11 @@ public class DataManager {
 	private void initialiseConfigFiles() {
 		sessionConfiguration = fileHandler.loadSessionConfig();
 		localConfiguration = fileHandler.loadLocalConfig();
-
-		// Actually loaded later via loadProjectConfig
-		projConfiguration = new ProjectConfiguration();
 	}
 
 	/**
 	 * Operations
 	 */
-
-	public void loadProjectConfig(IRepositoryIdProvider repoId) {
-		projConfiguration = fileHandler.loadProjectConfig(repoId);
-	}
 
 	public void saveLocalConfig() {
 		fileHandler.saveLocalConfig(localConfiguration);
@@ -78,14 +69,6 @@ public class DataManager {
 
 	public String getUserAlias(String user) {
 		return localConfiguration.getAlias(user);
-	}
-
-	/**
-	 * Project configuration
-	 */
-
-	public boolean isNonInheritedLabel(String label) {
-		return projConfiguration.isNonInheritedLabel(label);
 	}
 
 	/**

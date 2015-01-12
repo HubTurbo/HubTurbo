@@ -1,6 +1,5 @@
 package storage;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,22 +10,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.client.RequestException;
-
-import service.ServiceManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,23 +32,15 @@ public class ConfigFileHandler {
 	private static final String CHARSET = "UTF-8";
 	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
 	
-	private static final String ADDRESS_SEPARATOR = "/";
-	private static final String URL_SPACE = "%20";
-	private static final String GITHUB_DOMAIN = "https://raw.githubusercontent.com";
-	private static final String DEFAULT_BRANCH = "master";
-	private static final int BUFFER_SIZE = 1024;
-	
 	private Gson gson;
 
 	private final String sessionConfigFilePath;
 	private final String localConfigFilePath;
-	private final String projectConfigDirPath;
 
-	public ConfigFileHandler(String sessionConfigFilePath, String localConfigFilePath, String projectConfigDir) {
+	public ConfigFileHandler(String sessionConfigFilePath, String localConfigFilePath) {
 
 		this.localConfigFilePath = localConfigFilePath;
 		this.sessionConfigFilePath = sessionConfigFilePath;
-		this.projectConfigDirPath = projectConfigDir;
 
 		setupGson();
 	}
@@ -150,168 +131,6 @@ public class ConfigFileHandler {
 		return config;
 	}
 	
-	/**
-	 * Project configuration
-	 */
-	
-	private void saveProjectConfig(ProjectConfiguration config, IRepositoryIdProvider repoId) {
-		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(generateFileName(repoId)), CHARSET);
-			gson.toJson(config, ProjectConfiguration.class, writer);
-			writer.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-
-	public ProjectConfiguration loadProjectConfig(IRepositoryIdProvider repoId) {
-		directorySetup();
-		ProjectConfiguration config = new ProjectConfiguration();
-		String fileName = generateFileName(repoId);
-
-		if (isValidURL(generateFileURL(repoId))) {
-			try {
-				// Download config file from repo if available
-				download(generateFileURL(repoId), fileName);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		
-		} 
-		File configFile = new File(fileName);
-		if (configFile.exists()) {
-			config = readProjectConfigFile(fileName);
-		} else {
-			config = createProjectConfigFile(repoId, fileName);
-		}		
-		return config;
-	}
-
-	private ProjectConfiguration readProjectConfigFile(String fileName) {
-		ProjectConfiguration config = null;
-		try {
-			Reader reader = new InputStreamReader(new FileInputStream(fileName), CHARSET);
-			config = gson.fromJson(reader, ProjectConfiguration.class);
-			reader.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		return config;
-	}
-
-	private ProjectConfiguration createProjectConfigFile(IRepositoryIdProvider repoId, String fileName) {
-
-		// Default project configuration file
-		ProjectConfiguration config = new ProjectConfiguration();
-		
-		File configFile = new File(fileName);
-		try {
-			configFile.createNewFile();
-			saveProjectConfig(config, repoId);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		return config;
-	}
-
-	private void directorySetup() {
-		File directory = new File(projectConfigDirPath);
-		if (!directory.exists()) {
-			directory.mkdir();
-		}
-	}
-
-	private String generateFileName(IRepositoryIdProvider repoId) {
-		String fileName = projectConfigDirPath + File.separator + determineConfigFileName(repoId, " ");
-		return fileName;
-	}
-
-	private String determineConfigFileName(IRepositoryIdProvider repoId, String space_char) {
-		String[] repoIdTokens = repoId.generateId().split("/");
-		String expectedFileName = repoIdTokens[0] + space_char + repoIdTokens[1] + ".json";
-		String configFileName = expectedFileName;
-		try {
-			ServiceManager service = ServiceManager.getInstance();
-			List<RepositoryContents> repoContents = null;
-			try {
-				repoContents = service.getContents(repoId, projectConfigDirPath);
-			} catch (RequestException e) {
-				// Config file was not found; do nothing
-				logger.info(String.format("Config file in repo %s, directory %s not found", repoId, projectConfigDirPath));
-			}
-			
-			// Do nothing if the config file wasn't found
-			if (repoContents != null) {
-				for (RepositoryContents content : repoContents) {
-					System.out.println(content.getName());
-					if (content.getName().equalsIgnoreCase(expectedFileName)) {
-						configFileName = content.getName();
-						break;
-					}
-				}
-			}
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		return configFileName;
-	}
-
-	private String generateFileURL(IRepositoryIdProvider repoId) {
-		String[] repoIdTokens = repoId.generateId().split(ADDRESS_SEPARATOR);
-		String urlString = GITHUB_DOMAIN + ADDRESS_SEPARATOR + repoIdTokens[0] 
-										 + ADDRESS_SEPARATOR + repoIdTokens[1]
-										 + ADDRESS_SEPARATOR + DEFAULT_BRANCH
-										 + ADDRESS_SEPARATOR + projectConfigDirPath
-										 + ADDRESS_SEPARATOR + determineConfigFileName(repoId, URL_SPACE);
-		return urlString;
-	}
-
-	private boolean isValidURL(String stringURL) {
-		HttpURLConnection httpUrlConn;
-		try {
-			httpUrlConn = (HttpURLConnection) new URL(stringURL).openConnection();
-
-			// Check if resource is available without downloading it
-			httpUrlConn.setRequestMethod("HEAD");
-			httpUrlConn.setConnectTimeout(30000);
-			httpUrlConn.setReadTimeout(30000);
-
-			return (httpUrlConn.getResponseCode() == HttpURLConnection.HTTP_OK);
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return false;
-		}
-	}
-
-	private void download(String stringURL, String destination) throws IOException {
-		String downloadedFileName = stringURL.substring(stringURL.lastIndexOf(ADDRESS_SEPARATOR) + 1);
-        Path inputPath = Paths.get(destination);
-        
-		URL url = new URL(stringURL);
-		BufferedInputStream inStream  = null;
-		FileOutputStream fos = null;
-		try {
-			inStream = new BufferedInputStream(url.openStream());
-			fos = new FileOutputStream(inputPath.toAbsolutePath().toString());
-
-			byte data[] = new byte[BUFFER_SIZE];
-			int bytesRead;
-			System.out.print("Downloading " + downloadedFileName);
-			while ((bytesRead = inStream.read(data, 0, BUFFER_SIZE)) != -1) {
-				System.out.print(".");// Progress bar
-				fos.write(data, 0, bytesRead);
-			}
-			System.out.println("done!");
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-		} finally {
-			if (inStream != null)
-				inStream.close();
-			if (fos != null)
-				fos.close();
-		}
-	}
-
 	private void setupGson() {
 		 gson = new GsonBuilder()
 			.setPrettyPrinting()

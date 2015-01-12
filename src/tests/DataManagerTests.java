@@ -1,9 +1,8 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +19,6 @@ public class DataManagerTests {
 
 	private static final String FILE_CONFIG_SESSION = "session-config-test.json";
 	private static final String FILE_CONFIG_LOCAL = "local-config-test.json";
-	private static final String DIR_CONFIG_PROJECTS = ".hubturboconfig-test";
 	
 	private static DataManager dataManager;
 	private static ConfigFileHandler stubFileHandler;
@@ -28,7 +26,7 @@ public class DataManagerTests {
 	@BeforeClass
 	public static void setup() {
 		dataManager = DataManager.getInstance();
-		stubFileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL, DIR_CONFIG_PROJECTS);
+		stubFileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL);
 
 		dataManager.setConfigFileHandler(stubFileHandler);
 	}
@@ -78,9 +76,5 @@ public class DataManagerTests {
 	private static void cleanup() {
 		FileUtils.deleteQuietly(new File(FILE_CONFIG_LOCAL));
 		FileUtils.deleteQuietly(new File(FILE_CONFIG_SESSION));
-		try {
-			FileUtils.deleteDirectory(new File(DIR_CONFIG_PROJECTS));
-		} catch (IOException e) {
-		}
 	}
 }

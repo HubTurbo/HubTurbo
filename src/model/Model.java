@@ -28,7 +28,6 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
-import storage.DataManager;
 import util.CollectionUtilities;
 import util.DialogMessage;
 
@@ -42,7 +41,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
-	private static final String MESSAGE_LOADING_PROJECT_CONFIG = "Loading project configuration...";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -107,8 +105,6 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
-		logger.info(MESSAGE_LOADING_PROJECT_CONFIG);
-		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
 		boolean isPublicRepo = false;
