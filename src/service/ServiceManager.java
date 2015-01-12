@@ -158,9 +158,9 @@ public class ServiceManager {
 	 * Starts the concurrent tasks which update the model.
 	 */
 	public void startModelUpdate(){
-		if (refreshResult != null && !refreshResult.isCancelled()) {
-			stopModelUpdate();
-		}
+		
+		// Ensure that model update isn't ongoing
+		stopModelUpdate();
 
 		// We get the repo id from the model now. On task completion, the
 		// repo id may be different if the project was switched, so we
@@ -190,9 +190,18 @@ public class ServiceManager {
 	 * Stops the concurrent tasks which update the model.
 	 */
 	public void stopModelUpdate() {
+		
+		// If the model update was never started, don't do anything
+		if (refreshResult == null || refreshResult.isCancelled()) return;
+		if (timeUntilRefreshResult == null || timeUntilRefreshResult.isCancelled()) return;
+		
 		refreshResult.cancel(true);
 		timeUntilRefreshResult.cancel(true);
 		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+		
+		// Indicate that model update has been stopped
+		refreshResult = null;
+		timeUntilRefreshResult = null;
 	}
 	
 	private int getTime() {
