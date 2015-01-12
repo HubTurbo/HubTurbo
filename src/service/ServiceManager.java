@@ -62,8 +62,19 @@ import util.events.RefreshDoneEvent;
  * labels, milestones, assignees and issues.
  * */
 public class ServiceManager {
-	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
+	
+	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	public static final boolean isTestMode = false;
+	
+	public static ServiceManager getInstance(){
+		if(!isTestMode){
+			return serviceManagerInstance;
+		}else{
+			return new ServiceManagerStub();
+		}
+	}
+
+	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
 	
 	protected static final String METHOD_PUT = "PUT";
 	protected static final String METHOD_POST = "POST";
@@ -73,7 +84,6 @@ public class ServiceManager {
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
 	public static final int MAX_FEED = 10;
-	private static final ServiceManager serviceManagerInstance = new ServiceManager();
 	private GitHubClientExtended githubClient;
 	
 	private CollaboratorService collabService;
@@ -92,15 +102,16 @@ public class ServiceManager {
 	private String labelsETag = null;
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
+
+	private static final int REFRESH_INTERVAL = 60;
+	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> refreshResult;
 	
-	private static final int SECS_BETWEEN_POLLS = 60;
-	private final ScheduledExecutorService pollExecutor = Executors.newScheduledThreadPool(1);
-	private ScheduledFuture<?> pollHandler;
+	private static final int TICK_INTERVAL = 1;
+	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> timeUntilRefreshResult;
 	
-	private static final int COUNTDOWN_INTERVAL = 1;
-	private int timeRemaining = 60;
-	private final ScheduledExecutorService stopwatchExecutor = Executors.newScheduledThreadPool(1);
-	private ScheduledFuture<?> stopwatchHandler;
+	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	
 	public static final String STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -143,13 +154,20 @@ public class ServiceManager {
 		}
 	}
 	
+	/**
+	 * Starts the concurrent tasks which update the model.
+	 */
 	public void startModelUpdate(){
-		if (pollHandler != null && !pollHandler.isCancelled()) {
-			stopModelUpdate();
-		}
+		
+		// Ensure that model update isn't ongoing
+		stopModelUpdate();
 
-		// get the current repo id from the model now so that the updates done will correspond with the current id in case of project switching
+		// We get the repo id from the model now. On task completion, the
+		// repo id may be different if the project was switched, so we
+		// validate with this repo id at that point.
+		
 		final IRepositoryIdProvider repoId = model.getRepoId();
+		
 		Runnable pollTask = new Runnable() {
 			@Override
 			public void run() {
@@ -157,7 +175,7 @@ public class ServiceManager {
 				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
 			}
 		};
-		pollHandler = pollExecutor.scheduleAtFixedRate(pollTask, 0, SECS_BETWEEN_POLLS, TimeUnit.SECONDS);
+		refreshResult = refreshExecutor.scheduleAtFixedRate(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
 		
 		Runnable countdown = new Runnable() {
 			@Override
@@ -165,44 +183,53 @@ public class ServiceManager {
 				StatusBar.displayMessage("Next refresh in " + getTime());
 			}
 		};
-		stopwatchHandler = stopwatchExecutor.scheduleAtFixedRate(countdown, 0, COUNTDOWN_INTERVAL, TimeUnit.SECONDS);
+		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleAtFixedRate(countdown, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 	
-	public void stopModelUpdate(){
-		pollHandler.cancel(true);
-		stopwatchHandler.cancel(true);
-		timeRemaining = SECS_BETWEEN_POLLS;
+	/**
+	 * Stops the concurrent tasks which update the model.
+	 */
+	public void stopModelUpdate() {
+		
+		// If the model update was never started, don't do anything
+		if (refreshResult == null || refreshResult.isCancelled()) return;
+		if (timeUntilRefreshResult == null || timeUntilRefreshResult.isCancelled()) return;
+		
+		refreshResult.cancel(true);
+		timeUntilRefreshResult.cancel(true);
+		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+		
+		// Indicate that model update has been stopped
+		refreshResult = null;
+		timeUntilRefreshResult = null;
 	}
 	
 	private int getTime() {
-	    if (timeRemaining == 1) {
-	        timeRemaining = SECS_BETWEEN_POLLS;
+	    if (timeRemainingUntilRefresh == 1) {
+	        timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	    } else {
-	    	--timeRemaining;
+	    	--timeRemainingUntilRefresh;
 	    }
-	    return timeRemaining;
+	    return timeRemainingUntilRefresh;
 	}
 	
-	// Terminates threads
+	/**
+	 * Called on application exit. Will be called only once.
+	 */
 	public void shutdownModelUpdate() {
 		stopModelUpdate();
-		pollExecutor.shutdown();
-		stopwatchExecutor.shutdown();
+		refreshExecutor.shutdown();
+		timeUntilRefreshExecutor.shutdown();
 	}
 	
+	/**
+	 * Helper function for restarting model update.
+	 */
 	public void restartModelUpdate(){
 		stopModelUpdate();
 		startModelUpdate();
 	}
-	
-	public static ServiceManager getInstance(){
-		if(!isTestMode){
-			return serviceManagerInstance;
-		}else{
-			return new ServiceManagerStub();
-		}
-	}
-	
+		
 	public boolean login(String userId, String password){
 		this.password = password;
 		githubClient.setCredentials(userId, password);
