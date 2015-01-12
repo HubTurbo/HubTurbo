@@ -14,15 +14,14 @@ import model.Model;
 import storage.DataManager;
 import ui.UI;
 import ui.components.StatusBar;
-import ui.issuepanel.HierarchicalIssuePanel;
 import ui.issuepanel.IssuePanel;
 import util.events.ColumnChangeEvent;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
+
 import command.TurboCommandExecutor;
-import filter.expression.FilterExpression;
 
 
 public class ColumnControl extends HBox {
@@ -139,20 +138,6 @@ public class ColumnControl extends HBox {
 		}
 	}
 	
-	public void toggleColumn(int index) {
-		IssueColumn column;
-		IssueColumn current = (IssueColumn) getChildren().get(index);
-		FilterExpression currentFilterExpr = current.getCurrentFilterExpression();
-		if (current instanceof HierarchicalIssuePanel) {
-			column = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
-		} else {
-			column = new HierarchicalIssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
-		}
-		column.setItems(model.getIssues());
-		column.filter(currentFilterExpr);
-		getChildren().set(index, column);
-	}
-		
 	public void createNewPanelAtStart() {
 		addColumnAt(0);
 	}
