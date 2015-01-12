@@ -20,13 +20,19 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
 import model.TurboIssue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import service.ServiceManager;
 import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.StatusBar;
+
 import command.CommandType;
 import command.TurboCommandExecutor;
+
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
@@ -41,8 +47,7 @@ import filter.expression.Qualifier;
  */
 public abstract class IssueColumn extends Column {
 
-	// private static final String ADD_ISSUE = "\u271A";
-	// private static final String TOGGLE_HIERARCHY = "\u27A5";
+	private static final Logger logger = LogManager.getLogger(IssueColumn.class.getName());
 
 	// Collection-related
 
@@ -226,6 +231,7 @@ public abstract class IssueColumn extends Column {
 		}
 		catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
+			logger.error(ex.getLocalizedMessage(), ex);
 			// Overrides message in status bar
 			StatusBar.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
 		}

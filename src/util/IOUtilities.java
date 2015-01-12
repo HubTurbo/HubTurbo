@@ -7,9 +7,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ui.UI;
 
 public class IOUtilities {
+
+	private static final Logger logger = LogManager.getLogger(IOUtilities.class.getName());
+
 	public static ByteArrayOutputStream inputStreamToByteArrayOutputStream(InputStream is) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int nRead;
@@ -36,7 +42,7 @@ public class IOUtilities {
 			reader.close();
 			return Optional.of(sb.toString());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return Optional.empty();
 	}

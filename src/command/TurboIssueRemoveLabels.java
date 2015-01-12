@@ -64,11 +64,13 @@ public class TurboIssueRemoveLabels extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout removing label(s) from issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not remove issue labels: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot remove label(s) from issue.");
 				});
+				logger.info("Could not remove issue labels: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}

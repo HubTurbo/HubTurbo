@@ -239,7 +239,7 @@ public class LoginDialog extends Dialog<Boolean> {
 			    try {
 					latch.await();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					logger.error(e.getLocalizedMessage(), e);
 				} 
 		    	return loadSuccess;
 		    }

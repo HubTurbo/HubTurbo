@@ -349,9 +349,11 @@ public class UI extends Application {
 		} catch (SocketTimeoutException e){
 			DialogMessage.showWarningDialog("Internet Connection Timeout", 
 					"Timeout while connecting to GitHub, please check your internet connection.");
+			logger.error(e.getLocalizedMessage(), e);
 		} catch (UnknownHostException e){
 			DialogMessage.showWarningDialog("No Internet Connection", 
 					"Please check your internet connection and try again.");
+			logger.error(e.getLocalizedMessage(), e);
 		}catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}

@@ -28,8 +28,7 @@ public class ServiceManagerStub extends ServiceManager{
 		try {
 			model.loadComponents(getRepoId());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -38,8 +37,6 @@ public class ServiceManagerStub extends ServiceManager{
 		try {
 			return model.loadComponents(RepositoryId.create(owner, name));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return false;
 		}
 	}

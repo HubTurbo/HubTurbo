@@ -650,7 +650,7 @@ public class TurboIssue implements Listable {
 		try {
 			feeds = ServiceManager.getInstance().getFeeds(getId());
 		} catch (Exception e) {
-			System.out.println(e.getLocalizedMessage());
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return feeds;
 	}

@@ -84,11 +84,13 @@ public class TurboIssueEdit extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout while editing issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not edit issue: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot edit issue.");
 				});
+				logger.info("Could not edit issue: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}

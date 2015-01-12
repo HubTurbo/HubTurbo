@@ -88,14 +88,16 @@ public class Model {
 		} catch(SocketTimeoutException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("Internet Connection is down", 
-						"Timeout while loading items from github. Please check your internet connection.");
+						"Timeout while loading items from GitHub. Please check your internet connection.");
 			});
+			logger.info("Timeout while loading items from GitHub: " + e.getLocalizedMessage());
 			return false;
 		} catch(UnknownHostException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No Internet Connection", 
 						"Please check your internet connection and try again");
 			});
+			logger.info("No internet connection: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
