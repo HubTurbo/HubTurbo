@@ -4,12 +4,10 @@ import java.util.Date;
 
 import org.eclipse.egit.github.core.User;
 
-import ui.issuepanel.expanded.comments.CommentListItem;
-
 /**
  * Models an event that could happen to an issue.
  */
-public class TurboIssueEvent implements CommentListItem {
+public class TurboIssueEvent {
 	private Date date;
 	private IssueEventType type;
 	private User actor;
