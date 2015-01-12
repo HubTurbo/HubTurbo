@@ -25,7 +25,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
@@ -426,7 +425,6 @@ public class Model {
 	}
 
 	public void loadLabels(List<Label> ghLabels){
-		standardiseStatusLabels(ghLabels);
 		Platform.runLater(()->{
 			labels.clear();
 			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
@@ -439,44 +437,6 @@ public class Model {
 		labels.addAll(list);
 	}
 	
-	private void standardiseStatusLabels(List<Label> ghLabels) {
-		DataManager dataManager = DataManager.getInstance();
-		List<String> defaultStatuses = dataManager.getStatusLabels();
-		List<String> projectLabels = ghLabels.stream()
-											 .map(label -> label.getName())
-											 .collect(Collectors.toList());
-		
-		defaultStatuses.removeAll(projectLabels);
-
-		for (String standardStatus : defaultStatuses) {
-			if(standardStatus == null){
-				//Check is required because status labels array serialised from json file can contain null
-				continue;
-			}
-			Label statusLabel = new Label();
-			statusLabel.setName(standardStatus);
-			if (dataManager.isOpenStatusLabel(standardStatus)) {
-				statusLabel.setColor("009800");
-			} else {
-				statusLabel.setColor("0052cc");
-			}
-			try {
-				ghLabels.add(ServiceManager.getInstance().createLabel(statusLabel));
-			} catch (IOException e) {
-				if(e instanceof RequestException){
-					//Happens because user has no repo permissions
-					if(((RequestException) e).getStatus() == 404){
-						logger.error("No repository permissions to create label", e);
-						break;
-					}
-				}else{
-					logger.error(e.getLocalizedMessage(), e);
-				}
-			}
-		}
-		
-	}
-
 	public void updateCachedLabels(List<Label> ghLabels, String repoId){
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		updateCachedList(labels, newLabels, repoId);	
