@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
-import storage.DataManager;
 
 public abstract class TurboIssueCommand {
 	protected static final Logger logger = LogManager.getLogger(TurboIssueCommand.class.getName());
@@ -85,9 +84,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for(TurboLabel label : addedParent.getLabels()){
-			if(!DataManager.getInstance().isNonInheritedLabel(label.toGhName())){
-				issue.addLabel(label);
-			}
+			issue.addLabel(label);
 		}
 	}
 	
@@ -98,9 +95,7 @@ public abstract class TurboIssueCommand {
 		}
 		
 		for (TurboLabel label : removedParent.getLabels()) {
-			if(!DataManager.getInstance().isNonInheritedLabel(label.toGhName())){
-				issue.removeLabel(label);
-			}
+			issue.removeLabel(label);
 		}
 	}
 }

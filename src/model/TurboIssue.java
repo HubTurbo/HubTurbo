@@ -323,35 +323,6 @@ public class TurboIssue implements Listable {
 		}
 	}
 
-	public boolean hasStatusLabel() {
-		for (TurboLabel label : labels) {
-			String ghName = label.toGhName();
-			if (DataManager.getInstance().isStatusLabel(ghName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public TurboLabel getStatusLabel() {
-		List<TurboLabel> statusLabel = labels
-				.stream()
-				.filter(l -> (DataManager.getInstance().isStatusLabel(l
-						.toGhName()))).collect(Collectors.toList());
-		if (!statusLabel.isEmpty()) {
-			return statusLabel.get(0);
-		} else {
-			return null;
-		}
-	}
-
-	public List<TurboLabel> getNonStatusLabel() {
-		return labels
-				.stream()
-				.filter(l -> (!DataManager.getInstance().isStatusLabel(
-						l.toGhName()))).collect(Collectors.toList());
-	}
-
 	public boolean hasLabel(TurboLabel label) {
 		return labels.contains(label);
 	}

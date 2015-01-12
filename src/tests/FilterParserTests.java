@@ -21,7 +21,7 @@ import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
 
-public class ParserTests {
+public class FilterParserTests {
 
     @Test
     public void basics() {

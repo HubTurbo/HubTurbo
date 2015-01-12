@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import service.ServiceManager;
 
-public class ServiceManagerTest {
+public class ServiceManagerTests {
 	public static String TEST_GH_USERNAME = "testapi";
 	public static String TEST_GH_PASSWORD = "hubAPItest1";
 	public static String TEST_REPO_NAME = "issuetest";

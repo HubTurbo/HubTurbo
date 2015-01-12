@@ -25,11 +25,9 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.RequestException;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
-import storage.DataManager;
 import util.CollectionUtilities;
 import util.DialogMessage;
 
@@ -43,7 +41,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
-	private static final String MESSAGE_LOADING_PROJECT_CONFIG = "Loading project configuration...";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -108,8 +105,6 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
-		logger.info(MESSAGE_LOADING_PROJECT_CONFIG);
-		DataManager.getInstance().loadProjectConfig(getRepoId());
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
 		boolean isPublicRepo = false;
@@ -425,34 +420,7 @@ public class Model {
 		issues.addAll(list);
 	}
 
-//	private void enforceStatusStateConsistency(List<Issue> ghIssues) {
-//		for (Issue ghIssue : ghIssues) {
-//			Set<Label> toBeRemovedLabels = new HashSet<Label>();
-//			for (Label ghLabel : ghIssue.getLabels()) {
-//				if (isInconsistent(ghIssue.getState(), ghLabel.getName())) {
-//					toBeRemovedLabels.add(ghLabel);
-//				}
-//			}
-//			ghIssue.getLabels().removeAll(toBeRemovedLabels);
-//			
-//			if (!toBeRemovedLabels.isEmpty()) {
-//				try {
-//					ServiceManager.getInstance().setLabelsForIssue(ghIssue.getNumber(), ghIssue.getLabels());
-//				} catch (IOException e) {
-//					logger.error(e.getLocalizedMessage(), e);
-//				}
-//			}
-//		}
-//	}
-
-	private boolean isInconsistent(String state, String ghLabelName) {
-		DataManager dataManager = DataManager.getInstance();
-		return ((dataManager.isOpenStatusLabel(ghLabelName) && state.equals(STATE_CLOSED)) ||
-				(dataManager.isClosedStatusLabel(ghLabelName) && state.equals(STATE_OPEN)));
-	}
-
 	public void loadLabels(List<Label> ghLabels){
-		standardiseStatusLabels(ghLabels);
 		Platform.runLater(()->{
 			labels.clear();
 			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
@@ -465,44 +433,6 @@ public class Model {
 		labels.addAll(list);
 	}
 	
-	private void standardiseStatusLabels(List<Label> ghLabels) {
-		DataManager dataManager = DataManager.getInstance();
-		List<String> defaultStatuses = dataManager.getStatusLabels();
-		List<String> projectLabels = ghLabels.stream()
-											 .map(label -> label.getName())
-											 .collect(Collectors.toList());
-		
-		defaultStatuses.removeAll(projectLabels);
-
-		for (String standardStatus : defaultStatuses) {
-			if(standardStatus == null){
-				//Check is required because status labels array serialised from json file can contain null
-				continue;
-			}
-			Label statusLabel = new Label();
-			statusLabel.setName(standardStatus);
-			if (dataManager.isOpenStatusLabel(standardStatus)) {
-				statusLabel.setColor("009800");
-			} else {
-				statusLabel.setColor("0052cc");
-			}
-			try {
-				ghLabels.add(ServiceManager.getInstance().createLabel(statusLabel));
-			} catch (IOException e) {
-				if(e instanceof RequestException){
-					//Happens because user has no repo permissions
-					if(((RequestException) e).getStatus() == 404){
-						logger.error("No repository permissions to create label", e);
-						break;
-					}
-				}else{
-					logger.error(e.getLocalizedMessage(), e);
-				}
-			}
-		}
-		
-	}
-
 	public void updateCachedLabels(List<Label> ghLabels, String repoId){
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		updateCachedList(labels, newLabels, repoId);	

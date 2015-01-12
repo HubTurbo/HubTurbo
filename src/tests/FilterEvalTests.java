@@ -21,7 +21,7 @@ import filter.ParseException;
 import filter.Parser;
 import filter.expression.Qualifier;
 
-public class EvalTests {
+public class FilterEvalTests {
 
 	private final ModelStub model = new ModelStub();
 
