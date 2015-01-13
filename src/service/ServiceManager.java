@@ -175,7 +175,7 @@ public class ServiceManager {
 				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
 			}
 		};
-		refreshResult = refreshExecutor.scheduleAtFixedRate(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
+		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
 		
 		Runnable countdown = new Runnable() {
 			@Override
@@ -183,7 +183,7 @@ public class ServiceManager {
 				StatusBar.displayMessage("Next refresh in " + getTime());
 			}
 		};
-		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleAtFixedRate(countdown, 0, TICK_INTERVAL, TimeUnit.SECONDS);
+		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(countdown, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	/**
