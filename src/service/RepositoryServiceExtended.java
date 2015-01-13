@@ -6,12 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.OrganizationService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 public class RepositoryServiceExtended extends RepositoryService{
+	private static final Logger logger = LogManager.getLogger(RepositoryServiceExtended.class.getName());
+
 	private GitHubClientExtended ghClient;
 	private OrganizationService orgService;
 	
@@ -28,8 +32,7 @@ public class RepositoryServiceExtended extends RepositoryService{
 		try {
 			return getOrgRepositories(org.getLogin());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return new ArrayList<Repository>();
 	}

@@ -11,9 +11,7 @@ import javafx.beans.property.StringProperty;
 
 import org.eclipse.egit.github.core.Label;
 
-import ui.labelmanagement.LabelTreeItem;
-
-public class TurboLabel implements Listable, LabelTreeItem {
+public class TurboLabel implements Listable {
 	
 	/*
 	 * Attributes, Getters & Setters

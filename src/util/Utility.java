@@ -14,7 +14,12 @@ import java.util.regex.Pattern;
 
 import javax.swing.UIManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Utility {
+
+	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 	
 	public static int safeLongToInt(long l) {
 	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
@@ -74,7 +79,7 @@ public class Utility {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			return Optional.of(ge.getMaximumWindowBounds());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return Optional.empty();
 	}

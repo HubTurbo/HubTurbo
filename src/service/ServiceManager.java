@@ -288,8 +288,10 @@ public class ServiceManager {
 			githubClient.get(req.setUri(uri));
 			return true;
 		} catch (RequestException e) {
-			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND)
+			logger.error(e.getLocalizedMessage(), e);
+			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
 				return false;
+			}
 			throw e;
 		}
 	}

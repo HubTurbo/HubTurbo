@@ -1,4 +1,4 @@
-package ui.issuepanel.expanded;
+package browserview;
 
 import java.awt.Rectangle;
 import java.io.File;
@@ -241,7 +241,7 @@ public class BrowserComponent {
 						login();
 						runBrowserOperation(operation); // Recurse and repeat
 					case NoSuchElement:
-						logger.info("Warning: no such element!");
+						logger.info("Warning: no such element! " + e.getMessage());
 						break;
 					default:
 						break;
@@ -295,8 +295,7 @@ public class BrowserComponent {
 				out.close();
 				f.setExecutable(true);
 			} catch (IOException e) {
-				System.out.println("Could not load Chrome driver binary!");
-				e.printStackTrace();
+				logger.error("Could not load Chrome driver binary! " + e.getLocalizedMessage(), e);
 			}
 			System.out.println("Could not find " + binaryFileName + "; extracted it from jar");
 		} else {

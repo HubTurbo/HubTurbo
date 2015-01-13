@@ -36,11 +36,13 @@ public class MilestonesHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
-						"Cannot create milestone for repository in Github.");
+						"Could not create milestone for repository on GitHub.");
 			});
+			logger.info("Could not create milestone for repository on GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
@@ -60,11 +62,13 @@ public class MilestonesHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
-						"Cannot delete milestone from Github.");
+						"Could not delete milestone from Github.");
 			});
+			logger.info("Could not delete milestone from GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
@@ -80,11 +84,13 @@ public class MilestonesHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
 						"Cannot update milestone.");
 			});
+			logger.info("Could not update milestone on GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}

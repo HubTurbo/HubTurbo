@@ -48,6 +48,7 @@ public class Browse {
 				try {
 					Runtime.getRuntime().exec(new String[] {cmd, url.toString()});
 				} catch (IOException e) {
+					logger.error(e.getLocalizedMessage(), e);
 				}
 				return;
 			}

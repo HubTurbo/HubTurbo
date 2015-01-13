@@ -57,11 +57,13 @@ public class TurboIssueSetAssignee extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying assignee for issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not change issue assignee: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot modify issue assignee.");
 				});
+				logger.info("Could not change issue assignee: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}

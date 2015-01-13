@@ -36,6 +36,7 @@ public class TurboIssueAdd extends TurboIssueCommand{
 				DialogMessage.showWarningDialog("Internet Connection Timeout", 
 						"Timeout adding issue in GitHub, please check your internet connection.");
 			});
+			logger.info("Failed to create issue on GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		} 

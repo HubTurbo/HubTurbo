@@ -61,10 +61,8 @@ public class DataCacheFileHandler {
 			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
 			
 			bufferedReader.close();
-		} catch (FileNotFoundException e){
-			
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 	

@@ -39,11 +39,13 @@ public class LabelsHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
-						"Cannot create label for repository in Github.");
+						"Cannot create label for repository on Github.");
 			});
+			logger.info("Could not create label for repository on GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
@@ -63,11 +65,13 @@ public class LabelsHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
 						"Cannot delete label from Github.");
 			});
+			logger.info("Could not delete label from GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
@@ -83,11 +87,13 @@ public class LabelsHandler {
 				DialogMessage.showWarningDialog("Cannot connect to GitHub", 
 						"Please check your internet connection and try again.");
 			});
+			logger.info("Could not connect to GitHub: " + e.getLocalizedMessage());
 		} catch (RequestException e){
 			Platform.runLater(()->{
 				DialogMessage.showWarningDialog("No repository permissions", 
 						"Cannot edit label.");
 			});
+			logger.info("Could not edit label on GitHub: " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}

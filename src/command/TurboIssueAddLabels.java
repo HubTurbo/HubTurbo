@@ -63,11 +63,13 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout adding label(s) to issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Failed to add label to issue on GitHub: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot add label(s) to issue.");
 				});
+				logger.info("Failed to add label to issue on GitHub: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}
@@ -94,11 +96,13 @@ public class TurboIssueAddLabels extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying label(s) for issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not modify labels of issue on GitHub: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot modify issue labels.");
 				});
+				logger.info("Could not modify labels of issue on GitHub (repository permission): " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}

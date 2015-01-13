@@ -10,6 +10,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubResponse;
@@ -23,6 +25,8 @@ import com.google.gson.reflect.TypeToken;
  */
 public class GitHubEventsResponse {
 	
+	private static final Logger logger = LogManager.getLogger(GitHubEventsResponse.class.getName());
+
 	private GitHubResponse response;
 	private ArrayList<TurboIssueEvent> turboIssueEvents;
 	
@@ -96,7 +100,7 @@ public class GitHubEventsResponse {
 				turboIssueEvents.add(event);
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 

@@ -53,11 +53,13 @@ public class TurboIssueEditDescription extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying description for issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not edit issue description: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot modify issue description.");
 				});
+				logger.info("Could not edit issue description: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}

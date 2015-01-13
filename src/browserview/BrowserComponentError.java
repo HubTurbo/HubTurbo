@@ -1,4 +1,4 @@
-package ui.issuepanel.expanded;
+package browserview;
 
 public enum BrowserComponentError {
 	NoSuchWindow,

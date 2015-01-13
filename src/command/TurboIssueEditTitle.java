@@ -47,11 +47,13 @@ public class TurboIssueEditTitle extends TurboIssueCommand{
 					DialogMessage.showWarningDialog("Internet Connection Timeout", 
 							"Timeout modifying title for issue in GitHub, please check your internet connection.");
 				});
+				logger.info("Could not edit issue title: " + e.getLocalizedMessage());
 			}else if(e instanceof RequestException){
 				Platform.runLater(()->{
 					DialogMessage.showWarningDialog("No repository permissions", 
 							"Cannot modify issue title.");
 				});
+				logger.info("Could not edit issue title: " + e.getLocalizedMessage());
 			}else{
 				logger.error(e.getLocalizedMessage(), e);
 			}
