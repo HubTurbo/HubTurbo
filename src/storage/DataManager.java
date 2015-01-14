@@ -1,6 +1,7 @@
 package storage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
@@ -78,6 +79,10 @@ public class DataManager {
 	
 	public List<String> getPanelSet(String name) {
 		return localConfiguration.getPanelSet(name);
+	}
+	
+	public Map<String, List<String>> getAllPanelSets() {
+		return localConfiguration.getAllPanelSets();
 	}
 
 	/**

@@ -26,4 +26,8 @@ public class LocalConfiguration {
 	public List<String> getPanelSet(String name) {
 		return panelSets.get(name);
 	}
+
+	public Map<String, List<String>> getAllPanelSets() {
+		return panelSets;
+	}
 }
