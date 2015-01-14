@@ -3,6 +3,9 @@ package ui;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -23,11 +26,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import service.ServiceManager;
+import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
+import util.events.PanelSavedEvent;
+import util.events.PanelSavedEventHandler;
 
 public class MenuControl extends MenuBar {
 
@@ -101,8 +108,56 @@ public class MenuControl extends MenuBar {
 		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 
-		cols.getItems().addAll(createRight, createLeft, closeColumn);
+		Menu sets = new Menu("Sets");
+		sets.getItems().addAll(createPanelsSetsMenu());
+		
+		cols.getItems().addAll(createRight, createLeft, closeColumn, sets);
 		return cols;
+	}
+
+	private MenuItem[] createPanelsSetsMenu() {
+		MenuItem save = new MenuItem("Save");
+		save.setOnAction(e -> {
+            List<String> filterExprs = getCurrentFilterExprs();
+            
+            if (!filterExprs.isEmpty()) {
+            	// TODO get name from user input
+            	DataManager.getInstance().addPanelSet("default", filterExprs);
+            	ui.triggerEvent(new PanelSavedEvent());
+            }
+            // TODO remove
+            System.out.println(filterExprs);
+		});
+		
+		Menu open = new Menu("Open");
+		ui.registerEvent(new PanelSavedEventHandler() {
+			@Override
+			public void handle(PanelSavedEvent e) {
+				open.getItems().clear();
+				for (String filterName : DataManager.getInstance().getAllPanelSets().keySet()) {
+					final List<String> filterSet = DataManager.getInstance().getAllPanelSets().get(filterName);
+					MenuItem item = new MenuItem(filterName);
+					item.setOnAction(e1 -> {
+						columns.closeAllColumns();
+						columns.openColumnsWithFilters(filterSet);
+					});
+					open.getItems().add(item);
+				}
+			}
+		});
+
+		Menu delete = new Menu("Delete");
+		return new MenuItem[] {save, open, delete};
+	}
+
+	private List<String> getCurrentFilterExprs() {
+		return columns.getChildren().stream().flatMap(c -> {
+			if (c instanceof IssueColumn) {
+				return Stream.of(((IssueColumn) c).getCurrentFilterString());
+			} else {
+				return Stream.of();
+			}
+		}).collect(Collectors.toList());
 	}
 
 	private MenuItem createDocumentationMenuItem() {
