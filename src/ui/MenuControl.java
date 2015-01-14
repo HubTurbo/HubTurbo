@@ -34,55 +34,57 @@ public class MenuControl extends MenuBar {
 	private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
 	private final ColumnControl columns;
-	private final ScrollPane columnsScroll;
+	private final ScrollPane columnsScrollPane;
 	private final UI ui;
 
-	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScroll) {
+	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane) {
 		this.columns = columns;
-		this.columnsScroll = columnsScroll;
+		this.columnsScrollPane = columnsScrollPane;
 		this.ui = ui;
 		createMenuItems();
 	}
-	
+
 	private void createMenuItems() {
 		Menu newMenu = new Menu("New");
 		newMenu.getItems().addAll(createNewMenuItems());
 
-		Menu view = new Menu("View");
-		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
+		Menu panels = createPanelsMenu();
 
-		getMenus().addAll(newMenu, view);
+		Menu view = new Menu("View");
+		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
+
+		getMenus().addAll(newMenu, panels, view);
 	}
 
-
-	private MenuItem createColumnsMenuItem() {
+	private Menu createPanelsMenu() {
 		Menu cols = new Menu("Panels");
 
-		MenuItem createLeft = new MenuItem("Create Panel (Left)");
+		MenuItem createLeft = new MenuItem("Create (Left)");
 		createLeft.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Create Panel (Left)");
+			logger.info("Menu: Panels > Create (Left)");
 			columns.createNewPanelAtStart();
-			columnsScroll.setHvalue(columnsScroll.getHmin());
+			columnsScrollPane.setHvalue(columnsScrollPane.getHmin());
 		});
-		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
+				KeyCombination.SHIFT_DOWN));
 
-		MenuItem createRight = new MenuItem("Create Panel");
+		MenuItem createRight = new MenuItem("Create");
 		createRight.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Create Panel");
+			logger.info("Menu: Panels > Create");
 			columns.createNewPanelAtEnd();
-			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
+			// listener is used as columnsScroll's Hmax property doesn't update
+			// synchronously
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
 				@Override
-				public void changed(ObservableValue<? extends Number> arg0,
-						Number arg1, Number arg2) {
-					for (Node child : columnsScroll.getChildrenUnmodifiable()) {
+				public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+					for (Node child : columnsScrollPane.getChildrenUnmodifiable()) {
 						if (child instanceof ScrollBar) {
 							ScrollBar scrollBar = (ScrollBar) child;
-							if (scrollBar.getOrientation() == Orientation.HORIZONTAL &&
-									scrollBar.visibleProperty().get()) {
-								columnsScroll.setHvalue(columnsScroll.getHmax());
+							if (scrollBar.getOrientation() == Orientation.HORIZONTAL
+									&& scrollBar.visibleProperty().get()) {
+								columnsScrollPane.setHvalue(columnsScrollPane.getHmax());
 								break;
-							}			
+							}
 						}
 					}
 					columns.widthProperty().removeListener(this);
@@ -92,9 +94,9 @@ public class MenuControl extends MenuBar {
 		});
 		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
-		MenuItem closeColumn = new MenuItem("Close Panel");
+		MenuItem closeColumn = new MenuItem("Close");
 		closeColumn.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Close Panel");
+			logger.info("Menu: Panels > Close");
 			columns.closeCurrentColumn();
 		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
@@ -112,7 +114,7 @@ public class MenuControl extends MenuBar {
 		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		return documentationMenuItem;
 	}
-	
+
 	private MenuItem createRefreshMenuItem() {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
@@ -123,19 +125,19 @@ public class MenuControl extends MenuBar {
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
 	}
-	
+
 	private MenuItem createForceRefreshMenuItem() {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
 			triggerForceRefreshProgressDialog();
 		});
-		
+
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
 	}
-	
+
 	private void triggerForceRefreshProgressDialog() {
-		Task<Boolean> task = new Task<Boolean>(){
+		Task<Boolean> task = new Task<Boolean>() {
 			@Override
 			protected Boolean call() throws IOException {
 				try {
@@ -161,21 +163,22 @@ public class MenuControl extends MenuBar {
 			private void handleSocketTimeoutException(Exception e) {
 				Platform.runLater(() -> {
 					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("Internet Connection is down", 
+					DialogMessage.showWarningDialog("Internet Connection is down",
 							"Timeout while loading items from github. Please check your internet connection.");
-					
+
 				});
 			}
 
 			private void handleUnknownHostException(Exception e) {
 				Platform.runLater(() -> {
 					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("No Internet Connection", 
+					DialogMessage.showWarningDialog("No Internet Connection",
 							"Please check your internet connection and try again");
 				});
 			}
 		};
-		DialogMessage.showProgressDialog(task, "Reloading issues for current repo... This may take awhile, please wait.");
+		DialogMessage.showProgressDialog(task,
+				"Reloading issues for current repo... This may take awhile, please wait.");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
@@ -203,6 +206,6 @@ public class MenuControl extends MenuBar {
 		});
 		newMilestoneMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
 
-		return new MenuItem[] {newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem};
+		return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
 	}
 }
