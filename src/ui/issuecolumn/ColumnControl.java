@@ -125,6 +125,19 @@ public class ColumnControl extends HBox {
 		return (Column) getChildren().get(index);
 	}
 	
+	public void closeAllColumns() {
+		getChildren().clear();
+		// There aren't any children left, so we don't need to update indices
+		ui.triggerEvent(new ColumnChangeEvent());
+	}
+	
+	public void openColumnsWithFilters(List<String> filters) {
+		for (String filter : filters) {
+			IssueColumn column = addColumn();
+			column.filterByString(filter);
+		}
+	}
+
 	public void closeColumn(int index) {
 		getChildren().remove(index);
 		updateColumnIndices();
