@@ -70,6 +70,15 @@ public class DataManager {
 	public String getUserAlias(String user) {
 		return localConfiguration.getAlias(user);
 	}
+	
+	public void addPanelSet(String name, List<String> filterExprs) {
+		assert name != null && filterExprs != null;
+		localConfiguration.addPanelSet(name, filterExprs);
+	}
+	
+	public List<String> getPanelSet(String name) {
+		return localConfiguration.getPanelSet(name);
+	}
 
 	/**
 	 * Session configuration
