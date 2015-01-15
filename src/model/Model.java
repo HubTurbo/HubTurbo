@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +42,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 	
-	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
@@ -61,7 +59,6 @@ public class Model {
 	private DataCacheFileHandler dcHandler = null;
 			
 	public Model(){
-		setupModelChangeListeners();
 	}
 
 	/**
@@ -94,6 +91,39 @@ public class Model {
 
 	public List<TurboIssue> getIssues() {
 		return Collections.unmodifiableList(_issues);
+	}
+	
+	/**
+	 * Collaborators
+	 */
+	
+	private List<TurboUser> _collaborators = new ArrayList<>();
+
+	private void changeCollaborators(List<TurboUser> newCollaborators) {
+		_collaborators = new ArrayList<>(newCollaborators);
+		applyChangeMethods();
+	}
+	
+	private void removeAllCollaborators() {
+		// TODO remove clearCollaborators once it's no longer used
+		_collaborators = new ArrayList<>();
+		applyChangeMethods();
+	}
+
+	public List<TurboUser> getCollaborators() {
+		return Collections.unmodifiableList(_collaborators);
+	}
+
+	/**
+	 * Labels
+	 */
+
+	public List<TurboLabel> getLabels() {
+		return Collections.unmodifiableList(labels);
+	}
+
+	public List<TurboMilestone> getMilestones() {
+		return Collections.unmodifiableList(milestones);
 	}
 	
 	/**
@@ -207,37 +237,12 @@ public class Model {
 
 	public void applyMethodOnModelChange(Runnable method){
 		methodsOnChange.add(method);
-	}
-	
-	private void setupModelChangeListeners(){
-		//No need to use weak listeners because model is persistent through the lifetime of the application
-		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) ->{
-			Model.this.applyChangeMethods();
-		}); 
-		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) ->{
-			Model.this.applyChangeMethods();
-		});
-		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) ->{
-			Model.this.applyChangeMethods();
-		});
-	}
+	}	
 	
 	public void applyChangeMethods(){
 		for(Runnable method : methodsOnChange){
 			method.run();
 		}
-	}
-	
-	public ObservableList<TurboUser> getCollaborators() {
-		return collaborators;
-	}
-
-	public ObservableList<TurboLabel> getLabels() {
-		return labels;
-	}
-
-	public ObservableList<TurboMilestone> getMilestones() {
-		return milestones;
 	}
 	
 	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
@@ -282,7 +287,7 @@ public class Model {
 					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
 					updateCachedIssue(newCached);
 				}
-				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
+				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 			}
 		});
 	}
@@ -368,6 +373,7 @@ public class Model {
 	}
 	
 	public TurboUser getUserByGhName(String name) {
+		List<TurboUser> collaborators = getCollaborators();
 		for (int i=0; i<labels.size(); i++) {
 			if (collaborators.get(i).getGithubName().equals(name)) {
 				return collaborators.get(i);
@@ -406,7 +412,7 @@ public class Model {
 	        	}
 	        	list.addAll(buffer);
 	        	
-	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
+	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	        }
 
 			private void logNumOfUpdates(List newList, String type) {
@@ -415,27 +421,27 @@ public class Model {
 	   });
 	}
 	
-	public void loadCollaborators(List<User> ghCollaborators) {	
+	public void loadCollaborators(List<User> ghCollaborators) {
+		
+		
 		Platform.runLater(()->{
-			collaborators.clear();
-			collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+			changeCollaborators(CollectionUtilities.getHubTurboUserList(ghCollaborators));
 		});
 	}
 	
 	public void clearCollaborators() {	
 		Platform.runLater(()->{
-			collaborators.clear();
+			removeAllCollaborators();
 		});
 	}
 	
 	public void loadTurboCollaborators(List<TurboUser> list) {
-		collaborators.clear();
-		collaborators.addAll(list);
+		changeCollaborators(list);
 	}
 	
 	public void updateCachedCollaborators(List<User> ghCollaborators, String repoId){
 		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
-		updateCachedList(collaborators, newCollaborators, repoId);
+		updateCachedList(getCollaborators(), newCollaborators, repoId);
 	}
 		
 	public void loadIssues(List<Issue> ghIssues) {
@@ -444,7 +450,7 @@ public class Model {
 		}
 		Platform.runLater(()->{
 			changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
-			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
+			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 		});
 	}
 	
