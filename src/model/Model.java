@@ -13,8 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +39,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
-	
-	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
-	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
 	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 	
@@ -118,12 +113,54 @@ public class Model {
 	 * Labels
 	 */
 
+	private List<TurboLabel> _labels = new ArrayList<>();
+
+	private void changeLabels(List<TurboLabel> newLabels) {
+		_labels = new ArrayList<>(newLabels);
+		applyChangeMethods();
+	}
+
+	private void addLabelToEnd(TurboLabel label) {
+		// TODO remove addLabel once it's unused
+		_labels.add(label);
+		applyChangeMethods();
+	}
+
+	private void removeLabel(TurboLabel label){
+		// TODO remove deleteLabel once it's unused
+		_labels.remove(label);
+		applyChangeMethods();
+	}
+
 	public List<TurboLabel> getLabels() {
-		return Collections.unmodifiableList(labels);
+		return Collections.unmodifiableList(_labels);
+	}
+
+	/**
+	 * Milestones
+	 */
+	
+	private List<TurboMilestone> _milestones = new ArrayList<>();
+
+	private void changeMilestones(List<TurboMilestone> newMilestones) {
+		_milestones = new ArrayList<>(newMilestones);
+		applyChangeMethods();
+	}
+
+	private void addMilestoneToEnd(TurboMilestone milestone) {
+		// TODO remove addMilestone once it's unused
+		_milestones.add(milestone);
+		applyChangeMethods();
+	}
+
+	private void removeMilestone(TurboMilestone milestone){
+		// TODO remove deleteMilestone once it's unused
+		_milestones.remove(milestone);
+		applyChangeMethods();
 	}
 
 	public List<TurboMilestone> getMilestones() {
-		return Collections.unmodifiableList(milestones);
+		return Collections.unmodifiableList(_milestones);
 	}
 	
 	/**
@@ -258,9 +295,9 @@ public class Model {
 	}
 	
 	public boolean isExclusiveLabelGroup(String group){
-		List<TurboLabel> labelsInGrp = labels.stream()
-											 .filter(l -> group.equals(l.getGroup()))
-											 .collect(Collectors.toList());
+		List<TurboLabel> labelsInGrp = getLabels().stream()
+			.filter(l -> group.equals(l.getGroup()))
+			.collect(Collectors.toList());
 		
 		for(TurboLabel label : labelsInGrp){
 			if(!label.isExclusive()){
@@ -300,30 +337,30 @@ public class Model {
 		}else{		
 			addIssueToStart(tIssue);
 			logger.info("Added issue: " + issue.getId());
-		}	
+		}
 	}
 	
 	public void addLabel(TurboLabel label){
 		Platform.runLater(()->{
-			labels.add(label);
+			addLabelToEnd(label);
 		});
 	}
 	
 	public void deleteLabel(TurboLabel label){
 		Platform.runLater(()->{
-			labels.remove(label);
+			removeLabel(label);
 		});
 	}
 	
 	public void addMilestone(TurboMilestone milestone){
 		Platform.runLater(()->{
-			milestones.add(milestone);
+			addMilestoneToEnd(milestone);
 		});
 	}
 	
 	public void deleteMilestone(TurboMilestone milestone){
 		Platform.runLater(()->{
-			milestones.remove(milestone);
+			removeMilestone(milestone);
 		});
 	}
 
@@ -355,6 +392,7 @@ public class Model {
 	}
 	
 	public TurboLabel getLabelByGhName(String name) {
+		List<TurboLabel> labels = getLabels();
 		for (int i=0; i<labels.size(); i++) {
 			if (labels.get(i).toGhName().equals(name)) {
 				return labels.get(i);
@@ -364,6 +402,7 @@ public class Model {
 	}
 	
 	public TurboMilestone getMilestoneByTitle(String title) {
+		List<TurboMilestone> milestones = getMilestones();
 		for (int i=0; i<milestones.size(); i++) {
 			if (milestones.get(i).getTitle().equals(title)) {
 				return milestones.get(i);
@@ -373,6 +412,7 @@ public class Model {
 	}
 	
 	public TurboUser getUserByGhName(String name) {
+		List<TurboLabel> labels = getLabels();
 		List<TurboUser> collaborators = getCollaborators();
 		for (int i=0; i<labels.size(); i++) {
 			if (collaborators.get(i).getGithubName().equals(name)) {
@@ -389,7 +429,9 @@ public class Model {
 		Platform.runLater(new Runnable() {
 	        @Override
 	        public void run() {
-	        	list.removeAll(removed);
+	        	
+	        	List remaining = new ArrayList<>(list);
+	        	remaining.removeAll(removed);
   	
 	        	Listable listItem = (Listable)newList.get(0);
 	        	if (listItem instanceof TurboMilestone) {
@@ -460,38 +502,32 @@ public class Model {
 
 	public void loadLabels(List<Label> ghLabels){
 		Platform.runLater(()->{
-			labels.clear();
-			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
-			labels.addAll(buffer);
+			changeLabels(CollectionUtilities.getHubTurboLabelList(ghLabels));
 		});
 	}
 	
 	public void loadTurboLabels(List<TurboLabel> list) {
-		labels.clear();
-		labels.addAll(list);
+		changeLabels(list);
 	}
 	
 	public void updateCachedLabels(List<Label> ghLabels, String repoId){
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		updateCachedList(labels, newLabels, repoId);	
+		updateCachedList(getLabels(), newLabels, repoId);	
 	}
 	
 	public void loadMilestones(List<Milestone> ghMilestones){
 		Platform.runLater(()->{
-			milestones.clear();
-			ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-			milestones.addAll(buffer);
+			changeMilestones(CollectionUtilities.getHubTurboMilestoneList(ghMilestones));
 		});
 	}
 	
 	public void loadTurboMilestones(List<TurboMilestone> list) {
-		milestones.clear();
-		milestones.addAll(list);
+		changeMilestones(list);
 	}
 	
 	public void updateCachedMilestones(List<Milestone> ghMilestones, String repoId){
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-		updateCachedList(milestones, newMilestones, repoId);
+		updateCachedList(getMilestones(), newMilestones, repoId);
 	}
 	
 	public void refresh(){
