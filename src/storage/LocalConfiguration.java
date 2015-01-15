@@ -30,4 +30,8 @@ public class LocalConfiguration {
 	public Map<String, List<String>> getAllPanelSets() {
 		return panelSets;
 	}
+
+	public void removePanelSet(String name) {
+		panelSets.remove(name);
+	}
 }

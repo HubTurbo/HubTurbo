@@ -130,23 +130,33 @@ public class MenuControl extends MenuBar {
 		});
 		
 		Menu open = new Menu("Open");
+		Menu delete = new Menu("Delete");
+
 		ui.registerEvent(new PanelSavedEventHandler() {
 			@Override
 			public void handle(PanelSavedEvent e) {
 				open.getItems().clear();
+				delete.getItems().clear();
+
 				for (String filterName : DataManager.getInstance().getAllPanelSets().keySet()) {
 					final List<String> filterSet = DataManager.getInstance().getAllPanelSets().get(filterName);
-					MenuItem item = new MenuItem(filterName);
-					item.setOnAction(e1 -> {
+					MenuItem openItem = new MenuItem(filterName);
+					openItem.setOnAction(e1 -> {
 						columns.closeAllColumns();
 						columns.openColumnsWithFilters(filterSet);
 					});
-					open.getItems().add(item);
+					open.getItems().add(openItem);
+					
+					MenuItem deleteItem = new MenuItem(filterName);
+					deleteItem.setOnAction(e1 -> {
+						DataManager.getInstance().removePanelSet(filterName);
+						ui.triggerEvent(new PanelSavedEvent());
+					});
+					delete.getItems().add(deleteItem);
 				}
 			}
 		});
 
-		Menu delete = new Menu("Delete");
 		return new MenuItem[] {save, open, delete};
 	}
 

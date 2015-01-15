@@ -87,6 +87,10 @@ public class DataManager {
 	public Map<String, List<String>> getAllPanelSets() {
 		return localConfiguration.getAllPanelSets();
 	}
+	
+	public void removePanelSet(String name) {
+		localConfiguration.removePanelSet(name);
+	}
 
 	/**
 	 * Session configuration
