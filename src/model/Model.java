@@ -25,8 +25,10 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
+import ui.UI;
 import util.CollectionUtilities;
 import util.DialogMessage;
+import util.events.RefreshDoneEvent;
 
 
 public class Model {
@@ -40,8 +42,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 	
 	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
-	
-	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
 	
 	protected IRepositoryIdProvider repoId;
 	
@@ -70,17 +70,17 @@ public class Model {
 
 	private void addIssueToStart(TurboIssue issue) {
 		_issues.add(0, issue);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void addIssueToEnd(TurboIssue issue) {
 		_issues.add(issue);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void changeIssues(List<TurboIssue> newIssues) {
 		_issues = new ArrayList<>(newIssues);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	public List<TurboIssue> getIssues() {
@@ -95,13 +95,13 @@ public class Model {
 
 	private void changeCollaborators(List<TurboUser> newCollaborators) {
 		_collaborators = new ArrayList<>(newCollaborators);
-		applyChangeMethods();
+		modelUpdated();
 	}
 	
 	private void removeAllCollaborators() {
 		// TODO remove clearCollaborators once it's no longer used
 		_collaborators = new ArrayList<>();
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	public List<TurboUser> getCollaborators() {
@@ -116,19 +116,19 @@ public class Model {
 
 	private void changeLabels(List<TurboLabel> newLabels) {
 		_labels = new ArrayList<>(newLabels);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void addLabelToEnd(TurboLabel label) {
 		// TODO remove addLabel once it's unused
 		_labels.add(label);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void removeLabel(TurboLabel label){
 		// TODO remove deleteLabel once it's unused
 		_labels.remove(label);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	public List<TurboLabel> getLabels() {
@@ -143,23 +143,36 @@ public class Model {
 
 	private void changeMilestones(List<TurboMilestone> newMilestones) {
 		_milestones = new ArrayList<>(newMilestones);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void addMilestoneToEnd(TurboMilestone milestone) {
 		// TODO remove addMilestone once it's unused
 		_milestones.add(milestone);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	private void removeMilestone(TurboMilestone milestone){
 		// TODO remove deleteMilestone once it's unused
 		_milestones.remove(milestone);
-		applyChangeMethods();
+		modelUpdated();
 	}
 
 	public List<TurboMilestone> getMilestones() {
 		return Collections.unmodifiableList(_milestones);
+	}
+	
+	/**
+	 * Important operations
+	 */
+	
+	/**
+	 * Should be called when the model is updated. Triggers a UI update.
+	 * Platform.runLater is not needed because subscribers to the RefreshDoneEvent
+	 * should have it there. 
+	 */
+	public void modelUpdated(){
+		UI.getInstance().triggerEvent(new RefreshDoneEvent());
 	}
 	
 	/**
@@ -269,16 +282,6 @@ public class Model {
 		loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 
-	public void applyMethodOnModelChange(Runnable method){
-		methodsOnChange.add(method);
-	}	
-	
-	public void applyChangeMethods(){
-		for(Runnable method : methodsOnChange){
-			method.run();
-		}
-	}
-	
 	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
 		cachedGithubComments.put(issueId, new ArrayList<Comment>(comments));
 	}
@@ -504,7 +507,7 @@ public class Model {
 	
 	public void refresh(){
 		ServiceManager.getInstance().restartModelUpdate();
-		applyChangeMethods();
+		modelUpdated();
 	}
 	
 	public void updateIssuesETag(String ETag) {

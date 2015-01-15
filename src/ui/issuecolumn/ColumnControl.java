@@ -1,6 +1,5 @@
 package ui.issuecolumn;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +20,7 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
+
 import command.TurboCommandExecutor;
 
 
@@ -44,12 +44,11 @@ public class ColumnControl extends HBox {
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
-		setupModelChangeResponse();
 		
 		ui.registerEvent(new RefreshDoneEventHandler() {
 			@Override
 			public void handle(RefreshDoneEvent e) {
-				// We need this because this is triggered from a Timer thread
+				// We need this because this may be triggered from other threads
 				Platform.runLater(()-> {
 					refresh();
 				});	
@@ -62,12 +61,6 @@ public class ColumnControl extends HBox {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
-	}
-	
-	private void setupModelChangeResponse(){
-		WeakReference<ColumnControl> selfRef = new WeakReference<>(this);
-		//No need for weak listeners because ColumnControl is persistent for the lifetime of the app
-		model.applyMethodOnModelChange(() -> selfRef.get().refresh());
 	}
 	
 	public void resumeColumns() {
