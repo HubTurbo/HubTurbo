@@ -95,7 +95,7 @@ public class ConfigFileHandler {
 	 */
 	public void saveLocalConfig(LocalConfiguration config) {
 		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(localConfigFilePath) , CHARSET);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(localConfigFilePath), CHARSET);
 			gson.toJson(config, LocalConfiguration.class, writer);
 			writer.close();
 		} catch (IOException e) {

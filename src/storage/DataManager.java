@@ -13,10 +13,13 @@ import org.eclipse.egit.github.core.RepositoryId;
  */
 public class DataManager {
 
-	private static final DataManager dataManagerInstance = new DataManager();
+	private static DataManager instance = null;
 	
 	public static DataManager getInstance() {
-		return dataManagerInstance;
+		if (instance == null) {
+			instance = new DataManager();
+		}
+		return instance;
 	}
 
 	private static final String FILE_CONFIG_SESSION = "session-config.json";

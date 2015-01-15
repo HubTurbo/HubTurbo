@@ -41,6 +41,7 @@ import util.events.ColumnChangeEventHandler;
 import util.events.Event;
 import util.events.EventHandler;
 import util.events.LoginEvent;
+import util.events.PanelSavedEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -99,6 +100,8 @@ public class UI extends Application {
 		applyCSS(scene);
 		getUserCredentials();
 		commandLineArgs = initialiseCommandLineArguments();
+		
+		DataManager.getInstance();
 	}
 
 	private void getUserCredentials() {
@@ -108,6 +111,7 @@ public class UI extends Application {
 				triggerEvent(new LoginEvent());
 				repoSelector.refreshComboBoxContents();
 				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
+				triggerEvent(new PanelSavedEvent());
 				setExpandedWidth(false);
 			} else {
 				quit();
@@ -178,6 +182,7 @@ public class UI extends Application {
 	private void quit() {
 		ServiceManager.getInstance().shutdownModelUpdate();
 		columns.saveSession();
+		DataManager.getInstance().saveLocalConfig();
 		DataManager.getInstance().saveSessionConfig();
 		browserComponent.quit();
 		Platform.exit();
