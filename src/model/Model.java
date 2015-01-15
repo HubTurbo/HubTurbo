@@ -245,7 +245,7 @@ public class Model {
 			loadTurboResources(resources);	
 		} else {
 			// is Github Resource
-			loadGitHubResources(resources, isPublicRepo);
+			loadGitHubResources(repoId, resources, isPublicRepo);
 		}
 	}
 
@@ -265,7 +265,7 @@ public class Model {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
+	private void loadGitHubResources(IRepositoryIdProvider repoId, HashMap<String, List> resources, boolean isPublicRepo) {
 		if (!isPublicRepo) {
 			logger.info(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
@@ -279,7 +279,7 @@ public class Model {
 		logger.info(MESSAGE_LOADING_MILESTONES);
 		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
 		logger.info(MESSAGE_LOADING_ISSUES);
-		loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
+		loadIssues(repoId, (List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 
 	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
@@ -467,7 +467,7 @@ public class Model {
 		updateCachedList(getCollaborators(), newCollaborators, repoId);
 	}
 		
-	public void loadIssues(List<Issue> ghIssues) {
+	public void loadIssues(IRepositoryIdProvider repoId, List<Issue> ghIssues) {
 		if (ghIssues != null) {
 			//enforceStatusStateConsistency(ghIssues);
 		}
