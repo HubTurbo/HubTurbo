@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +44,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 	
 	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
-	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 	
@@ -63,7 +63,43 @@ public class Model {
 	public Model(){
 		setupModelChangeListeners();
 	}
-		
+
+	/**
+	 * Issues
+	 * 
+	 * The model maintains a list of issues. This list is strictly data-only.
+	 * It should not be observed or tied to the GUI in any way.
+	 * It should not be accessed or changed, even within this class, by any methods
+	 * other than the following.
+	 * It may only be accessed in a read-only manner if the following methods aren't
+	 * used.
+	 */
+	
+	private ArrayList<TurboIssue> _issues = new ArrayList<>();
+
+	private void addIssueToStart(TurboIssue issue) {
+		_issues.add(0, issue);
+		applyChangeMethods();
+	}
+
+	private void addIssueToEnd(TurboIssue issue) {
+		_issues.add(issue);
+		applyChangeMethods();
+	}
+
+	private void changeIssues(List<TurboIssue> newIssues) {
+		_issues = new ArrayList<>(newIssues);
+		applyChangeMethods();
+	}
+
+	public List<TurboIssue> getIssues() {
+		return Collections.unmodifiableList(_issues);
+	}
+	
+	/**
+	 * Others
+	 */
+
 	public IRepositoryIdProvider getRepoId(){
 		return repoId;
 	}
@@ -174,19 +210,15 @@ public class Model {
 	}
 	
 	private void setupModelChangeListeners(){
-		WeakReference<Model> selfRef = new WeakReference<>(this);
 		//No need to use weak listeners because model is persistent through the lifetime of the application
 		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) ->{
-			selfRef.get().applyChangeMethods();
+			Model.this.applyChangeMethods();
 		}); 
-		issues.addListener((ListChangeListener.Change<? extends TurboIssue> c) ->{
-			selfRef.get().applyChangeMethods();
-		});
 		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) ->{
-			selfRef.get().applyChangeMethods();
+			Model.this.applyChangeMethods();
 		});
 		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) ->{
-			selfRef.get().applyChangeMethods();
+			Model.this.applyChangeMethods();
 		});
 	}
 	
@@ -194,10 +226,6 @@ public class Model {
 		for(Runnable method : methodsOnChange){
 			method.run();
 		}
-	}
-
-	public ObservableList<TurboIssue> getIssues() {
-		return issues;
 	}
 	
 	public ObservableList<TurboUser> getCollaborators() {
@@ -219,9 +247,9 @@ public class Model {
 	public List<Comment>getCommentsListForIssue(int issueId){
 		return cachedGithubComments.get(issueId);
 	}
- 	
+ 		
 	public void appendToCachedIssues(TurboIssue issue){
-		issues.add(0, issue);
+		addIssueToStart(issue);
 	}
 	
 	public boolean isExclusiveLabelGroup(String group){
@@ -254,7 +282,7 @@ public class Model {
 					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
 					updateCachedIssue(newCached);
 				}
-				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
+				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
 			}
 		});
 	}
@@ -265,7 +293,7 @@ public class Model {
 			tIssue.copyValues(issue);
 			logger.debug("Updated issue: " + issue.getId());
 		}else{		
-			issues.add(0, issue);
+			addIssueToStart(tIssue);
 			logger.info("Added issue: " + issue.getId());
 		}	
 	}
@@ -295,6 +323,7 @@ public class Model {
 	}
 
 	public int getIndexOfIssue(int id){
+		List<TurboIssue> issues = getIssues();
 		for(int i = 0; i < issues.size(); i++){
 			if(((TurboIssue)(issues.get(i))).getId() == id){
 				return i;
@@ -307,6 +336,8 @@ public class Model {
 		if(id <= 0){
 			return null;
 		}
+
+		List<TurboIssue> issues = getIssues();
 		
 		for(int i = 0; i < issues.size(); i++){
 			TurboIssue issue = issues.get(i);
@@ -375,7 +406,7 @@ public class Model {
 	        	}
 	        	list.addAll(buffer);
 	        	
-	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
+	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
 	        }
 
 			private void logNumOfUpdates(List newList, String type) {
@@ -406,25 +437,19 @@ public class Model {
 		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 		updateCachedList(collaborators, newCollaborators, repoId);
 	}
-	
+		
 	public void loadIssues(List<Issue> ghIssues) {
 		if (ghIssues != null) {
 			//enforceStatusStateConsistency(ghIssues);
 		}
 		Platform.runLater(()->{
-			issues.clear();
-			// Add the issues to a temporary list to prevent a quadratic number
-			// of updates to subscribers of the ObservableList
-			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-			// Add them all at once, so this hopefully propagates only one change
-			issues.addAll(buffer);
-			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
+			changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
+			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, getIssues());
 		});
 	}
 	
 	public void loadTurboIssues(List<TurboIssue> list) {
-		issues.clear();
-		issues.addAll(list);
+		changeIssues(list);
 	}
 
 	public void loadLabels(List<Label> ghLabels){

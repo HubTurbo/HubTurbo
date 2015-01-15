@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -20,7 +21,6 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
-
 import command.TurboCommandExecutor;
 
 
@@ -99,7 +99,7 @@ public class ColumnControl extends HBox {
 		for (Node node : getChildren()) {
 			if (node instanceof IssueColumn) {
 				IssueColumn panel = (IssueColumn) node;
-				panel.setItems(model.getIssues());
+				panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public class ColumnControl extends HBox {
 	private IssueColumn addColumn() {
 		IssueColumn panel = new IssuePanel(ui, stage, model, this, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
-		panel.setItems(model.getIssues());
+		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
@@ -115,7 +115,7 @@ public class ColumnControl extends HBox {
 	public IssueColumn addColumnAt(int index) {
 		IssueColumn panel = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
 		getChildren().add(index, panel);
-		panel.setItems(model.getIssues());
+		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		updateColumnIndices();
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
