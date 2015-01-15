@@ -357,13 +357,10 @@ public class ServiceManager {
 		issueCheckTime = null;
 		
 		List<User> ghCollaborators = new ArrayList<User>();
-		List<Label> ghLabels = new ArrayList<Label>();
-		List<Milestone> ghMilestones = new ArrayList<Milestone>();
-		List<Issue> ghIssues = new ArrayList<Issue>();
 		
-		ghLabels = getLabels();
-		ghMilestones = getMilestones();
-		ghIssues = getAllIssues();
+		List<Label> ghLabels = getLabels();
+		List<Milestone> ghMilestones = getMilestones();
+		List<Issue> ghIssues = getAllIssues();
 		
 		HashMap<String, List> map = new HashMap<String, List>();
 		map.put(KEY_COLLABORATORS, ghCollaborators);

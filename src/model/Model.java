@@ -221,7 +221,7 @@ public class Model {
 		
 		// This is made with the assumption that labels of repos will not be empty (even a fresh copy of a repo)
 		if (!resources.get(ServiceManager.KEY_LABELS).isEmpty()) {
-			if (resources.get(ServiceManager.KEY_LABELS).get(0).getClass() == TurboLabel.class) {
+			if (resources.get(ServiceManager.KEY_LABELS).get(0) instanceof TurboLabel) {
 				isTurboResource = true;
 			}
 			if (resources.get(ServiceManager.KEY_COLLABORATORS).isEmpty()) {
