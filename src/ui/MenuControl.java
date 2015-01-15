@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -119,25 +120,65 @@ public class MenuControl extends MenuBar {
 		cols.getItems().addAll(createRight, createLeft, closeColumn, sets);
 		return cols;
 	}
+	
+	/**
+	 * Called upon the Panels > Sets > Save being clicked
+	 */
+	private void onPanelSetSave() {
+		logger.info("Menu: Panels > Sets > Save");
+
+		List<String> filterStrings = getCurrentFilterExprs();
+	    
+	    if (!filterStrings.isEmpty()) {
+	    	Optional<String> response = Dialogs.create()
+	            .title("Panel Set Name")
+	            .lightweight()
+	            .masthead("Please name this panel set")
+	            .message("What should this panel set be called?").showTextInput();
+	         
+	    	if (response.isPresent()) {
+	        	DataManager.getInstance().addPanelSet(response.get(), filterStrings);
+	        	ui.triggerEvent(new PanelSavedEvent());
+	        	logger.info("New panel set " + response.get() + " saved, containing " + filterStrings);
+	        	return;
+	    	}
+	    }
+    	logger.info("Did not save new panel set");
+	}
+	
+	/**
+	 * Called upon the Panels > Sets > Open being clicked
+	 */
+	private void onPanelSetOpen(String panelSetName, List<String> filterSet) {
+		logger.info("Menu: Panels > Sets > Open > " + panelSetName);
+
+		columns.closeAllColumns();
+		columns.openColumnsWithFilters(filterSet);
+	}
+
+	/**
+	 * Called upon the Panels > Sets > Delete being clicked
+	 */
+	private void onPanelSetDelete(String panelSetName) {
+		logger.info("Menu: Panels > Sets > Delete > " + panelSetName);
+
+		Action response = Dialogs.create().title("Confirmation")
+				.masthead("Delete panel set '" + panelSetName + "'?")
+				.message("Are you sure you want to delete this panelSet?")
+				.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO }).showConfirm();
+
+		if (response == Dialog.Actions.YES) {
+			DataManager.getInstance().removePanelSet(panelSetName);
+			ui.triggerEvent(new PanelSavedEvent());
+			logger.info(panelSetName + " was deleted");
+		} else {
+			logger.info(panelSetName + " was not deleted");
+		}
+	}
 
 	private MenuItem[] createPanelsSetsMenu() {
 		MenuItem save = new MenuItem("Save");
-		save.setOnAction(e -> {
-            List<String> filterExprs = getCurrentFilterExprs();
-            
-            if (!filterExprs.isEmpty()) {
-            	Optional<String> response = Dialogs.create()
-		            .title("Panel Set Name")
-		            .lightweight()
-		            .masthead("Please name this panel set")
-		            .message("What should this panel set be called?").showTextInput();
-                 
-            	if (response.isPresent()) {
-	            	DataManager.getInstance().addPanelSet(response.get(), filterExprs);
-	            	ui.triggerEvent(new PanelSavedEvent());
-            	}
-            }
-		});
+		save.setOnAction(e -> onPanelSetSave());
 		
 		Menu open = new Menu("Open");
 		Menu delete = new Menu("Delete");
@@ -148,31 +189,17 @@ public class MenuControl extends MenuBar {
 				open.getItems().clear();
 				delete.getItems().clear();
 
-				for (String panelSetName : DataManager.getInstance().getAllPanelSets().keySet()) {
-					final List<String> filterSet = DataManager.getInstance().getAllPanelSets().get(panelSetName);
+				Map<String, List<String>> panelSets = DataManager.getInstance().getAllPanelSets();
+
+				for (final String panelSetName : panelSets.keySet()) {
+					final List<String> filterSet = panelSets.get(panelSetName);
+					
 					MenuItem openItem = new MenuItem(panelSetName);
-					openItem.setOnAction(e1 -> {
-						columns.closeAllColumns();
-						columns.openColumnsWithFilters(filterSet);
-					});
+					openItem.setOnAction(e1 -> onPanelSetOpen(panelSetName, filterSet));
 					open.getItems().add(openItem);
 					
 					MenuItem deleteItem = new MenuItem(panelSetName);
-					deleteItem.setOnAction(e1 -> {
-
-						Action response = Dialogs
-							.create()
-							.title("Confirmation")
-							.masthead("Delete panel set '" + panelSetName + "'?")
-							.message("Are you sure you want to delete this panelSet?")
-							.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO })
-							.showConfirm();
-						
-						if (response == Dialog.Actions.YES) {
-							DataManager.getInstance().removePanelSet(panelSetName);
-							ui.triggerEvent(new PanelSavedEvent());
-						}
-					});
+					deleteItem.setOnAction(e1 -> onPanelSetDelete(panelSetName));
 					delete.getItems().add(deleteItem);
 				}
 			}
@@ -181,6 +208,10 @@ public class MenuControl extends MenuBar {
 		return new MenuItem[] {save, open, delete};
 	}
 
+	/**
+	 * Returns the list of filter strings currently showing the user interface
+	 * @return
+	 */
 	private List<String> getCurrentFilterExprs() {
 		return columns.getChildren().stream().flatMap(c -> {
 			if (c instanceof IssueColumn) {
