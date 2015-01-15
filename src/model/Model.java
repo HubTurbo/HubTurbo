@@ -429,36 +429,42 @@ public class Model {
 		Platform.runLater(new Runnable() {
 	        @Override
 	        public void run() {
+	        	  	
+				ArrayList<Object> additions = new ArrayList<>();
+				for (Object item : newList) {
+					int index = list.indexOf(item);
+					if (index != -1) {
+						Listable old = (Listable) list.get(index);
+						old.copyValues(item);
+					} else {
+						additions.add(item);
+					}
+				}
 	        	
-	        	List remaining = new ArrayList<>(list);
-	        	remaining.removeAll(removed);
-  	
+	        	List finalList = new ArrayList<>(list);
+	        	finalList.removeAll(removed);
+	        	finalList.addAll(additions);
+	        	
 	        	Listable listItem = (Listable)newList.get(0);
 	        	if (listItem instanceof TurboMilestone) {
-	        		logNumOfUpdates(newList, "milestone(s)");
+	        		logNumOfUpdates(newList, "milestone");
+	        		changeMilestones(finalList);
 	        	} else if (listItem instanceof TurboLabel) {
-	        		logNumOfUpdates(newList, "label(s)");
+	        		logNumOfUpdates(newList, "label");
+	        		changeLabels(finalList);
 	        	} else if (listItem instanceof TurboUser) {
-	        		logNumOfUpdates(newList, "collaborator(s)");
+	        		logNumOfUpdates(newList, "collaborator");
+	        		changeCollaborators(finalList);
+	        	} else {
+	        		// TODO remove this once ad-hoc polymorphism removed
+	        		assert false : "updateCachedList called with invalid type " + listItem.getClass().getName();
 	        	}
-	        	
-	        	ArrayList<Object> buffer = new ArrayList<>();
-	        	for (Object item : newList) {
-					int index = list.indexOf(item);
-					if(index != -1){
-						Listable old = (Listable)list.get(index);
-						old.copyValues(item);
-					}else{
-						buffer.add(item);
-					}
-	        	}
-	        	list.addAll(buffer);
 	        	
 	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	        }
 
 			private void logNumOfUpdates(List newList, String type) {
-				logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
+				logger.info("Retrieved " + newList.size() + " updated " + type + "(s) since last sync");
 			}
 	   });
 	}
