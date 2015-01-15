@@ -48,7 +48,7 @@ import service.updateservice.ModelUpdater;
 import storage.DataCacheFileHandler;
 import storage.TurboRepoData;
 import stubs.ServiceManagerStub;
-import ui.UIReference;
+import ui.UI;
 import ui.components.StatusBar;
 import util.events.RefreshDoneEvent;
 
@@ -172,7 +172,7 @@ public class ServiceManager {
 			@Override
 			public void run() {
 				modelUpdater.updateModel(repoId);
-				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
+				UI.getInstance().triggerEvent(new RefreshDoneEvent());
 			}
 		};
 		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);

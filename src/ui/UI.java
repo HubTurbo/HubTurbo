@@ -46,7 +46,7 @@ import browserview.BrowserComponent;
 import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
-
+	
 	private static final int VERSION_MAJOR = 1;
 	private static final int VERSION_MINOR = 4;
 	private static final int VERSION_PATCH = 0;
@@ -76,9 +76,17 @@ public class UI extends Application {
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
+	
+	private static UI instance;
+	public static UI getInstance() {
+		return instance;
+	}
 
 	@Override
 	public void start(Stage stage) throws IOException {
+		
+		instance = this;
+		
 		//log all uncaught exceptions
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
             logger.error(throwable.getMessage(), throwable);
@@ -188,8 +196,6 @@ public class UI extends Application {
 
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
 		
-		UIReference.getInstance().setUI(this);
-
 		VBox top = new VBox();
 
 		ScrollPane columnsScrollPane = new ScrollPane(columns);
