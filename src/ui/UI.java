@@ -371,11 +371,12 @@ public class UI extends Application {
 		
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+		ServiceManager.getInstance().stopModelUpdate();
+		
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
-				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
+				HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId);
 			
 				final CountDownLatch latch = new CountDownLatch(1);
 				ServiceManager.getInstance().getModel().loadComponents(repoId, items);
