@@ -104,8 +104,13 @@ public class Model {
 		loadComponents(repoId, items);
 	}
 
+	/**
+	 * Given the resources for a repository, populates the application's state with them.
+	 * @param repoId the repository these resources belong to
+	 * @param resources a data structure containing the resources for a repository
+	 */
 	@SuppressWarnings("rawtypes")
-	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
+	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources) {
 		this.repoId = repoId;
 		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;

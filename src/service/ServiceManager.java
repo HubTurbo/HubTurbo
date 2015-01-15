@@ -304,32 +304,40 @@ public class ServiceManager {
 		return githubClient.getRequestLimit();
 	}
 	
+	/**
+	 * Retrieves a data structure containing all resources of the given repository.
+	 * May load from cache if available or download from GitHub.
+	 * Should be run as a task.
+	 * @param repoId the repository to get resources for
+	 * @return a data structure containing all resoureces
+	 * @throws IOException
+	 */
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
 
-		boolean needToGetResources = true;
 		String repoIdString = repoId.toString();
 
 		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoIdString);
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
 
-		TurboRepoData repo = dcHandler.getRepo();
-		if (repo != null) {
-			needToGetResources = false;
-		}
-
-		if (!needToGetResources) {
+		TurboRepoData cachedRepoData = dcHandler.getRepo();
+		boolean needToGetResources = cachedRepoData == null;
+		
+		if (needToGetResources) {
+			logger.info("Cache not found, loading data from GitHub...");
+			return getGitHubResources();
+		} else {
 			logger.info("Loading from cache...");
-			issuesETag = repo.getIssuesETag();
-			collabsETag = repo.getCollaboratorsETag();
-			labelsETag = repo.getLabelsETag();
-			milestonesETag = repo.getMilestonesETag();
-			issueCheckTime = repo.getIssueCheckTime();
-			List<TurboUser> collaborators = repo.getCollaborators();
-			List<TurboLabel> labels = repo.getLabels();
-			List<TurboMilestone> milestones = repo.getMilestones();
+			issuesETag = cachedRepoData.getIssuesETag();
+			collabsETag = cachedRepoData.getCollaboratorsETag();
+			labelsETag = cachedRepoData.getLabelsETag();
+			milestonesETag = cachedRepoData.getMilestonesETag();
+			issueCheckTime = cachedRepoData.getIssueCheckTime();
+			List<TurboUser> collaborators = cachedRepoData.getCollaborators();
+			List<TurboLabel> labels = cachedRepoData.getLabels();
+			List<TurboMilestone> milestones = cachedRepoData.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
 			
 			HashMap<String, List> map = new HashMap<String, List>();
@@ -337,9 +345,6 @@ public class ServiceManager {
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
 			return map;
-		} else {
-			logger.info("Cache not found, loading data from GitHub...");
-			return getGitHubResources();
 		}
 	}
 
