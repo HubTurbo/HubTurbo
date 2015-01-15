@@ -332,27 +332,19 @@ public class Model {
 	}
 	
 	public void addLabel(TurboLabel label){
-		Platform.runLater(()->{
-			addLabelToEnd(label);
-		});
+		addLabelToEnd(label);
 	}
 	
 	public void deleteLabel(TurboLabel label){
-		Platform.runLater(()->{
-			removeLabel(label);
-		});
+		removeLabel(label);
 	}
 	
 	public void addMilestone(TurboMilestone milestone){
-		Platform.runLater(()->{
-			addMilestoneToEnd(milestone);
-		});
+		addMilestoneToEnd(milestone);
 	}
 	
 	public void deleteMilestone(TurboMilestone milestone){
-		Platform.runLater(()->{
-			removeMilestone(milestone);
-		});
+		removeMilestone(milestone);
 	}
 
 	public int getIndexOfIssue(int id){
@@ -417,61 +409,50 @@ public class Model {
 	private void updateCachedList(List list, List newList, String repoId){
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	  	
-				ArrayList<Object> additions = new ArrayList<>();
-				for (Object item : newList) {
-					int index = list.indexOf(item);
-					if (index != -1) {
-						Listable old = (Listable) list.get(index);
-						old.copyValues(item);
-					} else {
-						additions.add(item);
-					}
-				}
-	        	
-	        	List finalList = new ArrayList<>(list);
-	        	finalList.removeAll(removed);
-	        	finalList.addAll(additions);
-	        	
-	        	Listable listItem = (Listable)newList.get(0);
-	        	if (listItem instanceof TurboMilestone) {
-	        		logNumOfUpdates(newList, "milestone");
-	        		changeMilestones(finalList);
-	        	} else if (listItem instanceof TurboLabel) {
-	        		logNumOfUpdates(newList, "label");
-	        		changeLabels(finalList);
-	        	} else if (listItem instanceof TurboUser) {
-	        		logNumOfUpdates(newList, "collaborator");
-	        		changeCollaborators(finalList);
-	        	} else {
-	        		// TODO remove this once ad-hoc polymorphism removed
-	        		assert false : "updateCachedList called with invalid type " + listItem.getClass().getName();
-	        	}
-	        	
-	        	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
-	        }
-
-			private void logNumOfUpdates(List newList, String type) {
-				logger.info("Retrieved " + newList.size() + " updated " + type + "(s) since last sync");
+		
+		ArrayList<Object> additions = new ArrayList<>();
+		for (Object item : newList) {
+			int index = list.indexOf(item);
+			if (index != -1) {
+				Listable old = (Listable) list.get(index);
+				old.copyValues(item);
+			} else {
+				additions.add(item);
 			}
-	   });
+		}
+    	
+    	List finalList = new ArrayList<>(list);
+    	finalList.removeAll(removed);
+    	finalList.addAll(additions);
+    	
+    	Listable listItem = (Listable)newList.get(0);
+    	if (listItem instanceof TurboMilestone) {
+    		logNumOfUpdates(newList, "milestone");
+    		changeMilestones(finalList);
+    	} else if (listItem instanceof TurboLabel) {
+    		logNumOfUpdates(newList, "label");
+    		changeLabels(finalList);
+    	} else if (listItem instanceof TurboUser) {
+    		logNumOfUpdates(newList, "collaborator");
+    		changeCollaborators(finalList);
+    	} else {
+    		// TODO remove this once ad-hoc polymorphism removed
+    		assert false : "updateCachedList called with invalid type " + listItem.getClass().getName();
+    	}
+    	
+    	dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
+	}
+	
+	private void logNumOfUpdates(List newList, String type) {
+		logger.info("Retrieved " + newList.size() + " updated " + type + "(s) since last sync");
 	}
 	
 	public void loadCollaborators(List<User> ghCollaborators) {
-		
-		
-		Platform.runLater(()->{
-			changeCollaborators(CollectionUtilities.getHubTurboUserList(ghCollaborators));
-		});
+		changeCollaborators(CollectionUtilities.getHubTurboUserList(ghCollaborators));
 	}
 	
 	public void clearCollaborators() {	
-		Platform.runLater(()->{
-			removeAllCollaborators();
-		});
+		removeAllCollaborators();
 	}
 	
 	public void loadTurboCollaborators(List<TurboUser> list) {
