@@ -8,7 +8,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
-import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -107,7 +106,6 @@ public class IssuePanelCard extends VBox {
 		issueDetails.setPrefWrapLength(CARD_WIDTH);
 		issueDetails.setHgap(3);
 		
-		issue.getLabelsReference().addListener(new WeakListChangeListener<TurboLabel>(createLabelsChangeListener()));
 		issue.parentIssueProperty().addListener(new WeakChangeListener<Number>(createParentsChangeListener()));
 		if (issue.getMilestone() != null) {
 			issue.getMilestone().titleProperty().addListener(new WeakChangeListener<String>(createMilestoneChangeListener()));

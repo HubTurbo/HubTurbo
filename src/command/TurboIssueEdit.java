@@ -5,9 +5,9 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -115,10 +115,10 @@ public class TurboIssueEdit extends TurboIssueCommand{
 	}
 	
 	private void mergeLabels(TurboIssue original, TurboIssue edited, TurboIssue latest) {
-		ObservableList<TurboLabel> originalLabels = original.getLabels();
-		ObservableList<TurboLabel> editedLabels = edited.getLabels();
+		List<TurboLabel> originalLabels = original.getLabels();
+		List<TurboLabel> editedLabels = edited.getLabels();
 		HashMap<String, HashSet<TurboLabel>> changeSet = CollectionUtilities.getChangesToList(originalLabels, editedLabels);
-		ObservableList<TurboLabel> latestLabels = latest.getLabels();
+		List<TurboLabel> latestLabels = latest.getLabels();
 		HashSet<TurboLabel> removed = changeSet.get(CollectionUtilities.REMOVED_TAG);
 		HashSet<TurboLabel> added = changeSet.get(CollectionUtilities.ADDED_TAG);
 		

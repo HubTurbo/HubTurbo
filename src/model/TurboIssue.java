@@ -17,8 +17,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -280,14 +278,14 @@ public class TurboIssue implements Listable {
 		this.htmlUrl = htmlUrl;
 	}
 
-	private ObservableList<TurboLabel> labels = FXCollections
-			.observableArrayList();
+	private List<TurboLabel> labels = new ArrayList<>();
 
-	public ObservableList<TurboLabel> getLabels() {
-		return FXCollections.observableArrayList(labels);
+	public List<TurboLabel> getLabels() {
+		// TODO change to unmodifiable list
+		return new ArrayList<>(labels);
 	}
 
-	public ObservableList<TurboLabel> getLabelsReference() {
+	public List<TurboLabel> getLabelsReference() {
 		return labels;
 	}
 
@@ -752,17 +750,12 @@ public class TurboIssue implements Listable {
 		return message;
 	}
 
-	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections
-				.observableArrayList();
-		if (labels == null)
-			return turboLabels;
-
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
+	private List<TurboLabel> translateLabels(List<Label> labels) {
+		if (labels == null) {
+			return new ArrayList<>();
+		} else {
+			return labels.stream().map(l -> new TurboLabel(l)).collect(Collectors.toList());
 		}
-
-		return turboLabels;
 	}
 
 	private static int getSeparatorIndex(String[] lines) {
