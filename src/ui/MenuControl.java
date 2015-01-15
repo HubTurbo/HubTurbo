@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +25,9 @@ import javafx.scene.input.KeyCombination;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
 
 import service.ServiceManager;
 import storage.DataManager;
@@ -35,6 +39,7 @@ import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
 import util.events.PanelSavedEvent;
 import util.events.PanelSavedEventHandler;
+
 
 public class MenuControl extends MenuBar {
 
@@ -121,12 +126,17 @@ public class MenuControl extends MenuBar {
             List<String> filterExprs = getCurrentFilterExprs();
             
             if (!filterExprs.isEmpty()) {
-            	// TODO get name from user input
-            	DataManager.getInstance().addPanelSet("default", filterExprs);
-            	ui.triggerEvent(new PanelSavedEvent());
+            	Optional<String> response = Dialogs.create()
+		            .title("Panel Set Name")
+		            .lightweight()
+		            .masthead("Please name this panel set")
+		            .message("What should this panel set be called?").showTextInput();
+                 
+            	if (response.isPresent()) {
+	            	DataManager.getInstance().addPanelSet(response.get(), filterExprs);
+	            	ui.triggerEvent(new PanelSavedEvent());
+            	}
             }
-            // TODO remove
-            System.out.println(filterExprs);
 		});
 		
 		Menu open = new Menu("Open");
@@ -138,19 +148,30 @@ public class MenuControl extends MenuBar {
 				open.getItems().clear();
 				delete.getItems().clear();
 
-				for (String filterName : DataManager.getInstance().getAllPanelSets().keySet()) {
-					final List<String> filterSet = DataManager.getInstance().getAllPanelSets().get(filterName);
-					MenuItem openItem = new MenuItem(filterName);
+				for (String panelSetName : DataManager.getInstance().getAllPanelSets().keySet()) {
+					final List<String> filterSet = DataManager.getInstance().getAllPanelSets().get(panelSetName);
+					MenuItem openItem = new MenuItem(panelSetName);
 					openItem.setOnAction(e1 -> {
 						columns.closeAllColumns();
 						columns.openColumnsWithFilters(filterSet);
 					});
 					open.getItems().add(openItem);
 					
-					MenuItem deleteItem = new MenuItem(filterName);
+					MenuItem deleteItem = new MenuItem(panelSetName);
 					deleteItem.setOnAction(e1 -> {
-						DataManager.getInstance().removePanelSet(filterName);
-						ui.triggerEvent(new PanelSavedEvent());
+
+						Action response = Dialogs
+							.create()
+							.title("Confirmation")
+							.masthead("Delete panel set '" + panelSetName + "'?")
+							.message("Are you sure you want to delete this panelSet?")
+							.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO })
+							.showConfirm();
+						
+						if (response == Dialog.Actions.YES) {
+							DataManager.getInstance().removePanelSet(panelSetName);
+							ui.triggerEvent(new PanelSavedEvent());
+						}
 					});
 					delete.getItems().add(deleteItem);
 				}
