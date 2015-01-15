@@ -1,7 +1,6 @@
 package model;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -312,19 +311,13 @@ public class Model {
 		} else {
 			//enforceStatusStateConsistency(issueList);
 		}
-		WeakReference<Model> selfRef = new WeakReference<Model>(this);
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {	
-				logger.debug(issueList.size() + " issues changed/added since last sync");
-				for (int i = issueList.size() - 1; i >= 0; i--) {
-					Issue issue = issueList.get(i);
-					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
-					updateCachedIssue(newCached);
-				}
-				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
-			}
-		});
+		logger.debug(issueList.size() + " issues changed/added since last sync");
+		for (int i = issueList.size() - 1; i >= 0; i--) {
+			Issue issue = issueList.get(i);
+			TurboIssue newCached = new TurboIssue(issue, this);
+			updateCachedIssue(newCached);
+		}
+		dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	}
 		
 	public void updateCachedIssue(TurboIssue issue){
