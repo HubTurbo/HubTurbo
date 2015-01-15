@@ -239,19 +239,17 @@ public class Model {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadTurboResources(HashMap<String, List> turboResources) {
-		Platform.runLater(()-> {
-			logger.info(MESSAGE_LOADING_COLLABS);
-			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
-			logger.info(MESSAGE_LOADING_LABELS);
-			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
-			logger.info(MESSAGE_LOADING_MILESTONES);
-			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
+		logger.info(MESSAGE_LOADING_COLLABS);
+		loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
+		logger.info(MESSAGE_LOADING_LABELS);
+		loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
+		logger.info(MESSAGE_LOADING_MILESTONES);
+		loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
-			// only get issues now to prevent assertion error in getLabelReference of TurboIssues
-			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
-			logger.info(MESSAGE_LOADING_ISSUES);
-			loadTurboIssues(issues);
-		});
+		// only get issues now to prevent assertion error in getLabelReference of TurboIssues
+		List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
+		logger.info(MESSAGE_LOADING_ISSUES);
+		loadTurboIssues(issues);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
