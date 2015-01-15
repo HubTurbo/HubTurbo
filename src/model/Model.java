@@ -494,10 +494,8 @@ public class Model {
 		if (ghIssues != null) {
 			//enforceStatusStateConsistency(ghIssues);
 		}
-		Platform.runLater(()->{
-			changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
-			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
-		});
+		changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
+		dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	}
 	
 	public void loadTurboIssues(List<TurboIssue> list) {
@@ -505,9 +503,7 @@ public class Model {
 	}
 
 	public void loadLabels(List<Label> ghLabels){
-		Platform.runLater(()->{
-			changeLabels(CollectionUtilities.getHubTurboLabelList(ghLabels));
-		});
+		changeLabels(CollectionUtilities.getHubTurboLabelList(ghLabels));
 	}
 	
 	public void loadTurboLabels(List<TurboLabel> list) {
@@ -520,9 +516,7 @@ public class Model {
 	}
 	
 	public void loadMilestones(List<Milestone> ghMilestones){
-		Platform.runLater(()->{
-			changeMilestones(CollectionUtilities.getHubTurboMilestoneList(ghMilestones));
-		});
+		changeMilestones(CollectionUtilities.getHubTurboMilestoneList(ghMilestones));
 	}
 	
 	public void loadTurboMilestones(List<TurboMilestone> list) {
