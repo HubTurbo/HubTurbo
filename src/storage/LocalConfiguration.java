@@ -10,7 +10,7 @@ import java.util.Map;
 public class LocalConfiguration {
 	
 	private Map<String, String> userAliases = new HashMap<>();
-	private Map<String, List<String>> panelSets = new HashMap<>();
+	private Map<String, Map<String, List<String>>> panelSets = new HashMap<>();
 	
 	public LocalConfiguration() {
 	}
@@ -19,19 +19,23 @@ public class LocalConfiguration {
 		return userAliases.get(user);
 	}
 	
-	public void addPanelSet(String name, List<String> filterExprs) {
-		panelSets.put(name, filterExprs);
+	public void addPanelSet(String repo, String name, List<String> filterExprs) {
+		if (!panelSets.containsKey(repo)) {
+			panelSets.put(repo, new HashMap<>());
+		}
+		panelSets.get(repo).put(name, filterExprs);
 	}
 	
-	public List<String> getPanelSet(String name) {
-		return panelSets.get(name);
+	public List<String> getPanelSet(String repo, String name) {
+		return panelSets.get(repo).get(name);
 	}
 
-	public Map<String, List<String>> getAllPanelSets() {
-		return panelSets;
+	public Map<String, List<String>> getAllPanelSets(String repo) {
+		return panelSets.get(repo);
 	}
 
-	public void removePanelSet(String name) {
-		panelSets.remove(name);
+	public void removePanelSet(String repo, String name) {
+		assert panelSets.containsKey(repo);
+		panelSets.get(repo).remove(name);
 	}
 }

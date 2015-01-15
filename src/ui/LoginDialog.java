@@ -233,7 +233,7 @@ public class LoginDialog extends Dialog<Boolean> {
 			    boolean loadSuccess = loadRepository(owner, repo);
 			    final CountDownLatch latch = new CountDownLatch(1);
 			    Platform.runLater(()->{
-			    	columns.resumeColumns();
+			    	columns.restoreColumns();
 			    	latch.countDown();
 			    });
 			    try {

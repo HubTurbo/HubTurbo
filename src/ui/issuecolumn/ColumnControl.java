@@ -70,7 +70,7 @@ public class ColumnControl extends HBox {
 		model.applyMethodOnModelChange(() -> selfRef.get().refresh());
 	}
 	
-	public void resumeColumns() {
+	public void restoreColumns() {
 		getChildren().clear();
 		
 		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());

@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
+import service.ServiceManager;
+
 /**
  * A singleton for managing all local files used by HubTurbo. It provides
  * facilities for saving and loading all files and methods for accessing them.
@@ -75,21 +77,25 @@ public class DataManager {
 		return localConfiguration.getAlias(user);
 	}
 	
+	private String getCurrentRepoId() {
+		return ServiceManager.getInstance().getRepoId().generateId();
+	}
+
 	public void addPanelSet(String name, List<String> filterExprs) {
 		assert name != null && filterExprs != null;
-		localConfiguration.addPanelSet(name, filterExprs);
+		localConfiguration.addPanelSet(getCurrentRepoId(), name, filterExprs);
 	}
 	
 	public List<String> getPanelSet(String name) {
-		return localConfiguration.getPanelSet(name);
+		return localConfiguration.getPanelSet(getCurrentRepoId(), name);
 	}
 	
 	public Map<String, List<String>> getAllPanelSets() {
-		return localConfiguration.getAllPanelSets();
+		return localConfiguration.getAllPanelSets(getCurrentRepoId());
 	}
 	
 	public void removePanelSet(String name) {
-		localConfiguration.removePanelSet(name);
+		localConfiguration.removePanelSet(getCurrentRepoId(), name);
 	}
 
 	/**

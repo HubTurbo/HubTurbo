@@ -376,6 +376,7 @@ public class UI extends Application {
 		
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+		
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
@@ -384,8 +385,9 @@ public class UI extends Application {
 			
 				final CountDownLatch latch = new CountDownLatch(1);
 				ServiceManager.getInstance().getModel().loadComponents(repoId, items);
-				Platform.runLater(()->{
-					columns.resumeColumns();
+				Platform.runLater(() -> {
+					columns.restoreColumns();
+					triggerEvent(new PanelSavedEvent());
 					latch.countDown();
 				});
 				try {
