@@ -468,9 +468,6 @@ public class Model {
 	}
 		
 	public void loadIssues(IRepositoryIdProvider repoId, List<Issue> ghIssues) {
-		if (ghIssues != null) {
-			//enforceStatusStateConsistency(ghIssues);
-		}
 		changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
 		dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	}
