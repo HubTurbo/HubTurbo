@@ -29,11 +29,6 @@ public class DataCacheFileHandler {
 	private static final String FILE_DATA_CACHE = "-cache.json";
 	private static final String FILE_DATA_CACHE_TEMP = "-cache-temp.json";
 
-	private List<TurboUser> collaborators = null;
-	private List<TurboLabel> labels = null;
-	private List<TurboMilestone> milestones = null;
-	private List<TurboIssue> issues = null;
-	
 	private TurboRepoData repo = null;
 	private String repoId = null;
 	
@@ -76,30 +71,10 @@ public class DataCacheFileHandler {
 		return repo;
 	}
 
-	public void setCollaborators(List<TurboUser> collaborators) {
-		this.collaborators = collaborators;
-	}
-	
-	public void setLabels(List<TurboLabel> labels) {
-		this.labels = labels;
-	}
-	
-	public void setMilestones(List<TurboMilestone> milestones) {
-		this.milestones = milestones;
-	}
-	
-	public void setIssues(List<TurboIssue> issues) {
-		this.issues = issues;
-	}
-	
 	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
 		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
-		this.issues = issues.stream().collect(Collectors.toList());
-		this.collaborators = collaborators.stream().collect(Collectors.toList());
-		this.labels = labels.stream().collect(Collectors.toList());
-		this.milestones = milestones.stream().collect(Collectors.toList());
 		
-		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
+		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
