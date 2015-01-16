@@ -8,14 +8,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -40,8 +38,6 @@ public class Model {
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
-	
-	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 	
 	protected IRepositoryIdProvider repoId;
 	
@@ -227,7 +223,6 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources) {
 		this.repoId = repoId;
-		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
 		boolean isPublicRepo = false;
 		
@@ -282,14 +277,6 @@ public class Model {
 		loadIssues(repoId, (List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 
-	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
-		cachedGithubComments.put(issueId, new ArrayList<Comment>(comments));
-	}
-	
-	public List<Comment>getCommentsListForIssue(int issueId){
-		return cachedGithubComments.get(issueId);
-	}
- 		
 	public void appendToCachedIssues(TurboIssue issue){
 		addIssueToStart(issue);
 	}
