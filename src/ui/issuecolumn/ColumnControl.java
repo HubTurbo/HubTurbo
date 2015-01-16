@@ -1,11 +1,11 @@
 package ui.issuecolumn;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -44,12 +44,11 @@ public class ColumnControl extends HBox {
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
-		setupModelChangeResponse();
 		
 		ui.registerEvent(new RefreshDoneEventHandler() {
 			@Override
 			public void handle(RefreshDoneEvent e) {
-				// We need this because this is triggered from a Timer thread
+				// We need this because this may be triggered from other threads
 				Platform.runLater(()-> {
 					refresh();
 				});	
@@ -62,12 +61,6 @@ public class ColumnControl extends HBox {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
-	}
-	
-	private void setupModelChangeResponse(){
-		WeakReference<ColumnControl> selfRef = new WeakReference<>(this);
-		//No need for weak listeners because ColumnControl is persistent for the lifetime of the app
-		model.applyMethodOnModelChange(() -> selfRef.get().refresh());
 	}
 	
 	public void resumeColumns() {
@@ -99,7 +92,7 @@ public class ColumnControl extends HBox {
 		for (Node node : getChildren()) {
 			if (node instanceof IssueColumn) {
 				IssueColumn panel = (IssueColumn) node;
-				panel.setItems(model.getIssues());
+				panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 			}
 		}
 	}
@@ -107,7 +100,7 @@ public class ColumnControl extends HBox {
 	private IssueColumn addColumn() {
 		IssueColumn panel = new IssuePanel(ui, stage, model, this, getChildren().size(), dragAndDropExecutor);
 		getChildren().add(panel);
-		panel.setItems(model.getIssues());
+		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
@@ -115,7 +108,7 @@ public class ColumnControl extends HBox {
 	public IssueColumn addColumnAt(int index) {
 		IssueColumn panel = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
 		getChildren().add(index, panel);
-		panel.setItems(model.getIssues());
+		panel.setItems(FXCollections.observableArrayList(model.getIssues()));
 		updateColumnIndices();
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;

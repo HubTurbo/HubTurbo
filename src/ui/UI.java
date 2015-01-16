@@ -46,7 +46,7 @@ import browserview.BrowserComponent;
 import com.google.common.eventbus.EventBus;
 
 public class UI extends Application {
-
+	
 	private static final int VERSION_MAJOR = 1;
 	private static final int VERSION_MINOR = 4;
 	private static final int VERSION_PATCH = 0;
@@ -76,9 +76,17 @@ public class UI extends Application {
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
+	
+	private static UI instance;
+	public static UI getInstance() {
+		return instance;
+	}
 
 	@Override
 	public void start(Stage stage) throws IOException {
+		
+		instance = this;
+		
 		//log all uncaught exceptions
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
             logger.error(throwable.getMessage(), throwable);
@@ -188,8 +196,6 @@ public class UI extends Application {
 
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
 		
-		UIReference.getInstance().setUI(this);
-
 		VBox top = new VBox();
 
 		ScrollPane columnsScrollPane = new ScrollPane(columns);
@@ -371,11 +377,13 @@ public class UI extends Application {
 		
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+		ServiceManager.getInstance().stopModelUpdate();
+		repoSelector.setDisable(true);
+		
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
-				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
+				HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId);
 			
 				final CountDownLatch latch = new CountDownLatch(1);
 				ServiceManager.getInstance().getModel().loadComponents(repoId, items);
@@ -387,26 +395,30 @@ public class UI extends Application {
 					latch.await();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				} 
+				}
 				return true;
 			}
 		};
+		
 		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
 			
 		task.setOnSucceeded(wse -> {
+			repoSelector.setDisable(false);
 			repoSelector.refreshComboBoxContents();
+
 			StatusBar.displayMessage("Issues loaded successfully!");
 			ServiceManager.getInstance().setupAndStartModelUpdate();
 		});
 			
 		task.setOnFailed(wse -> {
+			repoSelector.setDisable(false);
+
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);
 			StatusBar.displayMessage("An error occurred: " + err);
 		});
-
 	}
 }

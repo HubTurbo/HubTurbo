@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import model.Model;
 import model.TurboLabel;
@@ -23,7 +22,6 @@ import model.TurboUser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.IssueEvent;
@@ -43,12 +41,11 @@ import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
-import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import storage.DataCacheFileHandler;
 import storage.TurboRepoData;
 import stubs.ServiceManagerStub;
-import ui.UIReference;
+import ui.UI;
 import ui.components.StatusBar;
 import util.events.RefreshDoneEvent;
 
@@ -166,13 +163,13 @@ public class ServiceManager {
 		// repo id may be different if the project was switched, so we
 		// validate with this repo id at that point.
 		
-		final IRepositoryIdProvider repoId = model.getRepoId();
+		final IRepositoryIdProvider repoId = RepositoryId.createFromId(model.getRepoId().generateId());
 		
 		Runnable pollTask = new Runnable() {
 			@Override
 			public void run() {
 				modelUpdater.updateModel(repoId);
-				UIReference.getInstance().getUI().triggerEvent(new RefreshDoneEvent());
+				UI.getInstance().triggerEvent(new RefreshDoneEvent());
 			}
 		};
 		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
@@ -304,32 +301,40 @@ public class ServiceManager {
 		return githubClient.getRequestLimit();
 	}
 	
+	/**
+	 * Retrieves a data structure containing all resources of the given repository.
+	 * May load from cache if available or download from GitHub.
+	 * Should be run as a task.
+	 * @param repoId the repository to get resources for
+	 * @return a data structure containing all resoureces
+	 * @throws IOException
+	 */
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
 
-		boolean needToGetResources = true;
 		String repoIdString = repoId.toString();
 
 		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoIdString);
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
 
-		TurboRepoData repo = dcHandler.getRepo();
-		if (repo != null) {
-			needToGetResources = false;
-		}
-
-		if (!needToGetResources) {
+		TurboRepoData cachedRepoData = dcHandler.getRepo();
+		boolean needToGetResources = cachedRepoData == null;
+		
+		if (needToGetResources) {
+			logger.info("Cache not found, loading data from GitHub...");
+			return getGitHubResources();
+		} else {
 			logger.info("Loading from cache...");
-			issuesETag = repo.getIssuesETag();
-			collabsETag = repo.getCollaboratorsETag();
-			labelsETag = repo.getLabelsETag();
-			milestonesETag = repo.getMilestonesETag();
-			issueCheckTime = repo.getIssueCheckTime();
-			List<TurboUser> collaborators = repo.getCollaborators();
-			List<TurboLabel> labels = repo.getLabels();
-			List<TurboMilestone> milestones = repo.getMilestones();
+			issuesETag = cachedRepoData.getIssuesETag();
+			collabsETag = cachedRepoData.getCollaboratorsETag();
+			labelsETag = cachedRepoData.getLabelsETag();
+			milestonesETag = cachedRepoData.getMilestonesETag();
+			issueCheckTime = cachedRepoData.getIssueCheckTime();
+			List<TurboUser> collaborators = cachedRepoData.getCollaborators();
+			List<TurboLabel> labels = cachedRepoData.getLabels();
+			List<TurboMilestone> milestones = cachedRepoData.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
 			
 			HashMap<String, List> map = new HashMap<String, List>();
@@ -337,9 +342,6 @@ public class ServiceManager {
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
 			return map;
-		} else {
-			logger.info("Cache not found, loading data from GitHub...");
-			return getGitHubResources();
 		}
 	}
 
@@ -352,13 +354,10 @@ public class ServiceManager {
 		issueCheckTime = null;
 		
 		List<User> ghCollaborators = new ArrayList<User>();
-		List<Label> ghLabels = new ArrayList<Label>();
-		List<Milestone> ghMilestones = new ArrayList<Milestone>();
-		List<Issue> ghIssues = new ArrayList<Issue>();
 		
-		ghLabels = getLabels();
-		ghMilestones = getMilestones();
-		ghIssues = getAllIssues();
+		List<Label> ghLabels = getLabels();
+		List<Milestone> ghMilestones = getMilestones();
+		List<Issue> ghIssues = getAllIssues();
 		
 		HashMap<String, List> map = new HashMap<String, List>();
 		map.put(KEY_COLLABORATORS, ghCollaborators);
@@ -552,30 +551,6 @@ public class ServiceManager {
 	}
 	
 	/**
-	 * Methods to work with comments data from github
-	 * */
-		
-	public CommentUpdateService getCommentUpdateService(int id, List<Comment> list){
-		return new CommentUpdateService(githubClient, id, list);
-	}
-	
-	public Comment createComment(int issueId, String comment) throws IOException{
-		if(repoId != null){
-			return (Comment)issueService.createComment(repoId, Integer.toString(issueId), comment);
-		}
-		return null;
-	}
-	
-	public String getMarkupForComment(Comment comment){
-		try {
-			return getContentMarkup(comment.getBody());
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return comment.getBody();
-		}
-	}
-	
-	/**
 	 * Gets events for a issue from GitHub, or returns
 	 * a cached version if already present.
 	 * @param issueId
@@ -587,58 +562,6 @@ public class ServiceManager {
 			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
 		}
 		return new ArrayList<>();
-	}
-	
-	/**
-	 * Gets comments for a issue from GitHub, or returns
-	 * a cached version if already present.
-	 * @param issueId
-	 * @return
-	 * @throws IOException
-	 */
-	public List<Comment> getComments(int issueId) throws IOException{
-		if(repoId != null){
-			List<Comment> cached = model.getCommentsListForIssue(issueId);
-			if(cached == null){
-				return getLatestComments(issueId);
-			}else{
-				return cached;
-			}
-		}
-		return new ArrayList<Comment>();
-	}
-	
-	/**
-	 * Gets comments from an issue from GitHub and updates the cache.
-	 * @param issueId
-	 * @return
-	 * @throws IOException
-	 */
-	private List<Comment> getLatestComments(int issueId) throws IOException{
-		if(repoId != null){
-			List<Comment> comments = issueService.getComments(repoId, issueId);
-			List<Comment> list =  comments.stream()
-						   				  .map(c -> {
-						   					  			c.setBodyHtml(getMarkupForComment(c));
-						   					  			return c;})
-						   				  .collect(Collectors.toList());
-			model.cacheCommentsListForIssue(list, issueId);
-			return list;
-		}
-		return new ArrayList<Comment>();
-	}
-	
-	public void deleteComment(long commentId) throws IOException{
-		if(repoId != null){
-			issueService.deleteComment(repoId, commentId);
-		}
-	}
-	
-	public Comment editComment(Comment comment) throws IOException{
-		if(repoId != null){
-			return issueService.editComment(repoId, comment);
-		}
-		return null;
 	}
 	
 	/**

@@ -62,9 +62,7 @@ class TurboSerializableIssue {
 		
 		this.htmlUrl = issue.getHtmlUrl();
 		
-		ObservableList<TurboLabel> turboLabelObservableList = issue.getLabels();
-		List<TurboLabel> turboLabelList = turboLabelObservableList.stream().collect(Collectors.toList());
-		this.labels = convertFromListOfTurboLabels(turboLabelList);
+		this.labels = convertFromListOfTurboLabels(issue.getLabels());
 	}
 	
 	private List<TurboSerializableLabel> convertFromListOfTurboLabels(List<TurboLabel> turboLabelsList) {

@@ -2,15 +2,12 @@ package storage;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import javafx.collections.ObservableList;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -29,11 +26,6 @@ public class DataCacheFileHandler {
 	private static final String FILE_DATA_CACHE = "-cache.json";
 	private static final String FILE_DATA_CACHE_TEMP = "-cache-temp.json";
 
-	private List<TurboUser> collaborators = null;
-	private List<TurboLabel> labels = null;
-	private List<TurboMilestone> milestones = null;
-	private List<TurboIssue> issues = null;
-	
 	private TurboRepoData repo = null;
 	private String repoId = null;
 	
@@ -55,14 +47,15 @@ public class DataCacheFileHandler {
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
 			.create();
 
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
-			
-			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
-			
-			bufferedReader.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+		String filename = getFileName(FILE_DATA_CACHE, this.repoId);
+		if (new File(filename).exists()) {
+			try {
+				BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+				repo = gson.fromJson(bufferedReader, TurboRepoData.class);
+				bufferedReader.close();
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		}
 	}
 	
@@ -76,30 +69,10 @@ public class DataCacheFileHandler {
 		return repo;
 	}
 
-	public void setCollaborators(List<TurboUser> collaborators) {
-		this.collaborators = collaborators;
-	}
-	
-	public void setLabels(List<TurboLabel> labels) {
-		this.labels = labels;
-	}
-	
-	public void setMilestones(List<TurboMilestone> milestones) {
-		this.milestones = milestones;
-	}
-	
-	public void setIssues(List<TurboIssue> issues) {
-		this.issues = issues;
-	}
-	
-	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators, ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones, ObservableList<TurboIssue> issues) {
+	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
 		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
-		this.issues = issues.stream().collect(Collectors.toList());
-		this.collaborators = collaborators.stream().collect(Collectors.toList());
-		this.labels = labels.stream().collect(Collectors.toList());
-		this.milestones = milestones.stream().collect(Collectors.toList());
 		
-		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
+		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, collaborators, labels, milestones, issues);
 
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
@@ -115,21 +88,16 @@ public class DataCacheFileHandler {
 			writer.close();
 			logger.info("Done writing to file for repo: " + repoIdString);
 			
-			File file = new File(getFileName(FILE_DATA_CACHE, repoIdString));
+			String filename = getFileName(FILE_DATA_CACHE, repoIdString);
+			File file = new File(filename);
 			
-			if (file.exists()) {
-				if (file.delete()) {
-					//System.out.println("Cache file is deleted");
-				} else {
-					logger.error("Failed to delete cache file");
-				}
+			if (file.exists() && !file.delete()) {
+				logger.error("Failed to delete cache file " + filename);
 			} 
 			
 			File newFile = new File(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
-			if (newFile.renameTo(file)) {
-				//System.out.println("Temp cache file is renamed!");
-			} else {
-				logger.error("Failed to rename temp cache file");
+			if (!newFile.renameTo(file)) {
+				logger.error("Failed to rename temp cache file " + filename);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

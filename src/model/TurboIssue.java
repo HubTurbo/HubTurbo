@@ -17,8 +17,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -280,14 +278,14 @@ public class TurboIssue implements Listable {
 		this.htmlUrl = htmlUrl;
 	}
 
-	private ObservableList<TurboLabel> labels = FXCollections
-			.observableArrayList();
+	private List<TurboLabel> labels = new ArrayList<>();
 
-	public ObservableList<TurboLabel> getLabels() {
-		return FXCollections.observableArrayList(labels);
+	public List<TurboLabel> getLabels() {
+		// TODO change to unmodifiable list
+		return new ArrayList<>(labels);
 	}
 
-	public ObservableList<TurboLabel> getLabelsReference() {
+	public List<TurboLabel> getLabelsReference() {
 		return labels;
 	}
 
@@ -752,17 +750,12 @@ public class TurboIssue implements Listable {
 		return message;
 	}
 
-	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections
-				.observableArrayList();
-		if (labels == null)
-			return turboLabels;
-
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
+	private List<TurboLabel> translateLabels(List<Label> labels) {
+		if (labels == null) {
+			return new ArrayList<>();
+		} else {
+			return labels.stream().map(l -> new TurboLabel(l)).collect(Collectors.toList());
 		}
-
-		return turboLabels;
 	}
 
 	private static int getSeparatorIndex(String[] lines) {
@@ -824,73 +817,4 @@ public class TurboIssue implements Listable {
 			return false;
 		return true;
 	}
-
-	/**
-	 * Deprecated methods
-	 * */
-	// private ObservableList<Integer> parents =
-	// FXCollections.observableArrayList();
-	// public ObservableList<Integer> getParents() {
-	// return FXCollections.observableArrayList(parents);
-	// }
-	// public ObservableList<Integer> getParentsReference(){
-	// return parents;
-	// }
-	//
-	// public void setParents(ObservableList<Integer> parentNumbers) {
-	// if (this.parents == null) {
-	// this.parents = parentNumbers;
-	// } else if (parentNumbers != this.parents) {
-	// this.parents.clear();
-	// if(!parentNumbers.isEmpty()){
-	// this.parents.add(parentNumbers.get(0));
-	// }
-	// }
-	// }
-	//
-	// public void addParent(Integer parentId){
-	// //Only single parent for now. This might be extended in future to allow
-	// multiple parents
-	// this.parents.clear();
-	// this.parents.add(parentId);
-	// }
-	//
-	// private ObservableList<Integer> extractParentNumbers(String issueBody) {
-	// ObservableList<Integer> parents = FXCollections.observableArrayList();
-	// if (issueBody == null) return parents;
-	// String[] lines = issueBody.split(REGEX_SPLIT_LINES);
-	// int seperatorLineIndex = getSeperatorIndex(lines);
-	// for (int i = 0; i < seperatorLineIndex; i++) {
-	// String line = lines[i];
-	// if (line.startsWith(METADATA_HEADER_PARENT)) {
-	// String value = line.replace(METADATA_HEADER_PARENT, "");
-	// String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-	// for (int j = 0; j < valueTokens.length; j++) {
-	// if (valueTokens[j].trim().isEmpty()) continue;
-	// parents.add(Integer.parseInt(valueTokens[j].trim()));
-	// }
-	// }
-	// }
-	// return parents;
-	// }
-
-	// public String buildGithubBody() {
-	// StringBuilder body = new StringBuilder();
-	//
-	// if (!parents.isEmpty()) {
-	// String parentsMd = METADATA_HEADER_PARENT;
-	// Iterator<Integer> parentsItr = parents.iterator();
-	// while (parentsItr.hasNext()) {
-	// parentsMd = parentsMd + "#" + parentsItr.next();
-	// if (parentsItr.hasNext()) {
-	// parentsMd = parentsMd + ", ";
-	// }
-	// }
-	// body.append(parentsMd + "\n");
-	// }
-	//
-	// body.append(METADATA_SEPERATOR + "\n");
-	// body.append(getDescription());
-	// return body.toString();
-	// }
 }
