@@ -109,15 +109,9 @@ public class ModelStub extends Model{
 	private void updateCachedList(List list, List newList){
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	list.removeAll(removed);
-	        	newList.stream()
-	        	       .forEach(item -> updateCachedListItem((Listable)item, list));
-	        }
-	   });
-		
+    	list.removeAll(removed);
+    	newList.stream()
+    	       .forEach(item -> updateCachedListItem((Listable)item, list));
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -73,10 +73,7 @@ public class TurboIssueEdit extends TurboIssueCommand{
 						+ "Please reload and enter your descripton again.");
 			}
 			
-			Platform.runLater(() -> {
-				//Must be run on application thread since this triggers ui updates.
-				model.get().updateCachedIssue(latestIssue);
-			});
+			model.get().updateCachedIssue(latestIssue);
 			return true;
 		} catch (IOException e) {
 			if(e instanceof SocketTimeoutException | e instanceof UnknownHostException){
