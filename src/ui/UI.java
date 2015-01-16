@@ -378,6 +378,7 @@ public class UI extends Application {
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		ServiceManager.getInstance().stopModelUpdate();
+		repoSelector.setDisable(true);
 		
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
@@ -394,26 +395,30 @@ public class UI extends Application {
 					latch.await();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				} 
+				}
 				return true;
 			}
 		};
+		
 		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
 			
 		task.setOnSucceeded(wse -> {
+			repoSelector.setDisable(false);
 			repoSelector.refreshComboBoxContents();
+
 			StatusBar.displayMessage("Issues loaded successfully!");
 			ServiceManager.getInstance().setupAndStartModelUpdate();
 		});
 			
 		task.setOnFailed(wse -> {
+			repoSelector.setDisable(false);
+
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);
 			StatusBar.displayMessage("An error occurred: " + err);
 		});
-
 	}
 }
