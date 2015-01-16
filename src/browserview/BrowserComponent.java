@@ -143,7 +143,7 @@ public class BrowserComponent {
 		if (file.isPresent()) {
 			executeJavaScript(file.get());
 		} else {
-			System.out.println("Failed to read script for hiding elements; did not execute");
+			logger.info("Failed to read script for hiding elements; did not execute");
 		}
 	}
 
@@ -287,6 +287,7 @@ public class BrowserComponent {
 		
 		File f = new File(binaryFileName);
 		if(!f.exists()) {
+			logger.info("Could not find Chrome driver binary");
 			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream("ui/issuepanel/expanded/" + binaryFileName);
 			OutputStream out;
 			try {
@@ -297,9 +298,9 @@ public class BrowserComponent {
 			} catch (IOException e) {
 				logger.error("Could not load Chrome driver binary! " + e.getLocalizedMessage(), e);
 			}
-			System.out.println("Could not find " + binaryFileName + "; extracted it from jar");
+			logger.info("Extracted " + binaryFileName + " from jar");
 		} else {
-			System.out.println("Located " + binaryFileName);
+			logger.info("Located " + binaryFileName);
 		}
 		
 		System.setProperty("webdriver.chrome.driver", binaryFileName);

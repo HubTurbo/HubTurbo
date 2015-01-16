@@ -36,7 +36,6 @@ public class ModelStub extends Model{
 	
 	public boolean loadComponents(IRepositoryIdProvider repoId){
 		this.repoId = repoId;
-		System.out.println("model "+repoId);
 		return true;
 	}
 	

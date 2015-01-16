@@ -2,15 +2,12 @@ package storage;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import javafx.collections.ObservableList;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -50,14 +47,15 @@ public class DataCacheFileHandler {
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
 			.create();
 
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
-			
-			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
-			
-			bufferedReader.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+		String filename = getFileName(FILE_DATA_CACHE, this.repoId);
+		if (new File(filename).exists()) {
+			try {
+				BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+				repo = gson.fromJson(bufferedReader, TurboRepoData.class);
+				bufferedReader.close();
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		}
 	}
 	
@@ -90,21 +88,16 @@ public class DataCacheFileHandler {
 			writer.close();
 			logger.info("Done writing to file for repo: " + repoIdString);
 			
-			File file = new File(getFileName(FILE_DATA_CACHE, repoIdString));
+			String filename = getFileName(FILE_DATA_CACHE, repoIdString);
+			File file = new File(filename);
 			
-			if (file.exists()) {
-				if (file.delete()) {
-					//System.out.println("Cache file is deleted");
-				} else {
-					logger.error("Failed to delete cache file");
-				}
+			if (file.exists() && !file.delete()) {
+				logger.error("Failed to delete cache file " + filename);
 			} 
 			
 			File newFile = new File(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
-			if (newFile.renameTo(file)) {
-				//System.out.println("Temp cache file is renamed!");
-			} else {
-				logger.error("Failed to rename temp cache file");
+			if (!newFile.renameTo(file)) {
+				logger.error("Failed to rename temp cache file " + filename);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

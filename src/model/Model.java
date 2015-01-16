@@ -320,6 +320,7 @@ public class Model {
 			TurboIssue newCached = new TurboIssue(issue, this);
 			updateCachedIssue(newCached);
 		}
+		logger.info("Updating cached issues");
 		dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	}
 		
@@ -468,6 +469,7 @@ public class Model {
 	}
 		
 	public void loadIssues(IRepositoryIdProvider repoId, List<Issue> ghIssues) {
+		logger.info("Loaded GitHub issues");
 		changeIssues(CollectionUtilities.getHubTurboIssueList(ghIssues));
 		dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, getCollaborators(), getLabels(), getMilestones(), getIssues());
 	}
