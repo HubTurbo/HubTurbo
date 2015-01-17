@@ -1,10 +1,13 @@
 package storage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
+
+import service.ServiceManager;
 
 /**
  * A singleton for managing all local files used by HubTurbo. It provides
@@ -12,10 +15,13 @@ import org.eclipse.egit.github.core.RepositoryId;
  */
 public class DataManager {
 
-	private static final DataManager dataManagerInstance = new DataManager();
+	private static DataManager instance = null;
 	
 	public static DataManager getInstance() {
-		return dataManagerInstance;
+		if (instance == null) {
+			instance = new DataManager();
+		}
+		return instance;
 	}
 
 	private static final String FILE_CONFIG_SESSION = "session-config.json";
@@ -69,6 +75,27 @@ public class DataManager {
 
 	public String getUserAlias(String user) {
 		return localConfiguration.getAlias(user);
+	}
+	
+	private String getCurrentRepoId() {
+		return ServiceManager.getInstance().getRepoId().generateId();
+	}
+
+	public void addPanelSet(String name, List<String> filterExprs) {
+		assert name != null && filterExprs != null;
+		localConfiguration.addPanelSet(getCurrentRepoId(), name, filterExprs);
+	}
+	
+	public List<String> getPanelSet(String name) {
+		return localConfiguration.getPanelSet(getCurrentRepoId(), name);
+	}
+	
+	public Map<String, List<String>> getAllPanelSets() {
+		return localConfiguration.getAllPanelSets(getCurrentRepoId());
+	}
+	
+	public void removePanelSet(String name) {
+		localConfiguration.removePanelSet(getCurrentRepoId(), name);
 	}
 
 	/**

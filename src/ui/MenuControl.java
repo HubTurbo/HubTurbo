@@ -3,6 +3,11 @@ package ui;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -21,68 +26,78 @@ import javafx.scene.input.KeyCombination;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
 
 import service.ServiceManager;
+import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
+import util.events.PanelSavedEvent;
+import util.events.PanelSavedEventHandler;
+
 
 public class MenuControl extends MenuBar {
 
 	private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
 	private final ColumnControl columns;
-	private final ScrollPane columnsScroll;
+	private final ScrollPane columnsScrollPane;
 	private final UI ui;
 
-	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScroll) {
+	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane) {
 		this.columns = columns;
-		this.columnsScroll = columnsScroll;
+		this.columnsScrollPane = columnsScrollPane;
 		this.ui = ui;
 		createMenuItems();
 	}
-	
+
 	private void createMenuItems() {
 		Menu newMenu = new Menu("New");
 		newMenu.getItems().addAll(createNewMenuItems());
 
-		Menu view = new Menu("View");
-		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createColumnsMenuItem(), createDocumentationMenuItem());
+		Menu panels = createPanelsMenu();
 
-		getMenus().addAll(newMenu, view);
+		Menu view = new Menu("View");
+		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
+
+		getMenus().addAll(newMenu, panels, view);
 	}
 
-
-	private MenuItem createColumnsMenuItem() {
+	private Menu createPanelsMenu() {
 		Menu cols = new Menu("Panels");
 
-		MenuItem createLeft = new MenuItem("Create Panel (Left)");
+		MenuItem createLeft = new MenuItem("Create (Left)");
 		createLeft.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Create Panel (Left)");
+			logger.info("Menu: Panels > Create (Left)");
 			columns.createNewPanelAtStart();
-			columnsScroll.setHvalue(columnsScroll.getHmin());
+			columnsScrollPane.setHvalue(columnsScrollPane.getHmin());
 		});
-		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
+				KeyCombination.SHIFT_DOWN));
 
-		MenuItem createRight = new MenuItem("Create Panel");
+		MenuItem createRight = new MenuItem("Create");
 		createRight.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Create Panel");
+			logger.info("Menu: Panels > Create");
 			columns.createNewPanelAtEnd();
-			// listener is used as columnsScroll's Hmax property doesn't update synchronously 
+			// listener is used as columnsScroll's Hmax property doesn't update
+			// synchronously
 			ChangeListener<Number> listener = new ChangeListener<Number>() {
 				@Override
-				public void changed(ObservableValue<? extends Number> arg0,
-						Number arg1, Number arg2) {
-					for (Node child : columnsScroll.getChildrenUnmodifiable()) {
+				public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+					for (Node child : columnsScrollPane.getChildrenUnmodifiable()) {
 						if (child instanceof ScrollBar) {
 							ScrollBar scrollBar = (ScrollBar) child;
-							if (scrollBar.getOrientation() == Orientation.HORIZONTAL &&
-									scrollBar.visibleProperty().get()) {
-								columnsScroll.setHvalue(columnsScroll.getHmax());
+							if (scrollBar.getOrientation() == Orientation.HORIZONTAL
+									&& scrollBar.visibleProperty().get()) {
+								columnsScrollPane.setHvalue(columnsScrollPane.getHmax());
 								break;
-							}			
+							}
 						}
 					}
 					columns.widthProperty().removeListener(this);
@@ -92,15 +107,119 @@ public class MenuControl extends MenuBar {
 		});
 		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
-		MenuItem closeColumn = new MenuItem("Close Panel");
+		MenuItem closeColumn = new MenuItem("Close");
 		closeColumn.setOnAction(e -> {
-			logger.info("Menu: View > Panels > Close Panel");
+			logger.info("Menu: Panels > Close");
 			columns.closeCurrentColumn();
 		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 
-		cols.getItems().addAll(createRight, createLeft, closeColumn);
+		Menu sets = new Menu("Sets");
+		sets.getItems().addAll(createPanelsSetsMenu());
+		
+		cols.getItems().addAll(createRight, createLeft, closeColumn, sets);
 		return cols;
+	}
+	
+	/**
+	 * Called upon the Panels > Sets > Save being clicked
+	 */
+	private void onPanelSetSave() {
+		logger.info("Menu: Panels > Sets > Save");
+
+		List<String> filterStrings = getCurrentFilterExprs();
+	    
+	    if (!filterStrings.isEmpty()) {
+	    	Optional<String> response = Dialogs.create()
+	            .title("Panel Set Name")
+	            .lightweight()
+	            .masthead("Please name this panel set")
+	            .message("What should this panel set be called?").showTextInput();
+	         
+	    	if (response.isPresent()) {
+	        	DataManager.getInstance().addPanelSet(response.get(), filterStrings);
+	        	ui.triggerEvent(new PanelSavedEvent());
+	        	logger.info("New panel set " + response.get() + " saved, containing " + filterStrings);
+	        	return;
+	    	}
+	    }
+    	logger.info("Did not save new panel set");
+	}
+	
+	/**
+	 * Called upon the Panels > Sets > Open being clicked
+	 */
+	private void onPanelSetOpen(String panelSetName, List<String> filterSet) {
+		logger.info("Menu: Panels > Sets > Open > " + panelSetName);
+
+		columns.closeAllColumns();
+		columns.openColumnsWithFilters(filterSet);
+	}
+
+	/**
+	 * Called upon the Panels > Sets > Delete being clicked
+	 */
+	private void onPanelSetDelete(String panelSetName) {
+		logger.info("Menu: Panels > Sets > Delete > " + panelSetName);
+
+		Action response = Dialogs.create().title("Confirmation")
+				.masthead("Delete panel set '" + panelSetName + "'?")
+				.message("Are you sure you want to delete this panelSet?")
+				.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO }).showConfirm();
+
+		if (response == Dialog.Actions.YES) {
+			DataManager.getInstance().removePanelSet(panelSetName);
+			ui.triggerEvent(new PanelSavedEvent());
+			logger.info(panelSetName + " was deleted");
+		} else {
+			logger.info(panelSetName + " was not deleted");
+		}
+	}
+
+	private MenuItem[] createPanelsSetsMenu() {
+		MenuItem save = new MenuItem("Save");
+		save.setOnAction(e -> onPanelSetSave());
+		
+		Menu open = new Menu("Open");
+		Menu delete = new Menu("Delete");
+
+		ui.registerEvent(new PanelSavedEventHandler() {
+			@Override
+			public void handle(PanelSavedEvent e) {
+				open.getItems().clear();
+				delete.getItems().clear();
+
+				Map<String, List<String>> panelSets = DataManager.getInstance().getAllPanelSets();
+
+				for (final String panelSetName : panelSets.keySet()) {
+					final List<String> filterSet = panelSets.get(panelSetName);
+					
+					MenuItem openItem = new MenuItem(panelSetName);
+					openItem.setOnAction(e1 -> onPanelSetOpen(panelSetName, filterSet));
+					open.getItems().add(openItem);
+					
+					MenuItem deleteItem = new MenuItem(panelSetName);
+					deleteItem.setOnAction(e1 -> onPanelSetDelete(panelSetName));
+					delete.getItems().add(deleteItem);
+				}
+			}
+		});
+
+		return new MenuItem[] {save, open, delete};
+	}
+
+	/**
+	 * Returns the list of filter strings currently showing the user interface
+	 * @return
+	 */
+	private List<String> getCurrentFilterExprs() {
+		return columns.getChildren().stream().flatMap(c -> {
+			if (c instanceof IssueColumn) {
+				return Stream.of(((IssueColumn) c).getCurrentFilterString());
+			} else {
+				return Stream.of();
+			}
+		}).collect(Collectors.toList());
 	}
 
 	private MenuItem createDocumentationMenuItem() {
@@ -112,7 +231,7 @@ public class MenuControl extends MenuBar {
 		documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		return documentationMenuItem;
 	}
-	
+
 	private MenuItem createRefreshMenuItem() {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
@@ -123,19 +242,19 @@ public class MenuControl extends MenuBar {
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
 	}
-	
+
 	private MenuItem createForceRefreshMenuItem() {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
 		forceRefreshMenuItem.setOnAction((e) -> {
 			triggerForceRefreshProgressDialog();
 		});
-		
+
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
 	}
-	
+
 	private void triggerForceRefreshProgressDialog() {
-		Task<Boolean> task = new Task<Boolean>(){
+		Task<Boolean> task = new Task<Boolean>() {
 			@Override
 			protected Boolean call() throws IOException {
 				try {
@@ -161,21 +280,22 @@ public class MenuControl extends MenuBar {
 			private void handleSocketTimeoutException(Exception e) {
 				Platform.runLater(() -> {
 					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("Internet Connection is down", 
+					DialogMessage.showWarningDialog("Internet Connection is down",
 							"Timeout while loading items from github. Please check your internet connection.");
-					
+
 				});
 			}
 
 			private void handleUnknownHostException(Exception e) {
 				Platform.runLater(() -> {
 					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("No Internet Connection", 
+					DialogMessage.showWarningDialog("No Internet Connection",
 							"Please check your internet connection and try again");
 				});
 			}
 		};
-		DialogMessage.showProgressDialog(task, "Reloading issues for current repo... This may take awhile, please wait.");
+		DialogMessage.showProgressDialog(task,
+				"Reloading issues for current repo... This may take awhile, please wait.");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
@@ -203,6 +323,6 @@ public class MenuControl extends MenuBar {
 		});
 		newMilestoneMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
 
-		return new MenuItem[] {newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem};
+		return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
 	}
 }
