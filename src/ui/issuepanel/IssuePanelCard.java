@@ -1,14 +1,7 @@
 package ui.issuepanel;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ListChangeListener;
-import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -39,7 +32,6 @@ public class IssuePanelCard extends VBox {
 	
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
-	private ArrayList<Object> changeListeners = new ArrayList<Object>();
 	private IssueColumn parentPanel;
 
 	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel) {
@@ -53,7 +45,6 @@ public class IssuePanelCard extends VBox {
 		issueTitle.setWrappingWidth(CARD_WIDTH);
 		issueTitle.getStyleClass().add("issue-panel-name");
 		if (!issue.isOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
-		issue.titleProperty().addListener(new WeakChangeListener<String>(createIssueTitleListener(issue, issueTitle)));
 	
 		setupIssueDetailsBox();
 		
@@ -66,7 +57,6 @@ public class IssuePanelCard extends VBox {
 				Text issueFeed = new Text(feed);
 				issueFeed.setWrappingWidth(CARD_WIDTH);
 				issueFeed.getStyleClass().add("issue-panel-feed");
-				issue.activityFeedProperty().addListener(new WeakChangeListener<String>(createIssueFeedListener(issue, issueFeed)));
 				getChildren().addAll(issueTitle, issueDetails, issueFeed);
 			} else {
 				getChildren().addAll(issueTitle, issueDetails);
@@ -107,11 +97,6 @@ public class IssuePanelCard extends VBox {
 		issueDetails.setPrefWrapLength(CARD_WIDTH);
 		issueDetails.setHgap(3);
 		
-		issue.getLabelsReference().addListener(new WeakListChangeListener<TurboLabel>(createLabelsChangeListener()));
-		issue.parentIssueProperty().addListener(new WeakChangeListener<Number>(createParentsChangeListener()));
-		if (issue.getMilestone() != null) {
-			issue.getMilestone().titleProperty().addListener(new WeakChangeListener<String>(createMilestoneChangeListener()));
-		}
 		updateDetails();
 	}
 	
@@ -128,10 +113,8 @@ public class IssuePanelCard extends VBox {
 			Label labelText = new Label(label.getName());
 			labelText.getStyleClass().add("labels");
 			labelText.setStyle(label.getStyle());
-			label.nameProperty().addListener(new WeakChangeListener<String>(createLabelNameListener(labelText)));
 			if (label.getGroup() != null) {
 				Tooltip groupTooltip = new Tooltip(label.getGroup());
-				label.groupProperty().addListener(new WeakChangeListener<String>(createLabelGroupListener(groupTooltip)));
 				labelText.setTooltip(groupTooltip);
 			}
 			issueDetails.getChildren().add(labelText);
@@ -164,118 +147,5 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(assignee);
 		}
 		
-	}
-	
-	private ListChangeListener<TurboLabel> createLabelsChangeListener(){
-		WeakReference<IssuePanelCard> that = new WeakReference<IssuePanelCard>(this);
-		ListChangeListener<TurboLabel> listener = new ListChangeListener<TurboLabel>() {
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends TurboLabel> arg0) {
-				if(that.get() != null){
-					that.get().updateDetails();
-				}
-			}
-		};
-		changeListeners.add(listener);
-		return listener;
-	}
-	
-	private ChangeListener<String> createLabelNameListener(Label labelText){
-		WeakReference<Label> labelTextRef = new WeakReference<Label>(labelText);
-		ChangeListener<String> listener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				Label labelText = labelTextRef.get();
-				if(labelText != null){
-					labelText.setText(newValue);
-				}
-			}
-		};
-		changeListeners.add(listener);
-		return listener;
-	}
-
-	private ChangeListener<String> createLabelGroupListener(Tooltip groupTooltip) {
-		WeakReference<Tooltip> groupTooltipRef = new WeakReference<Tooltip>(groupTooltip);
-		ChangeListener<String> listener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				Tooltip groupToolTip = groupTooltipRef.get();
-				if(groupToolTip != null){
-					groupToolTip.setText(newValue);
-				}
-			}
-		};
-		changeListeners.add(listener);
-		return listener;
-	}
-	
-	private ChangeListener<Number> createParentsChangeListener(){
-		WeakReference<IssuePanelCard> that = new WeakReference<IssuePanelCard>(this);
-		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> integerProperty,
-					Number oldValue, Number newValue) {
-				if(that.get() != null){
-					that.get().updateDetails();
-				}
-			}
-		};
-		changeListeners.add(changeListener);
-		return changeListener;
-	}
-	
-	private ChangeListener<String> createMilestoneChangeListener() {
-		WeakReference<IssuePanelCard> that = new WeakReference<IssuePanelCard>(this);
-		ChangeListener<String> changeListener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				if(that.get() != null){
-					that.get().updateDetails();
-				}
-			}
-		};
-		changeListeners.add(changeListener);
-		return changeListener;
-	}
-
-	private ChangeListener<String> createIssueTitleListener(TurboIssue issue, Text issueName){
-		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		ChangeListener<String> titleChangeListener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				TurboIssue issue = issueRef.get();
-				if(issue != null){
-					issueName.setText("#" + issue.getId() + " " + newValue);
-				}
-			}
-		};
-		changeListeners.add(titleChangeListener);
-		return titleChangeListener;
-	}
-
-	private ChangeListener<String> createIssueFeedListener(TurboIssue issue, Text issueFeed){
-		WeakReference<TurboIssue> issueRef = new WeakReference<TurboIssue>(issue);
-		ChangeListener<String> feedChangeListener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> stringProperty,
-					String oldValue, String newValue) {
-				TurboIssue issue = issueRef.get();
-				if(issue != null){
-					issueFeed.setText(issue.getActivityFeed());
-				}
-			}
-		};
-		changeListeners.add(feedChangeListener);
-		return feedChangeListener;
 	}
 }
