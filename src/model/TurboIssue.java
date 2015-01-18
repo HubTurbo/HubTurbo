@@ -11,12 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -116,63 +110,47 @@ public class TurboIssue implements Listable {
 		return pullRequest != null && pullRequest.getUrl() != null;
 	}
 
-	private IntegerProperty id = new SimpleIntegerProperty();
+	private int id = 0;
 
 	public final int getId() {
-		return id.get();
-	}
-
-	public final void setId(int value) {
-		id.set(value);
-	}
-
-	public IntegerProperty idProperty() {
 		return id;
 	}
 
-	private StringProperty title = new SimpleStringProperty();
+	public final void setId(int value) {
+		id = value;
+	}
+
+	private String title = "";
 
 	public final String getTitle() {
-		return title.get();
-	}
-
-	public final void setTitle(String value) {
-		title.set(value);
-	}
-
-	public StringProperty titleProperty() {
 		return title;
 	}
 
-	private StringProperty activityFeed = new SimpleStringProperty();
+	public final void setTitle(String value) {
+		title = value;
+	}
+
+	private String activityFeed = "";
 
 	public final String getActivityFeed() {
-		return activityFeed.get();
+		return activityFeed;
 	}
 
 	public final void setActivityFeed(String value, LocalDateTime time) {
 		lastModifiedTime = time;
-		activityFeed.set(value);
+		activityFeed = value;
 	}
 
-	public StringProperty activityFeedProperty() {
-		return activityFeed;
-	}
-
-	private StringProperty description = new SimpleStringProperty();
+	private String description = "";
 
 	public final String getDescription() {
-		return description.get();
+		return description;
 	}
 
 	public final void setDescription(String value) {
 		cachedDescriptionMarkup = null; // markup is invalid since the issue's
 										// description is to be overwritten
-		description.set(value);
-	}
-
-	public StringProperty descriptionProperty() {
-		return description;
+		description = value;
 	}
 
 	private String cachedDescriptionMarkup;
@@ -195,18 +173,14 @@ public class TurboIssue implements Listable {
 		this.cachedDescriptionMarkup = descMarkup;
 	}
 
-	private IntegerProperty parentIssue = new SimpleIntegerProperty();
+	private int parentIssue = 0;
 
 	public int getParentIssue() {
-		return parentIssue.get();
-	}
-
-	public final IntegerProperty parentIssueProperty() {
 		return parentIssue;
 	}
 
 	public final void setParentIssue(int parent) {
-		parentIssue.set(parent);
+		parentIssue = parent;
 	}
 
 	public final TurboIssue parentReference() {
@@ -236,18 +210,14 @@ public class TurboIssue implements Listable {
 		return depth;
 	}
 
-	private BooleanProperty state = new SimpleBooleanProperty();
+	private boolean state = false;
 
-	public final Boolean isOpen() {
-		return state.get();
-	}
-
-	public final void setOpen(Boolean value) {
-		state.set(value);
-	}
-
-	public BooleanProperty openProperty() {
+	public final boolean isOpen() {
 		return state;
+	}
+
+	public final void setOpen(boolean value) {
+		state = value;
 	}
 
 	private TurboUser assignee;
@@ -544,7 +514,7 @@ public class TurboIssue implements Listable {
 		return description;
 	}
 
-	public static Integer extractIssueParent(String issueBody) {
+	public static int extractIssueParent(String issueBody) {
 		if (issueBody == null) {
 			return -1;
 		}
@@ -799,98 +769,7 @@ public class TurboIssue implements Listable {
 	public String getListName() {
 		return "#" + getId() + " " + getTitle();
 	}
+	
+	
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TurboIssue other = (TurboIssue) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (getId() != other.getId())
-			return false;
-		return true;
-	}
-
-	/**
-	 * Deprecated methods
-	 * */
-	// private ObservableList<Integer> parents =
-	// FXCollections.observableArrayList();
-	// public ObservableList<Integer> getParents() {
-	// return FXCollections.observableArrayList(parents);
-	// }
-	// public ObservableList<Integer> getParentsReference(){
-	// return parents;
-	// }
-	//
-	// public void setParents(ObservableList<Integer> parentNumbers) {
-	// if (this.parents == null) {
-	// this.parents = parentNumbers;
-	// } else if (parentNumbers != this.parents) {
-	// this.parents.clear();
-	// if(!parentNumbers.isEmpty()){
-	// this.parents.add(parentNumbers.get(0));
-	// }
-	// }
-	// }
-	//
-	// public void addParent(Integer parentId){
-	// //Only single parent for now. This might be extended in future to allow
-	// multiple parents
-	// this.parents.clear();
-	// this.parents.add(parentId);
-	// }
-	//
-	// private ObservableList<Integer> extractParentNumbers(String issueBody) {
-	// ObservableList<Integer> parents = FXCollections.observableArrayList();
-	// if (issueBody == null) return parents;
-	// String[] lines = issueBody.split(REGEX_SPLIT_LINES);
-	// int seperatorLineIndex = getSeperatorIndex(lines);
-	// for (int i = 0; i < seperatorLineIndex; i++) {
-	// String line = lines[i];
-	// if (line.startsWith(METADATA_HEADER_PARENT)) {
-	// String value = line.replace(METADATA_HEADER_PARENT, "");
-	// String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-	// for (int j = 0; j < valueTokens.length; j++) {
-	// if (valueTokens[j].trim().isEmpty()) continue;
-	// parents.add(Integer.parseInt(valueTokens[j].trim()));
-	// }
-	// }
-	// }
-	// return parents;
-	// }
-
-	// public String buildGithubBody() {
-	// StringBuilder body = new StringBuilder();
-	//
-	// if (!parents.isEmpty()) {
-	// String parentsMd = METADATA_HEADER_PARENT;
-	// Iterator<Integer> parentsItr = parents.iterator();
-	// while (parentsItr.hasNext()) {
-	// parentsMd = parentsMd + "#" + parentsItr.next();
-	// if (parentsItr.hasNext()) {
-	// parentsMd = parentsMd + ", ";
-	// }
-	// }
-	// body.append(parentsMd + "\n");
-	// }
-	//
-	// body.append(METADATA_SEPERATOR + "\n");
-	// body.append(getDescription());
-	// return body.toString();
-	// }
 }
