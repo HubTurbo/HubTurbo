@@ -109,6 +109,11 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(icon);
 		}
 		
+		if (issue.getNumOfComments() > 0){
+			Text commentCount = new Text(issue.getNumOfComments() + " comments");
+			issueDetails.getChildren().add(commentCount);
+		}
+		
 		for (TurboLabel label : issue.getLabels()) {
 			Label labelText = new Label(label.getName());
 			labelText.getStyleClass().add("labels");
