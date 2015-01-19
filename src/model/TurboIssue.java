@@ -633,7 +633,6 @@ public class TurboIssue implements Listable {
 					eventSeq.clear();
 				}
 				eventSeq.add(event.getType());
-				System.out.println("Original Seq: " + event.getType().toString());
 				currentMessage = formatMessage(currentActor, currentPTime, event);
 				if(currentMessage != null && !currentMessage.isEmpty() 
 										  && !currentMessage.equals(previousMessage)) {
@@ -652,25 +651,21 @@ public class TurboIssue implements Listable {
 		int bufferIndex = 0;
 		
 		for (IssueEventType eventType : inputSeq) {
-			System.out.println("Process Seq: " + eventType.toString());
 			switch (eventType) {
 			case Milestoned: 
 			case Demilestoned: 
 				if (milestonedCount > 0 || demilestonedCount > 0) {
-					System.out.println("Actual Add Seq: " + eventType.toString());
 					outputBuffer.add(aggregateMilestoneEvent());
 				}
 				break;
 			case Labeled:
 			case Unlabeled:
 				if (labeledCount > 0 || unlabeledCount > 0) {
-					System.out.println("Actual Add Seq: " + eventType.toString());
 					outputBuffer.add(aggregateLabelEvent());
 				}
 				break;
 			default:
 				if (bufferIndex < inputBuffer.size()) {
-					System.out.println("Actual Add Seq: " + eventType.toString());
 					outputBuffer.add(inputBuffer.get(bufferIndex));
 					++bufferIndex;
 				}
