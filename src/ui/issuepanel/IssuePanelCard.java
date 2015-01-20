@@ -25,6 +25,7 @@ public class IssuePanelCard extends VBox {
 	private static final int HOURS_AGO = 24;
 	private static final int MINUTES_AGO = 0;
 	private static final int SECONDS_AGO = 0;
+	private static final String OCTICON_COMMENT = "\uf02b";
 	/**
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
@@ -110,7 +111,10 @@ public class IssuePanelCard extends VBox {
 		}
 		
 		if (issue.getNumOfComments() > 0){
-			Text commentCount = new Text(issue.getNumOfComments() + " comments");
+			Label commentIcon = new Label(OCTICON_COMMENT);
+			commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
+			Text commentCount = new Text(""+ issue.getNumOfComments());
+			issueDetails.getChildren().add(commentIcon);
 			issueDetails.getChildren().add(commentCount);
 		}
 		
