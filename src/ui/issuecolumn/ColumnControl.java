@@ -113,6 +113,7 @@ public class ColumnControl extends HBox {
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
+		currentlySelectedColumn = Optional.of(index);
 		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
