@@ -105,11 +105,7 @@ public class ColumnControl extends HBox {
 	}
 	
 	private IssueColumn addColumn() {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, getChildren().size(), dragAndDropExecutor);
-		getChildren().add(panel);
-		panel.setItems(model.getIssues());
-		ui.triggerEvent(new ColumnChangeEvent());
-		return panel;
+		return addColumnAt(getChildren().size());
 	}
 
 	public IssueColumn addColumnAt(int index) {
