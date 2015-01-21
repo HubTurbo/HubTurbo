@@ -390,7 +390,7 @@ public class UI extends Application {
 				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
 			
 				final CountDownLatch latch = new CountDownLatch(1);
-				ServiceManager.getInstance().getModel().loadComponents(repoId, items);
+				ServiceManager.getInstance().getModel().populateComponents(repoId, items);
 				Platform.runLater(() -> {
 					columns.restoreColumns();
 					triggerEvent(new PanelSavedEvent());
