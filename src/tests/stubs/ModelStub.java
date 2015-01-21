@@ -1,4 +1,4 @@
-package stubs;
+package tests.stubs;
 
 import java.util.ArrayList;
 import java.util.HashMap;

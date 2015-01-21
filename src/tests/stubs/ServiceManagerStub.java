@@ -1,4 +1,4 @@
-package stubs;
+package tests.stubs;
 
 import java.io.IOException;
 import java.util.ArrayList;

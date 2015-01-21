@@ -47,7 +47,7 @@ import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import storage.DataCacheFileHandler;
 import storage.TurboRepoData;
-import stubs.ServiceManagerStub;
+import tests.stubs.ServiceManagerStub;
 import ui.UIReference;
 import ui.components.StatusBar;
 import util.events.RefreshDoneEvent;
