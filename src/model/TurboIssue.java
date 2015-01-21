@@ -17,13 +17,13 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import service.IssueEventType;
 import service.ServiceManager;
+import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
 
@@ -42,9 +42,25 @@ public class TurboIssue implements Listable {
 	private static final String NEW_LINE = "\n";
 	private static final int REFRESH_FEED_MINUTES = 15;
 
-	private List<IssueEvent> issueFeeds = new ArrayList<IssueEvent>();
+	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
 	private boolean hasAddedFeeds = false;
 	private LocalDateTime lastModifiedTime;
+	private String previousActor;
+	private String previousPTime;
+	private String previousMessage;
+	private String currentActor;
+	private String currentPTime;
+	private String currentMessage;
+
+	private ArrayList<String> labelsAdded = new ArrayList<String>();
+	private ArrayList<String> labelsRemoved = new ArrayList<String>();
+	private ArrayList<String> milestonesAdded = new ArrayList<String>();
+	private ArrayList<String> milestonesRemoved = new ArrayList<String>();
+
+	private int labeledCount = 0;
+	private int unlabeledCount = 0;
+	private int milestonedCount = 0;
+	private int demilestonedCount = 0;
 
 	/*
 	 * Attributes, Getters & Setters
@@ -586,8 +602,8 @@ public class TurboIssue implements Listable {
 	 * Private Methods
 	 */
 
-	private List<IssueEvent> getGithubFeed() {
-		List<IssueEvent> feeds = new ArrayList<IssueEvent>();
+	private List<TurboIssueEvent> getGithubFeed() {
+		List<TurboIssueEvent> feeds = new ArrayList<TurboIssueEvent>();
 		try {
 			feeds = ServiceManager.getInstance().getFeeds(getId());
 		} catch (Exception e) {
@@ -600,88 +616,198 @@ public class TurboIssue implements Listable {
 		LocalDateTime currentTime = LocalDateTime.now();
 		LocalDateTime cutoffTime = currentTime.minusHours(hours)
 				.minusMinutes(minutes).minusSeconds(seconds);
-
 		ArrayList<String> feedMessages = new ArrayList<String>();
-		String previousMessage = "";
-		String currentMessage = "";
-		boolean isFirstEvent = true;
-		for (IssueEvent event : issueFeeds) {
-			if (LocalDateTime.ofInstant(event.getCreatedAt().toInstant(),
+		ArrayList<String> tempMessages = new ArrayList<String>();
+		ArrayList<IssueEventType> eventSeq = new ArrayList<IssueEventType>();
+
+		previousActor = "";
+		previousPTime = "";
+		previousMessage = "";
+		currentMessage = "";
+		for (TurboIssueEvent event : issueFeeds) {
+			if (LocalDateTime.ofInstant(event.getDate().toInstant(),
 					ZoneId.systemDefault()).isAfter(cutoffTime)) {
-				currentMessage = formatMessage(event);
-				if (isFirstEvent) {
-					feedMessages.add(currentMessage);
-					isFirstEvent = false;
-					previousMessage = currentMessage;
-				} else if (!currentMessage.equals(previousMessage)) {
-					feedMessages.add(currentMessage);
+				if (isNewEvent(event)) {
+					feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
+					tempMessages.clear();
+					eventSeq.clear();
+				}
+				eventSeq.add(event.getType());
+				currentMessage = formatMessage(currentActor, currentPTime, event);
+				if(currentMessage != null && !currentMessage.isEmpty() 
+										  && !currentMessage.equals(previousMessage)) {
+					tempMessages.add(currentMessage);
 					previousMessage = currentMessage;
 				}
 			}
 		}
-
+		feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
+		return outputReverseOrder(feedMessages);
+	}
+	
+	private ArrayList<String> outputToBuffer(ArrayList<String> inputBuffer, 
+			ArrayList<IssueEventType> inputSeq) {
+		ArrayList<String> outputBuffer = new ArrayList<String>();
+		int bufferIndex = 0;
+		
+		for (IssueEventType eventType : inputSeq) {
+			switch (eventType) {
+			case Milestoned: 
+			case Demilestoned: 
+				if (milestonedCount > 0 || demilestonedCount > 0) {
+					outputBuffer.add(aggregateMilestoneEvent());
+				}
+				break;
+			case Labeled:
+			case Unlabeled:
+				if (labeledCount > 0 || unlabeledCount > 0) {
+					outputBuffer.add(aggregateLabelEvent());
+				}
+				break;
+			default:
+				if (bufferIndex < inputBuffer.size()) {
+					outputBuffer.add(inputBuffer.get(bufferIndex));
+					++bufferIndex;
+				}
+			}
+		}
+		previousActor = currentActor;
+		previousPTime = currentPTime;
+		return outputBuffer;
+	}
+	
+	private String outputReverseOrder(ArrayList<String> bufferList) {
 		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = feedMessages.size() - 1; i > 0; i--) {
-			if (i == feedMessages.size()) {
-				stringBuffer.append(feedMessages.get(i - 1));
+		for (int i = bufferList.size(); i > 0; i--) {
+			if (i == bufferList.size()) {
+				stringBuffer.append(bufferList.get(i - 1));
 			} else {
-				stringBuffer.append(NEW_LINE + feedMessages.get(i - 1));
+				stringBuffer.append(NEW_LINE + bufferList.get(i - 1));
 			}
 		}
 		return stringBuffer.toString();
 	}
 
-	private String formatMessage(IssueEvent issueEvent) {
+	private boolean isNewEvent(TurboIssueEvent issueEvent) {
 		PrettyTime pt = new PrettyTime();
-		String timeString = pt.format(issueEvent.getCreatedAt());
-		String actorName = issueEvent.getActor().getLogin();
-		Issue issue = issueEvent.getIssue();
-		String milestoneTitle = "";
-		String message = "";
+		currentPTime = pt.format(issueEvent.getDate());
+		currentActor = issueEvent.getActor().getLogin();
+		if (currentActor.equalsIgnoreCase(previousActor) && currentPTime.equalsIgnoreCase(previousPTime)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-		switch (IssueEventType.fromString(issueEvent.getEvent())) {
+	private String aggregateLabelEvent() {
+		String affectedLabels;
+		String message;
+		if (labeledCount > 0 && unlabeledCount > 0) {
+			affectedLabels = labelsAdded.get(0);
+			for (int i=1; i < labelsAdded.size(); ++i) {
+				affectedLabels += ", " + labelsAdded.get(i);
+			}
+			String removedLabels = labelsRemoved.get(0);
+			for (int i=1; i < labelsRemoved.size(); ++i) {
+				removedLabels += ", " + labelsRemoved.get(i);
+			}
+			message = String.format("%s added %s and removed %s labels %s.", 
+					previousActor, affectedLabels, removedLabels, previousPTime);
+		} else if (labeledCount == 1) {
+			affectedLabels = labelsAdded.get(0);
+			message = String.format("%s added %s label %s.", 
+					previousActor, affectedLabels, previousPTime);
+		} else if (labeledCount > 1) {
+			affectedLabels = labelsAdded.get(0);
+			for (int i=1; i < labelsAdded.size(); ++i) {
+				affectedLabels += ", " + labelsAdded.get(i);
+			}
+			message = String.format("%s added %s labels %s.", 
+					previousActor, affectedLabels, previousPTime);
+		} else if (unlabeledCount == 1) {
+			affectedLabels = labelsRemoved.get(0);
+			message = String.format("%s removed %s label %s.", 
+					previousActor, affectedLabels, previousPTime);
+		} else { 
+			// (unlabeledCount > 1)
+			affectedLabels = labelsRemoved.get(0);
+			for (int i=1; i < labelsRemoved.size(); ++i) {
+				affectedLabels += ", " + labelsRemoved.get(i);
+			}
+			message = String.format("%s removed %s labels %s.", 
+					previousActor, affectedLabels, previousPTime);
+		}
+		labeledCount = 0;
+		unlabeledCount = 0;
+		labelsAdded.clear();
+		labelsRemoved.clear();
+		return message;
+	}
+
+	private String aggregateMilestoneEvent() {
+		String affectedMilestones;
+		String message;
+		if (milestonedCount > 0 && demilestonedCount > 0) {
+			affectedMilestones = milestonesAdded.get(0);
+			for (int i=1; i < milestonesAdded.size(); ++i) {
+				affectedMilestones += ", " + milestonesAdded.get(i);
+			}
+			for (int i=0; i < milestonesRemoved.size(); ++i) {
+				affectedMilestones += ", " + milestonesRemoved.get(i);
+			}
+			message = String.format("%s modified the milestone: %s %s.", 
+					previousActor, affectedMilestones, previousPTime);
+		} else if (milestonedCount > 0) {
+			affectedMilestones = milestonesAdded.get(0);
+			for (int i=1; i < milestonesAdded.size(); ++i) {
+				affectedMilestones += ", " + milestonesAdded.get(i);
+			}
+			message = String.format("%s added to %s milestone %s.",
+					previousActor, affectedMilestones, previousPTime);
+		} else { 
+			// (demilestonedCount > 0)
+			affectedMilestones = milestonesRemoved.get(0);
+			for (int i=1; i < milestonesRemoved.size(); ++i) {
+				affectedMilestones += ", " + milestonesRemoved.get(i);
+			}
+			message = String.format("%s removed from %s milestone %s.", 
+					previousActor, affectedMilestones, previousPTime);
+		}
+		milestonedCount = 0;
+		demilestonedCount = 0;
+		milestonesAdded.clear();
+		milestonesRemoved.clear();
+		return message;
+	}
+
+	private String formatMessage(String actorName, String timeString, TurboIssueEvent issueEvent) {
+		String message = "";
+		switch (issueEvent.getType()) {
 		case Renamed:
-			message = String.format("%s renamed this issue %s.", actorName,
+			message = String.format("%s renamed this issue %s.", actorName, 
 					timeString);
 			break;
-		case Milestoned:
-			if (issue.getMilestone() != null) {
-				milestoneTitle = issue.getMilestone().getTitle();
-			}
-			message = String.format("%s added this issue to %s milestone %s.",
-					actorName, milestoneTitle, timeString);
+		case Milestoned: 
+			milestonedCount++;
+			milestonesAdded.add(issueEvent.getMilestoneTitle());
 			break;
-		case Demilestoned:
-			if (issue.getMilestone() != null) {
-				milestoneTitle = issue.getMilestone().getTitle();
-			}
-			message = String.format(
-					"%s removed this issue from %s milestone %s.", actorName,
-					milestoneTitle, timeString);
+		case Demilestoned: 
+			demilestonedCount++;
+			milestonesRemoved.add(issueEvent.getMilestoneTitle());
 			break;
 		case Labeled:
-			message = String.format("%s added label(s) %s.", actorName,
-					timeString);
+			labeledCount++;
+			labelsAdded.add(issueEvent.getLabelName());
 			break;
 		case Unlabeled:
-			message = String.format("%s removed label(s) %s.", actorName,
-					timeString);
+			unlabeledCount++;
+			labelsRemoved.add(issueEvent.getLabelName());
 			break;
 		case Assigned:
-			String assignee = "";
-			if (issue.getAssignee() != null) {
-				assignee = issue.getAssignee().getLogin();
-			}
-			if (actorName.equalsIgnoreCase(assignee)) {
-				message = String.format("%s self-assigned this issue %s.",
-						assignee, timeString);
-			} else {
-				message = String.format(
-						"%s was assigned by %s to this issue %s.", assignee,
-						actorName, timeString);
-			}
+			message = String.format("%s was assigned to this issue %s.", 
+					actorName, timeString);
 			break;
-		case Unassigned:
+		case Unassigned: 
 			message = String.format("%s was unassigned from this issue %s.",
 					actorName, timeString);
 			break;
@@ -706,18 +832,29 @@ public class TurboIssue implements Listable {
 					timeString);
 			break;
 		case Subscribed:
+			message = String.format("%s subscribed to receive notifications for this issue %s.", 
+					actorName, timeString);
+			break;
 		case Mentioned:
-			// message = String.format("%s commented on this issue %s.",
-			// actorName, timeString);
-			// break;
+			message = String.format("%s was mentioned %s.", actorName,
+					timeString);
+			break;
 		case Merged:
+			message = String.format("%s merged this issue %s.", 
+					actorName, timeString);
+			break;
 		case HeadRefDeleted:
+			message = String.format("%s deleted the pull request's branch %s.", 
+					actorName, timeString);
+			break;
 		case HeadRefRestored:
+			message = String.format("%s restored the pull request's branch %s.", 
+					actorName, timeString);
+			break;
 		default:
 			// Not yet implemented, or no events triggered
 			message = String.format("%s %s %s.", actorName,
-					issueEvent.getEvent(), timeString);
-			break;
+					issueEvent.getType().toString(), timeString);
 		}
 		return message;
 	}

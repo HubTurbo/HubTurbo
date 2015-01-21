@@ -83,7 +83,6 @@ public class ServiceManager {
 	public static final String KEY_MILESTONES = "milestones";
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
-	public static final int MAX_FEED = 10;
 	private GitHubClientExtended githubClient;
 	
 	private CollaboratorService collabService;
@@ -433,35 +432,9 @@ public class ServiceManager {
 	/**
 	 * Services for IssueEvent
 	 * */
-	public List<IssueEvent> getFeeds(int issueNum) throws IOException{
-		ArrayList<IssueEvent> eventList = new ArrayList<IssueEvent>();
-		String user = getRepoOwner();
-		String repo = getRepoName();
-		boolean toContinue = true;
-		PageIterator<IssueEvent> iter = issueService.pageIssueEvents(user, repo, issueNum);
-		if (iter != null && iter.hasNext()) {
-			for (Collection<IssueEvent> currentPage : iter) {
-				if (!currentPage.isEmpty()) {
-					for (IssueEvent event : currentPage) {
-						if (event != null) {
-							IssueEvent fetched = issueService.getIssueEvent(user, repo, event.getId());
-							if (fetched != null) {
-								if (eventList.size() < MAX_FEED) { 
-									eventList.add(fetched);
-								} else {
-									toContinue = false;
-									break;
-								}
-							}
-						}
-					}
-				}
-				if (!toContinue) {
-					break;
-				}
-			}
-		}
-		return eventList;
+	public List<TurboIssueEvent> getFeeds(int issueNum) throws IOException{
+		GitHubEventsResponse ghEventsResponse = issueService.getIssueEvents(getRepoId(), issueNum);
+		return ghEventsResponse.getTurboIssueEvents();
 	}
 
 	/**
