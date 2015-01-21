@@ -26,8 +26,10 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import storage.DataCacheFileHandler;
+import ui.UI;
 import util.CollectionUtilities;
 import util.DialogMessage;
+import util.events.ModelChangedEvent;
 
 
 public class Model {
@@ -43,9 +45,7 @@ public class Model {
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
-		
-	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
-	
+
 	protected IRepositoryIdProvider repoId;
 	
 	private String issuesETag = null;
@@ -159,33 +159,21 @@ public class Model {
 		loadIssues((List<Issue>)resources.get(ServiceManager.KEY_ISSUES));
 	}
 
-	public void applyMethodOnModelChange(Runnable method){
-		methodsOnChange.add(method);
-	}
-	
 	private void setupModelChangeListeners(){
-		WeakReference<Model> selfRef = new WeakReference<>(this);
-		//No need to use weak listeners because model is persistent through the lifetime of the application
 		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) ->{
-			selfRef.get().applyChangeMethods();
+			UI.getInstance().triggerEvent(new ModelChangedEvent());
 		}); 
 		issues.addListener((ListChangeListener.Change<? extends TurboIssue> c) ->{
-			selfRef.get().applyChangeMethods();
+			UI.getInstance().triggerEvent(new ModelChangedEvent());
 		});
 		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) ->{
-			selfRef.get().applyChangeMethods();
+			UI.getInstance().triggerEvent(new ModelChangedEvent());
 		});
 		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) ->{
-			selfRef.get().applyChangeMethods();
+			UI.getInstance().triggerEvent(new ModelChangedEvent());
 		});
 	}
 	
-	public void applyChangeMethods(){
-		for(Runnable method : methodsOnChange){
-			method.run();
-		}
-	}
-
 	public ObservableList<TurboIssue> getIssues() {
 		return issues;
 	}
@@ -447,7 +435,7 @@ public class Model {
 	
 	public void refresh(){
 		ServiceManager.getInstance().restartModelUpdate();
-		applyChangeMethods();
+		UI.getInstance().triggerEvent(new ModelChangedEvent());
 	}
 	
 	public void updateIssuesETag(String ETag) {

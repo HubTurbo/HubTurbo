@@ -1,6 +1,5 @@
 package ui.issuecolumn;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +17,8 @@ import ui.issuepanel.IssuePanel;
 import util.events.ColumnChangeEvent;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
+import util.events.ModelChangedEvent;
+import util.events.ModelChangedEventHandler;
 import util.events.RefreshDoneEvent;
 import util.events.RefreshDoneEventHandler;
 
@@ -65,9 +66,12 @@ public class ColumnControl extends HBox {
 	}
 	
 	private void setupModelChangeResponse(){
-		WeakReference<ColumnControl> selfRef = new WeakReference<>(this);
-		//No need for weak listeners because ColumnControl is persistent for the lifetime of the app
-		model.applyMethodOnModelChange(() -> selfRef.get().refresh());
+		ui.registerEvent(new ModelChangedEventHandler() {
+			@Override
+			public void handle(ModelChangedEvent e) {
+				refresh();
+			}
+		});
 	}
 	
 	public void restoreColumns() {
