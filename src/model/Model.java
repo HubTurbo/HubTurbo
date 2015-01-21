@@ -33,10 +33,9 @@ import util.DialogMessage;
 
 
 public class Model {
+	
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
-	public static final String STATE_ALL = "all";
-	public static final String STATE_OPEN = "open";
-	public static final String STATE_CLOSED = "closed";
+	
 	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
