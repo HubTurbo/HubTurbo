@@ -5,7 +5,6 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import model.Model;
 import model.TurboLabel;
@@ -23,10 +21,8 @@ import model.TurboUser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.Repository;
@@ -34,7 +30,6 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.ContentsService;
@@ -43,7 +38,6 @@ import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
-import service.updateservice.CommentUpdateService;
 import service.updateservice.ModelUpdater;
 import storage.DataCacheFileHandler;
 import storage.TurboRepoData;
@@ -525,30 +519,6 @@ public class ServiceManager {
 	}
 	
 	/**
-	 * Methods to work with comments data from github
-	 * */
-		
-	public CommentUpdateService getCommentUpdateService(int id, List<Comment> list){
-		return new CommentUpdateService(githubClient, id, list);
-	}
-	
-	public Comment createComment(int issueId, String comment) throws IOException{
-		if(repoId != null){
-			return (Comment)issueService.createComment(repoId, Integer.toString(issueId), comment);
-		}
-		return null;
-	}
-	
-	public String getMarkupForComment(Comment comment){
-		try {
-			return getContentMarkup(comment.getBody());
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return comment.getBody();
-		}
-	}
-	
-	/**
 	 * Gets events for a issue from GitHub, or returns
 	 * a cached version if already present.
 	 * @param issueId
@@ -560,58 +530,6 @@ public class ServiceManager {
 			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
 		}
 		return new ArrayList<>();
-	}
-	
-	/**
-	 * Gets comments for a issue from GitHub, or returns
-	 * a cached version if already present.
-	 * @param issueId
-	 * @return
-	 * @throws IOException
-	 */
-	public List<Comment> getComments(int issueId) throws IOException{
-		if(repoId != null){
-			List<Comment> cached = model.getCommentsListForIssue(issueId);
-			if(cached == null){
-				return getLatestComments(issueId);
-			}else{
-				return cached;
-			}
-		}
-		return new ArrayList<Comment>();
-	}
-	
-	/**
-	 * Gets comments from an issue from GitHub and updates the cache.
-	 * @param issueId
-	 * @return
-	 * @throws IOException
-	 */
-	private List<Comment> getLatestComments(int issueId) throws IOException{
-		if(repoId != null){
-			List<Comment> comments = issueService.getComments(repoId, issueId);
-			List<Comment> list =  comments.stream()
-						   				  .map(c -> {
-						   					  			c.setBodyHtml(getMarkupForComment(c));
-						   					  			return c;})
-						   				  .collect(Collectors.toList());
-			model.cacheCommentsListForIssue(list, issueId);
-			return list;
-		}
-		return new ArrayList<Comment>();
-	}
-	
-	public void deleteComment(long commentId) throws IOException{
-		if(repoId != null){
-			issueService.deleteComment(repoId, commentId);
-		}
-	}
-	
-	public Comment editComment(Comment comment) throws IOException{
-		if(repoId != null){
-			return issueService.editComment(repoId, comment);
-		}
-		return null;
 	}
 	
 	/**

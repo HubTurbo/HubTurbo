@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -18,7 +17,6 @@ import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -45,9 +43,7 @@ public class Model {
 	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
-	
-	private ConcurrentHashMap<Integer, List<Comment>> cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
-	
+		
 	private ArrayList<Runnable> methodsOnChange = new ArrayList<Runnable>();
 	
 	protected IRepositoryIdProvider repoId;
@@ -98,6 +94,7 @@ public class Model {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void forceReloadComponents() throws IOException{
 		HashMap<String, List> items =  ServiceManager.getInstance().getGitHubResources();
 		loadComponents(repoId, items);
@@ -106,7 +103,6 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public void loadComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources){
 		this.repoId = repoId;
-		cachedGithubComments = new ConcurrentHashMap<Integer, List<Comment>>();
 		boolean isTurboResource = false;
 		boolean isPublicRepo = false;
 		
@@ -206,14 +202,6 @@ public class Model {
 		return milestones;
 	}
 	
-	public void cacheCommentsListForIssue(List<Comment> comments, int issueId){
-		cachedGithubComments.put(issueId, new ArrayList<Comment>(comments));
-	}
-	
-	public List<Comment>getCommentsListForIssue(int issueId){
-		return cachedGithubComments.get(issueId);
-	}
- 	
 	public void appendToCachedIssues(TurboIssue issue){
 		issues.add(0, issue);
 	}

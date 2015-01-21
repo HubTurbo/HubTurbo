@@ -13,7 +13,6 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
-import service.updateservice.CommentUpdateService;
 
 public class ServiceManagerStub extends ServiceManager{
 	public static String TEST_GH_USERNAME = "testapi";
@@ -67,10 +66,6 @@ public class ServiceManagerStub extends ServiceManager{
 	
 	public int getRequestLimit(){
 		return 100;
-	}
-	
-	public CommentUpdateService getCommentUpdateService(int id, List<Comment> list){
-		return null;
 	}
 	
 	public List<Repository> getRepositories() throws IOException{
