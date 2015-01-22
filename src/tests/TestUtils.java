@@ -54,17 +54,26 @@ public class TestUtils {
 	    user.setLogin("tester");
 	    
 	    for (int i=0; i<number; i++) {
-	        Issue issue = new Issue();
-	        issue.setTitle("issue" + i);
-	        issue.setBody("description for issue " + i);
-	        issue.setId(i+1);
-	        issue.setState("open");
-	        issue.setUser(user);
-	        issue.setCreatedAt(new Date());
-	        issue.setUpdatedAt(new Date());
+	        Issue issue = getStubIssue(i+1);
 	        issues.add(issue);
 	    }
 	    return issues;
+	}
+	
+	public static Issue getStubIssue(int issueId) {
+	    User user = new User();
+	    user.setLogin("tester");
+	    
+        Issue issue = new Issue();
+        issue.setTitle("issue" + issueId);
+        issue.setBody("description for issue " + issueId);
+        issue.setNumber(issueId);
+        issue.setState("open");
+        issue.setUser(user);
+        issue.setCreatedAt(new Date());
+        issue.setUpdatedAt(new Date());
+        
+	    return issue;
 	}
 
 	/**
@@ -140,11 +149,16 @@ public class TestUtils {
 	public static List<TurboIssue> getStubTurboIssues(Model model, int number) {
 		ArrayList<TurboIssue> issues = new ArrayList<>();
 		for (int i=0; i<number; i++) {
-			TurboIssue issue = new TurboIssue("issue" + i, "description for issue " + i, model);
-			issue.setId(i+1);
+			TurboIssue issue = getStubTurboIssue(model, i+1);
 			issues.add(issue);
 		}
 		return issues;
+	}
+	
+	public static TurboIssue getStubTurboIssue(Model model, int issueId) {
+		TurboIssue issue = new TurboIssue("issue" + issueId, "description for issue " + issueId, model);
+		issue.setId(issueId);
+		return issue;
 	}
 
 	/**

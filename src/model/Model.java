@@ -266,6 +266,10 @@ public class Model {
 	private void ______ISSUES______() {
 	}
 
+	public ObservableList<TurboIssue> getIssues() {
+		return issues;
+	}
+
 	public void loadIssues(List<Issue> ghIssues) {
 		if (ghIssues != null) {
 			// enforceStatusStateConsistency(ghIssues);
@@ -281,10 +285,6 @@ public class Model {
 			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag,
 					issueCheckTime, collaborators, labels, milestones, issues);
 		});
-	}
-
-	public ObservableList<TurboIssue> getIssues() {
-		return issues;
 	}
 
 	public int getIndexOfIssue(int id) {
@@ -303,6 +303,7 @@ public class Model {
 
 		for (int i = 0; i < issues.size(); i++) {
 			TurboIssue issue = issues.get(i);
+			int  x = issue.getId();
 			if (issue.getId() == id) {
 				return issue;
 			}
@@ -346,6 +347,11 @@ public class Model {
 		});
 	}
 
+	/**
+	 * Given a TurboIssue, adds it to the model if it is not yet in it,
+	 * otherwise updates the corresponding issue in the model with its fields.
+	 * @param issue
+	 */
 	public void updateCachedIssue(TurboIssue issue) {
 		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if (tIssue != null) {

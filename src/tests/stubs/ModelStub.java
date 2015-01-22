@@ -1,5 +1,6 @@
 package tests.stubs;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -131,6 +132,19 @@ public class ModelStub extends Model {
 	
 	private void ______CACHED_ISSUES______() {
 	}
+	
+	/**
+	 * Overridden to remove logging, Platform.runLater, and writing to cache
+	 */
+	@Override
+	public void updateCachedIssues(List<Issue> issueList, String repoId) {
+		for (int i = issueList.size() - 1; i >= 0; i--) {
+			Issue issue = issueList.get(i);
+			TurboIssue newCached = new TurboIssue(issue, this);
+			updateCachedIssue(newCached);
+		}
+	}
+	
 	private void ______LABELS______() {
 	}
 	private void ______CACHED_LABELS______() {
