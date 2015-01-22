@@ -47,6 +47,8 @@ public class BrowserComponent {
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
+
+	private static final String CHROME_DRIVER_LOCATION = "browserview/";
 	
 	static {
 		setupChromeDriverExecutable();
@@ -287,7 +289,8 @@ public class BrowserComponent {
 		
 		File f = new File(binaryFileName);
 		if(!f.exists()) {
-			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream("ui/issuepanel/expanded/" + binaryFileName);
+			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + binaryFileName);
+			assert in != null : "Could not find " + binaryFileName + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
 			OutputStream out;
 			try {
 				out = new FileOutputStream(binaryFileName);
