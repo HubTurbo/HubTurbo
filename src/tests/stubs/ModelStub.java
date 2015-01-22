@@ -32,16 +32,17 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * Does not set up model change listeners.
-	 * TODO needs an alternative way of testing model changes
+	 * Does not set up model change listeners. TODO needs an alternative way of
+	 * testing model changes
 	 */
 	@Override
 	protected void setupModelChangeListeners() {
 	}
-	
+
 	/**
-	 * Returns a reference to the actual resource collection, for
-	 * listening while testing.
+	 * Returns a reference to the actual resource collection, for listening
+	 * while testing.
+	 * 
 	 * @return
 	 */
 	public ObservableList<TurboIssue> getIssuesRef() {
@@ -49,8 +50,9 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * Returns a reference to the actual resource collection, for
-	 * listening while testing.
+	 * Returns a reference to the actual resource collection, for listening
+	 * while testing.
+	 * 
 	 * @return
 	 */
 	public ObservableList<TurboUser> getUserRef() {
@@ -58,8 +60,9 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * Returns a reference to the actual resource collection, for
-	 * listening while testing.
+	 * Returns a reference to the actual resource collection, for listening
+	 * while testing.
+	 * 
 	 * @return
 	 */
 	public ObservableList<TurboLabel> getLabelsRef() {
@@ -67,21 +70,22 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * Returns a reference to the actual resource collection, for
-	 * listening while testing.
+	 * Returns a reference to the actual resource collection, for listening
+	 * while testing.
+	 * 
 	 * @return
 	 */
 	public ObservableList<TurboMilestone> getMilestonesRef() {
 		return milestones;
 	}
-	
+
 	private void ______MODEL_FUNCTIONALITY______() {
 	}
 
 	/**
 	 * Overridden to not perform network access; instead it loads stub data.
-	 * This stub data will always be from the cache. Loading from an online source
-	 * is tested with forceReloadComponents instead.
+	 * This stub data will always be from the cache. Loading from an online
+	 * source is tested with forceReloadComponents instead.
 	 */
 	@Override
 	public boolean loadComponents(RepositoryId repoId) {
@@ -92,16 +96,17 @@ public class ModelStub extends Model {
 
 	/**
 	 * Overridden to not perform network access; instead it loads stub data.
-	 * This stub data will always be from an online source. loadComponents tests the
-	 * loading of cache data.
+	 * This stub data will always be from an online source. loadComponents tests
+	 * the loading of cache data.
 	 */
 	@Override
 	public void forceReloadComponents() {
 		populateComponents(repoId, TestUtils.getStubResources(this, 10));
 	}
-	
+
 	/**
 	 * Overridden to not be wrapped in Platform.runLater.
+	 * 
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -114,14 +119,46 @@ public class ModelStub extends Model {
 
 		// Load issues last, and from a separate source
 		loadTurboIssues(TestUtils.getStubTurboIssues(this, 10));
-
 	}
-	
+
+	/**
+	 * Overridden to remove Platform.runLater, writing to cache
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void updateCachedList(List list, List newList, String repoId) {
+		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
+		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
+		list.removeAll(removed);
+
+		Listable listItem = (Listable) newList.get(0);
+		if (listItem instanceof TurboMilestone) {
+			logNumOfUpdates(newList, "milestone(s)");
+		} else if (listItem instanceof TurboLabel) {
+			logNumOfUpdates(newList, "label(s)");
+		} else if (listItem instanceof TurboUser) {
+			logNumOfUpdates(newList, "collaborator(s)");
+		}
+
+		ArrayList<Object> buffer = new ArrayList<>();
+		for (Object item : newList) {
+			int index = list.indexOf(item);
+			if (index != -1) {
+				Listable old = (Listable) list.get(index);
+				old.copyValues(item);
+			} else {
+				buffer.add(item);
+			}
+		}
+		list.addAll(buffer);
+	}
+
 	private void ______ISSUES______() {
 	}
-	
+
 	/**
-	 * Overridden to not run on the JavaFX Application Thread, and to not write to cache
+	 * Overridden to not run on the JavaFX Application Thread, and to not write
+	 * to cache
 	 */
 	@Override
 	public void loadIssues(List<Issue> ghIssues) {
@@ -129,10 +166,10 @@ public class ModelStub extends Model {
 		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 		issues.addAll(buffer);
 	}
-	
+
 	private void ______CACHED_ISSUES______() {
 	}
-	
+
 	/**
 	 * Overridden to remove logging, Platform.runLater, and writing to cache
 	 */
@@ -144,49 +181,87 @@ public class ModelStub extends Model {
 			updateCachedIssue(newCached);
 		}
 	}
-	
+
 	private void ______LABELS______() {
-	}
-	private void ______CACHED_LABELS______() {
-	}
-	private void ______MILESTONES______() {
-	}
-	private void ______CACHED_MILESTONES______() {
-	}
-	private void ______COLLABORATORS______() {
-	}
-	private void ______CACHED_COLLABORATORS______() {
-	}
-	private void ______RESOURCE_METADATA______() {
-	}
-	
-	private void ______DONE_UNTIL_HERE______() {
 	}
 
 	/**
-	 * Overridden to not run on the JavaFX Application Thread
+	 * Overridden to remove Platform.runLater
+	 */
+	@Override
+	public void addLabel(TurboLabel label) {
+		labels.add(label);
+	}
+
+	/**
+	 * Overridden to remove Platform.runLater
+	 */
+	public void loadLabels(List<Label> ghLabels) {
+		labels.clear();
+		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
+		labels.addAll(buffer);
+	}
+
+	/**
+	 * Overridden to remove Platform.runLater
+	 */
+	public void deleteLabel(TurboLabel label) {
+		labels.remove(label);
+	}
+
+	private void ______CACHED_LABELS______() {
+	}
+
+	private void ______MILESTONES______() {
+	}
+
+	/**
+	 * Overridden to not remove Platform.runLater
 	 */
 	@Override
 	public void addMilestone(TurboMilestone milestone) {
 		milestones.add(milestone);
 	}
 
-	/**
-	 * Overridden to not run on the JavaFX Application Thread
-	 */
-	@Override
-	public void addLabel(TurboLabel label) {
-		labels.add(label);
+	private void ______CACHED_MILESTONES______() {
 	}
-	
+
+	private void ______COLLABORATORS______() {
+	}
+
 	/**
-	 * This is NOT overridden
+	 * This is NOT overridden, just used by other tests
+	 * 
 	 * @param user
 	 */
 	public void addCollaborator(TurboUser user) {
 		collaborators.add(user);
 	}
-	
+
+	/**
+	 * Overridden to remove Platform.runLater
+	 */
+	public void loadCollaborators(List<User> ghCollaborators) {
+		collaborators.clear();
+		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+	}
+
+	/**
+	 * Overridden to remove Platform.runLater
+	 */
+	public void clearCollaborators() {
+		collaborators.clear();
+	}
+
+	private void ______CACHED_COLLABORATORS______() {
+	}
+
+	private void ______RESOURCE_METADATA______() {
+	}
+
+	private void ______DONE_UNTIL_HERE______() {
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updateCachedList(List list, List newList) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);

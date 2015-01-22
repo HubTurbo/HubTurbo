@@ -91,8 +91,9 @@ public class Model {
 	}
 
 	/**
-	 * Given a repository id, downloads its resources from GitHub,
-	 * then populates fields in this class with them.
+	 * Given a repository id, downloads its resources from GitHub, then
+	 * populates fields in this class with them.
+	 * 
 	 * @param repoId
 	 * @return true on success, false otherwise
 	 * @throws IOException
@@ -123,6 +124,7 @@ public class Model {
 	/**
 	 * Downloads the resources of the current repository from GitHub, bypassing
 	 * the cache, then populates the fields of this class with them.
+	 * 
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
@@ -132,8 +134,9 @@ public class Model {
 	}
 
 	/**
-	 * Given a repository id and a data structure containing resources, populates
-	 * the fields of this class with them
+	 * Given a repository id and a data structure containing resources,
+	 * populates the fields of this class with them
+	 * 
 	 * @param repoId
 	 * @param resources
 	 */
@@ -163,8 +166,9 @@ public class Model {
 	}
 
 	/**
-	 * Given a data structure containing resources loaded from the cache, populates
-	 * the fields of this class with them.
+	 * Given a data structure containing resources loaded from the cache,
+	 * populates the fields of this class with them.
+	 * 
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -186,8 +190,9 @@ public class Model {
 	}
 
 	/**
-	 * Given a data structure containing resources loaded from the cache, populates
-	 * the fields of this class with them.
+	 * Given a data structure containing resources loaded from the cache,
+	 * populates the fields of this class with them.
+	 * 
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -211,15 +216,16 @@ public class Model {
 	}
 
 	/**
-	 * Given two lists of one type of resource (one being the current set, and one being
-	 * the new set), updates the current set with the contents of the new set, then writes
-	 * the current set to cache.
+	 * Given two lists of one type of resource (one being the current set, and
+	 * one being the new set), updates the current set with the contents of the
+	 * new set, then writes the current set to cache.
+	 * 
 	 * @param list
 	 * @param newList
 	 * @param repoId
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updateCachedList(List list, List newList, String repoId) {
+	protected void updateCachedList(List list, List newList, String repoId) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
 		Platform.runLater(new Runnable() {
@@ -252,10 +258,11 @@ public class Model {
 						collaborators, labels, milestones, issues);
 			}
 
-			private void logNumOfUpdates(List newList, String type) {
-				logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
-			}
 		});
+	}
+
+	protected void logNumOfUpdates(List newList, String type) {
+		logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
 	}
 
 	public void refresh() {
@@ -272,6 +279,7 @@ public class Model {
 
 	/**
 	 * Given a list of Issues, loads them into the issue collection.
+	 * 
 	 * @param ghIssues
 	 */
 	public void loadIssues(List<Issue> ghIssues) {
@@ -288,10 +296,10 @@ public class Model {
 	}
 
 	/**
-	 * Given the id of an issue, returns its index in the issue collection
-	 * TODO change to optional
-	 * TODO index may no longer be applicable if we don't use a list to store issues,
-	 * re-evaluate uses of this method
+	 * Given the id of an issue, returns its index in the issue collection TODO
+	 * change to optional TODO index may no longer be applicable if we don't use
+	 * a list to store issues, re-evaluate uses of this method
+	 * 
 	 * @param issueId
 	 * @return
 	 */
@@ -308,8 +316,9 @@ public class Model {
 	}
 
 	/**
-	 * Given the id of a issue, returns a reference to it
-	 * TODO change to optional
+	 * Given the id of a issue, returns a reference to it TODO change to
+	 * optional
+	 * 
 	 * @param issueId
 	 * @return
 	 */
@@ -357,6 +366,7 @@ public class Model {
 	/**
 	 * Given a TurboIssue, adds it to the model if it is not yet in it,
 	 * otherwise updates the corresponding issue in the model with its fields.
+	 * 
 	 * @param issue
 	 */
 	public void updateCachedIssue(TurboIssue issue) {
@@ -392,6 +402,13 @@ public class Model {
 		});
 	}
 
+	/**
+	 * Tests to see if all labels of a group are exclusive. If one is not
+	 * exclusive, all are not exclusive.
+	 * 
+	 * @param group
+	 * @return
+	 */
 	public boolean isExclusiveLabelGroup(String group) {
 		List<TurboLabel> labelsInGrp = labels.stream().filter(l -> group.equals(l.getGroup()))
 				.collect(Collectors.toList());

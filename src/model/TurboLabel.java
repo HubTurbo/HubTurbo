@@ -203,8 +203,7 @@ public class TurboLabel implements Listable {
 
 	@Override
 	public String toString() {
-        String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
-        return getGroup() + groupDelimiter + getName();
+        return toGhName();
     }
 	
 }
