@@ -58,7 +58,7 @@ import util.events.RefreshDoneEvent;
 public class ServiceManager {
 	
 	private static final ServiceManager serviceManagerInstance = new ServiceManager();
-	public static final boolean isTestMode = false;
+	public static boolean isTestMode = false;
 	
 	public static ServiceManager getInstance(){
 		if(!isTestMode){

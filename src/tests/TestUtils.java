@@ -1,6 +1,7 @@
 package tests;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 
-public class Test {
+public class TestUtils {
 
 	/**
 	 * Methods for generating GitHub stub data.
@@ -48,12 +49,19 @@ public class Test {
 	 */
 	public static List<Issue> getStubIssues(int number) {
 	    ArrayList<Issue> issues = new ArrayList<>();
+	    
+	    User user = new User();
+	    user.setLogin("tester");
+	    
 	    for (int i=0; i<number; i++) {
-	    	
 	        Issue issue = new Issue();
 	        issue.setTitle("issue" + i);
 	        issue.setBody("description for issue " + i);
 	        issue.setId(i+1);
+	        issue.setState("open");
+	        issue.setUser(user);
+	        issue.setCreatedAt(new Date());
+	        issue.setUpdatedAt(new Date());
 	        issues.add(issue);
 	    }
 	    return issues;

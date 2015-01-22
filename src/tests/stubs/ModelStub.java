@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import model.Listable;
 import model.Model;
 import model.TurboIssue;
@@ -13,15 +14,17 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
-import tests.Test;
+import tests.TestUtils;
 import util.CollectionUtilities;
 
+@SuppressWarnings("unused")
 public class ModelStub extends Model {
 
 	public ModelStub() {
@@ -36,6 +39,45 @@ public class ModelStub extends Model {
 	}
 	
 	/**
+	 * Returns a reference to the actual resource collection, for
+	 * listening while testing.
+	 * @return
+	 */
+	public ObservableList<TurboIssue> getIssuesRef() {
+		return issues;
+	}
+
+	/**
+	 * Returns a reference to the actual resource collection, for
+	 * listening while testing.
+	 * @return
+	 */
+	public ObservableList<TurboUser> getUserRef() {
+		return collaborators;
+	}
+
+	/**
+	 * Returns a reference to the actual resource collection, for
+	 * listening while testing.
+	 * @return
+	 */
+	public ObservableList<TurboLabel> getLabelsRef() {
+		return labels;
+	}
+
+	/**
+	 * Returns a reference to the actual resource collection, for
+	 * listening while testing.
+	 * @return
+	 */
+	public ObservableList<TurboMilestone> getMilestonesRef() {
+		return milestones;
+	}
+	
+	private void ______MODEL_FUNCTIONALITY______() {
+	}
+
+	/**
 	 * Overridden to not perform network access; instead it loads stub data.
 	 * This stub data will always be from the cache. Loading from an online source
 	 * is tested with forceReloadComponents instead.
@@ -43,7 +85,7 @@ public class ModelStub extends Model {
 	@Override
 	public boolean loadComponents(RepositoryId repoId) {
 		this.repoId = repoId;
-		populateComponents(repoId, Test.getStubTurboResourcesFromCache(this, 10));
+		populateComponents(repoId, TestUtils.getStubTurboResourcesFromCache(this, 10));
 		return true;
 	}
 
@@ -54,7 +96,7 @@ public class ModelStub extends Model {
 	 */
 	@Override
 	public void forceReloadComponents() {
-		populateComponents(repoId, Test.getStubResources(this, 10));
+		populateComponents(repoId, TestUtils.getStubResources(this, 10));
 	}
 	
 	/**
@@ -70,8 +112,38 @@ public class ModelStub extends Model {
 		loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
 		// Load issues last, and from a separate source
-		loadTurboIssues(Test.getStubTurboIssues(this, 10));
+		loadTurboIssues(TestUtils.getStubTurboIssues(this, 10));
 
+	}
+	
+	private void ______ISSUES______() {
+	}
+	
+	/**
+	 * Overridden to not run on the JavaFX Application Thread, and to not write to cache
+	 */
+	@Override
+	public void loadIssues(List<Issue> ghIssues) {
+		issues.clear();
+		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
+		issues.addAll(buffer);
+	}
+	
+	private void ______CACHED_ISSUES______() {
+	}
+	private void ______LABELS______() {
+	}
+	private void ______CACHED_LABELS______() {
+	}
+	private void ______MILESTONES______() {
+	}
+	private void ______CACHED_MILESTONES______() {
+	}
+	private void ______COLLABORATORS______() {
+	}
+	private void ______CACHED_COLLABORATORS______() {
+	}
+	private void ______RESOURCE_METADATA______() {
 	}
 	
 	//// DONE UNTIL HERE
