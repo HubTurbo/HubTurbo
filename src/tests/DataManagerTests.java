@@ -12,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import service.ServiceManager;
 import storage.ConfigFileHandler;
 import storage.DataManager;
 
@@ -25,6 +26,9 @@ public class DataManagerTests {
 
 	@BeforeClass
 	public static void setup() {
+
+		ServiceManager.isTestMode = true;
+
 		dataManager = DataManager.getInstance();
 		stubFileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL);
 

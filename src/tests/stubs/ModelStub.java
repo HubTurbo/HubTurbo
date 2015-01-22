@@ -160,7 +160,8 @@ public class ModelStub extends Model {
 	private void ______RESOURCE_METADATA______() {
 	}
 	
-	//// DONE UNTIL HERE
+	private void ______DONE_UNTIL_HERE______() {
+	}
 
 	/**
 	 * Overridden to not run on the JavaFX Application Thread
@@ -177,21 +178,15 @@ public class ModelStub extends Model {
 	public void addLabel(TurboLabel label) {
 		labels.add(label);
 	}
-
+	
+	/**
+	 * This is NOT overridden
+	 * @param user
+	 */
 	public void addCollaborator(TurboUser user) {
-		// This isn't overridden
 		collaborators.add(user);
 	}
-
-	public TurboIssue createIssue(TurboIssue newIssue) {
-		appendToCachedIssues(newIssue);
-		return newIssue;
-	}
-
-	public void updateIssue(TurboIssue originalIssue, TurboIssue editedIssue) {
-		this.updateCachedIssue(editedIssue);
-	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void updateCachedList(List list, List newList) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
