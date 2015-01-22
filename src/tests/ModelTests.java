@@ -10,11 +10,6 @@ import tests.stubs.ModelStub;
 public class ModelTests {
 
 	@Test
-	public void loadingFromGitHub() {
-	
-	}
-	
-	@Test
 	public void loadingFromCache() {
 		ModelStub model = new ModelStub();
 		model.loadComponents(new RepositoryId("test", "testing"));
@@ -26,8 +21,14 @@ public class ModelTests {
 	}
 
 	@Test
-	public void forceReload() {
-
+	public void loadingFromGitHub() {
+		ModelStub model = new ModelStub();
+		model.loadComponents(new RepositoryId("test", "testing"));
+		
+		assertEquals(model.getLabels().size(), 10);
+		assertEquals(model.getMilestones().size(), 10);
+		assertEquals(model.getCollaborators().size(), 10);
+		assertEquals(model.getIssues().size(), 10);
 	}
-
+	
 }

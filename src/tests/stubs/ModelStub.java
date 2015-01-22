@@ -36,7 +36,9 @@ public class ModelStub extends Model {
 	}
 	
 	/**
-	 * This is overridden to not perform network access; instead it loads stub data.
+	 * Overridden to not perform network access; instead it loads stub data.
+	 * This stub data will always be from the cache. Loading from an online source
+	 * is tested with forceReloadComponents instead.
 	 */
 	@Override
 	public boolean loadComponents(RepositoryId repoId) {
@@ -46,11 +48,13 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * This is overridden to not perform network access; instead it loads stub data.
+	 * Overridden to not perform network access; instead it loads stub data.
+	 * This stub data will always be from an online source. loadComponents tests the
+	 * loading of cache data.
 	 */
 	@Override
 	public void forceReloadComponents() {
-		populateComponents(repoId, Test.getStubTurboResourcesFromCache(this, 10));
+		populateComponents(repoId, Test.getStubResources(this, 10));
 	}
 	
 	/**
@@ -65,22 +69,26 @@ public class ModelStub extends Model {
 		loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
 		loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
-		// Load issues last, and from  a separate source
+		// Load issues last, and from a separate source
 		loadTurboIssues(Test.getStubTurboIssues(this, 10));
 
 	}
 	
 	//// DONE UNTIL HERE
 
+	/**
+	 * Overridden to not run on the JavaFX Application Thread
+	 */
 	@Override
 	public void addMilestone(TurboMilestone milestone) {
-		// The overridden version of this doesn't run on the JavaFX Application Thread
 		milestones.add(milestone);
 	}
 
+	/**
+	 * Overridden to not run on the JavaFX Application Thread
+	 */
 	@Override
 	public void addLabel(TurboLabel label) {
-		// The overridden version of this doesn't run on the JavaFX Application Thread
 		labels.add(label);
 	}
 
