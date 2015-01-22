@@ -41,10 +41,10 @@ public class Model {
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 
-	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
-	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
-	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
+	protected ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
+	protected ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+	protected ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+	protected ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
 	protected IRepositoryIdProvider repoId;
 
@@ -60,7 +60,7 @@ public class Model {
 		setupModelChangeListeners();
 	}
 
-	private void setupModelChangeListeners() {
+	protected void setupModelChangeListeners() {
 		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) -> {
 			UI.getInstance().triggerEvent(new ModelChangedEvent());
 		});
@@ -168,7 +168,7 @@ public class Model {
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadTurboResources(HashMap<String, List> turboResources) {
+	protected void loadTurboResources(HashMap<String, List> turboResources) {
 		Platform.runLater(() -> {
 			logger.info(MESSAGE_LOADING_COLLABS);
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));

@@ -5,15 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
-
-import util.CollectionUtilities;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.Listable;
 import model.Model;
 import model.TurboIssue;
@@ -21,77 +13,74 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
+
+import service.ServiceManager;
+import tests.Test;
+import util.CollectionUtilities;
+
 public class ModelStub extends Model {
 
-	private ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
-	private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
-	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
-	private ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
-
 	public ModelStub() {
-		setupCollabStub();
-		setupIssueStub();
-		setupLabelStub();
-		setupMilestoneStub();
 	}
 
-	public boolean loadComponents(IRepositoryIdProvider repoId) {
+	/**
+	 * Does not set up model change listeners.
+	 * TODO needs an alternative way of testing model changes
+	 */
+	@Override
+	protected void setupModelChangeListeners() {
+	}
+	
+	/**
+	 * This is overridden to not perform network access; instead it loads stub data.
+	 */
+	@Override
+	public boolean loadComponents(RepositoryId repoId) {
 		this.repoId = repoId;
-		System.out.println("model " + repoId);
+		populateComponents(repoId, Test.getStubTurboResourcesFromCache(this, 10));
 		return true;
 	}
 
-	private void setupCollabStub() {
-		TurboUser user = new TurboUser();
-		user.setGithubName("Test user");
-		collaborators.add(user);
+	/**
+	 * This is overridden to not perform network access; instead it loads stub data.
+	 */
+	@Override
+	public void forceReloadComponents() {
+		populateComponents(repoId, Test.getStubTurboResourcesFromCache(this, 10));
 	}
+	
+	/**
+	 * Overridden to not be wrapped in Platform.runLater.
+	 * @param turboResources
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	protected void loadTurboResources(HashMap<String, List> turboResources) {
 
-	private void setupIssueStub() {
-		TurboIssue issue = new TurboIssue("Test", "", this);
-		issue.setId(1);
-		issues.add(issue);
-	}
+		loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
+		loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
+		loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
-	private void setupLabelStub() {
-		TurboLabel label = new TurboLabel();
-		label.setName("label1");
-		labels.add(label);
-	}
+		// Load issues last, and from  a separate source
+		loadTurboIssues(Test.getStubTurboIssues(this, 10));
 
-	private void setupMilestoneStub() {
-		TurboMilestone ms = new TurboMilestone();
-		ms.setTitle("hello");
-		milestones.add(ms);
 	}
-
-	public ObservableList<TurboIssue> getIssues() {
-		return issues;
-	}
-
-	public ObservableList<TurboUser> getCollaborators() {
-		return collaborators;
-	}
-
-	public ObservableList<TurboLabel> getLabels() {
-		return labels;
-	}
-
-	public ObservableList<TurboMilestone> getMilestones() {
-		return milestones;
-	}
+	
+	//// DONE UNTIL HERE
 
 	@Override
 	public void addMilestone(TurboMilestone milestone) {
-		// The overridden version of this doesn't run on the JavaFX Application
-		// Thread
+		// The overridden version of this doesn't run on the JavaFX Application Thread
 		milestones.add(milestone);
 	}
 
 	@Override
 	public void addLabel(TurboLabel label) {
-		// The overridedn version of this doesn't run on the JavaFX Application
-		// Thread
+		// The overridden version of this doesn't run on the JavaFX Application Thread
 		labels.add(label);
 	}
 
@@ -148,5 +137,4 @@ public class ModelStub extends Model {
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		updateCachedList(milestones, newMilestones);
 	}
-
 }
