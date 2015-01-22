@@ -270,45 +270,56 @@ public class Model {
 		return issues;
 	}
 
+	/**
+	 * Given a list of Issues, loads them into the issue collection.
+	 * @param ghIssues
+	 */
 	public void loadIssues(List<Issue> ghIssues) {
-		if (ghIssues != null) {
-			// enforceStatusStateConsistency(ghIssues);
-		}
 		Platform.runLater(() -> {
 			issues.clear();
 			// Add the issues to a temporary list to prevent a quadratic number
 			// of updates to subscribers of the ObservableList
 			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-			// Add them all at once, so this hopefully propagates only one
-			// change
+			// Add them all at once, so this propagates only one change
 			issues.addAll(buffer);
 			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag,
 					issueCheckTime, collaborators, labels, milestones, issues);
 		});
 	}
 
-	public int getIndexOfIssue(int id) {
-		for (int i = 0; i < issues.size(); i++) {
-			if (((TurboIssue) (issues.get(i))).getId() == id) {
+	/**
+	 * Given the id of an issue, returns its index in the issue collection
+	 * TODO change to optional
+	 * TODO index may no longer be applicable if we don't use a list to store issues,
+	 * re-evaluate uses of this method
+	 * @param issueId
+	 * @return
+	 */
+	public int getIndexOfIssue(int issueId) {
+		assert issueId >= 1 : "Invalid issue with id " + issueId;
+		int i = 0;
+		for (TurboIssue issue : issues) {
+			if (issue.getId() == issueId) {
 				return i;
 			}
+			i++;
 		}
 		return -1;
 	}
 
-	public TurboIssue getIssueWithId(int id) {
-		if (id <= 0) {
-			return null;
-		}
-
-		for (int i = 0; i < issues.size(); i++) {
-			TurboIssue issue = issues.get(i);
-			int  x = issue.getId();
-			if (issue.getId() == id) {
+	/**
+	 * Given the id of a issue, returns a reference to it
+	 * TODO change to optional
+	 * @param issueId
+	 * @return
+	 */
+	public TurboIssue getIssueWithId(int issueId) {
+		assert issueId >= 1 : "Invalid issue with id " + issueId;
+		for (TurboIssue issue : issues) {
+			if (issue.getId() == issueId) {
 				return issue;
 			}
 		}
-
 		return null;
 	}
 
@@ -324,26 +335,22 @@ public class Model {
 		issues.add(0, issue);
 	}
 
-	public void updateCachedIssues(List<Issue> issueList, String repoId) {
-		if (issueList.size() == 0) {
-			// should not happen
+	public void updateCachedIssues(List<Issue> newIssues, String repoId) {
+
+		if (newIssues.size() == 0) {
+			assert false : "updateCachedIssues should not be called before issues have been loaded";
 			return;
-		} else {
-			// enforceStatusStateConsistency(issueList);
 		}
-		WeakReference<Model> selfRef = new WeakReference<Model>(this);
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				logger.debug(issueList.size() + " issues changed/added since last sync");
-				for (int i = issueList.size() - 1; i >= 0; i--) {
-					Issue issue = issueList.get(i);
-					TurboIssue newCached = new TurboIssue(issue, selfRef.get());
-					updateCachedIssue(newCached);
-				}
-				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime,
-						collaborators, labels, milestones, issues);
+
+		Platform.runLater(() -> {
+			logger.debug(newIssues.size() + " issues changed/added since last sync");
+			for (int i = newIssues.size() - 1; i >= 0; i--) {
+				Issue issue = newIssues.get(i);
+				TurboIssue newCached = new TurboIssue(issue, Model.this);
+				updateCachedIssue(newCached);
 			}
+			dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime,
+					collaborators, labels, milestones, issues);
 		});
 	}
 
