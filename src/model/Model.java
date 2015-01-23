@@ -30,6 +30,17 @@ import util.CollectionUtilities;
 import util.DialogMessage;
 import util.events.ModelChangedEvent;
 
+/**
+ * Aggregates collections of all resources: issues, labels, milestones, users/collaborators.
+ * Provides methods to access them, and method for updating them from different sources
+ * (cache (Turbo* resource)/GitHub (regular resource)).
+ * 
+ * When modifying this class, it is important that you modify ModelStub as well, to add
+ * stub versions of new methods. Platform.runLater should be removed. Other things like
+ * network operations or file access may not be needed depending on the intent of the test.
+ * 
+ * TODO use a proper data structure in updateCachedList and get rid of untyped methods
+ */
 @SuppressWarnings("unused")
 public class Model {
 
@@ -260,6 +271,7 @@ public class Model {
 		});
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected void logNumOfUpdates(List newList, String type) {
 		logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
 	}
@@ -386,6 +398,12 @@ public class Model {
 		return labels;
 	}
 
+	/**
+	 * Returns a reference to the TurboLabel given its full name on GitHub.
+	 * TODO change to optional
+	 * @param name
+	 * @return
+	 */
 	public TurboLabel getLabelByGhName(String name) {
 		for (int i = 0; i < labels.size(); i++) {
 			if (labels.get(i).toGhName().equals(name)) {
@@ -462,6 +480,12 @@ public class Model {
 		});
 	}
 
+	/**
+	 * Returns a reference to the TurboLabel given its title on GitHub.
+	 * TODO change to optional
+	 * @param title
+	 * @return
+	 */
 	public TurboMilestone getMilestoneByTitle(String title) {
 		for (int i = 0; i < milestones.size(); i++) {
 			if (milestones.get(i).getTitle().equals(title)) {
@@ -503,6 +527,13 @@ public class Model {
 		return collaborators;
 	}
 
+	/**
+	 * Returns a reference to a TurboUser given his/her login name on GitHub.
+	 * TODO change to optional
+	 * TODO make naming of method more consistent, use login for one
+	 * @param name
+	 * @return
+	 */
 	public TurboUser getUserByGhName(String name) {
 		for (int i = 0; i < collaborators.size(); i++) {
 			if (collaborators.get(i).getGithubName().equals(name)) {
