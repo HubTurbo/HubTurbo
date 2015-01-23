@@ -26,6 +26,29 @@ import tests.stubs.ModelStub;
 @SuppressWarnings("unused")
 public class ModelTests {
 
+	// TODO enable this test once these changes can be put into effect
+	// @Test
+	public void getters() {
+		// Ensure getters do not return references to the actual resource collections
+		ModelStub model = new ModelStub();
+		
+		assertEquals(model.getIssues().size(), 0);
+		model.getIssues().add(TestUtils.getStubTurboIssue(model, 1));
+		assertEquals(model.getIssues().size(), 0);
+
+		assertEquals(model.getMilestones().size(), 0);
+		model.getMilestones().add(TestUtils.getStubTurboMilestone("this"));
+		assertEquals(model.getMilestones().size(), 0);
+
+		assertEquals(model.getLabels().size(), 0);
+		model.getLabels().add(TestUtils.getStubTurboLabel("does", "not"));
+		assertEquals(model.getLabels().size(), 0);
+
+		assertEquals(model.getCollaborators().size(), 0);
+		model.getCollaborators().add(TestUtils.getStubTurboUser("matter"));
+		assertEquals(model.getCollaborators().size(), 0);
+	}
+
 	private void ______MODEL_FUNCTIONALITY______() {
 	}
 
