@@ -20,6 +20,6 @@ import service.ServiceManager;
 public class Tests {
 	@BeforeClass
 	public static void setup() {
-		ServiceManager.isTestMode = true;
+		ServiceManager.isInTestMode = true;
 	}
 }

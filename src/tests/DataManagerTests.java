@@ -27,7 +27,7 @@ public class DataManagerTests {
 	@BeforeClass
 	public static void setup() {
 
-		ServiceManager.isTestMode = true;
+		ServiceManager.isInTestMode = true;
 
 		dataManager = DataManager.getInstance();
 		stubFileHandler = new ConfigFileHandler(FILE_CONFIG_SESSION, FILE_CONFIG_LOCAL);
