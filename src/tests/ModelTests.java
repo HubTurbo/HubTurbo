@@ -12,11 +12,13 @@ import javafx.collections.ListChangeListener;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
+import model.TurboUser;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
 import tests.stubs.ModelStub;
@@ -399,31 +401,89 @@ public class ModelTests {
 	}
 
 	@Test
-	public void getUserByGhName() {
-		// TODO
+	public void getUserByGhNameTest() {
+		ModelStub model = new ModelStub();
+		model.loadCollaborators(TestUtils.getStubUsers(10));
+		for (int i = 0; i < model.getCollaborators().size(); i++) {
+			assertEquals(model.getCollaborators().get(i), model.getUserByGhName("user" + (i+1)));
+		}
 	}
 
 	@Test
-	public void loadCollaborators() {
-		// TODO
+	public void loadCollaboratorsTest() {
+		ModelStub model = new ModelStub();
+		assertEquals(model.getCollaborators().size(), 0);
+
+		int start = numberOfUpdates;
+		ListChangeListener<TurboUser> listener = c -> ++numberOfUpdates;
+		model.getCollaboratorsRef().addListener(listener);
+		model.loadCollaborators(TestUtils.getStubUsers(10));
+		model.getCollaboratorsRef().removeListener(listener);
+		int end = numberOfUpdates;
+
+		// All issues loaded
+		assertEquals(model.getCollaborators().size(), 10);
+
+		// Only one update triggered
+		assertEquals(end - start, 1);
 	}
 
 	@Test
-	public void clearCollaborators() {
-		// TODO
+	public void clearCollaboratorsTest() {
+		ModelStub model = new ModelStub();
+		assertEquals(model.getCollaborators().size(), 0);
+		model.loadTurboCollaborators(TestUtils.getStubTurboUsers(10));
+		assertEquals(model.getCollaborators().size(), 10);
+		model.clearCollaborators();
+		assertEquals(model.getCollaborators().size(), 0);
 	}
 
 	private void ______CACHED_COLLABORATORS______() {
 	}
 
 	@Test
-	public void loadTurboCollaborators() {
-		// TODO
+	public void loadTurboCollaboratorsTest() {
+		ModelStub model = new ModelStub();
+		assertEquals(model.getCollaborators().size(), 0);
+
+		int start = numberOfUpdates;
+		ListChangeListener<TurboUser> listener = c -> ++numberOfUpdates;
+		model.getCollaboratorsRef().addListener(listener);
+		model.loadTurboCollaborators(TestUtils.getStubTurboUsers(10));
+		model.getCollaboratorsRef().removeListener(listener);
+		int end = numberOfUpdates;
+
+		// All issues loaded
+		assertEquals(model.getCollaborators().size(), 10);
+
+		// Only one update triggered
+		assertEquals(end - start, 1);
 	}
 
 	@Test
-	public void updateCachedCollaborators() {
-		// TODO
+	public void updateCachedCollaboratorsTest() {
+	    ModelStub model = new ModelStub();
+	    List<User> milestones = TestUtils.getStubUsers(10);
+	    model.loadCollaborators(milestones);
+
+	    User user1 = milestones.get(3);
+	    user1.setLogin("auser");
+
+        User user2 = TestUtils.getStubUser("anotheruser");
+
+        assertEquals(model.getCollaborators().size(), 10);
+        assertEquals(model.getCollaborators().get(3).getGithubName(), "user4");
+        assertEquals(model.getUserByGhName("anotheruser"), null);
+
+        model.updateCachedCollaborators(Arrays.asList(user1, user2), "testing/test");
+        assertEquals(model.getCollaborators().size(), 2);
+
+        // user1 is there and has been changed
+        // user2 is not there but is there after
+        // Order is preserved
+        // The other milestones are gone
+        assertEquals(model.getCollaborators().get(0).getGithubName(), "auser");
+        assertEquals(model.getCollaborators().get(1).getGithubName(), "anotheruser");
 	}
 
 	private void ______RESOURCE_METADATA______() {

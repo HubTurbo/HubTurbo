@@ -55,7 +55,7 @@ public class ModelStub extends Model {
 	 * 
 	 * @return
 	 */
-	public ObservableList<TurboUser> getUserRef() {
+	public ObservableList<TurboUser> getCollaboratorsRef() {
 		return collaborators;
 	}
 

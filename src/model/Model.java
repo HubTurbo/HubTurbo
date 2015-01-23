@@ -1,7 +1,6 @@
 package model;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -505,7 +504,7 @@ public class Model {
 	}
 
 	public TurboUser getUserByGhName(String name) {
-		for (int i = 0; i < labels.size(); i++) {
+		for (int i = 0; i < collaborators.size(); i++) {
 			if (collaborators.get(i).getGithubName().equals(name)) {
 				return collaborators.get(i);
 			}
