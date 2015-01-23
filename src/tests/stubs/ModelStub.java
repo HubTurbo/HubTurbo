@@ -216,11 +216,29 @@ public class ModelStub extends Model {
 	}
 
 	/**
-	 * Overridden to not remove Platform.runLater
+	 * Overridden to remove Platform.runLater
+	 */
+	@Override
+	public void loadMilestones(List<Milestone> ghMilestones) {
+		milestones.clear();
+		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
+		milestones.addAll(buffer);
+	}
+
+	/**
+	 * Overridden to remove Platform.runLater
 	 */
 	@Override
 	public void addMilestone(TurboMilestone milestone) {
 		milestones.add(milestone);
+	}
+
+	/**
+	 * Overridden to remove Platform.runLater
+	 */
+	@Override
+	public void deleteMilestone(TurboMilestone milestone) {
+		milestones.remove(milestone);
 	}
 
 	private void ______CACHED_MILESTONES______() {

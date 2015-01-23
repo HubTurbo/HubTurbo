@@ -15,6 +15,7 @@ import model.TurboMilestone;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 
@@ -304,17 +305,46 @@ public class ModelTests {
 
 	@Test
 	public void deleteMilestoneTest() {
-		// TODO
+		ModelStub model = new ModelStub();
+		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
+		
+		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
+		model.deleteMilestone(model.getMilestones().get(4));
+		
+		assertEquals(model.getMilestones().size(), 8);
+		for (TurboMilestone milestone : model.getMilestones()) {
+			if (milestone.getTitle().endsWith("3") || milestone.getTitle().endsWith("5")) {
+				assert false;
+			}
+		}
 	}
 
 	@Test
 	public void loadMilestonesTest() {
-		// TODO
+		ModelStub model = new ModelStub();
+		assertEquals(model.getMilestones().size(), 0);
+
+		int start = numberOfUpdates;
+		ListChangeListener<TurboMilestone> listener = c -> ++numberOfUpdates;
+		model.getMilestonesRef().addListener(listener);
+		model.loadMilestones(TestUtils.getStubMilestones(10));
+		model.getMilestonesRef().removeListener(listener);
+		int end = numberOfUpdates;
+
+		// All issues loaded
+		assertEquals(model.getMilestones().size(), 10);
+
+		// Only one update triggered
+		assertEquals(end - start, 1);
 	}
 
 	@Test
 	public void getMilestoneByTitleTest() {
-		// TODO
+		ModelStub model = new ModelStub();
+		model.loadMilestones(TestUtils.getStubMilestones(10));
+		for (int i = 0; i < model.getMilestones().size(); i++) {
+			assertEquals(model.getMilestones().get(i), model.getMilestoneByTitle("v0." + (i + 1)));
+		}
 	}
 
 	private void ______CACHED_MILESTONES______() {
@@ -322,12 +352,47 @@ public class ModelTests {
 
 	@Test
 	public void loadTurboMilestonesTest() {
-		// TODO
+		ModelStub model = new ModelStub();
+		assertEquals(model.getMilestones().size(), 0);
+
+		int start = numberOfUpdates;
+		ListChangeListener<TurboMilestone> listener = c -> ++numberOfUpdates;
+		model.getMilestonesRef().addListener(listener);
+		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
+		model.getMilestonesRef().removeListener(listener);
+		int end = numberOfUpdates;
+
+		// All issues loaded
+		assertEquals(model.getMilestones().size(), 10);
+
+		// Only one update triggered
+		assertEquals(end - start, 1);
 	}
 
 	@Test
 	public void updateCachedMilestonesTest() {
-		// TODO
+	    ModelStub model = new ModelStub();
+	    List<Milestone> milestones = TestUtils.getStubMilestones(10);
+	    model.loadMilestones(milestones);
+
+	    Milestone milestone1 = milestones.get(3);
+	    milestone1.setTitle("amilestone");
+
+	    Milestone milestone2 = TestUtils.getStubMilestone("anothermilestone");
+
+	    assertEquals(model.getMilestones().size(), 10);
+	    assertEquals(model.getMilestones().get(3).getTitle(), "v0.4");
+	    assertEquals(model.getMilestoneByTitle("anothermilestone"), null);
+
+	    model.updateCachedMilestones(Arrays.asList(milestone1, milestone2), "testing/test");
+	    assertEquals(model.getMilestones().size(), 2);
+
+	    // milestone1 is there and has been changed
+	    // milestone2 is not there but is there after
+	    // Order is preserved
+	    // The other milestones are gone
+	    assertEquals(model.getMilestones().get(0).getTitle(), "amilestone");
+	    assertEquals(model.getMilestones().get(1).getTitle(), "anothermilestone");
 	}
 
 	private void ______COLLABORATORS______() {
