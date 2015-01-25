@@ -57,6 +57,7 @@ import util.events.RefreshDoneEvent;
  * Also holds a reference to the application's current Model instance, which
  * stores the repository's labels, milestones, assignees and issues.
  * */
+@SuppressWarnings("unused")
 public class ServiceManager {
 
 	private static final ServiceManager instance = new ServiceManager();
@@ -79,6 +80,12 @@ public class ServiceManager {
 	public static final String KEY_LABELS = "labels";
 	public static final String KEY_COLLABORATORS = "collaborators";
 
+	// Login state
+
+	private String lastUsedPassword;
+
+	// Services
+	
 	private GitHubClientExtended githubClient;
 
 	private CollaboratorService collabService;
@@ -89,6 +96,8 @@ public class ServiceManager {
 	private MarkdownService markdownService;
 	private ContentsService contentService;
 
+	// Model updates
+	
 	private ModelUpdater modelUpdater;
 	private Model model;
 	private RepositoryId repoId;
@@ -101,17 +110,13 @@ public class ServiceManager {
 	private static final int REFRESH_INTERVAL = 60;
 	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> refreshResult;
+	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
 
 	private static final int TICK_INTERVAL = 1;
 	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> timeUntilRefreshResult;
 
-	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
-
 	private static final String ISSUE_STATE_ALL = "all";
-
-	// Login state
-	private String password;
 
 	protected ServiceManager() {
 		githubClient = new GitHubClientExtended();
@@ -125,14 +130,259 @@ public class ServiceManager {
 		model = new Model();
 	}
 
+	/**
+	 * Methods concerned with login logic
+	 */
+	private void ______LOGIN______() {
+	}
+
+	/**
+	 * Given a username and password, attempts to log into GitHub.
+	 * Returns true on success and false otherwise.
+	 * @param userId
+	 * @param password
+	 * @return
+	 */
+	public boolean login(String userId, String password) {
+		
+		this.lastUsedPassword = password;
+		githubClient.setCredentials(userId, password);
+		
+		// Attempt login
+		try {
+			GitHubRequest request = new GitHubRequest();
+			request.setUri("/");
+			githubClient.get(request);
+		} catch (IOException e) {
+			// Login failed
+			logger.error(e.getLocalizedMessage(), e);
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the username last used to log in.
+	 * @return
+	 */
+	public String getUserId() {
+		return githubClient.getUser();
+	}
+
+	/**
+	 * Returns the password last used to log in.
+	 * @return
+	 */
+	public String getLastUsedPassword() {
+		assert lastUsedPassword != null;
+		return lastUsedPassword;
+	}
+
+	/**
+	 * Methods concerned with dealing with online GitHub repositories
+	 */
+	private void ______REPOSITORY______() {
+	}
+
+	// TODO should return a copy
 	public IRepositoryIdProvider getRepoId() {
 		return repoId;
+	}
+
+	/**
+	 * Given a repository owner and name, loads its contents into the model.
+	 * Assumes that authentication has already been done, so should be called
+	 * after {@link #login(String, String) login}.
+	 * @param owner
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean setupRepository(String owner, String name) throws IOException {
+
+		assert lastUsedPassword != null : "setupRepository should be called only after login";
+		logger.info("Authenticating...");
+
+		this.repoId = RepositoryId.create(owner, name);
+
+		if (isRepositoryValid(repoId)) {
+			return model.loadComponents(repoId);
+		} else {
+			// TODO: create specific exception for this
+			throw new IOException("Cannot access repository");
+		}
+	}
+
+	public String getRepoOwner() {
+		return repoId.getOwner();
+	}
+
+	public String getRepoName() {
+		return repoId.getName();
+	}
+
+	/**
+	 * Determines if a repository is a valid one. Returns false if not, otherwise
+	 * returns true. Throws an IOException if the check fails in any other way.
+	 * @param repo
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean isRepositoryValid(IRepositoryIdProvider repo) throws IOException {
+		return isRepositoryValid(repo.generateId());
+	}
+
+	/**
+	 * Determines if a repository is a valid one. Returns false if not, otherwise
+	 * returns true. Throws an IOException if the check fails in any other way.
+	 * @param repo
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean isRepositoryValid(String repo) throws IOException {
+		String repoURL = SEGMENT_REPOS + "/" + repo;
+		return checkRepositoryValidity(repoURL);
+	}
+
+	/**
+	 * Determines if a repository is a valid one. Returns false if not, otherwise
+	 * returns true. Throws an IOException if the check fails in any other way.
+	 * @param repo
+	 * @return
+	 * @throws IOException
+	 */
+	protected boolean checkRepositoryValidity(String uri) throws IOException {
+		try {
+			GitHubRequest req = new GitHubRequest();
+			githubClient.get(req.setUri(uri));
+			return true;
+		} catch (RequestException e) {
+			logger.error(e.getLocalizedMessage(), e);
+			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+				return false;
+			}
+			throw e;
+		}
+	}
+
+	public int getRemainingRequests() {
+		return githubClient.getRemainingRequests();
+	}
+
+	public int getRequestLimit() {
+		return githubClient.getRequestLimit();
+	}
+
+	/**
+	 * Returns a list of the user's public repositories.
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Repository> getRepositories() throws IOException {
+		return repositoryService.getRepositories();
+	}
+
+	/**
+	 * Returns a list of the names of the user's public repositories
+	 * @return
+	 * @throws IOException
+	 */
+	public List<String> getRepositoriesNames() throws IOException {
+		return repositoryService.getRepositoriesNames(getUserId());
+	}
+
+	/**
+	 * Returns a list of the public repositories belonging to the user and the
+	 * user's organisations
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Repository> getAllRepositories() throws IOException {
+		return repositoryService.getAllRepositories(getUserId());
+	}
+
+	/**
+	 * Returns a list of the names of the public repositories belonging to the
+	 * user and the user's organisations
+	 * */
+	public List<String> getAllRepositoryNames() throws IOException {
+		return repositoryService.getAllRepositoriesNames(getUserId());
+	}
+
+	/**
+	 * Methods concerned with updating or interfacing with the model
+	 */
+	private void ______MODEL______() {
+	}
+
+	@SuppressWarnings("rawtypes")
+	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
+		this.repoId = repoId;
+	
+		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoId.toString());
+		model.setDataCacheFileHandler(dcHandler);
+		model.setRepoId(repoId);
+	
+		boolean needToGetResources = true;
+		
+		TurboRepoData repo = dcHandler.getRepo();
+		if (repo != null) {
+			needToGetResources = false;
+		}
+	
+		if (!needToGetResources) {
+			logger.info("Loading from cache...");
+			issuesETag = repo.getIssuesETag();
+			collabsETag = repo.getCollaboratorsETag();
+			labelsETag = repo.getLabelsETag();
+			milestonesETag = repo.getMilestonesETag();
+			issueCheckTime = repo.getIssueCheckTime();
+			List<TurboUser> collaborators = repo.getCollaborators();
+			List<TurboLabel> labels = repo.getLabels();
+			List<TurboMilestone> milestones = repo.getMilestones();
+			// Delay getting of issues until labels and milestones are loaded in Model
+	
+			HashMap<String, List> map = new HashMap<String, List>();
+			map.put(KEY_COLLABORATORS, collaborators);
+			map.put(KEY_LABELS, labels);
+			map.put(KEY_MILESTONES, milestones);
+			return map;
+		} else {
+			logger.info("Cache not found, loading data from GitHub...");
+			return getGitHubResources();
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public HashMap<String, List> getGitHubResources() throws IOException {
+		issuesETag = null;
+		collabsETag = null;
+		labelsETag = null;
+		milestonesETag = null;
+		issueCheckTime = null;
+	
+		List<User> ghCollaborators = new ArrayList<User>();
+		List<Label> ghLabels = new ArrayList<Label>();
+		List<Milestone> ghMilestones = new ArrayList<Milestone>();
+		List<Issue> ghIssues = new ArrayList<Issue>();
+	
+		ghLabels = getLabels();
+		ghMilestones = getMilestones();
+		ghIssues = getAllIssues();
+	
+		HashMap<String, List> map = new HashMap<String, List>();
+		map.put(KEY_COLLABORATORS, ghCollaborators);
+		map.put(KEY_LABELS, ghLabels);
+		map.put(KEY_MILESTONES, ghMilestones);
+		map.put(KEY_ISSUES, ghIssues);
+		return map;
 	}
 
 	public Model getModel() {
 		return model;
 	}
 
+	// TODO change to optional or somehow remove null return value (assertion?)
 	public Date getLastModelUpdateTime() {
 		if (modelUpdater != null) {
 			return modelUpdater.getLastUpdateTime();
@@ -174,7 +424,7 @@ public class ServiceManager {
 		Runnable countdown = new Runnable() {
 			@Override
 			public void run() {
-				StatusBar.displayMessage("Next refresh in " + getTime());
+				StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
 			}
 		};
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(countdown, 0, TICK_INTERVAL,
@@ -201,7 +451,7 @@ public class ServiceManager {
 		timeUntilRefreshResult = null;
 	}
 
-	private int getTime() {
+	private int updateTimeRemainingUntilRefresh() {
 		if (timeRemainingUntilRefresh == 1) {
 			timeRemainingUntilRefresh = REFRESH_INTERVAL;
 		} else {
@@ -227,151 +477,8 @@ public class ServiceManager {
 		startModelUpdate();
 	}
 
-	public boolean login(String userId, String password) {
-		this.password = password;
-		githubClient.setCredentials(userId, password);
-		try {
-			GitHubRequest request = new GitHubRequest();
-			request.setUri("/");
-			githubClient.get(request);
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-			// Login failed
-			return false;
-		}
-		return true;
+	private void ______LABELS______() {
 	}
-
-	public String getUserId() {
-		return githubClient.getUser();
-	}
-
-	public String getPassword() {
-		assert password != null;
-		return password;
-	}
-
-	public boolean setupRepository(String owner, String name) throws IOException {
-		logger.info("Authenticating...");
-		repoId = RepositoryId.create(owner, name);
-		if (checkRepository(repoId)) {
-			return model.loadComponents(repoId);
-		} else {
-			throw new IOException("Cannot access repository"); // TODO: create
-																// specific
-																// exception for
-																// this
-		}
-
-	}
-
-	public String getRepoOwner() {
-		return repoId.getOwner();
-	}
-
-	public String getRepoName() {
-		return repoId.getName();
-	}
-
-	public boolean checkRepository(String repo) throws IOException {
-		String repoURL = SEGMENT_REPOS + "/" + repo;
-		return check(repoURL);
-	}
-
-	public boolean checkRepository(IRepositoryIdProvider repo) throws IOException {
-		return checkRepository(repo.generateId());
-	}
-
-	protected boolean check(String uri) throws IOException {
-		try {
-			GitHubRequest req = new GitHubRequest();
-			githubClient.get(req.setUri(uri));
-			return true;
-		} catch (RequestException e) {
-			logger.error(e.getLocalizedMessage(), e);
-			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
-				return false;
-			}
-			throw e;
-		}
-	}
-
-	public int getRemainingRequests() {
-		return githubClient.getRemainingRequests();
-	}
-
-	public int getRequestLimit() {
-		return githubClient.getRequestLimit();
-	}
-
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
-		this.repoId = repoId;
-
-		boolean needToGetResources = true;
-		String repoIdString = repoId.toString();
-
-		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoIdString);
-		model.setDataCacheFileHandler(dcHandler);
-		model.setRepoId(repoId);
-
-		TurboRepoData repo = dcHandler.getRepo();
-		if (repo != null) {
-			needToGetResources = false;
-		}
-
-		if (!needToGetResources) {
-			logger.info("Loading from cache...");
-			issuesETag = repo.getIssuesETag();
-			collabsETag = repo.getCollaboratorsETag();
-			labelsETag = repo.getLabelsETag();
-			milestonesETag = repo.getMilestonesETag();
-			issueCheckTime = repo.getIssueCheckTime();
-			List<TurboUser> collaborators = repo.getCollaborators();
-			List<TurboLabel> labels = repo.getLabels();
-			List<TurboMilestone> milestones = repo.getMilestones();
-			// Delay getting of issues until labels and milestones are loaded in
-			// Model
-
-			HashMap<String, List> map = new HashMap<String, List>();
-			map.put(KEY_COLLABORATORS, collaborators);
-			map.put(KEY_LABELS, labels);
-			map.put(KEY_MILESTONES, milestones);
-			return map;
-		} else {
-			logger.info("Cache not found, loading data from GitHub...");
-			return getGitHubResources();
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getGitHubResources() throws IOException {
-		issuesETag = null;
-		collabsETag = null;
-		labelsETag = null;
-		milestonesETag = null;
-		issueCheckTime = null;
-
-		List<User> ghCollaborators = new ArrayList<User>();
-		List<Label> ghLabels = new ArrayList<Label>();
-		List<Milestone> ghMilestones = new ArrayList<Milestone>();
-		List<Issue> ghIssues = new ArrayList<Issue>();
-
-		ghLabels = getLabels();
-		ghMilestones = getMilestones();
-		ghIssues = getAllIssues();
-
-		HashMap<String, List> map = new HashMap<String, List>();
-		map.put(KEY_COLLABORATORS, ghCollaborators);
-		map.put(KEY_LABELS, ghLabels);
-		map.put(KEY_MILESTONES, ghMilestones);
-		map.put(KEY_ISSUES, ghIssues);
-		return map;
-	}
-
-	/**
-	 * Label Services
-	 * */
 
 	public List<Label> getLabels() throws IOException {
 		if (repoId != null) {
@@ -384,7 +491,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.createLabel(repoId, ghLabel);
 		}
-		return null; // TODO:
+		return null; // TODO
 	}
 
 	public void deleteLabel(String label) throws IOException {
@@ -400,9 +507,9 @@ public class ServiceManager {
 		return null;
 	}
 
-	/**
-	 * Milestone Services
-	 * */
+	private void ______MILESTONES______() {
+	}
+
 	public List<Milestone> getMilestones() throws IOException {
 		if (repoId != null) {
 			return milestoneService.getMilestones(repoId, ISSUE_STATE_ALL);
@@ -430,28 +537,8 @@ public class ServiceManager {
 		return null;
 	}
 
-	/**
-	 * Services for IssueEvent
-	 * */
-	public List<TurboIssueEvent> getFeeds(int issueNum) throws IOException {
-		GitHubEventsResponse ghEventsResponse = issueService.getIssueEvents(getRepoId(), issueNum);
-		return ghEventsResponse.getTurboIssueEvents();
+	private void ______ISSUES______() {
 	}
-
-	/**
-	 * Collaborator Services
-	 * */
-
-	public List<User> getCollaborators() throws IOException {
-		if (repoId != null) {
-			return collabService.getCollaborators(repoId);
-		}
-		return new ArrayList<User>();
-	}
-
-	/**
-	 * Issue Services
-	 * */
 
 	public List<Issue> getAllIssues() throws IOException {
 		if (repoId != null) {
@@ -488,6 +575,10 @@ public class ServiceManager {
 		return (String) issueData.get(IssueServiceExtended.ISSUE_DATE);
 	}
 
+	/**
+	 * Get user repositories
+	 * */
+
 	public Issue getIssueFromIssueData(HashMap<String, Object> issueData) {
 		return (Issue) issueData.get(IssueServiceExtended.ISSUE_CONTENTS);
 	}
@@ -523,21 +614,6 @@ public class ServiceManager {
 		if (repoId != null) {
 			issueService.editIssueState(repoId, issueId, true);
 		}
-	}
-
-	/**
-	 * Gets events for a issue from GitHub, or returns a cached version if
-	 * already present.
-	 * 
-	 * @param issueId
-	 * @return
-	 * @throws IOException
-	 */
-	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException {
-		if (repoId != null) {
-			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
-		}
-		return new ArrayList<>();
 	}
 
 	/**
@@ -600,43 +676,42 @@ public class ServiceManager {
 		return false;
 	}
 
-	/**
-	 * Get user repositories
-	 * */
+	private void ______COLLABORATORS______() {
+	}
 
-	/**
-	 * Returns a list of the user's public repositories
-	 * */
-	public List<Repository> getRepositories() throws IOException {
-		return repositoryService.getRepositories();
+	public List<User> getCollaborators() throws IOException {
+		if (repoId != null) {
+			return collabService.getCollaborators(repoId);
+		}
+		return new ArrayList<User>();
+	}
+
+	private void ______EVENTS______() {
+	}
+
+	public List<TurboIssueEvent> getFeeds(int issueNum) throws IOException {
+		GitHubEventsResponse ghEventsResponse = issueService.getIssueEvents(getRepoId(), issueNum);
+		return ghEventsResponse.getTurboIssueEvents();
 	}
 
 	/**
-	 * Returns a list of the names of the user's public repositories
-	 * */
-	public List<String> getRepositoriesNames() throws IOException {
-		return repositoryService.getRepositoriesNames(getUserId());
+	 * Gets events for a issue from GitHub, or returns a cached version if
+	 * already present.
+	 * 
+	 * @param issueId
+	 * @return
+	 * @throws IOException
+	 */
+	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException {
+		if (repoId != null) {
+			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
+		}
+		return new ArrayList<>();
 	}
 
-	/**
-	 * Returns a list of the public repositories belonging to the user and the
-	 * user's organisations
-	 * */
-	public List<Repository> getAllRepositories() throws IOException {
-		return repositoryService.getAllRepositories(getUserId());
+	private void ______MARKDOWN______() {
 	}
 
-	/**
-	 * Returns a list of the names of the public repositories belonging to the
-	 * user and the user's organisations
-	 * */
-	public List<String> getAllRepositoryNames() throws IOException {
-		return repositoryService.getAllRepositoriesNames(getUserId());
-	}
-
-	/**
-	 * Markdown service methods
-	 * */
 	public String getContentMarkup(final String text) throws IOException {
 		if (text.contains("#")) {
 			return getRepositoryHtml(text);
@@ -656,9 +731,9 @@ public class ServiceManager {
 		return markdownService.getHtml(text, mode);
 	}
 
-	/**
-	 * Contents service methods
-	 * */
+	private void ______REPOSITORY_CONTENTS______() {
+	}
+
 	public List<RepositoryContents> getContents(IRepositoryIdProvider repository) throws IOException {
 		return contentService.getContents(repository);
 	}

@@ -351,7 +351,7 @@ public class UI extends Application {
 	
 	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		try {
-			if(!ServiceManager.getInstance().checkRepository(currRepo)){
+			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
 				Platform.runLater(() -> {
 					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
 				});
