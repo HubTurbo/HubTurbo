@@ -267,7 +267,7 @@ public class BrowserComponent {
 				WebElement searchBox = driver.findElement(By.name("login"));
 				searchBox.sendKeys(ServiceManager.getInstance().getUserId());
 				searchBox = driver.findElement(By.name("password"));
-				searchBox.sendKeys(ServiceManager.getInstance().getPassword());
+				searchBox.sendKeys(ServiceManager.getInstance().getLastUsedPassword());
 				searchBox.submit();
 			} catch (NoSuchElementException e) {
 				// Already logged in; do nothing

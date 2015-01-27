@@ -15,7 +15,7 @@ import model.TurboUser;
 import org.eclipse.egit.github.core.PullRequest;
 import org.junit.Test;
 
-import stubs.ModelStub;
+import tests.stubs.ModelStub;
 import util.Utility;
 import filter.ParseException;
 import filter.Parser;
