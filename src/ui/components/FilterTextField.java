@@ -59,8 +59,10 @@ public class FilterTextField extends TextField {
 		});
 		
 		setOnKeyTyped(e -> {
+			boolean isModifierKeyPress = e.isAltDown() || e.isMetaDown() || e.isControlDown();
 			String key = e.getCharacter();
-			if(key == null || key.isEmpty()){
+			
+			if(key == null || key.isEmpty() || isModifierKeyPress){
 				return;
 			}
 			
