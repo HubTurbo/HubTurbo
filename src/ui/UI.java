@@ -90,7 +90,6 @@ public class UI extends Application {
 		repoSelector = createRepoFields();
 		
 		browserComponent = new BrowserComponent(this);
-		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -107,12 +106,13 @@ public class UI extends Application {
 	private void getUserCredentials() {
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
+				browserComponent.initialise();
+				setExpandedWidth(false);
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
 				repoSelector.refreshComboBoxContents();
 				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new PanelSavedEvent());
-				setExpandedWidth(false);
 			} else {
 				quit();
 			}
@@ -141,7 +141,6 @@ public class UI extends Application {
 	private void setupMainStage(Scene scene) {
 		
 		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
-		setExpandedWidth(false);
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
@@ -151,19 +150,6 @@ public class UI extends Application {
 				if (is) {
 					ServiceManager.getInstance().getModel().refresh();
 				}
-			}
-		});
-		
-		registerEvent(new ColumnChangeEventHandler() {
-			@Override
-			public void handle(ColumnChangeEvent e) {
-				// We let this event fire once so the browser window is resized
-				// as soon as the issues are loaded into a column.
-				// We don't want this to happen more than once, however, as it
-				// would cause the browser window to resize when switching project,
-				// and when making changes to columns.
-				setExpandedWidth(false);
-				events.unregister(this);
 			}
 		});
 	}
@@ -326,11 +312,8 @@ public class UI extends Application {
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);
-		
-		Platform.runLater(() -> {
-			mainStage.setMaxWidth(dimensions.getWidth());
-			browserComponent.resize(mainStage.getWidth());
-		});
+		mainStage.setMaxWidth(dimensions.getWidth());
+		browserComponent.resize(mainStage.getWidth());
 	}
 
 	public HashMap<String, String> getCommandLineArgs() {
