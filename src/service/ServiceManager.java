@@ -82,7 +82,7 @@ public class ServiceManager {
 
 	// Login state
 
-	private String lastUsedPassword;
+	protected String lastUsedPassword;
 
 	// Services
 	
@@ -99,8 +99,8 @@ public class ServiceManager {
 	// Model updates
 	
 	private ModelUpdater modelUpdater;
-	private Model model;
-	private RepositoryId repoId;
+	protected Model model;
+	protected RepositoryId repoId;
 	private String issuesETag = null;
 	private String collabsETag = null;
 	private String labelsETag = null;
@@ -117,6 +117,8 @@ public class ServiceManager {
 	private ScheduledFuture<?> timeUntilRefreshResult;
 
 	private static final String ISSUE_STATE_ALL = "all";
+	public static final String STATE_OPEN = "open";
+	public static final String STATE_CLOSED = "closed";
 
 	protected ServiceManager() {
 		githubClient = new GitHubClientExtended();

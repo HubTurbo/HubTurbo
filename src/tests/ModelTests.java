@@ -26,6 +26,9 @@ import tests.stubs.ModelStub;
 @SuppressWarnings("unused")
 public class ModelTests {
 
+	private static final String TEST_REPO_OWNER = "test";
+	private static final String TEST_REPO_NAME = "testing";
+
 	// TODO enable this test once these changes can be put into effect
 	// @Test
 	public void getters() {
@@ -55,7 +58,7 @@ public class ModelTests {
 	@Test
 	public void loadingFromCache() {
 		ModelStub model = new ModelStub();
-		model.loadComponents(new RepositoryId("test", "testing"));
+		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
 
 		assertEquals(model.getLabels().size(), 10);
 		assertEquals(model.getMilestones().size(), 10);
@@ -66,7 +69,7 @@ public class ModelTests {
 	@Test
 	public void loadingFromGitHub() {
 		ModelStub model = new ModelStub();
-		model.loadComponents(new RepositoryId("test", "testing"));
+		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
 
 		assertEquals(model.getLabels().size(), 10);
 		assertEquals(model.getMilestones().size(), 10);
@@ -215,7 +218,7 @@ public class ModelTests {
 	public void addLabelTest() {
 		ModelStub model = new ModelStub();
 		model.loadLabels(TestUtils.getStubLabels(10));
-		TurboLabel newLabel = TestUtils.getStubTurboLabel("group", "test");
+		TurboLabel newLabel = TestUtils.getStubTurboLabel("group", "name");
 		model.addLabel(newLabel);
 		assertNotEquals(model.getLabels().size(), 0);
 		assertEquals(model.getLabels().get(model.getLabels().size() - 1), newLabel);

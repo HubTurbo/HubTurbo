@@ -14,6 +14,7 @@ import service.ServiceManager;
 	FilterEvalTests.class,
 	FilterParserTests.class,
 	EventTests.class,
+	ServiceManagerTests.class,
 	ModelTests.class
 })
 
