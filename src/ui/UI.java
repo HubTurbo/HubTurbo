@@ -36,9 +36,8 @@ import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.Utility;
-import util.events.ColumnChangeEvent;
-import util.events.ColumnChangeEventHandler;
 import util.events.Event;
+import util.events.EventDispatcher;
 import util.events.EventHandler;
 import util.events.LoginEvent;
 import util.events.PanelSavedEvent;
@@ -46,7 +45,7 @@ import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
 
-public class UI extends Application {
+public class UI extends Application implements EventDispatcher {
 	
 	private static final int VERSION_MAJOR = 1;
 	private static final int VERSION_MINOR = 5;
@@ -224,23 +223,13 @@ public class UI extends Application {
 	 * UI operations
 	 */
 
-	/**
-	 * Publish/subscribe API making use of Guava's EventBus.
-	 * Takes a lambda expression to be called upon an event being fired.
-	 * @param handler
-	 */
+	@Override
 	public <T extends Event> void registerEvent(EventHandler handler) {
 		events.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 	
-	/**
-	 * Publish/subscribe API making use of Guava's EventBus.
-	 * Triggers all events of a certain type. EventBus will ensure that the
-	 * event is fired for all subscribers whose parameter is either the same
-	 * or a super type.
-	 * @param handler
-	 */
+	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
