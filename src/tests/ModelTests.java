@@ -21,7 +21,14 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
+import tests.stubs.ModelEventDispatcherStub;
 import tests.stubs.ModelStub;
+import ui.UI;
+import util.events.EventHandler;
+import util.events.ModelChangedEvent;
+import util.events.ModelChangedEventHandler;
+
+import com.google.common.eventbus.EventBus;
 
 @SuppressWarnings("unused")
 public class ModelTests {
@@ -77,7 +84,26 @@ public class ModelTests {
 		assertEquals(model.getIssues().size(), 10);
 	}
 
-	int numberOfUpdates = 0;
+	private EventBus events = new EventBus();
+	private int numberOfUpdates = 0;
+	private EventHandler modelChangedHandler = null;
+
+	private void registerChangeEvent(ModelStub model) {
+		assert modelChangedHandler == null;
+		model.setEventDispatcher(new ModelEventDispatcherStub(events));
+		events.register(modelChangedHandler = new ModelChangedEventHandler() {
+			@Override
+			public void handle(ModelChangedEvent e) {
+				++numberOfUpdates;
+			}
+		});
+	}
+
+	private void unregisterChangeEvent(ModelStub model) {
+		assert modelChangedHandler != null;
+		model.setEventDispatcher(UI.getInstance());
+		events.unregister(modelChangedHandler);
+	}
 
 	private void ______ISSUES______() {
 	}
@@ -88,17 +114,16 @@ public class ModelTests {
 		assertEquals(model.getIssues().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboIssue> listener = c -> ++numberOfUpdates;
-		model.getIssuesRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadIssues(TestUtils.getStubIssues(10));
-		model.getIssuesRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
 		assertEquals(model.getIssues().size(), 10);
 
 		// Only one update triggered
-		assertEquals(end - start, 1);
+		assertEquals(1, end - start);
 	}
 
 	@Test
@@ -131,17 +156,16 @@ public class ModelTests {
 		assertEquals(model.getIssues().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboIssue> listener = c -> ++numberOfUpdates;
-		model.getIssuesRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadTurboIssues(TestUtils.getStubTurboIssues(model, 10));
-		model.getIssuesRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
 		assertEquals(model.getIssues().size(), 10);
 
 		// Only one update triggered
-		assertEquals(end - start, 1);
+		assertEquals(1, end - start);
 	}
 
 	@Test

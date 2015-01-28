@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import storage.CacheFileHandler;
 import ui.UI;
 import util.CollectionUtilities;
 import util.DialogMessage;
+import util.events.EventDispatcher;
 import util.events.ModelChangedEvent;
 
 /**
@@ -45,14 +47,14 @@ import util.events.ModelChangedEvent;
 public class Model {
 
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
-
+	
 	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 
+	protected List<TurboIssue> issues = new ArrayList<>();
 	protected ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
-	protected ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 	protected ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	protected ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
@@ -65,6 +67,8 @@ public class Model {
 	private String issueCheckTime = null;
 
 	private CacheFileHandler dcHandler = null;
+	
+	protected EventDispatcher eventDispatcher = UI.getInstance();
 
 	public Model() {
 		setupModelChangeListeners();
@@ -72,20 +76,24 @@ public class Model {
 
 	protected void setupModelChangeListeners() {
 		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) -> {
-			UI.getInstance().triggerEvent(new ModelChangedEvent());
-		});
-		issues.addListener((ListChangeListener.Change<? extends TurboIssue> c) -> {
-			UI.getInstance().triggerEvent(new ModelChangedEvent());
+			eventDispatcher.triggerEvent(new ModelChangedEvent());
 		});
 		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) -> {
-			UI.getInstance().triggerEvent(new ModelChangedEvent());
+			eventDispatcher.triggerEvent(new ModelChangedEvent());
 		});
 		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) -> {
-			UI.getInstance().triggerEvent(new ModelChangedEvent());
+			eventDispatcher.triggerEvent(new ModelChangedEvent());
 		});
 	}
 
 	private void ______MODEL_FUNCTIONALITY______() {
+	}
+	
+	/**
+	 * Notifies subscribers that the model has changed
+	 */
+	protected void triggerModelChangeEvent() {
+		eventDispatcher.triggerEvent(new ModelChangedEvent());
 	}
 
 	public IRepositoryIdProvider getRepoId() {
@@ -284,8 +292,8 @@ public class Model {
 	private void ______ISSUES______() {
 	}
 
-	public ObservableList<TurboIssue> getIssues() {
-		return issues;
+	public List<TurboIssue> getIssues() {
+		return Collections.unmodifiableList(issues);
 	}
 
 	/**
@@ -301,6 +309,7 @@ public class Model {
 			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			// Add them all at once, so this propagates only one change
 			issues.addAll(buffer);
+			triggerModelChangeEvent();
 			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag,
 					issueCheckTime, collaborators, labels, milestones, issues);
 		});
@@ -349,10 +358,12 @@ public class Model {
 	public void loadTurboIssues(List<TurboIssue> list) {
 		issues.clear();
 		issues.addAll(list);
+		triggerModelChangeEvent();
 	}
 
 	public void appendToCachedIssues(TurboIssue issue) {
 		issues.add(0, issue);
+		triggerModelChangeEvent();
 	}
 
 	public void updateCachedIssues(List<Issue> newIssues, String repoId) {

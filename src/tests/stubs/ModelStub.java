@@ -1,6 +1,5 @@
 package tests.stubs;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,19 +23,23 @@ import org.eclipse.egit.github.core.User;
 import service.ServiceManager;
 import tests.TestUtils;
 import util.CollectionUtilities;
+import util.events.EventDispatcher;
+
+import com.google.common.eventbus.EventBus;
 
 @SuppressWarnings("unused")
 public class ModelStub extends Model {
 
 	public ModelStub() {
+		eventDispatcher = new ModelEventDispatcherStub(new EventBus());
 	}
 
 	/**
-	 * Does not set up model change listeners. TODO needs an alternative way of
-	 * testing model changes
+	 * Making the event dispatcher accessible
+	 * @param ed
 	 */
-	@Override
-	protected void setupModelChangeListeners() {
+	public void setEventDispatcher(EventDispatcher ed) {
+		eventDispatcher = ed;
 	}
 
 	/**
@@ -45,7 +48,7 @@ public class ModelStub extends Model {
 	 * 
 	 * @return
 	 */
-	public ObservableList<TurboIssue> getIssuesRef() {
+	public List<TurboIssue> getIssuesRef() {
 		return issues;
 	}
 
@@ -165,6 +168,7 @@ public class ModelStub extends Model {
 		issues.clear();
 		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
 		issues.addAll(buffer);
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_ISSUES______() {
