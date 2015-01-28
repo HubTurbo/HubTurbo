@@ -38,6 +38,7 @@ public class ModelUpdater {
 	  	updateModelMilestones(repoId);
 	  	updateModelIssues(repoId);
 	  	lastUpdateTime = issueUpdateService.lastCheckTime;
+	  	model.triggerModelChangeEvent();
 	}
 	
 	private void updateModelIssues(IRepositoryIdProvider repoId){

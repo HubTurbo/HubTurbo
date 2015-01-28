@@ -92,7 +92,7 @@ public class Model {
 	/**
 	 * Notifies subscribers that the model has changed
 	 */
-	protected void triggerModelChangeEvent() {
+	public void triggerModelChangeEvent() {
 		eventDispatcher.triggerEvent(new ModelChangedEvent());
 	}
 
@@ -344,7 +344,7 @@ public class Model {
 	 */
 	public TurboIssue getIssueWithId(int issueId) {
 		assert issueId >= 1 : "Invalid issue with id " + issueId;
-		for (TurboIssue issue : issues) {
+		for (TurboIssue issue : getIssues()) {
 			if (issue.getId() == issueId) {
 				return issue;
 			}
