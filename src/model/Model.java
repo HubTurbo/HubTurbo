@@ -24,7 +24,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
-import storage.DataCacheFileHandler;
+import storage.CacheFileHandler;
 import ui.UI;
 import util.CollectionUtilities;
 import util.DialogMessage;
@@ -64,7 +64,7 @@ public class Model {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 
-	private DataCacheFileHandler dcHandler = null;
+	private CacheFileHandler dcHandler = null;
 
 	public Model() {
 		setupModelChangeListeners();
@@ -96,7 +96,7 @@ public class Model {
 		this.repoId = repoId;
 	}
 
-	public void setDataCacheFileHandler(DataCacheFileHandler dcHandler) {
+	public void setDataCacheFileHandler(CacheFileHandler dcHandler) {
 		this.dcHandler = dcHandler;
 	}
 

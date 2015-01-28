@@ -39,8 +39,8 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
 import service.updateservice.ModelUpdater;
-import storage.DataCacheFileHandler;
-import storage.TurboRepoData;
+import storage.CacheFileHandler;
+import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.StatusBar;
@@ -321,13 +321,13 @@ public class ServiceManager {
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
 	
-		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoId.toString());
+		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
 	
 		boolean needToGetResources = true;
 		
-		TurboRepoData repo = dcHandler.getRepo();
+		CachedRepoData repo = dcHandler.getRepo();
 		if (repo != null) {
 			needToGetResources = false;
 		}

@@ -2,7 +2,7 @@ package storage;
 
 import model.TurboMilestone;
 
-class TurboSerializableMilestone {
+class SerializableMilestone {
 	private int number;
 	private String title;
 	private String state;
@@ -11,7 +11,7 @@ class TurboSerializableMilestone {
 	private int closed;
 	private int open;
 	
-	public TurboSerializableMilestone(TurboMilestone milestone) {
+	public SerializableMilestone(TurboMilestone milestone) {
 		this.number = milestone.getNumber();
 		this.title = milestone.getTitle();
 		this.state = milestone.getState();

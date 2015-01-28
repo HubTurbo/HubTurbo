@@ -2,7 +2,6 @@ package storage;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,9 +21,9 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class DataCacheFileHandler {
+public class CacheFileHandler {
 
-	private static final Logger logger = LogManager.getLogger(DataCacheFileHandler.class.getName());
+	private static final Logger logger = LogManager.getLogger(CacheFileHandler.class.getName());
 	private static final String DIR_CACHE = ".hubturbocache";
 	private static final String FILE_DATA_CACHE = "-cache.json";
 	private static final String FILE_DATA_CACHE_TEMP = "-cache-temp.json";
@@ -34,10 +33,10 @@ public class DataCacheFileHandler {
 	private List<TurboMilestone> milestones = null;
 	private List<TurboIssue> issues = null;
 	
-	private TurboRepoData repo = null;
+	private CachedRepoData repo = null;
 	private String repoId = null;
 	
-	public DataCacheFileHandler(String repoId) {
+	public CacheFileHandler(String repoId) {
 		this.repoId = repoId;
 		directorySetup();
 		readFromFile();
@@ -58,7 +57,7 @@ public class DataCacheFileHandler {
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
 			
-			repo = gson.fromJson(bufferedReader, TurboRepoData.class);
+			repo = gson.fromJson(bufferedReader, CachedRepoData.class);
 			
 			bufferedReader.close();
 		} catch (IOException e) {
@@ -72,7 +71,7 @@ public class DataCacheFileHandler {
 		return DIR_CACHE + File.separator + repoFileName + givenFileName;
 	}
 	
-	public TurboRepoData getRepo() {
+	public CachedRepoData getRepo() {
 		return repo;
 	}
 
@@ -99,7 +98,7 @@ public class DataCacheFileHandler {
 		this.labels = labels.stream().collect(Collectors.toList());
 		this.milestones = milestones.stream().collect(Collectors.toList());
 		
-		TurboRepoData currentRepoData = new TurboRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
+		CachedRepoData currentRepoData = new CachedRepoData(issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime, this.collaborators, this.labels, this.milestones, this.issues);
 
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()

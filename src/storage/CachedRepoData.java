@@ -9,7 +9,7 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
-public class TurboRepoData {
+public class CachedRepoData {
 	
 	//last ETags
 	private String issuesETag = null;
@@ -18,11 +18,11 @@ public class TurboRepoData {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 	private List<TurboUser> collaborators = null;
-	private List<TurboSerializableLabel> labels = null;
-	private List<TurboSerializableMilestone> milestones = null; 
-	private List<TurboSerializableIssue> issues = null;
+	private List<SerializableLabel> labels = null;
+	private List<SerializableMilestone> milestones = null; 
+	private List<SerializableIssue> issues = null;
 	
-	public TurboRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public CachedRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
 		this.issuesETag = issuesETag;
 		this.collabsETag = collabsETag;
 		this.labelsETag = labelsETag;
@@ -31,24 +31,24 @@ public class TurboRepoData {
 		
 		this.collaborators = collaborators;
 		
-		this.labels = new ArrayList<TurboSerializableLabel>();
+		this.labels = new ArrayList<SerializableLabel>();
 		if (this.labels != null) {
 			for (TurboLabel label : labels) {
-				this.labels.add(new TurboSerializableLabel(label));
+				this.labels.add(new SerializableLabel(label));
 			}
 		}
 		
-		this.milestones = new ArrayList<TurboSerializableMilestone>();
+		this.milestones = new ArrayList<SerializableMilestone>();
 		if (this.milestones != null) {
 			for (TurboMilestone milestone : milestones) {
-				this.milestones.add(new TurboSerializableMilestone(milestone));
+				this.milestones.add(new SerializableMilestone(milestone));
 			}
 		}
 
-		this.issues = new ArrayList<TurboSerializableIssue>();
+		this.issues = new ArrayList<SerializableIssue>();
 		if (this.issues != null) {
 			for (TurboIssue issue : issues) {
-				this.issues.add(new TurboSerializableIssue(issue));
+				this.issues.add(new SerializableIssue(issue));
 			}
 		}
 	}
@@ -84,7 +84,7 @@ public class TurboRepoData {
 	public List<TurboLabel> getLabels() {
 		List<TurboLabel> turboLabelList = new ArrayList<TurboLabel>();
 		if (this.labels != null) {
-			for (TurboSerializableLabel label: this.labels) {
+			for (SerializableLabel label: this.labels) {
 				turboLabelList.add(label.toTurboLabel());
 			}
 		}
@@ -94,7 +94,7 @@ public class TurboRepoData {
 	public List<TurboMilestone> getMilestones() {
 		List<TurboMilestone> turboMilestoneList = new ArrayList<TurboMilestone>();
 		if (this.milestones != null) {
-			for (TurboSerializableMilestone milestone: this.milestones) {
+			for (SerializableMilestone milestone: this.milestones) {
 				turboMilestoneList.add(milestone.toTurboMilestone());
 			}
 		}
@@ -104,7 +104,7 @@ public class TurboRepoData {
 	public List<TurboIssue> getIssues(Model model) {
 		List<TurboIssue> turboIssueList = new ArrayList<TurboIssue>();
 		if (this.issues != null) {
-			for (TurboSerializableIssue issue: this.issues) {
+			for (SerializableIssue issue: this.issues) {
 				turboIssueList.add(issue.toTurboIssue(model));
 			}
 		}
