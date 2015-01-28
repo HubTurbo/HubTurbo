@@ -184,6 +184,7 @@ public class ModelStub extends Model {
 			TurboIssue newCached = new TurboIssue(issue, this);
 			updateCachedIssue(newCached);
 		}
+		triggerModelChangeEvent();
 	}
 
 	private void ______LABELS______() {

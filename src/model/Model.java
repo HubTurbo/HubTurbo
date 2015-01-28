@@ -380,6 +380,7 @@ public class Model {
 				TurboIssue newCached = new TurboIssue(issue, Model.this);
 				updateCachedIssue(newCached);
 			}
+			triggerModelChangeEvent();
 			dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime,
 					collaborators, labels, milestones, issues);
 		});

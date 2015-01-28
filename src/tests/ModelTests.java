@@ -184,6 +184,9 @@ public class ModelTests {
 		ModelStub model = new ModelStub();
 		model.loadIssues(TestUtils.getStubIssues(10));
 
+		int start = numberOfUpdates;
+		registerChangeEvent(model);
+		
 		Issue issue1 = TestUtils.getStubIssue(3);
 		issue1.setTitle("something different");
 
@@ -200,6 +203,12 @@ public class ModelTests {
 		assertEquals(model.getIssueWithId(3).getTitle(), "something different");
 		assertEquals(model.getIssueWithId(11).getTitle(), "something really different");
 		assertEquals(model.getIssueWithId(11), model.getIssues().get(0));
+		
+		unregisterChangeEvent(model);
+		int end = numberOfUpdates;
+
+		// Only one update triggered
+		assertEquals(1, end - start);
 	}
 
 	@Test
