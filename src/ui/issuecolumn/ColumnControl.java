@@ -69,7 +69,7 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
 			public void handle(ModelChangedEvent e) {
-				refresh();
+				Platform.runLater(() -> refresh());
 			}
 		});
 	}
