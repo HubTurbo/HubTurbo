@@ -44,14 +44,16 @@ public class CacheFileHandler {
 	}
 
 	public void readFromFile() {
+		String filename = getFileName(FILE_DATA_CACHE, this.repoId);
+		if (!new File(filename).exists()) {
+			return;
+		}
+
 		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
 		try {
-			BufferedReader bufferedReader = new BufferedReader(
-					new FileReader(getFileName(FILE_DATA_CACHE, this.repoId)));
-
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
 			repo = gson.fromJson(bufferedReader, CachedRepoData.class);
-
 			bufferedReader.close();
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);

@@ -393,6 +393,7 @@ public class ServiceManager {
 	}
 
 	public void setupAndStartModelUpdate() {
+		logger.info("About to set up and start model update");
 		if (repoId != null) {
 			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
 					issueCheckTime);
@@ -431,6 +432,8 @@ public class ServiceManager {
 		};
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(countdown, 0, TICK_INTERVAL,
 				TimeUnit.SECONDS);
+
+		logger.info("Started model update");
 	}
 
 	/**
@@ -451,6 +454,8 @@ public class ServiceManager {
 		// Indicate that model update has been stopped
 		refreshResult = null;
 		timeUntilRefreshResult = null;
+		
+		logger.info("Stopped model update");
 	}
 
 	private int updateTimeRemainingUntilRefresh() {
