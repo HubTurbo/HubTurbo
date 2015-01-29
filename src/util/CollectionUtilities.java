@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import model.TurboIssue;
 import model.TurboLabel;
@@ -81,5 +82,21 @@ public class CollectionUtilities {
 			githubLabels.add(label.toGhResource());
 		}
 		return githubLabels;
+	}
+	
+	public static List<TurboLabel> deepCopyLabels(List<TurboLabel> labels) {
+	    return labels.stream().map(l -> new TurboLabel(l)).collect(Collectors.toList());
+	}
+	
+	public static List<TurboMilestone> deepCopyMilestones(List<TurboMilestone> milestones) {
+	    return milestones.stream().map(m -> new TurboMilestone(m)).collect(Collectors.toList());
+	}
+	
+	public static List<TurboUser> deepCopyUsers(List<TurboUser> users) {
+	    return users.stream().map(u -> new TurboUser(u)).collect(Collectors.toList());
+	}
+	
+	public static List<TurboIssue> deepCopyIssues(List<TurboIssue> issues) {
+	    return issues.stream().map(i -> new TurboIssue(i)).collect(Collectors.toList());
 	}
 }

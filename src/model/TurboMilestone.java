@@ -69,6 +69,10 @@ public class TurboMilestone implements Listable {
 	 * Constructors and Public Methods
 	 */
 	
+	public TurboMilestone(TurboMilestone other) {
+		this(other.toGhResource());
+	}
+
 	public TurboMilestone() {
 		setTitle("");
 	}

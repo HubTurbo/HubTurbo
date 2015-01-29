@@ -47,6 +47,11 @@ public class TurboLabel implements Listable {
 	/*
 	 * Constructors and Public Methods
 	 */
+
+	public TurboLabel(TurboLabel other){
+		this(other.toGhResource());
+	}
+
 	public TurboLabel(){
 		setColour("000000");
 	}

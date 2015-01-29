@@ -59,16 +59,19 @@ public class TurboUser implements Listable {
 	 * Constructors and Public Methods
 	 */
 	
-	public TurboUser(){
-		super();
+	public TurboUser() {
 	}
-	
+
 	public TurboUser(User user) {
 		assert user != null;
 
 		this.githubName = user.getLogin();
 		this.realName = user.getName();
 		this.avatarUrl = user.getAvatarUrl();
+	}
+
+	public TurboUser(TurboUser other) {
+		this(other.toGhResource());
 	}
 	
 	public User toGhResource() {
