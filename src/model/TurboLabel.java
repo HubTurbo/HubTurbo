@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
@@ -22,24 +19,24 @@ public class TurboLabel implements Listable {
 	public String getValue() {return getName();}
 	public void setValue(String value) {setName(value);}
 	
-	private StringProperty name = new SimpleStringProperty();
-    public final String getName() {return name.get();}
-    public final void setName(String value) {
+	private String name = "";
+    public String getName() {
+    	return name;
+    }
+
+    public void setName(String value) {
     	assert value != "";
     	assert value != null;
-    	name.set(value);
-    	}
-    public StringProperty nameProperty() {return name;}
+    	name = value;
+    }
 	
-    private StringProperty colour = new SimpleStringProperty();
-    public final String getColour() {return colour.get();}
-    public final void setColour(String value) {colour.set(value);}
-    public StringProperty colourProperty() {return colour;}
+    private String colour = "";
+    public final String getColour() {return colour;}
+    public final void setColour(String value) {colour = value;}
     
-    private StringProperty group = new SimpleStringProperty();
-    public final String getGroup() {return group.get();}
-    public final void setGroup(String value) {group.set(value);}
-    public StringProperty groupProperty() {return group;}
+    private String group = "";
+    public final String getGroup() {return group;}
+    public final void setGroup(String value) {group = value;}
     
 	private boolean isExclusive; // exclusive: "." non-exclusive: "-"
 	public boolean isExclusive() {return isExclusive;}
