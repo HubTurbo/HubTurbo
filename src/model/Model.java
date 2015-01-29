@@ -63,11 +63,11 @@ public class Model {
 
 	protected IRepositoryIdProvider repoId;
 
-	private String issuesETag = null;
-	private String collabsETag = null;
-	private String labelsETag = null;
-	private String milestonesETag = null;
-	private String issueCheckTime = null;
+	private String lastIssuesETag = null;
+	private String lastCollabsETag = null;
+	private String lastLabelsETag = null;
+	private String lastMilestonesETag = null;
+	private String lastIssueCheckTime = null;
 
 	private CacheFileHandler dcHandler = null;
 
@@ -150,25 +150,26 @@ public class Model {
 	 */
 	@SuppressWarnings("rawtypes")
 	public void populateComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources) {
+		
 		this.repoId = repoId;
-		boolean isTurboResource = false;
+		
+		boolean loadedFromCache = false;
 		boolean isPublicRepo = false;
 
 		// This is made with the assumption that labels of repos will not be
 		// empty (even a fresh copy of a repo)
 		if (!resources.get(ServiceManager.KEY_LABELS).isEmpty()) {
 			if (resources.get(ServiceManager.KEY_LABELS).get(0).getClass() == TurboLabel.class) {
-				isTurboResource = true;
+				loadedFromCache = true;
 			}
 			if (resources.get(ServiceManager.KEY_COLLABORATORS).isEmpty()) {
 				isPublicRepo = true;
 			}
 		}
 
-		if (isTurboResource) {
+		if (loadedFromCache) {
 			loadTurboResources(resources);
 		} else {
-			// is Github Resource
 			loadGitHubResources(resources, isPublicRepo);
 		}
 	}
@@ -262,7 +263,7 @@ public class Model {
 				}
 				list.addAll(buffer);
 
-				dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime,
+				dcHandler.writeToFile(repoId, lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag, lastIssueCheckTime,
 						collaborators, labels, milestones, issues);
 			}
 
@@ -300,8 +301,8 @@ public class Model {
 			// Add them all at once, so this propagates only one change
 			issues.addAll(buffer);
 			triggerModelChangeEvent();
-			dcHandler.writeToFile(repoId.toString(), issuesETag, collabsETag, labelsETag, milestonesETag,
-					issueCheckTime, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
+					lastIssueCheckTime, collaborators, labels, milestones, issues);
 		});
 	}
 
@@ -372,7 +373,7 @@ public class Model {
 				updateCachedIssue(newCached);
 			}
 			triggerModelChangeEvent();
-			dcHandler.writeToFile(repoId, issuesETag, collabsETag, labelsETag, milestonesETag, issueCheckTime,
+			dcHandler.writeToFile(repoId, lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag, lastIssueCheckTime,
 					collaborators, labels, milestones, issues);
 		});
 	}
@@ -590,22 +591,22 @@ public class Model {
 	}
 
 	public void updateIssuesETag(String ETag) {
-		this.issuesETag = ETag;
+		this.lastIssuesETag = ETag;
 	}
 
 	public void updateCollabsETag(String ETag) {
-		this.collabsETag = ETag;
+		this.lastCollabsETag = ETag;
 	}
 
 	public void updateLabelsETag(String ETag) {
-		this.labelsETag = ETag;
+		this.lastLabelsETag = ETag;
 	}
 
 	public void updateMilestonesETag(String ETag) {
-		this.milestonesETag = ETag;
+		this.lastMilestonesETag = ETag;
 	}
 
 	public void updateIssueCheckTime(String date) {
-		this.issueCheckTime = date;
+		this.lastIssueCheckTime = date;
 	}
 }
