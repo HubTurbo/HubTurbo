@@ -210,10 +210,8 @@ public class Model {
 			logger.info(MESSAGE_LOADING_COLLABS);
 			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
 		} else {
-			// Unable to get collaborators for public repo, so there's no point
-			// doing the above
-			// This is to remove any collaborators from previous repo (from
-			// repo-switching)
+			// We can't get collaborators from a public repo. Remove any collaborators
+			// left over from a previous repo instead.
 			clearCollaborators();
 		}
 		logger.info(MESSAGE_LOADING_LABELS);
@@ -294,12 +292,7 @@ public class Model {
 	 */
 	public void loadIssues(List<Issue> ghIssues) {
 		Platform.runLater(() -> {
-			issues.clear();
-			// Add the issues to a temporary list to prevent a quadratic number
-			// of updates to subscribers of the ObservableList
-			ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-			// Add them all at once, so this propagates only one change
-			issues.addAll(buffer);
+			issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			triggerModelChangeEvent();
 			dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
 					lastIssueCheckTime, collaborators, labels, milestones, issues);
@@ -453,9 +446,7 @@ public class Model {
 
 	public void loadLabels(List<Label> ghLabels) {
 		Platform.runLater(() -> {
-			labels.clear();
-			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
-			labels.addAll(buffer);
+			labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 			triggerModelChangeEvent();
 		});
 	}
@@ -464,8 +455,7 @@ public class Model {
 	}
 
 	public void loadTurboLabels(List<TurboLabel> list) {
-		labels.clear();
-		labels.addAll(list);
+		labels = new ArrayList<>(list);
 		triggerModelChangeEvent();
 	}
 
@@ -483,9 +473,7 @@ public class Model {
 
 	public void loadMilestones(List<Milestone> ghMilestones) {
 		Platform.runLater(() -> {
-			milestones.clear();
-			ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-			milestones.addAll(buffer);
+			milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 			triggerModelChangeEvent();
 		});
 	}
@@ -560,8 +548,7 @@ public class Model {
 
 	public void loadCollaborators(List<User> ghCollaborators) {
 		Platform.runLater(() -> {
-			collaborators.clear();
-			collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+			collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 			triggerModelChangeEvent();
 		});
 	}

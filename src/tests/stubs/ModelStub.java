@@ -165,9 +165,7 @@ public class ModelStub extends Model {
 	 */
 	@Override
 	public void loadIssues(List<Issue> ghIssues) {
-		issues.clear();
-		ArrayList<TurboIssue> buffer = CollectionUtilities.getHubTurboIssueList(ghIssues);
-		issues.addAll(buffer);
+		issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
 		triggerModelChangeEvent();
 	}
 
@@ -203,9 +201,7 @@ public class ModelStub extends Model {
 	 * Overridden to remove Platform.runLater
 	 */
 	public void loadLabels(List<Label> ghLabels) {
-		labels.clear();
-		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		labels.addAll(buffer);
+		labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		triggerModelChangeEvent();
 	}
 
@@ -228,10 +224,7 @@ public class ModelStub extends Model {
 	 */
 	@Override
 	public void loadMilestones(List<Milestone> ghMilestones) {
-		milestones.clear();
-		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-		milestones.addAll(buffer);
-		// TODO remove buffer
+		milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		triggerModelChangeEvent();
 	}
 
@@ -273,8 +266,7 @@ public class ModelStub extends Model {
 	 * Overridden to remove Platform.runLater
 	 */
 	public void loadCollaborators(List<User> ghCollaborators) {
-		collaborators.clear();
-		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+		collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 		triggerModelChangeEvent();
 	}
 
