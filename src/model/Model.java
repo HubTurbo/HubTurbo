@@ -58,8 +58,8 @@ public class Model {
 
 	protected List<TurboIssue> issues = new ArrayList<>();
 	protected List<TurboUser> collaborators = new ArrayList<>();
-	protected ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
-	protected ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
+	protected List<TurboLabel> labels = new ArrayList<>();
+	protected List<TurboMilestone> milestones = new ArrayList<>();
 
 	protected IRepositoryIdProvider repoId;
 
@@ -74,16 +74,6 @@ public class Model {
 	protected EventDispatcher eventDispatcher = UI.getInstance();
 
 	public Model() {
-		setupModelChangeListeners();
-	}
-
-	protected void setupModelChangeListeners() {
-		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) -> {
-			eventDispatcher.triggerEvent(new ModelChangedEvent());
-		});
-		milestones.addListener((ListChangeListener.Change<? extends TurboMilestone> c) -> {
-			eventDispatcher.triggerEvent(new ModelChangedEvent());
-		});
 	}
 
 	private void ______MODEL_FUNCTIONALITY______() {
@@ -406,7 +396,7 @@ public class Model {
 	private void ______LABELS______() {
 	}
 
-	public ObservableList<TurboLabel> getLabels() {
+	public List<TurboLabel> getLabels() {
 		return labels;
 	}
 
@@ -485,7 +475,7 @@ public class Model {
 	private void ______MILESTONES______() {
 	}
 
-	public ObservableList<TurboMilestone> getMilestones() {
+	public List<TurboMilestone> getMilestones() {
 		return milestones;
 	}
 

@@ -291,10 +291,9 @@ public class ModelTests {
 		assertEquals(model.getLabels().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboLabel> listener = c -> ++numberOfUpdates;
-		model.getLabelsRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadLabels(TestUtils.getStubLabels(10));
-		model.getLabelsRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
@@ -313,10 +312,9 @@ public class ModelTests {
 		assertEquals(model.getLabels().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboLabel> listener = c -> ++numberOfUpdates;
-		model.getLabelsRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadTurboLabels(TestUtils.getStubTurboLabels(10));
-		model.getLabelsRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
@@ -386,10 +384,9 @@ public class ModelTests {
 		assertEquals(model.getMilestones().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboMilestone> listener = c -> ++numberOfUpdates;
-		model.getMilestonesRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadMilestones(TestUtils.getStubMilestones(10));
-		model.getMilestonesRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
@@ -417,10 +414,9 @@ public class ModelTests {
 		assertEquals(model.getMilestones().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboMilestone> listener = c -> ++numberOfUpdates;
-		model.getMilestonesRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
-		model.getMilestonesRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded

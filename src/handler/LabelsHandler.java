@@ -7,7 +7,6 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import model.Model;
 import model.TurboLabel;
 
@@ -97,9 +96,5 @@ public class LabelsHandler {
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-	}
-	
-	public ObservableList<TurboLabel> getLabels(){
-		return modelRef.get().getLabels();
 	}
 }

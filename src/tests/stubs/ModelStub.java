@@ -68,7 +68,7 @@ public class ModelStub extends Model {
 	 * 
 	 * @return
 	 */
-	public ObservableList<TurboLabel> getLabelsRef() {
+	public List<TurboLabel> getLabelsRef() {
 		return labels;
 	}
 
@@ -78,7 +78,7 @@ public class ModelStub extends Model {
 	 * 
 	 * @return
 	 */
-	public ObservableList<TurboMilestone> getMilestonesRef() {
+	public List<TurboMilestone> getMilestonesRef() {
 		return milestones;
 	}
 
