@@ -36,8 +36,6 @@ import ui.components.StatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.Utility;
-import util.events.ColumnChangeEvent;
-import util.events.ColumnChangeEventHandler;
 import util.events.Event;
 import util.events.EventHandler;
 import util.events.LoginEvent;
@@ -49,7 +47,7 @@ import com.google.common.eventbus.EventBus;
 public class UI extends Application {
 	
 	private static final int VERSION_MAJOR = 1;
-	private static final int VERSION_MINOR = 5;
+	private static final int VERSION_MINOR = 6;
 	private static final int VERSION_PATCH = 0;
 	
 	public static final String ARG_UPDATED_TO = "--updated-to";
