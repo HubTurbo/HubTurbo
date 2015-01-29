@@ -412,7 +412,7 @@ public class ServiceManager {
 		// repo id may be different if the project was switched, so we
 		// validate with this repo id at that point.
 
-		final IRepositoryIdProvider repoId = model.getRepoId();
+		final String repoId = model.getRepoId().generateId();
 
 		Runnable pollTask = new Runnable() {
 			@Override

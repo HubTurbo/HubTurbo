@@ -3,14 +3,15 @@ package service.updateservice;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import model.Model;
+
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
-import model.Model;
 
 public class ModelUpdater {
 	private Model model;
@@ -32,7 +33,7 @@ public class ModelUpdater {
 		return lastUpdateTime;
 	}
 	
-	public void updateModel(IRepositoryIdProvider repoId){
+	public void updateModel(String repoId){
 	    updateModelCollaborators(repoId);
 	   	updateModelLabels(repoId);
 	  	updateModelMilestones(repoId);
@@ -41,52 +42,44 @@ public class ModelUpdater {
 	  	model.triggerModelChangeEvent();
 	}
 	
-	private void updateModelIssues(IRepositoryIdProvider repoId){
-		// here, we check if the repoId is the same as the one stored in model 
-		// (as this method could have been triggered before project switching but executed after project switching)
-		// when project switching occurs, the model will contain the new repoId so we stop i.e.
-		// we don't get updated items or write them to file for the old repo. This prevents cache corruption.
-		if (model.getRepoId().equals(repoId)) {
-			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(repoId);	
-			
-			// if there are updates
+	private void updateModelIssues(String repoId) {
+		if (model.getRepoId().generateId().equals(repoId)) {
+			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
 				model.updateIssuesETag(issueUpdateService.getLastETag());
 				model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
-				model.updateCachedIssues(updatedIssues, repoId.toString());
+				model.updateCachedIssues(updatedIssues, repoId);
 			}
 		}
 	}
-	
-	private void updateModelCollaborators(IRepositoryIdProvider repoId){
-		if (model.getRepoId().equals(repoId)) {
-			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(repoId);
-			if(collaborators.size() > 0){
+
+	private void updateModelCollaborators(String repoId) {
+		if (model.getRepoId().generateId().equals(repoId)) {
+			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+			if (collaborators.size() > 0) {
 				model.updateCollabsETag(collaboratorUpdateService.getLastETag());
-				model.updateCachedCollaborators(collaborators, repoId.toString());
+				model.updateCachedCollaborators(collaborators, repoId);
 			}
 		}
 	}
-	
-	private void updateModelLabels(IRepositoryIdProvider repoId){
-		if (model.getRepoId().equals(repoId)) {
-			List<Label> labels = labelUpdateService.getUpdatedItems(repoId);
-			if(labels.size() > 0){
+
+	private void updateModelLabels(String repoId) {
+		if (model.getRepoId().generateId().equals(repoId)) {
+			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+			if (labels.size() > 0) {
 				model.updateLabelsETag(labelUpdateService.getLastETag());
-				model.updateCachedLabels(labels, repoId.toString());
+				model.updateCachedLabels(labels, repoId);
 			}
 		}
 	}
-	
-	private void updateModelMilestones(IRepositoryIdProvider repoId){
-		if (model.getRepoId().equals(repoId)) {
-			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(repoId);
-			if(milestones.size() > 0){
+
+	private void updateModelMilestones(String repoId) {
+		if (model.getRepoId().generateId().equals(repoId)) {
+			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+			if (milestones.size() > 0) {
 				model.updateMilestonesETag(milestoneUpdateService.getLastETag());
-				model.updateCachedMilestones(milestones, repoId.toString());
+				model.updateCachedMilestones(milestones, repoId);
 			}
 		}
 	}
-
-
 }
