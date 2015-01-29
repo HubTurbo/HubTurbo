@@ -33,28 +33,31 @@ import util.events.EventDispatcher;
 import util.events.ModelChangedEvent;
 
 /**
- * Aggregates collections of all resources: issues, labels, milestones, users/collaborators.
- * Provides methods to access them, and method for updating them from different sources
- * (cache (Turbo* resource)/GitHub (regular resource)).
+ * Aggregates collections of all resources: issues, labels, milestones,
+ * users/collaborators. Provides methods to access them, and method for updating
+ * them from different sources (cache (Turbo* resource)/GitHub (regular
+ * resource)).
  * 
- * When modifying this class, it is important that you modify ModelStub as well, to add
- * stub versions of new methods. Platform.runLater should be removed. Other things like
- * network operations or file access may not be needed depending on the intent of the test.
+ * When modifying this class, it is important that you modify ModelStub as well,
+ * to add stub versions of new methods. Platform.runLater should be removed.
+ * Other things like network operations or file access may not be needed
+ * depending on the intent of the test.
  * 
- * TODO use a proper data structure in updateCachedList and get rid of untyped methods
+ * TODO use a proper data structure in updateCachedList and get rid of untyped
+ * methods
  */
 @SuppressWarnings("unused")
 public class Model {
 
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
-	
+
 	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
 	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
 	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
 	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
 
 	protected List<TurboIssue> issues = new ArrayList<>();
-	protected ObservableList<TurboUser> collaborators = FXCollections.observableArrayList();
+	protected List<TurboUser> collaborators = new ArrayList<>();
 	protected ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 	protected ObservableList<TurboMilestone> milestones = FXCollections.observableArrayList();
 
@@ -67,7 +70,7 @@ public class Model {
 	private String issueCheckTime = null;
 
 	private CacheFileHandler dcHandler = null;
-	
+
 	protected EventDispatcher eventDispatcher = UI.getInstance();
 
 	public Model() {
@@ -75,9 +78,6 @@ public class Model {
 	}
 
 	protected void setupModelChangeListeners() {
-		collaborators.addListener((ListChangeListener.Change<? extends TurboUser> c) -> {
-			eventDispatcher.triggerEvent(new ModelChangedEvent());
-		});
 		labels.addListener((ListChangeListener.Change<? extends TurboLabel> c) -> {
 			eventDispatcher.triggerEvent(new ModelChangedEvent());
 		});
@@ -88,7 +88,7 @@ public class Model {
 
 	private void ______MODEL_FUNCTIONALITY______() {
 	}
-	
+
 	/**
 	 * Notifies subscribers that the model has changed
 	 */
@@ -411,8 +411,9 @@ public class Model {
 	}
 
 	/**
-	 * Returns a reference to the TurboLabel given its full name on GitHub.
-	 * TODO change to optional
+	 * Returns a reference to the TurboLabel given its full name on GitHub. TODO
+	 * change to optional
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -428,6 +429,7 @@ public class Model {
 	public void addLabel(TurboLabel label) {
 		Platform.runLater(() -> {
 			labels.add(label);
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -453,6 +455,7 @@ public class Model {
 	public void deleteLabel(TurboLabel label) {
 		Platform.runLater(() -> {
 			labels.remove(label);
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -461,6 +464,7 @@ public class Model {
 			labels.clear();
 			ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
 			labels.addAll(buffer);
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -470,6 +474,7 @@ public class Model {
 	public void loadTurboLabels(List<TurboLabel> list) {
 		labels.clear();
 		labels.addAll(list);
+		triggerModelChangeEvent();
 	}
 
 	public void updateCachedLabels(List<Label> ghLabels, String repoId) {
@@ -489,12 +494,14 @@ public class Model {
 			milestones.clear();
 			ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 			milestones.addAll(buffer);
+			triggerModelChangeEvent();
 		});
 	}
 
 	/**
-	 * Returns a reference to the TurboLabel given its title on GitHub.
-	 * TODO change to optional
+	 * Returns a reference to the TurboLabel given its title on GitHub. TODO
+	 * change to optional
+	 * 
 	 * @param title
 	 * @return
 	 */
@@ -510,12 +517,14 @@ public class Model {
 	public void addMilestone(TurboMilestone milestone) {
 		Platform.runLater(() -> {
 			milestones.add(milestone);
+			triggerModelChangeEvent();
 		});
 	}
 
 	public void deleteMilestone(TurboMilestone milestone) {
 		Platform.runLater(() -> {
 			milestones.remove(milestone);
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -525,6 +534,7 @@ public class Model {
 	public void loadTurboMilestones(List<TurboMilestone> list) {
 		milestones.clear();
 		milestones.addAll(list);
+		triggerModelChangeEvent();
 	}
 
 	public void updateCachedMilestones(List<Milestone> ghMilestones, String repoId) {
@@ -535,14 +545,15 @@ public class Model {
 	private void ______COLLABORATORS______() {
 	}
 
-	public ObservableList<TurboUser> getCollaborators() {
+	public List<TurboUser> getCollaborators() {
 		return collaborators;
 	}
 
 	/**
 	 * Returns a reference to a TurboUser given his/her login name on GitHub.
-	 * TODO change to optional
-	 * TODO make naming of method more consistent, use login for one
+	 * TODO change to optional TODO make naming of method more consistent, use
+	 * login for one
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -559,12 +570,14 @@ public class Model {
 		Platform.runLater(() -> {
 			collaborators.clear();
 			collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+			triggerModelChangeEvent();
 		});
 	}
 
 	public void clearCollaborators() {
 		Platform.runLater(() -> {
 			collaborators.clear();
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -574,6 +587,7 @@ public class Model {
 	public void loadTurboCollaborators(List<TurboUser> list) {
 		collaborators.clear();
 		collaborators.addAll(list);
+		triggerModelChangeEvent();
 	}
 
 	public void updateCachedCollaborators(List<User> ghCollaborators, String repoId) {

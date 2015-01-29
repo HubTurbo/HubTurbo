@@ -58,7 +58,7 @@ public class ModelStub extends Model {
 	 * 
 	 * @return
 	 */
-	public ObservableList<TurboUser> getCollaboratorsRef() {
+	public List<TurboUser> getCollaboratorsRef() {
 		return collaborators;
 	}
 
@@ -196,6 +196,7 @@ public class ModelStub extends Model {
 	@Override
 	public void addLabel(TurboLabel label) {
 		labels.add(label);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -205,6 +206,7 @@ public class ModelStub extends Model {
 		labels.clear();
 		ArrayList<TurboLabel> buffer = CollectionUtilities.getHubTurboLabelList(ghLabels);
 		labels.addAll(buffer);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -212,6 +214,7 @@ public class ModelStub extends Model {
 	 */
 	public void deleteLabel(TurboLabel label) {
 		labels.remove(label);
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_LABELS______() {
@@ -228,6 +231,8 @@ public class ModelStub extends Model {
 		milestones.clear();
 		ArrayList<TurboMilestone> buffer = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 		milestones.addAll(buffer);
+		// TODO remove buffer
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -236,6 +241,7 @@ public class ModelStub extends Model {
 	@Override
 	public void addMilestone(TurboMilestone milestone) {
 		milestones.add(milestone);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -244,6 +250,7 @@ public class ModelStub extends Model {
 	@Override
 	public void deleteMilestone(TurboMilestone milestone) {
 		milestones.remove(milestone);
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_MILESTONES______() {
@@ -259,6 +266,7 @@ public class ModelStub extends Model {
 	 */
 	public void addCollaborator(TurboUser user) {
 		collaborators.add(user);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -267,6 +275,7 @@ public class ModelStub extends Model {
 	public void loadCollaborators(List<User> ghCollaborators) {
 		collaborators.clear();
 		collaborators.addAll(CollectionUtilities.getHubTurboUserList(ghCollaborators));
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -274,6 +283,7 @@ public class ModelStub extends Model {
 	 */
 	public void clearCollaborators() {
 		collaborators.clear();
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_COLLABORATORS______() {

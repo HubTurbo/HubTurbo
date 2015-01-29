@@ -474,17 +474,16 @@ public class ModelTests {
 		assertEquals(model.getCollaborators().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboUser> listener = c -> ++numberOfUpdates;
-		model.getCollaboratorsRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadCollaborators(TestUtils.getStubUsers(10));
-		model.getCollaboratorsRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
 		assertEquals(model.getCollaborators().size(), 10);
 
 		// Only one update triggered
-		assertEquals(end - start, 1);
+		assertEquals(1, end - start);
 	}
 
 	@Test
@@ -506,10 +505,9 @@ public class ModelTests {
 		assertEquals(model.getCollaborators().size(), 0);
 
 		int start = numberOfUpdates;
-		ListChangeListener<TurboUser> listener = c -> ++numberOfUpdates;
-		model.getCollaboratorsRef().addListener(listener);
+		registerChangeEvent(model);
 		model.loadTurboCollaborators(TestUtils.getStubTurboUsers(10));
-		model.getCollaboratorsRef().removeListener(listener);
+		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
 		// All issues loaded
@@ -522,6 +520,7 @@ public class ModelTests {
 	@Test
 	public void updateCachedCollaboratorsTest() {
 	    ModelStub model = new ModelStub();
+
 	    List<User> milestones = TestUtils.getStubUsers(10);
 	    model.loadCollaborators(milestones);
 

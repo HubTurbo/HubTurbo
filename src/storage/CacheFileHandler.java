@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.collections.ObservableList;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -90,10 +89,11 @@ public class CacheFileHandler {
 	public void setIssues(List<TurboIssue> issues) {
 		this.issues = issues;
 	}
+	// TODO remove redundant setters and fields
 	
 	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag,
-			String milestonesETag, String issueCheckTime, ObservableList<TurboUser> collaborators,
-			ObservableList<TurboLabel> labels, ObservableList<TurboMilestone> milestones,
+			String milestonesETag, String issueCheckTime, List<TurboUser> collaborators,
+			List<TurboLabel> labels, List<TurboMilestone> milestones,
 			List<TurboIssue> issues) {
 		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
 		this.issues = issues.stream().collect(Collectors.toList());
