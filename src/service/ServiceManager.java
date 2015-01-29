@@ -493,7 +493,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.createLabel(repoId, ghLabel);
 		}
-		return null; // TODO
+		return null;
 	}
 
 	public void deleteLabel(String label) throws IOException {

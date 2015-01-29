@@ -306,8 +306,9 @@ public class Model {
 	}
 
 	/**
-	 * Given the id of an issue, returns its index in the issue collection TODO
-	 * change to optional TODO index may no longer be applicable if we don't use
+	 * Given the id of an issue, returns its index in the issue collection
+	 * TODO change to optional
+	 * TODO index may no longer be applicable if we don't use
 	 * a list to store issues, re-evaluate uses of this method
 	 * 
 	 * @param issueId
@@ -326,8 +327,8 @@ public class Model {
 	}
 
 	/**
-	 * Given the id of a issue, returns a reference to it TODO change to
-	 * optional
+	 * Given the id of a issue, returns a reference to it
+	 * TODO change to optional
 	 * 
 	 * @param issueId
 	 * @return
@@ -397,12 +398,12 @@ public class Model {
 	}
 
 	public List<TurboLabel> getLabels() {
-		return labels;
+		return Collections.unmodifiableList(labels);
 	}
 
 	/**
-	 * Returns a reference to the TurboLabel given its full name on GitHub. TODO
-	 * change to optional
+	 * Returns a reference to the TurboLabel given its full name on GitHub.
+	 * TODO change to optional
 	 * 
 	 * @param name
 	 * @return
@@ -476,7 +477,7 @@ public class Model {
 	}
 
 	public List<TurboMilestone> getMilestones() {
-		return milestones;
+		return Collections.unmodifiableList(milestones);
 	}
 
 	public void loadMilestones(List<Milestone> ghMilestones) {
@@ -489,8 +490,8 @@ public class Model {
 	}
 
 	/**
-	 * Returns a reference to the TurboLabel given its title on GitHub. TODO
-	 * change to optional
+	 * Returns a reference to the TurboLabel given its title on GitHub.
+	 * TODO change to optional
 	 * 
 	 * @param title
 	 * @return
@@ -536,7 +537,7 @@ public class Model {
 	}
 
 	public List<TurboUser> getCollaborators() {
-		return collaborators;
+		return Collections.unmodifiableList(collaborators);
 	}
 
 	/**

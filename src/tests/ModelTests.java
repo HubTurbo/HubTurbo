@@ -36,27 +36,28 @@ public class ModelTests {
 	private static final String TEST_REPO_OWNER = "test";
 	private static final String TEST_REPO_NAME = "testing";
 
-	// TODO enable this test once these changes can be put into effect
-	// @Test
-	public void getters() {
-		// Ensure getters do not return references to the actual resource collections
+	@Test(expected = UnsupportedOperationException.class)
+	public void mutationOfIssues() {
 		ModelStub model = new ModelStub();
-		
-		assertEquals(model.getIssues().size(), 0);
 		model.getIssues().add(TestUtils.getStubTurboIssue(model, 1));
-		assertEquals(model.getIssues().size(), 0);
+	}
 
-		assertEquals(model.getMilestones().size(), 0);
+	@Test(expected = UnsupportedOperationException.class)
+	public void mutationOfMilestones() {
+		ModelStub model = new ModelStub();
 		model.getMilestones().add(TestUtils.getStubTurboMilestone("this"));
-		assertEquals(model.getMilestones().size(), 0);
+	}
 
-		assertEquals(model.getLabels().size(), 0);
+	@Test(expected = UnsupportedOperationException.class)
+	public void mutationOfLabels() {
+		ModelStub model = new ModelStub();
 		model.getLabels().add(TestUtils.getStubTurboLabel("does", "not"));
-		assertEquals(model.getLabels().size(), 0);
+	}
 
-		assertEquals(model.getCollaborators().size(), 0);
+	@Test(expected = UnsupportedOperationException.class)
+	public void mutationOfUsers() {
+		ModelStub model = new ModelStub();
 		model.getCollaborators().add(TestUtils.getStubTurboUser("matter"));
-		assertEquals(model.getCollaborators().size(), 0);
 	}
 
 	private void ______MODEL_FUNCTIONALITY______() {
