@@ -51,11 +51,6 @@ public class Model {
 
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
 
-	private static final String MESSAGE_LOADING_COLLABS = "Loading collaborators...";
-	private static final String MESSAGE_LOADING_LABELS = "Loading labels...";
-	private static final String MESSAGE_LOADING_MILESTONES = "Loading milestones...";
-	private static final String MESSAGE_LOADING_ISSUES = "Loading issues...";
-
 	protected List<TurboIssue> issues = new ArrayList<>();
 	protected List<TurboUser> collaborators = new ArrayList<>();
 	protected List<TurboLabel> labels = new ArrayList<>();
@@ -183,17 +178,17 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void loadTurboResources(HashMap<String, List> turboResources) {
 		Platform.runLater(() -> {
-			logger.info(MESSAGE_LOADING_COLLABS);
+			logger.info("Loading collaborators from cache...");
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
-			logger.info(MESSAGE_LOADING_LABELS);
+			logger.info("Loading labels from cache...");
 			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
-			logger.info(MESSAGE_LOADING_MILESTONES);
+			logger.info("Loading milestones from cache...");
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 
 			// only get issues now to prevent assertion error in
 			// getLabelReference of TurboIssues
 			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
-			logger.info(MESSAGE_LOADING_ISSUES);
+			logger.info("Loading issues from cache...");
 			loadTurboIssues(issues);
 		});
 	}
@@ -207,18 +202,18 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
 		if (!isPublicRepo) {
-			logger.info(MESSAGE_LOADING_COLLABS);
+			logger.info("Loading collaborators from GitHub...");
 			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
 		} else {
 			// We can't get collaborators from a public repo. Remove any collaborators
 			// left over from a previous repo instead.
 			clearCollaborators();
 		}
-		logger.info(MESSAGE_LOADING_LABELS);
+		logger.info("Loading labels from GitHub...");
 		loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
-		logger.info(MESSAGE_LOADING_MILESTONES);
+		logger.info("Loading milestones from GitHub...");
 		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
-		logger.info(MESSAGE_LOADING_ISSUES);
+		logger.info("Loading issues from GitHub...");
 		loadIssues((List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
 	}
 

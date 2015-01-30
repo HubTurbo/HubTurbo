@@ -117,7 +117,6 @@ public class UpdateService<T> extends GitHubService{
 			PageIterator<T> requestIterator = new PageIterator<T>(request, client);
 			HttpURLConnection connection = createUpdatedConnection(request);
 			int responseCode = connection.getResponseCode();
-			System.out.println(responseCode);
 			if(client.isError(responseCode)){
 				return new ArrayList<T>();
 			}
