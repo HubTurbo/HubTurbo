@@ -7,15 +7,16 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
 import org.eclipse.egit.github.core.PullRequest;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import tests.stubs.ModelStub;
 import util.Utility;
 import filter.ParseException;
 import filter.Parser;
@@ -23,8 +24,13 @@ import filter.expression.Qualifier;
 
 public class FilterEvalTests {
 
-	private final ModelStub model = new ModelStub();
+	private final Model model = new Model();
 
+	@BeforeClass
+	public static void setup() {
+		Model.isInTestMode = true;
+	}
+	
 	/**
 	 * Tests for the presence of keywords in a particular issue.
 	 * 

@@ -5,24 +5,25 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import javafx.collections.ListChangeListener;
+import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
 import model.TurboMilestone;
-import model.TurboUser;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import tests.stubs.ModelEventDispatcherStub;
-import tests.stubs.ModelStub;
 import ui.UI;
 import util.events.EventHandler;
 import util.events.ModelChangedEvent;
@@ -36,27 +37,32 @@ public class ModelTests {
 	private static final String TEST_REPO_OWNER = "test";
 	private static final String TEST_REPO_NAME = "testing";
 
+	@BeforeClass
+	public static void setup() {
+		Model.isInTestMode = true;
+	}
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void mutationOfIssues() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.getIssues().add(TestUtils.getStubTurboIssue(model, 1));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void mutationOfMilestones() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.getMilestones().add(TestUtils.getStubTurboMilestone("this"));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void mutationOfLabels() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.getLabels().add(TestUtils.getStubTurboLabel("does", "not"));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void mutationOfUsers() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.getCollaborators().add(TestUtils.getStubTurboUser("matter"));
 	}
 
@@ -64,8 +70,8 @@ public class ModelTests {
 	}
 
 	@Test
-	public void loadingFromCache() {
-		ModelStub model = new ModelStub();
+	public void loadingFromCache() throws IOException {
+		Model model = new Model();
 		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
 
 		assertEquals(model.getLabels().size(), 10);
@@ -75,8 +81,8 @@ public class ModelTests {
 	}
 
 	@Test
-	public void loadingFromGitHub() {
-		ModelStub model = new ModelStub();
+	public void loadingFromGitHub() throws IOException {
+		Model model = new Model();
 		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
 
 		assertEquals(model.getLabels().size(), 10);
@@ -85,14 +91,12 @@ public class ModelTests {
 		assertEquals(model.getIssues().size(), 10);
 	}
 
-	private EventBus events = new EventBus();
 	private int numberOfUpdates = 0;
 	private EventHandler modelChangedHandler = null;
 
-	private void registerChangeEvent(ModelStub model) {
+	private void registerChangeEvent(Model model) {
 		assert modelChangedHandler == null;
-		model.setEventDispatcher(new ModelEventDispatcherStub(events));
-		events.register(modelChangedHandler = new ModelChangedEventHandler() {
+		model.getTestEvents().register(modelChangedHandler = new ModelChangedEventHandler() {
 			@Override
 			public void handle(ModelChangedEvent e) {
 				++numberOfUpdates;
@@ -100,10 +104,9 @@ public class ModelTests {
 		});
 	}
 
-	private void unregisterChangeEvent(ModelStub model) {
+	private void unregisterChangeEvent(Model model) {
 		assert modelChangedHandler != null;
-		model.setEventDispatcher(UI.getInstance());
-		events.unregister(modelChangedHandler);
+		model.getTestEvents().unregister(modelChangedHandler);
 	}
 
 	private void ______ISSUES______() {
@@ -111,12 +114,12 @@ public class ModelTests {
 
 	@Test
 	public void loadIssuesTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getIssues().size(), 0);
 
 		int start = numberOfUpdates;
 		registerChangeEvent(model);
-		model.loadIssues(TestUtils.getStubIssues(10));
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
@@ -129,8 +132,8 @@ public class ModelTests {
 
 	@Test
 	public void getIndexOfIssueTest() {
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 
 		for (int i = 1; i <= 10; i++) {
 			assertEquals(model.getIndexOfIssue(i), i - 1);
@@ -139,8 +142,8 @@ public class ModelTests {
 
 	@Test
 	public void getIssueWithIdTest() {
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 
 		for (int i = 1; i <= 10; i++) {
 			assertNotEquals(model.getIssueWithId(i), null);
@@ -153,7 +156,7 @@ public class ModelTests {
 
 	@Test
 	public void loadTurboIssuesTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getIssues().size(), 0);
 
 		int start = numberOfUpdates;
@@ -171,8 +174,8 @@ public class ModelTests {
 
 	@Test
 	public void appendToCachedIssuesTest() {
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 		TurboIssue issue11 = TestUtils.getStubTurboIssue(model, 11);
 		model.appendToCachedIssues(issue11);
 		assertTrue(model.getIssues().size() > 0);
@@ -182,12 +185,12 @@ public class ModelTests {
 
 	@Test
 	public void updateCachedIssuesTest() {
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 
 		int start = numberOfUpdates;
 		registerChangeEvent(model);
-		
+
 		Issue issue1 = TestUtils.getStubIssue(3);
 		issue1.setTitle("something different");
 
@@ -197,14 +200,14 @@ public class ModelTests {
 		assertEquals(model.getIssueWithId(3).getTitle(), "issue3");
 		assertEquals(model.getIssueWithId(11), null);
 
-		model.updateCachedIssues(Arrays.asList(issue1, issue2), "testing/test");
+		model.updateCachedIssues(new CountDownLatch(4), Arrays.asList(issue1, issue2), "testing/test");
 
 		// 3 is there and has been changed
 		// 11 is not there but is there after
 		assertEquals(model.getIssueWithId(3).getTitle(), "something different");
 		assertEquals(model.getIssueWithId(11).getTitle(), "something really different");
 		assertEquals(model.getIssueWithId(11), model.getIssues().get(0));
-		
+
 		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
@@ -215,8 +218,8 @@ public class ModelTests {
 	@Test
 	public void updateCachedIssueTest() {
 
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 
 		TurboIssue issue = TestUtils.getStubTurboIssue(model, 3);
 		issue.setTitle("something different");
@@ -241,8 +244,8 @@ public class ModelTests {
 
 	@Test
 	public void getLabelByGhNameTest() {
-		ModelStub model = new ModelStub();
-		model.loadLabels(TestUtils.getStubLabels(10));
+		Model model = new Model();
+		model.loadLabels(new CountDownLatch(4), TestUtils.getStubLabels(10));
 		for (int i = 0; i < model.getLabels().size(); i++) {
 			assertEquals(model.getLabels().get(i), model.getLabelByGhName("group.label" + (i + 1)));
 		}
@@ -250,8 +253,8 @@ public class ModelTests {
 
 	@Test
 	public void addLabelTest() {
-		ModelStub model = new ModelStub();
-		model.loadLabels(TestUtils.getStubLabels(10));
+		Model model = new Model();
+		model.loadLabels(new CountDownLatch(4), TestUtils.getStubLabels(10));
 		TurboLabel newLabel = TestUtils.getStubTurboLabel("group", "name");
 		model.addLabel(newLabel);
 		assertNotEquals(model.getLabels().size(), 0);
@@ -260,24 +263,24 @@ public class ModelTests {
 
 	@Test
 	public void isExclusiveLabelTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		List<TurboLabel> labels = TestUtils.getStubTurboLabels(10);
 		labels.forEach(l -> l.setExclusive(true));
-		
+
 		model.loadTurboLabels(labels);
 		assertTrue(model.isExclusiveLabelGroup("group"));
-		
+
 		labels.get(0).setExclusive(false);
 		assertFalse(model.isExclusiveLabelGroup("group"));
 	}
 
 	@Test
 	public void deleteLabelTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.loadTurboLabels(TestUtils.getStubTurboLabels(10));
 		model.deleteLabel(model.getLabels().get(2)); // ids 3 and 5
 		model.deleteLabel(model.getLabels().get(4));
-		
+
 		assertEquals(model.getLabels().size(), 8);
 		for (TurboLabel label : model.getLabels()) {
 			if (label.getName().endsWith("3") || label.getName().endsWith("5")) {
@@ -288,12 +291,12 @@ public class ModelTests {
 
 	@Test
 	public void loadLabelsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getLabels().size(), 0);
 
 		int start = numberOfUpdates;
 		registerChangeEvent(model);
-		model.loadLabels(TestUtils.getStubLabels(10));
+		model.loadLabels(new CountDownLatch(4), TestUtils.getStubLabels(10));
 		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
@@ -309,7 +312,7 @@ public class ModelTests {
 
 	@Test
 	public void loadTurboLabelsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getLabels().size(), 0);
 
 		int start = numberOfUpdates;
@@ -327,9 +330,9 @@ public class ModelTests {
 
 	@Test
 	public void updateCachedLabelsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		List<Label> labels = TestUtils.getStubLabels(10);
-		model.loadLabels(labels);
+		model.loadLabels(new CountDownLatch(4), labels);
 
 		Label label1 = labels.get(3);
 		label1.setName("something");
@@ -340,7 +343,7 @@ public class ModelTests {
 		assertEquals(model.getLabels().get(3).getName(), "label4");
 		assertEquals(model.getLabelByGhName("something else"), null);
 
-		model.updateCachedLabels(Arrays.asList(label1, label2), "testing/test");
+		model.updateCachedLabels(new CountDownLatch(4), Arrays.asList(label1, label2), "testing/test");
 		assertEquals(model.getLabels().size(), 2);
 
 		// label1 is there and has been changed
@@ -356,8 +359,8 @@ public class ModelTests {
 
 	@Test
 	public void addMilestoneTest() {
-		ModelStub model = new ModelStub();
-		model.loadIssues(TestUtils.getStubIssues(10));
+		Model model = new Model();
+		model.loadIssues(new CountDownLatch(4), TestUtils.getStubIssues(10));
 		TurboMilestone newMilestone = TestUtils.getStubTurboMilestone("milestone123");
 		model.addMilestone(newMilestone);
 		assertEquals(model.getMilestones().get(model.getMilestones().size() - 1), newMilestone);
@@ -365,12 +368,12 @@ public class ModelTests {
 
 	@Test
 	public void deleteMilestoneTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
-		
+
 		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
 		model.deleteMilestone(model.getMilestones().get(4));
-		
+
 		assertEquals(model.getMilestones().size(), 8);
 		for (TurboMilestone milestone : model.getMilestones()) {
 			if (milestone.getTitle().endsWith("3") || milestone.getTitle().endsWith("5")) {
@@ -381,12 +384,12 @@ public class ModelTests {
 
 	@Test
 	public void loadMilestonesTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getMilestones().size(), 0);
 
 		int start = numberOfUpdates;
 		registerChangeEvent(model);
-		model.loadMilestones(TestUtils.getStubMilestones(10));
+		model.loadMilestones(new CountDownLatch(4), TestUtils.getStubMilestones(10));
 		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
@@ -399,8 +402,8 @@ public class ModelTests {
 
 	@Test
 	public void getMilestoneByTitleTest() {
-		ModelStub model = new ModelStub();
-		model.loadMilestones(TestUtils.getStubMilestones(10));
+		Model model = new Model();
+		model.loadMilestones(new CountDownLatch(4), TestUtils.getStubMilestones(10));
 		for (int i = 0; i < model.getMilestones().size(); i++) {
 			assertEquals(model.getMilestones().get(i), model.getMilestoneByTitle("v0." + (i + 1)));
 		}
@@ -411,7 +414,7 @@ public class ModelTests {
 
 	@Test
 	public void loadTurboMilestonesTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getMilestones().size(), 0);
 
 		int start = numberOfUpdates;
@@ -429,9 +432,9 @@ public class ModelTests {
 
 	@Test
 	public void updateCachedMilestonesTest() {
-	    ModelStub model = new ModelStub();
+	    Model model = new Model();
 	    List<Milestone> milestones = TestUtils.getStubMilestones(10);
-	    model.loadMilestones(milestones);
+	    model.loadMilestones(new CountDownLatch(4), milestones);
 
 	    Milestone milestone1 = milestones.get(3);
 	    milestone1.setTitle("amilestone");
@@ -442,7 +445,7 @@ public class ModelTests {
 	    assertEquals(model.getMilestones().get(3).getTitle(), "v0.4");
 	    assertEquals(model.getMilestoneByTitle("anothermilestone"), null);
 
-	    model.updateCachedMilestones(Arrays.asList(milestone1, milestone2), "testing/test");
+	    model.updateCachedMilestones(new CountDownLatch(4), Arrays.asList(milestone1, milestone2), "testing/test");
 	    assertEquals(model.getMilestones().size(), 2);
 
 	    // milestone1 is there and has been changed
@@ -458,8 +461,8 @@ public class ModelTests {
 
 	@Test
 	public void getUserByGhNameTest() {
-		ModelStub model = new ModelStub();
-		model.loadCollaborators(TestUtils.getStubUsers(10));
+		Model model = new Model();
+		model.loadCollaborators(new CountDownLatch(4), TestUtils.getStubUsers(10));
 		for (int i = 0; i < model.getCollaborators().size(); i++) {
 			assertEquals(model.getCollaborators().get(i), model.getUserByGhName("user" + (i+1)));
 		}
@@ -467,12 +470,12 @@ public class ModelTests {
 
 	@Test
 	public void loadCollaboratorsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getCollaborators().size(), 0);
 
 		int start = numberOfUpdates;
 		registerChangeEvent(model);
-		model.loadCollaborators(TestUtils.getStubUsers(10));
+		model.loadCollaborators(new CountDownLatch(4), TestUtils.getStubUsers(10));
 		unregisterChangeEvent(model);
 		int end = numberOfUpdates;
 
@@ -485,11 +488,11 @@ public class ModelTests {
 
 	@Test
 	public void clearCollaboratorsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getCollaborators().size(), 0);
 		model.loadTurboCollaborators(TestUtils.getStubTurboUsers(10));
 		assertEquals(model.getCollaborators().size(), 10);
-		model.clearCollaborators();
+		model.clearCollaborators(new CountDownLatch(4));
 		assertEquals(model.getCollaborators().size(), 0);
 	}
 
@@ -498,7 +501,7 @@ public class ModelTests {
 
 	@Test
 	public void loadTurboCollaboratorsTest() {
-		ModelStub model = new ModelStub();
+		Model model = new Model();
 		assertEquals(model.getCollaborators().size(), 0);
 
 		int start = numberOfUpdates;
@@ -516,10 +519,10 @@ public class ModelTests {
 
 	@Test
 	public void updateCachedCollaboratorsTest() {
-	    ModelStub model = new ModelStub();
+	    Model model = new Model();
 
 	    List<User> milestones = TestUtils.getStubUsers(10);
-	    model.loadCollaborators(milestones);
+	    model.loadCollaborators(new CountDownLatch(4), milestones);
 
 	    User user1 = milestones.get(3);
 	    user1.setLogin("auser");
@@ -530,7 +533,7 @@ public class ModelTests {
         assertEquals(model.getCollaborators().get(3).getGithubName(), "user4");
         assertEquals(model.getUserByGhName("anotheruser"), null);
 
-        model.updateCachedCollaborators(Arrays.asList(user1, user2), "testing/test");
+        model.updateCachedCollaborators(new CountDownLatch(4), Arrays.asList(user1, user2), "testing/test");
         assertEquals(model.getCollaborators().size(), 2);
 
         // user1 is there and has been changed

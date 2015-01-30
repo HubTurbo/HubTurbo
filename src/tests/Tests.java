@@ -1,6 +1,8 @@
 
 package tests;
 
+import model.Model;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -22,5 +24,6 @@ public class Tests {
 	@BeforeClass
 	public static void setup() {
 		ServiceManager.isInTestMode = true;
+		Model.isInTestMode = true;
 	}
 }

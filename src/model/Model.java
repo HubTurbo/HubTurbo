@@ -24,23 +24,27 @@ import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
 import storage.CacheFileHandler;
+import tests.TestUtils;
+import tests.stubs.ModelEventDispatcherStub;
 import ui.UI;
 import util.CollectionUtilities;
 import util.DialogMessage;
 import util.events.EventDispatcher;
 import util.events.ModelChangedEvent;
 
+import com.google.common.eventbus.EventBus;
+
 /**
  * Aggregates collections of all resources: issues, labels, milestones,
  * users/collaborators. Provides methods to access them, and method for updating
  * them from different sources (cache (Turbo* resource)/GitHub (regular
  * resource)).
- * 
+ *
  * When modifying this class, it is important that you modify ModelStub as well,
  * to add stub versions of new methods. Platform.runLater should be removed.
  * Other things like network operations or file access may not be needed
  * depending on the intent of the test.
- * 
+ *
  * TODO use a proper data structure in updateCachedList and get rid of untyped
  * methods
  */
@@ -48,6 +52,8 @@ import util.events.ModelChangedEvent;
 public class Model {
 
 	private static final Logger logger = LogManager.getLogger(Model.class.getName());
+
+	public static boolean isInTestMode = false;
 
 	protected List<TurboIssue> issues = new ArrayList<>();
 	protected List<TurboUser> collaborators = new ArrayList<>();
@@ -64,12 +70,27 @@ public class Model {
 
 	private CacheFileHandler dcHandler = null;
 
-	protected EventDispatcher eventDispatcher = UI.getInstance();
+	private EventDispatcher eventDispatcher = null;
+	private EventBus testEvents = null;
 
 	public Model() {
+		if (isInTestMode) {
+			testEvents = new EventBus();
+			eventDispatcher = new ModelEventDispatcherStub(testEvents);
+		} else {
+			eventDispatcher = UI.getInstance();
+		}
 	}
 
 	private void ______MODEL_FUNCTIONALITY______() {
+	}
+
+	private void run(Runnable action) {
+		if (isInTestMode) {
+			action.run();
+		} else {
+			Platform.runLater(action);
+		}
 	}
 
 	/**
@@ -80,7 +101,7 @@ public class Model {
 			eventDispatcher.triggerEvent(new ModelChangedEvent());
 		}
 	}
-	
+
 	private int modelChangeCounter = 0;
 
 	public void disableModelChanges() {
@@ -107,13 +128,22 @@ public class Model {
 	/**
 	 * Given a repository id, downloads its resources from GitHub, then
 	 * populates fields in this class with them.
-	 * 
+	 *
+	 * Does not perform network operations in test mode, and always loads
+	 * stub data from cache.
+	 *
 	 * @param repoId
 	 * @return true on success, false otherwise
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
 	public boolean loadComponents(RepositoryId repoId) throws IOException {
+		if (isInTestMode) {
+			this.repoId = repoId;
+			populateComponents(repoId, TestUtils.getStubTurboResourcesFromCache(this, 10));
+			return true;
+		}
+
 		try {
 			HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId);
 			populateComponents(repoId, items);
@@ -138,11 +168,18 @@ public class Model {
 	/**
 	 * Downloads the resources of the current repository from GitHub, bypassing
 	 * the cache, then populates the fields of this class with them.
-	 * 
+	 *
+	 * Does not perform network operations in test mode, instead loading stub
+	 * data from cache.
+	 *
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
 	public void forceReloadComponents() throws IOException {
+		if (isInTestMode) {
+			populateComponents(repoId, TestUtils.getStubResources(this, 10));
+		}
+
 		HashMap<String, List> items = ServiceManager.getInstance().getGitHubResources();
 		populateComponents(repoId, items);
 	}
@@ -150,15 +187,15 @@ public class Model {
 	/**
 	 * Given a repository id and a data structure containing resources,
 	 * populates the fields of this class with them
-	 * 
+	 *
 	 * @param repoId
 	 * @param resources
 	 */
 	@SuppressWarnings("rawtypes")
 	public void populateComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources) {
-		
+
 		this.repoId = repoId;
-		
+
 		boolean loadedFromCache = false;
 		boolean isPublicRepo = false;
 
@@ -174,31 +211,31 @@ public class Model {
 		}
 
 		CountDownLatch latch = new CountDownLatch(4);
-		
+
 		if (loadedFromCache) {
 			loadTurboResources(latch, resources);
 		} else {
 			loadGitHubResources(latch, resources, isPublicRepo);
 		}
-		
+
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		
+
 		updateCache();
 	}
 
 	/**
 	 * Given a data structure containing resources loaded from the cache,
 	 * populates the fields of this class with them.
-	 * 
+	 *
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void loadTurboResources(CountDownLatch latch, HashMap<String, List> turboResources) {
-		Platform.runLater(() -> {
+		run(() -> {
 			disableModelChanges();
 			logger.info("Loading collaborators from cache...");
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
@@ -210,9 +247,12 @@ public class Model {
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 			latch.countDown();
 
-			// only get issues now to prevent assertion error in
-			// getLabelReference of TurboIssues
-			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
+			// Load issues last, as this would require having references other resources
+			
+			List<TurboIssue> issues = isInTestMode
+					? TestUtils.getStubTurboIssues(this, 10)
+					: dcHandler.getRepo().getIssues(this);
+			
 			logger.info("Loading issues from cache...");
 			loadTurboIssues(issues);
 			enableModelChanges();
@@ -224,7 +264,7 @@ public class Model {
 	/**
 	 * Given a data structure containing resources loaded from the cache,
 	 * populates the fields of this class with them.
-	 * 
+	 *
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -252,7 +292,7 @@ public class Model {
 	 * Given two lists of one type of resource (one being the current set, and
 	 * one being the new set), updates the current set with the contents of the
 	 * new set, then writes the current set to cache.
-	 * 
+	 *
 	 * @param list
 	 * @param newList
 	 * @param repoId
@@ -261,7 +301,8 @@ public class Model {
 	protected void updateCachedList(List list, List newList, String repoId, CountDownLatch latch) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		Platform.runLater(() -> {
+
+		run(() -> {
 			list.removeAll(removed);
 
 			Listable listItem = (Listable) newList.get(0);
@@ -291,12 +332,16 @@ public class Model {
 
 	@SuppressWarnings("rawtypes")
 	protected void logNumOfUpdates(List newList, String type) {
-		logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
+		if (!isInTestMode) {
+			logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
+		}
 	}
 
 	public void updateCache() {
-		dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
-				lastIssueCheckTime, collaborators, labels, milestones, issues);
+		if (!isInTestMode) {
+            dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
+            		lastIssueCheckTime, collaborators, labels, milestones, issues);
+		}
 	}
 
 	public void refresh() {
@@ -312,11 +357,11 @@ public class Model {
 
 	/**
 	 * Given a list of Issues, loads them into the issue collection.
-	 * 
+	 *
 	 * @param ghIssues
 	 */
 	public void loadIssues(CountDownLatch latch, List<Issue> ghIssues) {
-		Platform.runLater(() -> {
+		run(() -> {
 			issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			triggerModelChangeEvent();
 			latch.countDown();
@@ -328,7 +373,7 @@ public class Model {
 	 * TODO change to optional
 	 * TODO index may no longer be applicable if we don't use
 	 * a list to store issues, re-evaluate uses of this method
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 */
@@ -347,7 +392,7 @@ public class Model {
 	/**
 	 * Given the id of a issue, returns a reference to it
 	 * TODO change to optional
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 */
@@ -382,7 +427,7 @@ public class Model {
 			return;
 		}
 
-		Platform.runLater(() -> {
+		run(() -> {
 			logger.info(newIssues.size() + " issues changed/added since last sync");
 			for (int i = newIssues.size() - 1; i >= 0; i--) {
 				Issue issue = newIssues.get(i);
@@ -397,7 +442,7 @@ public class Model {
 	/**
 	 * Given a TurboIssue, adds it to the model if it is not yet in it,
 	 * otherwise updates the corresponding issue in the model with its fields.
-	 * 
+	 *
 	 * @param issue
 	 */
 	public void updateCachedIssue(TurboIssue issue) {
@@ -421,7 +466,7 @@ public class Model {
 	/**
 	 * Returns a reference to the TurboLabel given its full name on GitHub.
 	 * TODO change to optional
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -435,7 +480,7 @@ public class Model {
 	}
 
 	public void addLabel(TurboLabel label) {
-		Platform.runLater(() -> {
+		run(() -> {
 			labels.add(label);
 			triggerModelChangeEvent();
 		});
@@ -444,7 +489,7 @@ public class Model {
 	/**
 	 * Tests to see if all labels of a group are exclusive. If one is not
 	 * exclusive, all are not exclusive.
-	 * 
+	 *
 	 * @param group
 	 * @return
 	 */
@@ -461,14 +506,14 @@ public class Model {
 	}
 
 	public void deleteLabel(TurboLabel label) {
-		Platform.runLater(() -> {
+		run(() -> {
 			labels.remove(label);
 			triggerModelChangeEvent();
 		});
 	}
 
 	public void loadLabels(CountDownLatch latch, List<Label> ghLabels) {
-		Platform.runLater(() -> {
+		run(() -> {
 			labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 			triggerModelChangeEvent();
 			latch.countDown();
@@ -496,7 +541,7 @@ public class Model {
 	}
 
 	public void loadMilestones(CountDownLatch latch, List<Milestone> ghMilestones) {
-		Platform.runLater(() -> {
+		run(() -> {
 			milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 			triggerModelChangeEvent();
 			latch.countDown();
@@ -506,7 +551,7 @@ public class Model {
 	/**
 	 * Returns a reference to the TurboLabel given its title on GitHub.
 	 * TODO change to optional
-	 * 
+	 *
 	 * @param title
 	 * @return
 	 */
@@ -520,14 +565,14 @@ public class Model {
 	}
 
 	public void addMilestone(TurboMilestone milestone) {
-		Platform.runLater(() -> {
+		run(() -> {
 			milestones.add(milestone);
 			triggerModelChangeEvent();
 		});
 	}
 
 	public void deleteMilestone(TurboMilestone milestone) {
-		Platform.runLater(() -> {
+		run(() -> {
 			milestones.remove(milestone);
 			triggerModelChangeEvent();
 		});
@@ -550,6 +595,11 @@ public class Model {
 	private void ______COLLABORATORS______() {
 	}
 
+	public void addCollaborator(TurboUser user) {
+		collaborators.add(user);
+		triggerModelChangeEvent();
+	}
+
 	public List<TurboUser> getCollaborators() {
 		return Collections.unmodifiableList(collaborators);
 	}
@@ -558,7 +608,7 @@ public class Model {
 	 * Returns a reference to a TurboUser given his/her login name on GitHub.
 	 * TODO change to optional TODO make naming of method more consistent, use
 	 * login for one
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -572,7 +622,7 @@ public class Model {
 	}
 
 	public void loadCollaborators(CountDownLatch latch, List<User> ghCollaborators) {
-		Platform.runLater(() -> {
+		run(() -> {
 			collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 			triggerModelChangeEvent();
 			latch.countDown();
@@ -580,7 +630,7 @@ public class Model {
 	}
 
 	public void clearCollaborators(CountDownLatch latch) {
-		Platform.runLater(() -> {
+		run(() -> {
 			collaborators.clear();
 			triggerModelChangeEvent();
 			latch.countDown();
@@ -622,5 +672,33 @@ public class Model {
 
 	public void updateIssueCheckTime(String date) {
 		this.lastIssueCheckTime = date;
+	}
+
+	private void ______TESTING______() {
+	}
+	
+	public EventBus getTestEvents() {
+		assert isInTestMode : "This function should not be called outside test mode";
+		return testEvents;
+	}
+
+	public List<TurboIssue> getIssuesRef() {
+		assert isInTestMode : "This function should not be called outside test mode";
+		return issues;
+	}
+
+	public List<TurboUser> getCollaboratorsRef() {
+		assert isInTestMode : "This function should not be called outside test mode";
+		return collaborators;
+	}
+
+	public List<TurboLabel> getLabelsRef() {
+		assert isInTestMode : "This function should not be called outside test mode";
+		return labels;
+	}
+
+	public List<TurboMilestone> getMilestonesRef() {
+		assert isInTestMode : "This function should not be called outside test mode";
+		return milestones;
 	}
 }

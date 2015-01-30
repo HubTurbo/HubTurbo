@@ -131,6 +131,7 @@ public class ServiceManager {
 		repositoryService = new RepositoryServiceExtended(githubClient);
 		markdownService = new MarkdownService(githubClient);
 		contentService = new ContentsService(githubClient);
+		// TODO construct model later
 		model = new Model();
 	}
 
@@ -324,6 +325,7 @@ public class ServiceManager {
 		this.repoId = repoId;
 	
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
+		// TODO set these paramters in constructor instead
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
 	
