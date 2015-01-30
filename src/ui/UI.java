@@ -373,7 +373,6 @@ public class UI extends Application implements EventDispatcher {
 		
 		logger.info("Switching repository to " + repoString + " in progress");
 		
-		disableRepositorySwitching();
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		
@@ -387,15 +386,12 @@ public class UI extends Application implements EventDispatcher {
 				
 				try {
 					ServiceManager.getInstance().updateModelNow().await();
-				} catch (Exception e) {
+				} catch (InterruptedException e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
 
 				final CountDownLatch latch = new CountDownLatch(1);
 				Platform.runLater(() -> {
-					// Re-enable repository switching when everything is done
-					enableRepositorySwitching();
-					
 					columns.restoreColumns();
 					triggerEvent(new PanelSavedEvent());
 					latch.countDown();

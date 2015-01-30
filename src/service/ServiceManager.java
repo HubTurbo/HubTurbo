@@ -411,6 +411,8 @@ public class ServiceManager {
 			preventRepoSwitchingAndUpdateModel(latch, repoId);
 		});
 
+		// The latch is returned. Thus there will be two threads blocking on it:
+		// this one, and whatever is calling this method to update the model.
 		return latch;
 	}
 	
