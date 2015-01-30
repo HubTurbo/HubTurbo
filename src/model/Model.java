@@ -95,6 +95,7 @@ public class Model {
 		return repoId;
 	}
 
+	// TODO get rid of this
 	public void setRepoId(IRepositoryIdProvider repoId) {
 		this.repoId = repoId;
 	}
@@ -185,7 +186,8 @@ public class Model {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		System.out.println("+++ +++ ++ + DONE loading everything and triggering model update");
+		
+		updateCache();
 	}
 
 	/**
@@ -256,45 +258,45 @@ public class Model {
 	 * @param repoId
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void updateCachedList(List list, List newList, String repoId) {
+	protected void updateCachedList(List list, List newList, String repoId, CountDownLatch latch) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				list.removeAll(removed);
+		Platform.runLater(() -> {
+			list.removeAll(removed);
 
-				Listable listItem = (Listable) newList.get(0);
-				if (listItem instanceof TurboMilestone) {
-					logNumOfUpdates(newList, "milestone(s)");
-				} else if (listItem instanceof TurboLabel) {
-					logNumOfUpdates(newList, "label(s)");
-				} else if (listItem instanceof TurboUser) {
-					logNumOfUpdates(newList, "collaborator(s)");
-				}
-
-				ArrayList<Object> buffer = new ArrayList<>();
-				for (Object item : newList) {
-					int index = list.indexOf(item);
-					if (index != -1) {
-						Listable old = (Listable) list.get(index);
-						old.copyValues(item);
-					} else {
-						buffer.add(item);
-					}
-				}
-				list.addAll(buffer);
-
-				dcHandler.writeToFile(repoId, lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag, lastIssueCheckTime,
-						collaborators, labels, milestones, issues);
+			Listable listItem = (Listable) newList.get(0);
+			if (listItem instanceof TurboMilestone) {
+				logNumOfUpdates(newList, "milestone(s)");
+			} else if (listItem instanceof TurboLabel) {
+				logNumOfUpdates(newList, "label(s)");
+			} else if (listItem instanceof TurboUser) {
+				logNumOfUpdates(newList, "collaborator(s)");
 			}
 
+			ArrayList<Object> buffer = new ArrayList<>();
+			for (Object item : newList) {
+				int index = list.indexOf(item);
+				if (index != -1) {
+					Listable old = (Listable) list.get(index);
+					old.copyValues(item);
+				} else {
+					buffer.add(item);
+				}
+			}
+			list.addAll(buffer);
+
+			latch.countDown();
 		});
 	}
 
 	@SuppressWarnings("rawtypes")
 	protected void logNumOfUpdates(List newList, String type) {
 		logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
+	}
+
+	public void updateCache() {
+		dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
+				lastIssueCheckTime, collaborators, labels, milestones, issues);
 	}
 
 	public void refresh() {
@@ -317,8 +319,6 @@ public class Model {
 		Platform.runLater(() -> {
 			issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			triggerModelChangeEvent();
-			dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
-					lastIssueCheckTime, collaborators, labels, milestones, issues);
 			latch.countDown();
 		});
 	}
@@ -375,7 +375,7 @@ public class Model {
 		triggerModelChangeEvent();
 	}
 
-	public void updateCachedIssues(List<Issue> newIssues, String repoId) {
+	public void updateCachedIssues(CountDownLatch latch, List<Issue> newIssues, String repoId) {
 
 		if (newIssues.size() == 0) {
 			assert false : "updateCachedIssues should not be called before issues have been loaded";
@@ -383,15 +383,14 @@ public class Model {
 		}
 
 		Platform.runLater(() -> {
-			logger.debug(newIssues.size() + " issues changed/added since last sync");
+			logger.info(newIssues.size() + " issues changed/added since last sync");
 			for (int i = newIssues.size() - 1; i >= 0; i--) {
 				Issue issue = newIssues.get(i);
 				TurboIssue newCached = new TurboIssue(issue, Model.this);
 				updateCachedIssue(newCached);
 			}
 			triggerModelChangeEvent();
-			dcHandler.writeToFile(repoId, lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag, lastIssueCheckTime,
-					collaborators, labels, milestones, issues);
+			latch.countDown();
 		});
 	}
 
@@ -484,9 +483,9 @@ public class Model {
 		triggerModelChangeEvent();
 	}
 
-	public void updateCachedLabels(List<Label> ghLabels, String repoId) {
+	public void updateCachedLabels(CountDownLatch latch, List<Label> ghLabels, String repoId) {
 		ArrayList<TurboLabel> newLabels = CollectionUtilities.getHubTurboLabelList(ghLabels);
-		updateCachedList(labels, newLabels, repoId);
+		updateCachedList(labels, newLabels, repoId, latch);
 	}
 
 	private void ______MILESTONES______() {
@@ -543,9 +542,9 @@ public class Model {
 		triggerModelChangeEvent();
 	}
 
-	public void updateCachedMilestones(List<Milestone> ghMilestones, String repoId) {
+	public void updateCachedMilestones(CountDownLatch latch, List<Milestone> ghMilestones, String repoId) {
 		ArrayList<TurboMilestone> newMilestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-		updateCachedList(milestones, newMilestones, repoId);
+		updateCachedList(milestones, newMilestones, repoId, latch);
 	}
 
 	private void ______COLLABORATORS______() {
@@ -597,9 +596,9 @@ public class Model {
 		triggerModelChangeEvent();
 	}
 
-	public void updateCachedCollaborators(List<User> ghCollaborators, String repoId) {
+	public void updateCachedCollaborators(CountDownLatch latch, List<User> ghCollaborators, String repoId) {
 		ArrayList<TurboUser> newCollaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
-		updateCachedList(collaborators, newCollaborators, repoId);
+		updateCachedList(collaborators, newCollaborators, repoId, latch);
 	}
 
 	private void ______RESOURCE_METADATA______() {

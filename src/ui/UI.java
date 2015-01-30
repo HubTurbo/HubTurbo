@@ -354,6 +354,7 @@ public class UI extends Application implements EventDispatcher {
 			return;
 		}
 		
+		repoSelector.setDisable(true);
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		
@@ -363,9 +364,19 @@ public class UI extends Application implements EventDispatcher {
 				ServiceManager.getInstance().stopModelUpdate();
 				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
 			
-				final CountDownLatch latch = new CountDownLatch(1);
 				ServiceManager.getInstance().getModel().populateComponents(repoId, items);
+				
+				try {
+					ServiceManager.getInstance().updateModelNow().await();
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+
+				final CountDownLatch latch = new CountDownLatch(1);
 				Platform.runLater(() -> {
+					// Re-enable repository switching when everything is done
+					repoSelector.setDisable(false);
+					
 					columns.restoreColumns();
 					triggerEvent(new PanelSavedEvent());
 					latch.countDown();
@@ -373,8 +384,8 @@ public class UI extends Application implements EventDispatcher {
 				try {
 					latch.await();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} 
+					logger.error(e.getLocalizedMessage(), e);
+				}
 				return true;
 			}
 		};
@@ -386,7 +397,8 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
 			StatusBar.displayMessage("Issues loaded successfully!");
-			ServiceManager.getInstance().setupAndStartModelUpdate();
+
+			ServiceManager.getInstance().startModelUpdates();
 		});
 			
 		task.setOnFailed(wse -> {
