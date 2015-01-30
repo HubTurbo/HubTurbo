@@ -107,6 +107,8 @@ public class ServiceManager {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 
+	private final Executor immediateExecutor = Executors.newSingleThreadExecutor();
+
 	private static final int REFRESH_INTERVAL = 60;
 	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> refreshResult;
@@ -391,11 +393,9 @@ public class ServiceManager {
 		}
 		return null;
 	}
-
-	Executor immediateExecutor = Executors.newSingleThreadExecutor();
 	
-	public CountDownLatch updateModelNow() {
-		logger.info("Updating model now");
+	private CountDownLatch updateModelNow(boolean log) {
+		if (log) logger.info("Updating model now");
 		final String repoId = model.getRepoId().generateId();
 		final CountDownLatch latch = new CountDownLatch(4);
 		
@@ -406,40 +406,19 @@ public class ServiceManager {
 		return latch;
 	}
 	
-	public void startModelUpdates() {
-		logger.info("Starting model updates (without updating immediately)");
-		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-				issueCheckTime);
-		startModelUpdate();
+	public CountDownLatch updateModelNow() {
+		return updateModelNow(true);
 	}
+	
+	private void updateModelPeriodically(boolean log) {
 
-	public void updateModelAndStartUpdates() {
-		logger.info("Updating model and starting periodic updates");
-		if (repoId != null) {
-			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-					issueCheckTime);
-			
-			updateModelNow();
-			startModelUpdate();
-		}
-	}
-
-	/**
-	 * Helper function for restarting model update.
-	 */
-	public void restartModelUpdate() {
-		updateModelNow();
-		stopModelUpdate();
-		startModelUpdate();
-	}
-
-	/**
-	 * Starts the concurrent tasks which update the model.
-	 */
-	private void startModelUpdate() {
+		if (log) logger.info("Starting model updates (without updating immediately)");
 
 		// Ensure that model update isn't ongoing
-		stopModelUpdate();
+		stopPeriodicModelUpdates(false);
+
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+				issueCheckTime);
 
 		// We get the repo id from the model now. On task completion, the
 		// repo id may be different if the project was switched, so we
@@ -455,14 +434,13 @@ public class ServiceManager {
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
 			StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
 		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
-
-		logger.info("Started model update");
 	}
 
-	/**
-	 * Stops the concurrent tasks which update the model.
-	 */
-	public void stopModelUpdate() {
+	public void updateModelPeriodically() {
+		updateModelPeriodically(true);
+	}
+	
+	private void stopPeriodicModelUpdates(boolean log) {
 
 		// If the model update was never started, don't do anything
 		if (refreshResult == null || refreshResult.isCancelled())
@@ -478,7 +456,17 @@ public class ServiceManager {
 		refreshResult = null;
 		timeUntilRefreshResult = null;
 		
-		logger.info("Stopped model update");
+		if (log) logger.info("Stopped model update");
+	}
+
+	public void stopModelUpdate() {
+		stopPeriodicModelUpdates(true);
+	}
+
+	public void updateModelNowAndPeriodically() {
+		logger.info("Updating model now, and starting periodic update");
+		updateModelNow(false);
+		updateModelPeriodically(false);
 	}
 
 	private int updateTimeRemainingUntilRefresh() {

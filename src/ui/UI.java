@@ -354,6 +354,8 @@ public class UI extends Application implements EventDispatcher {
 			return;
 		}
 		
+		logger.info("Switching repository to " + repoString + " in progress");
+		
 		repoSelector.setDisable(true);
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
@@ -397,8 +399,8 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
 			StatusBar.displayMessage("Issues loaded successfully!");
-
-			ServiceManager.getInstance().startModelUpdates();
+			ServiceManager.getInstance().updateModelPeriodically();
+			logger.info("Repository " + repoString + " successfully switched to!");
 		});
 			
 		task.setOnFailed(wse -> {

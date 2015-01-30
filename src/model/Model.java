@@ -300,7 +300,7 @@ public class Model {
 	}
 
 	public void refresh() {
-		ServiceManager.getInstance().restartModelUpdate();
+		ServiceManager.getInstance().updateModelNow();
 	}
 
 	private void ______ISSUES______() {

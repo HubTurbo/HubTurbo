@@ -74,8 +74,6 @@ public class CacheFileHandler {
 			String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
 			List<TurboMilestone> milestones, List<TurboIssue> issues) {
 
-		logger.info("About to write to file for repo: " + repoIdString + " with last checked time: " + issueCheckTime);
-
 		CachedRepoData currentRepoData = new CachedRepoData(issuesETag, collabsETag, labelsETag, milestonesETag,
 				issueCheckTime, new ArrayList<>(collaborators), new ArrayList<>(labels), new ArrayList<>(milestones),
 				new ArrayList<>(issues));
@@ -90,7 +88,6 @@ public class CacheFileHandler {
 			FileWriter writer = new FileWriter(getFileName(FILE_DATA_CACHE_TEMP, repoIdString));
 			writer.write(json);
 			writer.close();
-			logger.info("Done writing to file for repo: " + repoIdString);
 
 			File file = new File(getFileName(FILE_DATA_CACHE, repoIdString));
 
@@ -105,5 +102,6 @@ public class CacheFileHandler {
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		logger.info("Wrote to file for repo " + repoIdString + " with last checked time: " + issueCheckTime);
 	}
 }
