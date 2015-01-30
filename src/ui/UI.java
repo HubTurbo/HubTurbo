@@ -111,12 +111,14 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void getUserCredentials() {
+		repoSelector.setDisable(true);
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
 				browserComponent.initialise();
 				setExpandedWidth(false);
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
+				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents();
 				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new PanelSavedEvent());

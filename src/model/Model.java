@@ -8,12 +8,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -174,11 +172,20 @@ public class Model {
 			}
 		}
 
+		CountDownLatch latch = new CountDownLatch(4);
+		
 		if (loadedFromCache) {
-			loadTurboResources(resources);
+			loadTurboResources(latch, resources);
 		} else {
-			loadGitHubResources(resources, isPublicRepo);
+			loadGitHubResources(latch, resources, isPublicRepo);
 		}
+		
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		System.out.println("+++ +++ ++ + DONE loading everything and triggering model update");
 	}
 
 	/**
@@ -188,15 +195,18 @@ public class Model {
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void loadTurboResources(HashMap<String, List> turboResources) {
+	protected void loadTurboResources(CountDownLatch latch, HashMap<String, List> turboResources) {
 		Platform.runLater(() -> {
 			disableModelChanges();
 			logger.info("Loading collaborators from cache...");
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
+			latch.countDown();
 			logger.info("Loading labels from cache...");
 			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
+			latch.countDown();
 			logger.info("Loading milestones from cache...");
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
+			latch.countDown();
 
 			// only get issues now to prevent assertion error in
 			// getLabelReference of TurboIssues
@@ -205,6 +215,7 @@ public class Model {
 			loadTurboIssues(issues);
 			enableModelChanges();
 			triggerModelChangeEvent();
+			latch.countDown();
 		});
 	}
 
@@ -215,22 +226,22 @@ public class Model {
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
+	private void loadGitHubResources(CountDownLatch latch, HashMap<String, List> resources, boolean isPublicRepo) {
 		disableModelChanges();
 		if (!isPublicRepo) {
 			logger.info("Loading collaborators from GitHub...");
-			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+			loadCollaborators(latch, (List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
 		} else {
 			// We can't get collaborators from a public repo. Remove any collaborators
 			// left over from a previous repo instead.
-			clearCollaborators();
+			clearCollaborators(latch);
 		}
 		logger.info("Loading labels from GitHub...");
-		loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
+		loadLabels(latch, (List<Label>) resources.get(ServiceManager.KEY_LABELS));
 		logger.info("Loading milestones from GitHub...");
-		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
+		loadMilestones(latch, (List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
 		logger.info("Loading issues from GitHub...");
-		loadIssues((List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
+		loadIssues(latch, (List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
 		enableModelChanges();
 		triggerModelChangeEvent();
 	}
@@ -302,12 +313,13 @@ public class Model {
 	 * 
 	 * @param ghIssues
 	 */
-	public void loadIssues(List<Issue> ghIssues) {
+	public void loadIssues(CountDownLatch latch, List<Issue> ghIssues) {
 		Platform.runLater(() -> {
 			issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
 			triggerModelChangeEvent();
 			dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
 					lastIssueCheckTime, collaborators, labels, milestones, issues);
+			latch.countDown();
 		});
 	}
 
@@ -456,10 +468,11 @@ public class Model {
 		});
 	}
 
-	public void loadLabels(List<Label> ghLabels) {
+	public void loadLabels(CountDownLatch latch, List<Label> ghLabels) {
 		Platform.runLater(() -> {
 			labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
 			triggerModelChangeEvent();
+			latch.countDown();
 		});
 	}
 
@@ -483,10 +496,11 @@ public class Model {
 		return Collections.unmodifiableList(milestones);
 	}
 
-	public void loadMilestones(List<Milestone> ghMilestones) {
+	public void loadMilestones(CountDownLatch latch, List<Milestone> ghMilestones) {
 		Platform.runLater(() -> {
 			milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
 			triggerModelChangeEvent();
+			latch.countDown();
 		});
 	}
 
@@ -558,17 +572,19 @@ public class Model {
 		return null;
 	}
 
-	public void loadCollaborators(List<User> ghCollaborators) {
+	public void loadCollaborators(CountDownLatch latch, List<User> ghCollaborators) {
 		Platform.runLater(() -> {
 			collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
 			triggerModelChangeEvent();
+			latch.countDown();
 		});
 	}
 
-	public void clearCollaborators() {
+	public void clearCollaborators(CountDownLatch latch) {
 		Platform.runLater(() -> {
 			collaborators.clear();
 			triggerModelChangeEvent();
+			latch.countDown();
 		});
 	}
 
