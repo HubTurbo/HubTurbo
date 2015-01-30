@@ -157,6 +157,7 @@ public class UI extends Application implements EventDispatcher {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
 				if (is) {
+					logger.info("Gained focus; refreshing");
 					ServiceManager.getInstance().getModel().refresh();
 				}
 			}

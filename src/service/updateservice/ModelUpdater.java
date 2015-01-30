@@ -40,6 +40,7 @@ public class ModelUpdater {
 	}
 	
 	public void updateModel(CountDownLatch latch, String repoId) {
+		logger.info("Updating model...");
 		model.disableModelChanges();
 	    updateModelCollaborators(latch, repoId);
 	   	updateModelLabels(latch, repoId);
