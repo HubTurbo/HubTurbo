@@ -55,12 +55,13 @@ public class Model {
 
 	public static boolean isInTestMode = false;
 
-	protected List<TurboIssue> issues = new ArrayList<>();
-	protected List<TurboUser> collaborators = new ArrayList<>();
-	protected List<TurboLabel> labels = new ArrayList<>();
-	protected List<TurboMilestone> milestones = new ArrayList<>();
+	private List<TurboIssue> issues = new ArrayList<>();
+	private List<TurboUser> collaborators = new ArrayList<>();
+	private List<TurboLabel> labels = new ArrayList<>();
+	private List<TurboMilestone> milestones = new ArrayList<>();
 
-	protected IRepositoryIdProvider repoId;
+	// TODO make final when the model is constructed with this
+	private IRepositoryIdProvider repoId;
 
 	private String lastIssuesETag = null;
 	private String lastCollabsETag = null;
@@ -139,6 +140,7 @@ public class Model {
 	@SuppressWarnings("rawtypes")
 	public boolean loadComponents(RepositoryId repoId) throws IOException {
 		if (isInTestMode) {
+			// TODO will not be needed when the model is constructed with this
 			this.repoId = repoId;
 			populateComponents(repoId, TestUtils.getStubTurboResourcesFromCache(this, 10));
 			return true;
@@ -234,7 +236,7 @@ public class Model {
 	 * @param turboResources
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void loadTurboResources(CountDownLatch latch, HashMap<String, List> turboResources) {
+	private void loadTurboResources(CountDownLatch latch, HashMap<String, List> turboResources) {
 		run(() -> {
 			disableModelChanges();
 			logger.info("Loading collaborators from cache...");
@@ -298,7 +300,7 @@ public class Model {
 	 * @param repoId
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void updateCachedList(List list, List newList, String repoId, CountDownLatch latch) {
+	private void updateCachedList(List list, List newList, String repoId, CountDownLatch latch) {
 		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
 		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
 
@@ -331,7 +333,7 @@ public class Model {
 	}
 
 	@SuppressWarnings("rawtypes")
-	protected void logNumOfUpdates(List newList, String type) {
+	private void logNumOfUpdates(List newList, String type) {
 		if (!isInTestMode) {
 			logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
 		}
