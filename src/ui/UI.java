@@ -345,6 +345,22 @@ public class UI extends Application implements EventDispatcher {
 		}
 		return true;
 	}
+	
+	private boolean repoSwitchingAllowed = true;
+	
+	public boolean isRepoSwitchingAllowed() {
+		return repoSwitchingAllowed;
+	}
+
+	public void enableRepositorySwitching() {
+		repoSwitchingAllowed = true;
+		repoSelector.setDisable(false);
+	}
+
+	public void disableRepositorySwitching() {
+		repoSwitchingAllowed = false;
+		repoSelector.setDisable(true);
+	}
 
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
@@ -357,7 +373,7 @@ public class UI extends Application implements EventDispatcher {
 		
 		logger.info("Switching repository to " + repoString + " in progress");
 		
-		repoSelector.setDisable(true);
+		disableRepositorySwitching();
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		
@@ -378,7 +394,7 @@ public class UI extends Application implements EventDispatcher {
 				final CountDownLatch latch = new CountDownLatch(1);
 				Platform.runLater(() -> {
 					// Re-enable repository switching when everything is done
-					repoSelector.setDisable(false);
+					enableRepositorySwitching();
 					
 					columns.restoreColumns();
 					triggerEvent(new PanelSavedEvent());
