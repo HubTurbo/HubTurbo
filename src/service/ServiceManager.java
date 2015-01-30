@@ -16,6 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import model.Model;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -44,6 +45,7 @@ import service.updateservice.ModelUpdater;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
+import ui.UI;
 import ui.components.StatusBar;
 
 /**
@@ -429,8 +431,33 @@ public class ServiceManager {
 		final String repoId = model.getRepoId().generateId();
 
 		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
-			// Provide the latch, but don't do anything with it
-			modelUpdater.updateModel(new CountDownLatch(4), repoId);
+			
+			// Wait for repository selection to be disabled
+			CountDownLatch continuation = new CountDownLatch(1);
+			Platform.runLater(() -> {
+				UI.getInstance().disableRepositorySwitching();
+				continuation.countDown();
+			});
+			try {
+				continuation.await();
+			} catch (InterruptedException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+			
+			// Wait for the update to complete
+			CountDownLatch latch = new CountDownLatch(4);
+			modelUpdater.updateModel(latch, repoId);
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+			
+			// Enable repository switching
+			Platform.runLater(() -> {
+				UI.getInstance().enableRepositorySwitching();
+			});
+
 		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
