@@ -8,8 +8,8 @@ import org.junit.Test;
 import util.events.EventHandler;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
-import util.events.RefreshDoneEvent;
-import util.events.RefreshDoneEventHandler;
+import util.events.ModelChangedEvent;
+import util.events.ModelChangedEventHandler;
 
 import com.google.common.eventbus.EventBus;
 
@@ -23,7 +23,7 @@ public class EventTests {
         events.register(fail2);
         events.register(succeed1);
         
-        RefreshDoneEvent te = new RefreshDoneEvent();
+        ModelChangedEvent te = new ModelChangedEvent();
         IssueSelectedEvent te2 = new IssueSelectedEvent(1, 2);
 
         events.post(te);
@@ -73,15 +73,15 @@ public class EventTests {
             fail("IssueSelectedEventHandler failed");
         }
     };
-    private final EventHandler succeed1 = new RefreshDoneEventHandler() {
+    private final EventHandler succeed1 = new ModelChangedEventHandler() {
         @Override
-        public void handle(RefreshDoneEvent e) {
+        public void handle(ModelChangedEvent e) {
             assertTrue(true);
         }
     };
-    private final EventHandler fail1 = new RefreshDoneEventHandler() {
+    private final EventHandler fail1 = new ModelChangedEventHandler() {
         @Override
-        public void handle(RefreshDoneEvent e) {
+        public void handle(ModelChangedEvent e) {
             fail("RefreshDoneEventHandler failed");
         }
     };

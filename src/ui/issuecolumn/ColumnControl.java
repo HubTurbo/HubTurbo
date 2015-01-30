@@ -19,8 +19,6 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-import util.events.RefreshDoneEvent;
-import util.events.RefreshDoneEventHandler;
 
 import command.TurboCommandExecutor;
 
@@ -45,31 +43,18 @@ public class ColumnControl extends HBox {
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
-		setupModelChangeResponse();
-		
-		ui.registerEvent(new RefreshDoneEventHandler() {
-			@Override
-			public void handle(RefreshDoneEvent e) {
-				// We need this because this is triggered from a Timer thread
-				Platform.runLater(()-> {
-					refresh();
-				});	
-			}
-		});
-		
-		ui.registerEvent(new IssueSelectedEventHandler() {
-			@Override
-			public void handle(IssueSelectedEvent e) {
-				currentlySelectedColumn = Optional.of(e.columnIndex);
-			}
-		});
-	}
-	
-	private void setupModelChangeResponse(){
+
 		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
 			public void handle(ModelChangedEvent e) {
 				Platform.runLater(() -> refresh());
+			}
+		});
+
+		ui.registerEvent(new IssueSelectedEventHandler() {
+			@Override
+			public void handle(IssueSelectedEvent e) {
+				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
 	}

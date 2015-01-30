@@ -42,9 +42,7 @@ import service.updateservice.ModelUpdater;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
-import ui.UI;
 import ui.components.StatusBar;
-import util.events.RefreshDoneEvent;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -419,7 +417,6 @@ public class ServiceManager {
 			@Override
 			public void run() {
 				modelUpdater.updateModel(repoId);
-				UI.getInstance().triggerEvent(new RefreshDoneEvent());
 			}
 		};
 		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);

@@ -288,7 +288,6 @@ public class Model {
 
 	public void refresh() {
 		ServiceManager.getInstance().restartModelUpdate();
-		UI.getInstance().triggerEvent(new ModelChangedEvent());
 	}
 
 	private void ______ISSUES______() {
