@@ -78,7 +78,19 @@ public class Model {
 	 * Notifies subscribers that the model has changed
 	 */
 	public void triggerModelChangeEvent() {
-		eventDispatcher.triggerEvent(new ModelChangedEvent());
+		if (modelChangeCounter == 0) {
+			eventDispatcher.triggerEvent(new ModelChangedEvent());
+		}
+	}
+	
+	private int modelChangeCounter = 0;
+
+	public void disableModelChanges() {
+		++modelChangeCounter;
+	}
+
+	public void enableModelChanges() {
+		--modelChangeCounter;
 	}
 
 	public IRepositoryIdProvider getRepoId() {
@@ -178,6 +190,7 @@ public class Model {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void loadTurboResources(HashMap<String, List> turboResources) {
 		Platform.runLater(() -> {
+			disableModelChanges();
 			logger.info("Loading collaborators from cache...");
 			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
 			logger.info("Loading labels from cache...");
@@ -190,6 +203,8 @@ public class Model {
 			List<TurboIssue> issues = dcHandler.getRepo().getIssues(ServiceManager.getInstance().getModel());
 			logger.info("Loading issues from cache...");
 			loadTurboIssues(issues);
+			enableModelChanges();
+			triggerModelChangeEvent();
 		});
 	}
 
@@ -201,6 +216,7 @@ public class Model {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadGitHubResources(HashMap<String, List> resources, boolean isPublicRepo) {
+		disableModelChanges();
 		if (!isPublicRepo) {
 			logger.info("Loading collaborators from GitHub...");
 			loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
@@ -215,6 +231,8 @@ public class Model {
 		loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
 		logger.info("Loading issues from GitHub...");
 		loadIssues((List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
+		enableModelChanges();
+		triggerModelChangeEvent();
 	}
 
 	/**

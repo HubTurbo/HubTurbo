@@ -34,11 +34,13 @@ public class ModelUpdater {
 	}
 	
 	public void updateModel(String repoId){
+		model.disableModelChanges();
 	    updateModelCollaborators(repoId);
 	   	updateModelLabels(repoId);
 	  	updateModelMilestones(repoId);
 	  	updateModelIssues(repoId);
 	  	lastUpdateTime = issueUpdateService.lastCheckTime;
+	  	model.enableModelChanges();
 	  	model.triggerModelChangeEvent();
 	}
 	
