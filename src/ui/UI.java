@@ -156,7 +156,9 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
-				if (is) {
+				// Only if the window is now in focus and repo switching is NOT
+				// disabled (meaning an update is in progress anyway) do we update
+				if (is && isRepoSwitchingAllowed()) {
 					logger.info("Gained focus; refreshing");
 					ServiceManager.getInstance().getModel().refresh();
 				}
