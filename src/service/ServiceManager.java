@@ -400,8 +400,12 @@ public class ServiceManager {
 	
 	private CountDownLatch updateModelNow(boolean log) {
 		if (log) logger.info("Updating model now");
+		
 		final String repoId = model.getRepoId().generateId();
 		final CountDownLatch latch = new CountDownLatch(4);
+		
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+				issueCheckTime);
 		
 		immediateExecutor.execute(() -> {
 			modelUpdater.updateModel(latch, repoId);
