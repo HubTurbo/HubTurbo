@@ -14,7 +14,6 @@ import storage.DataManager;
 import ui.UI;
 import ui.components.StatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.ColumnChangeEvent;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
@@ -103,7 +102,6 @@ public class ColumnControl extends HBox {
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
 		currentlySelectedColumn = Optional.of(index);
-		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
@@ -114,7 +112,6 @@ public class ColumnControl extends HBox {
 	public void closeAllColumns() {
 		getChildren().clear();
 		// There aren't any children left, so we don't need to update indices
-		ui.triggerEvent(new ColumnChangeEvent());
 	}
 	
 	public void openColumnsWithFilters(List<String> filters) {
@@ -127,7 +124,6 @@ public class ColumnControl extends HBox {
 	public void closeColumn(int index) {
 		getChildren().remove(index);
 		updateColumnIndices();
-		ui.triggerEvent(new ColumnChangeEvent());
 	}
 
 	private void updateColumnIndices() {
