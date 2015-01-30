@@ -408,7 +408,7 @@ public class ServiceManager {
 				issueCheckTime);
 		
 		immediateExecutor.execute(() -> {
-			modelUpdater.updateModel(latch, repoId);
+			preventRepoSwitchingAndUpdateModel(latch, repoId);
 		});
 
 		return latch;
@@ -435,33 +435,7 @@ public class ServiceManager {
 		final String repoId = model.getRepoId().generateId();
 
 		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
-			
-			// Wait for repository selection to be disabled
-			CountDownLatch continuation = new CountDownLatch(1);
-			Platform.runLater(() -> {
-				UI.getInstance().disableRepositorySwitching();
-				continuation.countDown();
-			});
-			try {
-				continuation.await();
-			} catch (InterruptedException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-			
-			// Wait for the update to complete
-			CountDownLatch latch = new CountDownLatch(4);
-			modelUpdater.updateModel(latch, repoId);
-			try {
-				latch.await();
-			} catch (InterruptedException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-			
-			// Enable repository switching
-			Platform.runLater(() -> {
-				UI.getInstance().enableRepositorySwitching();
-			});
-
+			preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
 		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
@@ -471,6 +445,33 @@ public class ServiceManager {
 
 	public void updateModelPeriodically() {
 		updateModelPeriodically(true);
+	}
+	
+	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
+		// Wait for repository selection to be disabled
+		CountDownLatch continuation = new CountDownLatch(1);
+		Platform.runLater(() -> {
+			UI.getInstance().disableRepositorySwitching();
+			continuation.countDown();
+		});
+		try {
+			continuation.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		
+		// Wait for the update to complete
+		modelUpdater.updateModel(latch, repoId);
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		
+		// Enable repository switching
+		Platform.runLater(() -> {
+			UI.getInstance().enableRepositorySwitching();
+		});
 	}
 	
 	private void stopPeriodicModelUpdates(boolean log) {
