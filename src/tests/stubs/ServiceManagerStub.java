@@ -23,7 +23,7 @@ public class ServiceManagerStub extends ServiceManager {
 	}
 
 	@Override
-	public void setupAndStartModelUpdate() {
+	public void updateModelAndStartUpdates() {
 	}
 
 	@Override

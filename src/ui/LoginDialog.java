@@ -240,7 +240,7 @@ public class LoginDialog extends Dialog<Boolean> {
 					latch.await();
 				} catch (InterruptedException e) {
 					logger.error(e.getLocalizedMessage(), e);
-				} 
+				}
 		    	return loadSuccess;
 		    }
 		};
@@ -293,7 +293,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	
 	private boolean loadRepository(String owner, String repoName) throws IOException {
 		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName);
-		ServiceManager.getInstance().setupAndStartModelUpdate();
+		ServiceManager.getInstance().updateModelAndStartUpdates();
 		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
 		if (currRepo != null) {
 			String repoId = currRepo.generateId();

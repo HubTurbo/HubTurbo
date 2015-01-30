@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -390,19 +392,51 @@ public class ServiceManager {
 		return null;
 	}
 
-	public void setupAndStartModelUpdate() {
-		logger.info("About to set up and start model update");
+	Executor immediateExecutor = Executors.newSingleThreadExecutor();
+	
+	public CountDownLatch updateModelNow() {
+		logger.info("Updating model now");
+		final String repoId = model.getRepoId().generateId();
+		final CountDownLatch latch = new CountDownLatch(4);
+		
+		immediateExecutor.execute(() -> {
+			modelUpdater.updateModel(latch, repoId);
+		});
+
+		return latch;
+	}
+	
+	public void startModelUpdates() {
+		logger.info("Starting model updates (without updating immediately)");
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+				issueCheckTime);
+		startModelUpdate();
+	}
+
+	public void updateModelAndStartUpdates() {
+		logger.info("Updating model and starting periodic updates");
 		if (repoId != null) {
 			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
 					issueCheckTime);
+			
+			updateModelNow();
 			startModelUpdate();
 		}
 	}
 
 	/**
+	 * Helper function for restarting model update.
+	 */
+	public void restartModelUpdate() {
+		updateModelNow();
+		stopModelUpdate();
+		startModelUpdate();
+	}
+
+	/**
 	 * Starts the concurrent tasks which update the model.
 	 */
-	public void startModelUpdate() {
+	private void startModelUpdate() {
 
 		// Ensure that model update isn't ongoing
 		stopModelUpdate();
@@ -413,22 +447,14 @@ public class ServiceManager {
 
 		final String repoId = model.getRepoId().generateId();
 
-		Runnable pollTask = new Runnable() {
-			@Override
-			public void run() {
-				modelUpdater.updateModel(repoId);
-			}
-		};
-		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
+		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
+			// Provide the latch, but don't do anything with it
+			modelUpdater.updateModel(new CountDownLatch(4), repoId);
+		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
-		Runnable countdown = new Runnable() {
-			@Override
-			public void run() {
-				StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
-			}
-		};
-		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(countdown, 0, TICK_INTERVAL,
-				TimeUnit.SECONDS);
+		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
+			StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
+		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 
 		logger.info("Started model update");
 	}
@@ -471,14 +497,6 @@ public class ServiceManager {
 		stopModelUpdate();
 		refreshExecutor.shutdown();
 		timeUntilRefreshExecutor.shutdown();
-	}
-
-	/**
-	 * Helper function for restarting model update.
-	 */
-	public void restartModelUpdate() {
-		stopModelUpdate();
-		startModelUpdate();
 	}
 
 	private void ______LABELS______() {
