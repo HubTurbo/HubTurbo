@@ -86,6 +86,11 @@ public class Model {
 	private void ______MODEL_FUNCTIONALITY______() {
 	}
 
+	/**
+	 * Executes a block of code in the current thread in test mode,
+	 * otherwise executes it on the JavaFX thread.
+	 * @param action
+	 */
 	private void run(Runnable action) {
 		if (isInTestMode) {
 			action.run();
@@ -95,7 +100,8 @@ public class Model {
 	}
 
 	/**
-	 * Notifies subscribers that the model has changed
+	 * Notifies subscribers that the model has changed. May be disabled to batch
+	 * a set of changes.
 	 */
 	public void triggerModelChangeEvent() {
 		if (modelChangeCounter == 0) {
@@ -249,7 +255,7 @@ public class Model {
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 			latch.countDown();
 
-			// Load issues last, as this would require having references other resources
+			// Load issues last, as this would require having references to other resources
 			
 			List<TurboIssue> issues = isInTestMode
 					? TestUtils.getStubTurboIssues(this, 10)
@@ -271,23 +277,30 @@ public class Model {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void loadGitHubResources(CountDownLatch latch, HashMap<String, List> resources, boolean isPublicRepo) {
-		disableModelChanges();
-		if (!isPublicRepo) {
-			logger.info("Loading collaborators from GitHub...");
-			loadCollaborators(latch, (List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
-		} else {
-			// We can't get collaborators from a public repo. Remove any collaborators
-			// left over from a previous repo instead.
-			clearCollaborators(latch);
-		}
-		logger.info("Loading labels from GitHub...");
-		loadLabels(latch, (List<Label>) resources.get(ServiceManager.KEY_LABELS));
-		logger.info("Loading milestones from GitHub...");
-		loadMilestones(latch, (List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
-		logger.info("Loading issues from GitHub...");
-		loadIssues(latch, (List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
-		enableModelChanges();
-		triggerModelChangeEvent();
+		run(() -> {
+			disableModelChanges();
+			if (isPublicRepo) {
+				// We can't get collaborators from a public repo. Remove any collaborators
+				// left over from a previous repo instead.
+				logger.info("Public repo: cannot get collaborators");
+				clearCollaborators();
+			} else {
+				logger.info("Loading collaborators from GitHub...");
+				loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+			}
+			latch.countDown();
+			logger.info("Loading labels from GitHub...");
+			loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
+			latch.countDown();
+			logger.info("Loading milestones from GitHub...");
+			loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
+			latch.countDown();
+			logger.info("Loading issues from GitHub...");
+			loadIssues((List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
+			enableModelChanges();
+			triggerModelChangeEvent();
+			latch.countDown();
+		});
 	}
 
 	/**
@@ -359,15 +372,12 @@ public class Model {
 
 	/**
 	 * Given a list of Issues, loads them into the issue collection.
-	 *
+	 * @param latch
 	 * @param ghIssues
 	 */
-	public void loadIssues(CountDownLatch latch, List<Issue> ghIssues) {
-		run(() -> {
-			issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
-			triggerModelChangeEvent();
-			latch.countDown();
-		});
+	public void loadIssues(List<Issue> ghIssues) {
+		issues = CollectionUtilities.getHubTurboIssueList(ghIssues);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -514,12 +524,9 @@ public class Model {
 		});
 	}
 
-	public void loadLabels(CountDownLatch latch, List<Label> ghLabels) {
-		run(() -> {
-			labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
-			triggerModelChangeEvent();
-			latch.countDown();
-		});
+	public void loadLabels(List<Label> ghLabels) {
+		labels = CollectionUtilities.getHubTurboLabelList(ghLabels);
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_LABELS______() {
@@ -542,12 +549,9 @@ public class Model {
 		return Collections.unmodifiableList(milestones);
 	}
 
-	public void loadMilestones(CountDownLatch latch, List<Milestone> ghMilestones) {
-		run(() -> {
-			milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
-			triggerModelChangeEvent();
-			latch.countDown();
-		});
+	public void loadMilestones(List<Milestone> ghMilestones) {
+		milestones = CollectionUtilities.getHubTurboMilestoneList(ghMilestones);
+		triggerModelChangeEvent();
 	}
 
 	/**
@@ -623,20 +627,14 @@ public class Model {
 		return null;
 	}
 
-	public void loadCollaborators(CountDownLatch latch, List<User> ghCollaborators) {
-		run(() -> {
-			collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
-			triggerModelChangeEvent();
-			latch.countDown();
-		});
+	public void loadCollaborators(List<User> ghCollaborators) {
+		collaborators = CollectionUtilities.getHubTurboUserList(ghCollaborators);
+		triggerModelChangeEvent();
 	}
 
-	public void clearCollaborators(CountDownLatch latch) {
-		run(() -> {
-			collaborators.clear();
-			triggerModelChangeEvent();
-			latch.countDown();
-		});
+	public void clearCollaborators() {
+		collaborators.clear();
+		triggerModelChangeEvent();
 	}
 
 	private void ______CACHED_COLLABORATORS______() {

@@ -256,7 +256,6 @@ public class UI extends Application implements EventDispatcher {
 
 	/**
 	 * Toggles the expansion state of the window.
-	 * Returns a boolean value indicating the state.
 	 */
 	public boolean toggleExpandedWidth() {
 		expanded = !expanded;
