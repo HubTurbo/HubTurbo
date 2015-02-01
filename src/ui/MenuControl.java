@@ -15,20 +15,23 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.stage.Modality;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 
 import service.ServiceManager;
 import storage.DataManager;
@@ -65,7 +68,7 @@ public class MenuControl extends MenuBar {
 
 		Menu boards = new Menu("Boards");
 		boards.getItems().addAll(createBoardsMenu());
-		
+
 		Menu view = new Menu("View");
 		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
 
@@ -120,7 +123,7 @@ public class MenuControl extends MenuBar {
 		cols.getItems().addAll(createRight, createLeft, closeColumn);
 		return cols;
 	}
-	
+
 	/**
 	 * Called upon the Boards > Save being clicked
 	 */
@@ -128,14 +131,14 @@ public class MenuControl extends MenuBar {
 		logger.info("Menu: Boards > Save");
 
 		List<String> filterStrings = getCurrentFilterExprs();
-	    
+
 	    if (!filterStrings.isEmpty()) {
-	    	Optional<String> response = Dialogs.create()
-	            .title("Board Name")
-	            .lightweight()
-	            .masthead("Please name this board")
-	            .message("What should this board be called?").showTextInput();
-	         
+            TextInputDialog dlg = new TextInputDialog("");
+            dlg.setTitle("Board Name");
+            dlg.getDialogPane().setContentText("What should this board be called?");
+    		dlg.getDialogPane().setHeaderText("Please name this board");
+            Optional<String> response = dlg.showAndWait();
+
 	    	if (response.isPresent()) {
 	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
 	        	ui.triggerEvent(new BoardSavedEvent());
@@ -145,7 +148,7 @@ public class MenuControl extends MenuBar {
 	    }
     	logger.info("Did not save new board");
 	}
-	
+
 	/**
 	 * Called upon the Boards > Open being clicked
 	 */
@@ -162,24 +165,26 @@ public class MenuControl extends MenuBar {
 	private void onBoardDelete(String boardName) {
 		logger.info("Menu: Boards > Delete > " + boardName);
 
-		Action response = Dialogs.create().title("Confirmation")
-				.masthead("Delete board '" + boardName + "'?")
-				.message("Are you sure you want to delete this board?")
-				.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO }).showConfirm();
+        Alert dlg = new Alert(AlertType.CONFIRMATION, "");
+        dlg.initModality(Modality.APPLICATION_MODAL);
+        dlg.setTitle("Confirmation");
+		dlg.getDialogPane().setHeaderText("Delete board '" + boardName + "'?");
+        dlg.getDialogPane().setContentText("Are you sure you want to delete this panelboard?");
+        Optional<ButtonType> response = dlg.showAndWait();
 
-		if (response == Dialog.Actions.YES) {
+        if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
 			DataManager.getInstance().removeBoard(boardName);
 			ui.triggerEvent(new BoardSavedEvent());
 			logger.info(boardName + " was deleted");
-		} else {
+        } else {
 			logger.info(boardName + " was not deleted");
-		}
+        }
 	}
 
 	private MenuItem[] createBoardsMenu() {
 		MenuItem save = new MenuItem("Save");
 		save.setOnAction(e -> onBoardSave());
-		
+
 		Menu open = new Menu("Open");
 		Menu delete = new Menu("Delete");
 
@@ -193,11 +198,11 @@ public class MenuControl extends MenuBar {
 
 				for (final String boardName : boards.keySet()) {
 					final List<String> filterSet = boards.get(boardName);
-					
+
 					MenuItem openItem = new MenuItem(boardName);
 					openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
 					open.getItems().add(openItem);
-					
+
 					MenuItem deleteItem = new MenuItem(boardName);
 					deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
 					delete.getItems().add(deleteItem);

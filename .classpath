@@ -19,7 +19,6 @@
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-core-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-api-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/controlsfx-8.0.6_20.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-java-2.44.0.jar" sourcepath="lib/selenium-java-2.44.0-srcs.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-server-standalone-2.44.0.jar"/>
 	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
@@ -28,5 +27,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/prettytime-3.2.7.Final-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/controlsfx-8.20.8.jar"/>
+	<classpathentry kind="lib" path="lib/openjfx-dialogs-1.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
