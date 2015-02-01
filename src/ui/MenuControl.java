@@ -38,8 +38,8 @@ import util.DialogMessage;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
-import util.events.PanelSavedEvent;
-import util.events.PanelSavedEventHandler;
+import util.events.BoardSavedEvent;
+import util.events.BoardSavedEventHandler;
 
 
 public class MenuControl extends MenuBar {
@@ -122,9 +122,9 @@ public class MenuControl extends MenuBar {
 	}
 	
 	/**
-	 * Called upon the Panels > Sets > Save being clicked
+	 * Called upon the Boards > Save being clicked
 	 */
-	private void onPanelSetSave() {
+	private void onBoardSave() {
 		logger.info("Menu: Boards > Save");
 
 		List<String> filterStrings = getCurrentFilterExprs();
@@ -137,69 +137,69 @@ public class MenuControl extends MenuBar {
 	            .message("What should this board be called?").showTextInput();
 	         
 	    	if (response.isPresent()) {
-	        	DataManager.getInstance().addPanelSet(response.get(), filterStrings);
-	        	ui.triggerEvent(new PanelSavedEvent());
-	        	logger.info("New panel set " + response.get() + " saved, containing " + filterStrings);
+	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
+	        	ui.triggerEvent(new BoardSavedEvent());
+	        	logger.info("New board" + response.get() + " saved, containing " + filterStrings);
 	        	return;
 	    	}
 	    }
-    	logger.info("Did not save new panel set");
+    	logger.info("Did not save new board");
 	}
 	
 	/**
-	 * Called upon the Panels > Sets > Open being clicked
+	 * Called upon the Boards > Open being clicked
 	 */
-	private void onPanelSetOpen(String panelSetName, List<String> filterSet) {
-		logger.info("Menu: Boards > Open > " + panelSetName);
+	private void onBoardOpen(String boardName, List<String> filters) {
+		logger.info("Menu: Boards > Open > " + boardName);
 
 		columns.closeAllColumns();
-		columns.openColumnsWithFilters(filterSet);
+		columns.openColumnsWithFilters(filters);
 	}
 
 	/**
-	 * Called upon the Panels > Sets > Delete being clicked
+	 * Called upon the Boards > Delete being clicked
 	 */
-	private void onPanelSetDelete(String panelSetName) {
-		logger.info("Menu: Boards > Delete > " + panelSetName);
+	private void onBoardDelete(String boardName) {
+		logger.info("Menu: Boards > Delete > " + boardName);
 
 		Action response = Dialogs.create().title("Confirmation")
-				.masthead("Delete board '" + panelSetName + "'?")
+				.masthead("Delete board '" + boardName + "'?")
 				.message("Are you sure you want to delete this board?")
 				.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO }).showConfirm();
 
 		if (response == Dialog.Actions.YES) {
-			DataManager.getInstance().removePanelSet(panelSetName);
-			ui.triggerEvent(new PanelSavedEvent());
-			logger.info(panelSetName + " was deleted");
+			DataManager.getInstance().removeBoard(boardName);
+			ui.triggerEvent(new BoardSavedEvent());
+			logger.info(boardName + " was deleted");
 		} else {
-			logger.info(panelSetName + " was not deleted");
+			logger.info(boardName + " was not deleted");
 		}
 	}
 
 	private MenuItem[] createBoardsMenu() {
 		MenuItem save = new MenuItem("Save");
-		save.setOnAction(e -> onPanelSetSave());
+		save.setOnAction(e -> onBoardSave());
 		
 		Menu open = new Menu("Open");
 		Menu delete = new Menu("Delete");
 
-		ui.registerEvent(new PanelSavedEventHandler() {
+		ui.registerEvent(new BoardSavedEventHandler() {
 			@Override
-			public void handle(PanelSavedEvent e) {
+			public void handle(BoardSavedEvent e) {
 				open.getItems().clear();
 				delete.getItems().clear();
 
-				Map<String, List<String>> panelSets = DataManager.getInstance().getAllPanelSets();
+				Map<String, List<String>> boards = DataManager.getInstance().getAllBoards();
 
-				for (final String panelSetName : panelSets.keySet()) {
-					final List<String> filterSet = panelSets.get(panelSetName);
+				for (final String boardName : boards.keySet()) {
+					final List<String> filterSet = boards.get(boardName);
 					
-					MenuItem openItem = new MenuItem(panelSetName);
-					openItem.setOnAction(e1 -> onPanelSetOpen(panelSetName, filterSet));
+					MenuItem openItem = new MenuItem(boardName);
+					openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
 					open.getItems().add(openItem);
 					
-					MenuItem deleteItem = new MenuItem(panelSetName);
-					deleteItem.setOnAction(e1 -> onPanelSetDelete(panelSetName));
+					MenuItem deleteItem = new MenuItem(boardName);
+					deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
 					delete.getItems().add(deleteItem);
 				}
 			}
