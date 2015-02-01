@@ -63,10 +63,13 @@ public class MenuControl extends MenuBar {
 
 		Menu panels = createPanelsMenu();
 
+		Menu boards = new Menu("Boards");
+		boards.getItems().addAll(createBoardsMenu());
+		
 		Menu view = new Menu("View");
 		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
 
-		getMenus().addAll(newMenu, panels, view);
+		getMenus().addAll(newMenu, panels, boards, view);
 	}
 
 	private Menu createPanelsMenu() {
@@ -114,10 +117,7 @@ public class MenuControl extends MenuBar {
 		});
 		closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 
-		Menu sets = new Menu("Sets");
-		sets.getItems().addAll(createPanelsSetsMenu());
-		
-		cols.getItems().addAll(createRight, createLeft, closeColumn, sets);
+		cols.getItems().addAll(createRight, createLeft, closeColumn);
 		return cols;
 	}
 	
@@ -125,16 +125,16 @@ public class MenuControl extends MenuBar {
 	 * Called upon the Panels > Sets > Save being clicked
 	 */
 	private void onPanelSetSave() {
-		logger.info("Menu: Panels > Sets > Save");
+		logger.info("Menu: Boards > Save");
 
 		List<String> filterStrings = getCurrentFilterExprs();
 	    
 	    if (!filterStrings.isEmpty()) {
 	    	Optional<String> response = Dialogs.create()
-	            .title("Panel Set Name")
+	            .title("Board Name")
 	            .lightweight()
-	            .masthead("Please name this panel set")
-	            .message("What should this panel set be called?").showTextInput();
+	            .masthead("Please name this board")
+	            .message("What should this board be called?").showTextInput();
 	         
 	    	if (response.isPresent()) {
 	        	DataManager.getInstance().addPanelSet(response.get(), filterStrings);
@@ -150,7 +150,7 @@ public class MenuControl extends MenuBar {
 	 * Called upon the Panels > Sets > Open being clicked
 	 */
 	private void onPanelSetOpen(String panelSetName, List<String> filterSet) {
-		logger.info("Menu: Panels > Sets > Open > " + panelSetName);
+		logger.info("Menu: Boards > Open > " + panelSetName);
 
 		columns.closeAllColumns();
 		columns.openColumnsWithFilters(filterSet);
@@ -160,11 +160,11 @@ public class MenuControl extends MenuBar {
 	 * Called upon the Panels > Sets > Delete being clicked
 	 */
 	private void onPanelSetDelete(String panelSetName) {
-		logger.info("Menu: Panels > Sets > Delete > " + panelSetName);
+		logger.info("Menu: Boards > Delete > " + panelSetName);
 
 		Action response = Dialogs.create().title("Confirmation")
-				.masthead("Delete panel set '" + panelSetName + "'?")
-				.message("Are you sure you want to delete this panelSet?")
+				.masthead("Delete board '" + panelSetName + "'?")
+				.message("Are you sure you want to delete this board?")
 				.actions(new Action[] { Dialog.Actions.YES, Dialog.Actions.NO }).showConfirm();
 
 		if (response == Dialog.Actions.YES) {
@@ -176,7 +176,7 @@ public class MenuControl extends MenuBar {
 		}
 	}
 
-	private MenuItem[] createPanelsSetsMenu() {
+	private MenuItem[] createBoardsMenu() {
 		MenuItem save = new MenuItem("Save");
 		save.setOnAction(e -> onPanelSetSave());
 		
