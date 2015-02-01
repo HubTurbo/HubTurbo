@@ -40,7 +40,7 @@ import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
 import util.events.LoginEvent;
-import util.events.PanelSavedEvent;
+import util.events.BoardSavedEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -121,7 +121,7 @@ public class UI extends Application implements EventDispatcher {
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents();
 				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
-				triggerEvent(new PanelSavedEvent());
+				triggerEvent(new BoardSavedEvent());
 			} else {
 				quit();
 			}
@@ -394,7 +394,7 @@ public class UI extends Application implements EventDispatcher {
 				final CountDownLatch latch = new CountDownLatch(1);
 				Platform.runLater(() -> {
 					columns.restoreColumns();
-					triggerEvent(new PanelSavedEvent());
+					triggerEvent(new BoardSavedEvent());
 					latch.countDown();
 				});
 				try {

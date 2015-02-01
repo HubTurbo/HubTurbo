@@ -71,14 +71,14 @@ public class DataManagerTests {
 		List<String> savedSet1 = Arrays.asList(new String[] {"assignee:a milestone:b", "id:1 updated:<24"});
 		List<String> savedSet2 = Arrays.asList(new String[] {"some syntax", "id:2 & id:3"});
 
-		dataManager.addPanelSet("aaa", savedSet1);
-		dataManager.addPanelSet("bbb", savedSet2);
+		dataManager.addBoard("aaa", savedSet1);
+		dataManager.addBoard("bbb", savedSet2);
 
 		dataManager.saveLocalConfig();
 		reload();
 		
-		List<String> loadedSet1 = dataManager.getPanelSet("aaa");
-		List<String> loadedSet2 = dataManager.getPanelSet("bbb");
+		List<String> loadedSet1 = dataManager.getBoardPanels("aaa");
+		List<String> loadedSet2 = dataManager.getBoardPanels("bbb");
 		assertEquals(savedSet1, loadedSet1);
 		assertEquals(savedSet2, loadedSet2);
 	}
