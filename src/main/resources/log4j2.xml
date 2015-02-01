@@ -13,16 +13,18 @@
         <!-- relative time, date, level, class, thread - msg -->
         <PatternLayout pattern="%r %d{dd MMM yyyy HH:mm:ss} %p %C{1} [%t] - %m%n" />
     </Console>
-    <File name="File" fileName="${filename}">
-        <!-- relative time, date, level, class, thread - msg -->
-        <PatternLayout pattern="%r %d{dd MMM yyyy HH:mm:ss} %p %C{1} [%t] - %m%n" />
-    </File>
+	<RollingFile name="RollingFile" fileName="${filename}" filePattern="${filename}-%d{yyyy-MM-dd}-%i.log.gz">
+	  <PatternLayout pattern="%r %d{dd MMM yyyy HH:mm:ss} %p %C{1} [%t] - %m%n" />
+	  <Policies>
+	    <SizeBasedTriggeringPolicy size="5 MB"/>
+	  </Policies>
+	</RollingFile>
 </Appenders>
  
   <Loggers>
     <Root level="info">
       <AppenderRef ref="STDOUT"/>
-      <AppenderRef ref="File"/>
+      <AppenderRef ref="RollingFile"/>
     </Root>
   </Loggers>
  
