@@ -14,13 +14,10 @@ import storage.DataManager;
 import ui.UI;
 import ui.components.StatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.ColumnChangeEvent;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-import util.events.RefreshDoneEvent;
-import util.events.RefreshDoneEventHandler;
 
 import command.TurboCommandExecutor;
 
@@ -45,31 +42,18 @@ public class ColumnControl extends HBox {
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
-		setupModelChangeResponse();
-		
-		ui.registerEvent(new RefreshDoneEventHandler() {
+
+		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
-			public void handle(RefreshDoneEvent e) {
-				// We need this because this is triggered from a Timer thread
-				Platform.runLater(()-> {
-					refresh();
-				});	
+			public void handle(ModelChangedEvent e) {
+				Platform.runLater(() -> refresh());
 			}
 		});
-		
+
 		ui.registerEvent(new IssueSelectedEventHandler() {
 			@Override
 			public void handle(IssueSelectedEvent e) {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
-			}
-		});
-	}
-	
-	private void setupModelChangeResponse(){
-		ui.registerEvent(new ModelChangedEventHandler() {
-			@Override
-			public void handle(ModelChangedEvent e) {
-				refresh();
 			}
 		});
 	}
@@ -118,7 +102,6 @@ public class ColumnControl extends HBox {
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
 		currentlySelectedColumn = Optional.of(index);
-		ui.triggerEvent(new ColumnChangeEvent());
 		return panel;
 	}
 
@@ -129,7 +112,6 @@ public class ColumnControl extends HBox {
 	public void closeAllColumns() {
 		getChildren().clear();
 		// There aren't any children left, so we don't need to update indices
-		ui.triggerEvent(new ColumnChangeEvent());
 	}
 	
 	public void openColumnsWithFilters(List<String> filters) {
@@ -142,7 +124,6 @@ public class ColumnControl extends HBox {
 	public void closeColumn(int index) {
 		getChildren().remove(index);
 		updateColumnIndices();
-		ui.triggerEvent(new ColumnChangeEvent());
 	}
 
 	private void updateColumnIndices() {

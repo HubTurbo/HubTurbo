@@ -37,6 +37,7 @@ import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.Utility;
 import util.events.Event;
+import util.events.EventDispatcher;
 import util.events.EventHandler;
 import util.events.LoginEvent;
 import util.events.PanelSavedEvent;
@@ -44,7 +45,7 @@ import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
 
-public class UI extends Application {
+public class UI extends Application implements EventDispatcher {
 	
 	private static final int VERSION_MAJOR = 1;
 	private static final int VERSION_MINOR = 6;
@@ -110,12 +111,14 @@ public class UI extends Application {
 	}
 
 	private void getUserCredentials() {
+		repoSelector.setDisable(true);
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
 				browserComponent.initialise();
 				setExpandedWidth(false);
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
+				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents();
 				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new PanelSavedEvent());
@@ -153,7 +156,10 @@ public class UI extends Application {
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
-				if (is) {
+				// Only if the window is now in focus and repo switching is NOT
+				// disabled (meaning an update is in progress anyway) do we update
+				if (is && isRepoSwitchingAllowed()) {
+					logger.info("Gained focus; refreshing");
 					ServiceManager.getInstance().getModel().refresh();
 				}
 			}
@@ -222,23 +228,13 @@ public class UI extends Application {
 	 * UI operations
 	 */
 
-	/**
-	 * Publish/subscribe API making use of Guava's EventBus.
-	 * Takes a lambda expression to be called upon an event being fired.
-	 * @param handler
-	 */
+	@Override
 	public <T extends Event> void registerEvent(EventHandler handler) {
 		events.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 	
-	/**
-	 * Publish/subscribe API making use of Guava's EventBus.
-	 * Triggers all events of a certain type. EventBus will ensure that the
-	 * event is fired for all subscribers whose parameter is either the same
-	 * or a super type.
-	 * @param handler
-	 */
+	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
@@ -260,7 +256,6 @@ public class UI extends Application {
 
 	/**
 	 * Toggles the expansion state of the window.
-	 * Returns a boolean value indicating the state.
 	 */
 	public boolean toggleExpandedWidth() {
 		expanded = !expanded;
@@ -351,6 +346,22 @@ public class UI extends Application {
 		}
 		return true;
 	}
+	
+	private boolean repoSwitchingAllowed = true;
+	
+	public boolean isRepoSwitchingAllowed() {
+		return repoSwitchingAllowed;
+	}
+
+	public void enableRepositorySwitching() {
+		repoSwitchingAllowed = true;
+		repoSelector.setDisable(false);
+	}
+
+	public void disableRepositorySwitching() {
+		repoSwitchingAllowed = false;
+		repoSelector.setDisable(true);
+	}
 
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
@@ -361,6 +372,8 @@ public class UI extends Application {
 			return;
 		}
 		
+		logger.info("Switching repository to " + repoString + " in progress");
+		
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 		
@@ -370,8 +383,15 @@ public class UI extends Application {
 				ServiceManager.getInstance().stopModelUpdate();
 				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
 			
-				final CountDownLatch latch = new CountDownLatch(1);
 				ServiceManager.getInstance().getModel().populateComponents(repoId, items);
+				
+				try {
+					ServiceManager.getInstance().updateModelNow().await();
+				} catch (InterruptedException e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+
+				final CountDownLatch latch = new CountDownLatch(1);
 				Platform.runLater(() -> {
 					columns.restoreColumns();
 					triggerEvent(new PanelSavedEvent());
@@ -380,8 +400,8 @@ public class UI extends Application {
 				try {
 					latch.await();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} 
+					logger.error(e.getLocalizedMessage(), e);
+				}
 				return true;
 			}
 		};
@@ -393,7 +413,8 @@ public class UI extends Application {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
 			StatusBar.displayMessage("Issues loaded successfully!");
-			ServiceManager.getInstance().setupAndStartModelUpdate();
+			ServiceManager.getInstance().updateModelPeriodically();
+			logger.info("Repository " + repoString + " successfully switched to!");
 		});
 			
 		task.setOnFailed(wse -> {

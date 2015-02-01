@@ -236,7 +236,7 @@ public class MenuControl extends MenuBar {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
-			ServiceManager.getInstance().restartModelUpdate();
+			ServiceManager.getInstance().updateModelNowAndPeriodically();
 			columns.refresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
@@ -261,7 +261,7 @@ public class MenuControl extends MenuBar {
 					logger.info("Menu: View > Force Refresh");
 					ServiceManager.getInstance().stopModelUpdate();
 					ServiceManager.getInstance().getModel().forceReloadComponents();
-					ServiceManager.getInstance().restartModelUpdate();
+					ServiceManager.getInstance().updateModelNowAndPeriodically();
 				} catch (SocketTimeoutException e) {
 					handleSocketTimeoutException(e);
 					return false;

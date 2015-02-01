@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Model;
+
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -14,7 +16,7 @@ import tests.ServiceManagerTests;
 public class ServiceManagerStub extends ServiceManager {
 
 	public ServiceManagerStub() {
-		model = new ModelStub();
+		model = new Model();
 	}
 
 	@Override
@@ -23,12 +25,7 @@ public class ServiceManagerStub extends ServiceManager {
 	}
 
 	@Override
-	public void setupAndStartModelUpdate() {
-	}
-
-	@Override
-	public void restartModelUpdate() {
-
+	public void updateModelNowAndPeriodically() {
 	}
 
 	@Override

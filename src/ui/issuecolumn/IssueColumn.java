@@ -288,8 +288,8 @@ public abstract class IssueColumn extends Column {
 		return transformedIssueList;
 	}
 
-	public void setItems(ObservableList<TurboIssue> items) {
-		this.issues = items;
+	public void setItems(List<TurboIssue> items) {
+		this.issues = FXCollections.observableArrayList(items);
 		refreshItems();
 	}
 

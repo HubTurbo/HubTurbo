@@ -15,7 +15,7 @@ import model.TurboUser;
 
 import org.eclipse.egit.github.core.PullRequest;
 
-class TurboSerializableIssue {
+class SerializableIssue {
 	private String creator;
 	private String createdAt;
 	private LocalDateTime updatedAt;
@@ -33,11 +33,11 @@ class TurboSerializableIssue {
 	private boolean state;
 	
 	private TurboUser assignee;
-	private TurboSerializableMilestone milestone;
+	private SerializableMilestone milestone;
 	private String htmlUrl;
-	private List<TurboSerializableLabel> labels;
+	private List<SerializableLabel> labels;
 	
-	public TurboSerializableIssue(TurboIssue issue) {
+	public SerializableIssue(TurboIssue issue) {
 		this.creator = issue.getCreator();
 		this.createdAt = issue.getCreatedAt();
 		this.updatedAt = issue.getUpdatedAt();
@@ -55,7 +55,7 @@ class TurboSerializableIssue {
 		
 		TurboMilestone turboMilestone = issue.getMilestone();
 		if (turboMilestone != null) {
-			this.milestone = new TurboSerializableMilestone(issue.getMilestone());
+			this.milestone = new SerializableMilestone(issue.getMilestone());
 		} else {
 			this.milestone = null;
 		}
@@ -67,13 +67,13 @@ class TurboSerializableIssue {
 		this.labels = convertFromListOfTurboLabels(turboLabelList);
 	}
 	
-	private List<TurboSerializableLabel> convertFromListOfTurboLabels(List<TurboLabel> turboLabelsList) {
-		List<TurboSerializableLabel> list = new ArrayList<TurboSerializableLabel>();
+	private List<SerializableLabel> convertFromListOfTurboLabels(List<TurboLabel> turboLabelsList) {
+		List<SerializableLabel> list = new ArrayList<SerializableLabel>();
 		if (turboLabelsList == null) {
 			return null;
 		} else {
 			for (TurboLabel label : turboLabelsList) {
-				list.add(new TurboSerializableLabel(label));
+				list.add(new SerializableLabel(label));
 			}
 		}
 		return list;
@@ -106,7 +106,7 @@ class TurboSerializableIssue {
 		if (labels == null) {
 			tI.setLabels(turboLabelList);
 		} else {
-			for (TurboSerializableLabel label : labels) {
+			for (SerializableLabel label : labels) {
 				turboLabelList.add(label.toTurboLabel());
 			}
 			tI.setLabels(turboLabelList);

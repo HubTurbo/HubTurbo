@@ -9,11 +9,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import model.Model;
 import model.TurboLabel;
 import model.TurboMilestone;
@@ -39,12 +42,11 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
 import service.updateservice.ModelUpdater;
-import storage.DataCacheFileHandler;
-import storage.TurboRepoData;
+import storage.CacheFileHandler;
+import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.StatusBar;
-import util.events.RefreshDoneEvent;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -107,6 +109,8 @@ public class ServiceManager {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 
+	private final Executor immediateExecutor = Executors.newSingleThreadExecutor();
+
 	private static final int REFRESH_INTERVAL = 60;
 	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> refreshResult;
@@ -129,6 +133,7 @@ public class ServiceManager {
 		repositoryService = new RepositoryServiceExtended(githubClient);
 		markdownService = new MarkdownService(githubClient);
 		contentService = new ContentsService(githubClient);
+		// TODO construct model later
 		model = new Model();
 	}
 
@@ -321,13 +326,14 @@ public class ServiceManager {
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
 	
-		DataCacheFileHandler dcHandler = new DataCacheFileHandler(repoId.toString());
+		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
+		// TODO set these paramters in constructor instead
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
 	
 		boolean needToGetResources = true;
 		
-		TurboRepoData repo = dcHandler.getRepo();
+		CachedRepoData repo = dcHandler.getRepo();
 		if (repo != null) {
 			needToGetResources = false;
 		}
@@ -391,52 +397,86 @@ public class ServiceManager {
 		}
 		return null;
 	}
+	
+	private CountDownLatch updateModelNow(boolean log) {
+		if (log) logger.info("Updating model now");
+		
+		final String repoId = model.getRepoId().generateId();
+		final CountDownLatch latch = new CountDownLatch(4);
+		
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+				issueCheckTime);
+		
+		immediateExecutor.execute(() -> {
+			preventRepoSwitchingAndUpdateModel(latch, repoId);
+		});
 
-	public void setupAndStartModelUpdate() {
-		if (repoId != null) {
-			modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-					issueCheckTime);
-			startModelUpdate();
-		}
+		// The latch is returned. Thus there will be two threads blocking on it:
+		// this one, and whatever is calling this method to update the model.
+		return latch;
 	}
+	
+	public CountDownLatch updateModelNow() {
+		return updateModelNow(true);
+	}
+	
+	private void updateModelPeriodically(boolean log) {
 
-	/**
-	 * Starts the concurrent tasks which update the model.
-	 */
-	public void startModelUpdate() {
+		if (log) logger.info("Starting model updates (without updating immediately)");
 
 		// Ensure that model update isn't ongoing
-		stopModelUpdate();
+		stopPeriodicModelUpdates(false);
+
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+				issueCheckTime);
 
 		// We get the repo id from the model now. On task completion, the
 		// repo id may be different if the project was switched, so we
 		// validate with this repo id at that point.
 
-		final IRepositoryIdProvider repoId = model.getRepoId();
+		final String repoId = model.getRepoId().generateId();
 
-		Runnable pollTask = new Runnable() {
-			@Override
-			public void run() {
-				modelUpdater.updateModel(repoId);
-				UI.getInstance().triggerEvent(new RefreshDoneEvent());
-			}
-		};
-		refreshResult = refreshExecutor.scheduleWithFixedDelay(pollTask, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
+		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
+			preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
+		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
-		Runnable countdown = new Runnable() {
-			@Override
-			public void run() {
-				StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
-			}
-		};
-		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(countdown, 0, TICK_INTERVAL,
-				TimeUnit.SECONDS);
+		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
+			StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
+		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 
-	/**
-	 * Stops the concurrent tasks which update the model.
-	 */
-	public void stopModelUpdate() {
+	public void updateModelPeriodically() {
+		updateModelPeriodically(true);
+	}
+	
+	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
+		// Wait for repository selection to be disabled
+		CountDownLatch continuation = new CountDownLatch(1);
+		Platform.runLater(() -> {
+			UI.getInstance().disableRepositorySwitching();
+			continuation.countDown();
+		});
+		try {
+			continuation.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		
+		// Wait for the update to complete
+		modelUpdater.updateModel(latch, repoId);
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		
+		// Enable repository switching
+		Platform.runLater(() -> {
+			UI.getInstance().enableRepositorySwitching();
+		});
+	}
+	
+	private void stopPeriodicModelUpdates(boolean log) {
 
 		// If the model update was never started, don't do anything
 		if (refreshResult == null || refreshResult.isCancelled())
@@ -451,6 +491,18 @@ public class ServiceManager {
 		// Indicate that model update has been stopped
 		refreshResult = null;
 		timeUntilRefreshResult = null;
+		
+		if (log) logger.info("Stopped model update");
+	}
+
+	public void stopModelUpdate() {
+		stopPeriodicModelUpdates(true);
+	}
+
+	public void updateModelNowAndPeriodically() {
+		logger.info("Updating model now, and starting periodic update");
+		updateModelNow(false);
+		updateModelPeriodically(false);
 	}
 
 	private int updateTimeRemainingUntilRefresh() {
@@ -471,14 +523,6 @@ public class ServiceManager {
 		timeUntilRefreshExecutor.shutdown();
 	}
 
-	/**
-	 * Helper function for restarting model update.
-	 */
-	public void restartModelUpdate() {
-		stopModelUpdate();
-		startModelUpdate();
-	}
-
 	private void ______LABELS______() {
 	}
 
@@ -493,7 +537,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.createLabel(repoId, ghLabel);
 		}
-		return null; // TODO
+		return null;
 	}
 
 	public void deleteLabel(String label) throws IOException {

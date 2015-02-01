@@ -31,6 +31,9 @@ public class LocalConfiguration {
 	}
 
 	public Map<String, List<String>> getAllPanelSets(String repo) {
+		if (!panelSets.containsKey(repo)) {
+			panelSets.put(repo, new HashMap<>());
+		}
 		return panelSets.get(repo);
 	}
 

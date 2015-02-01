@@ -6,7 +6,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import model.Model;
 import model.TurboMilestone;
 
@@ -94,9 +93,5 @@ public class MilestonesHandler {
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-	}
-	
-	public ObservableList<TurboMilestone> getMilestones(){
-		return modelRef.get().getMilestones();
 	}
 }

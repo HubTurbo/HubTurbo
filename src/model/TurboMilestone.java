@@ -8,11 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
 import org.eclipse.egit.github.core.Milestone;
 
 public class TurboMilestone implements Listable {
@@ -28,10 +23,9 @@ public class TurboMilestone implements Listable {
 		this.number = number;
 	}
 	
-	private StringProperty title = new SimpleStringProperty();
-    public final String getTitle() {return title.get();}
-    public final void setTitle(String value) {title.set(value);}
-    public StringProperty titleProperty() {return title;}
+	private String title = "";
+    public final String getTitle() {return title;}
+    public final void setTitle(String value) {title = value;}
 	
 	private String state;
 	public String getState() {return state;}
@@ -59,25 +53,26 @@ public class TurboMilestone implements Listable {
 		}
 	}
 
-	private StringProperty dueOnString = new SimpleStringProperty();
-    public final String getDueOnString() {return dueOnString.get();}
-    public final void setDueOnString(String value) {dueOnString.set(value);}
-    public StringProperty dueOnStringProperty() {return dueOnString;}
+	private String dueOnString;
+    public final String getDueOnString() {return dueOnString;}
+    public final void setDueOnString(String value) {dueOnString = value;}
 	
-	private IntegerProperty closed = new SimpleIntegerProperty();
-    public final Integer getClosed() {return closed.get();}
-    public final void setClosed(Integer value) {closed.set(value);}
-    public IntegerProperty closedProperty() {return closed;}
+	private int closed = 0;
+    public final int getClosed() {return closed;}
+    public final void setClosed(Integer value) {closed = value;}
     
-    private IntegerProperty open = new SimpleIntegerProperty();
-    public final Integer getOpen() {return open.get();}
-    public final void setOpen(Integer value) {open.set(value);}
-    public IntegerProperty openProperty() {return open;}
+    private int open = 0;
+    public final int getOpen() {return open;}
+    public final void setOpen(Integer value) {open = value;}
 	
 	/*
 	 * Constructors and Public Methods
 	 */
 	
+	public TurboMilestone(TurboMilestone other) {
+		this(other.toGhResource());
+	}
+
 	public TurboMilestone() {
 		setTitle("");
 	}
