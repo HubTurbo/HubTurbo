@@ -89,7 +89,13 @@ public class BrowserComponent {
 	 */
 	public void quit() {
 		logger.info("Quitting browser component");
-		assert driver != null;
+		
+		// The application may quit before the browser is initialised.
+		// In that case, do nothing.
+		if (driver == null) {
+			return;
+		}
+		
 		try {
 			driver.close();
 			if (PlatformSpecific.isOnWindows()) {
