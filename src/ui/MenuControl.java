@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -267,6 +268,17 @@ public class MenuControl extends MenuBar {
 					ServiceManager.getInstance().stopModelUpdate();
 					ServiceManager.getInstance().getModel().forceReloadComponents();
 					ServiceManager.getInstance().updateModelNowAndPeriodically();
+					CountDownLatch continuation = new CountDownLatch(1);
+					Platform.runLater(() -> {
+						columns.saveSession();
+						columns.restoreColumns();
+						continuation.countDown();
+					});
+					try {
+						continuation.await();
+					} catch (InterruptedException e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
 				} catch (SocketTimeoutException e) {
 					handleSocketTimeoutException(e);
 					return false;
