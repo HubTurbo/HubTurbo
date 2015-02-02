@@ -75,6 +75,11 @@ public class ColumnControl extends HBox {
 		StatusBar.displayMessage(message);
 	}
 	
+	public void recreateColumns() {
+		saveSession();
+		restoreColumns();
+	}
+	
 	public void refresh() {
 		getChildren().forEach(child -> ((Column) child).refreshItems());
 	}

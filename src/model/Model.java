@@ -186,6 +186,7 @@ public class Model {
 	public void forceReloadComponents() throws IOException {
 		if (isInTestMode) {
 			populateComponents(repoId, TestUtils.getStubResources(this, 10));
+			return;
 		}
 
 		HashMap<String, List> items = ServiceManager.getInstance().getGitHubResources();
