@@ -270,8 +270,7 @@ public class MenuControl extends MenuBar {
 					ServiceManager.getInstance().updateModelNowAndPeriodically();
 					CountDownLatch continuation = new CountDownLatch(1);
 					Platform.runLater(() -> {
-						columns.saveSession();
-						columns.restoreColumns();
+						columns.recreateColumns();
 						continuation.countDown();
 					});
 					try {
