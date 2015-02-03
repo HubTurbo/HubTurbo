@@ -157,4 +157,12 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	public void setOnItemSelected(IntConsumer callback) {
 		onItemSelected = callback;
 	}
+	
+	public void selectFirstItem(){
+		requestFocus();
+		if (getItems().size() == 0) return;
+		selectedIndex = Optional.of(0);
+		onItemSelected.accept(selectedIndex.get());
+		
+	}
 }

@@ -2,8 +2,13 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
+import javafx.event.EventHandler;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -22,7 +27,8 @@ public class IssuePanel extends IssueColumn {
 	private final UI ui;
 
 	private NavigableListView<TurboIssue> listView;
-
+	final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+	
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
 		this.model = model;
@@ -69,6 +75,13 @@ public class IssuePanel extends IssueColumn {
 	
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
+		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				if (keyComb1.match(event)) {
+					listView.selectFirstItem();
+				}
+			}
+		});
 		listView.setOnItemSelected(i -> {
 			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
 		});
