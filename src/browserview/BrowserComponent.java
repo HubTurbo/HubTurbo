@@ -81,6 +81,7 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = setupChromeDriver();
+//		logger.info(driver.getRemoteStatus());
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
 
@@ -97,7 +98,7 @@ public class BrowserComponent {
 		}
 		
 		try {
-			driver.close();
+			driver.quit();
 			if (PlatformSpecific.isOnWindows()) {
 				Runtime.getRuntime().exec("taskkill.exe /F /im chromedriver.exe");
 			} else {
