@@ -80,8 +80,8 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
+		System.setProperty("webdriver.chrome.logfile", "chromedriver-log.log");
 		driver = setupChromeDriver();
-//		logger.info(driver.getRemoteStatus());
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
 
