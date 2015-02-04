@@ -80,7 +80,6 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
-		System.setProperty("webdriver.chrome.logfile", "chromedriver-log.log");
 		driver = setupChromeDriver();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
@@ -162,11 +161,17 @@ public class BrowserComponent {
 	 */
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
-		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
-				driver.get(GitHubURL.getPathForNewLabel());
-			}
-		});
+		if (isBrowserActive()) {
+			runBrowserOperation(() -> {
+				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
+					driver.get(GitHubURL.getPathForNewLabel());
+				}
+			});
+		}
+		else{
+			resetBrowser();
+			newLabel();
+		}
 	}
 
 	/**
@@ -175,11 +180,17 @@ public class BrowserComponent {
 	 */
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
-		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
-				driver.get(GitHubURL.getPathForNewMilestone());
-			}
-		});
+		if (isBrowserActive()) {
+			runBrowserOperation(() -> {
+				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
+					driver.get(GitHubURL.getPathForNewMilestone());
+				}
+			});
+		}
+		else{
+			resetBrowser();
+			newMilestone();
+		}
 	}
 
 	/**
@@ -188,11 +199,17 @@ public class BrowserComponent {
 	 */
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
-		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
-				driver.get(GitHubURL.getPathForNewIssue());
-			}
-		});
+		if (isBrowserActive()) {
+			runBrowserOperation(() -> {
+				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
+					driver.get(GitHubURL.getPathForNewIssue());
+				}
+			});
+		}
+		else{
+			resetBrowser();
+			newIssue();
+		}
 	}
 	
 	/**
@@ -201,9 +218,15 @@ public class BrowserComponent {
 	 */
 	public void showDocs() {
 		logger.info("Showing documentation page");
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getPathForDocsPage());
-		});
+		if(isBrowserActive()){
+			runBrowserOperation(() -> {
+				driver.get(GitHubURL.getPathForDocsPage());
+			});
+		}
+		else{
+			resetBrowser();
+			showDocs();
+		}
 	}
 
 	/**
@@ -212,9 +235,15 @@ public class BrowserComponent {
 	 */
 	public void showChangelog(String version) {
 		logger.info("Showing changelog for version " + version);
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getChangelogForVersion(version));
-		});
+		if (isBrowserActive()) {
+			runBrowserOperation(() -> {
+				driver.get(GitHubURL.getChangelogForVersion(version));
+			});
+		}
+		else{
+			resetBrowser();
+			showChangelog(version);
+		}
 	}
 
 	/**
@@ -224,11 +253,17 @@ public class BrowserComponent {
 	 */
 	public void showIssue(int id) {
 		logger.info("Showing issue #" + id);
-		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-				driver.get(GitHubURL.getPathForIssue(id));
-			}
-		});
+		if (isBrowserActive()){
+			runBrowserOperation(() -> {
+				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+					driver.get(GitHubURL.getPathForIssue(id));
+				}
+			});
+		}
+		else{
+			resetBrowser();
+			showIssue(id);
+		}
 	}
 	
 	/**
@@ -236,6 +271,34 @@ public class BrowserComponent {
 	 * Takes care of running it on a separate thread, and normalises error-handling across
 	 * all types of code.
 	 */
+	private boolean isBrowserActive(){
+		try {
+			if (driver.getCurrentUrl().isEmpty() && driver != null){
+				return false;
+			}
+			else if (driver == null){
+				return false;
+			}
+			return true;
+		}
+			catch (WebDriverException e) {
+				switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+				case NoSuchWindow:
+					logger.info("Chrome was closed.");
+				default:
+					break;
+				}
+				return false;
+			}
+	}
+	
+	private void resetBrowser(){
+		logger.info("Chrome not responding.");
+		quit();
+		driver = setupChromeDriver();
+		login();
+	}
+	
 	private void runBrowserOperation (Runnable operation) {
 		executor.execute(new Task<Void>() {
 			@Override
@@ -246,6 +309,7 @@ public class BrowserComponent {
 					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 					case NoSuchWindow:
 						logger.info("Chrome was closed; recreating window...");
+						quit();
 						driver = setupChromeDriver();
 						login();
 						runBrowserOperation(operation); // Recurse and repeat
