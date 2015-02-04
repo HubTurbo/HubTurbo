@@ -167,8 +167,7 @@ public class BrowserComponent {
 					driver.get(GitHubURL.getPathForNewLabel());
 				}
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			newLabel();
 		}
@@ -186,8 +185,7 @@ public class BrowserComponent {
 					driver.get(GitHubURL.getPathForNewMilestone());
 				}
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			newMilestone();
 		}
@@ -205,8 +203,7 @@ public class BrowserComponent {
 					driver.get(GitHubURL.getPathForNewIssue());
 				}
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			newIssue();
 		}
@@ -222,8 +219,7 @@ public class BrowserComponent {
 			runBrowserOperation(() -> {
 				driver.get(GitHubURL.getPathForDocsPage());
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			showDocs();
 		}
@@ -239,8 +235,7 @@ public class BrowserComponent {
 			runBrowserOperation(() -> {
 				driver.get(GitHubURL.getChangelogForVersion(version));
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			showChangelog(version);
 		}
@@ -259,8 +254,7 @@ public class BrowserComponent {
 					driver.get(GitHubURL.getPathForIssue(id));
 				}
 			});
-		}
-		else{
+		} else {
 			resetBrowser();
 			showIssue(id);
 		}
