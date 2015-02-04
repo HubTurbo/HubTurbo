@@ -3,6 +3,7 @@ package ui.issuecolumn;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -46,7 +47,13 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
 			public void handle(ModelChangedEvent e) {
-				Platform.runLater(() -> refresh());
+				Platform.runLater(() -> {
+					forEach(child -> {
+						if (child instanceof IssueColumn) {
+							((IssueColumn) child).setItems(e.issues);
+						}
+					});
+				});
 			}
 		});
 
@@ -80,12 +87,16 @@ public class ColumnControl extends HBox {
 		restoreColumns();
 	}
 	
+	public void forEach(Consumer<Column> callback) {
+		getChildren().forEach(child -> callback.accept((Column) child));
+	}
+	
 	public void refresh() {
-		getChildren().forEach(child -> ((Column) child).refreshItems());
+		forEach(child -> child.refreshItems());
 	}
 	
 	public void deselect() {
-		getChildren().forEach(child -> ((Column) child).deselect());
+		forEach(child -> child.deselect());
 	}
 
 	public void loadIssues() {

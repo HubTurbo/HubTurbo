@@ -23,7 +23,7 @@ public class EventTests {
         events.register(fail2);
         events.register(succeed1);
         
-        ModelChangedEvent te = new ModelChangedEvent();
+        ModelChangedEvent te = new ModelChangedEvent(null, null, null, null);
         IssueSelectedEvent te2 = new IssueSelectedEvent(1, 2);
 
         events.post(te);
