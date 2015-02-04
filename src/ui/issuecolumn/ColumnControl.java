@@ -47,7 +47,13 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
 			public void handle(ModelChangedEvent e) {
-				Platform.runLater(() -> refresh());
+				Platform.runLater(() -> {
+					forEach(child -> {
+						if (child instanceof IssueColumn) {
+							((IssueColumn) child).setItems(e.issues);
+						}
+					});
+				});
 			}
 		});
 
