@@ -105,7 +105,9 @@ public class Model {
 	 */
 	public void triggerModelChangeEvent() {
 		if (modelChangeCounter == 0) {
-			eventDispatcher.triggerEvent(new ModelChangedEvent());
+			// TODO in future this should do a deep copy to ensure
+			// that the actual model resources are not mutated
+			eventDispatcher.triggerEvent(new ModelChangedEvent(getIssues(), getMilestones(), getLabels(), getCollaborators()));
 		}
 	}
 
