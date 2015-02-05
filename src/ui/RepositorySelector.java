@@ -47,6 +47,14 @@ public class RepositorySelector extends HBox {
 	public void setValue(String val) {
 		comboBox.setValue(val);
 	}
+	
+	public void enable() {
+		comboBox.setDisable(false);
+	}
+
+	public void disable() {
+		comboBox.setDisable(true);
+	}
 
 	public void setOnValueChange(Consumer<String> callback) {
 		onValueChangeCallback = callback;
