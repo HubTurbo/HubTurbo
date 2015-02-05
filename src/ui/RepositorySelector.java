@@ -6,17 +6,20 @@ import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import storage.DataManager;
 
 public class RepositorySelector extends HBox {
 	private final ComboBox<String> comboBox = new ComboBox<>();
+	private final Label label = new Label();
 	private Consumer<String> onValueChangeCallback = null;
 
 	public RepositorySelector() {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
+		getChildren().addAll(label);
 	}
 
 	private void setupLayout() {
@@ -35,6 +38,10 @@ public class RepositorySelector extends HBox {
 				onValueChangeCallback.accept(newVal);
 			}
 		});
+	}
+	
+	public void setLabelText(String text) {
+		label.setText(text);
 	}
 
 	public void setValue(String val) {
