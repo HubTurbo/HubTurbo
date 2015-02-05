@@ -119,6 +119,7 @@ public class ServiceManager {
 	private static final int TICK_INTERVAL = 1;
 	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> timeUntilRefreshResult;
+	private boolean isPeriodicUpdatePaused = false;
 
 	private static final String ISSUE_STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -450,6 +451,9 @@ public class ServiceManager {
 	}
 	
 	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
+
+		isPeriodicUpdatePaused = true;
+
 		// Wait for repository selection to be disabled
 		CountDownLatch continuation = new CountDownLatch(1);
 		Platform.runLater(() -> {
@@ -474,6 +478,7 @@ public class ServiceManager {
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
+		isPeriodicUpdatePaused = false;
 	}
 	
 	private void stopPeriodicModelUpdates(boolean log) {
@@ -508,7 +513,7 @@ public class ServiceManager {
 	private int updateTimeRemainingUntilRefresh() {
 		if (timeRemainingUntilRefresh == 1) {
 			timeRemainingUntilRefresh = REFRESH_INTERVAL;
-		} else {
+		} else if (!isPeriodicUpdatePaused) {
 			--timeRemainingUntilRefresh;
 		}
 		return timeRemainingUntilRefresh;
