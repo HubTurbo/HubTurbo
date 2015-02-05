@@ -355,11 +355,13 @@ public class UI extends Application implements EventDispatcher {
 
 	public void enableRepositorySwitching() {
 		repoSwitchingAllowed = true;
+		repoSelector.setLabelText("");
 		repoSelector.setDisable(false);
 	}
 
 	public void disableRepositorySwitching() {
 		repoSwitchingAllowed = false;
+		repoSelector.setLabelText("Syncing...");
 		repoSelector.setDisable(true);
 	}
 
