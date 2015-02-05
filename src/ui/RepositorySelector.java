@@ -11,7 +11,7 @@ import storage.DataManager;
 
 public class RepositorySelector extends HBox {
 	private final ComboBox<String> comboBox = new ComboBox<>();
-	private Consumer<String> methodOnValueChange;
+	private Consumer<String> onValueChangeCallback = null;
 
 	public RepositorySelector() {
 		setupLayout();
@@ -31,8 +31,8 @@ public class RepositorySelector extends HBox {
 		comboBox.setEditable(true);
 		loadComboBoxContents();
 		comboBox.valueProperty().addListener((observable, old, newVal) -> {
-			if (methodOnValueChange != null) {
-				methodOnValueChange.accept(newVal);
+			if (onValueChangeCallback != null) {
+				onValueChangeCallback.accept(newVal);
 			}
 		});
 	}
@@ -41,8 +41,8 @@ public class RepositorySelector extends HBox {
 		comboBox.setValue(val);
 	}
 
-	public void setComboValueChangeMethod(Consumer<String> method) {
-		methodOnValueChange = method;
+	public void setOnValueChange(Consumer<String> callback) {
+		onValueChangeCallback = callback;
 	}
 
 	private void loadComboBoxContents() {

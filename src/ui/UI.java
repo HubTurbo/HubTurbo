@@ -94,7 +94,7 @@ public class UI extends Application implements EventDispatcher {
 		
 		events = new EventBus();
 		
-		repoSelector = createRepoFields();
+		repoSelector = createRepoSelector();
 		
 		browserComponent = new BrowserComponent(this);
 		initCSS();
@@ -319,10 +319,10 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 	
-	private RepositorySelector createRepoFields() {
-		RepositorySelector repoIdBox = new RepositorySelector();
-		repoIdBox.setComboValueChangeMethod(this::loadRepo);
-		return repoIdBox;
+	private RepositorySelector createRepoSelector() {
+		RepositorySelector repoSelector = new RepositorySelector();
+		repoSelector.setOnValueChange(this::loadRepo);
+		return repoSelector;
 	}
 	
 	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
