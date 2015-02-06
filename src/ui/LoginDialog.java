@@ -246,7 +246,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		};
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
-				HTStatusBar.displayMessage("Issues loaded successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
+				HTStatusBar.displayMessage("Issues loaded successfully!");
 				completeResponse(true);
 				close();
 			} else {

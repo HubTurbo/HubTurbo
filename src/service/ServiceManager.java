@@ -442,7 +442,7 @@ public class ServiceManager {
 		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
-			HTStatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
+			HTStatusBar.updateRefreshTimer(updateTimeRemainingUntilRefresh());
 		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 
