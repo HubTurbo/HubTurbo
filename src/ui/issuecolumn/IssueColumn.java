@@ -28,7 +28,7 @@ import service.ServiceManager;
 import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
-import ui.components.StatusBar;
+import ui.components.HTStatusBar;
 
 import command.CommandType;
 import command.TurboCommandExecutor;
@@ -227,13 +227,13 @@ public abstract class IssueColumn extends Column {
 			}
 			
 			// Clear displayed message on successful filter
-			StatusBar.displayMessage("");
+			HTStatusBar.displayMessage("");
 		}
 		catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			logger.error(ex.getLocalizedMessage(), ex);
 			// Overrides message in status bar
-			StatusBar.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
+			HTStatusBar.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
 		}
 	}
 
