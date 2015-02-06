@@ -46,7 +46,7 @@ import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
 import ui.UI;
-import ui.components.StatusBar;
+import ui.components.HTStatusBar;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -442,7 +442,7 @@ public class ServiceManager {
 		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
-			StatusBar.displayMessage("Next refresh in " + updateTimeRemainingUntilRefresh());
+			HTStatusBar.updateRefreshTimer(updateTimeRemainingUntilRefresh());
 		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 
@@ -473,6 +473,7 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		HTStatusBar.updateProgress(0);
 		
 		// Enable repository switching
 		Platform.runLater(() -> {

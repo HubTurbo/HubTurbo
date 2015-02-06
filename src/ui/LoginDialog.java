@@ -32,7 +32,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import service.ServiceManager;
 import storage.DataManager;
 import ui.components.Dialog;
-import ui.components.StatusBar;
+import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 
@@ -223,13 +223,13 @@ public class LoginDialog extends Dialog<Boolean> {
 		
 		// Run blocking operations in the background
 		
-		StatusBar.displayMessage("Signing in at GitHub...");
+		HTStatusBar.displayMessage("Signing in at GitHub...");
     	boolean couldLogIn = ServiceManager.getInstance().login(username, password);
 
 		Task<Boolean> task = new Task<Boolean>() {
 		    @Override
 		    protected Boolean call() throws Exception {
-		    	StatusBar.displayMessage("Signed in; loading data...");
+		    	HTStatusBar.displayMessage("Signed in; loading data...");
 			    boolean loadSuccess = loadRepository(owner, repo);
 			    final CountDownLatch latch = new CountDownLatch(1);
 			    Platform.runLater(()->{
@@ -246,7 +246,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		};
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
-				StatusBar.displayMessage("Issues loaded successfully! " + ServiceManager.getInstance().getRemainingRequests() + " requests remaining out of " + ServiceManager.getInstance().getRequestLimit() + ".");
+				HTStatusBar.displayMessage("Issues loaded successfully!");
 				completeResponse(true);
 				close();
 			} else {
@@ -277,7 +277,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	private void handleError(String message) {
 		Platform.runLater(()->{
 			enableElements(true);
-			StatusBar.displayMessage(message);
+			HTStatusBar.displayMessage(message);
 			DialogMessage.showWarningDialog("Warning", message);
 		});
 	}

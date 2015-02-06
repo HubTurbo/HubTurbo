@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import model.Model;
 import storage.DataManager;
 import ui.UI;
-import ui.components.StatusBar;
+import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
@@ -79,7 +79,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public void displayMessage(String message) {
-		StatusBar.displayMessage(message);
+		HTStatusBar.displayMessage(message);
 	}
 	
 	public void recreateColumns() {

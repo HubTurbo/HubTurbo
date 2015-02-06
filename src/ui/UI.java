@@ -32,7 +32,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
 import storage.DataManager;
-import ui.components.StatusBar;
+import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.Utility;
@@ -206,7 +206,7 @@ public class UI extends Application implements EventDispatcher {
 		BorderPane root = new BorderPane();
 		root.setTop(top);
 		root.setCenter(columnsScrollPane);
-		root.setBottom(StatusBar.getInstance());
+		root.setBottom(HTStatusBar.getInstance());
 
 		return root;
 	}
@@ -415,7 +415,7 @@ public class UI extends Application implements EventDispatcher {
 			
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
-			StatusBar.displayMessage("Issues loaded successfully!");
+			HTStatusBar.displayMessage("Issues loaded successfully!");
 			ServiceManager.getInstance().updateModelPeriodically();
 			logger.info("Repository " + repoString + " successfully switched to!");
 		});
@@ -423,7 +423,7 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnFailed(wse -> {
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);
-			StatusBar.displayMessage("An error occurred: " + err);
+			HTStatusBar.displayMessage("An error occurred: " + err);
 		});
 
 	}

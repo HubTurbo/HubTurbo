@@ -15,6 +15,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.GitHubClientExtended;
+import ui.components.HTStatusBar;
 
 public class ModelUpdater {
 	
@@ -42,6 +43,8 @@ public class ModelUpdater {
 	public void updateModel(CountDownLatch latch, String repoId) {
 		logger.info("Updating model...");
 		model.disableModelChanges();
+		// TODO all these should return CompletableFuture<Integer>
+		// with the number of resources updated
 	    updateModelCollaborators(latch, repoId);
 	   	updateModelLabels(latch, repoId);
 	  	updateModelMilestones(latch, repoId);
@@ -53,6 +56,7 @@ public class ModelUpdater {
 	}
 	
 	private void updateModelIssues(CountDownLatch latch, String repoId) {
+		// TODO turn this into an assertion, same for the rest
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
@@ -75,6 +79,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No collaborators to update");
 				latch.countDown();
+				HTStatusBar.addProgress(0.25);
 			}
 		}
 	}
@@ -88,6 +93,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No labels to update");
 				latch.countDown();
+				HTStatusBar.addProgress(0.25);
 			}
 		}
 	}
@@ -101,6 +107,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No milestones to update");
 				latch.countDown();
+				HTStatusBar.addProgress(0.25);
 			}
 		}
 	}
