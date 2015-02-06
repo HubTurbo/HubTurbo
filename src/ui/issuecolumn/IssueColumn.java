@@ -231,7 +231,6 @@ public abstract class IssueColumn extends Column {
 		}
 		catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
-			logger.error(ex.getLocalizedMessage(), ex);
 			// Overrides message in status bar
 			HTStatusBar.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
 		}
