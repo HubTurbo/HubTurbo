@@ -491,7 +491,7 @@ public class ServiceManager {
 
 		refreshResult.cancel(true);
 		timeUntilRefreshResult.cancel(true);
-		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+		resetTimeRemainingUntilRefresh();
 
 		// Indicate that model update has been stopped
 		refreshResult = null;
@@ -509,10 +509,14 @@ public class ServiceManager {
 		updateModelNow(false);
 		updateModelPeriodically(false);
 	}
+	
+	public void resetTimeRemainingUntilRefresh() {
+		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+	}
 
 	private int updateTimeRemainingUntilRefresh() {
 		if (timeRemainingUntilRefresh == 1) {
-			timeRemainingUntilRefresh = REFRESH_INTERVAL;
+			resetTimeRemainingUntilRefresh();
 		} else if (!isPeriodicUpdatePaused) {
 			--timeRemainingUntilRefresh;
 		}
