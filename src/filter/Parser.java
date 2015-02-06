@@ -38,6 +38,7 @@ public class Parser {
 
 	private ArrayList<Token> input;
 	private int position = 0;
+	private int sourcePosition = 0;
 	
 	private Token consume(TokenType type) {
 		if (input.get(position).getType() == type) {
@@ -48,7 +49,9 @@ public class Parser {
 	}
 	
 	private Token consume() {
-		return input.get(position++);
+		Token token = input.get(position++);
+		sourcePosition += token.getValue().length();
+		return token;
 	}
 
 	private Token lookAhead() {
@@ -58,7 +61,7 @@ public class Parser {
 	private FilterExpression parseExpression(int precedence) {
 		Token token = consume();
 		if (token.getType() == TokenType.EOF) {
-			throw new ParseException("Unexpected EOF while parsing at " + position);
+			throw new ParseException("Unexpected EOF while parsing at " + sourcePosition + " (token " + position + ")");
 		}
 		
 		// Prefix
