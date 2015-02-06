@@ -473,6 +473,7 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		HTStatusBar.updateProgress(0);
 		
 		// Enable repository switching
 		Platform.runLater(() -> {

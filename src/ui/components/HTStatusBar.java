@@ -21,10 +21,10 @@ public class HTStatusBar extends StatusBar {
 	private Label timerLabel = new Label();
 
 	public HTStatusBar() {
+		getStyleClass().add("top-borders");
+
 		setupTimerLabel();
 		getRightItems().add(timerLabel);
-
-		getStyleClass().add("top-borders");
 	}
 
 	private void setupTimerLabel() {
@@ -40,6 +40,19 @@ public class HTStatusBar extends StatusBar {
 	public static void updateRefreshTimer(int time) {
 		Platform.runLater(() -> {
 			getInstance().timerLabel.setText(Integer.toString(time));
+		});
+	}
+	
+	public static void addProgress(double increment) {
+		double progress = Math.min(Math.max(0, getInstance().getProgress() + increment), 1);
+		Platform.runLater(() -> {
+			getInstance().setProgress(progress);
+		});
+	}
+
+	public static void updateProgress(double progress) {
+		Platform.runLater(() -> {
+			getInstance().setProgress(progress);
 		});
 	}
 }

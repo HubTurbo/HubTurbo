@@ -27,6 +27,7 @@ import storage.CacheFileHandler;
 import tests.TestUtils;
 import tests.stubs.ModelEventDispatcherStub;
 import ui.UI;
+import ui.components.HTStatusBar;
 import util.CollectionUtilities;
 import util.DialogMessage;
 import util.events.EventDispatcher;
@@ -345,6 +346,7 @@ public class Model {
 			list.addAll(buffer);
 
 			latch.countDown();
+			HTStatusBar.addProgress(0.25);
 		});
 	}
 
