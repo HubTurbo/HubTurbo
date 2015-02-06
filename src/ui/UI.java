@@ -160,7 +160,8 @@ public class UI extends Application implements EventDispatcher {
 				// disabled (meaning an update is in progress anyway) do we update
 				if (is && isRepoSwitchingAllowed()) {
 					logger.info("Gained focus; refreshing");
-					ServiceManager.getInstance().getModel().refresh();
+					ServiceManager.getInstance().updateModelNow();
+					ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 				}
 			}
 		});
