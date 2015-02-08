@@ -98,15 +98,8 @@ public class BrowserComponent {
 		
 		try {
 			driver.quit();
-			if (PlatformSpecific.isOnWindows()) {
-				Runtime.getRuntime().exec("taskkill.exe /F /im chromedriver.exe");
-			} else {
-				Runtime.getRuntime().exec("killall chromedriver");
-			}
 		} catch (WebDriverException e) {
 			// Chrome was closed; do nothing
-		} catch (IOException e) {
-			// Could not kill processes; do nothing
 		}
 	}
 	
@@ -161,16 +154,11 @@ public class BrowserComponent {
 	 */
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
-		if (isBrowserActive()) {
-			runBrowserOperation(() -> {
-				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
-					driver.get(GitHubURL.getPathForNewLabel());
-				}
-			});
-		} else {
-			resetBrowser();
-			newLabel();
-		}
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
+				driver.get(GitHubURL.getPathForNewLabel());
+			}
+		});
 	}
 
 	/**
@@ -179,16 +167,11 @@ public class BrowserComponent {
 	 */
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
-		if (isBrowserActive()) {
-			runBrowserOperation(() -> {
-				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
-					driver.get(GitHubURL.getPathForNewMilestone());
-				}
-			});
-		} else {
-			resetBrowser();
-			newMilestone();
-		}
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
+				driver.get(GitHubURL.getPathForNewMilestone());
+			}
+		});
 	}
 
 	/**
@@ -197,16 +180,11 @@ public class BrowserComponent {
 	 */
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
-		if (isBrowserActive()) {
-			runBrowserOperation(() -> {
-				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
-					driver.get(GitHubURL.getPathForNewIssue());
-				}
-			});
-		} else {
-			resetBrowser();
-			newIssue();
-		}
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
+				driver.get(GitHubURL.getPathForNewIssue());
+			}
+		});
 	}
 	
 	/**
@@ -215,14 +193,9 @@ public class BrowserComponent {
 	 */
 	public void showDocs() {
 		logger.info("Showing documentation page");
-		if(isBrowserActive()){
-			runBrowserOperation(() -> {
-				driver.get(GitHubURL.getPathForDocsPage());
-			});
-		} else {
-			resetBrowser();
-			showDocs();
-		}
+		runBrowserOperation(() -> {
+			driver.get(GitHubURL.getPathForDocsPage());
+		});
 	}
 
 	/**
@@ -231,14 +204,9 @@ public class BrowserComponent {
 	 */
 	public void showChangelog(String version) {
 		logger.info("Showing changelog for version " + version);
-		if (isBrowserActive()) {
-			runBrowserOperation(() -> {
-				driver.get(GitHubURL.getChangelogForVersion(version));
-			});
-		} else {
-			resetBrowser();
-			showChangelog(version);
-		}
+		runBrowserOperation(() -> {
+			driver.get(GitHubURL.getChangelogForVersion(version));
+		});
 	}
 
 	/**
@@ -248,23 +216,13 @@ public class BrowserComponent {
 	 */
 	public void showIssue(int id) {
 		logger.info("Showing issue #" + id);
-		if (isBrowserActive()){
-			runBrowserOperation(() -> {
-				if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-					driver.get(GitHubURL.getPathForIssue(id));
-				}
-			});
-		} else {
-			resetBrowser();
-			showIssue(id);
-		}
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+				driver.get(GitHubURL.getPathForIssue(id));
+			}
+		});
 	}
 	
-	/**
-	 * A helper function for running browser operations.
-	 * Takes care of running it on a separate thread, and normalises error-handling across
-	 * all types of code.
-	 */
 	private boolean isBrowserActive(){
 		try {
 			if (driver.getCurrentUrl().isEmpty() && driver != null){
@@ -275,8 +233,8 @@ public class BrowserComponent {
 			}
 			return true;
 		}
-			catch (WebDriverException e) {
-				switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+		catch (WebDriverException e) {
+			switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 				case NoSuchWindow:
 					logger.info("Chrome was closed.");
 				default:
@@ -286,19 +244,20 @@ public class BrowserComponent {
 			}
 	}
 	
-	private void resetBrowser(){
-		logger.info("Chrome not responding.");
-		quit();
-		driver = setupChromeDriver();
-		login();
-	}
+	/**
+	 * A helper function for running browser operations.
+	 * Takes care of running it on a separate thread, and normalises error-handling across
+	 * all types of code.
+	 */
 	
 	private void runBrowserOperation (Runnable operation) {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
 				try {
-					operation.run();
+					if (isBrowserActive()) {
+						operation.run();
+					}
 				} catch (WebDriverException e) {
 					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 					case NoSuchWindow:
