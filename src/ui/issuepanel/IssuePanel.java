@@ -2,13 +2,16 @@ package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
 
+import javafx.event.EventHandler;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
+import service.ServiceManager;
 import ui.UI;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
@@ -71,6 +74,12 @@ public class IssuePanel extends IssueColumn {
 		setVgrow(listView, Priority.ALWAYS);
 		listView.setOnItemSelected(i -> {
 			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
+		});
+		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				ServiceManager.getInstance().updateModelNowAndPeriodically();
+				parentColumnControl.refresh();
+			}
 		});
 	}
 }
