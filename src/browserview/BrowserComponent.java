@@ -97,16 +97,9 @@ public class BrowserComponent {
 		}
 		
 		try {
-			driver.close();
-			if (PlatformSpecific.isOnWindows()) {
-				Runtime.getRuntime().exec("taskkill.exe /F /im chromedriver.exe");
-			} else {
-				Runtime.getRuntime().exec("killall chromedriver");
-			}
+			driver.quit();
 		} catch (WebDriverException e) {
 			// Chrome was closed; do nothing
-		} catch (IOException e) {
-			// Could not kill processes; do nothing
 		}
 	}
 	
@@ -230,21 +223,46 @@ public class BrowserComponent {
 		});
 	}
 	
+	private boolean isBrowserActive(){
+		try {
+			if (driver.getCurrentUrl().isEmpty() && driver != null){
+				return false;
+			}
+			else if (driver == null){
+				return false;
+			}
+			return true;
+		}
+		catch (WebDriverException e) {
+			switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+				case NoSuchWindow:
+					logger.info("Chrome was closed.");
+				default:
+					break;
+				}
+				return false;
+			}
+	}
+	
 	/**
 	 * A helper function for running browser operations.
 	 * Takes care of running it on a separate thread, and normalises error-handling across
 	 * all types of code.
 	 */
+	
 	private void runBrowserOperation (Runnable operation) {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
 				try {
-					operation.run();
+					if (isBrowserActive()) {
+						operation.run();
+					}
 				} catch (WebDriverException e) {
 					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 					case NoSuchWindow:
 						logger.info("Chrome was closed; recreating window...");
+						quit();
 						driver = setupChromeDriver();
 						login();
 						runBrowserOperation(operation); // Recurse and repeat
