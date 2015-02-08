@@ -242,8 +242,8 @@ public class MenuControl extends MenuBar {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
-			ServiceManager.getInstance().updateModelNowAndPeriodically();
-			columns.refresh();
+			ServiceManager.getInstance().updateModelNow();
+			ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;

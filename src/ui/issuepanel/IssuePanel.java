@@ -78,9 +78,9 @@ public class IssuePanel extends IssueColumn {
 		});
 		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F5){
-					ServiceManager.getInstance().updateModelNowAndPeriodically();
-					parentColumnControl.refresh();
+				if (event.getCode() == KeyCode.F5) {
+					ServiceManager.getInstance().updateModelNow();
+					ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 				}
 			}
 		});
