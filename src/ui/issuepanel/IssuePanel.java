@@ -27,7 +27,7 @@ public class IssuePanel extends IssueColumn {
 	private final UI ui;
 
 	private NavigableListView<TurboIssue> listView;
-	final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+	final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
 	
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
@@ -75,7 +75,7 @@ public class IssuePanel extends IssueColumn {
 	
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
-		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (keyComb1.match(event)) {
 					listView.selectFirstItem();
