@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import javafx.event.EventHandler;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
@@ -77,8 +78,10 @@ public class IssuePanel extends IssueColumn {
 		});
 		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				ServiceManager.getInstance().updateModelNowAndPeriodically();
-				parentColumnControl.refresh();
+				if (event.getCode() == KeyCode.F5){
+					ServiceManager.getInstance().updateModelNowAndPeriodically();
+					parentColumnControl.refresh();
+				}
 			}
 		});
 	}
