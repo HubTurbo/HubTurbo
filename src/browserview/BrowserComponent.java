@@ -87,7 +87,14 @@ public class BrowserComponent {
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
-	public void quit() {
+	public void onAppQuit() {
+		quit();
+	}
+
+	/**
+	 * Quits the browser component.
+	 */
+	private void quit() {
 		logger.info("Quitting browser component");
 		
 		// The application may quit before the browser is initialised.
