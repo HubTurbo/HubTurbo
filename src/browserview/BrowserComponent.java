@@ -87,7 +87,14 @@ public class BrowserComponent {
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
-	public void quit() {
+	public void onAppQuit() {
+		quit();
+	}
+
+	/**
+	 * Quits the browser component.
+	 */
+	private void quit() {
 		logger.info("Quitting browser component");
 		
 		// The application may quit before the browser is initialised.
@@ -236,12 +243,20 @@ public class BrowserComponent {
 		catch (WebDriverException e) {
 			switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 				case NoSuchWindow:
-					logger.info("Chrome was closed.");
+					resetBrowser();
 				default:
 					break;
 				}
 				return false;
 			}
+	}
+
+	//	A helper function for reseting browser.
+	private void resetBrowser(){
+		logger.info("Relaunching chrome.");
+		quit(); // if the driver hangs
+		driver = setupChromeDriver();
+		login();
 	}
 	
 	/**
@@ -261,10 +276,7 @@ public class BrowserComponent {
 				} catch (WebDriverException e) {
 					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 					case NoSuchWindow:
-						logger.info("Chrome was closed; recreating window...");
-						quit();
-						driver = setupChromeDriver();
-						login();
+						resetBrowser();
 						runBrowserOperation(operation); // Recurse and repeat
 					case NoSuchElement:
 						logger.info("Warning: no such element! " + e.getMessage());
