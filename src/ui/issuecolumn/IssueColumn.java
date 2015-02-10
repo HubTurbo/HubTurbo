@@ -59,7 +59,7 @@ public abstract class IssueColumn extends Column {
 	public static final FilterExpression EMPTY = filter.expression.Qualifier.EMPTY;
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
-	private FilterTextField filterTextField;
+	protected FilterTextField filterTextField;
 
 	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl,
 			int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
