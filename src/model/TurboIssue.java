@@ -27,9 +27,11 @@ import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
 
+@SuppressWarnings("unused")
 public class TurboIssue implements Listable {
-	private static final Logger logger = LogManager.getLogger(TurboIssue.class
-			.getName());
+
+	private static final Logger logger = LogManager.getLogger(TurboIssue.class.getName());
+
 	private static final String STATE_CLOSED = "closed";
 	private static final String STATE_OPEN = "open";
 	private static final String REGEX_REPLACE_DESC = "^[^<>]*<hr>";
@@ -41,6 +43,33 @@ public class TurboIssue implements Listable {
 	private static final String METADATA_SEPERATOR = "<hr>";
 	private static final String NEW_LINE = "\n";
 	private static final int REFRESH_FEED_MINUTES = 15;
+
+	private void ______SERIALISED_FIELDS______() {
+	}
+
+	private String creator;
+	private String createdAt;
+	private LocalDateTime updatedAt;
+	private int numOfComments;
+	private PullRequest pullRequest;
+	private int id = 0;
+	private String title = "";
+	private String description = "";
+
+	private int parentIssue = 0;
+	private boolean state = false;
+	private TurboUser assignee;
+	private TurboMilestone milestone;
+	private String htmlUrl;
+	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+
+	private void ______MISCELLANEOUS_DATA_FIELDS______() {
+	}
+
+	private WeakReference<Model> model;
+
+	private String activityFeed = "";
+	private String cachedDescriptionMarkup;
 
 	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
 	private boolean hasAddedFeeds = false;
@@ -62,91 +91,160 @@ public class TurboIssue implements Listable {
 	private int milestonedCount = 0;
 	private int demilestonedCount = 0;
 
-	/*
-	 * Attributes, Getters & Setters
-	 */
+	private void ______ESSENTIALS______() {
+	}
 
-	private WeakReference<Model> model;
+	public TurboIssue(String title, String desc, Model model) {
+		assert title != null;
+		assert desc != null;
+		assert model != null;
+		this.model = new WeakReference<Model>(model);
 
-	private String creator;
+		setTitle(title);
+		setDescription(desc);
+		setOpen(true);
+	}
 
-	public String getCreator() {
-		String name = DataManager.getInstance().getUserAlias(creator);
-		if (name == null) {
-			name = creator;
+	public TurboIssue(Issue issue, Model model) {
+		assert issue != null;
+		assert model != null;
+		this.model = new WeakReference<Model>(model);
+		setHtmlUrl(issue.getHtmlUrl());
+		setTitle(issue.getTitle());
+		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
+		setId(issue.getNumber());
+		setDescription(extractDescription(issue.getBody()));
+		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
+		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(issue.getMilestone()));
+		setLabels(translateLabels(issue.getLabels()));
+		setParentIssue(extractIssueParent(issue.getBody()));
+		setPullRequest(issue.getPullRequest());
+		setNumOfComments(issue.getComments());
+		setCreator(issue.getUser().getLogin());
+		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue.getCreatedAt()));
+		setUpdatedAt(LocalDateTime.ofInstant(issue.getUpdatedAt().toInstant(), ZoneId.systemDefault()));
+	}
+
+	public Issue toGhResource() {
+		Issue ghIssue = new Issue();
+		ghIssue.setHtmlUrl(getHtmlUrl());
+		ghIssue.setNumber(getId());
+		ghIssue.setTitle(getTitle());
+		ghIssue.setState(isOpen() ? STATE_OPEN : STATE_CLOSED);
+		if (assignee != null)
+			ghIssue.setAssignee(assignee.toGhResource());
+		if (milestone != null)
+			ghIssue.setMilestone(milestone.toGhResource());
+		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
+		ghIssue.setBody(buildGithubBody());
+		return ghIssue;
+	}
+
+	public TurboIssue(TurboIssue other) {
+		assert other != null;
+		copyValues(other);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void copyValues(Object other) {
+		assert other != null;
+		if (other.getClass() == TurboIssue.class) {
+			TurboIssue obj = (TurboIssue) other;
+			model = obj.model;
+
+			setHtmlUrl(obj.getHtmlUrl());
+
+			// Logging is done with the assumption that this method is used for
+			// updating the values of TurboIssue in mind
+			if (!obj.getTitle().equals(this.getTitle())) {
+				logger.info("Issue " + this.getId() + "; Title was '" + this.getTitle() + "'. Now it's '"
+						+ obj.getTitle() + "'");
+			}
+			setTitle(obj.getTitle());
+			setOpen(obj.isOpen());
+			setId(obj.getId());
+
+			if (obj.getDescription() != null && this.getDescription() != null) {
+				if (!obj.getDescription().equals(this.getDescription())) {
+					logger.info("Issue " + this.getId() + "; Description was '" + this.getDescription()
+							+ "'. Now it's '" + obj.getDescription() + "'");
+				}
+			} else if (obj.getDescription() == null && this.getDescription() != null) {
+				logger.info("Description was removed for Issue " + this.getId());
+			} else if (obj.getDescription() != null && this.getDescription() == null) {
+				logger.info("Description was added for Issue " + this.getId());
+			}
+			setDescription(obj.getDescription());
+
+			if (obj.getAssignee() != null && this.getAssignee() != null) {
+				if (!obj.getAssignee().equals(this.getAssignee())) {
+					logger.info("Issue " + this.getId() + "; Assignee was '" + this.getAssignee() + "'. Now it's '"
+							+ obj.getAssignee() + "'");
+				}
+			} else if (obj.getAssignee() == null && this.getAssignee() != null) {
+				logger.info("Assignee was removed for Issue " + this.getId());
+			} else if (obj.getAssignee() != null && this.getAssignee() == null) {
+				logger.info("Assignee was added for Issue " + this.getId());
+			}
+			setAssignee(obj.getAssignee());
+
+			if (obj.getMilestone() != null && this.getMilestone() != null) {
+				if (!obj.getMilestone().equals(this.getMilestone())) {
+					logger.info("Issue " + this.getId() + "; Milestone was '" + this.getMilestone() + "'. Now it's '"
+							+ obj.getMilestone() + "'");
+				}
+			} else if (obj.getMilestone() == null && this.getMilestone() != null) {
+				logger.info("Milestone was removed for Issue " + this.getId());
+			} else if (obj.getMilestone() != null && this.getMilestone() == null) {
+				logger.info("Milestone was added for Issue " + this.getId());
+			}
+			setMilestone(obj.getMilestone());
+
+			List oldList = new ArrayList<TurboLabel>();
+			List newList = new ArrayList<TurboLabel>();
+			for (TurboLabel label : this.getLabels()) {
+				oldList.add(label);
+			}
+			for (TurboLabel label : obj.getLabels()) {
+				newList.add(label);
+			}
+			HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(oldList, newList);
+			HashSet<TurboLabel> removed = changes.get(CollectionUtilities.REMOVED_TAG);
+			HashSet<TurboLabel> added = changes.get(CollectionUtilities.ADDED_TAG);
+			if (removed.size() > 0) {
+				logger.info(removed.size() + " label(s) removed. Label name(s):");
+				removed.forEach(System.out::println);
+			}
+			if (added.size() > 0) {
+				logger.info(added.size() + " label(s) added. Label name(s):");
+				added.forEach(System.out::println);
+			}
+			setLabels(obj.getLabels());
+			setParentIssue(obj.getParentIssue());
+			setPullRequest(obj.getPullRequest());
+			setNumOfComments(obj.getNumOfComments());
+			setCreator(obj.getCreator());
+			setCreatedAt(obj.getCreatedAt());
+			setUpdatedAt(obj.getUpdatedAt());
 		}
-		return name;
 	}
 
-	public void setCreator(String creator) {
-		this.creator = creator;
+	@Override
+	public String toString() {
+		return "Issue " + getTitle();
 	}
 
-	private LocalDateTime updatedAt;
-
-	public LocalDateTime getUpdatedAt() {
-		return this.updatedAt;
+	@Override
+	public String getListName() {
+		return "#" + getId() + " " + getTitle();
 	}
 
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	private String createdAt;
-
-	public String getCreatedAt() {
-		return this.createdAt;
-	}
-
-	public void setCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	private int numOfComments;
-
-	public int getNumOfComments() {
-		return numOfComments;
-	}
-
-	public void setNumOfComments(int num) {
-		this.numOfComments = num;
-	}
-
-	private PullRequest pullRequest;
-
-	public PullRequest getPullRequest() {
-		return pullRequest;
-	}
-
-	public void setPullRequest(PullRequest pr) {
-		this.pullRequest = pr;
+	private void ______UTILITY_METHODS______() {
 	}
 
 	public boolean isPullRequest() {
 		return pullRequest != null && pullRequest.getUrl() != null;
 	}
-
-	private int id = 0;
-
-	public final int getId() {
-		return id;
-	}
-
-	public final void setId(int value) {
-		id = value;
-	}
-
-	private String title = "";
-
-	public final String getTitle() {
-		return title;
-	}
-
-	public final void setTitle(String value) {
-		title = value;
-	}
-
-	private String activityFeed = "";
 
 	public final String getActivityFeed() {
 		return activityFeed;
@@ -157,26 +255,11 @@ public class TurboIssue implements Listable {
 		activityFeed = value;
 	}
 
-	private String description = "";
-
-	public final String getDescription() {
-		return description;
-	}
-
-	public final void setDescription(String value) {
-		cachedDescriptionMarkup = null; // markup is invalid since the issue's
-										// description is to be overwritten
-		description = value;
-	}
-
-	private String cachedDescriptionMarkup;
-
 	public String getDescriptionMarkup() {
 		try {
 			if (cachedDescriptionMarkup == null) {
 				final String desc = getDescription();
-				cachedDescriptionMarkup = ServiceManager.getInstance()
-						.getContentMarkup(desc);
+				cachedDescriptionMarkup = ServiceManager.getInstance().getContentMarkup(desc);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -187,16 +270,6 @@ public class TurboIssue implements Listable {
 
 	public void setDescriptionMarkup(String descMarkup) {
 		this.cachedDescriptionMarkup = descMarkup;
-	}
-
-	private int parentIssue = 0;
-
-	public int getParentIssue() {
-		return parentIssue;
-	}
-
-	public final void setParentIssue(int parent) {
-		parentIssue = parent;
 	}
 
 	public final TurboIssue parentReference() {
@@ -226,53 +299,7 @@ public class TurboIssue implements Listable {
 		return depth;
 	}
 
-	private boolean state = false;
-
-	public final boolean isOpen() {
-		return state;
-	}
-
-	public final void setOpen(boolean value) {
-		state = value;
-	}
-
-	private TurboUser assignee;
-
-	public TurboUser getAssignee() {
-		return assignee;
-	}
-
-	public void setAssignee(TurboUser assignee) {
-		this.assignee = getCollaboratorReference(assignee);
-	}
-
-	private TurboMilestone milestone;
-
-	public TurboMilestone getMilestone() {
-		return milestone;
-	}
-
-	public void setMilestone(TurboMilestone milestone) {
-		this.milestone = getMilestoneReference(milestone);
-	}
-
-	private String htmlUrl;
-
-	public String getHtmlUrl() {
-		return htmlUrl;
-	}
-
-	public void setHtmlUrl(String htmlUrl) {
-		this.htmlUrl = htmlUrl;
-	}
-
-	private ObservableList<TurboLabel> labels = FXCollections
-			.observableArrayList();
-
-	public ObservableList<TurboLabel> getLabels() {
-		return FXCollections.observableArrayList(labels);
-	}
-
+	// TODO remove
 	public ObservableList<TurboLabel> getLabelsReference() {
 		return labels;
 	}
@@ -330,9 +357,7 @@ public class TurboIssue implements Listable {
 	}
 
 	private List<TurboLabel> getLabelsWithGroup(String group) {
-		return labels.stream()
-				.filter(label -> group.equalsIgnoreCase(label.getGroup()))
-				.collect(Collectors.toList());
+		return labels.stream().filter(label -> group.equalsIgnoreCase(label.getGroup())).collect(Collectors.toList());
 	}
 
 	public void addLabels(List<TurboLabel> labList) {
@@ -357,176 +382,10 @@ public class TurboIssue implements Listable {
 		labels.add(getLabelReference(label));
 	}
 
-	public void setLabels(List<TurboLabel> labels) {
-		if (this.labels != labels) {
-			this.labels.clear();
-			for (TurboLabel label : labels) {
-				addLabel(label);
-			}
-		}
-	}
-
-	/*
-	 * Constructors & Public Methods
-	 */
-
-	public TurboIssue(String title, String desc, Model model) {
-		assert title != null;
-		assert desc != null;
-		assert model != null;
-		this.model = new WeakReference<Model>(model);
-
-		setTitle(title);
-		setDescription(desc);
-		setOpen(true);
-	}
-
-	// Copy constructor
-	public TurboIssue(TurboIssue other) {
-		assert other != null;
-		copyValues(other);
-	}
-
-	public TurboIssue(Issue issue, Model model) {
-		assert issue != null;
-		assert model != null;
-		this.model = new WeakReference<Model>(model);
-		setHtmlUrl(issue.getHtmlUrl());
-		setTitle(issue.getTitle());
-		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
-		setId(issue.getNumber());
-		setDescription(extractDescription(issue.getBody()));
-		setAssignee(issue.getAssignee() == null ? null : new TurboUser(
-				issue.getAssignee()));
-		setMilestone(issue.getMilestone() == null ? null : new TurboMilestone(
-				issue.getMilestone()));
-		setLabels(translateLabels(issue.getLabels()));
-		setParentIssue(extractIssueParent(issue.getBody()));
-		setPullRequest(issue.getPullRequest());
-		setNumOfComments(issue.getComments());
-		setCreator(issue.getUser().getLogin());
-		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue
-				.getCreatedAt()));
-		setUpdatedAt(LocalDateTime.ofInstant(issue.getUpdatedAt().toInstant(),
-				ZoneId.systemDefault()));
-	}
-
-	public Issue toGhResource() {
-		Issue ghIssue = new Issue();
-		ghIssue.setHtmlUrl(getHtmlUrl());
-		ghIssue.setNumber(getId());
-		ghIssue.setTitle(getTitle());
-		ghIssue.setState(isOpen() ? STATE_OPEN : STATE_CLOSED);
-		if (assignee != null)
-			ghIssue.setAssignee(assignee.toGhResource());
-		if (milestone != null)
-			ghIssue.setMilestone(milestone.toGhResource());
-		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
-		ghIssue.setBody(buildGithubBody());
-		return ghIssue;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void copyValues(Object other) {
-		assert other != null;
-		if (other.getClass() == TurboIssue.class) {
-			TurboIssue obj = (TurboIssue)other;
-			model = obj.model;
-			
-			setHtmlUrl(obj.getHtmlUrl());
-
-			// Logging is done with the assumption that this method is used for
-			// updating the values of TurboIssue in mind
-			if (!obj.getTitle().equals(this.getTitle())) {
-				logger.info("Issue " + this.getId() + "; Title was '"
-						+ this.getTitle() + "'. Now it's '" + obj.getTitle()
-						+ "'");
-			}
-			setTitle(obj.getTitle());
-			setOpen(obj.isOpen());
-			setId(obj.getId());
-
-			if (obj.getDescription() != null && this.getDescription() != null) {
-				if (!obj.getDescription().equals(this.getDescription())) {
-					logger.info("Issue " + this.getId() + "; Description was '"
-							+ this.getDescription() + "'. Now it's '"
-							+ obj.getDescription() + "'");
-				}
-			} else if (obj.getDescription() == null
-					&& this.getDescription() != null) {
-				logger.info("Description was removed for Issue " + this.getId());
-			} else if (obj.getDescription() != null
-					&& this.getDescription() == null) {
-				logger.info("Description was added for Issue " + this.getId());
-			}
-			setDescription(obj.getDescription());
-
-			if (obj.getAssignee() != null && this.getAssignee() != null) {
-				if (!obj.getAssignee().equals(this.getAssignee())) {
-					logger.info("Issue " + this.getId() + "; Assignee was '"
-							+ this.getAssignee() + "'. Now it's '"
-							+ obj.getAssignee() + "'");
-				}
-			} else if (obj.getAssignee() == null && this.getAssignee() != null) {
-				logger.info("Assignee was removed for Issue " + this.getId());
-			} else if (obj.getAssignee() != null && this.getAssignee() == null) {
-				logger.info("Assignee was added for Issue " + this.getId());
-			}
-			setAssignee(obj.getAssignee());
-
-			if (obj.getMilestone() != null && this.getMilestone() != null) {
-				if (!obj.getMilestone().equals(this.getMilestone())) {
-					logger.info("Issue " + this.getId() + "; Milestone was '"
-							+ this.getMilestone() + "'. Now it's '"
-							+ obj.getMilestone() + "'");
-				}
-			} else if (obj.getMilestone() == null
-					&& this.getMilestone() != null) {
-				logger.info("Milestone was removed for Issue " + this.getId());
-			} else if (obj.getMilestone() != null
-					&& this.getMilestone() == null) {
-				logger.info("Milestone was added for Issue " + this.getId());
-			}
-			setMilestone(obj.getMilestone());
-
-			List oldList = new ArrayList<TurboLabel>();
-			List newList = new ArrayList<TurboLabel>();
-			for (TurboLabel label : this.getLabels()) {
-				oldList.add(label);
-			}
-			for (TurboLabel label : obj.getLabels()) {
-				newList.add(label);
-			}
-			HashMap<String, HashSet> changes = CollectionUtilities
-					.getChangesToList(oldList, newList);
-			HashSet<TurboLabel> removed = changes
-					.get(CollectionUtilities.REMOVED_TAG);
-			HashSet<TurboLabel> added = changes
-					.get(CollectionUtilities.ADDED_TAG);
-			if (removed.size() > 0) {
-				logger.info(removed.size()
-						+ " label(s) removed. Label name(s):");
-				removed.forEach(System.out::println);
-			}
-			if (added.size() > 0) {
-				logger.info(added.size() + " label(s) added. Label name(s):");
-				added.forEach(System.out::println);
-			}
-			setLabels(obj.getLabels());
-			setParentIssue(obj.getParentIssue());
-			setPullRequest(obj.getPullRequest());
-			setNumOfComments(obj.getNumOfComments());
-			setCreator(obj.getCreator());
-			setCreatedAt(obj.getCreatedAt());
-			setUpdatedAt(obj.getUpdatedAt());
-		}
-	}
-
 	public static String extractDescription(String issueBody) {
 		if (issueBody == null)
 			return "";
-		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "")
-				.trim();
+		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 		return description;
 	}
 
@@ -565,34 +424,29 @@ public class TurboIssue implements Listable {
 		LocalDateTime currentTime = LocalDateTime.now();
 		LocalDateTime cutoffTime;
 		if (!hasAddedFeeds) {
-			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes)
-					.minusSeconds(seconds);
+			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
 			if (cutoffTime.isAfter(getUpdatedAt())) {
 				// No activity feed to display
 				setActivityFeed("", currentTime);
 			} else {
 				issueFeeds.clear();
 				issueFeeds.addAll(getGithubFeed());
-				setActivityFeed(formatFeeds(hours, minutes, seconds),
-						currentTime);
+				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 			}
 			hasAddedFeeds = true;
 		} else {
 			cutoffTime = lastModifiedTime;
 			if (cutoffTime.isAfter(getUpdatedAt())) {
 				// No new activity for this issue
-				LocalDateTime refreshTime = currentTime
-						.minusMinutes(REFRESH_FEED_MINUTES);
+				LocalDateTime refreshTime = currentTime.minusMinutes(REFRESH_FEED_MINUTES);
 				if (refreshTime.isAfter(lastModifiedTime)) {
 					// Check to update pretty time
-					setActivityFeed(formatFeeds(hours, minutes, seconds),
-							currentTime);
+					setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 				}
 			} else {
 				issueFeeds.clear();
 				issueFeeds.addAll(getGithubFeed());
-				setActivityFeed(formatFeeds(hours, minutes, seconds),
-						currentTime);
+				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 			}
 		}
 		return getActivityFeed();
@@ -614,8 +468,7 @@ public class TurboIssue implements Listable {
 
 	private String formatFeeds(int hours, int minutes, int seconds) {
 		LocalDateTime currentTime = LocalDateTime.now();
-		LocalDateTime cutoffTime = currentTime.minusHours(hours)
-				.minusMinutes(minutes).minusSeconds(seconds);
+		LocalDateTime cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
 		ArrayList<String> feedMessages = new ArrayList<String>();
 		ArrayList<String> tempMessages = new ArrayList<String>();
 		ArrayList<IssueEventType> eventSeq = new ArrayList<IssueEventType>();
@@ -625,8 +478,7 @@ public class TurboIssue implements Listable {
 		previousMessage = "";
 		currentMessage = "";
 		for (TurboIssueEvent event : issueFeeds) {
-			if (LocalDateTime.ofInstant(event.getDate().toInstant(),
-					ZoneId.systemDefault()).isAfter(cutoffTime)) {
+			if (LocalDateTime.ofInstant(event.getDate().toInstant(), ZoneId.systemDefault()).isAfter(cutoffTime)) {
 				if (isNewEvent(event)) {
 					feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
 					tempMessages.clear();
@@ -634,8 +486,7 @@ public class TurboIssue implements Listable {
 				}
 				eventSeq.add(event.getType());
 				currentMessage = formatMessage(currentActor, currentPTime, event);
-				if(currentMessage != null && !currentMessage.isEmpty() 
-										  && !currentMessage.equals(previousMessage)) {
+				if (currentMessage != null && !currentMessage.isEmpty() && !currentMessage.equals(previousMessage)) {
 					tempMessages.add(currentMessage);
 					previousMessage = currentMessage;
 				}
@@ -644,16 +495,15 @@ public class TurboIssue implements Listable {
 		feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
 		return outputReverseOrder(feedMessages);
 	}
-	
-	private ArrayList<String> outputToBuffer(ArrayList<String> inputBuffer, 
-			ArrayList<IssueEventType> inputSeq) {
+
+	private ArrayList<String> outputToBuffer(ArrayList<String> inputBuffer, ArrayList<IssueEventType> inputSeq) {
 		ArrayList<String> outputBuffer = new ArrayList<String>();
 		int bufferIndex = 0;
-		
+
 		for (IssueEventType eventType : inputSeq) {
 			switch (eventType) {
-			case Milestoned: 
-			case Demilestoned: 
+			case Milestoned:
+			case Demilestoned:
 				if (milestonedCount > 0 || demilestonedCount > 0) {
 					outputBuffer.add(aggregateMilestoneEvent());
 				}
@@ -675,7 +525,7 @@ public class TurboIssue implements Listable {
 		previousPTime = currentPTime;
 		return outputBuffer;
 	}
-	
+
 	private String outputReverseOrder(ArrayList<String> bufferList) {
 		StringBuffer stringBuffer = new StringBuffer();
 		for (int i = bufferList.size(); i > 0; i--) {
@@ -704,38 +554,34 @@ public class TurboIssue implements Listable {
 		String message;
 		if (labeledCount > 0 && unlabeledCount > 0) {
 			affectedLabels = labelsAdded.get(0);
-			for (int i=1; i < labelsAdded.size(); ++i) {
+			for (int i = 1; i < labelsAdded.size(); ++i) {
 				affectedLabels += ", " + labelsAdded.get(i);
 			}
 			String removedLabels = labelsRemoved.get(0);
-			for (int i=1; i < labelsRemoved.size(); ++i) {
+			for (int i = 1; i < labelsRemoved.size(); ++i) {
 				removedLabels += ", " + labelsRemoved.get(i);
 			}
-			message = String.format("%s added %s and removed %s labels %s.", 
-					previousActor, affectedLabels, removedLabels, previousPTime);
+			message = String.format("%s added %s and removed %s labels %s.", previousActor, affectedLabels,
+					removedLabels, previousPTime);
 		} else if (labeledCount == 1) {
 			affectedLabels = labelsAdded.get(0);
-			message = String.format("%s added %s label %s.", 
-					previousActor, affectedLabels, previousPTime);
+			message = String.format("%s added %s label %s.", previousActor, affectedLabels, previousPTime);
 		} else if (labeledCount > 1) {
 			affectedLabels = labelsAdded.get(0);
-			for (int i=1; i < labelsAdded.size(); ++i) {
+			for (int i = 1; i < labelsAdded.size(); ++i) {
 				affectedLabels += ", " + labelsAdded.get(i);
 			}
-			message = String.format("%s added %s labels %s.", 
-					previousActor, affectedLabels, previousPTime);
+			message = String.format("%s added %s labels %s.", previousActor, affectedLabels, previousPTime);
 		} else if (unlabeledCount == 1) {
 			affectedLabels = labelsRemoved.get(0);
-			message = String.format("%s removed %s label %s.", 
-					previousActor, affectedLabels, previousPTime);
-		} else { 
+			message = String.format("%s removed %s label %s.", previousActor, affectedLabels, previousPTime);
+		} else {
 			// (unlabeledCount > 1)
 			affectedLabels = labelsRemoved.get(0);
-			for (int i=1; i < labelsRemoved.size(); ++i) {
+			for (int i = 1; i < labelsRemoved.size(); ++i) {
 				affectedLabels += ", " + labelsRemoved.get(i);
 			}
-			message = String.format("%s removed %s labels %s.", 
-					previousActor, affectedLabels, previousPTime);
+			message = String.format("%s removed %s labels %s.", previousActor, affectedLabels, previousPTime);
 		}
 		labeledCount = 0;
 		unlabeledCount = 0;
@@ -749,29 +595,28 @@ public class TurboIssue implements Listable {
 		String message;
 		if (milestonedCount > 0 && demilestonedCount > 0) {
 			affectedMilestones = milestonesAdded.get(0);
-			for (int i=1; i < milestonesAdded.size(); ++i) {
+			for (int i = 1; i < milestonesAdded.size(); ++i) {
 				affectedMilestones += ", " + milestonesAdded.get(i);
 			}
-			for (int i=0; i < milestonesRemoved.size(); ++i) {
+			for (int i = 0; i < milestonesRemoved.size(); ++i) {
 				affectedMilestones += ", " + milestonesRemoved.get(i);
 			}
-			message = String.format("%s modified the milestone: %s %s.", 
-					previousActor, affectedMilestones, previousPTime);
+			message = String.format("%s modified the milestone: %s %s.", previousActor, affectedMilestones,
+					previousPTime);
 		} else if (milestonedCount > 0) {
 			affectedMilestones = milestonesAdded.get(0);
-			for (int i=1; i < milestonesAdded.size(); ++i) {
+			for (int i = 1; i < milestonesAdded.size(); ++i) {
 				affectedMilestones += ", " + milestonesAdded.get(i);
 			}
-			message = String.format("%s added to %s milestone %s.",
-					previousActor, affectedMilestones, previousPTime);
-		} else { 
+			message = String.format("%s added to %s milestone %s.", previousActor, affectedMilestones, previousPTime);
+		} else {
 			// (demilestonedCount > 0)
 			affectedMilestones = milestonesRemoved.get(0);
-			for (int i=1; i < milestonesRemoved.size(); ++i) {
+			for (int i = 1; i < milestonesRemoved.size(); ++i) {
 				affectedMilestones += ", " + milestonesRemoved.get(i);
 			}
-			message = String.format("%s removed from %s milestone %s.", 
-					previousActor, affectedMilestones, previousPTime);
+			message = String.format("%s removed from %s milestone %s.", previousActor, affectedMilestones,
+					previousPTime);
 		}
 		milestonedCount = 0;
 		demilestonedCount = 0;
@@ -784,14 +629,13 @@ public class TurboIssue implements Listable {
 		String message = "";
 		switch (issueEvent.getType()) {
 		case Renamed:
-			message = String.format("%s renamed this issue %s.", actorName, 
-					timeString);
+			message = String.format("%s renamed this issue %s.", actorName, timeString);
 			break;
-		case Milestoned: 
+		case Milestoned:
 			milestonedCount++;
 			milestonesAdded.add(issueEvent.getMilestoneTitle());
 			break;
-		case Demilestoned: 
+		case Demilestoned:
 			demilestonedCount++;
 			milestonesRemoved.add(issueEvent.getMilestoneTitle());
 			break;
@@ -804,64 +648,50 @@ public class TurboIssue implements Listable {
 			labelsRemoved.add(issueEvent.getLabelName());
 			break;
 		case Assigned:
-			message = String.format("%s was assigned to this issue %s.", 
-					actorName, timeString);
+			message = String.format("%s was assigned to this issue %s.", actorName, timeString);
 			break;
-		case Unassigned: 
-			message = String.format("%s was unassigned from this issue %s.",
-					actorName, timeString);
+		case Unassigned:
+			message = String.format("%s was unassigned from this issue %s.", actorName, timeString);
 			break;
 		case Closed:
-			message = String.format("%s closed this issue %s.", actorName,
-					timeString);
+			message = String.format("%s closed this issue %s.", actorName, timeString);
 			break;
 		case Reopened:
-			message = String.format("%s reopened this issue %s.", actorName,
-					timeString);
+			message = String.format("%s reopened this issue %s.", actorName, timeString);
 			break;
 		case Locked:
-			message = String.format("%s locked issue %s.", actorName,
-					timeString);
+			message = String.format("%s locked issue %s.", actorName, timeString);
 			break;
 		case Unlocked:
-			message = String.format("%s unlocked this issue %s.", actorName,
-					timeString);
+			message = String.format("%s unlocked this issue %s.", actorName, timeString);
 			break;
 		case Referenced:
-			message = String.format("%s referenced this issue %s.", actorName,
-					timeString);
+			message = String.format("%s referenced this issue %s.", actorName, timeString);
 			break;
 		case Subscribed:
-			message = String.format("%s subscribed to receive notifications for this issue %s.", 
-					actorName, timeString);
+			message = String.format("%s subscribed to receive notifications for this issue %s.", actorName, timeString);
 			break;
 		case Mentioned:
-			message = String.format("%s was mentioned %s.", actorName,
-					timeString);
+			message = String.format("%s was mentioned %s.", actorName, timeString);
 			break;
 		case Merged:
-			message = String.format("%s merged this issue %s.", 
-					actorName, timeString);
+			message = String.format("%s merged this issue %s.", actorName, timeString);
 			break;
 		case HeadRefDeleted:
-			message = String.format("%s deleted the pull request's branch %s.", 
-					actorName, timeString);
+			message = String.format("%s deleted the pull request's branch %s.", actorName, timeString);
 			break;
 		case HeadRefRestored:
-			message = String.format("%s restored the pull request's branch %s.", 
-					actorName, timeString);
+			message = String.format("%s restored the pull request's branch %s.", actorName, timeString);
 			break;
 		default:
 			// Not yet implemented, or no events triggered
-			message = String.format("%s %s %s.", actorName,
-					issueEvent.getType().toString(), timeString);
+			message = String.format("%s %s %s.", actorName, issueEvent.getType().toString(), timeString);
 		}
 		return message;
 	}
 
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections
-				.observableArrayList();
+		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
 		if (labels == null)
 			return turboLabels;
 
@@ -893,20 +723,130 @@ public class TurboIssue implements Listable {
 		return body.toString();
 	}
 
-	/*
-	 * Overridden Methods
-	 */
-
-	@Override
-	public String toString() {
-		return "Issue " + getTitle();
+	private void ______GETTERS_AND_SETTERS______() {
 	}
 
-	@Override
-	public String getListName() {
-		return "#" + getId() + " " + getTitle();
+	public String getCreator() {
+		String name = DataManager.getInstance().getUserAlias(creator);
+		if (name == null) {
+			name = creator;
+		}
+		return name;
 	}
-	
-	
 
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+
+	public String getCreatedAt() {
+		return this.createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return this.updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public int getNumOfComments() {
+		return numOfComments;
+	}
+
+	public void setNumOfComments(int num) {
+		this.numOfComments = num;
+	}
+
+	public PullRequest getPullRequest() {
+		return pullRequest;
+	}
+
+	public void setPullRequest(PullRequest pr) {
+		this.pullRequest = pr;
+	}
+
+	public final int getId() {
+		return id;
+	}
+
+	public final void setId(int value) {
+		id = value;
+	}
+
+	public final String getTitle() {
+		return title;
+	}
+
+	public final void setTitle(String value) {
+		title = value;
+	}
+
+	public final String getDescription() {
+		return description;
+	}
+
+	public final void setDescription(String value) {
+		// TODO remove
+		cachedDescriptionMarkup = null; // markup is invalid since the issue's
+										// description is to be overwritten
+		description = value;
+	}
+
+	public int getParentIssue() {
+		return parentIssue;
+	}
+
+	public final void setParentIssue(int parent) {
+		parentIssue = parent;
+	}
+
+	public final boolean isOpen() {
+		return state;
+	}
+
+	public final void setOpen(boolean value) {
+		state = value;
+	}
+
+	public TurboUser getAssignee() {
+		return assignee;
+	}
+
+	public void setAssignee(TurboUser assignee) {
+		this.assignee = getCollaboratorReference(assignee);
+	}
+
+	public TurboMilestone getMilestone() {
+		return milestone;
+	}
+
+	public void setMilestone(TurboMilestone milestone) {
+		this.milestone = getMilestoneReference(milestone);
+	}
+
+	public String getHtmlUrl() {
+		return htmlUrl;
+	}
+
+	public void setHtmlUrl(String htmlUrl) {
+		this.htmlUrl = htmlUrl;
+	}
+
+	public ObservableList<TurboLabel> getLabels() {
+		return FXCollections.observableArrayList(labels);
+	}
+
+	public void setLabels(List<TurboLabel> labels) {
+		if (this.labels != labels) {
+			this.labels.clear();
+			for (TurboLabel label : labels) {
+				addLabel(label);
+			}
+		}
+	}
 }
