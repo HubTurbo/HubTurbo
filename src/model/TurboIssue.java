@@ -63,13 +63,12 @@ public class TurboIssue implements Listable {
 	private String htmlUrl;
 	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
 
-	private void ______MISCELLANEOUS_DATA_FIELDS______() {
+	private void ______MISCELLANEOUS_FIELDS______() {
 	}
 
 	private WeakReference<Model> model;
 
 	private String activityFeed = "";
-	private String cachedDescriptionMarkup;
 
 	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
 	private boolean hasAddedFeeds = false;
@@ -255,23 +254,6 @@ public class TurboIssue implements Listable {
 		activityFeed = value;
 	}
 
-	public String getDescriptionMarkup() {
-		try {
-			if (cachedDescriptionMarkup == null) {
-				final String desc = getDescription();
-				cachedDescriptionMarkup = ServiceManager.getInstance().getContentMarkup(desc);
-			}
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return getDescription();
-		}
-		return cachedDescriptionMarkup;
-	}
-
-	public void setDescriptionMarkup(String descMarkup) {
-		this.cachedDescriptionMarkup = descMarkup;
-	}
-
 	public final TurboIssue parentReference() {
 		if (getParentIssue() != -1) {
 			return model.get().getIssueWithId(getParentIssue());
@@ -297,11 +279,6 @@ public class TurboIssue implements Listable {
 			current = current.parentReference();
 		}
 		return depth;
-	}
-
-	// TODO remove
-	public ObservableList<TurboLabel> getLabelsReference() {
-		return labels;
 	}
 
 	private TurboLabel getLabelReference(TurboLabel label) {
@@ -791,9 +768,6 @@ public class TurboIssue implements Listable {
 	}
 
 	public final void setDescription(String value) {
-		// TODO remove
-		cachedDescriptionMarkup = null; // markup is invalid since the issue's
-										// description is to be overwritten
 		description = value;
 	}
 
