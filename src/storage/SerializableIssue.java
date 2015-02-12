@@ -41,7 +41,7 @@ class SerializableIssue {
 		this.creator = issue.getCreator();
 		this.createdAt = issue.getCreatedAt();
 		this.updatedAt = issue.getUpdatedAt();
-		this.numOfComments = issue.getNumOfComments();
+		this.numOfComments = issue.getCommentCount();
 		this.pullRequest = issue.getPullRequest();
 		
 		this.id = issue.getId();
@@ -85,7 +85,7 @@ class SerializableIssue {
 		tI.setCreator(creator);
 		tI.setCreatedAt(createdAt);
 		tI.setUpdatedAt(updatedAt);
-		tI.setNumOfComments(numOfComments);
+		tI.setCommentCount(numOfComments);
 		tI.setPullRequest(pullRequest);
 		
 		tI.setId(id);

@@ -50,7 +50,7 @@ public class TurboIssue implements Listable {
 	private String creator;
 	private String createdAt;
 	private LocalDateTime updatedAt;
-	private int numOfComments;
+	private int commentCount;
 	private PullRequest pullRequest;
 	private int id = 0;
 	private String title = "";
@@ -118,7 +118,7 @@ public class TurboIssue implements Listable {
 		setLabels(translateLabels(issue.getLabels()));
 		setParentIssue(extractIssueParent(issue.getBody()));
 		setPullRequest(issue.getPullRequest());
-		setNumOfComments(issue.getComments());
+		setCommentCount(issue.getComments());
 		setCreator(issue.getUser().getLogin());
 		setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(issue.getCreatedAt()));
 		setUpdatedAt(LocalDateTime.ofInstant(issue.getUpdatedAt().toInstant(), ZoneId.systemDefault()));
@@ -221,7 +221,7 @@ public class TurboIssue implements Listable {
 			setLabels(obj.getLabels());
 			setParentIssue(obj.getParentIssue());
 			setPullRequest(obj.getPullRequest());
-			setNumOfComments(obj.getNumOfComments());
+			setCommentCount(obj.getCommentCount());
 			setCreator(obj.getCreator());
 			setCreatedAt(obj.getCreatedAt());
 			setUpdatedAt(obj.getUpdatedAt());
@@ -731,12 +731,12 @@ public class TurboIssue implements Listable {
 		this.updatedAt = updatedAt;
 	}
 
-	public int getNumOfComments() {
-		return numOfComments;
+	public int getCommentCount() {
+		return commentCount;
 	}
 
-	public void setNumOfComments(int num) {
-		this.numOfComments = num;
+	public void setCommentCount(int num) {
+		this.commentCount = num;
 	}
 
 	public PullRequest getPullRequest() {

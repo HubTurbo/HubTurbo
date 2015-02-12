@@ -110,10 +110,10 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(icon);
 		}
 		
-		if (issue.getNumOfComments() > 0){
+		if (issue.getCommentCount() > 0){
 			Label commentIcon = new Label(OCTICON_COMMENT);
 			commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
-			Text commentCount = new Text(""+ issue.getNumOfComments());
+			Text commentCount = new Text(""+ issue.getCommentCount());
 			issueDetails.getChildren().add(commentIcon);
 			issueDetails.getChildren().add(commentCount);
 		}
