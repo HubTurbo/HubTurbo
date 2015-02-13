@@ -59,10 +59,8 @@ public class IssuePanel extends IssueColumn {
 		return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
 	}
 
-	// TODO remove
 	@Override
 	public void deselect() {
-		listView.getSelectionModel().clearSelection();
 	}
 
 	/**
