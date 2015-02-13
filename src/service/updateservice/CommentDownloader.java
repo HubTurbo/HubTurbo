@@ -23,7 +23,9 @@ public class CommentDownloader {
 	}
 
 	public void download() {
+		int issueCount = 0;
 		for (Integer issueId : UI.getInstance().getColumnControl().getUpdatedIssues()) {
+			++issueCount;
 			List<Comment> comments = new ArrayList<>();
 			try {
 				comments = serviceManager.getLatestComments(issueId);
@@ -32,5 +34,6 @@ public class CommentDownloader {
 			}
 			serviceManager.getModel().getIssueWithId(issueId).setComments(comments);
 		}
+		logger.info("Downloaded comments for " + issueCount + " issues");
 	}
 }
