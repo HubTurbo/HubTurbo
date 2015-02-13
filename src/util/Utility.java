@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +21,7 @@ import model.TurboLabel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
 
 import com.google.common.base.Joiner;
 
@@ -27,6 +29,23 @@ public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 	
+	public static String truncate(String text, int length) {
+		if (text.length() > length) {
+			text = text.substring(0, length);
+			return text + "...";
+		} else {
+			return text;
+		}
+	}
+
+	public static String stringify(List<Comment> comments) {
+		return comments.stream().map(c -> stringify(c)).collect(Collectors.toList()).toString();
+	}
+
+	public static String stringify(Comment comment) {
+		return comment.getUser().getLogin() + " says: " + truncate(comment.getBody(), 10);
+	}
+
 	public static String stringify(Collection<TurboLabel> labels) {
 		return "[" + Joiner.on(", ").join(labels.stream().map(l -> l.logString()).collect(Collectors.toList())) + "]";
 	}

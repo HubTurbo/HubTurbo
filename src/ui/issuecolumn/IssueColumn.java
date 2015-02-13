@@ -301,8 +301,8 @@ public abstract class IssueColumn extends Column {
 			}
 		}
 	}
-
-	protected TransformationList<TurboIssue, TurboIssue> getIssueList() {
+	
+	public TransformationList<TurboIssue, TurboIssue> getIssueList() {
 		return transformedIssueList;
 	}
 

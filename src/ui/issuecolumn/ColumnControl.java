@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -19,7 +20,6 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-
 import command.TurboCommandExecutor;
 
 
@@ -85,6 +85,21 @@ public class ColumnControl extends HBox {
 	public void recreateColumns() {
 		saveSession();
 		restoreColumns();
+	}
+	
+	/**
+	 * Returns a list of issues to download comments for
+	 * @return
+	 */
+	public List<Integer> getUpdatedIssues() {
+		List<Integer> result = new ArrayList<>();
+		for (Node child : getChildren()) {
+			IssueColumn panel = (IssueColumn) child;
+			if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
+				result.addAll(panel.getIssueList().stream().map(issue -> issue.getId()).collect(Collectors.toList()));
+			}
+		}
+		return result;
 	}
 	
 	public void forEach(Consumer<Column> callback) {

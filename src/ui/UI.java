@@ -36,11 +36,11 @@ import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.Utility;
+import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
 import util.events.LoginEvent;
-import util.events.BoardSavedEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -240,6 +240,10 @@ public class UI extends Application implements EventDispatcher {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
 		logger.info("Triggered event " + event.getClass().getSimpleName());
+	}
+	
+	public ColumnControl getColumnControl() {
+		return columns;
 	}
 	
 	public BrowserComponent getBrowserComponent() {

@@ -4,10 +4,12 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
@@ -26,6 +29,7 @@ import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
 import util.Utility;
+
 
 @SuppressWarnings("unused")
 public class TurboIssue implements Listable {
@@ -72,6 +76,7 @@ public class TurboIssue implements Listable {
 
 	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
 	private boolean hasAddedFeeds = false;
+	private boolean hasNewComments = false;
 	private LocalDateTime lastModifiedTime;
 	private String previousActor;
 	private String previousPTime;
@@ -89,6 +94,7 @@ public class TurboIssue implements Listable {
 	private int unlabeledCount = 0;
 	private int milestonedCount = 0;
 	private int demilestonedCount = 0;
+	private List<Comment> comments = new ArrayList<>();
 
 	private void ______ESSENTIALS______() {
 	}
@@ -414,7 +420,7 @@ public class TurboIssue implements Listable {
 	public String getFeeds(int hours, int minutes, int seconds) {
 		LocalDateTime currentTime = LocalDateTime.now();
 		LocalDateTime cutoffTime;
-		if (!hasAddedFeeds) {
+		if (!hasAddedFeeds || hasNewComments) {
 			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
 			if (cutoffTime.isAfter(getUpdatedAt())) {
 				// No activity feed to display
@@ -484,7 +490,31 @@ public class TurboIssue implements Listable {
 			}
 		}
 		feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
+		if (hasComments()) {
+			feedMessages.add(formatComments(hours));
+		}
 		return outputReverseOrder(feedMessages);
+	}
+	
+	private String formatComments(int hours) {
+		LocalDateTime currentTime = LocalDateTime.now();
+		List<Comment> comments = this.comments.stream()
+			.filter(comment -> {
+				LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+				int hoursBetween = Utility.safeLongToInt(created.until(currentTime, ChronoUnit.HOURS));
+				return hoursBetween < hours;
+			})
+			.collect(Collectors.toList());
+		List<String> names = new ArrayList<>(comments.stream()
+			.map(comment -> comment.getUser().getLogin())
+			.collect(Collectors.toSet()));
+		StringBuilder allNames = new StringBuilder();
+
+		for (int i=0; i<names.size()-1; i++) {
+			allNames.append(names.get(i)).append(", ");
+		}
+		allNames.append(names.get(names.size()-1));
+		return comments.size() + " comments since, involving " + allNames;
 	}
 
 	private ArrayList<String> outputToBuffer(ArrayList<String> inputBuffer, ArrayList<IssueEventType> inputSeq) {
@@ -712,6 +742,19 @@ public class TurboIssue implements Listable {
 		}
 		body.append(getDescription());
 		return body.toString();
+	}
+	
+	public boolean hasComments() {
+		return comments.size() > 0;
+	}
+	
+	public List<Comment> getComments() {
+		return comments;
+	}
+	
+	public void setComments(List<Comment> comments) {
+		hasNewComments = true;
+		this.comments = comments;
 	}
 
 	private void ______GETTERS_AND_SETTERS______() {

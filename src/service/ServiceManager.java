@@ -24,6 +24,7 @@ import model.TurboUser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -41,6 +42,7 @@ import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
+import service.updateservice.CommentDownloader;
 import service.updateservice.ModelUpdater;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
@@ -101,6 +103,7 @@ public class ServiceManager {
 	// Model updates
 	
 	private ModelUpdater modelUpdater;
+	private CommentDownloader commentDownloader = new CommentDownloader(this);
 	protected Model model;
 	protected RepositoryId repoId;
 	private String issuesETag = null;
@@ -473,6 +476,12 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+	  	model.updateCache();
+	  	
+		commentDownloader.download();
+	  	model.triggerModelChangeEvent();
+		
+		// Reset progress UI
 		HTStatusBar.updateProgress(0);
 		
 		// Enable repository switching
@@ -798,4 +807,14 @@ public class ServiceManager {
 		return contentService.getContents(repository, path);
 	}
 
+	private void ______COMMENTS______() {
+	}
+
+	public List<Comment> getLatestComments(int issueId) throws IOException {
+		if (repoId != null) {
+			List<Comment> comments = issueService.getComments(repoId, issueId);
+			return comments;
+		}
+		return new ArrayList<Comment>();
+	}
 }
