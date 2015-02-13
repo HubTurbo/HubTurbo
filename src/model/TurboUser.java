@@ -102,6 +102,14 @@ public class TurboUser implements Listable {
 	public String toString() {
 		return "TurboUser [githubName=" + githubName + "]";
 	}
+	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return githubName;
+	}
 
 	@Override
 	public int hashCode() {

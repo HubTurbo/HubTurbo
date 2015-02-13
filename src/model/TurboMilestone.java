@@ -146,6 +146,14 @@ public class TurboMilestone implements Listable {
 		return "TurboMilestone [title=" + title + "]";
 	}
 	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return title;
+	}
+	
 	/*
 	 * Private Methods
 	 */

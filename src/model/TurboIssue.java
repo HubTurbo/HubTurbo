@@ -427,7 +427,7 @@ public class TurboIssue implements Listable {
 	}
 
 	private void log(String field, String change) {
-		logger.info(String.format("Issue %d %s: %s", this.getId(), change));
+		logger.info(String.format("Issue %d %s: %s", this.getId(), field, change));
 	}
 
 	private void log(String field, String before, String after) {
@@ -899,5 +899,13 @@ public class TurboIssue implements Listable {
 	@Override
 	public String toString() {
 		return "TurboIssue [id=" + id + ", title=" + title + "]";
+	}
+	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return "Issue #" + getId() + ": " + getTitle();
 	}
 }
