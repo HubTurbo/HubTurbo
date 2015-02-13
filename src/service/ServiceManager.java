@@ -476,7 +476,10 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+	  	model.updateCache();
+	  	
 		commentDownloader.download();
+	  	model.triggerModelChangeEvent();
 		
 		// Reset progress UI
 		HTStatusBar.updateProgress(0);

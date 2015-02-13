@@ -51,8 +51,6 @@ public class ModelUpdater {
 	  	updateModelIssues(latch, repoId);
 	  	lastUpdateTime = issueUpdateService.lastCheckTime;
 	  	model.enableModelChanges();
-	  	model.triggerModelChangeEvent();
-	  	model.updateCache();
 	}
 	
 	private void updateModelIssues(CountDownLatch latch, String repoId) {

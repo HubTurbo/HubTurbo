@@ -420,7 +420,7 @@ public class TurboIssue implements Listable {
 	public String getFeeds(int hours, int minutes, int seconds) {
 		LocalDateTime currentTime = LocalDateTime.now();
 		LocalDateTime cutoffTime;
-		if (!hasAddedFeeds || hasNewComments ) {
+		if (!hasAddedFeeds || hasNewComments) {
 			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
 			if (cutoffTime.isAfter(getUpdatedAt())) {
 				// No activity feed to display
