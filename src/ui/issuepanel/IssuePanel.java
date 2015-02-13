@@ -29,6 +29,7 @@ public class IssuePanel extends IssueColumn {
 
 	private NavigableListView<TurboIssue> listView;
 	final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+	final KeyCombination keyComb2 = new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
@@ -76,6 +77,13 @@ public class IssuePanel extends IssueColumn {
 
 	private void setupListView() {
 		setVgrow(listView, Priority.ALWAYS);
+		setupKeyboardShortcuts();
+		listView.setOnItemSelected(i -> {
+			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
+		});
+	}
+	
+	private void setupKeyboardShortcuts(){
 		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (keyComb1.match(event)) {
@@ -83,16 +91,17 @@ public class IssuePanel extends IssueColumn {
 				}
 			}
 		});
-		listView.setOnItemSelected(i -> {
-			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
-		});
 		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) {
 					ServiceManager.getInstance().updateModelNow();
 					ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 				}
+				if (keyComb2.match(event)) {
+					filterTextField.requestFocus();
+				}
 			}
 		});
+		
 	}
 }

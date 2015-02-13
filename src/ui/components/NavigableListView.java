@@ -112,26 +112,30 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 
 	private void setupKeyEvents() {
 		setOnKeyPressed(e -> {
-			switch (e.getCode()) {
-			case UP:
-			case DOWN:
-				e.consume();
-				handleUpDownKeys(e.getCode() == KeyCode.DOWN);
-				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
-				if (!e.isShiftDown()) {
-					logger.info("Arrow key navigation to issue " + selectedIndex.get());
-					onItemSelected.accept(selectedIndex.get());
+			if (e.isControlDown()){
+				return;
+			} else {
+				switch (e.getCode()) {
+				case UP:
+				case DOWN:
+					e.consume();
+					handleUpDownKeys(e.getCode() == KeyCode.DOWN);
+					assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
+					if (!e.isShiftDown()) {
+						logger.info("Arrow key navigation to issue " + selectedIndex.get());
+						onItemSelected.accept(selectedIndex.get());
+					}
+					break;
+				case ENTER:
+					e.consume();
+					if (selectedIndex.isPresent()) {
+						logger.info("Enter key selection on issue " + selectedIndex.get());
+						onItemSelected.accept(selectedIndex.get());	
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-			case ENTER:
-				e.consume();
-				if (selectedIndex.isPresent()) {
-					logger.info("Enter key selection on issue " + selectedIndex.get());
-					onItemSelected.accept(selectedIndex.get());	
-				}
-				break;
-			default:
-				break;
 			}
 		});
 	}
