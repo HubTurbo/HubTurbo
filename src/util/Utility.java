@@ -7,19 +7,29 @@ import java.awt.Toolkit;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.UIManager;
+
+import model.TurboLabel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Joiner;
+
 public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
+	
+	public static String stringify(Collection<TurboLabel> labels) {
+		return "[" + Joiner.on(", ").join(labels.stream().map(l -> l.logString()).collect(Collectors.toList())) + "]";
+	}
 	
 	public static int safeLongToInt(long l) {
 	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {

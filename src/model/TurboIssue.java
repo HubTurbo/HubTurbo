@@ -26,6 +26,7 @@ import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
+import util.Utility;
 
 public class TurboIssue implements Listable {
 	private static final Logger logger = LogManager.getLogger(TurboIssue.class
@@ -466,7 +467,7 @@ public class TurboIssue implements Listable {
 
 			if (otherIssue.getAssignee() != null && this.getAssignee() != null) {
 				if (!otherIssue.getAssignee().equals(this.getAssignee())) {
-					log("assignee", this.getAssignee().toString(), otherIssue.getAssignee().toString());
+					log("assignee", this.getAssignee().logString(), otherIssue.getAssignee().logString());
 				}
 			} else if (otherIssue.getAssignee() == null && this.getAssignee() != null) {
 				log("assignee", "removed");
@@ -477,7 +478,7 @@ public class TurboIssue implements Listable {
 
 			if (otherIssue.getMilestone() != null && this.getMilestone() != null) {
 				if (!otherIssue.getMilestone().equals(this.getMilestone())) {
-					log("milestone", this.getMilestone().toString(), otherIssue.getMilestone().toString());
+					log("milestone", this.getMilestone().logString(), otherIssue.getMilestone().logString());
 				}
 			} else if (otherIssue.getMilestone() == null && this.getMilestone() != null) {
 				log("milestone", "removed");
@@ -501,10 +502,10 @@ public class TurboIssue implements Listable {
 			HashSet<TurboLabel> added = changes
 					.get(CollectionUtilities.ADDED_TAG);
 			if (removed.size() > 0) {
-				logger.info(String.format("Issue %d labels removed: %s", this.getId(), removed.toString()));
+				logger.info(String.format("Issue %d labels removed: %s", this.getId(), Utility.stringify(removed)));
 			}
 			if (added.size() > 0) {
-				logger.info(String.format("Issue %d labels added: %s", this.getId(), added.toString()));
+				logger.info(String.format("Issue %d labels added: %s", this.getId(), Utility.stringify(added)));
 			}
 			setLabels(otherIssue.getLabels());
 			setParentIssue(otherIssue.getParentIssue());
