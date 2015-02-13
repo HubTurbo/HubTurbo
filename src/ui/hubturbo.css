@@ -66,6 +66,10 @@
 	-fx-text-fill: grey;
 }
 
+.has-comments {
+	-fx-text-fill: red;
+}
+
 .issue-comment-events {
 	-fx-font-size: 11px;
 	-fx-text-fill: grey;
@@ -167,7 +171,7 @@
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
-	-fx-shape: " ";	
+	-fx-shape: " ";
 	-fx-padding:0;
 }
 

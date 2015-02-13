@@ -1,6 +1,8 @@
 package ui.issuepanel;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javafx.event.EventHandler;
 import javafx.scene.control.ListCell;
@@ -20,6 +22,7 @@ import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.events.IssueSelectedEvent;
+
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {
@@ -28,7 +31,8 @@ public class IssuePanel extends IssueColumn {
 	private final UI ui;
 
 	private NavigableListView<TurboIssue> listView;
-	final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();;
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
@@ -42,22 +46,59 @@ public class IssuePanel extends IssueColumn {
 		refreshItems();
 	}
 
+	/**
+	 * Determines if an issue has had new comments added (or removed) based on
+	 * its last-known comment count in {@link #issueCommentCounts}.
+	 * @param issue
+	 * @return true if the issue has changed, false otherwise
+	 */
+	private boolean issueHasNewComments(TurboIssue issue) {
+		if (!issueCommentCounts.containsKey(issue.getId())) {
+			return false;
+		}
+		return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+	}
+
+	// TODO remove
 	@Override
 	public void deselect() {
 		listView.getSelectionModel().clearSelection();
+	}
+
+	/**
+	 * Updates {@link #issueCommentCounts} with the latest counts.
+	 * Returns a list of issues which have new comments.
+	 * @return
+	 */
+	private HashSet<Integer> updateIssueCommentCounts() {
+		HashSet<Integer> result = new HashSet<>();
+		for (TurboIssue issue : getIssueList()) {
+			if (issueCommentCounts.containsKey(issue.getId())) {
+				// We know about this issue; check if it's been updated
+				if (issueHasNewComments(issue)) {
+					result.add(issue.getId());
+				}
+			} else {
+				// We don't know about this issue
+				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+			}
+		}
+		return result;
 	}
 
 	@Override
 	public void refreshItems() {
 		super.refreshItems();
 		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
-
+		
+		final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
+		
 		// Set the cell factory every time - this forces the list view to update
 		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
 			@Override
 			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
 				if(that.get() != null){
-					return new IssuePanelCell(ui, model, that.get(), columnIndex);
+					return new IssuePanelCell(ui, model, that.get(), columnIndex, issuesWithNewComments);
 				} else{
 					return null;
 				}
@@ -84,7 +125,12 @@ public class IssuePanel extends IssueColumn {
 			}
 		});
 		listView.setOnItemSelected(i -> {
-			ui.triggerEvent(new IssueSelectedEvent(listView.getItems().get(i).getId(), columnIndex));
+			TurboIssue issue = listView.getItems().get(i);
+			ui.triggerEvent(new IssueSelectedEvent(issue.getId(), columnIndex));
+			if (issueHasNewComments(issue)) {
+				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+				refreshItems();
+			}
 		});
 		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {

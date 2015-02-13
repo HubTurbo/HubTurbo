@@ -95,6 +95,7 @@ public class ColumnControl extends HBox {
 		forEach(child -> child.refreshItems());
 	}
 	
+	// TODO remove
 	public void deselect() {
 		forEach(child -> child.deselect());
 	}
