@@ -205,7 +205,14 @@ public class TurboLabel implements Listable {
 
 	@Override
 	public String toString() {
-        return toGhName();
-    }
+		return "TurboLabel [name=" + name + ", group=" + group + "]";
+	}
 	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return toGhName();
+	}
 }

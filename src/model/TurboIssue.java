@@ -26,6 +26,7 @@ import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
+import util.Utility;
 
 public class TurboIssue implements Listable {
 	private static final Logger logger = LogManager.getLogger(TurboIssue.class
@@ -426,75 +427,72 @@ public class TurboIssue implements Listable {
 		return ghIssue;
 	}
 
+	private void log(String field, String change) {
+		logger.info(String.format("Issue %d %s: %s", this.getId(), field, change));
+	}
+
+	private void log(String field, String before, String after) {
+		logger.info(String.format("Issue %d %s: '%s' -> '%s'", this.getId(), field, before, after));
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void copyValues(Object other) {
 		assert other != null;
 		if (other.getClass() == TurboIssue.class) {
-			TurboIssue obj = (TurboIssue)other;
-			model = obj.model;
+			TurboIssue otherIssue = (TurboIssue)other;
+			model = otherIssue.model;
 			
-			setHtmlUrl(obj.getHtmlUrl());
+			setHtmlUrl(otherIssue.getHtmlUrl());
 
 			// Logging is done with the assumption that this method is used for
 			// updating the values of TurboIssue in mind
-			if (!obj.getTitle().equals(this.getTitle())) {
-				logger.info("Issue " + this.getId() + "; Title was '"
-						+ this.getTitle() + "'. Now it's '" + obj.getTitle()
-						+ "'");
+			if (!otherIssue.getTitle().equals(this.getTitle())) {
+				log("title", this.getTitle(), otherIssue.getTitle());
 			}
-			setTitle(obj.getTitle());
-			setOpen(obj.isOpen());
-			setId(obj.getId());
+			setTitle(otherIssue.getTitle());
+			setOpen(otherIssue.isOpen());
+			setId(otherIssue.getId());
 
-			if (obj.getDescription() != null && this.getDescription() != null) {
-				if (!obj.getDescription().equals(this.getDescription())) {
-					logger.info("Issue " + this.getId() + "; Description was '"
-							+ this.getDescription() + "'. Now it's '"
-							+ obj.getDescription() + "'");
+			if (otherIssue.getDescription() != null && this.getDescription() != null) {
+				if (!otherIssue.getDescription().equals(this.getDescription())) {
+					log("desc", this.getDescription(), otherIssue.getDescription());
 				}
-			} else if (obj.getDescription() == null
-					&& this.getDescription() != null) {
-				logger.info("Description was removed for Issue " + this.getId());
-			} else if (obj.getDescription() != null
+			} else if (otherIssue.getDescription() == null && this.getDescription() != null) {
+				log("desc", "removed");
+			} else if (otherIssue.getDescription() != null
 					&& this.getDescription() == null) {
-				logger.info("Description was added for Issue " + this.getId());
+				log("desc", "added");
 			}
-			setDescription(obj.getDescription());
+			setDescription(otherIssue.getDescription());
 
-			if (obj.getAssignee() != null && this.getAssignee() != null) {
-				if (!obj.getAssignee().equals(this.getAssignee())) {
-					logger.info("Issue " + this.getId() + "; Assignee was '"
-							+ this.getAssignee() + "'. Now it's '"
-							+ obj.getAssignee() + "'");
+			if (otherIssue.getAssignee() != null && this.getAssignee() != null) {
+				if (!otherIssue.getAssignee().equals(this.getAssignee())) {
+					log("assignee", this.getAssignee().logString(), otherIssue.getAssignee().logString());
 				}
-			} else if (obj.getAssignee() == null && this.getAssignee() != null) {
-				logger.info("Assignee was removed for Issue " + this.getId());
-			} else if (obj.getAssignee() != null && this.getAssignee() == null) {
-				logger.info("Assignee was added for Issue " + this.getId());
+			} else if (otherIssue.getAssignee() == null && this.getAssignee() != null) {
+				log("assignee", "removed");
+			} else if (otherIssue.getAssignee() != null && this.getAssignee() == null) {
+				log("assignee", "added");
 			}
-			setAssignee(obj.getAssignee());
+			setAssignee(otherIssue.getAssignee());
 
-			if (obj.getMilestone() != null && this.getMilestone() != null) {
-				if (!obj.getMilestone().equals(this.getMilestone())) {
-					logger.info("Issue " + this.getId() + "; Milestone was '"
-							+ this.getMilestone() + "'. Now it's '"
-							+ obj.getMilestone() + "'");
+			if (otherIssue.getMilestone() != null && this.getMilestone() != null) {
+				if (!otherIssue.getMilestone().equals(this.getMilestone())) {
+					log("milestone", this.getMilestone().logString(), otherIssue.getMilestone().logString());
 				}
-			} else if (obj.getMilestone() == null
-					&& this.getMilestone() != null) {
-				logger.info("Milestone was removed for Issue " + this.getId());
-			} else if (obj.getMilestone() != null
-					&& this.getMilestone() == null) {
-				logger.info("Milestone was added for Issue " + this.getId());
+			} else if (otherIssue.getMilestone() == null && this.getMilestone() != null) {
+				log("milestone", "removed");
+			} else if (otherIssue.getMilestone() != null && this.getMilestone() == null) {
+				log("milestone", "added");
 			}
-			setMilestone(obj.getMilestone());
+			setMilestone(otherIssue.getMilestone());
 
 			List oldList = new ArrayList<TurboLabel>();
 			List newList = new ArrayList<TurboLabel>();
 			for (TurboLabel label : this.getLabels()) {
 				oldList.add(label);
 			}
-			for (TurboLabel label : obj.getLabels()) {
+			for (TurboLabel label : otherIssue.getLabels()) {
 				newList.add(label);
 			}
 			HashMap<String, HashSet> changes = CollectionUtilities
@@ -504,21 +502,18 @@ public class TurboIssue implements Listable {
 			HashSet<TurboLabel> added = changes
 					.get(CollectionUtilities.ADDED_TAG);
 			if (removed.size() > 0) {
-				logger.info(removed.size()
-						+ " label(s) removed. Label name(s):");
-				removed.forEach(System.out::println);
+				logger.info(String.format("Issue %d labels removed: %s", this.getId(), Utility.stringify(removed)));
 			}
 			if (added.size() > 0) {
-				logger.info(added.size() + " label(s) added. Label name(s):");
-				added.forEach(System.out::println);
+				logger.info(String.format("Issue %d labels added: %s", this.getId(), Utility.stringify(added)));
 			}
-			setLabels(obj.getLabels());
-			setParentIssue(obj.getParentIssue());
-			setPullRequest(obj.getPullRequest());
-			setNumOfComments(obj.getNumOfComments());
-			setCreator(obj.getCreator());
-			setCreatedAt(obj.getCreatedAt());
-			setUpdatedAt(obj.getUpdatedAt());
+			setLabels(otherIssue.getLabels());
+			setParentIssue(otherIssue.getParentIssue());
+			setPullRequest(otherIssue.getPullRequest());
+			setNumOfComments(otherIssue.getNumOfComments());
+			setCreator(otherIssue.getCreator());
+			setCreatedAt(otherIssue.getCreatedAt());
+			setUpdatedAt(otherIssue.getUpdatedAt());
 		}
 	}
 
@@ -896,17 +891,22 @@ public class TurboIssue implements Listable {
 	/*
 	 * Overridden Methods
 	 */
-
-	@Override
-	public String toString() {
-		return "Issue " + getTitle();
-	}
-
+	
 	@Override
 	public String getListName() {
 		return "#" + getId() + " " + getTitle();
 	}
-	
-	
 
+	@Override
+	public String toString() {
+		return "TurboIssue [id=" + id + ", title=" + title + "]";
+	}
+	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return "Issue #" + getId() + ": " + getTitle();
+	}
 }

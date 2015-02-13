@@ -99,6 +99,19 @@ public class TurboUser implements Listable {
 	}
 
 	@Override
+	public String toString() {
+		return "TurboUser [githubName=" + githubName + "]";
+	}
+	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return githubName;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

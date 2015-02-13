@@ -141,6 +141,19 @@ public class TurboMilestone implements Listable {
 		return ""; //stub value, should never be returned
 	}
 	
+	@Override
+	public String toString() {
+		return "TurboMilestone [title=" + title + "]";
+	}
+	
+	/**
+	 * A convenient string representation of this object, for purposes of readable logs.
+	 * @return
+	 */
+	public String logString() {
+		return title;
+	}
+	
 	/*
 	 * Private Methods
 	 */
