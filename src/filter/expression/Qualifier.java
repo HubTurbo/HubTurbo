@@ -249,7 +249,11 @@ public class Qualifier implements FilterExpression {
             if (name.equals("keyword")) {
                 return content.get();
             } else {
-                return name + ":" + content.get().toString();
+            	String quotedContent = content.get().toString();
+            	if (quotedContent.contains(" ")) {
+            		quotedContent = "\"" + quotedContent + "\"";
+            	}
+                return name + ":" + quotedContent;
             }
         } else if (date.isPresent()) {
             return name + ":" + date.get().toString();

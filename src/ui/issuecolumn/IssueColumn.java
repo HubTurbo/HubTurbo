@@ -36,6 +36,7 @@ import command.TurboCommandExecutor;
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
+import filter.expression.Disjunction;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 
@@ -192,7 +193,25 @@ public abstract class IssueColumn extends Column {
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
 					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-					filterByString("parent(#" + rightIssue.getId() + ")");
+					if (rightIssue.getLabels().size() == 0) {
+						// If the issue has no labels, show it by its title to inform
+						// the user that there are no similar issues
+						filter(new Qualifier("keyword", rightIssue.getTitle()));
+					} else {
+						// Otherwise, take the disjunction of its labels to show similar
+						// issues.
+						FilterExpression result = new Qualifier("label", rightIssue.getLabels().get(0).getName());
+						List<FilterExpression> rest = rightIssue.getLabels().stream()
+								.skip(1)
+								.map(label -> new Qualifier("label", label.getName()))
+								.collect(Collectors.toList());
+
+						for (FilterExpression label : rest) {
+							result = new Disjunction(label, result);
+						}
+
+						filter(result);
+					}
 				} else if (dd.getSource() == DragData.Source.COLUMN) {
 					// This event is never triggered when the drag is ended.
 					// It's not a huge deal, as this is only used to
@@ -200,11 +219,11 @@ public abstract class IssueColumn extends Column {
 					// The other main consequence of this is that we can't
 					// assert to check if the slot has been cleared when starting a drag-swap.
 				} else if (dd.getSource() == DragData.Source.LABEL_TAB) {
-					filterByString("label(" + dd.getEntityName() + ")");
+					filter(new Qualifier("label", dd.getEntityName()));
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-					filterByString("assignee(" + dd.getEntityName() + ")");
+					filter(new Qualifier("assignee", dd.getEntityName()));
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-					filterByString("milestone(" + dd.getEntityName() + ")");
+					filter(new Qualifier("milestone", dd.getEntityName()));
 				}
 
 			}
