@@ -896,17 +896,14 @@ public class TurboIssue implements Listable {
 	/*
 	 * Overridden Methods
 	 */
-
-	@Override
-	public String toString() {
-		return "Issue " + getTitle();
-	}
-
+	
 	@Override
 	public String getListName() {
 		return "#" + getId() + " " + getTitle();
 	}
-	
-	
 
+	@Override
+	public String toString() {
+		return "TurboIssue [id=" + id + ", title=" + title + "]";
+	}
 }
