@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
@@ -89,6 +90,7 @@ public class TurboIssue implements Listable {
 	private int unlabeledCount = 0;
 	private int milestonedCount = 0;
 	private int demilestonedCount = 0;
+	private List<Comment> comments = new ArrayList<>();
 
 	private void ______ESSENTIALS______() {
 	}
@@ -712,6 +714,18 @@ public class TurboIssue implements Listable {
 		}
 		body.append(getDescription());
 		return body.toString();
+	}
+	
+	public boolean hasComments() {
+		return comments.size() > 0;
+	}
+	
+	public List<Comment> getComments() {
+		return comments;
+	}
+	
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
 	}
 
 	private void ______GETTERS_AND_SETTERS______() {

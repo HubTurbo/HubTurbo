@@ -24,6 +24,7 @@ import model.TurboUser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -798,4 +799,14 @@ public class ServiceManager {
 		return contentService.getContents(repository, path);
 	}
 
+	private void ______COMMENTS______() {
+	}
+
+	private List<Comment> getLatestComments(int issueId) throws IOException {
+		if (repoId != null) {
+			List<Comment> comments = issueService.getComments(repoId, issueId);
+			return comments;
+		}
+		return new ArrayList<Comment>();
+	}
 }
