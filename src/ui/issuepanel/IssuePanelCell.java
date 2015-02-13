@@ -1,6 +1,7 @@
 package ui.issuepanel;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
@@ -11,6 +12,7 @@ import model.Model;
 import model.TurboIssue;
 import ui.DragData;
 import ui.UI;
+
 import command.TurboIssueAddLabels;
 import command.TurboIssueSetAssignee;
 import command.TurboIssueSetMilestone;
@@ -20,12 +22,14 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	private final Model model;
 	private final int parentColumnIndex;
 	private final IssuePanel parent;
+	private final HashSet<Integer> issuesWithNewComments;
 		
-	public IssuePanelCell(UI ui, Model model, IssuePanel parent, int parentColumnIndex) {
+	public IssuePanelCell(UI ui, Model model, IssuePanel parent, int parentColumnIndex, HashSet<Integer> issuesWithNewComments) {
 		super();
 		this.model = model;
 		this.parent = parent;
 		this.parentColumnIndex = parentColumnIndex;
+		this.issuesWithNewComments = issuesWithNewComments;
 	}
 
 	@Override
@@ -34,7 +38,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		if (issue == null)
 			return;
 		
-		setGraphic(new IssuePanelCard(issue, parent));
+		setGraphic(new IssuePanelCard(issue, parent, issuesWithNewComments));
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 		

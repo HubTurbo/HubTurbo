@@ -1,5 +1,6 @@
 package ui.issuepanel;
 
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.geometry.Insets;
@@ -34,10 +35,12 @@ public class IssuePanelCard extends VBox {
 	private final TurboIssue issue;
 	private FlowPane issueDetails = new FlowPane();
 	private IssueColumn parentPanel;
+	private final HashSet<Integer> issuesWithNewComments;
 
-	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel) {
+	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel, HashSet<Integer> issuesWithNewComments) {
 		this.issue = issue;
 		this.parentPanel = parentPanel;
+		this.issuesWithNewComments = issuesWithNewComments;
 		setup();
 	}
 	
@@ -110,10 +113,16 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(icon);
 		}
 		
-		if (issue.getNumOfComments() > 0){
+		if (issue.getCommentCount() > 0){
 			Label commentIcon = new Label(OCTICON_COMMENT);
 			commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
-			Text commentCount = new Text(""+ issue.getNumOfComments());
+			Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
+			
+			if (issuesWithNewComments.contains(issue.getId())) {
+				commentIcon.getStyleClass().add("has-comments");
+				commentCount.getStyleClass().add("has-comments");
+			}
+			
 			issueDetails.getChildren().add(commentIcon);
 			issueDetails.getChildren().add(commentCount);
 		}
