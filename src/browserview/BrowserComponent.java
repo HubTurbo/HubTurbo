@@ -176,6 +176,7 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewLabel());
 			}
 		});
+		bringToTop();
 	}
 
 	/**
@@ -189,6 +190,7 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewMilestone());
 			}
 		});
+		bringToTop();
 	}
 
 	/**
