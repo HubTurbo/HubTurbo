@@ -27,6 +27,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 
 import service.ServiceManager;
 import ui.UI;
@@ -54,7 +55,9 @@ public class BrowserComponent {
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
 	
 	private static final User32 user32 = User32.INSTANCE;
-	private static HWND BrowserWindowHandle;
+	private static final int SWP_NOSIZE = 0x0001;
+	private static final int SWP_NOMOVE = 0x0002;
+	private static HWND browserWindowHandle;
 	
 	static {
 		setupChromeDriverExecutable();
@@ -88,7 +91,6 @@ public class BrowserComponent {
 		assert driver == null;
 		driver = setupChromeDriver();
 		logger.info("Successfully initialised browser component and ChromeDriver");
-		BrowserWindowHandle = user32.GetForegroundWindow();
 	}
 
 	/**
@@ -132,6 +134,7 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
+		browserWindowHandle = user32.GetForegroundWindow();
 		return driver;
 	}
 
@@ -194,12 +197,12 @@ public class BrowserComponent {
 	 */
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
-		bringToTop();
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
 				driver.get(GitHubURL.getPathForNewIssue());
 			}
 		});
+		bringToTop();
 	}
 	
 	/**
@@ -370,9 +373,23 @@ public class BrowserComponent {
 		});
 	}
 	
-	public void bringToTop(){
+	private void bringToTop(){
 		if (PlatformSpecific.isOnWindows()) {
-			user32.SetForegroundWindow(BrowserWindowHandle);
+			user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
+			user32.SetForegroundWindow(browserWindowHandle);
+		} 
+		else {
+			// need to implement osx
+		}
+	}
+	
+	public void focus(HWND mainWindowHandle){
+		if (PlatformSpecific.isOnWindows()) {
+			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
+			user32.SetForegroundWindow(mainWindowHandle);
+		}
+		else{
+			// need to implement osx
 		}
 	}
 }
