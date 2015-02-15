@@ -25,6 +25,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
+
 import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
@@ -49,6 +53,11 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
+	
+	private static final User32 user32 = User32.INSTANCE;
+	private static final int SWP_NOSIZE = 0x0001;
+	private static final int SWP_NOMOVE = 0x0002;
+	private static HWND browserWindowHandle;
 	
 	static {
 		setupChromeDriverExecutable();
@@ -125,6 +134,7 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
+		browserWindowHandle = user32.GetForegroundWindow();
 		return driver;
 	}
 
@@ -166,6 +176,7 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewLabel());
 			}
 		});
+		bringToTop();
 	}
 
 	/**
@@ -179,6 +190,7 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewMilestone());
 			}
 		});
+		bringToTop();
 	}
 
 	/**
@@ -192,6 +204,7 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewIssue());
 			}
 		});
+		bringToTop();
 	}
 	
 	/**
@@ -360,5 +373,19 @@ public class BrowserComponent {
 				return null;
 			}
 		});
+	}
+	
+	private void bringToTop(){
+		if (PlatformSpecific.isOnWindows()) {
+			user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
+			user32.SetForegroundWindow(browserWindowHandle);
+		} 
+	}
+	
+	public void focus(HWND mainWindowHandle){
+		if (PlatformSpecific.isOnWindows()) {
+			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
+			user32.SetForegroundWindow(mainWindowHandle);
+		}
 	}
 }

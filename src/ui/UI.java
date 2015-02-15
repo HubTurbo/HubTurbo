@@ -44,6 +44,8 @@ import util.events.LoginEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
 
 public class UI extends Application implements EventDispatcher {
 	
@@ -56,6 +58,7 @@ public class UI extends Application implements EventDispatcher {
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
+	private static HWND mainWindowHandle;
 
 	// Main UI elements
 	
@@ -152,16 +155,20 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
 		mainStage.setScene(scene);
 		mainStage.show();
+		mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
 		mainStage.setOnCloseRequest(e -> quit());
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
-				// Only if the window is now in focus and repo switching is NOT
-				// disabled (meaning an update is in progress anyway) do we update
-				if (is && isRepoSwitchingAllowed()) {
-					logger.info("Gained focus; refreshing");
-					ServiceManager.getInstance().updateModelNow();
-					ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
+				if (is) {
+					browserComponent.focus(mainWindowHandle);
+					// Only if the window is now in focus and repo switching is NOT
+					// disabled (meaning an update is in progress anyway) do we update
+					if (isRepoSwitchingAllowed()) {
+						logger.info("Gained focus; refreshing");
+						ServiceManager.getInstance().updateModelNow();
+						ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
+					}
 				}
 			}
 		});
