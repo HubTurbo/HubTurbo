@@ -511,9 +511,8 @@ public class TurboIssue implements Listable {
 		StringBuilder allNames = new StringBuilder();
 
 		for (int i=0; i<names.size()-1; i++) {
-			allNames.append(names.get(i)).append(", ");
+			allNames.append(names.get(i)).append(" ");
 		}
-		allNames.append(names.get(names.size()-1));
 		return comments.size() + " comments since, involving " + allNames;
 	}
 
