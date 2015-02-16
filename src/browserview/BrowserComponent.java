@@ -134,8 +134,13 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
-		browserWindowHandle = user32.GetForegroundWindow();
+		browserWindowHandle = getHandle();
 		return driver;
+	}
+
+	private HWND getHandle() {
+		// TODO better implementation of getting window handles
+		return null;
 	}
 
 	/**
