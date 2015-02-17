@@ -120,8 +120,9 @@ public class ServiceManager {
 	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> timeUntilRefreshResult;
 
-	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
-	private boolean isPeriodicUpdatePaused = false;
+	// All method which use these fields should be synchronised.
+	private int _timeRemainingUntilRefresh = REFRESH_INTERVAL;
+	private boolean _isPeriodicUpdatePaused = false;
 
 	private static final String ISSUE_STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -441,7 +442,7 @@ public class ServiceManager {
 
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
 			boolean shouldUpdate = updateTimeRemainingUntilRefresh();
-			HTStatusBar.updateRefreshTimer(timeRemainingUntilRefresh);
+			HTStatusBar.updateRefreshTimer(getTimeRemainingUntilRefresh());
 
 			if (shouldUpdate) {
 				preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
@@ -455,7 +456,7 @@ public class ServiceManager {
 	
 	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
 
-		isPeriodicUpdatePaused = true;
+		pauseTimer();
 
 		// Wait for repository selection to be disabled
 		CountDownLatch continuation = new CountDownLatch(1);
@@ -488,7 +489,8 @@ public class ServiceManager {
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
-		isPeriodicUpdatePaused = false;
+		
+		unpauseTimer();
 	}
 	
 	private void stopPeriodicModelUpdates(boolean log) {
@@ -516,22 +518,40 @@ public class ServiceManager {
 		updateModelPeriodically(false);
 	}
 	
-	public void resetTimeRemainingUntilRefresh() {
-		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+	public synchronized int getTimeRemainingUntilRefresh() {
+		return _timeRemainingUntilRefresh;
+	}
+	
+	public synchronized void resetTimeRemainingUntilRefresh() {
+		_timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	}
 
 	/**
 	 * Updates {@link timeRemainingUntilRefresh}, returning true if an update should occur.
 	 * @return
 	 */
-	private boolean updateTimeRemainingUntilRefresh() {
-		if (timeRemainingUntilRefresh == 1) {
+	private synchronized boolean updateTimeRemainingUntilRefresh() {
+		if (_timeRemainingUntilRefresh == 1) {
 			resetTimeRemainingUntilRefresh();
 			return true;
-		} else if (!isPeriodicUpdatePaused) {
-			--timeRemainingUntilRefresh;
+		} else if (!isTimerPaused()) {
+			--_timeRemainingUntilRefresh;
 		}
 		return false;
+	}
+	
+	private synchronized boolean isTimerPaused() {
+		return _isPeriodicUpdatePaused;
+	}
+
+	private synchronized void pauseTimer() {
+		assert !_isPeriodicUpdatePaused : "Attempt to pause timer that is already paused";
+		_isPeriodicUpdatePaused = true;
+	}
+
+	private synchronized void unpauseTimer() {
+		assert _isPeriodicUpdatePaused : "Attempt to unpause timer that is not paused";
+		_isPeriodicUpdatePaused = false;
 	}
 
 	/**
