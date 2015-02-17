@@ -134,13 +134,8 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
-		browserWindowHandle = getHandle();
+		browserWindowHandle = user32.FindWindow(null, "data:, - Google Chrome");
 		return driver;
-	}
-
-	private HWND getHandle() {
-		// TODO better implementation of getting window handles
-		return null;
 	}
 
 	/**
