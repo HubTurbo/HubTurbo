@@ -115,13 +115,12 @@ public class ServiceManager {
 	private final Executor immediateExecutor = Executors.newSingleThreadExecutor();
 
 	private static final int REFRESH_INTERVAL = 60;
-	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
-	private ScheduledFuture<?> refreshResult;
-	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
 
 	private static final int TICK_INTERVAL = 1;
 	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> timeUntilRefreshResult;
+
+	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	private boolean isPeriodicUpdatePaused = false;
 
 	private static final String ISSUE_STATE_ALL = "all";
@@ -440,12 +439,13 @@ public class ServiceManager {
 
 		final String repoId = model.getRepoId().generateId();
 
-		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
-			preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
-		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
-
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
-			HTStatusBar.updateRefreshTimer(updateTimeRemainingUntilRefresh());
+			boolean shouldUpdate = updateTimeRemainingUntilRefresh();
+			HTStatusBar.updateRefreshTimer(timeRemainingUntilRefresh);
+
+			if (shouldUpdate) {
+				preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
+			}
 		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 
@@ -494,17 +494,13 @@ public class ServiceManager {
 	private void stopPeriodicModelUpdates(boolean log) {
 
 		// If the model update was never started, don't do anything
-		if (refreshResult == null || refreshResult.isCancelled())
-			return;
 		if (timeUntilRefreshResult == null || timeUntilRefreshResult.isCancelled())
 			return;
 
-		refreshResult.cancel(true);
 		timeUntilRefreshResult.cancel(true);
 		resetTimeRemainingUntilRefresh();
 
 		// Indicate that model update has been stopped
-		refreshResult = null;
 		timeUntilRefreshResult = null;
 		
 		if (log) logger.info("Stopped model update");
@@ -524,13 +520,18 @@ public class ServiceManager {
 		timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	}
 
-	private int updateTimeRemainingUntilRefresh() {
+	/**
+	 * Updates {@link timeRemainingUntilRefresh}, returning true if an update should occur.
+	 * @return
+	 */
+	private boolean updateTimeRemainingUntilRefresh() {
 		if (timeRemainingUntilRefresh == 1) {
 			resetTimeRemainingUntilRefresh();
+			return true;
 		} else if (!isPeriodicUpdatePaused) {
 			--timeRemainingUntilRefresh;
 		}
-		return timeRemainingUntilRefresh;
+		return false;
 	}
 
 	/**
@@ -538,7 +539,6 @@ public class ServiceManager {
 	 */
 	public void shutdownModelUpdate() {
 		stopModelUpdate();
-		refreshExecutor.shutdown();
 		timeUntilRefreshExecutor.shutdown();
 	}
 
