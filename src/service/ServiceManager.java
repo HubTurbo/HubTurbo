@@ -115,14 +115,14 @@ public class ServiceManager {
 	private final Executor immediateExecutor = Executors.newSingleThreadExecutor();
 
 	private static final int REFRESH_INTERVAL = 60;
-	private final ScheduledExecutorService refreshExecutor = Executors.newScheduledThreadPool(1);
-	private ScheduledFuture<?> refreshResult;
-	private int timeRemainingUntilRefresh = REFRESH_INTERVAL;
 
 	private static final int TICK_INTERVAL = 1;
 	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture<?> timeUntilRefreshResult;
-	private boolean isPeriodicUpdatePaused = false;
+
+	// All method which use these fields should be synchronised.
+	private int _timeRemainingUntilRefresh = REFRESH_INTERVAL;
+	private boolean _isPeriodicUpdatePaused = false;
 
 	private static final String ISSUE_STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -440,12 +440,13 @@ public class ServiceManager {
 
 		final String repoId = model.getRepoId().generateId();
 
-		refreshResult = refreshExecutor.scheduleWithFixedDelay(() -> {
-			preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
-		}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
-
 		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
-			HTStatusBar.updateRefreshTimer(updateTimeRemainingUntilRefresh());
+			boolean shouldUpdate = updateTimeRemainingUntilRefresh();
+			HTStatusBar.updateRefreshTimer(getTimeRemainingUntilRefresh());
+
+			if (shouldUpdate) {
+				preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
+			}
 		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
 	}
 
@@ -455,7 +456,7 @@ public class ServiceManager {
 	
 	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
 
-		isPeriodicUpdatePaused = true;
+		pauseTimer();
 
 		// Wait for repository selection to be disabled
 		CountDownLatch continuation = new CountDownLatch(1);
@@ -488,23 +489,20 @@ public class ServiceManager {
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
-		isPeriodicUpdatePaused = false;
+		
+		unpauseTimer();
 	}
 	
 	private void stopPeriodicModelUpdates(boolean log) {
 
 		// If the model update was never started, don't do anything
-		if (refreshResult == null || refreshResult.isCancelled())
-			return;
 		if (timeUntilRefreshResult == null || timeUntilRefreshResult.isCancelled())
 			return;
 
-		refreshResult.cancel(true);
 		timeUntilRefreshResult.cancel(true);
 		resetTimeRemainingUntilRefresh();
 
 		// Indicate that model update has been stopped
-		refreshResult = null;
 		timeUntilRefreshResult = null;
 		
 		if (log) logger.info("Stopped model update");
@@ -520,17 +518,40 @@ public class ServiceManager {
 		updateModelPeriodically(false);
 	}
 	
-	public void resetTimeRemainingUntilRefresh() {
-		timeRemainingUntilRefresh = REFRESH_INTERVAL;
+	public synchronized int getTimeRemainingUntilRefresh() {
+		return _timeRemainingUntilRefresh;
+	}
+	
+	public synchronized void resetTimeRemainingUntilRefresh() {
+		_timeRemainingUntilRefresh = REFRESH_INTERVAL;
 	}
 
-	private int updateTimeRemainingUntilRefresh() {
-		if (timeRemainingUntilRefresh == 1) {
+	/**
+	 * Updates {@link timeRemainingUntilRefresh}, returning true if an update should occur.
+	 * @return
+	 */
+	private synchronized boolean updateTimeRemainingUntilRefresh() {
+		if (_timeRemainingUntilRefresh == 1) {
 			resetTimeRemainingUntilRefresh();
-		} else if (!isPeriodicUpdatePaused) {
-			--timeRemainingUntilRefresh;
+			return true;
+		} else if (!isTimerPaused()) {
+			--_timeRemainingUntilRefresh;
 		}
-		return timeRemainingUntilRefresh;
+		return false;
+	}
+	
+	private synchronized boolean isTimerPaused() {
+		return _isPeriodicUpdatePaused;
+	}
+
+	private synchronized void pauseTimer() {
+		assert !_isPeriodicUpdatePaused : "Attempt to pause timer that is already paused";
+		_isPeriodicUpdatePaused = true;
+	}
+
+	private synchronized void unpauseTimer() {
+		assert _isPeriodicUpdatePaused : "Attempt to unpause timer that is not paused";
+		_isPeriodicUpdatePaused = false;
 	}
 
 	/**
@@ -538,7 +559,6 @@ public class ServiceManager {
 	 */
 	public void shutdownModelUpdate() {
 		stopModelUpdate();
-		refreshExecutor.shutdown();
 		timeUntilRefreshExecutor.shutdown();
 	}
 
