@@ -54,12 +54,13 @@ public class BrowserComponent {
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
 	
-	private static final User32 user32 = User32.INSTANCE;
 	private static final int SWP_NOSIZE = 0x0001;
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
+	private static User32 user32;
 	
 	static {
+		setupJNA();
 		setupChromeDriverExecutable();
 	}
 	
@@ -89,10 +90,11 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
-		driver = setupChromeDriver();
+		driver = createChromeDriver();
+		initialiseJNA();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
-
+	
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
@@ -123,7 +125,7 @@ public class BrowserComponent {
 	 * Creates, initialises, and returns a ChromeDriver.
 	 * @return
 	 */
-	private ChromeDriver setupChromeDriver() {
+	private ChromeDriver createChromeDriver() {
 		ChromeOptions options = new ChromeOptions();
 		if (USE_MOBILE_USER_AGENT) {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
@@ -134,7 +136,6 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
-		browserWindowHandle = user32.GetForegroundWindow();
 		return driver;
 	}
 
@@ -268,7 +269,8 @@ public class BrowserComponent {
 	private void resetBrowser(){
 		logger.info("Relaunching chrome.");
 		quit(); // if the driver hangs
-		driver = setupChromeDriver();
+		driver = createChromeDriver();
+		initialiseJNA();
 		login();
 	}
 	
@@ -325,12 +327,29 @@ public class BrowserComponent {
 	}
 	
 	/**
+	 * One-time JNA setup.
+	 */
+	private static void setupJNA() {
+		if (PlatformSpecific.isOnWindows()) {
+			user32 = User32.INSTANCE;
+		}
+	}
+	
+	/**
+	 * JNA initialisation. Should happen whenever the Chrome window is recreated.
+	 */
+	private void initialiseJNA() {
+		if (PlatformSpecific.isOnWindows()) {
+			browserWindowHandle = user32.GetForegroundWindow();
+		}
+	}
+	
+	/**
 	 * Ensures that the chromedriver executable is in the project root before
 	 * initialisation. Since executables are packaged for all platforms, this also
 	 * picks the right version to use.
 	 */
 	private static void setupChromeDriverExecutable() {
-		
 		String binaryFileName =
 				PlatformSpecific.isOnMac() ? "chromedriver"
 				: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
