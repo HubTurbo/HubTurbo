@@ -35,6 +35,7 @@ import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.PlatformSpecific;
 import util.Utility;
 import util.events.BoardSavedEvent;
 import util.events.Event;
@@ -100,6 +101,8 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 		
 		browserComponent = new BrowserComponent(this);
+		initialiseJNA();
+		
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -149,21 +152,23 @@ public class UI extends Application implements EventDispatcher {
 	public static void loadFonts(){
 		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
-	
-	private void setupMainStage(Scene scene) {
 		
+	private void setupMainStage(Scene scene) {
 		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
 		mainStage.setScene(scene);
 		mainStage.show();
-		mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
 		mainStage.setOnCloseRequest(e -> quit());
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
 				if (is) {
-					browserComponent.focus(mainWindowHandle);
-					// Only if the window is now in focus and repo switching is NOT
-					// disabled (meaning an update is in progress anyway) do we update
+					
+					if (PlatformSpecific.isOnWindows()) {
+						browserComponent.focus(mainWindowHandle);
+					}
+
+					// Only if the window is in focus and repo switching is not disabled
+					// (disabled => an update is in progress; do nothing) do we update
 					if (isRepoSwitchingAllowed()) {
 						logger.info("Gained focus; refreshing");
 						ServiceManager.getInstance().updateModelNow();
@@ -172,6 +177,12 @@ public class UI extends Application implements EventDispatcher {
 				}
 			}
 		});
+	}
+	
+	private static void initialiseJNA() {
+		if (PlatformSpecific.isOnWindows()) {
+			mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
+		}
 	}
 	
 	private HashMap<String, String> initialiseCommandLineArguments() {
