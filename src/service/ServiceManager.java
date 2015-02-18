@@ -774,24 +774,18 @@ public class ServiceManager {
 	private void ______EVENTS______() {
 	}
 
-	public List<TurboIssueEvent> getFeeds(int issueNum) throws IOException {
-		GitHubEventsResponse ghEventsResponse = issueService.getIssueEvents(getRepoId(), issueNum);
-		return ghEventsResponse.getTurboIssueEvents();
-	}
-
 	/**
-	 * Gets events for a issue from GitHub, or returns a cached version if
-	 * already present.
+	 * Gets events for a issue from GitHub. This only includes information
+	 * that GitHub exposes, such as milestones being added, labels being
+	 * removed, etc. Events like comments being added must be gotten separately.
 	 * 
 	 * @param issueId
 	 * @return
 	 * @throws IOException
 	 */
-	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException {
-		if (repoId != null) {
-			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
-		}
-		return new ArrayList<>();
+	public List<TurboIssueEvent> getEvents(int issueId) throws IOException {
+		assert repoId != null;
+		return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
 	}
 
 	private void ______MARKDOWN______() {

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
@@ -427,7 +426,7 @@ public class TurboIssue implements Listable {
 				setActivityFeed("", currentTime);
 			} else {
 				issueFeeds.clear();
-				issueFeeds.addAll(getGithubFeed());
+				issueFeeds.addAll(getGitHubEvents());
 				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 			}
 			hasAddedFeeds = true;
@@ -442,21 +441,17 @@ public class TurboIssue implements Listable {
 				}
 			} else {
 				issueFeeds.clear();
-				issueFeeds.addAll(getGithubFeed());
+				issueFeeds.addAll(getGitHubEvents());
 				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
 			}
 		}
 		return getActivityFeed();
 	}
 
-	/*
-	 * Private Methods
-	 */
-
-	private List<TurboIssueEvent> getGithubFeed() {
+	private List<TurboIssueEvent> getGitHubEvents() {
 		List<TurboIssueEvent> feeds = new ArrayList<TurboIssueEvent>();
 		try {
-			feeds = ServiceManager.getInstance().getFeeds(getId());
+			feeds = ServiceManager.getInstance().getEvents(getId());
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
