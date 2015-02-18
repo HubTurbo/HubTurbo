@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="lib/jfxrt.jar"/>
 	<classpathentry kind="lib" path="lib/markdown4j-2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-core-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/selenium-java-2.44.0.jar" sourcepath="lib/selenium-java-2.44.0-srcs.jar"/>
