@@ -91,7 +91,6 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = createChromeDriver();
-		initialiseJNA();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
 	
@@ -136,6 +135,7 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
+		initialiseJNA();
 		return driver;
 	}
 

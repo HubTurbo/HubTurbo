@@ -101,8 +101,6 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 		
 		browserComponent = new BrowserComponent(this);
-		initialiseJNA();
-		
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -158,6 +156,7 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
+		initialiseJNA();
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
