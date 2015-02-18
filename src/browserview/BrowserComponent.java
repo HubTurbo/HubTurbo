@@ -403,6 +403,7 @@ public class BrowserComponent {
 	
 	public void focus(HWND mainWindowHandle){
 		if (PlatformSpecific.isOnWindows()) {
+			user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
 			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
 			user32.SetForegroundWindow(mainWindowHandle);
 		}
