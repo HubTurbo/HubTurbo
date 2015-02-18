@@ -1,11 +1,6 @@
 package ui.issuecolumn;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
+import command.TurboCommandExecutor;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -20,7 +15,12 @@ import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-import command.TurboCommandExecutor;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 
 public class ColumnControl extends HBox {
@@ -92,14 +92,16 @@ public class ColumnControl extends HBox {
 	 * @return
 	 */
 	public List<Integer> getUpdatedIssues() {
-		List<Integer> result = new ArrayList<>();
+		HashSet<Integer> result = new HashSet<>();
 		for (Node child : getChildren()) {
 			IssueColumn panel = (IssueColumn) child;
 			if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
-				result.addAll(panel.getIssueList().stream().map(issue -> issue.getId()).collect(Collectors.toList()));
+				panel.getIssueList().stream()
+						.map(issue -> issue.getId()).
+						forEach(issueId -> result.add(issueId));
 			}
 		}
-		return result;
+		return new ArrayList<>(result);
 	}
 	
 	public void forEach(Consumer<Column> callback) {
