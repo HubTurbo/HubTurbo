@@ -340,7 +340,7 @@ public class BrowserComponent {
 	 */
 	private void initialiseJNA() {
 		if (PlatformSpecific.isOnWindows()) {
-			browserWindowHandle = user32.GetForegroundWindow();
+			browserWindowHandle = user32.FindWindow(null, "data:, - Google Chrome");
 		}
 	}
 	
