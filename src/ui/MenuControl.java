@@ -39,6 +39,7 @@ import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
+import util.PlatformEx;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
@@ -266,19 +267,11 @@ public class MenuControl extends MenuBar {
 					logger.info("Menu: View > Force Refresh");
 					ServiceManager.getInstance().forceRefresh();
 
-					CountDownLatch continuation = new CountDownLatch(1);
-					Platform.runLater(() -> {
-						columns.recreateColumns();
-						continuation.countDown();
-					});
-					try {
-						continuation.await();
-					} catch (InterruptedException e) {
-						logger.error(e.getLocalizedMessage(), e);
-					}
+                    PlatformEx.runAndWait(() -> {
+                        columns.recreateColumns();
+                    });
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
-					e.printStackTrace();
 					return false;
 				}
 				logger.info("Menu: View > Force Refresh completed");

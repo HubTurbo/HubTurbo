@@ -35,6 +35,7 @@ import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.PlatformEx;
 
 public class LoginDialog extends Dialog<Boolean> {
 	
@@ -231,16 +232,9 @@ public class LoginDialog extends Dialog<Boolean> {
 		    protected Boolean call() throws Exception {
 		    	HTStatusBar.displayMessage("Signed in; loading data...");
 			    boolean loadSuccess = loadRepository(owner, repo);
-			    final CountDownLatch latch = new CountDownLatch(1);
-			    Platform.runLater(()->{
-			    	columns.restoreColumns();
-			    	latch.countDown();
-			    });
-			    try {
-					latch.await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+                PlatformEx.runAndWait(() -> {
+                    columns.restoreColumns();
+                });
 		    	return loadSuccess;
 		    }
 		};

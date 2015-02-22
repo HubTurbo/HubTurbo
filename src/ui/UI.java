@@ -35,6 +35,7 @@ import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.PlatformEx;
 import util.PlatformSpecific;
 import util.Utility;
 import util.events.BoardSavedEvent;
@@ -405,17 +406,10 @@ public class UI extends Application implements EventDispatcher {
 
 				ServiceManager.getInstance().switchRepository(repoId);
 
-				final CountDownLatch latch = new CountDownLatch(1);
-				Platform.runLater(() -> {
-					columns.restoreColumns();
-					triggerEvent(new BoardSavedEvent());
-					latch.countDown();
-				});
-				try {
-					latch.await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+                PlatformEx.runAndWait(() -> {
+                    columns.restoreColumns();
+                    triggerEvent(new BoardSavedEvent());
+                });
 				return true;
 			}
 		};

@@ -50,6 +50,7 @@ import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.HTStatusBar;
+import util.PlatformEx;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -412,17 +413,11 @@ public class ServiceManager {
 		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
 				issueCheckTime);
 
-		// Wait for repository selection to be disabled
-		CountDownLatch continuation = new CountDownLatch(1);
-		Platform.runLater(() -> {
-			UI.getInstance().disableRepositorySwitching();
-			continuation.countDown();
-		});
-		try {
-			continuation.await();
-		} catch (InterruptedException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
+		// Disable repository selection
+        PlatformEx.runAndWait(() -> {
+            UI.getInstance().disableRepositorySwitching();
+        });
+
 		// Wait for the update to complete
 		CountDownLatch latch = new CountDownLatch(4);
 		modelUpdater.updateModel(latch, repoId);
