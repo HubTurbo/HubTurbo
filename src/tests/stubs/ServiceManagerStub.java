@@ -25,10 +25,6 @@ public class ServiceManagerStub extends ServiceManager {
 	}
 
 	@Override
-	public void updateModelNowAndPeriodically() {
-	}
-
-	@Override
 	public void stopModelUpdate() {
 
 	}

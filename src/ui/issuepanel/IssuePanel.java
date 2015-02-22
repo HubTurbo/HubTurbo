@@ -139,7 +139,6 @@ public class IssuePanel extends IssueColumn {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) {
 					ServiceManager.getInstance().updateModelNow();
-					ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 				}
 				if (keyCombListToBox.match(event)) {
 					filterTextField.requestFocus();

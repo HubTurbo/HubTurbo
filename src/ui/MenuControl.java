@@ -243,7 +243,6 @@ public class MenuControl extends MenuBar {
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
 			ServiceManager.getInstance().updateModelNow();
-			ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
@@ -265,9 +264,8 @@ public class MenuControl extends MenuBar {
 			protected Boolean call() throws IOException {
 				try {
 					logger.info("Menu: View > Force Refresh");
-					ServiceManager.getInstance().stopModelUpdate();
-					ServiceManager.getInstance().getModel().forceReloadComponents();
-					ServiceManager.getInstance().updateModelNowAndPeriodically();
+					ServiceManager.getInstance().forceRefresh();
+
 					CountDownLatch continuation = new CountDownLatch(1);
 					Platform.runLater(() -> {
 						columns.recreateColumns();
@@ -278,12 +276,6 @@ public class MenuControl extends MenuBar {
 					} catch (InterruptedException e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}
-				} catch (SocketTimeoutException e) {
-					handleSocketTimeoutException(e);
-					return false;
-				} catch (UnknownHostException e) {
-					handleUnknownHostException(e);
-					return false;
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					e.printStackTrace();
