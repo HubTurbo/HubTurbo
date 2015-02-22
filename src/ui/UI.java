@@ -161,22 +161,23 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (isFocused) {
-					if (PlatformSpecific.isOnWindows()) {
-						browserComponent.focus(mainWindowHandle);
-					}
-					PlatformEx.runLaterDelayed(() -> {
-						// A refresh is triggered if:
-						// 1. Repo-switching is not disabled (meaning an update is not in progress)
-						// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-						boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus();
-						if (shouldRefresh) {
-							logger.info("Gained focus; refreshing");
-							ServiceManager.getInstance().updateModelNow();
-							ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
-						}
-					});
+				if (!isFocused) {
+					return;
 				}
+				if (PlatformSpecific.isOnWindows()) {
+					browserComponent.focus(mainWindowHandle);
+				}
+				PlatformEx.runLaterDelayed(() -> {
+					// A refresh is triggered if:
+					// 1. Repo-switching is not disabled (meaning an update is not in progress)
+					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
+					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus();
+					if (shouldRefresh) {
+						logger.info("Gained focus; refreshing");
+						ServiceManager.getInstance().updateModelNow();
+						ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
+					}
+				});
 			}
 		});
 	}
