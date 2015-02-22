@@ -3,7 +3,6 @@ package util;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceManager;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -34,5 +33,33 @@ public class PlatformEx {
 			}
 			Platform.runLater(action);
 		});
+	}
+
+	/**
+	 * Synchronous version of Platform.runLater, like SwingUtilities.invokeAndWait.
+	 * Caveat: will execute immediately when invoked from the JavaFX application thread
+	 * instead of being queued up for execution.
+	 * @param action
+	 */
+	public static void runAndWait(Runnable action) {
+		if (action == null) {
+			throw new NullPointerException("runAndWait cannot accept a null action");
+		}
+
+		if (Platform.isFxApplicationThread()) {
+			action.run();
+			return;
+		}
+
+		CountDownLatch latch = new CountDownLatch(1);
+		Platform.runLater(() -> {
+			action.run();
+			latch.countDown();
+		});
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
 	}
 }

@@ -175,7 +175,6 @@ public class UI extends Application implements EventDispatcher {
 					if (shouldRefresh) {
 						logger.info("Gained focus; refreshing");
 						ServiceManager.getInstance().updateModelNow();
-						ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 					}
 				});
 			}
@@ -200,7 +199,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void quit() {
-		ServiceManager.getInstance().shutdownModelUpdate();
+		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();
 		DataManager.getInstance().saveSessionConfig();
@@ -235,7 +234,6 @@ public class UI extends Application implements EventDispatcher {
 	/**
 	 * Sets the dimensions of the stage to the maximum usable size
 	 * of the desktop, or to the screen size if this fails.
-	 * @param mainStage
 	 */
 	private Rectangle getDimensions() {
 		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
@@ -408,28 +406,13 @@ public class UI extends Application implements EventDispatcher {
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
-				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
-			
-				ServiceManager.getInstance().getModel().populateComponents(repoId, items);
-				
-				try {
-					ServiceManager.getInstance().updateModelNow().await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
 
-				final CountDownLatch latch = new CountDownLatch(1);
-				Platform.runLater(() -> {
-					columns.restoreColumns();
-					triggerEvent(new BoardSavedEvent());
-					latch.countDown();
-				});
-				try {
-					latch.await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+				ServiceManager.getInstance().switchRepository(repoId);
+
+                PlatformEx.runAndWait(() -> {
+                    columns.restoreColumns();
+                    triggerEvent(new BoardSavedEvent());
+                });
 				return true;
 			}
 		};
@@ -440,8 +423,6 @@ public class UI extends Application implements EventDispatcher {
 			
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
-			HTStatusBar.displayMessage("Issues loaded successfully!");
-			ServiceManager.getInstance().updateModelPeriodically();
 			logger.info("Repository " + repoString + " successfully switched to!");
 		});
 			

@@ -44,23 +44,25 @@ import org.markdown4j.Markdown4jProcessor;
 
 import service.updateservice.CommentDownloader;
 import service.updateservice.ModelUpdater;
+import service.updateservice.TickingTimer;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.HTStatusBar;
+import util.PlatformEx;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
  * HubTurbo
- * 
+ * <p>
  * Only data from a single repository can be loaded at any point of time. The
  * currently loaded repository is stored in the application's ServiceManager
  * instance
- * 
+ * <p>
  * Also holds a reference to the application's current Model instance, which
  * stores the repository's labels, milestones, assignees and issues.
- * */
+ */
 @SuppressWarnings("unused")
 public class ServiceManager {
 
@@ -89,7 +91,7 @@ public class ServiceManager {
 	protected String lastUsedPassword;
 
 	// Services
-	
+
 	private GitHubClientExtended githubClient;
 
 	private CollaboratorService collabService;
@@ -101,7 +103,7 @@ public class ServiceManager {
 	private ContentsService contentService;
 
 	// Model updates
-	
+
 	private ModelUpdater modelUpdater;
 	private CommentDownloader commentDownloader = new CommentDownloader(this);
 	protected Model model;
@@ -112,17 +114,7 @@ public class ServiceManager {
 	private String milestonesETag = null;
 	private String issueCheckTime = null;
 
-	private final Executor immediateExecutor = Executors.newSingleThreadExecutor();
-
-	private static final int REFRESH_INTERVAL = 60;
-
-	private static final int TICK_INTERVAL = 1;
-	private final ScheduledExecutorService timeUntilRefreshExecutor = Executors.newScheduledThreadPool(1);
-	private ScheduledFuture<?> timeUntilRefreshResult;
-
-	// All method which use these fields should be synchronised.
-	private int _timeRemainingUntilRefresh = REFRESH_INTERVAL;
-	private boolean _isPeriodicUpdatePaused = false;
+	private final TickingTimer timer;
 
 	private static final String ISSUE_STATE_ALL = "all";
 	public static final String STATE_OPEN = "open";
@@ -137,6 +129,7 @@ public class ServiceManager {
 		repositoryService = new RepositoryServiceExtended(githubClient);
 		markdownService = new MarkdownService(githubClient);
 		contentService = new ContentsService(githubClient);
+		timer = createTickingTimer();
 		// TODO construct model later
 		model = new Model();
 	}
@@ -150,15 +143,16 @@ public class ServiceManager {
 	/**
 	 * Given a username and password, attempts to log into GitHub.
 	 * Returns true on success and false otherwise.
+	 *
 	 * @param userId
 	 * @param password
 	 * @return
 	 */
 	public boolean login(String userId, String password) {
-		
+
 		this.lastUsedPassword = password;
 		githubClient.setCredentials(userId, password);
-		
+
 		// Attempt login
 		try {
 			GitHubRequest request = new GitHubRequest();
@@ -174,6 +168,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns the username last used to log in.
+	 *
 	 * @return
 	 */
 	public String getUserId() {
@@ -182,6 +177,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns the password last used to log in.
+	 *
 	 * @return
 	 */
 	public String getLastUsedPassword() {
@@ -204,6 +200,7 @@ public class ServiceManager {
 	 * Given a repository owner and name, loads its contents into the model.
 	 * Assumes that authentication has already been done, so should be called
 	 * after {@link #login(String, String) login}.
+	 *
 	 * @param owner
 	 * @param name
 	 * @return
@@ -235,6 +232,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -246,6 +244,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -258,6 +257,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -286,6 +286,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns a list of the user's public repositories.
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -295,6 +296,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns a list of the names of the user's public repositories
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -305,6 +307,7 @@ public class ServiceManager {
 	/**
 	 * Returns a list of the public repositories belonging to the user and the
 	 * user's organisations
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -315,7 +318,7 @@ public class ServiceManager {
 	/**
 	 * Returns a list of the names of the public repositories belonging to the
 	 * user and the user's organisations
-	 * */
+	 */
 	public List<String> getAllRepositoryNames() throws IOException {
 		return repositoryService.getAllRepositoriesNames(getUserId());
 	}
@@ -329,19 +332,19 @@ public class ServiceManager {
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
-	
+
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
 		// TODO set these paramters in constructor instead
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
-	
+
 		boolean needToGetResources = true;
-		
+
 		CachedRepoData repo = dcHandler.getRepo();
 		if (repo != null) {
 			needToGetResources = false;
 		}
-	
+
 		if (!needToGetResources) {
 			logger.info("Loading from cache...");
 			issuesETag = repo.getIssuesETag();
@@ -353,7 +356,7 @@ public class ServiceManager {
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
-	
+
 			HashMap<String, List> map = new HashMap<String, List>();
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
@@ -372,16 +375,16 @@ public class ServiceManager {
 		labelsETag = null;
 		milestonesETag = null;
 		issueCheckTime = null;
-	
+
 		List<User> ghCollaborators = new ArrayList<User>();
 		List<Label> ghLabels = new ArrayList<Label>();
 		List<Milestone> ghMilestones = new ArrayList<Milestone>();
 		List<Issue> ghIssues = new ArrayList<Issue>();
-	
+
 		ghLabels = getLabels();
 		ghMilestones = getMilestones();
 		ghIssues = getAllIssues();
-	
+
 		HashMap<String, List> map = new HashMap<String, List>();
 		map.put(KEY_COLLABORATORS, ghCollaborators);
 		map.put(KEY_LABELS, ghLabels);
@@ -401,165 +404,111 @@ public class ServiceManager {
 		}
 		return null;
 	}
-	
-	private CountDownLatch updateModelNow(boolean log) {
-		if (log) logger.info("Updating model now");
-		
-		final String repoId = model.getRepoId().generateId();
-		final CountDownLatch latch = new CountDownLatch(4);
-		
-		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-				issueCheckTime);
-		
-		immediateExecutor.execute(() -> {
-			preventRepoSwitchingAndUpdateModel(latch, repoId);
+
+	private TickingTimer createTickingTimer() {
+		TickingTimer timer = new TickingTimer("modelUpdate", 10, (time) -> {
+			HTStatusBar.updateRefreshTimer(time);
+		}, () -> {
+			preventRepoSwitchingAndUpdateModel(model.getRepoId().generateId());
 		});
-
-		// The latch is returned. Thus there will be two threads blocking on it:
-		// this one, and whatever is calling this method to update the model.
-		return latch;
+		return timer;
 	}
-	
-	public CountDownLatch updateModelNow() {
-		return updateModelNow(true);
-	}
-	
-	private void updateModelPeriodically(boolean log) {
 
-		if (log) logger.info("Starting model updates (without updating immediately)");
-
-		// Ensure that model update isn't ongoing
-		stopPeriodicModelUpdates(false);
+	/**
+	 * Updates the contents of the model with data from the given repository.
+	 *
+	 * @param repoId
+	 */
+	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
 		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-				issueCheckTime);
+			issueCheckTime);
 
-		// We get the repo id from the model now. On task completion, the
-		// repo id may be different if the project was switched, so we
-		// validate with this repo id at that point.
-
-		final String repoId = model.getRepoId().generateId();
-
-		timeUntilRefreshResult = timeUntilRefreshExecutor.scheduleWithFixedDelay(() -> {
-			boolean shouldUpdate = updateTimeRemainingUntilRefresh();
-			HTStatusBar.updateRefreshTimer(getTimeRemainingUntilRefresh());
-
-			if (shouldUpdate) {
-				preventRepoSwitchingAndUpdateModel(new CountDownLatch(4), repoId);
-			}
-		}, 0, TICK_INTERVAL, TimeUnit.SECONDS);
-	}
-
-	public void updateModelPeriodically() {
-		updateModelPeriodically(true);
-	}
-	
-	public void preventRepoSwitchingAndUpdateModel(CountDownLatch latch, String repoId) {
-
-		pauseTimer();
-
-		// Wait for repository selection to be disabled
-		CountDownLatch continuation = new CountDownLatch(1);
-		Platform.runLater(() -> {
+		// Disable repository selection
+		PlatformEx.runAndWait(() -> {
 			UI.getInstance().disableRepositorySwitching();
-			continuation.countDown();
 		});
-		try {
-			continuation.await();
-		} catch (InterruptedException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		
+
 		// Wait for the update to complete
+		CountDownLatch latch = new CountDownLatch(4);
 		modelUpdater.updateModel(latch, repoId);
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-	  	model.updateCache();
-	  	
+		model.updateCache();
+
 		commentDownloader.download();
-	  	model.triggerModelChangeEvent();
-		
+		model.triggerModelChangeEvent();
+
 		// Reset progress UI
 		HTStatusBar.updateProgress(0);
-		
+
 		// Enable repository switching
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
-		
-		unpauseTimer();
-	}
-	
-	private void stopPeriodicModelUpdates(boolean log) {
-
-		// If the model update was never started, don't do anything
-		if (timeUntilRefreshResult == null || timeUntilRefreshResult.isCancelled())
-			return;
-
-		timeUntilRefreshResult.cancel(true);
-		resetTimeRemainingUntilRefresh();
-
-		// Indicate that model update has been stopped
-		timeUntilRefreshResult = null;
-		
-		if (log) logger.info("Stopped model update");
 	}
 
+	/**
+	 * To be called when the app starts.
+	 */
+	public void startModelUpdate() {
+		timer.start();
+	}
+
+	/**
+	 * To be called when the app closes.
+	 */
 	public void stopModelUpdate() {
-		stopPeriodicModelUpdates(true);
-	}
-
-	public void updateModelNowAndPeriodically() {
-		logger.info("Updating model now, and starting periodic update");
-		updateModelNow(false);
-		updateModelPeriodically(false);
-	}
-	
-	public synchronized int getTimeRemainingUntilRefresh() {
-		return _timeRemainingUntilRefresh;
-	}
-	
-	public synchronized void resetTimeRemainingUntilRefresh() {
-		_timeRemainingUntilRefresh = REFRESH_INTERVAL;
+		timer.stop();
 	}
 
 	/**
-	 * Updates {@link timeRemainingUntilRefresh}, returning true if an update should occur.
-	 * @return
+	 * Triggers an update of the model.
+	 *
+	 * @return a latch which blocks until the model is finished updating
 	 */
-	private synchronized boolean updateTimeRemainingUntilRefresh() {
-		if (_timeRemainingUntilRefresh == 1) {
-			resetTimeRemainingUntilRefresh();
-			return true;
-		} else if (!isTimerPaused()) {
-			--_timeRemainingUntilRefresh;
+	public CountDownLatch updateModelNow() {
+		return timer.trigger();
+	}
+
+	/**
+	 * Compound, synchronous action. After being called the contents of the
+	 * model will be of the given repoId.
+	 *
+	 * @param repoId the repository to switch to
+	 * @throws IOException
+	 */
+	public void switchRepository(RepositoryId repoId) throws IOException {
+		timer.pause();
+		model.populateComponents(repoId, getResources(repoId));
+		timer.resume();
+		try {
+			updateModelNow().await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
 		}
-		return false;
-	}
-	
-	private synchronized boolean isTimerPaused() {
-		return _isPeriodicUpdatePaused;
-	}
-
-	private synchronized void pauseTimer() {
-		assert !_isPeriodicUpdatePaused : "Attempt to pause timer that is already paused";
-		_isPeriodicUpdatePaused = true;
-	}
-
-	private synchronized void unpauseTimer() {
-		assert _isPeriodicUpdatePaused : "Attempt to unpause timer that is not paused";
-		_isPeriodicUpdatePaused = false;
 	}
 
 	/**
-	 * Called on application exit. Will be called only once.
+	 * Compound, synchronous action. After being called the contents of the
+	 * model reflect the latest version of the currently-loaded repository.
 	 */
-	public void shutdownModelUpdate() {
-		stopModelUpdate();
-		timeUntilRefreshExecutor.shutdown();
+	public void forceRefresh() {
+		timer.pause();
+		try {
+			model.forceReloadComponents();
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		timer.resume();
+		try {
+			updateModelNow().await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
 	}
 
 	private void ______LABELS______() {
@@ -662,7 +611,7 @@ public class ServiceManager {
 
 	/**
 	 * Get user repositories
-	 * */
+	 */
 
 	public Issue getIssueFromIssueData(HashMap<String, Object> issueData) {
 		return (Issue) issueData.get(IssueServiceExtended.ISSUE_CONTENTS);
@@ -703,7 +652,7 @@ public class ServiceManager {
 
 	/**
 	 * Methods to work with issue labels
-	 * */
+	 */
 
 	public List<Label> setLabelsForIssue(long issueId, List<Label> labels) throws IOException {
 		if (repoId != null) {
@@ -715,7 +664,7 @@ public class ServiceManager {
 	/**
 	 * Adds list of labels to a github issue. Returns all the labels for the
 	 * issue.
-	 * */
+	 */
 	public List<Label> addLabelsToIssue(int issueId, List<Label> labels) throws IOException {
 		if (repoId != null) {
 			return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
@@ -782,7 +731,7 @@ public class ServiceManager {
 	/**
 	 * Gets events for a issue from GitHub, or returns a cached version if
 	 * already present.
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 * @throws IOException

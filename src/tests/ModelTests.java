@@ -188,9 +188,6 @@ public class ModelTests {
 		Model model = new Model();
 		model.loadIssues(TestUtils.getStubIssues(10));
 
-		int start = numberOfUpdates;
-		registerChangeEvent(model);
-
 		Issue issue1 = TestUtils.getStubIssue(3);
 		issue1.setTitle("something different");
 
@@ -207,12 +204,6 @@ public class ModelTests {
 		assertEquals(model.getIssueWithId(3).getTitle(), "something different");
 		assertEquals(model.getIssueWithId(11).getTitle(), "something really different");
 		assertEquals(model.getIssueWithId(11), model.getIssues().get(0));
-
-		unregisterChangeEvent(model);
-		int end = numberOfUpdates;
-
-		// Only one update triggered
-		assertEquals(1, end - start);
 	}
 
 	@Test
@@ -278,8 +269,8 @@ public class ModelTests {
 	public void deleteLabelTest() {
 		Model model = new Model();
 		model.loadTurboLabels(TestUtils.getStubTurboLabels(10));
-		model.deleteLabel(model.getLabels().get(2)); // ids 3 and 5
 		model.deleteLabel(model.getLabels().get(4));
+		model.deleteLabel(model.getLabels().get(2)); // ids 3 and 5
 
 		assertEquals(model.getLabels().size(), 8);
 		for (TurboLabel label : model.getLabels()) {
@@ -371,8 +362,8 @@ public class ModelTests {
 		Model model = new Model();
 		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
 
-		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
 		model.deleteMilestone(model.getMilestones().get(4));
+		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
 
 		assertEquals(model.getMilestones().size(), 8);
 		for (TurboMilestone milestone : model.getMilestones()) {

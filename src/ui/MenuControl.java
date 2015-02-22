@@ -39,6 +39,7 @@ import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
+import util.PlatformEx;
 import util.events.IssueCreatedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
@@ -243,7 +244,6 @@ public class MenuControl extends MenuBar {
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
 			ServiceManager.getInstance().updateModelNow();
-			ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
@@ -265,28 +265,13 @@ public class MenuControl extends MenuBar {
 			protected Boolean call() throws IOException {
 				try {
 					logger.info("Menu: View > Force Refresh");
-					ServiceManager.getInstance().stopModelUpdate();
-					ServiceManager.getInstance().getModel().forceReloadComponents();
-					ServiceManager.getInstance().updateModelNowAndPeriodically();
-					CountDownLatch continuation = new CountDownLatch(1);
-					Platform.runLater(() -> {
-						columns.recreateColumns();
-						continuation.countDown();
-					});
-					try {
-						continuation.await();
-					} catch (InterruptedException e) {
-						logger.error(e.getLocalizedMessage(), e);
-					}
-				} catch (SocketTimeoutException e) {
-					handleSocketTimeoutException(e);
-					return false;
-				} catch (UnknownHostException e) {
-					handleUnknownHostException(e);
-					return false;
+					ServiceManager.getInstance().forceRefresh();
+
+                    PlatformEx.runAndWait(() -> {
+                        columns.recreateColumns();
+                    });
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
-					e.printStackTrace();
 					return false;
 				}
 				logger.info("Menu: View > Force Refresh completed");

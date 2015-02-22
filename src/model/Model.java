@@ -346,7 +346,10 @@ public class Model {
 			list.addAll(buffer);
 
 			latch.countDown();
-			HTStatusBar.addProgress(0.25);
+
+			if (!isInTestMode) {
+				HTStatusBar.addProgress(0.25);
+			}
 		});
 	}
 
@@ -451,7 +454,6 @@ public class Model {
 				TurboIssue newCached = new TurboIssue(issue, Model.this);
 				updateCachedIssue(newCached);
 			}
-			triggerModelChangeEvent();
 			latch.countDown();
 		});
 	}
