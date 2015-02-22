@@ -251,24 +251,13 @@ public class BrowserComponent {
 	}
 	
 	private boolean isBrowserActive(){
-		try {
-			if (driver.getCurrentUrl().isEmpty() && driver != null){
-				return false;
-			}
-			else if (driver == null){
-				return false;
-			}
-			return true;
+		if (driver.getCurrentUrl().isEmpty() && driver != null){
+			return false;
 		}
-		catch (WebDriverException e) {
-			switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-				case NoSuchWindow:
-					resetBrowser();
-				default:
-					break;
-				}
-				return false;
-			}
+		else if (driver == null){
+			return false;
+		}
+		return true;
 	}
 
 	//	A helper function for reseting browser.
