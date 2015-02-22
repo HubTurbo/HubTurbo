@@ -55,14 +55,14 @@ import util.PlatformEx;
 /**
  * Singleton class that provides access to the GitHub API services required by
  * HubTurbo
- * 
+ * <p>
  * Only data from a single repository can be loaded at any point of time. The
  * currently loaded repository is stored in the application's ServiceManager
  * instance
- * 
+ * <p>
  * Also holds a reference to the application's current Model instance, which
  * stores the repository's labels, milestones, assignees and issues.
- * */
+ */
 @SuppressWarnings("unused")
 public class ServiceManager {
 
@@ -91,7 +91,7 @@ public class ServiceManager {
 	protected String lastUsedPassword;
 
 	// Services
-	
+
 	private GitHubClientExtended githubClient;
 
 	private CollaboratorService collabService;
@@ -103,7 +103,7 @@ public class ServiceManager {
 	private ContentsService contentService;
 
 	// Model updates
-	
+
 	private ModelUpdater modelUpdater;
 	private CommentDownloader commentDownloader = new CommentDownloader(this);
 	protected Model model;
@@ -143,15 +143,16 @@ public class ServiceManager {
 	/**
 	 * Given a username and password, attempts to log into GitHub.
 	 * Returns true on success and false otherwise.
+	 *
 	 * @param userId
 	 * @param password
 	 * @return
 	 */
 	public boolean login(String userId, String password) {
-		
+
 		this.lastUsedPassword = password;
 		githubClient.setCredentials(userId, password);
-		
+
 		// Attempt login
 		try {
 			GitHubRequest request = new GitHubRequest();
@@ -167,6 +168,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns the username last used to log in.
+	 *
 	 * @return
 	 */
 	public String getUserId() {
@@ -175,6 +177,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns the password last used to log in.
+	 *
 	 * @return
 	 */
 	public String getLastUsedPassword() {
@@ -197,6 +200,7 @@ public class ServiceManager {
 	 * Given a repository owner and name, loads its contents into the model.
 	 * Assumes that authentication has already been done, so should be called
 	 * after {@link #login(String, String) login}.
+	 *
 	 * @param owner
 	 * @param name
 	 * @return
@@ -228,6 +232,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -239,6 +244,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -251,6 +257,7 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
+	 *
 	 * @param repo
 	 * @return
 	 * @throws IOException
@@ -279,6 +286,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns a list of the user's public repositories.
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -288,6 +296,7 @@ public class ServiceManager {
 
 	/**
 	 * Returns a list of the names of the user's public repositories
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -298,6 +307,7 @@ public class ServiceManager {
 	/**
 	 * Returns a list of the public repositories belonging to the user and the
 	 * user's organisations
+	 *
 	 * @return
 	 * @throws IOException
 	 */
@@ -308,7 +318,7 @@ public class ServiceManager {
 	/**
 	 * Returns a list of the names of the public repositories belonging to the
 	 * user and the user's organisations
-	 * */
+	 */
 	public List<String> getAllRepositoryNames() throws IOException {
 		return repositoryService.getAllRepositoriesNames(getUserId());
 	}
@@ -322,19 +332,19 @@ public class ServiceManager {
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
 		this.repoId = repoId;
-	
+
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
 		// TODO set these paramters in constructor instead
 		model.setDataCacheFileHandler(dcHandler);
 		model.setRepoId(repoId);
-	
+
 		boolean needToGetResources = true;
-		
+
 		CachedRepoData repo = dcHandler.getRepo();
 		if (repo != null) {
 			needToGetResources = false;
 		}
-	
+
 		if (!needToGetResources) {
 			logger.info("Loading from cache...");
 			issuesETag = repo.getIssuesETag();
@@ -346,7 +356,7 @@ public class ServiceManager {
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
-	
+
 			HashMap<String, List> map = new HashMap<String, List>();
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
@@ -365,16 +375,16 @@ public class ServiceManager {
 		labelsETag = null;
 		milestonesETag = null;
 		issueCheckTime = null;
-	
+
 		List<User> ghCollaborators = new ArrayList<User>();
 		List<Label> ghLabels = new ArrayList<Label>();
 		List<Milestone> ghMilestones = new ArrayList<Milestone>();
 		List<Issue> ghIssues = new ArrayList<Issue>();
-	
+
 		ghLabels = getLabels();
 		ghMilestones = getMilestones();
 		ghIssues = getAllIssues();
-	
+
 		HashMap<String, List> map = new HashMap<String, List>();
 		map.put(KEY_COLLABORATORS, ghCollaborators);
 		map.put(KEY_LABELS, ghLabels);
@@ -406,17 +416,18 @@ public class ServiceManager {
 
 	/**
 	 * Updates the contents of the model with data from the given repository.
+	 *
 	 * @param repoId
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
 		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
-				issueCheckTime);
+			issueCheckTime);
 
 		// Disable repository selection
-        PlatformEx.runAndWait(() -> {
-            UI.getInstance().disableRepositorySwitching();
-        });
+		PlatformEx.runAndWait(() -> {
+			UI.getInstance().disableRepositorySwitching();
+		});
 
 		// Wait for the update to complete
 		CountDownLatch latch = new CountDownLatch(4);
@@ -456,6 +467,7 @@ public class ServiceManager {
 
 	/**
 	 * Triggers an update of the model.
+	 *
 	 * @return a latch which blocks until the model is finished updating
 	 */
 	public CountDownLatch updateModelNow() {
@@ -465,6 +477,7 @@ public class ServiceManager {
 	/**
 	 * Compound, synchronous action. After being called the contents of the
 	 * model will be of the given repoId.
+	 *
 	 * @param repoId the repository to switch to
 	 * @throws IOException
 	 */
@@ -598,7 +611,7 @@ public class ServiceManager {
 
 	/**
 	 * Get user repositories
-	 * */
+	 */
 
 	public Issue getIssueFromIssueData(HashMap<String, Object> issueData) {
 		return (Issue) issueData.get(IssueServiceExtended.ISSUE_CONTENTS);
@@ -639,7 +652,7 @@ public class ServiceManager {
 
 	/**
 	 * Methods to work with issue labels
-	 * */
+	 */
 
 	public List<Label> setLabelsForIssue(long issueId, List<Label> labels) throws IOException {
 		if (repoId != null) {
@@ -651,7 +664,7 @@ public class ServiceManager {
 	/**
 	 * Adds list of labels to a github issue. Returns all the labels for the
 	 * issue.
-	 * */
+	 */
 	public List<Label> addLabelsToIssue(int issueId, List<Label> labels) throws IOException {
 		if (repoId != null) {
 			return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
@@ -718,7 +731,7 @@ public class ServiceManager {
 	/**
 	 * Gets events for a issue from GitHub, or returns a cached version if
 	 * already present.
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 * @throws IOException
