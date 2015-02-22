@@ -22,6 +22,14 @@ public class RepositorySelector extends HBox {
 		getChildren().addAll(label);
 	}
 
+	/**
+	 * Meant as a replacement for {@link #isInFocus isInFocus} (which is final).
+	 * @return true if the combobox portion of this element is in focus
+	 */
+	public boolean isInFocus() {
+		return comboBox.isFocused();
+	}
+
 	private void setupLayout() {
 		setSpacing(5);
 		setPadding(new Insets(5));
