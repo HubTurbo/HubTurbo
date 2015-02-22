@@ -269,8 +269,8 @@ public class ModelTests {
 	public void deleteLabelTest() {
 		Model model = new Model();
 		model.loadTurboLabels(TestUtils.getStubTurboLabels(10));
-		model.deleteLabel(model.getLabels().get(2)); // ids 3 and 5
 		model.deleteLabel(model.getLabels().get(4));
+		model.deleteLabel(model.getLabels().get(2)); // ids 3 and 5
 
 		assertEquals(model.getLabels().size(), 8);
 		for (TurboLabel label : model.getLabels()) {
@@ -362,8 +362,8 @@ public class ModelTests {
 		Model model = new Model();
 		model.loadTurboMilestones(TestUtils.getStubTurboMilestones(10));
 
-		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
 		model.deleteMilestone(model.getMilestones().get(4));
+		model.deleteMilestone(model.getMilestones().get(2)); // ids 3 and 5
 
 		assertEquals(model.getMilestones().size(), 8);
 		for (TurboMilestone milestone : model.getMilestones()) {
