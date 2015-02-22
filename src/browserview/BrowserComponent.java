@@ -244,6 +244,12 @@ public class BrowserComponent {
 		});
 	}
 	
+	public void jumpToComment(){
+		WebElement comment = driver.findElementById("new_comment_field");
+		comment.click();
+		bringToTop();
+	}
+	
 	private boolean isBrowserActive(){
 		try {
 			if (driver.getCurrentUrl().isEmpty() && driver != null){
