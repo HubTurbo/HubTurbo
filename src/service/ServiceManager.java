@@ -81,6 +81,8 @@ public class ServiceManager {
 
 	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
 
+	public static final int SYNC_PERIOD = 60;
+
 	public static final String KEY_ISSUES = "issues";
 	public static final String KEY_MILESTONES = "milestones";
 	public static final String KEY_LABELS = "labels";
@@ -406,7 +408,7 @@ public class ServiceManager {
 	}
 
 	private TickingTimer createTickingTimer() {
-		TickingTimer timer = new TickingTimer("modelUpdate", 10, (time) -> {
+		TickingTimer timer = new TickingTimer("Sync Timer", SYNC_PERIOD, (time) -> {
 			HTStatusBar.updateRefreshTimer(time);
 		}, () -> {
 			preventRepoSwitchingAndUpdateModel(model.getRepoId().generateId());
