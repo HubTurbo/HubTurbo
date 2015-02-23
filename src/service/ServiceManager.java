@@ -408,7 +408,7 @@ public class ServiceManager {
 	}
 
 	private TickingTimer createTickingTimer() {
-		TickingTimer timer = new TickingTimer("modelUpdate", SYNC_PERIOD, (time) -> {
+		TickingTimer timer = new TickingTimer("Sync Timer", SYNC_PERIOD, (time) -> {
 			HTStatusBar.updateRefreshTimer(time);
 		}, () -> {
 			preventRepoSwitchingAndUpdateModel(model.getRepoId().generateId());
