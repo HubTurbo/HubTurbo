@@ -50,11 +50,11 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
 public class UI extends Application implements EventDispatcher {
-	
+
 	private static final int VERSION_MAJOR = 2;
 	private static final int VERSION_MINOR = 0;
-	private static final int VERSION_PATCH = 0;
-	
+	private static final int VERSION_PATCH = 1;
+
 	public static final String ARG_UPDATED_TO = "--updated-to";
 
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
@@ -63,7 +63,7 @@ public class UI extends Application implements EventDispatcher {
 	private static HWND mainWindowHandle;
 
 	// Main UI elements
-	
+
 	private Stage mainStage;
 	private ColumnControl columns;
 	private MenuControl menuBar;
@@ -71,17 +71,17 @@ public class UI extends Application implements EventDispatcher {
 	private RepositorySelector repoSelector;
 
 	// Events
-	
+
 	private EventBus events;
-	
+
 	// Application arguments
-	
+
 	private HashMap<String, String> commandLineArgs;
-		
+
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
-	
+
 	private static UI instance;
 	public static UI getInstance() {
 		return instance;
@@ -89,18 +89,18 @@ public class UI extends Application implements EventDispatcher {
 
 	@Override
 	public void start(Stage stage) throws IOException {
-		
+
 		instance = this;
-		
+
 		//log all uncaught exceptions
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
             logger.error(throwable.getMessage(), throwable);
         });
-		
+
 		events = new EventBus();
-		
+
 		repoSelector = createRepoSelector();
-		
+
 		browserComponent = new BrowserComponent(this);
 		initCSS();
 		mainStage = stage;
@@ -111,7 +111,7 @@ public class UI extends Application implements EventDispatcher {
 		applyCSS(scene);
 		getUserCredentials();
 		commandLineArgs = initialiseCommandLineArguments();
-		
+
 		DataManager.getInstance();
 	}
 
@@ -136,9 +136,9 @@ public class UI extends Application implements EventDispatcher {
 			return false;
 		});
 	}
-	
+
 	private static String CSS = "";
-	
+
 	public void initCSS() {
 		CSS = this.getClass().getResource("hubturbo.css").toString();
 	}
@@ -147,7 +147,7 @@ public class UI extends Application implements EventDispatcher {
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(CSS);
 	}
-	
+
 	public static void loadFonts(){
 		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
@@ -180,13 +180,13 @@ public class UI extends Application implements EventDispatcher {
 			}
 		});
 	}
-	
+
 	private static void initialiseJNA() {
 		if (PlatformSpecific.isOnWindows()) {
 			mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
 		}
 	}
-	
+
 	private HashMap<String, String> initialiseCommandLineArguments() {
 		Parameters params = getParameters();
 		final List<String> parameters = params.getRaw();
@@ -207,11 +207,11 @@ public class UI extends Application implements EventDispatcher {
 		Platform.exit();
 		System.exit(0);
 	}
-	
+
 	private Parent createRoot() throws IOException {
 
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
-		
+
 		VBox top = new VBox();
 
 		ScrollPane columnsScrollPane = new ScrollPane(columns);
@@ -219,7 +219,7 @@ public class UI extends Application implements EventDispatcher {
 		columnsScrollPane.setFitToHeight(true);
 		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
-		
+
 		menuBar = new MenuControl(this, columns, columnsScrollPane);
 		top.getChildren().addAll(menuBar, repoSelector);
 
@@ -243,7 +243,7 @@ public class UI extends Application implements EventDispatcher {
 			return Utility.getScreenDimensions();
 		}
 	}
-	
+
 	/**
 	 * UI operations
 	 */
@@ -253,22 +253,22 @@ public class UI extends Application implements EventDispatcher {
 		events.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
-	
+
 	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
 		logger.info("Triggered event " + event.getClass().getSimpleName());
 	}
-	
+
 	public ColumnControl getColumnControl() {
 		return columns;
 	}
-	
+
 	public BrowserComponent getBrowserComponent() {
 		return browserComponent;
 	}
-	
+
 	/**
 	 * Tracks whether or not the window is in an expanded state.
 	 */
@@ -298,7 +298,7 @@ public class UI extends Application implements EventDispatcher {
 		}
 		return mainStage.getWidth();
 	}
-	
+
 	/**
 	 * Returns the dimensions of the screen available for use when
 	 * the main window is in a collapsed state.
@@ -342,13 +342,13 @@ public class UI extends Application implements EventDispatcher {
 	public HashMap<String, String> getCommandLineArgs() {
 		return commandLineArgs;
 	}
-	
+
 	private RepositorySelector createRepoSelector() {
 		RepositorySelector repoSelector = new RepositorySelector();
 		repoSelector.setOnValueChange(this::loadRepo);
 		return repoSelector;
 	}
-	
+
 	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		try {
 			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
@@ -358,11 +358,11 @@ public class UI extends Application implements EventDispatcher {
 				return false;
 			}
 		} catch (SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection Timeout", 
+			DialogMessage.showWarningDialog("Internet Connection Timeout",
 					"Timeout while connecting to GitHub, please check your internet connection.");
 			logger.error(e.getLocalizedMessage(), e);
 		} catch (UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection", 
+			DialogMessage.showWarningDialog("No Internet Connection",
 					"Please check your internet connection and try again.");
 			logger.error(e.getLocalizedMessage(), e);
 		}catch (IOException e) {
@@ -370,9 +370,9 @@ public class UI extends Application implements EventDispatcher {
 		}
 		return true;
 	}
-	
+
 	private boolean repoSwitchingAllowed = true;
-	
+
 	public boolean isRepoSwitchingAllowed() {
 		return repoSwitchingAllowed;
 	}
@@ -392,17 +392,17 @@ public class UI extends Application implements EventDispatcher {
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
-		if(repoId == null 
-		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
+		if(repoId == null
+		  || repoId.equals(ServiceManager.getInstance().getRepoId())
 		  || !checkRepoAccess(repoId)){
 			return;
 		}
-		
+
 		logger.info("Switching repository to " + repoString + " in progress");
-		
+
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
-		
+
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
@@ -420,12 +420,12 @@ public class UI extends Application implements EventDispatcher {
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
-			
+
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
 			logger.info("Repository " + repoString + " successfully switched to!");
 		});
-			
+
 		task.setOnFailed(wse -> {
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);
