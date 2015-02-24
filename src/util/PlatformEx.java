@@ -27,7 +27,7 @@ public class PlatformEx {
 	public static void runLaterDelayed(Runnable action) {
 		delayExecutor.execute(() -> {
 			try {
-				Thread.sleep(100);
+				Thread.sleep(300);
 			} catch (InterruptedException e) {
 				assert false;
 			}
