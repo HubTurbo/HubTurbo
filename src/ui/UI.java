@@ -71,7 +71,7 @@ public class UI extends Application implements EventDispatcher {
 	private RepositorySelector repoSelector;
 	
 	// Bview changes
-	private String currentUrl = "";
+	private String currentPageSource = "";
 
 	// Events
 
@@ -185,10 +185,10 @@ public class UI extends Application implements EventDispatcher {
 	}
 	
 	private boolean hasBviewChanged() {
-		if (browserComponent.getCurrentUrl().matches(currentUrl)){
+		if (browserComponent.getCurrentPageSource().equals(currentPageSource)){
 			return false;
 		}
-		currentUrl = browserComponent.getCurrentUrl();
+		currentPageSource = browserComponent.getCurrentPageSource();
 		return true;
 	}
 

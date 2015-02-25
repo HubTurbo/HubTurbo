@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import javafx.concurrent.Task;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -404,7 +405,9 @@ public class BrowserComponent {
 		}
 	}
 
-	public String getCurrentUrl() {
-		return driver.getCurrentUrl();
+	public String getCurrentPageSource() {
+		JavascriptExecutor executor = (JavascriptExecutor) driver;
+		String result = StringEscapeUtils.escapeHtml4((String) executor.executeScript("return document.documentElement.outerHTML"));
+		return result;
 	}
 }
