@@ -403,4 +403,8 @@ public class BrowserComponent {
 			user32.SetForegroundWindow(mainWindowHandle);
 		}
 	}
+
+	public String getCurrentUrl() {
+		return driver.getCurrentUrl();
+	}
 }

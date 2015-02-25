@@ -69,6 +69,9 @@ public class UI extends Application implements EventDispatcher {
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
 	private RepositorySelector repoSelector;
+	
+	// Bview changes
+	private String currentUrl = "";
 
 	// Events
 
@@ -171,7 +174,7 @@ public class UI extends Application implements EventDispatcher {
 					// A refresh is triggered if:
 					// 1. Repo-switching is not disabled (meaning an update is not in progress)
 					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus();
+					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && hasBviewChanged();
 					if (shouldRefresh) {
 						logger.info("Gained focus; refreshing");
 						ServiceManager.getInstance().updateModelNow();
@@ -179,6 +182,14 @@ public class UI extends Application implements EventDispatcher {
 				});
 			}
 		});
+	}
+	
+	private boolean hasBviewChanged() {
+		if (browserComponent.getCurrentUrl().matches(currentUrl)){
+			return false;
+		}
+		currentUrl = browserComponent.getCurrentUrl();
+		return true;
 	}
 
 	private static void initialiseJNA() {
