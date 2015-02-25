@@ -252,9 +252,11 @@ public class BrowserComponent {
 	
 	private boolean isBrowserActive(){
 		if (driver.getCurrentUrl().isEmpty() && driver != null){
+			logger.warn("Unable to read url from bview. Resetting.");
 			return false;
 		}
 		else if (driver == null){
+			logger.warn("chromedriver process was killed !");
 			return false;
 		}
 		return true;
@@ -295,7 +297,7 @@ public class BrowserComponent {
 						}
 					}
 				} else {
-					logger.info("Chrome window not responding. Relaunching now");
+					logger.info("Chrome window not responding.");
 					resetBrowser();
 				}
 				return null;
