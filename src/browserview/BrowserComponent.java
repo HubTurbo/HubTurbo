@@ -279,21 +279,24 @@ public class BrowserComponent {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
-				try {
-					if (isBrowserActive()) {
-						operation.run();
+				if (isBrowserActive()) {
+					try {
+							operation.run();
+					} catch (WebDriverException e) {
+						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+						case NoSuchWindow:
+							resetBrowser();
+							runBrowserOperation(operation); // Recurse and repeat
+						case NoSuchElement:
+							logger.info("Warning: no such element! " + e.getMessage());
+							break;
+						default:
+							break;
+						}
 					}
-				} catch (WebDriverException e) {
-					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-					case NoSuchWindow:
-						resetBrowser();
-						runBrowserOperation(operation); // Recurse and repeat
-					case NoSuchElement:
-						logger.info("Warning: no such element! " + e.getMessage());
-						break;
-					default:
-						break;
-					}
+				} else {
+					logger.info("Chrome window not responding. Relaunching now");
+					resetBrowser();
 				}
 				return null;
 			}
