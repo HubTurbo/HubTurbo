@@ -71,7 +71,7 @@ public class UI extends Application implements EventDispatcher {
 	private RepositorySelector repoSelector;
 	
 	// Bview changes
-	private String currentPageSource = "";
+	private String pageContentOnLoad = "";
 
 	// Events
 
@@ -185,10 +185,10 @@ public class UI extends Application implements EventDispatcher {
 	}
 	
 	private boolean hasBviewChanged() {
-		if (browserComponent.getCurrentPageSource().equals(currentPageSource)){
+		if (browserComponent.getCurrentPageSource().equals(pageContentOnLoad)){
 			return false;
 		}
-		currentPageSource = browserComponent.getCurrentPageSource();
+		pageContentOnLoad = browserComponent.getCurrentPageSource();
 		return true;
 	}
 
