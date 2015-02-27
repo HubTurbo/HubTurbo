@@ -157,7 +157,7 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
-		initialiseJNA();
+		initialiseJNA(mainStage.getTitle());
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
@@ -181,9 +181,9 @@ public class UI extends Application implements EventDispatcher {
 		});
 	}
 
-	private static void initialiseJNA() {
+	private static void initialiseJNA(String windowTitle) {
 		if (PlatformSpecific.isOnWindows()) {
-			mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
+			mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
 		}
 	}
 
