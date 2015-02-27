@@ -3,6 +3,7 @@ package browserview;
 public enum BrowserComponentError {
 	NoSuchWindow,
 	NoSuchElement,
+	UnexpectedAlert,
 	Unknown;
 	
 	public static BrowserComponentError fromErrorMessage(String errorMessage) {
@@ -12,6 +13,8 @@ public enum BrowserComponentError {
 			return NoSuchWindow;
 		} else if (firstLine.startsWith("no such element")) {
 			return NoSuchElement;
+		} else if(firstLine.startsWith("unexpected alert open")) {
+			return UnexpectedAlert;
 		} else {
 			return Unknown;
 		}

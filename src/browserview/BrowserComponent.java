@@ -288,6 +288,8 @@ public class BrowserComponent {
 					case NoSuchWindow:
 						resetBrowser();
 						runBrowserOperation(operation); // Recurse and repeat
+					case UnexpectedAlert:
+						break;
 					case NoSuchElement:
 						logger.info("Warning: no such element! " + e.getMessage());
 						break;
