@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import javafx.concurrent.Task;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -53,7 +54,8 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
-	
+	private String pageContentOnLoad = "";
+
 	private static final int SWP_NOSIZE = 0x0001;
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
@@ -404,5 +406,19 @@ public class BrowserComponent {
 			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
 			user32.SetForegroundWindow(mainWindowHandle);
 		}
+	}
+
+	private String getCurrentPageSource() {
+		JavascriptExecutor executor = (JavascriptExecutor) driver;
+		String result = StringEscapeUtils.escapeHtml4((String) executor.executeScript("return document.documentElement.outerHTML"));
+		return result;
+	}
+	
+	public boolean hasBviewChanged() {
+		if (getCurrentPageSource().equals(pageContentOnLoad)){
+			return false;
+		}
+		pageContentOnLoad = getCurrentPageSource();
+		return true;
 	}
 }
