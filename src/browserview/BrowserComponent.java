@@ -253,10 +253,17 @@ public class BrowserComponent {
 	}
 	
 	private boolean isBrowserActive(){
-		if (driver.getCurrentUrl().isEmpty() && driver != null){
+		if (driver == null){
+			logger.warn("chromedriver process was killed !");
 			return false;
-		}
-		else if (driver == null){
+ 		}
+		try {
+			String url = driver.getCurrentUrl();
+			if(url.isEmpty() || url == null){
+				return false;
+			}
+		} catch (WebDriverException e){
+			logger.warn("Unable to read url from bview. Resetting.");
 			return false;
 		}
 		return true;
@@ -281,23 +288,24 @@ public class BrowserComponent {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
-				try {
-					if (isBrowserActive()) {
+				if (isBrowserActive()) {
+					try {
 						operation.run();
+					} catch (WebDriverException e) {
+						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+						case NoSuchWindow:
+							resetBrowser();
+							runBrowserOperation(operation); // Recurse and repeat
+						case NoSuchElement:
+							logger.info("Warning: no such element! " + e.getMessage());
+							break;
+						default:
+							break;
+						}
 					}
-				} catch (WebDriverException e) {
-					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-					case NoSuchWindow:
-						resetBrowser();
-						runBrowserOperation(operation); // Recurse and repeat
-					case UnexpectedAlert:
-						break;
-					case NoSuchElement:
-						logger.info("Warning: no such element! " + e.getMessage());
-						break;
-					default:
-						break;
-					}
+				} else {
+					logger.info("Chrome window not responding.");
+					resetBrowser();
 				}
 				return null;
 			}
