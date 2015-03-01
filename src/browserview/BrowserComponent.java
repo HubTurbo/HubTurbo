@@ -251,12 +251,17 @@ public class BrowserComponent {
 	}
 	
 	private boolean isBrowserActive(){
-		if (driver.getCurrentUrl().isEmpty() && driver != null){
-			logger.warn("Unable to read url from bview. Resetting.");
-			return false;
-		}
-		else if (driver == null){
+		if (driver == null){
 			logger.warn("chromedriver process was killed !");
+			return false;
+ 		}
+		try {
+			String url = driver.getCurrentUrl();
+			if(url.isEmpty() || url == null){
+				return false;
+			}
+		} catch (WebDriverException e){
+			logger.warn("Unable to read url from bview. Resetting.");
 			return false;
 		}
 		return true;
@@ -283,7 +288,7 @@ public class BrowserComponent {
 			protected Void call() {
 				if (isBrowserActive()) {
 					try {
-							operation.run();
+						operation.run();
 					} catch (WebDriverException e) {
 						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 						case NoSuchWindow:
