@@ -291,6 +291,7 @@ public class BrowserComponent {
 				if (isBrowserActive()) {
 					try {
 						operation.run();
+						pageContentOnLoad = getCurrentPageSource();
 					} catch (WebDriverException e) {
 						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
 						case NoSuchWindow:
