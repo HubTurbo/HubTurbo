@@ -1,10 +1,14 @@
 package storage;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
@@ -15,6 +19,8 @@ public class SessionConfiguration {
 	private HashMap<String, List<String>> projectFilters = new HashMap<>();
 	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
 	private String lastLoginUsername = "";
+	private byte[] lastLoginEncrypted = new byte[0];
+	private String lastLoginPassword = "";
 	
 	public SessionConfiguration() {
 	}
@@ -72,5 +78,43 @@ public class SessionConfiguration {
 
 	public void setLastLoginUsername(String lastLoginUsername) {
 		this.lastLoginUsername = lastLoginUsername;
+	}
+	
+	public void setLastLoginPassword(String lastPassword){
+		this.lastLoginPassword = encryptData(lastPassword);
+	}
+
+	public String getLastLoginPassword() {
+		// TODO Auto-generated method stub
+		return decryptData();
+	}
+
+	private String encryptData(String lastPassword) {
+		String result = "";
+		try {
+			String key = "HubTurboHubTurbo";
+		    Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+			Cipher cipher = Cipher.getInstance("AES");
+	        cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+	        lastLoginEncrypted = cipher.doFinal(lastPassword.getBytes());
+	        result = new String(lastLoginEncrypted);
+	      } catch(Exception e) {
+	         e.printStackTrace();
+	      }
+		return result;
+	}
+
+	private String decryptData() {
+		String result = "";
+		try {
+			String key = "HubTurboHubTurbo";
+		    Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+	        Cipher cipher = Cipher.getInstance("AES");
+	        cipher.init(Cipher.DECRYPT_MODE, aesKey);
+	        result = new String(cipher.doFinal(lastLoginEncrypted));
+	      }catch(Exception e) {
+	         e.printStackTrace();
+	      }
+		return result;
 	}
 }

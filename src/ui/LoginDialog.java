@@ -141,9 +141,15 @@ public class LoginDialog extends Dialog<Boolean> {
 			usernameField.setText(lastLoginName);
 		}
 		
+		String lastLoginPassword = DataManager.getInstance().getLastLoginPassword();
+		if (!lastLoginPassword.isEmpty()) {
+			passwordField.setText(lastLoginPassword);
+		}
 		// Change focus depending on what fields are present
 		Platform.runLater(() -> {
-			if (!lastLoginName.isEmpty()) {
+			if(!lastLoginPassword.isEmpty()){
+				login(null);
+			} else if (!lastLoginName.isEmpty()) {
 				passwordField.requestFocus();
 			} else if (lastViewed.isPresent()) {
 				usernameField.requestFocus();
@@ -257,6 +263,7 @@ public class LoginDialog extends Dialog<Boolean> {
 
 			// Save login details only on successful login
 			DataManager.getInstance().setLastLoginUsername(username);
+			DataManager.getInstance().setLastLoginPassword(password);
 		
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
