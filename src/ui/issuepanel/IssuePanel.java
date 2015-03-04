@@ -21,8 +21,8 @@ import ui.UI;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
+import util.KeyPress;
 import util.events.IssueSelectedEvent;
-
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {

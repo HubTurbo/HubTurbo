@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -63,6 +64,8 @@ public class ColumnControl extends HBox {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
+		
+		setupKeyEvents();
 	}
 	
 	public void restoreColumns() {
@@ -222,5 +225,33 @@ public class ColumnControl extends HBox {
 		// because when this function is called, columns may not have been sized yet.
 		// In any case column width is set to COLUMN_WIDTH at minimum, so we can assume
 		// that they are that large.
+	}
+	private void setupKeyEvents() {
+		setOnKeyPressed(e -> {
+				switch (e.getCode()) {
+				case F:
+				case B:
+					e.consume();
+					handleKeys(e.getCode() == KeyCode.F);
+					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
+					break;
+				default:
+					break;
+				}
+		});
+	}
+
+	private void handleKeys(boolean isDownKey) {
+		if (!currentlySelectedColumn.isPresent()) return;
+		if (getChildren().size() == 0) return;
+		int newIndex = currentlySelectedColumn.get() + (isDownKey ? 1 : -1);
+		newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
+		currentlySelectedColumn = Optional.of(newIndex);
+		Column selectedColumn = getColumn(currentlySelectedColumn.get());
+		if(selectedColumn instanceof IssueColumn){
+			((IssueColumn) selectedColumn).filterTextField.requestFocus();
+		}
+
+		
 	}
 }

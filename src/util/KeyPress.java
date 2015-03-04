@@ -1,4 +1,4 @@
-package ui.issuepanel;
+package util;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
