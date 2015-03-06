@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,9 +19,7 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
-import org.ocpsoft.prettytime.PrettyTime;
 
-import service.IssueEventType;
 import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
@@ -71,7 +68,7 @@ public class TurboIssue implements Listable {
 
 	private WeakReference<Model> model;
 
-	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
+	private List<TurboIssueEvent> events = new ArrayList<>();
 
 	private List<Comment> comments = new ArrayList<>();
 	private boolean hasNewComments = false;
@@ -447,6 +444,18 @@ public class TurboIssue implements Listable {
 	
 	public void setComments(List<Comment> comments) {
 		this.comments = comments;
+	}
+
+	public boolean hasEvents() {
+		return events.size() > 0;
+	}
+
+	public List<TurboIssueEvent> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<TurboIssueEvent> events) {
+		this.events = events;
 	}
 
 	private void ______GETTERS_AND_SETTERS______() {
