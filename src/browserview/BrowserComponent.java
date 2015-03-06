@@ -103,6 +103,7 @@ public class BrowserComponent {
 	 */
 	public void onAppQuit() {
 		quit();
+		removeChromeDriverIfNecessary();
 	}
 
 	/**
@@ -141,6 +142,12 @@ public class BrowserComponent {
 				(int) availableDimensions.getHeight()));
 		initialiseJNA();
 		return driver;
+	}
+
+	private void removeChromeDriverIfNecessary() {
+		if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
+			new File(CHROME_DRIVER_BINARY_NAME).delete();
+		}
 	}
 
 	/**
