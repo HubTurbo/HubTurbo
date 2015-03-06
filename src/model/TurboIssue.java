@@ -2,8 +2,10 @@ package model;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +25,7 @@ import org.eclipse.egit.github.core.PullRequest;
 import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
+import sun.rmi.rmic.iiop.StaticStringsHash;
 import util.CollectionUtilities;
 import util.Utility;
 
@@ -387,8 +390,24 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 
-	public String getFeed(int hours) {
-		return "<activity feed>";
+	public String getFeed(final int withinHours) {
+		final LocalDateTime now = LocalDateTime.now();
+
+		List<TurboIssueEvent> eventsWithinDuration = events.stream()
+			.filter(event -> {
+				LocalDateTime eventTime = Utility.longToLocalDateTime(event.getDate().getTime());
+				int hours = Utility.safeLongToInt(getUpdatedAt().until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		return formatEvents(eventsWithinDuration);
+	}
+
+	private static String formatEvents(List<TurboIssueEvent> events) {
+		return events.stream()
+			.map(e -> e.toString())
+			.collect(Collectors.joining("\n"));
 	}
 
 	private List<TurboIssueEvent> getGitHubEvents() {

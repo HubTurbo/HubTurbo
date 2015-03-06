@@ -23,7 +23,6 @@ public class IssuePanelCard extends VBox {
 
 	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
-	private static final int HOURS_AGO = 24;
 	private static final String OCTICON_COMMENT = "\uf02b";
 	/**
 	 * A card that is constructed with an issue as argument. Its components
@@ -78,18 +77,19 @@ public class IssuePanelCard extends VBox {
 
 		// Return the first of the updated qualifiers, if there are multiple
 		Qualifier qualifier = filters.get(0);
-		
-		// Currently we show 24 hours or less only, clamping ranges
+
 		if (qualifier.getNumber().isPresent()) {
-			return Math.min(qualifier.getNumber().get(), HOURS_AGO);
+			return qualifier.getNumber().get();
 		} else {
+			// TODO support ranges properly. getFeed only supports <
 			assert qualifier.getNumberRange().isPresent();
-			if (qualifier.getNumberRange().get().getStart() == null) {
-				return Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO);
-			} else if (qualifier.getNumberRange().get().getEnd() == null) {
-				return Math.min(qualifier.getNumberRange().get().getStart(), HOURS_AGO);
+			if (qualifier.getNumberRange().get().getStart() != null) {
+				// TODO semantics are not exactly right
+				return qualifier.getNumberRange().get().getStart();
 			} else {
-				return Math.min(qualifier.getNumberRange().get().getStart(), Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO));
+				assert qualifier.getNumberRange().get().getEnd() != null;
+				// TODO semantics are not exactly right
+				return qualifier.getNumberRange().get().getEnd();
 			}
 		}
 	}

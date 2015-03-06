@@ -79,4 +79,9 @@ public class TurboIssueEvent {
 		assert type == IssueEventType.Assigned || type == IssueEventType.Unassigned;
 		this.assignedUser = assignedUser;
 	}
+
+	@Override
+	public String toString() {
+		return getType().toString();
+	}
 }
