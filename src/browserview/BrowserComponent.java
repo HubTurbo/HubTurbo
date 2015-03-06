@@ -54,6 +54,8 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
+	private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
+
 	private String pageContentOnLoad = "";
 
 	private static final int SWP_NOSIZE = 0x0001;
@@ -351,37 +353,38 @@ public class BrowserComponent {
 			browserWindowHandle = user32.FindWindow(null, "data:, - Google Chrome");
 		}
 	}
-	
+
+	private static String determineChromeDriverBinaryName() {
+		return PlatformSpecific.isOnMac() ? "chromedriver"
+			: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
+			: "chromedriver_linux";
+	}
+
 	/**
 	 * Ensures that the chromedriver executable is in the project root before
 	 * initialisation. Since executables are packaged for all platforms, this also
 	 * picks the right version to use.
 	 */
 	private static void setupChromeDriverExecutable() {
-		String binaryFileName =
-				PlatformSpecific.isOnMac() ? "chromedriver"
-				: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
-				: "chromedriver_linux";
-		
-		File f = new File(binaryFileName);
+		File f = new File(CHROME_DRIVER_BINARY_NAME);
 		if(!f.exists()) {
-			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + binaryFileName);
-			assert in != null : "Could not find " + binaryFileName + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
+			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
+			assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
 			OutputStream out;
 			try {
-				out = new FileOutputStream(binaryFileName);
+				out = new FileOutputStream(CHROME_DRIVER_BINARY_NAME);
 				IOUtils.copy(in, out);
 				out.close();
 				f.setExecutable(true);
 			} catch (IOException e) {
 				logger.error("Could not load Chrome driver binary! " + e.getLocalizedMessage(), e);
 			}
-			logger.info("Could not find " + binaryFileName + "; extracted it from jar");
+			logger.info("Could not find " + CHROME_DRIVER_BINARY_NAME + "; extracted it from jar");
 		} else {
-			logger.info("Located " + binaryFileName);
+			logger.info("Located " + CHROME_DRIVER_BINARY_NAME);
 		}
 		
-		System.setProperty("webdriver.chrome.driver", binaryFileName);
+		System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
 	}
 
 	/**
