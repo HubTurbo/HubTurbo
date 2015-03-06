@@ -400,7 +400,7 @@ public class TurboIssue implements Listable {
 		List<TurboIssueEvent> eventsWithinDuration = events.stream()
 			.filter(event -> {
 				LocalDateTime eventTime = Utility.longToLocalDateTime(event.getDate().getTime());
-				int hours = Utility.safeLongToInt(getUpdatedAt().until(now, ChronoUnit.HOURS));
+				int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
 				return hours < withinHours;
 			})
 			.collect(Collectors.toList());
