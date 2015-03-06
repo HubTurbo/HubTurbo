@@ -20,8 +20,8 @@ public class TurboIssueEvent {
 	private static final String OCTICON_ISSUE_CLOSED = "\uf028";
 	private static final String OCTICON_ISSUE_OPENED = "\uf027";
 	private static final String OCTICON_MEGAPHONE = "\uf077";
-	private static final String OCTICON_QUOTE = "\uf063";
 	private static final String OCTICON_PERSON = "\uf018";
+	public static final String OCTICON_QUOTE = "\uf063";
 
 	private Date date;
 	private IssueEventType type;
@@ -95,7 +95,7 @@ public class TurboIssueEvent {
 		this.assignedUser = assignedUser;
 	}
 
-	private static Label octicon(String which) {
+	public static Label octicon(String which) {
 		Label label = new Label(which);
 		HBox.setMargin(label, new Insets(0, 2, 0, 0));
 		label.getStyleClass().addAll("octicon", "issue-event-icon");

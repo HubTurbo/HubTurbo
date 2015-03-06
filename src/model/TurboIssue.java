@@ -2,7 +2,6 @@ package model;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -17,6 +16,7 @@ import javafx.collections.ObservableList;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +29,6 @@ import org.eclipse.egit.github.core.PullRequest;
 import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
-import sun.rmi.rmic.iiop.StaticStringsHash;
 import util.CollectionUtilities;
 import util.Utility;
 
@@ -410,7 +409,15 @@ public class TurboIssue implements Listable {
 			})
 			.collect(Collectors.toList());
 
-		return layoutEvents(eventsWithinDuration);
+		List<Comment> commentsWithinDuration = this.comments.stream()
+			.filter(comment -> {
+				LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+				int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		return layoutEvents(eventsWithinDuration, commentsWithinDuration);
 	}
 
 	/**
@@ -418,13 +425,31 @@ public class TurboIssue implements Listable {
 	 * @param events
 	 * @return
 	 */
-	private static Node layoutEvents(List<TurboIssueEvent> events) {
+	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
 		VBox result = new VBox();
-		result.setSpacing(4);
-		VBox.setMargin(result, new Insets(4, 0, 0, 0));
+		result.setSpacing(3);
+		VBox.setMargin(result, new Insets(3, 0, 0, 0));
+
+		// Events
 		events.stream()
 			.map(TurboIssueEvent::display)
 			.forEach(e -> result.getChildren().add(e));
+
+		// Comments
+		if (comments.size() > 0) {
+			String names = comments.stream()
+				.map(comment -> comment.getUser().getLogin())
+				.distinct()
+				.collect(Collectors.joining(", "));
+			HBox commentDisplay = new HBox();
+			commentDisplay.getChildren().addAll(
+				TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
+				new javafx.scene.control.Label(String.format("%d comments since, involving %s.", comments.size(),
+					names))
+			);
+			result.getChildren().add(commentDisplay);
+		}
+
 		return result;
 	}
 
