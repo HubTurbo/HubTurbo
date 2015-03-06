@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 
 import service.ServiceManager;
+import service.TurboIssueEvent;
 import ui.UI;
 
 
@@ -24,6 +25,22 @@ public class UpdatedIssueMetadata {
 
 	public void download() {
 		downloadComments();
+		downloadEvents();
+	}
+
+	public void downloadEvents() {
+		int issueCount = 0;
+		for (Integer issueId : UI.getInstance().getColumnControl().getUpdatedIssues()) {
+			++issueCount;
+			List<TurboIssueEvent> events = new ArrayList<>();
+			try {
+				events = serviceManager.getEvents(issueId);
+			} catch (IOException e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+			serviceManager.getModel().getIssueWithId(issueId).setEvents(events);
+		}
+		logger.info("Downloaded events for " + issueCount + " issues");
 	}
 
 	public void downloadComments() {
