@@ -56,7 +56,7 @@ public class IssuePanelCard extends VBox {
 		getChildren().addAll(issueTitle, issueDetails);
 
 		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			Node feed = issue.getEventDisplay(CARD_WIDTH, getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
+			Node feed = issue.getEventDisplay(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
 			getChildren().add(feed);
 		}
 	}

@@ -394,7 +394,12 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 
-	public Node getEventDisplay(int width, final int withinHours) {
+	/**
+	 * Creates a JavaFX node containing a graphical display of this issue's events.
+	 * @param withinHours
+	 * @return
+	 */
+	public Node getEventDisplay(final int withinHours) {
 		final LocalDateTime now = LocalDateTime.now();
 
 		List<TurboIssueEvent> eventsWithinDuration = events.stream()
@@ -408,6 +413,11 @@ public class TurboIssue implements Listable {
 		return layoutEvents(eventsWithinDuration);
 	}
 
+	/**
+	 * Given a list of issue events, returns a JavaFX node laying them out properly.
+	 * @param events
+	 * @return
+	 */
 	private static Node layoutEvents(List<TurboIssueEvent> events) {
 		VBox result = new VBox();
 		result.setSpacing(4);
@@ -418,6 +428,12 @@ public class TurboIssue implements Listable {
 		return result;
 	}
 
+	/**
+	 * Given a list of issue events, returns a textual representation of them,
+	 * concatenated together with newlines.
+	 * @param events
+	 * @return
+	 */
 	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
 		String text = events.stream()
 			.map(TurboIssueEvent::toString)
