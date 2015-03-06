@@ -95,7 +95,7 @@ public class TurboLabel implements Listable {
 	
 	public String toGhName() {
 		String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
-		String groupPrefix = getGroup() == null ? "" : getGroup() + groupDelimiter;
+		String groupPrefix = (getGroup() == null || getGroup().isEmpty()) ? "" : getGroup() + groupDelimiter;
 		String groupAppended = groupPrefix + getName();
 		return groupAppended;
 	}
