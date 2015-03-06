@@ -65,14 +65,7 @@ public class LabelDisplayBox extends FlowPane {
 		}
 		
 		for (TurboLabel label : labels) {
-			Label labelText = new Label(label.getName());
-			labelText.getStyleClass().add("labels");
-			labelText.setStyle(label.getStyle());
-			if (label.getGroup() != null) {
-				Tooltip groupTooltip = new Tooltip(label.getGroup());
-				labelText.setTooltip(groupTooltip);
-			}
-			getChildren().add(labelText);
+			getChildren().add(label.getNode());
 		}
 	}
 	

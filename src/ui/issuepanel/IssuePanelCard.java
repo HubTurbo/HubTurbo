@@ -120,14 +120,7 @@ public class IssuePanelCard extends VBox {
 		}
 		
 		for (TurboLabel label : issue.getLabels()) {
-			Label labelText = new Label(label.getName());
-			labelText.getStyleClass().add("labels");
-			labelText.setStyle(label.getStyle());
-			if (label.getGroup() != null) {
-				Tooltip groupTooltip = new Tooltip(label.getGroup());
-				labelText.setTooltip(groupTooltip);
-			}
-			issueDetails.getChildren().add(labelText);
+			issueDetails.getChildren().add(label.getNode());
 		}
 		
 		if(issue.getParentIssue() >= 0){

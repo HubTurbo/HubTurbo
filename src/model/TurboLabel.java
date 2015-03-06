@@ -116,7 +116,7 @@ public class TurboLabel implements Listable {
 		return ghLabels;
 	}
 	
-	public String getStyle() {
+	private String getStyle() {
 		String colour = getColour();
 		int R = Integer.parseInt(colour.substring(0, 2), 16);
 		int G = Integer.parseInt(colour.substring(2, 4), 16);
