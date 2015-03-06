@@ -2,18 +2,27 @@ package service;
 
 import java.util.Date;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import model.TurboLabel;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
-
 /**
  * Models an event that could happen to an issue.
  */
 public class TurboIssueEvent {
+	private static final String OCTICON_TAG = "\uf015";
+	private static final String OCTICON_MILESTONE = "\uf075";
+	private static final String OCTICON_ISSUE_CLOSED = "\uf028";
+	private static final String OCTICON_ISSUE_OPENED = "\uf027";
+	private static final String OCTICON_MEGAPHONE = "\uf077";
+	private static final String OCTICON_QUOTE = "\uf063";
+	private static final String OCTICON_PERSON = "\uf018";
+
 	private Date date;
 	private IssueEventType type;
 	private User actor;
@@ -86,21 +95,47 @@ public class TurboIssueEvent {
 		this.assignedUser = assignedUser;
 	}
 
+	private static Label octicon(String which) {
+		Label label = new Label(which);
+		HBox.setMargin(label, new Insets(0, 2, 0, 0));
+		label.getStyleClass().addAll("octicon", "issue-event-icon");
+		return label;
+	}
+
 	public Node display() {
 		String actorName = getActor().getLogin();
 		String time = new PrettyTime().format(getDate());
 
 		switch (getType()) {
-			case Renamed:
-				return new Text(String.format("%s renamed this issue %s.", actorName, time));
-			case Milestoned:
-				return new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time));
-			case Demilestoned:
-				return new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time));
+			case Renamed: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_MEGAPHONE),
+					new Text(String.format("%s renamed this issue %s.", actorName, time))
+				);
+				return display;
+			}
+			case Milestoned: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_MILESTONE),
+					new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time))
+				);
+				return display;
+			}
+			case Demilestoned: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_MILESTONE),
+					new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))
+				);
+				return display;
+			}
 			case Labeled: {
 				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
+					octicon(OCTICON_TAG),
 					new Text(String.format("%s added label ", actorName)),
 					label.getNode(),
 					new Text(String.format(" %s.", time))
@@ -111,20 +146,45 @@ public class TurboIssueEvent {
 				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
+					octicon(OCTICON_TAG),
 					new Text(String.format("%s removed label ", actorName)),
 					label.getNode(),
 					new Text(String.format(" %s.", time))
 				);
 				return display;
 			}
-			case Assigned:
-				return new Text(String.format("%s was assigned to this issue %s.", actorName, time));
-			case Unassigned:
-				return new Text(String.format("%s was unassigned from this issue %s.", actorName, time));
-			case Closed:
-				return new Text(String.format("%s closed this issue %s.", actorName, time));
-			case Reopened:
-				return new Text(String.format("%s reopened this issue %s.", actorName, time));
+			case Assigned: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_PERSON),
+					new Text(String.format("%s was assigned to this issue %s.", actorName, time))
+				);
+				return display;
+			}
+			case Unassigned: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_PERSON),
+					new Text(String.format("%s was unassigned from this issue %s.", actorName, time))
+				);
+				return display;
+			}
+			case Closed: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_ISSUE_CLOSED),
+					new Text(String.format("%s closed this issue %s.", actorName, time))
+				);
+				return display;
+			}
+			case Reopened: {
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					octicon(OCTICON_ISSUE_OPENED),
+					new Text(String.format("%s reopened this issue %s.", actorName, time))
+				);
+				return display;
+			}
 			case Locked:
 				return new Text(String.format("%s locked issue %s.", actorName, time));
 			case Unlocked:
