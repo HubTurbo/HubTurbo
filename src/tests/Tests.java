@@ -17,7 +17,8 @@ import service.ServiceManager;
 	FilterParserTests.class,
 	EventTests.class,
 	ServiceManagerTests.class,
-	ModelTests.class
+	ModelTests.class,
+	TickingTimerTests.class
 })
 
 public class Tests {

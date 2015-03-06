@@ -35,6 +35,7 @@ import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.PlatformEx;
 import util.PlatformSpecific;
 import util.Utility;
 import util.events.BoardSavedEvent;
@@ -49,11 +50,11 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
 public class UI extends Application implements EventDispatcher {
-	
-	private static final int VERSION_MAJOR = 1;
-	private static final int VERSION_MINOR = 9;
-	private static final int VERSION_PATCH = 2;
-	
+
+	private static final int VERSION_MAJOR = 2;
+	private static final int VERSION_MINOR = 1;
+	private static final int VERSION_PATCH = 0;
+
 	public static final String ARG_UPDATED_TO = "--updated-to";
 
 	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
@@ -62,7 +63,7 @@ public class UI extends Application implements EventDispatcher {
 	private static HWND mainWindowHandle;
 
 	// Main UI elements
-	
+
 	private Stage mainStage;
 	private ColumnControl columns;
 	private MenuControl menuBar;
@@ -70,17 +71,17 @@ public class UI extends Application implements EventDispatcher {
 	private RepositorySelector repoSelector;
 
 	// Events
-	
+
 	private EventBus events;
-	
+
 	// Application arguments
-	
+
 	private HashMap<String, String> commandLineArgs;
-		
+
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
-	
+
 	private static UI instance;
 	public static UI getInstance() {
 		return instance;
@@ -88,21 +89,22 @@ public class UI extends Application implements EventDispatcher {
 
 	@Override
 	public void start(Stage stage) throws IOException {
-		
+
 		instance = this;
-		
+
 		//log all uncaught exceptions
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
             logger.error(throwable.getMessage(), throwable);
         });
-		
+
 		events = new EventBus();
-		
+
+		commandLineArgs = initialiseCommandLineArguments();
+		DataManager.getInstance();
+
 		repoSelector = createRepoSelector();
-		
+
 		browserComponent = new BrowserComponent(this);
-		initialiseJNA();
-		
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -111,9 +113,6 @@ public class UI extends Application implements EventDispatcher {
 		loadFonts();
 		applyCSS(scene);
 		getUserCredentials();
-		commandLineArgs = initialiseCommandLineArguments();
-		
-		DataManager.getInstance();
 	}
 
 	private void getUserCredentials() {
@@ -137,9 +136,9 @@ public class UI extends Application implements EventDispatcher {
 			return false;
 		});
 	}
-	
+
 	private static String CSS = "";
-	
+
 	public void initCSS() {
 		CSS = this.getClass().getResource("hubturbo.css").toString();
 	}
@@ -148,43 +147,46 @@ public class UI extends Application implements EventDispatcher {
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(CSS);
 	}
-	
+
 	public static void loadFonts(){
 		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
-		
+
 	private void setupMainStage(Scene scene) {
 		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
 		mainStage.setScene(scene);
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
+		initialiseJNA(mainStage.getTitle());
 		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> ov, Boolean was, Boolean is) {
-				if (is) {
-					
-					if (PlatformSpecific.isOnWindows()) {
-						browserComponent.focus(mainWindowHandle);
-					}
-
-					// Only if the window is in focus and repo switching is not disabled
-					// (disabled => an update is in progress; do nothing) do we update
-					if (isRepoSwitchingAllowed()) {
+			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
+				if (!isFocused) {
+					return;
+				}
+				if (PlatformSpecific.isOnWindows()) {
+					browserComponent.focus(mainWindowHandle);
+				}
+				PlatformEx.runLaterDelayed(() -> {
+					// A refresh is triggered if:
+					// 1. Repo-switching is not disabled (meaning an update is not in progress)
+					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
+					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+					if (shouldRefresh) {
 						logger.info("Gained focus; refreshing");
 						ServiceManager.getInstance().updateModelNow();
-						ServiceManager.getInstance().resetTimeRemainingUntilRefresh();
 					}
-				}
+				});
 			}
 		});
 	}
-	
-	private static void initialiseJNA() {
+
+	private static void initialiseJNA(String windowTitle) {
 		if (PlatformSpecific.isOnWindows()) {
-			mainWindowHandle = User32.INSTANCE.GetForegroundWindow();
+			mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
 		}
 	}
-	
+
 	private HashMap<String, String> initialiseCommandLineArguments() {
 		Parameters params = getParameters();
 		final List<String> parameters = params.getRaw();
@@ -197,7 +199,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void quit() {
-		ServiceManager.getInstance().shutdownModelUpdate();
+		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();
 		DataManager.getInstance().saveSessionConfig();
@@ -205,11 +207,11 @@ public class UI extends Application implements EventDispatcher {
 		Platform.exit();
 		System.exit(0);
 	}
-	
+
 	private Parent createRoot() throws IOException {
 
 		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
-		
+
 		VBox top = new VBox();
 
 		ScrollPane columnsScrollPane = new ScrollPane(columns);
@@ -217,7 +219,7 @@ public class UI extends Application implements EventDispatcher {
 		columnsScrollPane.setFitToHeight(true);
 		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
-		
+
 		menuBar = new MenuControl(this, columns, columnsScrollPane);
 		top.getChildren().addAll(menuBar, repoSelector);
 
@@ -232,7 +234,6 @@ public class UI extends Application implements EventDispatcher {
 	/**
 	 * Sets the dimensions of the stage to the maximum usable size
 	 * of the desktop, or to the screen size if this fails.
-	 * @param mainStage
 	 */
 	private Rectangle getDimensions() {
 		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
@@ -242,7 +243,7 @@ public class UI extends Application implements EventDispatcher {
 			return Utility.getScreenDimensions();
 		}
 	}
-	
+
 	/**
 	 * UI operations
 	 */
@@ -252,22 +253,22 @@ public class UI extends Application implements EventDispatcher {
 		events.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
-	
+
 	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
 		events.post(event);
 		logger.info("Triggered event " + event.getClass().getSimpleName());
 	}
-	
+
 	public ColumnControl getColumnControl() {
 		return columns;
 	}
-	
+
 	public BrowserComponent getBrowserComponent() {
 		return browserComponent;
 	}
-	
+
 	/**
 	 * Tracks whether or not the window is in an expanded state.
 	 */
@@ -297,7 +298,7 @@ public class UI extends Application implements EventDispatcher {
 		}
 		return mainStage.getWidth();
 	}
-	
+
 	/**
 	 * Returns the dimensions of the screen available for use when
 	 * the main window is in a collapsed state.
@@ -341,13 +342,13 @@ public class UI extends Application implements EventDispatcher {
 	public HashMap<String, String> getCommandLineArgs() {
 		return commandLineArgs;
 	}
-	
+
 	private RepositorySelector createRepoSelector() {
 		RepositorySelector repoSelector = new RepositorySelector();
 		repoSelector.setOnValueChange(this::loadRepo);
 		return repoSelector;
 	}
-	
+
 	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		try {
 			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
@@ -357,11 +358,11 @@ public class UI extends Application implements EventDispatcher {
 				return false;
 			}
 		} catch (SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection Timeout", 
+			DialogMessage.showWarningDialog("Internet Connection Timeout",
 					"Timeout while connecting to GitHub, please check your internet connection.");
 			logger.error(e.getLocalizedMessage(), e);
 		} catch (UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection", 
+			DialogMessage.showWarningDialog("No Internet Connection",
 					"Please check your internet connection and try again.");
 			logger.error(e.getLocalizedMessage(), e);
 		}catch (IOException e) {
@@ -369,9 +370,9 @@ public class UI extends Application implements EventDispatcher {
 		}
 		return true;
 	}
-	
+
 	private boolean repoSwitchingAllowed = true;
-	
+
 	public boolean isRepoSwitchingAllowed() {
 		return repoSwitchingAllowed;
 	}
@@ -391,42 +392,27 @@ public class UI extends Application implements EventDispatcher {
 	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
-		if(repoId == null 
-		  || repoId.equals(ServiceManager.getInstance().getRepoId()) 
+		if(repoId == null
+		  || repoId.equals(ServiceManager.getInstance().getRepoId())
 		  || !checkRepoAccess(repoId)){
 			return;
 		}
-		
+
 		logger.info("Switching repository to " + repoString + " in progress");
-		
+
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
-		
+
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override
 			protected Boolean call() throws IOException {
-				ServiceManager.getInstance().stopModelUpdate();
-				HashMap<String, List> items =  ServiceManager.getInstance().getResources(repoId);
-			
-				ServiceManager.getInstance().getModel().populateComponents(repoId, items);
-				
-				try {
-					ServiceManager.getInstance().updateModelNow().await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
 
-				final CountDownLatch latch = new CountDownLatch(1);
-				Platform.runLater(() -> {
-					columns.restoreColumns();
-					triggerEvent(new BoardSavedEvent());
-					latch.countDown();
-				});
-				try {
-					latch.await();
-				} catch (InterruptedException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+				ServiceManager.getInstance().switchRepository(repoId);
+
+                PlatformEx.runAndWait(() -> {
+                    columns.restoreColumns();
+                    triggerEvent(new BoardSavedEvent());
+                });
 				return true;
 			}
 		};
@@ -434,14 +420,12 @@ public class UI extends Application implements EventDispatcher {
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
-			
+
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents();
-			HTStatusBar.displayMessage("Issues loaded successfully!");
-			ServiceManager.getInstance().updateModelPeriodically();
 			logger.info("Repository " + repoString + " successfully switched to!");
 		});
-			
+
 		task.setOnFailed(wse -> {
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);

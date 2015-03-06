@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import javafx.concurrent.Task;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -53,7 +54,10 @@ public class BrowserComponent {
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
-	
+	private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
+
+	private String pageContentOnLoad = "";
+
 	private static final int SWP_NOSIZE = 0x0001;
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
@@ -91,7 +95,6 @@ public class BrowserComponent {
 	public void initialise() {
 		assert driver == null;
 		driver = createChromeDriver();
-		initialiseJNA();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
 	
@@ -100,6 +103,7 @@ public class BrowserComponent {
 	 */
 	public void onAppQuit() {
 		quit();
+		removeChromeDriverIfNecessary();
 	}
 
 	/**
@@ -136,7 +140,14 @@ public class BrowserComponent {
 		driver.manage().window().setSize(new Dimension(
 				(int) availableDimensions.getWidth(),
 				(int) availableDimensions.getHeight()));
+		initialiseJNA();
 		return driver;
+	}
+
+	private void removeChromeDriverIfNecessary() {
+		if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
+			new File(CHROME_DRIVER_BINARY_NAME).delete();
+		}
 	}
 
 	/**
@@ -244,25 +255,27 @@ public class BrowserComponent {
 		});
 	}
 	
+	public void jumpToComment(){
+		WebElement comment = driver.findElementById("new_comment_field");
+		comment.click();
+		bringToTop();
+	}
+	
 	private boolean isBrowserActive(){
+		if (driver == null){
+			logger.warn("chromedriver process was killed !");
+			return false;
+ 		}
 		try {
-			if (driver.getCurrentUrl().isEmpty() && driver != null){
+			String url = driver.getCurrentUrl();
+			if(url.isEmpty() || url == null){
 				return false;
 			}
-			else if (driver == null){
-				return false;
-			}
-			return true;
+		} catch (WebDriverException e){
+			logger.warn("Unable to read url from bview. Resetting.");
+			return false;
 		}
-		catch (WebDriverException e) {
-			switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-				case NoSuchWindow:
-					resetBrowser();
-				default:
-					break;
-				}
-				return false;
-			}
+		return true;
 	}
 
 	//	A helper function for reseting browser.
@@ -284,21 +297,25 @@ public class BrowserComponent {
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
-				try {
-					if (isBrowserActive()) {
+				if (isBrowserActive()) {
+					try {
 						operation.run();
+						pageContentOnLoad = getCurrentPageSource();
+					} catch (WebDriverException e) {
+						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+						case NoSuchWindow:
+							resetBrowser();
+							runBrowserOperation(operation); // Recurse and repeat
+						case NoSuchElement:
+							logger.info("Warning: no such element! " + e.getMessage());
+							break;
+						default:
+							break;
+						}
 					}
-				} catch (WebDriverException e) {
-					switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-					case NoSuchWindow:
-						resetBrowser();
-						runBrowserOperation(operation); // Recurse and repeat
-					case NoSuchElement:
-						logger.info("Warning: no such element! " + e.getMessage());
-						break;
-					default:
-						break;
-					}
+				} else {
+					logger.info("Chrome window not responding.");
+					resetBrowser();
 				}
 				return null;
 			}
@@ -340,40 +357,41 @@ public class BrowserComponent {
 	 */
 	private void initialiseJNA() {
 		if (PlatformSpecific.isOnWindows()) {
-			browserWindowHandle = user32.GetForegroundWindow();
+			browserWindowHandle = user32.FindWindow(null, "data:, - Google Chrome");
 		}
 	}
-	
+
+	private static String determineChromeDriverBinaryName() {
+		return PlatformSpecific.isOnMac() ? "chromedriver"
+			: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
+			: "chromedriver_linux";
+	}
+
 	/**
 	 * Ensures that the chromedriver executable is in the project root before
 	 * initialisation. Since executables are packaged for all platforms, this also
 	 * picks the right version to use.
 	 */
 	private static void setupChromeDriverExecutable() {
-		String binaryFileName =
-				PlatformSpecific.isOnMac() ? "chromedriver"
-				: PlatformSpecific.isOnWindows() ? "chromedriver.exe"
-				: "chromedriver_linux";
-		
-		File f = new File(binaryFileName);
+		File f = new File(CHROME_DRIVER_BINARY_NAME);
 		if(!f.exists()) {
-			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + binaryFileName);
-			assert in != null : "Could not find " + binaryFileName + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
+			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
+			assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
 			OutputStream out;
 			try {
-				out = new FileOutputStream(binaryFileName);
+				out = new FileOutputStream(CHROME_DRIVER_BINARY_NAME);
 				IOUtils.copy(in, out);
 				out.close();
 				f.setExecutable(true);
 			} catch (IOException e) {
 				logger.error("Could not load Chrome driver binary! " + e.getLocalizedMessage(), e);
 			}
-			logger.info("Could not find " + binaryFileName + "; extracted it from jar");
+			logger.info("Could not find " + CHROME_DRIVER_BINARY_NAME + "; extracted it from jar");
 		} else {
-			logger.info("Located " + binaryFileName);
+			logger.info("Located " + CHROME_DRIVER_BINARY_NAME);
 		}
 		
-		System.setProperty("webdriver.chrome.driver", binaryFileName);
+		System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
 	}
 
 	/**
@@ -403,8 +421,23 @@ public class BrowserComponent {
 	
 	public void focus(HWND mainWindowHandle){
 		if (PlatformSpecific.isOnWindows()) {
+			user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
 			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
 			user32.SetForegroundWindow(mainWindowHandle);
 		}
+	}
+
+	private String getCurrentPageSource() {
+		JavascriptExecutor executor = (JavascriptExecutor) driver;
+		String result = StringEscapeUtils.escapeHtml4((String) executor.executeScript("return document.documentElement.outerHTML"));
+		return result;
+	}
+	
+	public boolean hasBviewChanged() {
+		if (getCurrentPageSource().equals(pageContentOnLoad)){
+			return false;
+		}
+		pageContentOnLoad = getCurrentPageSource();
+		return true;
 	}
 }
