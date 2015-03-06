@@ -3,6 +3,7 @@ package service;
 import java.util.Date;
 
 import org.eclipse.egit.github.core.User;
+import org.ocpsoft.prettytime.PrettyTime;
 
 /**
  * Models an event that could happen to an issue.
@@ -82,6 +83,67 @@ public class TurboIssueEvent {
 
 	@Override
 	public String toString() {
-		return getType().toString();
+		String actorName = getActor().getLogin();
+		String time = new PrettyTime().format(getDate());
+		String message;
+
+		switch (getType()) {
+			case Renamed:
+				message = String.format("%s renamed this issue %s.", actorName, time);
+				break;
+			case Milestoned:
+				message = String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time);
+				break;
+			case Demilestoned:
+				message = String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time);
+				break;
+			case Labeled:
+				message = String.format("%s added label %s %s.", actorName, getLabelName(), time);
+				break;
+			case Unlabeled:
+				message = String.format("%s removed label %s %s.", actorName, getLabelName(), time);
+				break;
+			case Assigned:
+				message = String.format("%s was assigned to this issue %s.", actorName, time);
+				break;
+			case Unassigned:
+				message = String.format("%s was unassigned from this issue %s.", actorName, time);
+				break;
+			case Closed:
+				message = String.format("%s closed this issue %s.", actorName, time);
+				break;
+			case Reopened:
+				message = String.format("%s reopened this issue %s.", actorName, time);
+				break;
+			case Locked:
+				message = String.format("%s locked issue %s.", actorName, time);
+				break;
+			case Unlocked:
+				message = String.format("%s unlocked this issue %s.", actorName, time);
+				break;
+			case Referenced:
+				message = String.format("%s referenced this issue %s.", actorName, time);
+				break;
+			case Subscribed:
+				message = String.format("%s subscribed to receive notifications for this issue %s.", actorName, time);
+				break;
+			case Mentioned:
+				message = String.format("%s was mentioned %s.", actorName, time);
+				break;
+			case Merged:
+				message = String.format("%s merged this issue %s.", actorName, time);
+				break;
+			case HeadRefDeleted:
+				message = String.format("%s deleted the pull request's branch %s.", actorName, time);
+				break;
+			case HeadRefRestored:
+				message = String.format("%s restored the pull request's branch %s.", actorName, time);
+				break;
+			default:
+				// Not yet implemented, or no events triggered
+				message = String.format("%s %s %s.", actorName, getType(), time);
+				break;
+		}
+		return message;
 	}
 }
