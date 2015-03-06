@@ -98,6 +98,10 @@
 	-fx-padding: -2 0 2 3;
 }
 
+.issue-event-icon {
+	-fx-padding: -4 0 0 0;
+}
+
 .button-github-octicon {
 	-fx-padding: 0;
 	-fx-font-family: github-octicons;

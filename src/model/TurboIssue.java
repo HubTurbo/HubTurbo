@@ -9,21 +9,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
-import org.ocpsoft.prettytime.PrettyTime;
 
-import service.IssueEventType;
 import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
@@ -72,29 +74,12 @@ public class TurboIssue implements Listable {
 
 	private WeakReference<Model> model;
 
-	private String activityFeed = "";
+	private List<TurboIssueEvent> events = new ArrayList<>();
 
-	private List<TurboIssueEvent> issueFeeds = new ArrayList<TurboIssueEvent>();
-	private boolean hasAddedFeeds = false;
-	private boolean hasNewComments = false;
-	private LocalDateTime lastModifiedTime;
-	private String previousActor;
-	private String previousPTime;
-	private String previousMessage;
-	private String currentActor;
-	private String currentPTime;
-	private String currentMessage;
-
-	private ArrayList<String> labelsAdded = new ArrayList<String>();
-	private ArrayList<String> labelsRemoved = new ArrayList<String>();
-	private ArrayList<String> milestonesAdded = new ArrayList<String>();
-	private ArrayList<String> milestonesRemoved = new ArrayList<String>();
-
-	private int labeledCount = 0;
-	private int unlabeledCount = 0;
-	private int milestonedCount = 0;
-	private int demilestonedCount = 0;
 	private List<Comment> comments = new ArrayList<>();
+	private boolean hasNewComments = false;
+
+	private LocalDateTime lastModifiedTime;
 
 	private void ______ESSENTIALS______() {
 	}
@@ -265,15 +250,6 @@ public class TurboIssue implements Listable {
 		return pullRequest != null && pullRequest.getUrl() != null;
 	}
 
-	public final String getActivityFeed() {
-		return activityFeed;
-	}
-
-	public final void setActivityFeed(String value, LocalDateTime time) {
-		lastModifiedTime = time;
-		activityFeed = value;
-	}
-
 	public final TurboIssue parentReference() {
 		if (getParentIssue() != -1) {
 			return model.get().getIssueWithId(getParentIssue());
@@ -417,297 +393,91 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 
-	public String getFeeds(int hours, int minutes, int seconds) {
-		LocalDateTime currentTime = LocalDateTime.now();
-		LocalDateTime cutoffTime;
-		if (!hasAddedFeeds || hasNewComments) {
-			cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
-			if (cutoffTime.isAfter(getUpdatedAt())) {
-				// No activity feed to display
-				setActivityFeed("", currentTime);
-			} else {
-				issueFeeds.clear();
-				issueFeeds.addAll(getGithubFeed());
-				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
-			}
-			hasAddedFeeds = true;
-		} else {
-			cutoffTime = lastModifiedTime;
-			if (cutoffTime.isAfter(getUpdatedAt())) {
-				// No new activity for this issue
-				LocalDateTime refreshTime = currentTime.minusMinutes(REFRESH_FEED_MINUTES);
-				if (refreshTime.isAfter(lastModifiedTime)) {
-					// Check to update pretty time
-					setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
-				}
-			} else {
-				issueFeeds.clear();
-				issueFeeds.addAll(getGithubFeed());
-				setActivityFeed(formatFeeds(hours, minutes, seconds), currentTime);
-			}
-		}
-		return getActivityFeed();
+	/**
+	 * Creates a JavaFX node containing a graphical display of this issue's events.
+	 * @param withinHours
+	 * @return
+	 */
+	public Node getEventDisplay(final int withinHours) {
+		final LocalDateTime now = LocalDateTime.now();
+
+		List<TurboIssueEvent> eventsWithinDuration = events.stream()
+			.filter(event -> {
+				LocalDateTime eventTime = Utility.longToLocalDateTime(event.getDate().getTime());
+				int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		List<Comment> commentsWithinDuration = this.comments.stream()
+			.filter(comment -> {
+				LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+				int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		return layoutEvents(eventsWithinDuration, commentsWithinDuration);
 	}
 
-	/*
-	 * Private Methods
+	/**
+	 * Given a list of issue events, returns a JavaFX node laying them out properly.
+	 * @param events
+	 * @return
 	 */
+	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
+		VBox result = new VBox();
+		result.setSpacing(3);
+		VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
-	private List<TurboIssueEvent> getGithubFeed() {
+		// Events
+		events.stream()
+			.map(TurboIssueEvent::display)
+			.forEach(e -> result.getChildren().add(e));
+
+		// Comments
+		if (comments.size() > 0) {
+			String names = comments.stream()
+				.map(comment -> comment.getUser().getLogin())
+				.distinct()
+				.collect(Collectors.joining(", "));
+			HBox commentDisplay = new HBox();
+			commentDisplay.getChildren().addAll(
+				TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
+				new javafx.scene.control.Label(String.format("%d comments since, involving %s.", comments.size(),
+					names))
+			);
+			result.getChildren().add(commentDisplay);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Given a list of issue events, returns a textual representation of them,
+	 * concatenated together with newlines.
+	 * @param events
+	 * @return
+	 */
+	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
+		String text = events.stream()
+			.map(TurboIssueEvent::toString)
+			.collect(Collectors.joining("\n"));
+
+		Text display = new Text(text);
+		display.setWrappingWidth(width);
+		display.getStyleClass().add("issue-panel-feed");
+		return display;
+	}
+
+	private List<TurboIssueEvent> getGitHubEvents() {
 		List<TurboIssueEvent> feeds = new ArrayList<TurboIssueEvent>();
 		try {
-			feeds = ServiceManager.getInstance().getFeeds(getId());
+			feeds = ServiceManager.getInstance().getEvents(getId());
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		return feeds;
-	}
-
-	private String formatFeeds(int hours, int minutes, int seconds) {
-		LocalDateTime currentTime = LocalDateTime.now();
-		LocalDateTime cutoffTime = currentTime.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds);
-		ArrayList<String> feedMessages = new ArrayList<String>();
-		ArrayList<String> tempMessages = new ArrayList<String>();
-		ArrayList<IssueEventType> eventSeq = new ArrayList<IssueEventType>();
-
-		previousActor = "";
-		previousPTime = "";
-		previousMessage = "";
-		currentMessage = "";
-		for (TurboIssueEvent event : issueFeeds) {
-			if (LocalDateTime.ofInstant(event.getDate().toInstant(), ZoneId.systemDefault()).isAfter(cutoffTime)) {
-				if (isNewEvent(event)) {
-					feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
-					tempMessages.clear();
-					eventSeq.clear();
-				}
-				eventSeq.add(event.getType());
-				currentMessage = formatMessage(currentActor, currentPTime, event);
-				if (currentMessage != null && !currentMessage.isEmpty() && !currentMessage.equals(previousMessage)) {
-					tempMessages.add(currentMessage);
-					previousMessage = currentMessage;
-				}
-			}
-		}
-		feedMessages.addAll(outputToBuffer(tempMessages, eventSeq));
-		if (hasComments()) {
-			feedMessages.add(formatComments(hours));
-		}
-		return outputReverseOrder(feedMessages);
-	}
-	
-	private String formatComments(int hours) {
-		LocalDateTime currentTime = LocalDateTime.now();
-		List<Comment> comments = this.comments.stream()
-			.filter(comment -> {
-				LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
-				int hoursBetween = Utility.safeLongToInt(created.until(currentTime, ChronoUnit.HOURS));
-				return hoursBetween < hours;
-			})
-			.collect(Collectors.toList());
-		List<String> names = new ArrayList<>(comments.stream()
-			.map(comment -> comment.getUser().getLogin())
-			.collect(Collectors.toSet()));
-		StringBuilder allNames = new StringBuilder();
-
-		for (int i=0; i<names.size()-1; i++) {
-			allNames.append(names.get(i)).append(" ");
-		}
-		return comments.size() + " comments since, involving " + allNames;
-	}
-
-	private ArrayList<String> outputToBuffer(ArrayList<String> inputBuffer, ArrayList<IssueEventType> inputSeq) {
-		ArrayList<String> outputBuffer = new ArrayList<String>();
-		int bufferIndex = 0;
-
-		for (IssueEventType eventType : inputSeq) {
-			switch (eventType) {
-			case Milestoned:
-			case Demilestoned:
-				if (milestonedCount > 0 || demilestonedCount > 0) {
-					outputBuffer.add(aggregateMilestoneEvent());
-				}
-				break;
-			case Labeled:
-			case Unlabeled:
-				if (labeledCount > 0 || unlabeledCount > 0) {
-					outputBuffer.add(aggregateLabelEvent());
-				}
-				break;
-			default:
-				if (bufferIndex < inputBuffer.size()) {
-					outputBuffer.add(inputBuffer.get(bufferIndex));
-					++bufferIndex;
-				}
-			}
-		}
-		previousActor = currentActor;
-		previousPTime = currentPTime;
-		return outputBuffer;
-	}
-
-	private String outputReverseOrder(ArrayList<String> bufferList) {
-		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = bufferList.size(); i > 0; i--) {
-			if (i == bufferList.size()) {
-				stringBuffer.append(bufferList.get(i - 1));
-			} else {
-				stringBuffer.append(NEW_LINE + bufferList.get(i - 1));
-			}
-		}
-		return stringBuffer.toString();
-	}
-
-	private boolean isNewEvent(TurboIssueEvent issueEvent) {
-		PrettyTime pt = new PrettyTime();
-		currentPTime = pt.format(issueEvent.getDate());
-		currentActor = issueEvent.getActor().getLogin();
-		if (currentActor.equalsIgnoreCase(previousActor) && currentPTime.equalsIgnoreCase(previousPTime)) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private String aggregateLabelEvent() {
-		String affectedLabels;
-		String message;
-		if (labeledCount > 0 && unlabeledCount > 0) {
-			affectedLabels = labelsAdded.get(0);
-			for (int i = 1; i < labelsAdded.size(); ++i) {
-				affectedLabels += ", " + labelsAdded.get(i);
-			}
-			String removedLabels = labelsRemoved.get(0);
-			for (int i = 1; i < labelsRemoved.size(); ++i) {
-				removedLabels += ", " + labelsRemoved.get(i);
-			}
-			message = String.format("%s added %s and removed %s labels %s.", previousActor, affectedLabels,
-					removedLabels, previousPTime);
-		} else if (labeledCount == 1) {
-			affectedLabels = labelsAdded.get(0);
-			message = String.format("%s added %s label %s.", previousActor, affectedLabels, previousPTime);
-		} else if (labeledCount > 1) {
-			affectedLabels = labelsAdded.get(0);
-			for (int i = 1; i < labelsAdded.size(); ++i) {
-				affectedLabels += ", " + labelsAdded.get(i);
-			}
-			message = String.format("%s added %s labels %s.", previousActor, affectedLabels, previousPTime);
-		} else if (unlabeledCount == 1) {
-			affectedLabels = labelsRemoved.get(0);
-			message = String.format("%s removed %s label %s.", previousActor, affectedLabels, previousPTime);
-		} else {
-			// (unlabeledCount > 1)
-			affectedLabels = labelsRemoved.get(0);
-			for (int i = 1; i < labelsRemoved.size(); ++i) {
-				affectedLabels += ", " + labelsRemoved.get(i);
-			}
-			message = String.format("%s removed %s labels %s.", previousActor, affectedLabels, previousPTime);
-		}
-		labeledCount = 0;
-		unlabeledCount = 0;
-		labelsAdded.clear();
-		labelsRemoved.clear();
-		return message;
-	}
-
-	private String aggregateMilestoneEvent() {
-		String affectedMilestones;
-		String message;
-		if (milestonedCount > 0 && demilestonedCount > 0) {
-			affectedMilestones = milestonesAdded.get(0);
-			for (int i = 1; i < milestonesAdded.size(); ++i) {
-				affectedMilestones += ", " + milestonesAdded.get(i);
-			}
-			for (int i = 0; i < milestonesRemoved.size(); ++i) {
-				affectedMilestones += ", " + milestonesRemoved.get(i);
-			}
-			message = String.format("%s modified the milestone: %s %s.", previousActor, affectedMilestones,
-					previousPTime);
-		} else if (milestonedCount > 0) {
-			affectedMilestones = milestonesAdded.get(0);
-			for (int i = 1; i < milestonesAdded.size(); ++i) {
-				affectedMilestones += ", " + milestonesAdded.get(i);
-			}
-			message = String.format("%s added to %s milestone %s.", previousActor, affectedMilestones, previousPTime);
-		} else {
-			// (demilestonedCount > 0)
-			affectedMilestones = milestonesRemoved.get(0);
-			for (int i = 1; i < milestonesRemoved.size(); ++i) {
-				affectedMilestones += ", " + milestonesRemoved.get(i);
-			}
-			message = String.format("%s removed from %s milestone %s.", previousActor, affectedMilestones,
-					previousPTime);
-		}
-		milestonedCount = 0;
-		demilestonedCount = 0;
-		milestonesAdded.clear();
-		milestonesRemoved.clear();
-		return message;
-	}
-
-	private String formatMessage(String actorName, String timeString, TurboIssueEvent issueEvent) {
-		String message = "";
-		switch (issueEvent.getType()) {
-		case Renamed:
-			message = String.format("%s renamed this issue %s.", actorName, timeString);
-			break;
-		case Milestoned:
-			milestonedCount++;
-			milestonesAdded.add(issueEvent.getMilestoneTitle());
-			break;
-		case Demilestoned:
-			demilestonedCount++;
-			milestonesRemoved.add(issueEvent.getMilestoneTitle());
-			break;
-		case Labeled:
-			labeledCount++;
-			labelsAdded.add(issueEvent.getLabelName());
-			break;
-		case Unlabeled:
-			unlabeledCount++;
-			labelsRemoved.add(issueEvent.getLabelName());
-			break;
-		case Assigned:
-			message = String.format("%s was assigned to this issue %s.", actorName, timeString);
-			break;
-		case Unassigned:
-			message = String.format("%s was unassigned from this issue %s.", actorName, timeString);
-			break;
-		case Closed:
-			message = String.format("%s closed this issue %s.", actorName, timeString);
-			break;
-		case Reopened:
-			message = String.format("%s reopened this issue %s.", actorName, timeString);
-			break;
-		case Locked:
-			message = String.format("%s locked issue %s.", actorName, timeString);
-			break;
-		case Unlocked:
-			message = String.format("%s unlocked this issue %s.", actorName, timeString);
-			break;
-		case Referenced:
-			message = String.format("%s referenced this issue %s.", actorName, timeString);
-			break;
-		case Subscribed:
-			message = String.format("%s subscribed to receive notifications for this issue %s.", actorName, timeString);
-			break;
-		case Mentioned:
-			message = String.format("%s was mentioned %s.", actorName, timeString);
-			break;
-		case Merged:
-			message = String.format("%s merged this issue %s.", actorName, timeString);
-			break;
-		case HeadRefDeleted:
-			message = String.format("%s deleted the pull request's branch %s.", actorName, timeString);
-			break;
-		case HeadRefRestored:
-			message = String.format("%s restored the pull request's branch %s.", actorName, timeString);
-			break;
-		default:
-			// Not yet implemented, or no events triggered
-			message = String.format("%s %s %s.", actorName, issueEvent.getType().toString(), timeString);
-		}
-		return message;
 	}
 
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
@@ -752,8 +522,19 @@ public class TurboIssue implements Listable {
 	}
 	
 	public void setComments(List<Comment> comments) {
-		hasNewComments = true;
 		this.comments = comments;
+	}
+
+	public boolean hasEvents() {
+		return events.size() > 0;
+	}
+
+	public List<TurboIssueEvent> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<TurboIssueEvent> events) {
+		this.events = events;
 	}
 
 	private void ______GETTERS_AND_SETTERS______() {

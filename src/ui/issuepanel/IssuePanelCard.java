@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -23,9 +24,6 @@ public class IssuePanelCard extends VBox {
 
 	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
-	private static final int HOURS_AGO = 24;
-	private static final int MINUTES_AGO = 0;
-	private static final int SECONDS_AGO = 0;
 	private static final String OCTICON_COMMENT = "\uf02b";
 	/**
 	 * A card that is constructed with an issue as argument. Its components
@@ -55,18 +53,11 @@ public class IssuePanelCard extends VBox {
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
 
+		getChildren().addAll(issueTitle, issueDetails);
+
 		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			String feed = issue.getFeeds(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()), MINUTES_AGO, SECONDS_AGO);
-			if (feed != null && !feed.isEmpty()) {
-				Text issueFeed = new Text(feed);
-				issueFeed.setWrappingWidth(CARD_WIDTH);
-				issueFeed.getStyleClass().add("issue-panel-feed");
-				getChildren().addAll(issueTitle, issueDetails, issueFeed);
-			} else {
-				getChildren().addAll(issueTitle, issueDetails);
-			}
-		} else {
-			getChildren().addAll(issueTitle, issueDetails);
+			Node feed = issue.getEventDisplay(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
+			getChildren().add(feed);
 		}
 	}
 	
@@ -80,18 +71,19 @@ public class IssuePanelCard extends VBox {
 
 		// Return the first of the updated qualifiers, if there are multiple
 		Qualifier qualifier = filters.get(0);
-		
-		// Currently we show 24 hours or less only, clamping ranges
+
 		if (qualifier.getNumber().isPresent()) {
-			return Math.min(qualifier.getNumber().get(), HOURS_AGO);
+			return qualifier.getNumber().get();
 		} else {
+			// TODO support ranges properly. getEventDisplay only supports <
 			assert qualifier.getNumberRange().isPresent();
-			if (qualifier.getNumberRange().get().getStart() == null) {
-				return Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO);
-			} else if (qualifier.getNumberRange().get().getEnd() == null) {
-				return Math.min(qualifier.getNumberRange().get().getStart(), HOURS_AGO);
+			if (qualifier.getNumberRange().get().getStart() != null) {
+				// TODO semantics are not exactly right
+				return qualifier.getNumberRange().get().getStart();
 			} else {
-				return Math.min(qualifier.getNumberRange().get().getStart(), Math.min(qualifier.getNumberRange().get().getEnd(), HOURS_AGO));
+				assert qualifier.getNumberRange().get().getEnd() != null;
+				// TODO semantics are not exactly right
+				return qualifier.getNumberRange().get().getEnd();
 			}
 		}
 	}
@@ -128,14 +120,7 @@ public class IssuePanelCard extends VBox {
 		}
 		
 		for (TurboLabel label : issue.getLabels()) {
-			Label labelText = new Label(label.getName());
-			labelText.getStyleClass().add("labels");
-			labelText.setStyle(label.getStyle());
-			if (label.getGroup() != null) {
-				Tooltip groupTooltip = new Tooltip(label.getGroup());
-				labelText.setTooltip(groupTooltip);
-			}
-			issueDetails.getChildren().add(labelText);
+			issueDetails.getChildren().add(label.getNode());
 		}
 		
 		if(issue.getParentIssue() >= 0){

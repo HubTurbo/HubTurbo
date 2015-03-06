@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
@@ -95,7 +97,7 @@ public class TurboLabel implements Listable {
 	
 	public String toGhName() {
 		String groupDelimiter = isExclusive ? EXCLUSIVE_DELIM : NONEXCLUSIVE_DELIM;
-		String groupPrefix = getGroup() == null ? "" : getGroup() + groupDelimiter;
+		String groupPrefix = (getGroup() == null || getGroup().isEmpty()) ? "" : getGroup() + groupDelimiter;
 		String groupAppended = groupPrefix + getName();
 		return groupAppended;
 	}
@@ -114,7 +116,7 @@ public class TurboLabel implements Listable {
 		return ghLabels;
 	}
 	
-	public String getStyle() {
+	private String getStyle() {
 		String colour = getColour();
 		int R = Integer.parseInt(colour.substring(0, 2), 16);
 		int G = Integer.parseInt(colour.substring(2, 4), 16);
@@ -122,6 +124,17 @@ public class TurboLabel implements Listable {
 		double L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
 		boolean bright = L > 128;
 		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
+	}
+
+	public Node getNode() {
+		javafx.scene.control.Label node = new javafx.scene.control.Label(getName());
+		node.getStyleClass().add("labels");
+		node.setStyle(getStyle());
+		if (getGroup() != null) {
+			Tooltip groupTooltip = new Tooltip(getGroup());
+			node.setTooltip(groupTooltip);
+		}
+		return node;
 	}
 	
 	/**

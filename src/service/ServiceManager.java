@@ -10,11 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import model.Model;
@@ -42,7 +37,7 @@ import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
-import service.updateservice.CommentDownloader;
+import service.updateservice.UpdatedIssueMetadata;
 import service.updateservice.ModelUpdater;
 import service.updateservice.TickingTimer;
 import storage.CacheFileHandler;
@@ -107,7 +102,7 @@ public class ServiceManager {
 	// Model updates
 
 	private ModelUpdater modelUpdater;
-	private CommentDownloader commentDownloader = new CommentDownloader(this);
+	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
 	protected Model model;
 	protected RepositoryId repoId;
 	private String issuesETag = null;
@@ -441,7 +436,7 @@ public class ServiceManager {
 		}
 		model.updateCache();
 
-		commentDownloader.download();
+		updatedIssueMetadata.download();
 		model.triggerModelChangeEvent();
 
 		// Reset progress UI
@@ -725,24 +720,18 @@ public class ServiceManager {
 	private void ______EVENTS______() {
 	}
 
-	public List<TurboIssueEvent> getFeeds(int issueNum) throws IOException {
-		GitHubEventsResponse ghEventsResponse = issueService.getIssueEvents(getRepoId(), issueNum);
-		return ghEventsResponse.getTurboIssueEvents();
-	}
-
 	/**
-	 * Gets events for a issue from GitHub, or returns a cached version if
-	 * already present.
-	 *
+	 * Gets events for a issue from GitHub. This only includes information
+	 * that GitHub exposes, such as milestones being added, labels being
+	 * removed, etc. Events like comments being added must be gotten separately.
+	 * 
 	 * @param issueId
 	 * @return
 	 * @throws IOException
 	 */
-	public ArrayList<TurboIssueEvent> getEvents(int issueId) throws IOException {
-		if (repoId != null) {
-			return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
-		}
-		return new ArrayList<>();
+	public List<TurboIssueEvent> getEvents(int issueId) throws IOException {
+		assert repoId != null;
+		return issueService.getIssueEvents(repoId, issueId).getTurboIssueEvents();
 	}
 
 	private void ______MARKDOWN______() {
