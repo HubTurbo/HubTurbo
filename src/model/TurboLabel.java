@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
 public class TurboLabel implements Listable {
@@ -122,6 +124,17 @@ public class TurboLabel implements Listable {
 		double L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
 		boolean bright = L > 128;
 		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
+	}
+
+	public Node getNode() {
+		javafx.scene.control.Label node = new javafx.scene.control.Label(getName());
+		node.getStyleClass().add("labels");
+		node.setStyle(getStyle());
+		if (getGroup() != null) {
+			Tooltip groupTooltip = new Tooltip(getGroup());
+			node.setTooltip(groupTooltip);
+		}
+		return node;
 	}
 	
 	/**

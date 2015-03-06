@@ -3,7 +3,11 @@ package service;
 import java.util.Date;
 
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import model.TurboLabel;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -95,10 +99,26 @@ public class TurboIssueEvent {
 				return new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time));
 			case Demilestoned:
 				return new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time));
-			case Labeled:
-				return new Text(String.format("%s added label %s %s.", actorName, getLabelName(), time));
-			case Unlabeled:
-				return new Text(String.format("%s removed label %s %s.", actorName, getLabelName(), time));
+			case Labeled: {
+				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					new Text(String.format("%s added label ", actorName)),
+					label.getNode(),
+					new Text(String.format(" %s.", time))
+				);
+				return display;
+			}
+			case Unlabeled: {
+				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+				HBox display = new HBox();
+				display.getChildren().addAll(
+					new Text(String.format("%s removed label ", actorName)),
+					label.getNode(),
+					new Text(String.format(" %s.", time))
+				);
+				return display;
+			}
 			case Assigned:
 				return new Text(String.format("%s was assigned to this issue %s.", actorName, time));
 			case Unassigned:

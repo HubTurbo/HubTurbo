@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -409,6 +410,8 @@ public class TurboIssue implements Listable {
 
 	private static Node layoutEvents(List<TurboIssueEvent> events) {
 		VBox result = new VBox();
+		result.setSpacing(4);
+		VBox.setMargin(result, new Insets(4, 0, 0, 0));
 		events.stream()
 			.map(TurboIssueEvent::display)
 			.forEach(e -> result.getChildren().add(e));
