@@ -24,8 +24,6 @@ public class IssuePanelCard extends VBox {
 	private static final String OCTICON_PULL_REQUEST = "\uf009";
 	private static final int CARD_WIDTH = 350;
 	private static final int HOURS_AGO = 24;
-	private static final int MINUTES_AGO = 0;
-	private static final int SECONDS_AGO = 0;
 	private static final String OCTICON_COMMENT = "\uf02b";
 	/**
 	 * A card that is constructed with an issue as argument. Its components
@@ -56,7 +54,7 @@ public class IssuePanelCard extends VBox {
 		setSpacing(1);
 
 		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			String feed = issue.getFeeds(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()), MINUTES_AGO, SECONDS_AGO);
+			String feed = issue.getFeed(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
 			if (feed != null && !feed.isEmpty()) {
 				Text issueFeed = new Text(feed);
 				issueFeed.setWrappingWidth(CARD_WIDTH);
