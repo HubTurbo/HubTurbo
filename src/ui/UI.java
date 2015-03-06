@@ -99,6 +99,9 @@ public class UI extends Application implements EventDispatcher {
 
 		events = new EventBus();
 
+		commandLineArgs = initialiseCommandLineArguments();
+		DataManager.getInstance();
+
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
@@ -110,9 +113,6 @@ public class UI extends Application implements EventDispatcher {
 		loadFonts();
 		applyCSS(scene);
 		getUserCredentials();
-		commandLineArgs = initialiseCommandLineArguments();
-
-		DataManager.getInstance();
 	}
 
 	private void getUserCredentials() {
