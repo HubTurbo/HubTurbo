@@ -2,8 +2,11 @@ package service;
 
 import java.util.Date;
 
+import javafx.scene.Node;
+import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
+
 
 /**
  * Models an event that could happen to an issue.
@@ -81,69 +84,94 @@ public class TurboIssueEvent {
 		this.assignedUser = assignedUser;
 	}
 
+	public Node display() {
+		String actorName = getActor().getLogin();
+		String time = new PrettyTime().format(getDate());
+
+		switch (getType()) {
+			case Renamed:
+				return new Text(String.format("%s renamed this issue %s.", actorName, time));
+			case Milestoned:
+				return new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time));
+			case Demilestoned:
+				return new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time));
+			case Labeled:
+				return new Text(String.format("%s added label %s %s.", actorName, getLabelName(), time));
+			case Unlabeled:
+				return new Text(String.format("%s removed label %s %s.", actorName, getLabelName(), time));
+			case Assigned:
+				return new Text(String.format("%s was assigned to this issue %s.", actorName, time));
+			case Unassigned:
+				return new Text(String.format("%s was unassigned from this issue %s.", actorName, time));
+			case Closed:
+				return new Text(String.format("%s closed this issue %s.", actorName, time));
+			case Reopened:
+				return new Text(String.format("%s reopened this issue %s.", actorName, time));
+			case Locked:
+				return new Text(String.format("%s locked issue %s.", actorName, time));
+			case Unlocked:
+				return new Text(String.format("%s unlocked this issue %s.", actorName, time));
+			case Referenced:
+				return new Text(String.format("%s referenced this issue %s.", actorName, time));
+			case Subscribed:
+				return new Text(String.format("%s subscribed to receive notifications for this issue %s.", actorName, time));
+			case Mentioned:
+				return new Text(String.format("%s was mentioned %s.", actorName, time));
+			case Merged:
+				return new Text(String.format("%s merged this issue %s.", actorName, time));
+			case HeadRefDeleted:
+				return new Text(String.format("%s deleted the pull request's branch %s.", actorName, time));
+			case HeadRefRestored:
+				return new Text(String.format("%s restored the pull request's branch %s.", actorName, time));
+			default:
+				// Not yet implemented, or no events triggered
+				return new Text(String.format("%s %s %s.", actorName, getType(), time));
+		}
+	}
+
 	@Override
 	public String toString() {
 		String actorName = getActor().getLogin();
 		String time = new PrettyTime().format(getDate());
-		String message;
 
 		switch (getType()) {
 			case Renamed:
-				message = String.format("%s renamed this issue %s.", actorName, time);
-				break;
+				return String.format("%s renamed this issue %s.", actorName, time);
 			case Milestoned:
-				message = String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time);
-				break;
+				return String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time);
 			case Demilestoned:
-				message = String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time);
-				break;
+				return String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time);
 			case Labeled:
-				message = String.format("%s added label %s %s.", actorName, getLabelName(), time);
-				break;
+				return String.format("%s added label %s %s.", actorName, getLabelName(), time);
 			case Unlabeled:
-				message = String.format("%s removed label %s %s.", actorName, getLabelName(), time);
-				break;
+				return String.format("%s removed label %s %s.", actorName, getLabelName(), time);
 			case Assigned:
-				message = String.format("%s was assigned to this issue %s.", actorName, time);
-				break;
+				return String.format("%s was assigned to this issue %s.", actorName, time);
 			case Unassigned:
-				message = String.format("%s was unassigned from this issue %s.", actorName, time);
-				break;
+				return String.format("%s was unassigned from this issue %s.", actorName, time);
 			case Closed:
-				message = String.format("%s closed this issue %s.", actorName, time);
-				break;
+				return String.format("%s closed this issue %s.", actorName, time);
 			case Reopened:
-				message = String.format("%s reopened this issue %s.", actorName, time);
-				break;
+				return String.format("%s reopened this issue %s.", actorName, time);
 			case Locked:
-				message = String.format("%s locked issue %s.", actorName, time);
-				break;
+				return String.format("%s locked issue %s.", actorName, time);
 			case Unlocked:
-				message = String.format("%s unlocked this issue %s.", actorName, time);
-				break;
+				return String.format("%s unlocked this issue %s.", actorName, time);
 			case Referenced:
-				message = String.format("%s referenced this issue %s.", actorName, time);
-				break;
+				return String.format("%s referenced this issue %s.", actorName, time);
 			case Subscribed:
-				message = String.format("%s subscribed to receive notifications for this issue %s.", actorName, time);
-				break;
+				return String.format("%s subscribed to receive notifications for this issue %s.", actorName, time);
 			case Mentioned:
-				message = String.format("%s was mentioned %s.", actorName, time);
-				break;
+				return String.format("%s was mentioned %s.", actorName, time);
 			case Merged:
-				message = String.format("%s merged this issue %s.", actorName, time);
-				break;
+				return String.format("%s merged this issue %s.", actorName, time);
 			case HeadRefDeleted:
-				message = String.format("%s deleted the pull request's branch %s.", actorName, time);
-				break;
+				return String.format("%s deleted the pull request's branch %s.", actorName, time);
 			case HeadRefRestored:
-				message = String.format("%s restored the pull request's branch %s.", actorName, time);
-				break;
+				return String.format("%s restored the pull request's branch %s.", actorName, time);
 			default:
 				// Not yet implemented, or no events triggered
-				message = String.format("%s %s %s.", actorName, getType(), time);
-				break;
+				return String.format("%s %s %s.", actorName, getType(), time);
 		}
-		return message;
 	}
 }

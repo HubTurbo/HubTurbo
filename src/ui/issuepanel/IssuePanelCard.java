@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -52,18 +53,11 @@ public class IssuePanelCard extends VBox {
 		setPadding(new Insets(0,0,3,0));
 		setSpacing(1);
 
+		getChildren().addAll(issueTitle, issueDetails);
+
 		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			String feed = issue.getFeed(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
-			if (feed != null && !feed.isEmpty()) {
-				Text issueFeed = new Text(feed);
-				issueFeed.setWrappingWidth(CARD_WIDTH);
-				issueFeed.getStyleClass().add("issue-panel-feed");
-				getChildren().addAll(issueTitle, issueDetails, issueFeed);
-			} else {
-				getChildren().addAll(issueTitle, issueDetails);
-			}
-		} else {
-			getChildren().addAll(issueTitle, issueDetails);
+			Node feed = issue.getEventDisplay(CARD_WIDTH, getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
+			getChildren().add(feed);
 		}
 	}
 	
@@ -81,7 +75,7 @@ public class IssuePanelCard extends VBox {
 		if (qualifier.getNumber().isPresent()) {
 			return qualifier.getNumber().get();
 		} else {
-			// TODO support ranges properly. getFeed only supports <
+			// TODO support ranges properly. getEventDisplay only supports <
 			assert qualifier.getNumberRange().isPresent();
 			if (qualifier.getNumberRange().get().getStart() != null) {
 				// TODO semantics are not exactly right

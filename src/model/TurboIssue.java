@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
@@ -390,7 +393,7 @@ public class TurboIssue implements Listable {
 		return -1;
 	}
 
-	public String getFeed(final int withinHours) {
+	public Node getEventDisplay(int width, final int withinHours) {
 		final LocalDateTime now = LocalDateTime.now();
 
 		List<TurboIssueEvent> eventsWithinDuration = events.stream()
@@ -401,13 +404,26 @@ public class TurboIssue implements Listable {
 			})
 			.collect(Collectors.toList());
 
-		return formatEvents(eventsWithinDuration);
+		return layoutEvents(eventsWithinDuration);
 	}
 
-	private static String formatEvents(List<TurboIssueEvent> events) {
-		return events.stream()
-			.map(e -> e.toString())
+	private static Node layoutEvents(List<TurboIssueEvent> events) {
+		VBox result = new VBox();
+		events.stream()
+			.map(TurboIssueEvent::display)
+			.forEach(e -> result.getChildren().add(e));
+		return result;
+	}
+
+	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
+		String text = events.stream()
+			.map(TurboIssueEvent::toString)
 			.collect(Collectors.joining("\n"));
+
+		Text display = new Text(text);
+		display.setWrappingWidth(width);
+		display.getStyleClass().add("issue-panel-feed");
+		return display;
 	}
 
 	private List<TurboIssueEvent> getGitHubEvents() {
