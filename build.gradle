@@ -52,7 +52,9 @@ allprojects {
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
-        testCompile "junit:junit:$junitVersion"
+        // TODO: move junit to test compile
+        // testCompile "junit:junit:$junitVersion"
+        compile "junit:junit:$junitVersion"
     }
 
     // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package]
