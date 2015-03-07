@@ -29,10 +29,9 @@ import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
-
+import util.events.FilterFieldClickedEvent;
 import command.CommandType;
 import command.TurboCommandExecutor;
-
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
@@ -61,11 +60,12 @@ public abstract class IssueColumn extends Column {
 	private Predicate<TurboIssue> predicate = p -> true;
 	private FilterExpression currentFilterExpression = EMPTY;
 	protected FilterTextField filterTextField;
+	private UI ui;
 
 	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl,
 			int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
-
+		this.ui = ui;
 		getChildren().add(createFilterBox());
 		setupIssueColumnDragEvents(model, columnIndex);
 	}
@@ -108,7 +108,7 @@ public abstract class IssueColumn extends Column {
 			.stream().map(c -> c.getGithubName()).collect(Collectors.toList());
 		
 		filterTextField.addKeywords(collaboratorNames);
-
+		filterTextField.setOnMouseClicked(e-> {ui.triggerEvent(new FilterFieldClickedEvent(columnIndex));});
 		setupIssueDragEvents(filterTextField);
 
 		HBox buttonsBox = new HBox();

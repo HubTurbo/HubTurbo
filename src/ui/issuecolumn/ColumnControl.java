@@ -17,6 +17,8 @@ import storage.DataManager;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
+import util.events.FilterFieldClickedEvent;
+import util.events.FilterFieldClickedEventHandler;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
@@ -61,6 +63,13 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new IssueSelectedEventHandler() {
 			@Override
 			public void handle(IssueSelectedEvent e) {
+				currentlySelectedColumn = Optional.of(e.columnIndex);
+			}
+		});
+		
+		ui.registerEvent(new FilterFieldClickedEventHandler() {
+			@Override
+			public void handle(FilterFieldClickedEvent e) {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
@@ -227,7 +236,7 @@ public class ColumnControl extends HBox {
 		// that they are that large.
 	}
 	private void setupKeyEvents() {
-		setOnKeyPressed(e -> {
+		setOnKeyReleased(e -> {
 				switch (e.getCode()) {
 				case F:
 				case B:
@@ -244,14 +253,17 @@ public class ColumnControl extends HBox {
 	private void handleKeys(boolean isDownKey) {
 		if (!currentlySelectedColumn.isPresent()) return;
 		if (getChildren().size() == 0) return;
-		int newIndex = currentlySelectedColumn.get() + (isDownKey ? 1 : -1);
-		newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
-		currentlySelectedColumn = Optional.of(newIndex);
 		Column selectedColumn = getColumn(currentlySelectedColumn.get());
 		if(selectedColumn instanceof IssueColumn){
-			((IssueColumn) selectedColumn).filterTextField.requestFocus();
+			if(((IssueColumn) selectedColumn).filterTextField.isFocused()){
+				return;
+			} else {
+				int newIndex = currentlySelectedColumn.get() + (isDownKey ? 1 : -1);
+				newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
+				currentlySelectedColumn = Optional.of(newIndex);
+				selectedColumn = getColumn(currentlySelectedColumn.get());
+				((IssueColumn) selectedColumn).filterTextField.requestFocus();
+			}
 		}
-
-		
 	}
 }

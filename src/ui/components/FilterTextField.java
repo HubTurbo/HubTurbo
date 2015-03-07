@@ -104,6 +104,7 @@ public class FilterTextField extends TextField {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
 				revertEdit();
+				getParent().requestFocus();
 			}
 		});
 	}
