@@ -13,7 +13,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/org.eclipse.egit.github.core-2.1.5-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jfxrt.jar"/>
 	<classpathentry kind="lib" path="lib/markdown4j-2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-core-2.0.1.jar"/>
@@ -27,6 +26,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/controlsfx-8.20.8.jar"/>
-	<classpathentry kind="lib" path="lib/openjfx-dialogs-1.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
