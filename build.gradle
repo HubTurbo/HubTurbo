@@ -59,7 +59,7 @@ allprojects {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util']
+                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util', 'src/tests']
             }
             resources {
                 srcDirs = ['src/resources']
@@ -67,7 +67,7 @@ allprojects {
         }
         test {
             java {
-                srcDirs = ['src/tests']
+                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util', 'src/tests']
             }
             resources {
                 srcDirs = ['src/resources']
