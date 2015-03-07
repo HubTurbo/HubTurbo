@@ -1,0 +1,77 @@
+/*
+ * Gradle Configuration File
+ *
+ * For more details take a look at the Java Quickstart chapter in the Gradle
+ * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
+ */
+
+allprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'maven'
+
+    // NOTE: we can split below in sub projects later
+    apply plugin: 'java'
+    // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
+    version = '2.1.0'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    project.ext {
+        log4jVersion = '2.2'
+        controlsfxVersion = '8.20.8'
+        gsonVersion = '2.3.1'
+        guavaVersion = '18.0'
+        jnaVersion = '4.1.0'
+        markdown4jVersion = '2.2-cj-1.0'
+        openjfxDialogsVersion = '1.0.2'
+        egitVersion = '2.1.5_1'
+        prettytimeVersion = '3.2.7.Final'
+        seleniumJavaVersion = '2.45.0'
+        seleniumServerVersion = '2.45.0'
+
+        junitVersion = '4.12'
+    }
+
+    dependencies {
+        compile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+        compile "org.apache.logging.log4j:log4j-core:$log4jVersion"
+        compile "org.controlsfx:controlsfx:$controlsfxVersion"
+        compile "com.google.code.gson:gson:$gsonVersion"
+        compile "com.google.guava:guava:$guavaVersion"
+        compile "net.java.dev.jna:jna:$jnaVersion"
+        compile "org.commonjava.googlecode.markdown4j:markdown4j:$markdown4jVersion"
+        compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
+        compile "org.apache.servicemix.bundles:org.apache.servicemix.bundles.egit.github.core:$egitVersion"
+        compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
+        compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
+        compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
+
+        testCompile "junit:junit:$junitVersion"
+    }
+
+    // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package]
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util']
+            }
+            resources {
+                srcDirs = ['src/resources']
+            }
+        }
+        test {
+            java {
+                srcDirs = ['src/tests']
+            }
+            resources {
+                srcDirs = ['src/resources']
+            }
+        }
+    }
+}
