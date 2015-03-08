@@ -73,8 +73,9 @@ public class RepositorySelector extends HBox {
 		comboBox.getItems().addAll(items);
 	}
 
-	public void refreshComboBoxContents() {
+	public void refreshComboBoxContents(String repoId) {
 		comboBox.getItems().clear();
 		loadComboBoxContents();
+		comboBox.setValue(repoId);
 	}
 }
