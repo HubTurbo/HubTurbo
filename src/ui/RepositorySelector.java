@@ -52,10 +52,6 @@ public class RepositorySelector extends HBox {
 		label.setText(text);
 	}
 
-	public void setValue(String val) {
-		comboBox.setValue(val);
-	}
-	
 	public void enable() {
 		comboBox.setDisable(false);
 	}
@@ -73,8 +69,9 @@ public class RepositorySelector extends HBox {
 		comboBox.getItems().addAll(items);
 	}
 
-	public void refreshComboBoxContents() {
+	public void refreshComboBoxContents(String repoId) {
 		comboBox.getItems().clear();
 		loadComboBoxContents();
+		comboBox.setValue(repoId);
 	}
 }

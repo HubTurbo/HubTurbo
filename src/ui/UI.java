@@ -124,8 +124,7 @@ public class UI extends Application implements EventDispatcher {
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
 				repoSelector.setDisable(false);
-				repoSelector.refreshComboBoxContents();
-				repoSelector.setValue(ServiceManager.getInstance().getRepoId().generateId());
+				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
 			} else {
 				quit();
@@ -422,7 +421,7 @@ public class UI extends Application implements EventDispatcher {
 		thread.start();
 
 		task.setOnSucceeded(wse -> {
-			repoSelector.refreshComboBoxContents();
+			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 			logger.info("Repository " + repoString + " successfully switched to!");
 		});
 
