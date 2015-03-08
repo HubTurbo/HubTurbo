@@ -52,10 +52,6 @@ public class RepositorySelector extends HBox {
 		label.setText(text);
 	}
 
-	public void setValue(String val) {
-		comboBox.setValue(val);
-	}
-	
 	public void enable() {
 		comboBox.setDisable(false);
 	}
