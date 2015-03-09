@@ -88,7 +88,7 @@ public class FilterTextField extends TextField {
 				// Can't find out the characters deleted...
 			} else if (Character.isAlphabetic(typed)) {
 				performCompletion(e);
-			} else if (typed == ' ' && getText().isEmpty()){
+			} else if (typed == ' ' && (getText().isEmpty() || getText().endsWith(" "))){
 				e.consume();
 			}
 		});

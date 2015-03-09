@@ -135,6 +135,7 @@ public class IssuePanel extends IssueColumn {
 				}
 				if(event.getCode() == KeyCode.SPACE){
 					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+						KeyPress.setTimeKeyDown(0);
 						event.consume();
 						listView.selectFirstItem();
 					}

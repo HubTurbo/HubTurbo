@@ -250,7 +250,7 @@ public class ColumnControl extends HBox {
 		});
 	}
 
-	private void handleKeys(boolean isDownKey) {
+	private void handleKeys(boolean isForwardKey) {
 		if (!currentlySelectedColumn.isPresent()) return;
 		if (getChildren().size() == 0) return;
 		Column selectedColumn = getColumn(currentlySelectedColumn.get());
@@ -258,11 +258,11 @@ public class ColumnControl extends HBox {
 			if(((IssueColumn) selectedColumn).filterTextField.isFocused()){
 				return;
 			} else {
-				int newIndex = currentlySelectedColumn.get() + (isDownKey ? 1 : -1);
+				int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
 				newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
 				currentlySelectedColumn = Optional.of(newIndex);
 				selectedColumn = getColumn(currentlySelectedColumn.get());
-				((IssueColumn) selectedColumn).filterTextField.requestFocus();
+				((IssueColumn) selectedColumn).requestFocus();
 			}
 		}
 	}
