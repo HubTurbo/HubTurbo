@@ -433,4 +433,9 @@ public class UI extends Application implements EventDispatcher {
 		});
 
 	}
+
+	public MenuControl getMenuControl() {
+		// TODO Auto-generated method stub
+		return menuBar;
+	}
 }

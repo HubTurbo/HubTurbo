@@ -84,7 +84,7 @@ public class MenuControl extends MenuBar {
 		createLeft.setOnAction(e -> {
 			logger.info("Menu: Panels > Create (Left)");
 			columns.createNewPanelAtStart();
-			columnsScrollPane.setHvalue(columnsScrollPane.getHmin());
+			setHvalue(columnsScrollPane.getHmin());
 		});
 		createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
 				KeyCombination.SHIFT_DOWN));
@@ -103,7 +103,7 @@ public class MenuControl extends MenuBar {
 							ScrollBar scrollBar = (ScrollBar) child;
 							if (scrollBar.getOrientation() == Orientation.HORIZONTAL
 									&& scrollBar.visibleProperty().get()) {
-								columnsScrollPane.setHvalue(columnsScrollPane.getHmax());
+								setHvalue(columnsScrollPane.getHmax());
 								break;
 							}
 						}
@@ -326,4 +326,12 @@ public class MenuControl extends MenuBar {
 
 		return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
 	}
+	
+	public void scrollTo(int columnIndex, int NumOfColumns){
+		setHvalue(columnIndex * (columnsScrollPane.getHmax())/(NumOfColumns-1));
+	}
+	private void setHvalue(double val) {
+		columnsScrollPane.setHvalue(val);
+	}
+
 }

@@ -265,5 +265,11 @@ public class ColumnControl extends HBox {
 				((IssueColumn) selectedColumn).requestFocus();
 			}
 		}
+		scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
 	}
+
+	private void scrollandShowColumn(int SelectedColumnIndex, int numOfColumns) {
+		ui.getMenuControl().scrollTo(SelectedColumnIndex, numOfColumns);
+	}
+
 }
