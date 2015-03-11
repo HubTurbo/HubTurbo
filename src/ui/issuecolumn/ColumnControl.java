@@ -4,6 +4,7 @@ import command.TurboCommandExecutor;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -11,6 +12,8 @@ import storage.DataManager;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
+import util.events.FilterFieldClickedEvent;
+import util.events.FilterFieldClickedEventHandler;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
@@ -63,6 +66,15 @@ public class ColumnControl extends HBox {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
+		
+		ui.registerEvent(new FilterFieldClickedEventHandler() {
+			@Override
+			public void handle(FilterFieldClickedEvent e) {
+				currentlySelectedColumn = Optional.of(e.columnIndex);
+			}
+		});
+		
+		setupKeyEvents();
 	}
 	
 	public void restoreColumns() {
@@ -225,4 +237,41 @@ public class ColumnControl extends HBox {
 		// In any case column width is set to COLUMN_WIDTH at minimum, so we can assume
 		// that they are that large.
 	}
+	private void setupKeyEvents() {
+		setOnKeyReleased(e -> {
+				switch (e.getCode()) {
+				case F:
+				case B:
+					e.consume();
+					handleKeys(e.getCode() == KeyCode.F);
+					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
+					break;
+				default:
+					break;
+				}
+		});
+	}
+
+	private void handleKeys(boolean isForwardKey) {
+		if (!currentlySelectedColumn.isPresent()) return;
+		if (getChildren().size() == 0) return;
+		Column selectedColumn = getColumn(currentlySelectedColumn.get());
+		if(selectedColumn instanceof IssueColumn){
+			if(((IssueColumn) selectedColumn).filterTextField.isFocused()){
+				return;
+			} else {
+				int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
+				newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
+				currentlySelectedColumn = Optional.of(newIndex);
+				selectedColumn = getColumn(currentlySelectedColumn.get());
+				((IssueColumn) selectedColumn).requestFocus();
+			}
+		}
+		scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
+	}
+
+	private void scrollandShowColumn(int SelectedColumnIndex, int numOfColumns) {
+		ui.getMenuControl().scrollTo(SelectedColumnIndex, numOfColumns);
+	}
+
 }

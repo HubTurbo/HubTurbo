@@ -117,9 +117,11 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 			} else {
 				switch (e.getCode()) {
 				case UP:
+				case J:
 				case DOWN:
+				case K:
 					e.consume();
-					handleUpDownKeys(e.getCode() == KeyCode.DOWN);
+					handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.J);
 					assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
 					if (!e.isShiftDown()) {
 						logger.info("Arrow key navigation to issue " + selectedIndex.get());

@@ -21,8 +21,8 @@ import ui.UI;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
+import util.KeyPress;
 import util.events.IssueSelectedEvent;
-
 import command.TurboCommandExecutor;
 
 public class IssuePanel extends IssueColumn {
@@ -133,6 +133,13 @@ public class IssuePanel extends IssueColumn {
 				if (keyCombBoxToList.match(event)) {
 					listView.selectFirstItem();
 				}
+				if(event.getCode() == KeyCode.SPACE){
+					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+						KeyPress.setTimeKeyDown(0);
+						event.consume();
+						listView.selectFirstItem();
+					}
+				}
 			}
 		});
 		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
@@ -149,6 +156,11 @@ public class IssuePanel extends IssueColumn {
 				}
 				if (keyCombListToBox.match(event)) {
 					filterTextField.requestFocus();
+				}
+				if(event.getCode() == KeyCode.SPACE){
+					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+						filterTextField.requestFocus();
+					}
 				}
 			}
 		});
