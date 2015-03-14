@@ -241,7 +241,7 @@ public class ColumnControl extends HBox {
 		setOnKeyReleased(e -> {
 				switch (e.getCode()) {
 				case F:
-				case B:
+				case D:
 					e.consume();
 					handleKeys(e.getCode() == KeyCode.F);
 					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";

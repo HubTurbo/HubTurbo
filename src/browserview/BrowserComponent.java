@@ -440,4 +440,23 @@ public class BrowserComponent {
 		pageContentOnLoad = getCurrentPageSource();
 		return true;
 	}
+
+	public void scrollToTop() {
+		String script = "window.scrollTo(0, 0)";
+		executeJavaScript(script);
+	}
+
+	public void scrollToBottom() {
+		String script = "window.scrollTo(0, document.body.scrollHeight)";
+		executeJavaScript(script);
+	}
+
+	public void scrollPage(boolean isDownScroll) {
+		String script = "";
+		if (isDownScroll)
+			script = "window.scrollBy(0,100)";
+		else
+			script = "window.scrollBy(0, -100)";
+		executeJavaScript(script);
+	}
 }
