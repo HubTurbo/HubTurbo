@@ -261,7 +261,10 @@ public class ColumnControl extends HBox {
 				return;
 			} else {
 				int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
-				newIndex = Math.min(Math.max(0, newIndex), getChildren().size()-1);
+				if (newIndex < 0)
+					newIndex = getChildren().size() - 1;
+				else if (newIndex > getChildren().size() - 1)
+					newIndex = 0;
 				currentlySelectedColumn = Optional.of(newIndex);
 				selectedColumn = getColumn(currentlySelectedColumn.get());
 				((IssueColumn) selectedColumn).requestFocus();
