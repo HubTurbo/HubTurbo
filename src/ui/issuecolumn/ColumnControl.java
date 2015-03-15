@@ -2,9 +2,13 @@ package ui.issuecolumn;
 
 import command.TurboCommandExecutor;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import model.Model;
@@ -37,6 +41,9 @@ public class ColumnControl extends HBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
+	private final KeyCombination maximizeWindow = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination minimizeWindow = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	
 	public ColumnControl(UI ui, Stage stage, Model model) {
 		this.ui = ui;
@@ -238,10 +245,26 @@ public class ColumnControl extends HBox {
 		// that they are that large.
 	}
 	private void setupKeyEvents() {
+		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				event.consume();
+				if (maximizeWindow.match(event)) {
+					ui.maximizeWindow();
+				}
+				if (minimizeWindow.match(event)) {
+					stage.setIconified(true);
+				}
+				if (defaultSizeWindow.match(event)) {
+					ui.setDefaultWidth();
+				}
+			}
+			
+		});
 		setOnKeyReleased(e -> {
 				switch (e.getCode()) {
 				case F:
-				case B:
+				case D:
 					e.consume();
 					handleKeys(e.getCode() == KeyCode.F);
 					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";

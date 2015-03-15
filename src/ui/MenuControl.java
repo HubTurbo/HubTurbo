@@ -113,7 +113,7 @@ public class MenuControl extends MenuBar {
 			};
 			columns.widthProperty().addListener(listener);
 		});
-		createRight.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+		createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
 
 		MenuItem closeColumn = new MenuItem("Close");
 		closeColumn.setOnAction(e -> {

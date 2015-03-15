@@ -144,8 +144,22 @@ public class IssuePanel extends IssueColumn {
 		});
 		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.C) {
+				event.consume();
+				switch (event.getCode()){
+				case C:
 					ui.getBrowserComponent().jumpToComment();
+					break;
+				case T:
+					ui.getBrowserComponent().scrollToTop();
+					break;
+				case B:
+					ui.getBrowserComponent().scrollToBottom();
+				case U:
+				case D:
+					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.D);
+				break;
+				default:
+					break;
 				}
 			}
 		});
