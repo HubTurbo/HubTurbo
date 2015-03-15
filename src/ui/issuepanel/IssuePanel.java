@@ -144,21 +144,18 @@ public class IssuePanel extends IssueColumn {
 		});
 		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
+				event.consume();
 				switch (event.getCode()){
 				case C:
-					event.consume();
 					ui.getBrowserComponent().jumpToComment();
 					break;
 				case T:
-					event.consume();
 					ui.getBrowserComponent().scrollToTop();
 					break;
 				case B:
-					event.consume();
 					ui.getBrowserComponent().scrollToBottom();
 				case U:
 				case D:
-					event.consume();
 					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.D);
 				break;
 				default:

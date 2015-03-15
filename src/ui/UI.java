@@ -7,8 +7,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -388,7 +386,6 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector.disable();
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void loadRepo(String repoString) {
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
 		if(repoId == null
@@ -434,7 +431,28 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public MenuControl getMenuControl() {
-		// TODO Auto-generated method stub
 		return menuBar;
+	}
+
+	public void setDefaultWidth() {
+		mainStage.setMaximized(false);
+		Rectangle dimensions = getDimensions();
+		mainStage.setMinWidth(columns.getColumnWidth());
+		mainStage.setMinHeight(dimensions.getHeight());
+		mainStage.setMaxWidth(columns.getColumnWidth());
+		mainStage.setMaxHeight(dimensions.getHeight());
+		mainStage.setX(0);
+		mainStage.setY(0);
+	}
+
+	public void maximizeWindow() {
+		mainStage.setMaximized(true);
+		Rectangle dimensions = getDimensions();
+		mainStage.setMinWidth(dimensions.getWidth());
+		mainStage.setMinHeight(dimensions.getHeight());
+		mainStage.setMaxWidth(dimensions.getWidth());
+		mainStage.setMaxHeight(dimensions.getHeight());
+		mainStage.setX(0);
+		mainStage.setY(0);
 	}
 }
