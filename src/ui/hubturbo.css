@@ -61,6 +61,12 @@
 	-fx-font-size: 12px;
 }
 
+.issue-panel-focused {
+    -fx-effect: dropshadow(three-pass-box, derive(cadetblue, -20%), 10, 0, 4, 4);
+    -fx-margin-top: 6px;
+    -fx-border-radius: 4px;
+}
+
 .issue-creator {
 	-fx-font-style: italic;
 	-fx-text-fill: grey;

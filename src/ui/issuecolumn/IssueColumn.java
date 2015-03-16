@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -29,7 +31,7 @@ import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
-import util.events.FilterFieldClickedEvent;
+import util.events.ColumnClickedEvent;
 import command.CommandType;
 import command.TurboCommandExecutor;
 import filter.ParseException;
@@ -68,6 +70,20 @@ public abstract class IssueColumn extends Column {
 		this.ui = ui;
 		getChildren().add(createFilterBox());
 		setupIssueColumnDragEvents(model, columnIndex);
+		this.setOnMouseClicked(e-> {
+			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
+			getParent().requestFocus();
+		});
+		focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
+				if (isFocused) {
+				    getStyleClass().add("issue-panel-focused");
+				} else {
+				    getStyleClass().remove("issue-panel-focused");
+				}
+			}
+		});
 	}
 
 	private void setupIssueColumnDragEvents(Model model, int columnIndex) {
@@ -108,7 +124,7 @@ public abstract class IssueColumn extends Column {
 			.stream().map(c -> c.getGithubName()).collect(Collectors.toList());
 		
 		filterTextField.addKeywords(collaboratorNames);
-		filterTextField.setOnMouseClicked(e-> {ui.triggerEvent(new FilterFieldClickedEvent(columnIndex));});
+		filterTextField.setOnMouseClicked(e-> {ui.triggerEvent(new ColumnClickedEvent(columnIndex));});
 		setupIssueDragEvents(filterTextField);
 
 		HBox buttonsBox = new HBox();

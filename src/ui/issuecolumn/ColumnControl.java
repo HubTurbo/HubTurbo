@@ -16,8 +16,8 @@ import storage.DataManager;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.FilterFieldClickedEvent;
-import util.events.FilterFieldClickedEventHandler;
+import util.events.ColumnClickedEvent;
+import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelChangedEvent;
@@ -74,13 +74,13 @@ public class ColumnControl extends HBox {
 			}
 		});
 		
-		ui.registerEvent(new FilterFieldClickedEventHandler() {
+		ui.registerEvent(new ColumnClickedEventHandler() {
 			@Override
-			public void handle(FilterFieldClickedEvent e) {
+			public void handle(ColumnClickedEvent e) {
 				currentlySelectedColumn = Optional.of(e.columnIndex);
 			}
 		});
-		
+
 		setupKeyEvents();
 	}
 	
