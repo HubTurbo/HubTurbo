@@ -33,14 +33,15 @@ public class UpdateService<T> extends GitHubService{
 	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 	private static final String SINCE = "since";
 	private static final String SUFFIX_ISSUES = "/issues";
-	protected String apiSuffix;
+	private final String apiSuffix;
 	protected GitHubClientExtended client;
 	private String lastETag;
 	protected Date lastCheckTime;
 	protected String lastIssueCheckTime;
 	
-	public UpdateService(GitHubClientExtended client){
+	public UpdateService(GitHubClientExtended client, String apiSuffix){
 		this.client = client;
+		this.apiSuffix = apiSuffix;
 	}
 	
 	protected void updateLastETag(HttpURLConnection connection){

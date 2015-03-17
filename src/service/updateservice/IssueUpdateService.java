@@ -21,8 +21,7 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	
 	
 	public IssueUpdateService(GitHubClientExtended client, String issuesETag, String lastIssueCheckTime){
-		super(client);
-		apiSuffix = SEGMENT_ISSUES;
+		super(client, SEGMENT_ISSUES);
 		super.setLastETag(issuesETag);
 		lastCheckTime = new Date();
 		super.setLastIssueCheckTime(lastIssueCheckTime);
