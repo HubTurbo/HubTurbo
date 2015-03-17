@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.GitHubService;
@@ -98,7 +99,7 @@ public class UpdateService<T> extends GitHubService{
 			}
 
 			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
-				result = new ArrayList<>(getAll(new PageIterator<>(request, client)));
+				result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
 				updateLastETag(connection);
 			}
 
@@ -113,6 +114,30 @@ public class UpdateService<T> extends GitHubService{
 		updatedItems = result;
 
 		return result;
+	}
+
+	/**
+	 * A specialised version of GitHubService::getPage that does logging.
+	 * @param iterator the paged request to iterate through
+	 * @return a list of items
+	 * @throws IOException
+	 */
+	private List<T> getPagedItems(PageIterator<T> iterator) throws IOException {
+		logger.info("Getting paged items: " + iterator.getLastPage() + " pages");
+		List<T> elements = new ArrayList<>();
+		int length = 0;
+		int page = 0;
+		try {
+			while (iterator.hasNext()) {
+				elements.addAll(iterator.next());
+				int diff = elements.size() - length;
+				length = elements.size();
+				logger.info("Page " + page++ + ": " + diff + " items");
+			}
+		} catch (NoSuchPageException pageException) {
+			throw pageException.getCause();
+		}
+		return elements;
 	}
 
 	/**
