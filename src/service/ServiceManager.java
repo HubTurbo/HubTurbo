@@ -394,14 +394,6 @@ public class ServiceManager {
 		return model;
 	}
 
-	// TODO change to optional or somehow remove null return value (assertion?)
-	public Date getLastModelUpdateTime() {
-		if (modelUpdater != null) {
-			return modelUpdater.getLastUpdateTime();
-		}
-		return null;
-	}
-
 	private TickingTimer createTickingTimer() {
 		TickingTimer timer = new TickingTimer("Sync Timer", SYNC_PERIOD, (time) -> {
 			HTStatusBar.updateRefreshTimer(time);

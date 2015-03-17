@@ -1,6 +1,7 @@
 package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.IOException;
@@ -31,8 +32,6 @@ import service.GitHubClientExtended;
  * */
 public class UpdateService<T> extends GitHubService{
 	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
-	private static final String SINCE = "since";
-	private static final String SUFFIX_ISSUES = "/issues";
 	private final String apiSuffix;
 	protected GitHubClientExtended client;
 	private String lastETag;
@@ -75,9 +74,6 @@ public class UpdateService<T> extends GitHubService{
 	private void updateLastCheckTime(HttpURLConnection connection) throws ParseException{
 		String date = connection.getHeaderField("Date");
 		lastCheckTime = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(date);
-		if (apiSuffix == SUFFIX_ISSUES) {
-			lastIssueCheckTime = getFormattedDate(lastCheckTime);
-		}
 	}
 
 	private HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
@@ -101,23 +97,10 @@ public class UpdateService<T> extends GitHubService{
 		try {
 
 			PagedRequest<T> request = createUpdatedRequest(repoId);
-			
-			// This is to modify the param "since" for issues request that was added automatically. This is because we 
-			// do not want to retrieve issues since the time the request was made; but instead the last modified time.
-			if (apiSuffix == SUFFIX_ISSUES) {
-				Map<String, String> temp = request.getParams();
-				if (lastIssueCheckTime == null) {
-					temp.remove(SINCE);
-					request.setParams(temp);
-				} else {
-					temp.put(SINCE, lastIssueCheckTime);
-					request.setParams(temp);
-				}
-			}
-
 			PageIterator<T> requestIterator = new PageIterator<T>(request, client);
 			HttpURLConnection connection = createUpdatedConnection(request);
 			int responseCode = connection.getResponseCode();
+
 			if(client.isError(responseCode)){
 				return new ArrayList<T>();
 			}
