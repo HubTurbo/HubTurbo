@@ -2,10 +2,9 @@ package service.updateservice;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
@@ -21,12 +20,17 @@ public class IssueUpdateService extends UpdateService<Issue>{
 	
 	
 	public IssueUpdateService(GitHubClientExtended client, String issuesETag, String lastIssueCheckTime){
-		super(client, SEGMENT_ISSUES);
-		super.setLastETag(issuesETag);
+		super(client, SEGMENT_ISSUES, issuesETag);
 		lastCheckTime = new Date();
 		super.setLastIssueCheckTime(lastIssueCheckTime);
 	}
-	
+
+	protected String getFormattedDate(Date date){
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df.format(date);
+	}
+
 	private Map<String, String> createUpdatedIssuesParams(){
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("since", getFormattedDate(lastCheckTime));

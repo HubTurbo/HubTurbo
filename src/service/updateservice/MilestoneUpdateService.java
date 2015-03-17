@@ -18,8 +18,7 @@ public class MilestoneUpdateService extends UpdateService<Milestone>{
 	
 	
 	public MilestoneUpdateService(GitHubClientExtended client, String milestonesETag){
-		super(client, SEGMENT_MILESTONES);
-		super.setLastETag(milestonesETag);
+		super(client, SEGMENT_MILESTONES, milestonesETag);
 	}
 	
 	private Map<String, String> createUpdatedMilestonesParams(){
