@@ -1,6 +1,9 @@
 package storage;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import model.Model;
@@ -16,13 +19,16 @@ public class CachedRepoData {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
-	private String issueCheckTime = null;
+	private LocalDateTime issueCheckTime = null;
 	private List<TurboUser> collaborators = null;
 	private List<SerializableLabel> labels = null;
 	private List<SerializableMilestone> milestones = null; 
 	private List<SerializableIssue> issues = null;
 	
-	public CachedRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public CachedRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag,
+	                      LocalDateTime issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
+	                      List<TurboMilestone> milestones, List<TurboIssue> issues) {
+
 		this.issuesETag = issuesETag;
 		this.collabsETag = collabsETag;
 		this.labelsETag = labelsETag;
@@ -69,7 +75,7 @@ public class CachedRepoData {
 		return milestonesETag;
 	}
 	
-	public String getIssueCheckTime() {
+	public LocalDateTime getIssueCheckTime() {
 		return issueCheckTime;
 	}
 	

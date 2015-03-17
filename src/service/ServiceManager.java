@@ -43,6 +43,7 @@ import tests.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.HTStatusBar;
 import util.PlatformEx;
+import util.Utility;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -106,7 +107,7 @@ public class ServiceManager {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
-	private String issueCheckTime = null;
+	private Date issueCheckTime = null;
 
 	private final TickingTimer timer;
 
@@ -345,7 +346,7 @@ public class ServiceManager {
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
 			milestonesETag = repo.getMilestonesETag();
-			issueCheckTime = repo.getIssueCheckTime();
+			issueCheckTime = Utility.localDateTimeToDate(repo.getIssueCheckTime());
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();

@@ -4,15 +4,13 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -68,6 +66,20 @@ public class Utility {
 		}
 		// Should not happen
 		return null;
+	}
+
+	public static String formatDateISO8601(Date date){
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df.format(date);
+	}
+
+	public static Date localDateTimeToDate(LocalDateTime time) {
+		return new Date(localDateTimeToLong(time));
+	}
+
+	public static LocalDateTime dateToLocalDateTime(Date date) {
+		return longToLocalDateTime(date.getTime());
 	}
 
 	public static long localDateTimeToLong(LocalDateTime t) {

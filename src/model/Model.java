@@ -3,11 +3,7 @@ package model;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -68,7 +64,7 @@ public class Model {
 	private String lastCollabsETag = null;
 	private String lastLabelsETag = null;
 	private String lastMilestonesETag = null;
-	private String lastIssueCheckTime = null;
+	private Date lastIssueCheckTime = null;
 
 	private CacheFileHandler dcHandler = null;
 
@@ -677,7 +673,7 @@ public class Model {
 		this.lastMilestonesETag = ETag;
 	}
 
-	public void updateIssueCheckTime(String date) {
+	public void updateIssueCheckTime(Date date) {
 		this.lastIssueCheckTime = date;
 	}
 

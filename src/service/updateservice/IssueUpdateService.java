@@ -13,35 +13,22 @@ import org.eclipse.egit.github.core.client.PagedRequest;
 import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
+import util.Utility;
 
-public class IssueUpdateService extends UpdateService<Issue>{	
-	
-	
-	
-	
-	public IssueUpdateService(GitHubClientExtended client, String issuesETag, String lastIssueCheckTime){
+public class IssueUpdateService extends UpdateService<Issue>{
+
+	private final Date lastIssueCheckTime;
+
+	public IssueUpdateService(GitHubClientExtended client, String issuesETag, Date lastIssueCheckTime){
 		super(client, SEGMENT_ISSUES, issuesETag);
-		lastCheckTime = new Date();
-		super.setLastIssueCheckTime(lastIssueCheckTime);
-	}
-
-	protected String getFormattedDate(Date date){
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-		return df.format(date);
+		this.lastIssueCheckTime = lastIssueCheckTime;
 	}
 
 	private Map<String, String> createUpdatedIssuesParams(){
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("since", getFormattedDate(lastCheckTime));
+		Map<String, String> params = new HashMap<>();
+		params.put("since", Utility.formatDateISO8601(lastIssueCheckTime));
 		params.put("state", "all");
 		return params;
-	}
-	
-	@Override
-	public ArrayList<Issue> getUpdatedItems(IRepositoryIdProvider repoId){
-		ArrayList<Issue> updatedItems = super.getUpdatedItems(repoId);
-		return updatedItems;
 	}
 	
 	@Override
@@ -52,5 +39,4 @@ public class IssueUpdateService extends UpdateService<Issue>{
 		request.setArrayType(new TypeToken<ArrayList<Issue>>(){}.getType());
 		return request;
 	}
-
 }

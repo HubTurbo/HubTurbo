@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 import model.Model;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
@@ -31,7 +32,8 @@ public class ModelUpdater {
 	private MilestoneUpdateService milestoneUpdateService;
 	private Date lastUpdateTime = new Date();
 	
-	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime){
+	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String
+		labelsETag, String milestonesETag, Date issueCheckTime){
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client, issuesETag, issueCheckTime);
 		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);
@@ -52,7 +54,7 @@ public class ModelUpdater {
 	   	updateModelLabels(latch, repoId);
 	  	updateModelMilestones(latch, repoId);
 	  	updateModelIssues(latch, repoId);
-	  	lastUpdateTime = issueUpdateService.lastCheckTime;
+	  	lastUpdateTime = issueUpdateService.getUpdatedCheckTime();
 	  	model.enableModelChanges();
 	}
 	
@@ -61,8 +63,8 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
-				model.updateIssuesETag(issueUpdateService.getLastETag());
-				model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
+				model.updateIssuesETag(issueUpdateService.getUpdatedETag());
+				model.updateIssueCheckTime(issueUpdateService.getUpdatedCheckTime());
 				model.updateCachedIssues(latch, updatedIssues, repoId);
 			} else {
 				logger.info("No issues to update");
@@ -75,7 +77,7 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
-				model.updateCollabsETag(collaboratorUpdateService.getLastETag());
+				model.updateCollabsETag(collaboratorUpdateService.getUpdatedETag());
 				model.updateCachedCollaborators(latch, collaborators, repoId);
 			} else {
 				logger.info("No collaborators to update");
@@ -89,7 +91,7 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
-				model.updateLabelsETag(labelUpdateService.getLastETag());
+				model.updateLabelsETag(labelUpdateService.getUpdatedETag());
 				model.updateCachedLabels(latch, labels, repoId);
 			} else {
 				logger.info("No labels to update");
@@ -103,7 +105,7 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
-				model.updateMilestonesETag(milestoneUpdateService.getLastETag());
+				model.updateMilestonesETag(milestoneUpdateService.getUpdatedETag());
 				model.updateCachedMilestones(latch, milestones, repoId);
 			} else {
 				logger.info("No milestones to update");
