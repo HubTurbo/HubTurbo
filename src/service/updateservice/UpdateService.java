@@ -38,32 +38,32 @@ public class UpdateService<T> extends GitHubService{
 	private String lastETag;
 	protected Date lastCheckTime;
 	protected String lastIssueCheckTime;
-	
+
 	public UpdateService(GitHubClientExtended client, String apiSuffix){
 		this.client = client;
 		this.apiSuffix = apiSuffix;
 	}
-	
-	protected void updateLastETag(HttpURLConnection connection){
+
+	private void updateLastETag(HttpURLConnection connection){
 		lastETag = connection.getHeaderField("ETag");
 	}
-	
+
 	protected void setLastETag(String ETag) {
 		this.lastETag = ETag;
 	}
-	
-	protected String getLastETag() {
+
+	public String getLastETag() {
 		return this.lastETag;
 	}
-	
+
 	protected void setLastIssueCheckTime(String date) {
 		this.lastIssueCheckTime = date;
 	}
-	
-	protected String getLastIssueCheckTime() {
+
+	public String getLastIssueCheckTime() {
 		return this.lastIssueCheckTime;
 	}
-	
+
 	protected String getFormattedDate(Date date){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
@@ -71,7 +71,7 @@ public class UpdateService<T> extends GitHubService{
 	    String formatted = df.format(date);
 	    return formatted;
 	}
-	
+
 	private void updateLastCheckTime(HttpURLConnection connection) throws ParseException{
 		String date = connection.getHeaderField("Date");
 		lastCheckTime = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(date);
@@ -79,15 +79,15 @@ public class UpdateService<T> extends GitHubService{
 			lastIssueCheckTime = getFormattedDate(lastCheckTime);
 		}
 	}
-	
-	protected HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
+
+	private HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
 		HttpURLConnection connection = client.createConnection(request);
 		if(lastETag != null){
 			connection.setRequestProperty("If-None-Match", lastETag);
 		}
 		return connection;
 	}
-	
+
 	protected PagedRequest<T> createUpdatedRequest(IRepositoryIdProvider repoId){
 		PagedRequest<T> request = new PagedRequest<T>();
 		String path = SEGMENT_REPOS + "/" + repoId.generateId() + apiSuffix;
@@ -137,5 +137,5 @@ public class UpdateService<T> extends GitHubService{
 		}
 		return result;
 	}
-	
+
 }
