@@ -35,7 +35,7 @@ public class UpdateService<T> extends GitHubService{
 	private final String apiSuffix;
 	protected GitHubClientExtended client;
 	private String lastETag;
-	protected Date lastCheckTime;
+	public Date lastCheckTime;
 	protected String lastIssueCheckTime;
 
 	public UpdateService(GitHubClientExtended client, String apiSuffix){

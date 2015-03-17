@@ -37,9 +37,6 @@ import org.eclipse.egit.github.core.service.MarkdownService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.markdown4j.Markdown4jProcessor;
 
-import service.updateservice.UpdatedIssueMetadata;
-import service.updateservice.ModelUpdater;
-import service.updateservice.TickingTimer;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
