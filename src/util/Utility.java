@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -57,7 +59,17 @@ public class Utility {
 	    }
 	    return (int) l;
 	}
-	
+
+	public static Date parseHTTPLastModifiedDate(String dateString) {
+		try {
+			return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(dateString);
+		} catch (ParseException e) {
+			assert false : "Error in date format string!";
+		}
+		// Should not happen
+		return null;
+	}
+
 	public static long localDateTimeToLong(LocalDateTime t) {
 		return t.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}

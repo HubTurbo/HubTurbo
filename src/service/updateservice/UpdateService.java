@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.GitHubService;
 
 import service.GitHubClientExtended;
+import util.Utility;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
@@ -150,11 +151,7 @@ public class UpdateService<T> extends GitHubService{
 
 	private void updateCheckTime(HttpURLConnection connection) {
 		String date = connection.getHeaderField("Date");
-		try {
-			updatedCheckTime = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(date);
-		} catch (ParseException e) {
-			assert false : "Error in date format string!";
-		}
+		updatedCheckTime = Utility.parseHTTPLastModifiedDate(date);
 	}
 
 	private HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
