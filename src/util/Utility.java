@@ -28,26 +28,9 @@ import com.google.common.base.Joiner;
 public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
-	
-	public static String truncate(String text, int length) {
-		if (text.length() > length) {
-			text = text.substring(0, length);
-			return text + "...";
-		} else {
-			return text;
-		}
-	}
-
-	public static String stringify(List<Comment> comments) {
-		return comments.stream().map(c -> stringify(c)).collect(Collectors.toList()).toString();
-	}
-
-	public static String stringify(Comment comment) {
-		return comment.getUser().getLogin() + " says: " + truncate(comment.getBody(), 10);
-	}
 
 	public static String stringify(Collection<TurboLabel> labels) {
-		return "[" + Joiner.on(", ").join(labels.stream().map(l -> l.logString()).collect(Collectors.toList())) + "]";
+		return "[" + Joiner.on(", ").join(labels.stream().map(TurboLabel::logString).collect(Collectors.toList())) + "]";
 	}
 
 	public static String stripQuotes(String s) {
@@ -99,8 +82,13 @@ public class Utility {
 		Instant instant = new Date(epochMilli).toInstant();
 		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
-	
-	public static Optional<int[]> parseVersionNumberString(String version) {
+
+	/**
+	 * Parses a version number string in the format V1.2.3.
+	 * @param version version number string
+	 * @return an array of 3 elements, representing the major, minor, and patch versions respectively
+	 */
+	public static Optional<int[]> parseVersionNumber(String version) {
 		// Strip non-digits
 		version = version.replaceAll("[^0-9.]+", "");
 		
@@ -147,3 +135,4 @@ public class Utility {
 	}
 
 }
+
