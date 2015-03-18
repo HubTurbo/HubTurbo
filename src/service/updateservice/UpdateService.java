@@ -84,6 +84,7 @@ public class UpdateService<T> extends GitHubService{
 
 		ArrayList<T> result = new ArrayList<>();
 
+		logger.info(String.format("Starting update of %s with ETag %s", apiSuffix, lastETag));
 		try {
 
 			PagedRequest<T> request = createUpdatedRequest(repoId);
@@ -98,9 +99,13 @@ public class UpdateService<T> extends GitHubService{
 				return new ArrayList<>();
 			}
 
-			if(responseCode != GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+			logger.info("UpdateService response: " + responseCode);
+			if(responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+				logger.info("Nothing to update");
+			} else {
 				result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
-				updateLastETag(connection);
+				updatedETag = connection.getHeaderField("ETag");
+				logger.info(String.format("New ETag for resource %s: %s", apiSuffix, updatedETag));
 			}
 
 			updateCheckTime(connection);
@@ -123,7 +128,7 @@ public class UpdateService<T> extends GitHubService{
 	 * @throws IOException
 	 */
 	private List<T> getPagedItems(PageIterator<T> iterator) throws IOException {
-		logger.info("Getting paged items: " + iterator.getLastPage() + " pages");
+		logger.info("Getting paged items from " + apiSuffix + ": " + (iterator.getLastPage()+1) + " pages");
 		List<T> elements = new ArrayList<>();
 		int length = 0;
 		int page = 0;
@@ -168,10 +173,6 @@ public class UpdateService<T> extends GitHubService{
 	 */
 	public Date getUpdatedCheckTime() {
 		return updatedCheckTime;
-	}
-
-	private void updateLastETag(HttpURLConnection connection) {
-		updatedETag = connection.getHeaderField("ETag");
 	}
 
 	private void updateCheckTime(HttpURLConnection connection) {

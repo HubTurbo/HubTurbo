@@ -63,9 +63,13 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
-				model.updateIssuesETag(issueUpdateService.getUpdatedETag());
-				model.updateIssueCheckTime(issueUpdateService.getUpdatedCheckTime());
-				model.updateCachedIssues(latch, updatedIssues, repoId);
+				if (issueUpdateService.succeeded()) {
+					model.updateIssuesETag(issueUpdateService.getUpdatedETag());
+					model.updateIssueCheckTime(issueUpdateService.getUpdatedCheckTime());
+					model.updateCachedIssues(latch, updatedIssues, repoId);
+				} else {
+					logger.info("Issues failed to update");
+				}
 			} else {
 				logger.info("No issues to update");
 				latch.countDown();
@@ -77,8 +81,12 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
-				model.updateCollabsETag(collaboratorUpdateService.getUpdatedETag());
-				model.updateCachedCollaborators(latch, collaborators, repoId);
+				if (collaboratorUpdateService.succeeded()) {
+					model.updateCollabsETag(collaboratorUpdateService.getUpdatedETag());
+					model.updateCachedCollaborators(latch, collaborators, repoId);
+				} else {
+					logger.info("Collaborators failed to update");
+				}
 			} else {
 				logger.info("No collaborators to update");
 				latch.countDown();
@@ -91,8 +99,12 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
-				model.updateLabelsETag(labelUpdateService.getUpdatedETag());
-				model.updateCachedLabels(latch, labels, repoId);
+				if (labelUpdateService.succeeded()) {
+					model.updateLabelsETag(labelUpdateService.getUpdatedETag());
+					model.updateCachedLabels(latch, labels, repoId);
+				} else {
+					logger.info("Labels failed to update");
+				}
 			} else {
 				logger.info("No labels to update");
 				latch.countDown();
@@ -105,8 +117,12 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
-				model.updateMilestonesETag(milestoneUpdateService.getUpdatedETag());
-				model.updateCachedMilestones(latch, milestones, repoId);
+				if (milestoneUpdateService.succeeded()) {
+					model.updateMilestonesETag(milestoneUpdateService.getUpdatedETag());
+					model.updateCachedMilestones(latch, milestones, repoId);
+				} else {
+					logger.info("Milestones failed to update");
+				}
 			} else {
 				logger.info("No milestones to update");
 				latch.countDown();
