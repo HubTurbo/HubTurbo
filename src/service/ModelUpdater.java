@@ -2,6 +2,7 @@ package service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import model.Model;
@@ -30,8 +31,7 @@ public class ModelUpdater {
 	private CollaboratorUpdateService collaboratorUpdateService;
 	private LabelUpdateService labelUpdateService;
 	private MilestoneUpdateService milestoneUpdateService;
-	private Date lastUpdateTime = new Date();
-	
+
 	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String
 		labelsETag, String milestonesETag, Date issueCheckTime){
 		this.model = model;
@@ -41,20 +41,14 @@ public class ModelUpdater {
 		this.milestoneUpdateService = new MilestoneUpdateService(client, milestonesETag);
 	}
 	
-	public Date getLastUpdateTime(){
-		return lastUpdateTime;
-	}
-	
 	public void updateModel(CountDownLatch latch, String repoId) {
 		logger.info("Updating model...");
 		model.disableModelChanges();
-		// TODO all these should return CompletableFuture<Integer>
-		// with the number of resources updated
+		// TODO all these should return CompletableFuture<Integer> with the number of resources updated
 	    updateModelCollaborators(latch, repoId);
 	   	updateModelLabels(latch, repoId);
 	  	updateModelMilestones(latch, repoId);
 	  	updateModelIssues(latch, repoId);
-	  	lastUpdateTime = issueUpdateService.getUpdatedCheckTime();
 	  	model.enableModelChanges();
 	}
 	
@@ -130,4 +124,45 @@ public class ModelUpdater {
 			}
 		}
 	}
+
+	public Optional<Date> getLastUpdateTime() {
+		if (issueUpdateService.succeeded()) {
+			return Optional.of(issueUpdateService.getUpdatedCheckTime());
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<String> getUpdatedIssueETag() {
+		if (issueUpdateService.succeeded()) {
+			return Optional.of(issueUpdateService.getUpdatedETag());
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<String> getUpdatedLabelETag() {
+		if (labelUpdateService.succeeded()) {
+			return Optional.of(labelUpdateService.getUpdatedETag());
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<String> getUpdatedMilestoneETag() {
+		if (milestoneUpdateService.succeeded()) {
+			return Optional.of(milestoneUpdateService.getUpdatedETag());
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<String> getUpdatedCollaboratorETag() {
+		if (collaboratorUpdateService.succeeded()) {
+			return Optional.of(collaboratorUpdateService.getUpdatedETag());
+		} else {
+			return Optional.empty();
+		}
+	}
+
 }

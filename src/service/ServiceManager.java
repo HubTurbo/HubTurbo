@@ -103,10 +103,10 @@ public class ServiceManager {
 	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
 	protected Model model;
 	protected RepositoryId repoId;
-	private String issuesETag = null;
-	private String collabsETag = null;
-	private String labelsETag = null;
-	private String milestonesETag = null;
+	private String issueETag = null;
+	private String collaboratorETag = null;
+	private String labelETag = null;
+	private String milestoneETag = null;
 
 	// Initialisation is required as this field will be passed down to the model updater
 	// to be used in the 'since' query string parameter. If the cache is loaded this won't
@@ -347,10 +347,10 @@ public class ServiceManager {
 
 		if (!needToGetResources) {
 			logger.info("Loading from cache...");
-			issuesETag = repo.getIssuesETag();
-			collabsETag = repo.getCollaboratorsETag();
-			labelsETag = repo.getLabelsETag();
-			milestonesETag = repo.getMilestonesETag();
+			issueETag = repo.getIssuesETag();
+			collaboratorETag = repo.getCollaboratorsETag();
+			labelETag = repo.getLabelsETag();
+			milestoneETag = repo.getMilestonesETag();
 			if (repo.getIssueCheckTime() == null) {
 				issueCheckTime = new Date();
 			} else {
@@ -374,10 +374,10 @@ public class ServiceManager {
 
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getGitHubResources() throws IOException {
-		issuesETag = null;
-		collabsETag = null;
-		labelsETag = null;
-		milestonesETag = null;
+		issueETag = null;
+		collaboratorETag = null;
+		labelETag = null;
+		milestoneETag = null;
 		issueCheckTime = new Date();
 
 		List<User> ghCollaborators = new ArrayList<User>();
@@ -417,7 +417,7 @@ public class ServiceManager {
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
-		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, collabsETag, labelsETag, milestonesETag,
+		modelUpdater = new ModelUpdater(githubClient, model, issueETag, collaboratorETag, labelETag, milestoneETag,
 			issueCheckTime);
 
 		// Disable repository selection
@@ -433,6 +433,7 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		updateETags();
 		model.updateCache();
 
 		updatedIssueMetadata.download();
@@ -445,6 +446,24 @@ public class ServiceManager {
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
+	}
+
+	private void updateETags() {
+		if (modelUpdater.getUpdatedIssueETag().isPresent()) {
+			issueETag = modelUpdater.getUpdatedIssueETag().get();
+		}
+		if (modelUpdater.getLastUpdateTime().isPresent()) {
+			issueCheckTime = modelUpdater.getLastUpdateTime().get();
+		}
+		if (modelUpdater.getUpdatedLabelETag().isPresent()) {
+			labelETag = modelUpdater.getUpdatedLabelETag().get();
+		}
+		if (modelUpdater.getUpdatedMilestoneETag().isPresent()) {
+			milestoneETag = modelUpdater.getUpdatedMilestoneETag().get();
+		}
+		if (modelUpdater.getUpdatedCollaboratorETag().isPresent()) {
+			collaboratorETag = modelUpdater.getUpdatedCollaboratorETag().get();
+		}
 	}
 
 	/**
