@@ -449,21 +449,11 @@ public class ServiceManager {
 	}
 
 	private void updateETags() {
-		if (modelUpdater.getUpdatedIssueETag().isPresent()) {
-			issueETag = modelUpdater.getUpdatedIssueETag().get();
-		}
-		if (modelUpdater.getLastUpdateTime().isPresent()) {
-			issueCheckTime = modelUpdater.getLastUpdateTime().get();
-		}
-		if (modelUpdater.getUpdatedLabelETag().isPresent()) {
-			labelETag = modelUpdater.getUpdatedLabelETag().get();
-		}
-		if (modelUpdater.getUpdatedMilestoneETag().isPresent()) {
-			milestoneETag = modelUpdater.getUpdatedMilestoneETag().get();
-		}
-		if (modelUpdater.getUpdatedCollaboratorETag().isPresent()) {
-			collaboratorETag = modelUpdater.getUpdatedCollaboratorETag().get();
-		}
+		issueETag = modelUpdater.getUpdatedIssueETag();
+		issueCheckTime = modelUpdater.getLastUpdateTime();
+		labelETag = modelUpdater.getUpdatedLabelETag();
+		milestoneETag = modelUpdater.getUpdatedMilestoneETag();
+		collaboratorETag = modelUpdater.getUpdatedCollaboratorETag();
 	}
 
 	/**

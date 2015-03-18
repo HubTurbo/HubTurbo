@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,9 +23,9 @@ import util.Utility;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
- * Returns auxillary results in the form of an updated ETag and the time of response.
- * Only provides the basic framework for fetching updates: details of how updates are
- * gotten are left to subclasses.
+ * Returns auxillary results in the form of an updated ETag and the time of response,
+ * which may be retrieved via the provided getters.
+ * Only provides the basic framework for fetching updates. Subclasses fill in the details.
  * */
 public class UpdateService<T> extends GitHubService{
 	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
@@ -37,18 +35,21 @@ public class UpdateService<T> extends GitHubService{
 	private final String lastETag;
 
 	// Auxillary results of calling getUpdatedItems
-	private String updatedETag = null;
+	private Optional<String> updatedETag = Optional.empty();
 	private Date updatedCheckTime = new Date();
 
-	// Caches results of calling getUpdatedItems
+	// Cached results of calling getUpdatedItems
 	private ArrayList<T> updatedItems = null;
 
 	/**
-	 * @param client a non-null GitHubClient
-	 * @param apiSuffix the API URI for the type of item; should be defined by subclasses
-	 * @param lastETag the current ETag; may be null
+	 * @param client an authenticated GitHubClient
+	 * @param apiSuffix the API URI for the type of item; defined by subclasses
+	 * @param lastETag the last-known ETag for these items; may be null
 	 */
 	public UpdateService(GitHubClientExtended client, String apiSuffix, String lastETag){
+		assert client != null;
+		assert apiSuffix != null && !apiSuffix.isEmpty();
+
 		this.client = client;
 		this.apiSuffix = apiSuffix;
 		this.lastETag = lastETag;
@@ -95,25 +96,24 @@ public class UpdateService<T> extends GitHubService{
 				logger.warn(String.format("%s: error getting updated items (%d)",
 					getClass().getSimpleName(), responseCode));
 
-				// The internal state of this object is unchanged, so it can be reused
-				return new ArrayList<>();
-			}
+				// Respond as if we succeeded and there were no updates.
+				// The assumption is that updates are cheap and we can do them as frequently as needed.
 
-			logger.info("UpdateService response: " + responseCode);
-			if(responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
-				logger.info("Nothing to update");
 			} else {
-				result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
-				updatedETag = Utility.stripQuotes(connection.getHeaderField("ETag"));
-				logger.info(String.format("New ETag for resource %s: %s", apiSuffix, updatedETag));
+				logger.info("UpdateService response: " + responseCode);
+				if(responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+					logger.info("Nothing to update");
+				} else {
+					result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
+					updatedETag = Optional.of(Utility.stripQuotes(connection.getHeaderField("ETag")));
+					logger.info(String.format("New ETag for resource %s: %s", apiSuffix, updatedETag));
+				}
 			}
 
 			updateCheckTime(connection);
 
 		} catch (IOException e) {
-			if(!(e instanceof UnknownHostException || e instanceof SocketTimeoutException)){
-				logger.error(e.getLocalizedMessage(), e);
-			}
+			logger.error(e.getLocalizedMessage(), e);
 		}
 
 		updatedItems = result;
@@ -146,29 +146,21 @@ public class UpdateService<T> extends GitHubService{
 	}
 
 	/**
-	 * Tests to see if getUpdatedItems succeeded. If so, the auxillary fields are
-	 * guaranteed to be set.
-	 * @return true if getUpdatedItems succeeded
-	 */
-	public boolean succeeded() {
-		return updatedItems != null;
-	}
-
-	/**
 	 * Returns the ETag for the updated items.
-	 * Will be null in the event of failure, guaranteed not to be on success.
+	 * In the event of failure, will be whatever the last provided ETag was.
 	 * @return ETag for updated items
 	 */
 	public String getUpdatedETag() {
-		if (succeeded()) {
-			assert updatedETag != null;
+		if (updatedETag.isPresent()) {
+			return updatedETag.get();
+		} else {
+			return lastETag;
 		}
-		return updatedETag;
 	}
 
 	/**
 	 * Returns the time at which the updated items were sent from the server.
-	 * Has a reasonable default in the event of failure
+	 * In the event of failure, will be the time the request was made.
 	 * @return time at which updated items were sent from server
 	 */
 	public Date getUpdatedCheckTime() {

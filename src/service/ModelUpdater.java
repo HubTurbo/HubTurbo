@@ -2,12 +2,10 @@ package service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import model.Model;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
@@ -57,13 +55,9 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
-				if (issueUpdateService.succeeded()) {
-					model.updateIssuesETag(issueUpdateService.getUpdatedETag());
-					model.updateIssueCheckTime(issueUpdateService.getUpdatedCheckTime());
-					model.updateCachedIssues(latch, updatedIssues, repoId);
-				} else {
-					logger.info("Issues failed to update");
-				}
+				model.updateIssuesETag(issueUpdateService.getUpdatedETag());
+				model.updateIssueCheckTime(issueUpdateService.getUpdatedCheckTime());
+				model.updateCachedIssues(latch, updatedIssues, repoId);
 			} else {
 				logger.info("No issues to update");
 				latch.countDown();
@@ -75,12 +69,8 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
-				if (collaboratorUpdateService.succeeded()) {
-					model.updateCollabsETag(collaboratorUpdateService.getUpdatedETag());
-					model.updateCachedCollaborators(latch, collaborators, repoId);
-				} else {
-					logger.info("Collaborators failed to update");
-				}
+				model.updateCollabsETag(collaboratorUpdateService.getUpdatedETag());
+				model.updateCachedCollaborators(latch, collaborators, repoId);
 			} else {
 				logger.info("No collaborators to update");
 				latch.countDown();
@@ -93,12 +83,8 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
-				if (labelUpdateService.succeeded()) {
-					model.updateLabelsETag(labelUpdateService.getUpdatedETag());
-					model.updateCachedLabels(latch, labels, repoId);
-				} else {
-					logger.info("Labels failed to update");
-				}
+				model.updateLabelsETag(labelUpdateService.getUpdatedETag());
+				model.updateCachedLabels(latch, labels, repoId);
 			} else {
 				logger.info("No labels to update");
 				latch.countDown();
@@ -111,12 +97,8 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
-				if (milestoneUpdateService.succeeded()) {
-					model.updateMilestonesETag(milestoneUpdateService.getUpdatedETag());
-					model.updateCachedMilestones(latch, milestones, repoId);
-				} else {
-					logger.info("Milestones failed to update");
-				}
+				model.updateMilestonesETag(milestoneUpdateService.getUpdatedETag());
+				model.updateCachedMilestones(latch, milestones, repoId);
 			} else {
 				logger.info("No milestones to update");
 				latch.countDown();
@@ -125,44 +107,24 @@ public class ModelUpdater {
 		}
 	}
 
-	public Optional<Date> getLastUpdateTime() {
-		if (issueUpdateService.succeeded()) {
-			return Optional.of(issueUpdateService.getUpdatedCheckTime());
-		} else {
-			return Optional.empty();
-		}
+	public Date getLastUpdateTime() {
+		return issueUpdateService.getUpdatedCheckTime();
 	}
 
-	public Optional<String> getUpdatedIssueETag() {
-		if (issueUpdateService.succeeded()) {
-			return Optional.of(issueUpdateService.getUpdatedETag());
-		} else {
-			return Optional.empty();
-		}
+	public String getUpdatedIssueETag() {
+		return issueUpdateService.getUpdatedETag();
 	}
 
-	public Optional<String> getUpdatedLabelETag() {
-		if (labelUpdateService.succeeded()) {
-			return Optional.of(labelUpdateService.getUpdatedETag());
-		} else {
-			return Optional.empty();
-		}
+	public String getUpdatedLabelETag() {
+		return labelUpdateService.getUpdatedETag();
 	}
 
-	public Optional<String> getUpdatedMilestoneETag() {
-		if (milestoneUpdateService.succeeded()) {
-			return Optional.of(milestoneUpdateService.getUpdatedETag());
-		} else {
-			return Optional.empty();
-		}
+	public String getUpdatedMilestoneETag() {
+		return milestoneUpdateService.getUpdatedETag();
 	}
 
-	public Optional<String> getUpdatedCollaboratorETag() {
-		if (collaboratorUpdateService.succeeded()) {
-			return Optional.of(collaboratorUpdateService.getUpdatedETag());
-		} else {
-			return Optional.empty();
-		}
+	public String getUpdatedCollaboratorETag() {
+		return collaboratorUpdateService.getUpdatedETag();
 	}
 
 }
