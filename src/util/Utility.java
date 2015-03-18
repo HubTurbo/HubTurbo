@@ -49,7 +49,11 @@ public class Utility {
 	public static String stringify(Collection<TurboLabel> labels) {
 		return "[" + Joiner.on(", ").join(labels.stream().map(l -> l.logString()).collect(Collectors.toList())) + "]";
 	}
-	
+
+	public static String stripQuotes(String s) {
+		return s.replaceAll("^\"|\"$", "");
+	}
+
 	public static int safeLongToInt(long l) {
 	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
 	        throw new IllegalArgumentException

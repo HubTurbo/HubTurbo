@@ -104,7 +104,7 @@ public class UpdateService<T> extends GitHubService{
 				logger.info("Nothing to update");
 			} else {
 				result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
-				updatedETag = connection.getHeaderField("ETag");
+				updatedETag = Utility.stripQuotes(connection.getHeaderField("ETag"));
 				logger.info(String.format("New ETag for resource %s: %s", apiSuffix, updatedETag));
 			}
 
