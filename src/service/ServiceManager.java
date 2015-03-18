@@ -107,7 +107,12 @@ public class ServiceManager {
 	private String collabsETag = null;
 	private String labelsETag = null;
 	private String milestonesETag = null;
-	private Date issueCheckTime = null;
+
+	// Initialisation is required as this field will be passed down to the model updater
+	// to be used in the 'since' query string parameter. If the cache is loaded this won't
+	// be necessary (the cached time will be used instead), but if it isn't, this is a
+	// reasonable default.
+	private Date issueCheckTime = new Date();
 
 	private final TickingTimer timer;
 
@@ -346,7 +351,11 @@ public class ServiceManager {
 			collabsETag = repo.getCollaboratorsETag();
 			labelsETag = repo.getLabelsETag();
 			milestonesETag = repo.getMilestonesETag();
-			issueCheckTime = Utility.localDateTimeToDate(repo.getIssueCheckTime());
+			if (repo.getIssueCheckTime() == null) {
+				issueCheckTime = new Date();
+			} else {
+				issueCheckTime = Utility.localDateTimeToDate(repo.getIssueCheckTime());
+			}
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
@@ -369,7 +378,7 @@ public class ServiceManager {
 		collabsETag = null;
 		labelsETag = null;
 		milestonesETag = null;
-		issueCheckTime = null;
+		issueCheckTime = new Date();
 
 		List<User> ghCollaborators = new ArrayList<User>();
 		List<Label> ghLabels = new ArrayList<Label>();

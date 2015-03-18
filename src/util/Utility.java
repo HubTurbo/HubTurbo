@@ -59,6 +59,7 @@ public class Utility {
 	}
 
 	public static Date parseHTTPLastModifiedDate(String dateString) {
+		assert dateString != null;
 		try {
 			return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(dateString);
 		} catch (ParseException e) {
@@ -69,20 +70,24 @@ public class Utility {
 	}
 
 	public static String formatDateISO8601(Date date){
+		assert date != null;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return df.format(date);
 	}
 
 	public static Date localDateTimeToDate(LocalDateTime time) {
+		assert time != null;
 		return new Date(localDateTimeToLong(time));
 	}
 
 	public static LocalDateTime dateToLocalDateTime(Date date) {
+		assert date != null;
 		return longToLocalDateTime(date.getTime());
 	}
 
 	public static long localDateTimeToLong(LocalDateTime t) {
+		assert t != null;
 		return t.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 	

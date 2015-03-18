@@ -64,7 +64,13 @@ public class Model {
 	private String lastCollabsETag = null;
 	private String lastLabelsETag = null;
 	private String lastMilestonesETag = null;
-	private Date lastIssueCheckTime = null;
+
+	// This has to be initialised because the model may be written to cache
+	// before a sync ever takes place (as it uses the same code path as when
+	// downloading). This is probably the root problem to fix. TODO
+	// In the meanwhile the current time is a reasonable default for when
+	// updates were last fetched.
+	private Date lastIssueCheckTime = new Date();
 
 	private CacheFileHandler dcHandler = null;
 
