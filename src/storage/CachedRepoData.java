@@ -25,9 +25,9 @@ public class CachedRepoData {
 	private List<SerializableMilestone> milestones = null; 
 	private List<SerializableIssue> issues = null;
 	
-	public CachedRepoData(String issuesETag, String collabsETag, String labelsETag, String milestonesETag,
-	                      LocalDateTime issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
-	                      List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public CachedRepoData(String issuesETag, String labelsETag, String milestonesETag, String collabsETag,
+              LocalDateTime issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
+              List<TurboMilestone> milestones, List<TurboIssue> issues) {
 
 		this.issuesETag = issuesETag;
 		this.collabsETag = collabsETag;
@@ -37,7 +37,7 @@ public class CachedRepoData {
 		
 		this.collaborators = collaborators;
 		
-		this.labels = new ArrayList<SerializableLabel>();
+		this.labels = new ArrayList<>();
 		if (this.labels != null) {
 			for (TurboLabel label : labels) {
 				this.labels.add(new SerializableLabel(label));

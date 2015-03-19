@@ -74,9 +74,10 @@ public class CacheFileHandler {
 		return repo;
 	}
 
-	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag,
-			String milestonesETag, Date issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
-			List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public void writeToFile(String repoIdString, String issuesETag, String labelsETag, String milestonesETag,
+	    String collabsETag, Date issueCheckTime,
+	    List<TurboUser> collaborators, List<TurboLabel> labels,
+	    List<TurboMilestone> milestones, List<TurboIssue> issues) {
 
 		CachedRepoData currentRepoData = new CachedRepoData(issuesETag, collabsETag, labelsETag, milestonesETag,
 			Utility.dateToLocalDateTime(issueCheckTime), new ArrayList<>(collaborators), new ArrayList<>(labels),

@@ -60,18 +60,6 @@ public class Model {
 	// TODO make final when the model is constructed with this
 	private IRepositoryIdProvider repoId;
 
-	private String lastIssuesETag = null;
-	private String lastCollabsETag = null;
-	private String lastLabelsETag = null;
-	private String lastMilestonesETag = null;
-
-	// This has to be initialised because the model may be written to cache
-	// before a sync ever takes place (as it uses the same code path as when
-	// downloading). This is probably the root problem to fix. TODO
-	// In the meanwhile the current time is a reasonable default for when
-	// updates were last fetched.
-	private Date lastIssueCheckTime = new Date();
-
 	private CacheFileHandler dcHandler = null;
 
 	private EventDispatcher eventDispatcher = null;
@@ -362,10 +350,24 @@ public class Model {
 		}
 	}
 
+	/**
+	 * Updates the cache with the provided values for ETags and issueCheckTime
+	 */
+	public void updateCache(String issuesETag, String labelETag, String milestoneETag, String collaboratorETag, Date
+		lastIssueCheckTime) {
+		if (!isInTestMode) {
+			dcHandler.writeToFile(repoId.toString(), issuesETag, labelETag, milestoneETag, collaboratorETag,
+				lastIssueCheckTime, collaborators, labels, milestones, issues);
+		}
+	}
+
+	/**
+	 * Updates the cache with default values for ETags (nothing) and issueCheckTime (current time)
+	 */
 	public void updateCache() {
 		if (!isInTestMode) {
-            dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
-            		lastIssueCheckTime, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(repoId.toString(), null, null, null, null,
+				new Date(), collaborators, labels, milestones, issues);
 		}
 	}
 
@@ -661,26 +663,6 @@ public class Model {
 	}
 
 	private void ______RESOURCE_METADATA______() {
-	}
-
-	public void updateIssuesETag(String ETag) {
-		this.lastIssuesETag = ETag;
-	}
-
-	public void updateCollabsETag(String ETag) {
-		this.lastCollabsETag = ETag;
-	}
-
-	public void updateLabelsETag(String ETag) {
-		this.lastLabelsETag = ETag;
-	}
-
-	public void updateMilestonesETag(String ETag) {
-		this.lastMilestonesETag = ETag;
-	}
-
-	public void updateIssueCheckTime(Date date) {
-		this.lastIssueCheckTime = date;
 	}
 
 	private void ______TESTING______() {

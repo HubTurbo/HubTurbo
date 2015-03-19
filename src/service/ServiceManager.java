@@ -434,7 +434,7 @@ public class ServiceManager {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		updateETags();
-		model.updateCache();
+		model.updateCache(issueETag, labelETag, milestoneETag, collaboratorETag, issueCheckTime);
 
 		updatedIssueMetadata.download();
 		model.triggerModelChangeEvent();
