@@ -257,9 +257,8 @@ public class ServiceManager {
 	/**
 	 * Determines if a repository is a valid one. Returns false if not, otherwise
 	 * returns true. Throws an IOException if the check fails in any other way.
-	 *
-	 * @param repo
-	 * @return
+	 * @param uri the URL of the repository
+	 * @return true if the repository is valid
 	 * @throws IOException
 	 */
 	protected boolean checkRepositoryValidity(String uri) throws IOException {
@@ -361,7 +360,7 @@ public class ServiceManager {
 			List<TurboMilestone> milestones = repo.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
 
-			HashMap<String, List> map = new HashMap<String, List>();
+			HashMap<String, List> map = new HashMap<>();
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
@@ -380,20 +379,11 @@ public class ServiceManager {
 		milestonesETag = null;
 		issueCheckTime = new Date();
 
-		List<User> ghCollaborators = new ArrayList<User>();
-		List<Label> ghLabels = new ArrayList<Label>();
-		List<Milestone> ghMilestones = new ArrayList<Milestone>();
-		List<Issue> ghIssues = new ArrayList<Issue>();
-
-		ghLabels = getLabels();
-		ghMilestones = getMilestones();
-		ghIssues = getAllIssues();
-
-		HashMap<String, List> map = new HashMap<String, List>();
-		map.put(KEY_COLLABORATORS, ghCollaborators);
-		map.put(KEY_LABELS, ghLabels);
-		map.put(KEY_MILESTONES, ghMilestones);
-		map.put(KEY_ISSUES, ghIssues);
+		HashMap<String, List> map = new HashMap<>();
+		map.put(KEY_COLLABORATORS, new ArrayList<>());
+		map.put(KEY_LABELS, getLabels());
+		map.put(KEY_MILESTONES, getMilestones());
+		map.put(KEY_ISSUES, getAllIssues());
 		return map;
 	}
 
@@ -402,12 +392,9 @@ public class ServiceManager {
 	}
 
 	private TickingTimer createTickingTimer() {
-		TickingTimer timer = new TickingTimer("Sync Timer", SYNC_PERIOD, (time) -> {
-			HTStatusBar.updateRefreshTimer(time);
-		}, () -> {
+		return new TickingTimer("Sync Timer", SYNC_PERIOD, HTStatusBar::updateRefreshTimer, () -> {
 			preventRepoSwitchingAndUpdateModel(model.getRepoId().generateId());
 		});
-		return timer;
 	}
 
 	/**
@@ -523,7 +510,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.getLabels(repoId);
 		}
-		return new ArrayList<Label>();
+		return new ArrayList<>();
 	}
 
 	public Label createLabel(Label ghLabel) throws IOException {
@@ -541,7 +528,7 @@ public class ServiceManager {
 
 	public Label editLabel(Label label, String name) throws IOException {
 		if (repoId != null) {
-			return (Label) labelService.editLabel(repoId, label, name);
+			return labelService.editLabel(repoId, label, name);
 		}
 		return null;
 	}
@@ -553,7 +540,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return milestoneService.getMilestones(repoId, ISSUE_STATE_ALL);
 		}
-		return new ArrayList<Milestone>();
+		return new ArrayList<>();
 	}
 
 	public Milestone createMilestone(Milestone milestone) throws IOException {
@@ -571,7 +558,7 @@ public class ServiceManager {
 
 	public Milestone editMilestone(Milestone milestone) throws IOException {
 		if (repoId != null) {
-			return (Milestone) milestoneService.editMilestone(repoId, milestone);
+			return milestoneService.editMilestone(repoId, milestone);
 		}
 		return null;
 	}
@@ -581,12 +568,12 @@ public class ServiceManager {
 
 	public List<Issue> getAllIssues() throws IOException {
 		if (repoId != null) {
-			Map<String, String> filters = new HashMap<String, String>();
+			Map<String, String> filters = new HashMap<>();
 			filters.put(IssueService.FIELD_FILTER, ISSUE_STATE_ALL);
 			filters.put(IssueService.FILTER_STATE, ISSUE_STATE_ALL);
 			return issueService.getIssues(repoId, filters);
 		}
-		return new ArrayList<Issue>();
+		return new ArrayList<>();
 	}
 
 	public Issue createIssue(Issue issue) throws IOException {
@@ -607,7 +594,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return issueService.getIssueData(repoId, issueId);
 		}
-		return new HashMap<String, Object>();
+		return new HashMap<>();
 	}
 
 	public String getDateFromIssueData(HashMap<String, Object> issueData) {
@@ -624,7 +611,7 @@ public class ServiceManager {
 
 	public Issue editIssue(Issue latest, String dateModified) throws IOException {
 		if (repoId != null) {
-			return (Issue) issueService.editIssue(repoId, latest, dateModified);
+			return issueService.editIssue(repoId, latest, dateModified);
 		}
 		return null;
 	}
@@ -663,7 +650,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.setLabels(repoId, Long.toString(issueId), labels);
 		}
-		return new ArrayList<Label>();
+		return new ArrayList<>();
 	}
 
 	/**
@@ -674,7 +661,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return labelService.addLabelsToIssue(repoId, Integer.toString(issueId), labels);
 		}
-		return new ArrayList<Label>();
+		return new ArrayList<>();
 	}
 
 	public void deleteLabelsFromIssue(int issueId, List<Label> labels) throws IOException {
@@ -722,7 +709,7 @@ public class ServiceManager {
 		if (repoId != null) {
 			return collabService.getCollaborators(repoId);
 		}
-		return new ArrayList<User>();
+		return new ArrayList<>();
 	}
 
 	private void ______EVENTS______() {
@@ -780,9 +767,8 @@ public class ServiceManager {
 
 	public List<Comment> getLatestComments(int issueId) throws IOException {
 		if (repoId != null) {
-			List<Comment> comments = issueService.getComments(repoId, issueId);
-			return comments;
+			return issueService.getComments(repoId, issueId);
 		}
-		return new ArrayList<Comment>();
+		return new ArrayList<>();
 	}
 }
