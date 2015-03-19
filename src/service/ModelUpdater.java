@@ -30,13 +30,12 @@ public class ModelUpdater {
 	private LabelUpdateService labelUpdateService;
 	private MilestoneUpdateService milestoneUpdateService;
 
-	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String labelsETag,
-            String milestonesETag, String collabsETag, Date issueCheckTime){
+	public ModelUpdater(GitHubClientExtended client, Model model, UpdateSignature updateSignature) {
 		this.model = model;
-		this.issueUpdateService = new IssueUpdateService(client, issuesETag, issueCheckTime);
-		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);
-		this.labelUpdateService = new LabelUpdateService(client, labelsETag);
-		this.milestoneUpdateService = new MilestoneUpdateService(client, milestonesETag);
+		this.issueUpdateService = new IssueUpdateService(client, updateSignature.issuesETag, updateSignature.lastCheckTime);
+		this.collaboratorUpdateService = new CollaboratorUpdateService(client, updateSignature.collaboratorsETag);
+		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
+		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 	}
 	
 	public void updateModel(CountDownLatch latch, String repoId) {
@@ -102,24 +101,9 @@ public class ModelUpdater {
 		}
 	}
 
-	public Date getLastUpdateTime() {
-		return issueUpdateService.getUpdatedCheckTime();
+	public UpdateSignature getNewUpdateSignature() {
+		return new UpdateSignature(issueUpdateService.getUpdatedETag(),
+			labelUpdateService.getUpdatedETag(), milestoneUpdateService.getUpdatedETag(),
+			collaboratorUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
 	}
-
-	public String getUpdatedIssueETag() {
-		return issueUpdateService.getUpdatedETag();
-	}
-
-	public String getUpdatedLabelETag() {
-		return labelUpdateService.getUpdatedETag();
-	}
-
-	public String getUpdatedMilestoneETag() {
-		return milestoneUpdateService.getUpdatedETag();
-	}
-
-	public String getUpdatedCollaboratorETag() {
-		return collaboratorUpdateService.getUpdatedETag();
-	}
-
 }

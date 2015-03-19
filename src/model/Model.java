@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
+import service.UpdateSignature;
 import storage.CacheFileHandler;
 import tests.TestUtils;
 import tests.stubs.ModelEventDispatcherStub;
@@ -353,11 +354,11 @@ public class Model {
 	/**
 	 * Updates the cache with the provided values for ETags and issueCheckTime
 	 */
-	public void updateCache(String issuesETag, String labelETag, String milestoneETag, String collaboratorETag, Date
-		lastIssueCheckTime) {
+	public void updateCache(UpdateSignature updateSignature) {
 		if (!isInTestMode) {
-			dcHandler.writeToFile(repoId.toString(), issuesETag, labelETag, milestoneETag, collaboratorETag,
-				lastIssueCheckTime, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(repoId.toString(), updateSignature.issuesETag, updateSignature.labelsETag,
+				updateSignature.milestonesETag, updateSignature.collaboratorsETag,
+				updateSignature.lastCheckTime, collaborators, labels, milestones, issues);
 		}
 	}
 

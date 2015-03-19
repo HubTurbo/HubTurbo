@@ -103,16 +103,8 @@ public class ServiceManager {
 	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
 	protected Model model;
 	protected RepositoryId repoId;
-	private String issuesETag = null;
-	private String collaboratorsETag = null;
-	private String labelsETag = null;
-	private String milestonesETag = null;
 
-	// Initialisation is required as this field will be passed down to the model updater
-	// to be used in the 'since' query string parameter. If the cache is loaded this won't
-	// be necessary (the cached time will be used instead), but if it isn't, this is a
-	// reasonable default.
-	private Date issueCheckTime = new Date();
+	private UpdateSignature updateSignature = new UpdateSignature();
 
 	private final TickingTimer timer;
 
@@ -346,15 +338,14 @@ public class ServiceManager {
 
 		if (!needToGetResources) {
 			logger.info("Loading from cache...");
-			issuesETag = repo.getIssuesETag();
-			collaboratorsETag = repo.getCollaboratorsETag();
-			labelsETag = repo.getLabelsETag();
-			milestonesETag = repo.getMilestonesETag();
-			if (repo.getIssueCheckTime() == null) {
-				issueCheckTime = new Date();
-			} else {
-				issueCheckTime = Utility.localDateTimeToDate(repo.getIssueCheckTime());
-			}
+
+			Date issueCheckTime = repo.getIssueCheckTime() == null
+				? new Date()
+				: Utility.localDateTimeToDate(repo .getIssueCheckTime());
+
+			updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
+				repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
+
 			List<TurboUser> collaborators = repo.getCollaborators();
 			List<TurboLabel> labels = repo.getLabels();
 			List<TurboMilestone> milestones = repo.getMilestones();
@@ -373,11 +364,8 @@ public class ServiceManager {
 
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getGitHubResources() throws IOException {
-		issuesETag = null;
-		collaboratorsETag = null;
-		labelsETag = null;
-		milestonesETag = null;
-		issueCheckTime = new Date();
+
+		updateSignature = new UpdateSignature();
 
 		HashMap<String, List> map = new HashMap<>();
 		map.put(KEY_COLLABORATORS, new ArrayList<>());
@@ -404,8 +392,7 @@ public class ServiceManager {
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
-		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, labelsETag, milestonesETag,
-			collaboratorsETag, issueCheckTime);
+		modelUpdater = new ModelUpdater(githubClient, model, updateSignature);
 
 		// Disable repository selection
 		PlatformEx.runAndWait(() -> {
@@ -420,8 +407,8 @@ public class ServiceManager {
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		updateETags();
-		model.updateCache(issuesETag, labelsETag, milestonesETag, collaboratorsETag, issueCheckTime);
+		updateSignature = modelUpdater.getNewUpdateSignature();
+		model.updateCache(updateSignature);
 
 		updatedIssueMetadata.download();
 		model.triggerModelChangeEvent();
@@ -433,14 +420,6 @@ public class ServiceManager {
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
-	}
-
-	private void updateETags() {
-		issuesETag = modelUpdater.getUpdatedIssueETag();
-		issueCheckTime = modelUpdater.getLastUpdateTime();
-		labelsETag = modelUpdater.getUpdatedLabelETag();
-		milestonesETag = modelUpdater.getUpdatedMilestoneETag();
-		collaboratorsETag = modelUpdater.getUpdatedCollaboratorETag();
 	}
 
 	/**
