@@ -36,7 +36,7 @@ public class GitHubURL {
 	}
 
 	public static String getChangelogForVersion(String version) {
-		Optional<int[]> numbers = Utility.parseVersionNumberString(version);
+		Optional<int[]> numbers = Utility.parseVersionNumber(version);
 		if (numbers.isPresent()) {
 			int major = numbers.get()[0];
 			int minor = numbers.get()[1];

@@ -3,11 +3,7 @@ package model;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -23,6 +19,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
 import service.ServiceManager;
+import service.UpdateSignature;
 import storage.CacheFileHandler;
 import tests.TestUtils;
 import tests.stubs.ModelEventDispatcherStub;
@@ -63,12 +60,6 @@ public class Model {
 
 	// TODO make final when the model is constructed with this
 	private IRepositoryIdProvider repoId;
-
-	private String lastIssuesETag = null;
-	private String lastCollabsETag = null;
-	private String lastLabelsETag = null;
-	private String lastMilestonesETag = null;
-	private String lastIssueCheckTime = null;
 
 	private CacheFileHandler dcHandler = null;
 
@@ -360,10 +351,24 @@ public class Model {
 		}
 	}
 
+	/**
+	 * Updates the cache with the provided values for ETags and issueCheckTime
+	 */
+	public void updateCache(UpdateSignature updateSignature) {
+		if (!isInTestMode) {
+			dcHandler.writeToFile(repoId.toString(), updateSignature.issuesETag, updateSignature.labelsETag,
+				updateSignature.milestonesETag, updateSignature.collaboratorsETag,
+				updateSignature.lastCheckTime, collaborators, labels, milestones, issues);
+		}
+	}
+
+	/**
+	 * Updates the cache with default values for ETags (nothing) and issueCheckTime (current time)
+	 */
 	public void updateCache() {
 		if (!isInTestMode) {
-            dcHandler.writeToFile(repoId.toString(), lastIssuesETag, lastCollabsETag, lastLabelsETag, lastMilestonesETag,
-            		lastIssueCheckTime, collaborators, labels, milestones, issues);
+			dcHandler.writeToFile(repoId.toString(), null, null, null, null,
+				new Date(), collaborators, labels, milestones, issues);
 		}
 	}
 
@@ -659,26 +664,6 @@ public class Model {
 	}
 
 	private void ______RESOURCE_METADATA______() {
-	}
-
-	public void updateIssuesETag(String ETag) {
-		this.lastIssuesETag = ETag;
-	}
-
-	public void updateCollabsETag(String ETag) {
-		this.lastCollabsETag = ETag;
-	}
-
-	public void updateLabelsETag(String ETag) {
-		this.lastLabelsETag = ETag;
-	}
-
-	public void updateMilestonesETag(String ETag) {
-		this.lastMilestonesETag = ETag;
-	}
-
-	public void updateIssueCheckTime(String date) {
-		this.lastIssueCheckTime = date;
 	}
 
 	private void ______TESTING______() {

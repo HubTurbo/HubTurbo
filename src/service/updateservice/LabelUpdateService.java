@@ -14,9 +14,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class LabelUpdateService extends UpdateService<Label> {
 	public LabelUpdateService(GitHubClientExtended client, String labelsETag){
-		super(client);
-		apiSuffix = SEGMENT_LABELS;
-		super.setLastETag(labelsETag);
+		super(client, SEGMENT_LABELS, labelsETag);
 	}
 	@Override
 	protected PagedRequest<Label> createUpdatedRequest(IRepositoryIdProvider repoId){
