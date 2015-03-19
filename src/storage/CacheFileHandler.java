@@ -15,6 +15,7 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,6 +32,18 @@ public class CacheFileHandler {
 
 	private CachedRepoData repo = null;
 	private String repoId = null;
+
+	/**
+	 * TODO Stop-gap measure pending a more robust updater that can
+	 * deal with schema versions.
+	 */
+	public static void deleteCacheDirectory() {
+		try {
+			FileUtils.deleteDirectory(new File(DIR_CACHE));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
 
 	public CacheFileHandler(String repoId) {
 		this.repoId = repoId;
