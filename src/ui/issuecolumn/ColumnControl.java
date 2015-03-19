@@ -257,6 +257,7 @@ public class ColumnControl extends HBox {
 				}
 				if (defaultSizeWindow.match(event)) {
 					ui.setDefaultWidth();
+					scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
 				}
 			}
 			
