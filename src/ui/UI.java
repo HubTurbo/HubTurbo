@@ -29,6 +29,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
+import storage.CacheFileHandler;
 import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
@@ -99,6 +100,7 @@ public class UI extends Application implements EventDispatcher {
 
 		commandLineArgs = initialiseCommandLineArguments();
 		DataManager.getInstance();
+		clearCacheIfNecessary();
 
 		repoSelector = createRepoSelector();
 
@@ -111,6 +113,15 @@ public class UI extends Application implements EventDispatcher {
 		loadFonts();
 		applyCSS(scene);
 		getUserCredentials();
+	}
+
+	/**
+	 * TODO Stop-gap measure pending a more robust updater
+	 */
+	private void clearCacheIfNecessary() {
+		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
+			CacheFileHandler.deleteCacheDirectory();
+		}
 	}
 
 	private void getUserCredentials() {
