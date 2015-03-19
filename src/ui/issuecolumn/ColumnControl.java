@@ -248,7 +248,6 @@ public class ColumnControl extends HBox {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				event.consume();
 				if (maximizeWindow.match(event)) {
 					ui.maximizeWindow();
 				}
@@ -259,20 +258,12 @@ public class ColumnControl extends HBox {
 					ui.setDefaultWidth();
 					scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
 				}
+				if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.G) {
+					handleKeys(event.getCode() == KeyCode.F);
+					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
+				}
 			}
 			
-		});
-		setOnKeyReleased(e -> {
-				switch (e.getCode()) {
-				case F:
-				case D:
-					e.consume();
-					handleKeys(e.getCode() == KeyCode.F);
-					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
-					break;
-				default:
-					break;
-				}
 		});
 	}
 
