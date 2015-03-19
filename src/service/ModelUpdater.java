@@ -30,8 +30,8 @@ public class ModelUpdater {
 	private LabelUpdateService labelUpdateService;
 	private MilestoneUpdateService milestoneUpdateService;
 
-	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String
-		labelsETag, String milestonesETag, Date issueCheckTime){
+	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String labelsETag,
+            String milestonesETag, String collabsETag, Date issueCheckTime){
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client, issuesETag, issueCheckTime);
 		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);

@@ -103,10 +103,10 @@ public class ServiceManager {
 	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
 	protected Model model;
 	protected RepositoryId repoId;
-	private String issueETag = null;
-	private String collaboratorETag = null;
-	private String labelETag = null;
-	private String milestoneETag = null;
+	private String issuesETag = null;
+	private String collaboratorsETag = null;
+	private String labelsETag = null;
+	private String milestonesETag = null;
 
 	// Initialisation is required as this field will be passed down to the model updater
 	// to be used in the 'since' query string parameter. If the cache is loaded this won't
@@ -347,10 +347,10 @@ public class ServiceManager {
 
 		if (!needToGetResources) {
 			logger.info("Loading from cache...");
-			issueETag = repo.getIssuesETag();
-			collaboratorETag = repo.getCollaboratorsETag();
-			labelETag = repo.getLabelsETag();
-			milestoneETag = repo.getMilestonesETag();
+			issuesETag = repo.getIssuesETag();
+			collaboratorsETag = repo.getCollaboratorsETag();
+			labelsETag = repo.getLabelsETag();
+			milestonesETag = repo.getMilestonesETag();
 			if (repo.getIssueCheckTime() == null) {
 				issueCheckTime = new Date();
 			} else {
@@ -374,10 +374,10 @@ public class ServiceManager {
 
 	@SuppressWarnings("rawtypes")
 	public HashMap<String, List> getGitHubResources() throws IOException {
-		issueETag = null;
-		collaboratorETag = null;
-		labelETag = null;
-		milestoneETag = null;
+		issuesETag = null;
+		collaboratorsETag = null;
+		labelsETag = null;
+		milestonesETag = null;
 		issueCheckTime = new Date();
 
 		List<User> ghCollaborators = new ArrayList<User>();
@@ -413,12 +413,12 @@ public class ServiceManager {
 	/**
 	 * Updates the contents of the model with data from the given repository.
 	 *
-	 * @param repoId
+	 * @param repoId the repository get updates for/from
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
-		modelUpdater = new ModelUpdater(githubClient, model, issueETag, collaboratorETag, labelETag, milestoneETag,
-			issueCheckTime);
+		modelUpdater = new ModelUpdater(githubClient, model, issuesETag, labelsETag, milestonesETag,
+			collaboratorsETag, issueCheckTime);
 
 		// Disable repository selection
 		PlatformEx.runAndWait(() -> {
@@ -434,7 +434,7 @@ public class ServiceManager {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		updateETags();
-		model.updateCache(issueETag, labelETag, milestoneETag, collaboratorETag, issueCheckTime);
+		model.updateCache(issuesETag, labelsETag, milestonesETag, collaboratorsETag, issueCheckTime);
 
 		updatedIssueMetadata.download();
 		model.triggerModelChangeEvent();
@@ -449,11 +449,11 @@ public class ServiceManager {
 	}
 
 	private void updateETags() {
-		issueETag = modelUpdater.getUpdatedIssueETag();
+		issuesETag = modelUpdater.getUpdatedIssueETag();
 		issueCheckTime = modelUpdater.getLastUpdateTime();
-		labelETag = modelUpdater.getUpdatedLabelETag();
-		milestoneETag = modelUpdater.getUpdatedMilestoneETag();
-		collaboratorETag = modelUpdater.getUpdatedCollaboratorETag();
+		labelsETag = modelUpdater.getUpdatedLabelETag();
+		milestonesETag = modelUpdater.getUpdatedMilestoneETag();
+		collaboratorsETag = modelUpdater.getUpdatedCollaboratorETag();
 	}
 
 	/**
