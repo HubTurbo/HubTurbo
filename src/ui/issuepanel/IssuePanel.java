@@ -130,13 +130,12 @@ public class IssuePanel extends IssueColumn {
 	private void setupKeyboardShortcuts(){
 		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
+				event.consume();
 				if (keyCombBoxToList.match(event)) {
 					listView.selectFirstItem();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
-						KeyPress.setTimeKeyDown(0);
-						event.consume();
+					if (KeyPress.isDoublePress(event.getCode())) {
 						listView.selectFirstItem();
 					}
 				}
@@ -147,14 +146,49 @@ public class IssuePanel extends IssueColumn {
 				if(event.getCode() == KeyCode.C) {
 					ui.getBrowserComponent().jumpToComment();
 				}
+				if(event.getCode() == KeyCode.L) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().newLabel();
+					}
+					else {
+						ui.getBrowserComponent().manageLabels(event.getCode().toString());
+					}
+				}
+				if(event.getCode() == KeyCode.A) {
+					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				}
+				if(event.getCode() == KeyCode.M) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showMilestones();
+					}
+					else {
+					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+					}
+				}
+				if(event.getCode() == KeyCode.I) {
+					ui.getBrowserComponent().showIssues();
+				}
+				if(event.getCode() == KeyCode.P) {
+					ui.getBrowserComponent().showPullRequests();
+				}
+				if(event.getCode() == KeyCode.H) {
+					ui.getBrowserComponent().showDocs();
+				}
+				if(event.getCode() == KeyCode.K) {
+					ui.getBrowserComponent().showKeyboardShortcuts();
+				}
+				
 				if(event.getCode() == KeyCode.T) {
 					ui.getBrowserComponent().scrollToTop();
-				} 
+				}
 				if(event.getCode() == KeyCode.B) {
 					ui.getBrowserComponent().scrollToBottom();
 				}
 				if(event.getCode() == KeyCode.U || event.getCode() == KeyCode.D) {
 					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.D);
+				}
+				if(event.getCode() == KeyCode.G) {
+					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
 				}
 			}
 		});
@@ -167,7 +201,7 @@ public class IssuePanel extends IssueColumn {
 					filterTextField.requestFocus();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+					if (KeyPress.isDoublePress(event.getCode())) {
 						filterTextField.requestFocus();
 					}
 				}
