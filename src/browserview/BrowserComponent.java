@@ -459,4 +459,29 @@ public class BrowserComponent {
 			script = "window.scrollBy(0, -100)";
 		executeJavaScript(script);
 	}
+
+	private void sendKeysToBrowser(String keyCode) {
+		WebElement body = null;
+		try {
+			body = driver.findElementByTagName("body");
+			body.sendKeys(keyCode);
+		} catch (Exception e) {
+			logger.error("No such element" + e.getLocalizedMessage(), e);
+		}
+	}
+
+	public void manageLabels(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
+
+	public void manageAssignees(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
+
+	public void manageMilestones(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
 }

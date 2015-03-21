@@ -147,6 +147,15 @@ public class IssuePanel extends IssueColumn {
 				if(event.getCode() == KeyCode.C) {
 					ui.getBrowserComponent().jumpToComment();
 				}
+				if(event.getCode() == KeyCode.L) {
+					ui.getBrowserComponent().manageLabels(event.getCode().toString());
+				}
+				if(event.getCode() == KeyCode.A) {
+					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				}
+				if(event.getCode() == KeyCode.M) {
+					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+				}
 				if(event.getCode() == KeyCode.T) {
 					ui.getBrowserComponent().scrollToTop();
 				} 
