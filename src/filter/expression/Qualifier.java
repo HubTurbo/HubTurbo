@@ -389,9 +389,9 @@ public class Qualifier implements FilterExpression {
         case "issue":
             return typeSatisfies(issue);
         case "merged":
-        	return isPullRequest(issue) && !issue.isOpen();
+        	return issue.isPullRequest() && !issue.isOpen();
         case "unmerged":
-        	return isPullRequest(issue) && issue.isOpen();
+        	return issue.isPullRequest() && issue.isOpen();
         default:
             return false;
         }
@@ -511,17 +511,13 @@ public class Qualifier implements FilterExpression {
         return issue.getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private boolean isPullRequest(TurboIssue issue) {
-    	return issue.getPullRequest() != null;
-    }
-    
     private boolean typeSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
     	String content = this.content.get().toLowerCase();
     	if (content.equals("issue")) {
-            return !isPullRequest(issue);
+            return !issue.isPullRequest();
     	} else if (content.equals("pr") || content.equals("pullrequest")) {
-    		return isPullRequest(issue);
+    		return issue.isPullRequest();
     	} else {
     		return false;
     	}
