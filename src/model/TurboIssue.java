@@ -576,6 +576,12 @@ public class TurboIssue implements Listable {
 		this.commentCount = num;
 	}
 
+	/**
+	 * Returns the pull request object associated with this issue.
+	 * Is not guaranteed to be null even if the issue is not a pull request;
+	 * use {@link #isPullRequest()} to check for that.
+	 * @return the pull request object
+	 */
 	public PullRequest getPullRequest() {
 		return pullRequest;
 	}
