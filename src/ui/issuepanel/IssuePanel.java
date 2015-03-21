@@ -177,7 +177,6 @@ public class IssuePanel extends IssueColumn {
 				if(event.getCode() == KeyCode.K) {
 					ui.getBrowserComponent().showKeyboardShortcuts();
 				}
-				
 				if(event.getCode() == KeyCode.T) {
 					ui.getBrowserComponent().scrollToTop();
 				}
