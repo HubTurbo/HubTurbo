@@ -96,6 +96,10 @@ public class FilterTextField extends TextField {
 		setOnKeyPressed(e -> {
 			 if (e.getCode() == KeyCode.TAB) {
 				 e.consume();
+			 }   else if (e.getCode() == KeyCode.SPACE && !getSelectedText().isEmpty()) {
+				 e.consume();
+				 confirmCompletion();
+				 confirmEdit();
 			 }
 		});
 		
