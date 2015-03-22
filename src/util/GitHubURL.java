@@ -15,6 +15,10 @@ public class GitHubURL {
 	public static final String CHANGELOG_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog";
 	public static final String CHANGELOG_PAGE_FORMAT = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
 	
+	public static String getPathForAllIssues() {
+		return String.format("https://github.com/%s/%s/issues", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
+	
 	public static String getPathForIssue(int id) {
 		return String.format("https://github.com/%s/%s/issues/%d", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName(), id);
 	}
@@ -46,6 +50,22 @@ public class GitHubURL {
 			logger.error("Invalid version string format " + version + "; going to generic changelog page");
 			return CHANGELOG_PAGE;
 		}
+	}
+
+	public static String getPathForPullRequests() {
+		return String.format("https://github.com/%s/%s/pulls", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
+
+	public static String getPathForKeyboardShortcuts() {
+		return String.format("https://github.com/HubTurbo/HubTurbo/wiki/Keyboard-Shortcuts");
+	}
+	
+	public static String getPathForMilestones() {
+		return String.format("https://github.com/%s/%s/milestones", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
+
+	public static String getPathForContributors() {
+		return String.format("https://github.com/%s/%s/graphs/contributors", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
 	}
 	
 }
