@@ -73,7 +73,7 @@ public abstract class IssueColumn extends Column {
 		this.setOnMouseClicked(e-> {
 			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
 			try {
-				getParent().requestFocus();
+				requestFocus();
 			} catch (Exception e1) {
 				logger.warn("Nothing to focus on as panel was closed");
 			}
