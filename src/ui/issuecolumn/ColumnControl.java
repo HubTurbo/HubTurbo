@@ -258,7 +258,7 @@ public class ColumnControl extends HBox {
 					ui.setDefaultWidth();
 					scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
 				}
-				if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.G) {
+				if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
 					handleKeys(event.getCode() == KeyCode.F);
 					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
 				}
