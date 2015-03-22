@@ -134,9 +134,8 @@ public class IssuePanel extends IssueColumn {
 					listView.selectFirstItem();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
-						KeyPress.setTimeKeyDown(0);
-						event.consume();
+					event.consume();
+					if (KeyPress.isDoublePress(event.getCode())) {
 						listView.selectFirstItem();
 					}
 				}
@@ -167,7 +166,7 @@ public class IssuePanel extends IssueColumn {
 					filterTextField.requestFocus();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+					if (KeyPress.isDoublePress(event.getCode())) {
 						filterTextField.requestFocus();
 					}
 				}
