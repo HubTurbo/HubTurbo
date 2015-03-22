@@ -188,7 +188,6 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewLabel());
 			}
 		});
-		bringToTop();
 	}
 
 	/**
@@ -517,6 +516,15 @@ public class BrowserComponent {
 		runBrowserOperation(() -> {
 			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones())) {
 				driver.get(GitHubURL.getPathForMilestones());
+			}
+		});
+	}
+
+	public void showContributors() {
+		logger.info("Navigating to Contributors page");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors())) {
+				driver.get(GitHubURL.getPathForContributors());
 			}
 		});
 	}

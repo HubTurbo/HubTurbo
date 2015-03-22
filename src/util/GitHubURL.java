@@ -63,5 +63,9 @@ public class GitHubURL {
 	public static String getPathForMilestones() {
 		return String.format("https://github.com/%s/%s/milestones", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
 	}
+
+	public static String getPathForContributors() {
+		return String.format("https://github.com/%s/%s/graphs/contributors", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	}
 	
 }

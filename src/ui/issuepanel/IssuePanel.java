@@ -166,25 +166,39 @@ public class IssuePanel extends IssueColumn {
 					}
 				}
 				if(event.getCode() == KeyCode.I) {
-					ui.getBrowserComponent().showIssues();
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showIssues();
+					}
 				}
 				if(event.getCode() == KeyCode.P) {
-					ui.getBrowserComponent().showPullRequests();
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {	
+						ui.getBrowserComponent().showPullRequests();
+					}
 				}
 				if(event.getCode() == KeyCode.H) {
-					ui.getBrowserComponent().showDocs();
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showDocs();
+					}
 				}
 				if(event.getCode() == KeyCode.K) {
-					ui.getBrowserComponent().showKeyboardShortcuts();
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showKeyboardShortcuts();
+					}
 				}
-				if(event.getCode() == KeyCode.T) {
+				if(event.getCode() == KeyCode.D) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showContributors();
+						event.consume();
+					}
+				}
+				if(event.getCode() == KeyCode.U) {
 					ui.getBrowserComponent().scrollToTop();
 				}
-				if(event.getCode() == KeyCode.B) {
+				if(event.getCode() == KeyCode.N) {
 					ui.getBrowserComponent().scrollToBottom();
 				}
-				if(event.getCode() == KeyCode.U || event.getCode() == KeyCode.D) {
-					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.D);
+				if(event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
+					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
 				}
 				if(event.getCode() == KeyCode.G) {
 					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
