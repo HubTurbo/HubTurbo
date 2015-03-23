@@ -154,6 +154,7 @@ public abstract class IssueColumn extends Column {
 		Label closeList = new Label(CLOSE_COLUMN);
 		closeList.getStyleClass().add("label-button");
 		closeList.setOnMouseClicked((e) -> {
+			e.consume();
 			parentColumnControl.closeColumn(columnIndex);
 		});
 
