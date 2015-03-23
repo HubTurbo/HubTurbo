@@ -78,9 +78,9 @@ public abstract class IssueColumn extends Column {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
 				if (isFocused) {
-				    getStyleClass().add("issue-panel-focused");
+				    getStyleClass().add("panel-focused");
 				} else {
-				    getStyleClass().remove("issue-panel-focused");
+				    getStyleClass().remove("panel-focused");
 				}
 			}
 		});
