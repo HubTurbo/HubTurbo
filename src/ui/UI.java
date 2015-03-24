@@ -135,7 +135,9 @@ public class UI extends Application implements EventDispatcher {
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
-				getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+				if(columns.getCurrentlySelectedColumn().isPresent()) {
+					getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+				}
 			} else {
 				quit();
 			}
