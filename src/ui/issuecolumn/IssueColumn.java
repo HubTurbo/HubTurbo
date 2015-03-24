@@ -72,11 +72,7 @@ public abstract class IssueColumn extends Column {
 		setupIssueColumnDragEvents(model, columnIndex);
 		this.setOnMouseClicked(e-> {
 			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
-			try {
-				requestFocus();
-			} catch (Exception e1) {
-				logger.warn("Nothing to focus on as panel was closed");
-			}
+			requestFocus();
 		});
 		focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
