@@ -72,7 +72,7 @@ public abstract class IssueColumn extends Column {
 		setupIssueColumnDragEvents(model, columnIndex);
 		this.setOnMouseClicked(e-> {
 			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
-			getParent().requestFocus();
+			requestFocus();
 		});
 		focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -150,6 +150,7 @@ public abstract class IssueColumn extends Column {
 		Label closeList = new Label(CLOSE_COLUMN);
 		closeList.getStyleClass().add("label-button");
 		closeList.setOnMouseClicked((e) -> {
+			e.consume();
 			parentColumnControl.closeColumn(columnIndex);
 		});
 
