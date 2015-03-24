@@ -19,12 +19,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
-import ui.UI;
-
 /**
  * Abstractions for the contents of the session file.
  */
+@SuppressWarnings("unused")
 public class SessionConfiguration {
+
+	private static final Logger logger = LogManager.getLogger(SessionConfiguration.class.getName());
+
 	private HashMap<String, List<String>> projectFilters = new HashMap<>();
 	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
 	private String lastLoginUsername = "";
@@ -107,8 +109,7 @@ public class SessionConfiguration {
 			lastLoginEncrypted = cipher.doFinal(lastPassword.getBytes());
 			result = new String(lastLoginEncrypted);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-			Logger logger = LogManager.getLogger(UI.class.getName());
-			logger.info("Cannot encrypt data " + e.getMessage());
+			logger.error("Cannot encrypt data " + e.getMessage(), e);
 		}
 		return result;
 	}
@@ -122,8 +123,7 @@ public class SessionConfiguration {
 			cipher.init(Cipher.DECRYPT_MODE, aesKey);
 			result = new String(cipher.doFinal(lastLoginEncrypted));
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-			Logger logger = LogManager.getLogger(UI.class.getName());
-			logger.info("Warning: Cannot decrypt data " + e.getMessage());
+			logger.error("Cannot encrypt data " + e.getMessage(), e);
 		}
 		return result;
 	}
