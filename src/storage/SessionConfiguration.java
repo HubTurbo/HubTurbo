@@ -1,16 +1,25 @@
 package storage;
 
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+
+import ui.UI;
 
 /**
  * Abstractions for the contents of the session file.
@@ -85,7 +94,6 @@ public class SessionConfiguration {
 	}
 
 	public String getLastLoginPassword() {
-		// TODO Auto-generated method stub
 		return decryptData();
 	}
 
@@ -95,12 +103,13 @@ public class SessionConfiguration {
 			String key = "HubTurboHubTurbo";
 		    Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
 			Cipher cipher = Cipher.getInstance("AES");
-	        cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-	        lastLoginEncrypted = cipher.doFinal(lastPassword.getBytes());
-	        result = new String(lastLoginEncrypted);
-	      } catch(Exception e) {
-	         e.printStackTrace();
-	      }
+			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+			lastLoginEncrypted = cipher.doFinal(lastPassword.getBytes());
+			result = new String(lastLoginEncrypted);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+			Logger logger = LogManager.getLogger(UI.class.getName());
+			logger.info("Cannot encrypt data " + e.getMessage());
+		}
 		return result;
 	}
 
@@ -109,12 +118,13 @@ public class SessionConfiguration {
 		try {
 			String key = "HubTurboHubTurbo";
 		    Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
-	        Cipher cipher = Cipher.getInstance("AES");
-	        cipher.init(Cipher.DECRYPT_MODE, aesKey);
-	        result = new String(cipher.doFinal(lastLoginEncrypted));
-	      }catch(Exception e) {
-	         e.printStackTrace();
-	      }
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.DECRYPT_MODE, aesKey);
+			result = new String(cipher.doFinal(lastLoginEncrypted));
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+			Logger logger = LogManager.getLogger(UI.class.getName());
+			logger.info("Warning: Cannot decrypt data " + e.getMessage());
+		}
 		return result;
 	}
 }

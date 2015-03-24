@@ -198,7 +198,7 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-	void quit() {
+	public void quit() {
 		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();
