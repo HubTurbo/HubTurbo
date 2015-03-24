@@ -134,7 +134,6 @@ public class ConfigFileHandler {
 	private void setupGson() {
 		 gson = new GsonBuilder()
 			.setPrettyPrinting()
-			.excludeFieldsWithModifiers(Modifier.TRANSIENT)
 			.registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
 				@Override
 				public JsonElement serialize(

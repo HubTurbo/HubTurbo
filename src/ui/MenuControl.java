@@ -73,8 +73,22 @@ public class MenuControl extends MenuBar {
 
 		Menu view = new Menu("View");
 		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
+		
+		Menu preferences = new Menu("Preferences");
+		preferences.getItems().add(createPreferencesMenu());
+		
+		getMenus().addAll(newMenu, panels, boards, view, preferences);
+	}
 
-		getMenus().addAll(newMenu, panels, boards, view);
+	private MenuItem createPreferencesMenu() {
+		MenuItem logout = new MenuItem("Logout");
+		logout.setOnAction(e -> {
+			logger.info("Logging out of HT");
+			DataManager.getInstance().setLastLoginPassword("");
+			ui.quit();
+		});
+		return logout;
+
 	}
 
 	private Menu createPanelsMenu() {

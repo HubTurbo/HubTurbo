@@ -105,6 +105,7 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
+		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -128,7 +129,6 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector.setDisable(true);
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
-				browserComponent.initialise();
 				setExpandedWidth(false);
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
@@ -209,7 +209,7 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-	private void quit() {
+	public void quit() {
 		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();
