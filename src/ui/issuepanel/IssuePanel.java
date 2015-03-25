@@ -130,12 +130,13 @@ public class IssuePanel extends IssueColumn {
 	private void setupKeyboardShortcuts(){
 		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				event.consume();
 				if (keyCombBoxToList.match(event)) {
+					event.consume();
 					listView.selectFirstItem();
 				}
 				if(event.getCode() == KeyCode.SPACE){
 					if (KeyPress.isDoublePress(event.getCode())) {
+						event.consume();
 						listView.selectFirstItem();
 					}
 				}
@@ -209,6 +210,9 @@ public class IssuePanel extends IssueColumn {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) {
 					ServiceManager.getInstance().updateModelNow();
+				}
+				if (event.getCode() == KeyCode.F1) {
+					ui.getBrowserComponent().showDocs();
 				}
 				if (keyCombListToBox.match(event)) {
 					filterTextField.requestFocus();
