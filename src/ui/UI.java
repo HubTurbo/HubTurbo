@@ -469,4 +469,9 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setX(0);
 		mainStage.setY(0);
 	}
+
+	public void minimizeWindow() {
+		mainStage.setIconified(true);
+		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+	}
 }
