@@ -230,7 +230,7 @@ public class ColumnControl extends HBox {
 	public void closeCurrentColumn() {
 		if (currentlySelectedColumn.isPresent()) {
 			closeColumn(currentlySelectedColumn.get());
-			currentlySelectedColumn = Optional.empty();
+			currentlySelectedColumn = (getChildren() == null || getChildren().size() == 0) ? Optional.empty(): Optional.of(0);
 		}
 	}
 	
