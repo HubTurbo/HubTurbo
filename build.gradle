@@ -9,17 +9,19 @@ allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven'
+    apply plugin: 'jacoco'
+    apply plugin: 'com.github.kt3k.coveralls'
 
     // NOTE: we can split below in sub projects later
     apply plugin: 'java'
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '2.1.0'
+    version = '2.3.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
-        mavenCentral()
         jcenter()
+        mavenCentral()
     }
 
     project.ext {
@@ -36,6 +38,7 @@ allprojects {
         seleniumServerVersion = '2.45.0'
 
         junitVersion = '4.12'
+        kt3kVersion = '2.0.1'
     }
 
     dependencies {
@@ -53,6 +56,14 @@ allprojects {
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
         testCompile "junit:junit:$junitVersion"
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:$kt3kVersion'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
     }
 
     // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package]
