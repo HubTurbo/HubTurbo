@@ -15,6 +15,7 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
 
     // NOTE: we can split below in sub projects later
     apply plugin: 'java'
