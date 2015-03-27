@@ -72,15 +72,15 @@ public abstract class IssueColumn extends Column {
 		setupIssueColumnDragEvents(model, columnIndex);
 		this.setOnMouseClicked(e-> {
 			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
-			getParent().requestFocus();
+			requestFocus();
 		});
 		focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
 				if (isFocused) {
-				    getStyleClass().add("issue-panel-focused");
+				    getStyleClass().add("panel-focused");
 				} else {
-				    getStyleClass().remove("issue-panel-focused");
+				    getStyleClass().remove("panel-focused");
 				}
 			}
 		});
@@ -150,6 +150,7 @@ public abstract class IssueColumn extends Column {
 		Label closeList = new Label(CLOSE_COLUMN);
 		closeList.getStyleClass().add("label-button");
 		closeList.setOnMouseClicked((e) -> {
+			e.consume();
 			parentColumnControl.closeColumn(columnIndex);
 		});
 

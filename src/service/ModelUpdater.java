@@ -1,4 +1,4 @@
-package service.updateservice;
+package service;
 
 import java.util.Date;
 import java.util.List;
@@ -14,7 +14,10 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
-import service.GitHubClientExtended;
+import service.updateservice.CollaboratorUpdateService;
+import service.updateservice.IssueUpdateService;
+import service.updateservice.LabelUpdateService;
+import service.updateservice.MilestoneUpdateService;
 import ui.components.HTStatusBar;
 
 public class ModelUpdater {
@@ -26,30 +29,23 @@ public class ModelUpdater {
 	private CollaboratorUpdateService collaboratorUpdateService;
 	private LabelUpdateService labelUpdateService;
 	private MilestoneUpdateService milestoneUpdateService;
-	private Date lastUpdateTime = new Date();
-	
-	public ModelUpdater(GitHubClientExtended client, Model model, String issuesETag, String collabsETag, String labelsETag, String milestonesETag, String issueCheckTime){
+
+	public ModelUpdater(GitHubClientExtended client, Model model, UpdateSignature updateSignature) {
 		this.model = model;
-		this.issueUpdateService = new IssueUpdateService(client, issuesETag, issueCheckTime);
-		this.collaboratorUpdateService = new CollaboratorUpdateService(client, collabsETag);
-		this.labelUpdateService = new LabelUpdateService(client, labelsETag);
-		this.milestoneUpdateService = new MilestoneUpdateService(client, milestonesETag);
-	}
-	
-	public Date getLastUpdateTime(){
-		return lastUpdateTime;
+		this.issueUpdateService = new IssueUpdateService(client, updateSignature.issuesETag, updateSignature.lastCheckTime);
+		this.collaboratorUpdateService = new CollaboratorUpdateService(client, updateSignature.collaboratorsETag);
+		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
+		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 	}
 	
 	public void updateModel(CountDownLatch latch, String repoId) {
 		logger.info("Updating model...");
 		model.disableModelChanges();
-		// TODO all these should return CompletableFuture<Integer>
-		// with the number of resources updated
+		// TODO all these should return CompletableFuture<Integer> with the number of resources updated
 	    updateModelCollaborators(latch, repoId);
 	   	updateModelLabels(latch, repoId);
 	  	updateModelMilestones(latch, repoId);
 	  	updateModelIssues(latch, repoId);
-	  	lastUpdateTime = issueUpdateService.lastCheckTime;
 	  	model.enableModelChanges();
 	}
 	
@@ -58,8 +54,6 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
-				model.updateIssuesETag(issueUpdateService.getLastETag());
-				model.updateIssueCheckTime(issueUpdateService.getLastIssueCheckTime());
 				model.updateCachedIssues(latch, updatedIssues, repoId);
 			} else {
 				logger.info("No issues to update");
@@ -72,7 +66,6 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
-				model.updateCollabsETag(collaboratorUpdateService.getLastETag());
 				model.updateCachedCollaborators(latch, collaborators, repoId);
 			} else {
 				logger.info("No collaborators to update");
@@ -86,7 +79,6 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
-				model.updateLabelsETag(labelUpdateService.getLastETag());
 				model.updateCachedLabels(latch, labels, repoId);
 			} else {
 				logger.info("No labels to update");
@@ -100,7 +92,6 @@ public class ModelUpdater {
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
-				model.updateMilestonesETag(milestoneUpdateService.getLastETag());
 				model.updateCachedMilestones(latch, milestones, repoId);
 			} else {
 				logger.info("No milestones to update");
@@ -108,5 +99,11 @@ public class ModelUpdater {
 				HTStatusBar.addProgress(0.25);
 			}
 		}
+	}
+
+	public UpdateSignature getNewUpdateSignature() {
+		return new UpdateSignature(issueUpdateService.getUpdatedETag(),
+			labelUpdateService.getUpdatedETag(), milestoneUpdateService.getUpdatedETag(),
+			collaboratorUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
 	}
 }

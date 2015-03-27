@@ -131,11 +131,11 @@ public class IssuePanel extends IssueColumn {
 		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (keyCombBoxToList.match(event)) {
+					event.consume();
 					listView.selectFirstItem();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
-						KeyPress.setTimeKeyDown(0);
+					if (KeyPress.isDoublePress(event.getCode())) {
 						event.consume();
 						listView.selectFirstItem();
 					}
@@ -144,22 +144,65 @@ public class IssuePanel extends IssueColumn {
 		});
 		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				event.consume();
-				switch (event.getCode()){
-				case C:
+				if(event.getCode() == KeyCode.C) {
 					ui.getBrowserComponent().jumpToComment();
-					break;
-				case T:
+				}
+				if(event.getCode() == KeyCode.L) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().newLabel();
+					}
+					else {
+						ui.getBrowserComponent().manageLabels(event.getCode().toString());
+					}
+				}
+				if(event.getCode() == KeyCode.A) {
+					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				}
+				if(event.getCode() == KeyCode.M) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showMilestones();
+					}
+					else {
+					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+					}
+				}
+				if(event.getCode() == KeyCode.I) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showIssues();
+					}
+				}
+				if(event.getCode() == KeyCode.P) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {	
+						ui.getBrowserComponent().showPullRequests();
+					}
+				}
+				if(event.getCode() == KeyCode.H) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showDocs();
+					}
+				}
+				if(event.getCode() == KeyCode.K) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showKeyboardShortcuts();
+					}
+				}
+				if(event.getCode() == KeyCode.D) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showContributors();
+						event.consume();
+					}
+				}
+				if(event.getCode() == KeyCode.U) {
 					ui.getBrowserComponent().scrollToTop();
-					break;
-				case B:
+				}
+				if(event.getCode() == KeyCode.N) {
 					ui.getBrowserComponent().scrollToBottom();
-				case U:
-				case D:
-					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.D);
-				break;
-				default:
-					break;
+				}
+				if(event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
+					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
+				}
+				if(event.getCode() == KeyCode.G) {
+					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
 				}
 			}
 		});
@@ -168,11 +211,14 @@ public class IssuePanel extends IssueColumn {
 				if (event.getCode() == KeyCode.F5) {
 					ServiceManager.getInstance().updateModelNow();
 				}
+				if (event.getCode() == KeyCode.F1) {
+					ui.getBrowserComponent().showDocs();
+				}
 				if (keyCombListToBox.match(event)) {
 					filterTextField.requestFocus();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event, System.currentTimeMillis())) {
+					if (KeyPress.isDoublePress(event.getCode())) {
 						filterTextField.requestFocus();
 					}
 				}

@@ -3,8 +3,14 @@ language: java
 jdk:
     - oraclejdk8
 
+env:
+    - TERM=dumb
+
 script:
-    "./gradlew check -i"
+    - "./gradlew check -i"
+
+after_success:
+    - "./gradlew jacocoTestReport coveralls"
 
 branches:
   only:

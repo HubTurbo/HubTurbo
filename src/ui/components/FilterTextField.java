@@ -96,6 +96,10 @@ public class FilterTextField extends TextField {
 		setOnKeyPressed(e -> {
 			 if (e.getCode() == KeyCode.TAB) {
 				 e.consume();
+			 }   else if (e.getCode() == KeyCode.SPACE && !getSelectedText().isEmpty()) {
+				 e.consume();
+				 confirmCompletion();
+				 confirmEdit();
 			 }
 		});
 		
@@ -103,8 +107,12 @@ public class FilterTextField extends TextField {
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
-				revertEdit();
-				getParent().requestFocus();
+				if(getText().equals(previousText)) {
+					getParent().requestFocus();
+				} else {
+					revertEdit();
+					selectAll();
+				}
 			}
 		});
 	}

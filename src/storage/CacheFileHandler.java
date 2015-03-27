@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import model.TurboIssue;
@@ -14,11 +15,13 @@ import model.TurboLabel;
 import model.TurboMilestone;
 import model.TurboUser;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import util.Utility;
 
 public class CacheFileHandler {
 
@@ -29,6 +32,18 @@ public class CacheFileHandler {
 
 	private CachedRepoData repo = null;
 	private String repoId = null;
+
+	/**
+	 * TODO Stop-gap measure pending a more robust updater that can
+	 * deal with schema versions.
+	 */
+	public static void deleteCacheDirectory() {
+		try {
+			FileUtils.deleteDirectory(new File(DIR_CACHE));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
 
 	public CacheFileHandler(String repoId) {
 		this.repoId = repoId;
@@ -49,7 +64,9 @@ public class CacheFileHandler {
 			return;
 		}
 
-		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
+		Gson gson = new GsonBuilder()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.create();
 
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
@@ -70,13 +87,14 @@ public class CacheFileHandler {
 		return repo;
 	}
 
-	public void writeToFile(String repoIdString, String issuesETag, String collabsETag, String labelsETag,
-			String milestonesETag, String issueCheckTime, List<TurboUser> collaborators, List<TurboLabel> labels,
-			List<TurboMilestone> milestones, List<TurboIssue> issues) {
+	public void writeToFile(String repoIdString, String issuesETag, String labelsETag, String milestonesETag,
+	    String collabsETag, Date issueCheckTime,
+	    List<TurboUser> collaborators, List<TurboLabel> labels,
+	    List<TurboMilestone> milestones, List<TurboIssue> issues) {
 
 		CachedRepoData currentRepoData = new CachedRepoData(issuesETag, collabsETag, labelsETag, milestonesETag,
-				issueCheckTime, new ArrayList<>(collaborators), new ArrayList<>(labels), new ArrayList<>(milestones),
-				new ArrayList<>(issues));
+			Utility.dateToLocalDateTime(issueCheckTime), new ArrayList<>(collaborators), new ArrayList<>(labels),
+			new ArrayList<>(milestones), new ArrayList<>(issues));
 
 		Gson gson = new GsonBuilder().setPrettyPrinting()
 				.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();

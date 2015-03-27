@@ -1,7 +1,7 @@
 package tests;
 
 import org.junit.Test;
-import service.updateservice.TickingTimer;
+import service.TickingTimer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

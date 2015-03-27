@@ -29,6 +29,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
+import storage.CacheFileHandler;
 import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
@@ -50,7 +51,7 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 public class UI extends Application implements EventDispatcher {
 
 	private static final int VERSION_MAJOR = 2;
-	private static final int VERSION_MINOR = 2;
+	private static final int VERSION_MINOR = 3;
 	private static final int VERSION_PATCH = 0;
 
 	public static final String ARG_UPDATED_TO = "--updated-to";
@@ -99,10 +100,12 @@ public class UI extends Application implements EventDispatcher {
 
 		commandLineArgs = initialiseCommandLineArguments();
 		DataManager.getInstance();
+		clearCacheIfNecessary();
 
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
+		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
@@ -113,17 +116,28 @@ public class UI extends Application implements EventDispatcher {
 		getUserCredentials();
 	}
 
+	/**
+	 * TODO Stop-gap measure pending a more robust updater
+	 */
+	private void clearCacheIfNecessary() {
+		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
+			CacheFileHandler.deleteCacheDirectory();
+		}
+	}
+
 	private void getUserCredentials() {
 		repoSelector.setDisable(true);
 		new LoginDialog(mainStage, columns).show().thenApply(success -> {
 			if (success) {
-				browserComponent.initialise();
 				setExpandedWidth(false);
 				columns.loadIssues();
 				triggerEvent(new LoginEvent());
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
+				if(columns.getCurrentlySelectedColumn().isPresent()) {
+					getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+				}
 			} else {
 				quit();
 			}
@@ -195,7 +209,7 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-	private void quit() {
+	public void quit() {
 		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();

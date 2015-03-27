@@ -133,6 +133,14 @@ public class DataManager {
 		return sessionConfiguration.getLastLoginUsername();
 	}
 	
+	public void setLastLoginPassword(String password) {
+		sessionConfiguration.setLastLoginPassword(password);
+	}
+
+	public String getLastLoginPassword() {
+		return sessionConfiguration.getLastLoginPassword();
+	}
+
 	/**
 	 * Testing
 	 */

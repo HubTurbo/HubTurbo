@@ -135,11 +135,9 @@ public class BrowserComponent {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 		}
 		ChromeDriver driver = new ChromeDriver(options);
-		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
-		driver.manage().window().setSize(new Dimension(
-				(int) availableDimensions.getWidth(),
-				(int) availableDimensions.getHeight()));
+		driver.manage().window().setPosition(new Point((int) availableDimensions.getCenterX(), (int)availableDimensions.getCenterY() - 100));		
+		driver.manage().window().setSize(new Dimension(100, 100));
 		initialiseJNA();
 		return driver;
 	}
@@ -188,7 +186,6 @@ public class BrowserComponent {
 				driver.get(GitHubURL.getPathForNewLabel());
 			}
 		});
-		bringToTop();
 	}
 
 	/**
@@ -458,5 +455,75 @@ public class BrowserComponent {
 		else
 			script = "window.scrollBy(0, -100)";
 		executeJavaScript(script);
+	}
+
+	private void sendKeysToBrowser(String keyCode) {
+		WebElement body = null;
+		try {
+			body = driver.findElementByTagName("body");
+			body.sendKeys(keyCode);
+		} catch (Exception e) {
+			logger.error("No such element" + e.getLocalizedMessage(), e);
+		}
+	}
+
+	public void manageLabels(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
+
+	public void manageAssignees(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
+
+	public void manageMilestones(String keyCode) {
+		sendKeysToBrowser(keyCode.toLowerCase());
+		bringToTop();
+	}
+
+	public void showIssues() {
+		logger.info("Navigating to Issues page");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues())) {
+				driver.get(GitHubURL.getPathForAllIssues());
+			}
+		});
+	}
+
+	public void showPullRequests() {
+		logger.info("Navigating to Pull requests page");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests())) {
+				driver.get(GitHubURL.getPathForPullRequests());
+			}
+		});
+	}
+
+	public void showKeyboardShortcuts() {
+		logger.info("Navigating to Keyboard Shortcuts");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForKeyboardShortcuts())) {
+				driver.get(GitHubURL.getPathForKeyboardShortcuts());
+			}
+		});
+	}
+
+	public void showMilestones() {
+		logger.info("Navigating to Milestones page");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones())) {
+				driver.get(GitHubURL.getPathForMilestones());
+			}
+		});
+	}
+
+	public void showContributors() {
+		logger.info("Navigating to Contributors page");
+		runBrowserOperation(() -> {
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors())) {
+				driver.get(GitHubURL.getPathForContributors());
+			}
+		});
 	}
 }
