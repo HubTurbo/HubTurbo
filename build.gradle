@@ -9,31 +9,19 @@ allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven'
-<<<<<<< HEAD
-=======
     apply plugin: 'jacoco'
     apply plugin: 'com.github.kt3k.coveralls'
->>>>>>> master
 
     // NOTE: we can split below in sub projects later
     apply plugin: 'java'
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-<<<<<<< HEAD
-    version = '2.1.0'
-=======
     version = '2.3.0'
->>>>>>> master
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
-<<<<<<< HEAD
-        mavenCentral()
-        jcenter()
-=======
         jcenter()
         mavenCentral()
->>>>>>> master
     }
 
     project.ext {
