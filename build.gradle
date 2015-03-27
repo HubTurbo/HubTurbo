@@ -5,12 +5,16 @@
  * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
  */
 
+plugins {
+    id "com.github.kt3k.coveralls" version "2.3.1"
+}
+
 allprojects {
+
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
-    apply plugin: 'com.github.kt3k.coveralls'
 
     // NOTE: we can split below in sub projects later
     apply plugin: 'java'
@@ -38,7 +42,6 @@ allprojects {
         seleniumServerVersion = '2.45.0'
 
         junitVersion = '4.12'
-        kt3kVersion = '2.0.1'
     }
 
     dependencies {
@@ -58,7 +61,6 @@ allprojects {
         // TODO: move junit to test compile
         // testCompile "junit:junit:$junitVersion"
         compile "junit:junit:$junitVersion"
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:$kt3kVersion'
     }
 
     jacocoTestReport {
