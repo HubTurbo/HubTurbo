@@ -85,13 +85,13 @@ allprojects {
         }
     }
 
-    assemble.dependsOn shadowJar
-
-    shadowJar {
+    jar {
         manifest {
             attributes 'Main-Class': 'ui.UI'
         }
     }
+
+    assemble.dependsOn shadowJar
 
     // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package])
     sourceSets {
