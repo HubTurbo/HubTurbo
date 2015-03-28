@@ -10,7 +10,7 @@ script:
     - "./gradlew check -i"
 
 after_success:
-    - "./gradlew jacocoTestReport coveralls"
+    - "./gradlew jacocoRootReport coveralls"
 
 branches:
   only:

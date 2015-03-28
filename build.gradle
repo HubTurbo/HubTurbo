@@ -13,13 +13,13 @@ plugins {
 
 allprojects {
 
-    apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
     // TODO: use a checkstyle configuration
     // apply plugin: 'checkstyle'
+    apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
     version = '2.3.0'
@@ -111,5 +111,16 @@ allprojects {
                 srcDirs = ['src/resources']
             }
         }
+    }
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = allprojects.test
+    sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories =  files(allprojects.sourceSets.main.output)
+    executionData = files(allprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
     }
 }
