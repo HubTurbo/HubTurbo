@@ -83,7 +83,7 @@ allprojects {
 
     coveralls {
         sourceDirs = sourceSets.main.allJava.flatten()
-        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+        jacocoReportPath = "${buildDir}/reports/jacoco/test/jacocoRootReport.xml"
     }
 
     // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package])

@@ -6,6 +6,9 @@ jdk:
 env:
     - TERM=dumb
 
+before_script:
+    - "./gradlew wrapper"
+
 script:
     - "./gradlew check -i"
 
