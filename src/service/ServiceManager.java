@@ -69,11 +69,6 @@ public class ServiceManager {
 
 	public static final int SYNC_PERIOD = 60;
 
-	public static final String KEY_ISSUES = "issues";
-	public static final String KEY_MILESTONES = "milestones";
-	public static final String KEY_LABELS = "labels";
-	public static final String KEY_COLLABORATORS = "collaborators";
-
 	// Login state
 
 	protected String lastUsedPassword;
@@ -313,8 +308,7 @@ public class ServiceManager {
 	private void ______MODEL______() {
 	}
 
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getResources(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
+	public RepositoryResources getResources(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		this.repoId = repoId;
 
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
@@ -348,33 +342,27 @@ public class ServiceManager {
 			taskUpdate.accept("Loading issues...", 0.75f);
 			List<TurboIssue> issues = repo.getIssues(model);
 
-			HashMap<String, List> map = new HashMap<>();
-			map.put(KEY_COLLABORATORS, collaborators);
-			map.put(KEY_LABELS, labels);
-			map.put(KEY_MILESTONES, milestones);
-			map.put(KEY_ISSUES, issues);
-			return map;
+			return RepositoryResources.fromCache(issues, labels, milestones, collaborators);
 		} else {
 			logger.info("Cache not found, loading data from GitHub...");
 			return getGitHubResources(taskUpdate);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
+	public RepositoryResources getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		updateSignature = new UpdateSignature();
 
-		HashMap<String, List> map = new HashMap<>();
 		taskUpdate.accept("Loading collaborators...", 0f);
-		map.put(KEY_COLLABORATORS, new ArrayList<>());
+		List<User> users = new ArrayList<>();
 		taskUpdate.accept("Loading labels...", 0.25f);
-		map.put(KEY_LABELS, getLabels());
+		List<Label> labels = getLabels();
 		taskUpdate.accept("Loading milestones...", 0.5f);
-		map.put(KEY_MILESTONES, getMilestones());
+		List<Milestone> milestones = getMilestones();
 		taskUpdate.accept("Loading issues...", 0.75f);
-		map.put(KEY_ISSUES, getAllIssues(taskUpdate));
-		return map;
+		List<Issue> issues = getAllIssues(taskUpdate);
+
+		return RepositoryResources.fromGitHub(issues, labels, milestones, users);
 	}
 
 	public Model getModel() {

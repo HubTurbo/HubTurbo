@@ -2,7 +2,6 @@ package tests;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import model.Model;
@@ -16,7 +15,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import service.ServiceManager;
+import service.RepositoryResources;
 
 public class TestUtils {
 
@@ -33,14 +32,13 @@ public class TestUtils {
 	 * @param n
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	public static HashMap<String, List> getStubResources(Model model, int n) {
-		HashMap<String, List> resources = new HashMap<>();
-		resources.put(ServiceManager.KEY_ISSUES, getStubIssues(n));
-		resources.put(ServiceManager.KEY_LABELS, getStubLabels(n));
-		resources.put(ServiceManager.KEY_COLLABORATORS, getStubUsers(n));
-		resources.put(ServiceManager.KEY_MILESTONES, getStubMilestones(n));
-		return resources;
+	public static RepositoryResources getStubResources(Model model, int n) {
+		return RepositoryResources.fromGitHub(
+			getStubIssues(n),
+			getStubLabels(n),
+			getStubMilestones(n),
+			getStubUsers(n)
+		);
 	}
 
 	/**
@@ -152,14 +150,13 @@ public class TestUtils {
 	 * @param n
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	public static HashMap<String, List> getStubTurboResourcesFromCache(Model model, int n) {
-		HashMap<String, List> resources = new HashMap<>();
-		// Issues are not included here
-		resources.put(ServiceManager.KEY_LABELS, getStubTurboLabels(n));
-		resources.put(ServiceManager.KEY_COLLABORATORS, getStubTurboUsers(n));
-		resources.put(ServiceManager.KEY_MILESTONES, getStubTurboMilestones(n));
-		return resources;
+	public static RepositoryResources getStubTurboResourcesFromCache(Model model, int n) {
+		return RepositoryResources.fromCache(
+			TestUtils.getStubTurboIssues(model, 10),
+			getStubTurboLabels(n),
+			getStubTurboMilestones(n),
+			getStubTurboUsers(n)
+		);
 	}
 
 	/**

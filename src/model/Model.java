@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
+import service.RepositoryResources;
 import service.ServiceManager;
 import service.UpdateSignature;
 import storage.CacheFileHandler;
@@ -138,7 +139,6 @@ public class Model {
 	 * @return true on success, false otherwise
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	public boolean loadComponents(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		if (isInTestMode) {
 			// TODO will not be needed when the model is constructed with this
@@ -148,8 +148,8 @@ public class Model {
 		}
 
 		try {
-			HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId, taskUpdate);
-			populateComponents(repoId, items);
+			RepositoryResources resources = ServiceManager.getInstance().getResources(repoId, taskUpdate);
+			populateComponents(repoId, resources);
 			return true;
 		} catch (SocketTimeoutException e) {
 			Platform.runLater(() -> {
@@ -177,14 +177,13 @@ public class Model {
 	 *
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	public void forceReloadComponents() throws IOException {
 		if (isInTestMode) {
 			populateComponents(repoId, TestUtils.getStubResources(this, 10));
 			return;
 		}
 
-		HashMap<String, List> items = ServiceManager.getInstance().getGitHubResources((a, b) -> {});
+		RepositoryResources items = ServiceManager.getInstance().getGitHubResources((a, b) -> {});
 		populateComponents(repoId, items);
 	}
 
@@ -195,24 +194,14 @@ public class Model {
 	 * @param repoId
 	 * @param resources
 	 */
-	@SuppressWarnings("rawtypes")
-	public void populateComponents(IRepositoryIdProvider repoId, HashMap<String, List> resources) {
+	public void populateComponents(IRepositoryIdProvider repoId, RepositoryResources resources) {
 
 		this.repoId = repoId;
 
-		boolean loadedFromCache = false;
-		boolean isPublicRepo = false;
-
-		// This is made with the assumption that labels of repos will not be
-		// empty (even a fresh copy of a repo)
-		if (!resources.get(ServiceManager.KEY_LABELS).isEmpty()) {
-			if (resources.get(ServiceManager.KEY_LABELS).get(0).getClass() == TurboLabel.class) {
-				loadedFromCache = true;
-			}
-			if (resources.get(ServiceManager.KEY_COLLABORATORS).isEmpty()) {
-				isPublicRepo = true;
-			}
-		}
+		boolean loadedFromCache = resources.isCached();
+		boolean isPublicRepo = resources.isCached()
+			? resources.getTurboUsers().isEmpty()
+			: resources.getUsers().isEmpty();
 
 		CountDownLatch latch = new CountDownLatch(4);
 
@@ -237,24 +226,23 @@ public class Model {
 	 *
 	 * @param turboResources
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadTurboResources(CountDownLatch latch, HashMap<String, List> turboResources) {
+	private void loadTurboResources(CountDownLatch latch, RepositoryResources turboResources) {
 		run(() -> {
 			disableModelChanges();
+
 			logger.info("Loading collaborators from cache...");
-			loadTurboCollaborators((List<TurboUser>) turboResources.get(ServiceManager.KEY_COLLABORATORS));
+			loadTurboCollaborators(turboResources.getTurboUsers());
 			latch.countDown();
+
 			logger.info("Loading labels from cache...");
-			loadTurboLabels((List<TurboLabel>) turboResources.get(ServiceManager.KEY_LABELS));
+			loadTurboLabels(turboResources.getTurboLabels());
 			latch.countDown();
+
 			logger.info("Loading milestones from cache...");
-			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
+			loadTurboMilestones(turboResources.getTurboMilestones());
 			latch.countDown();
 
-			List<TurboIssue> issues = isInTestMode
-					? TestUtils.getStubTurboIssues(this, 10)
-					: turboResources.get(ServiceManager.KEY_ISSUES);
-
+			List<TurboIssue> issues = turboResources.getTurboIssues();
 			logger.info("Loading issues from cache...");
 			loadTurboIssues(issues);
 			enableModelChanges();
@@ -269,8 +257,7 @@ public class Model {
 	 *
 	 * @param turboResources
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void loadGitHubResources(CountDownLatch latch, HashMap<String, List> resources, boolean isPublicRepo) {
+	private void loadGitHubResources(CountDownLatch latch, RepositoryResources resources, boolean isPublicRepo) {
 		run(() -> {
 			disableModelChanges();
 			if (isPublicRepo) {
@@ -280,17 +267,17 @@ public class Model {
 				clearCollaborators();
 			} else {
 				logger.info("Loading collaborators from GitHub...");
-				loadCollaborators((List<User>) resources.get(ServiceManager.KEY_COLLABORATORS));
+				loadCollaborators(resources.getUsers());
 			}
 			latch.countDown();
 			logger.info("Loading labels from GitHub...");
-			loadLabels((List<Label>) resources.get(ServiceManager.KEY_LABELS));
+			loadLabels(resources.getLabels());
 			latch.countDown();
 			logger.info("Loading milestones from GitHub...");
-			loadMilestones((List<Milestone>) resources.get(ServiceManager.KEY_MILESTONES));
+			loadMilestones(resources.getMilestones());
 			latch.countDown();
 			logger.info("Loading issues from GitHub...");
-			loadIssues((List<Issue>) resources.get(ServiceManager.KEY_ISSUES));
+			loadIssues(resources.getIssues());
 			enableModelChanges();
 			triggerModelChangeEvent();
 			latch.countDown();
