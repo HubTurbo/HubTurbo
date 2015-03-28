@@ -324,29 +324,33 @@ public class ServiceManager {
 		}
 
 		if (!needToGetResources) {
-			logger.info("Loading from cache...");
-
-			Date issueCheckTime = repo.getIssueCheckTime() == null
-				? new Date()
-				: Utility.localDateTimeToDate(repo .getIssueCheckTime());
-
-			updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
-				repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
-
-			taskUpdate.accept("Loading collaborators...", 0f);
-			List<TurboUser> collaborators = repo.getCollaborators();
-			taskUpdate.accept("Loading labels...", 0.25f);
-			List<TurboLabel> labels = repo.getLabels();
-			taskUpdate.accept("Loading milestones...", 0.5f);
-			List<TurboMilestone> milestones = repo.getMilestones();
-			taskUpdate.accept("Loading issues...", 0.75f);
-			List<TurboIssue> issues = repo.getIssues(model);
-
-			return RepositoryResources.fromCache(issues, labels, milestones, collaborators);
+			return getCacheResources(repo, taskUpdate);
 		} else {
 			logger.info("Cache not found, loading data from GitHub...");
 			return getGitHubResources(taskUpdate);
 		}
+	}
+
+	private RepositoryResources getCacheResources(CachedRepoData repo, BiConsumer<String, Float> taskUpdate) {
+		logger.info("Loading from cache...");
+
+		Date issueCheckTime = repo.getIssueCheckTime() == null
+			? new Date()
+			: Utility.localDateTimeToDate(repo.getIssueCheckTime());
+
+		updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
+			repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
+
+		taskUpdate.accept("Loading collaborators...", 0f);
+		List<TurboUser> collaborators = repo.getCollaborators();
+		taskUpdate.accept("Loading labels...", 0.25f);
+		List<TurboLabel> labels = repo.getLabels();
+		taskUpdate.accept("Loading milestones...", 0.5f);
+		List<TurboMilestone> milestones = repo.getMilestones();
+		taskUpdate.accept("Loading issues...", 0.75f);
+		List<TurboIssue> issues = repo.getIssues(model);
+
+		return RepositoryResources.fromCache(issues, labels, milestones, collaborators);
 	}
 
 	public RepositoryResources getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
@@ -564,6 +568,7 @@ public class ServiceManager {
 				// Total is only available after iterator.next() is called at least once.
 				// Even then it's approximate: always >= the actual amount.
 				totalIssueCount = iterator.getLastPage() * PagedRequest.PAGE_SIZE;
+				assert totalIssueCount >= elements.size();
 
 				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
 

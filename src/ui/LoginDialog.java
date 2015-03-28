@@ -242,6 +242,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		    protected Boolean call() throws Exception {
 
 			    HTStatusBar.displayMessage("Signed in; loading data...");
+			    updateProgress(0, 1);
+			    updateMessage("Loading data from " + owner + "/" + repo + "...");
 			    boolean loadSuccess = loadRepository(owner, repo, (message, progress) -> {
 				    updateProgress(progress * 100, 100);
 				    updateMessage(message);
