@@ -5,6 +5,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -236,14 +240,17 @@ public class LoginDialog extends Dialog<Boolean> {
 		Task<Boolean> task = new Task<Boolean>() {
 		    @Override
 		    protected Boolean call() throws Exception {
-		    	HTStatusBar.displayMessage("Signed in; loading data...");
-			    boolean loadSuccess = loadRepository(owner, repo);
-                PlatformEx.runAndWait(() -> {
-                    columns.restoreColumns();
-                });
+
+			    HTStatusBar.displayMessage("Signed in; loading data...");
+			    boolean loadSuccess = loadRepository(owner, repo, (message, progress) -> {
+				    updateProgress(progress * 100, 100);
+				    updateMessage(message);
+			    });
+                PlatformEx.runAndWait(columns::restoreColumns);
 		    	return loadSuccess;
 		    }
 		};
+
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
 				HTStatusBar.displayMessage("Issues loaded successfully!");
@@ -292,8 +299,9 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField.setDisable(disable);
 	}
 	
-	private boolean loadRepository(String owner, String repoName) throws IOException {
-		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName);
+	private boolean loadRepository(String owner, String repoName,
+	                               BiConsumer<String, Float> taskUpdate) throws IOException {
+		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName, taskUpdate);
 		ServiceManager.getInstance().startModelUpdate();
 		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
 		if (currRepo != null) {

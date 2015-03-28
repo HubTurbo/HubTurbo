@@ -4,12 +4,9 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 
 import javafx.application.Platform;
 import model.Model;
@@ -28,8 +25,7 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -198,7 +194,7 @@ public class ServiceManager {
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean setupRepository(String owner, String name) throws IOException {
+	public boolean setupRepository(String owner, String name, BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		assert lastUsedPassword != null : "setupRepository should be called only after login";
 		logger.info("Authenticating...");
@@ -206,7 +202,7 @@ public class ServiceManager {
 		this.repoId = RepositoryId.create(owner, name);
 
 		if (isRepositoryValid(repoId)) {
-			return model.loadComponents(repoId);
+			return model.loadComponents(repoId, taskUpdate);
 		} else {
 			// TODO: create specific exception for this
 			throw new IOException("Cannot access repository");
@@ -321,7 +317,7 @@ public class ServiceManager {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
+	public HashMap<String, List> getResources(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		this.repoId = repoId;
 
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
@@ -346,10 +342,14 @@ public class ServiceManager {
 			updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
 				repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
 
+			taskUpdate.accept("Loading collaborators...", 0f);
 			List<TurboUser> collaborators = repo.getCollaborators();
+			taskUpdate.accept("Loading labels...", 0.25f);
 			List<TurboLabel> labels = repo.getLabels();
+			taskUpdate.accept("Loading milestones...", 0.5f);
 			List<TurboMilestone> milestones = repo.getMilestones();
 			// Delay getting of issues until labels and milestones are loaded in Model
+			taskUpdate.accept("Loading issues...", 0.75f);
 
 			HashMap<String, List> map = new HashMap<>();
 			map.put(KEY_COLLABORATORS, collaborators);
@@ -358,20 +358,24 @@ public class ServiceManager {
 			return map;
 		} else {
 			logger.info("Cache not found, loading data from GitHub...");
-			return getGitHubResources();
+			return getGitHubResources(taskUpdate);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getGitHubResources() throws IOException {
+	public HashMap<String, List> getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		updateSignature = new UpdateSignature();
 
 		HashMap<String, List> map = new HashMap<>();
+		taskUpdate.accept("Loading collaborators...", 0f);
 		map.put(KEY_COLLABORATORS, new ArrayList<>());
+		taskUpdate.accept("Loading labels...", 0.25f);
 		map.put(KEY_LABELS, getLabels());
+		taskUpdate.accept("Loading milestones...", 0.5f);
 		map.put(KEY_MILESTONES, getMilestones());
-		map.put(KEY_ISSUES, getAllIssues());
+		taskUpdate.accept("Loading issues...", 0.75f);
+		map.put(KEY_ISSUES, getAllIssues(taskUpdate));
 		return map;
 	}
 
@@ -454,7 +458,7 @@ public class ServiceManager {
 	 */
 	public void switchRepository(RepositoryId repoId) throws IOException {
 		timer.pause();
-		model.populateComponents(repoId, getResources(repoId));
+		model.populateComponents(repoId, getResources(repoId, (a, b) -> {}));
 		timer.resume();
 		try {
 			updateModelNow().await();
@@ -545,14 +549,44 @@ public class ServiceManager {
 	private void ______ISSUES______() {
 	}
 
-	public List<Issue> getAllIssues() throws IOException {
+	public List<Issue> getAllIssues(BiConsumer<String, Float> taskUpdate) throws IOException {
 		if (repoId != null) {
 			Map<String, String> filters = new HashMap<>();
 			filters.put(IssueService.FIELD_FILTER, ISSUE_STATE_ALL);
 			filters.put(IssueService.FILTER_STATE, ISSUE_STATE_ALL);
-			return issueService.getIssues(repoId, filters);
+			return getAllIssuesPaged(repoId, filters, taskUpdate);
 		}
 		return new ArrayList<>();
+	}
+
+	private List<Issue> getAllIssuesPaged(IRepositoryIdProvider repoId, Map<String, String> filters,
+	                                      BiConsumer<String, Float> taskUpdate) throws IOException {
+		return getAll(issueService.pageIssues(repoId, filters), taskUpdate);
+	}
+
+	private List<Issue> getAll(PageIterator<Issue> iterator, BiConsumer<String, Float> taskUpdate) throws IOException {
+		List<Issue> elements = new ArrayList<>();
+		int totalIssueCount;
+
+		try {
+			while (iterator.hasNext()) {
+				Collection<Issue> additions = iterator.next();
+				elements.addAll(additions);
+
+				// Compute progress
+
+				// Total is only available after iterator.next() is called at least once.
+				// Even then it's approximate: always >= the actual amount.
+				totalIssueCount = iterator.getLastPage() * PagedRequest.PAGE_SIZE;
+
+				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
+
+				taskUpdate.accept("Loaded " + elements.size() + " issues...", progress);
+			}
+		} catch (NoSuchPageException pageException) {
+			throw pageException.getCause();
+		}
+		return elements;
 	}
 
 	public Issue createIssue(Issue issue) throws IOException {

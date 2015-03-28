@@ -5,6 +5,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -138,7 +139,7 @@ public class Model {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
-	public boolean loadComponents(RepositoryId repoId) throws IOException {
+	public boolean loadComponents(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		if (isInTestMode) {
 			// TODO will not be needed when the model is constructed with this
 			this.repoId = repoId;
@@ -147,7 +148,7 @@ public class Model {
 		}
 
 		try {
-			HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId);
+			HashMap<String, List> items = ServiceManager.getInstance().getResources(repoId, taskUpdate);
 			populateComponents(repoId, items);
 			return true;
 		} catch (SocketTimeoutException e) {
@@ -183,7 +184,7 @@ public class Model {
 			return;
 		}
 
-		HashMap<String, List> items = ServiceManager.getInstance().getGitHubResources();
+		HashMap<String, List> items = ServiceManager.getInstance().getGitHubResources((a, b) -> {});
 		populateComponents(repoId, items);
 	}
 
