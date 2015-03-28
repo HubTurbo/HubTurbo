@@ -1,10 +1,5 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +25,8 @@ import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
 
 import com.google.common.eventbus.EventBus;
+
+import static org.junit.Assert.*;
 
 @SuppressWarnings("unused")
 public class ModelTests {
@@ -72,7 +69,7 @@ public class ModelTests {
 	@Test
 	public void loadingFromCache() throws IOException {
 		Model model = new Model();
-		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
+		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME), (a, b) -> {});
 
 		assertEquals(model.getLabels().size(), 10);
 		assertEquals(model.getMilestones().size(), 10);
@@ -83,7 +80,7 @@ public class ModelTests {
 	@Test
 	public void loadingFromGitHub() throws IOException {
 		Model model = new Model();
-		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME));
+		model.loadComponents(new RepositoryId(TEST_REPO_OWNER, TEST_REPO_NAME), (a, b) -> {});
 
 		assertEquals(model.getLabels().size(), 10);
 		assertEquals(model.getMilestones().size(), 10);
