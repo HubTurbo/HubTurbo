@@ -181,8 +181,9 @@ public class ServiceManager {
 	 * Assumes that authentication has already been done, so should be called
 	 * after {@link #login(String, String) login}.
 	 *
-	 * @param owner
-	 * @param name
+	 * @param owner the owner of the repository
+	 * @param name the repository name
+	 * @param taskUpdate a callback to handle progress updates
 	 * @return
 	 * @throws IOException
 	 */
@@ -308,6 +309,14 @@ public class ServiceManager {
 	private void ______MODEL______() {
 	}
 
+	/**
+	 * Retrieves resources for the given repository. Abstracts away differences
+	 * between a cache and online source
+	 * @param repoId the repository to load
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return all requested resources for the given repository
+	 * @throws IOException
+	 */
 	public RepositoryResources getResources(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		this.repoId = repoId;
 
@@ -331,6 +340,12 @@ public class ServiceManager {
 		}
 	}
 
+	/**
+	 * Loads resources from the cache.
+	 * @param repo the repository to load
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested resources
+	 */
 	private RepositoryResources getCacheResources(CachedRepoData repo, BiConsumer<String, Float> taskUpdate) {
 		logger.info("Loading from cache...");
 
@@ -353,6 +368,12 @@ public class ServiceManager {
 		return RepositoryResources.fromCache(issues, labels, milestones, collaborators);
 	}
 
+	/**
+	 * Loads resources from github
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested resources
+	 * @throws IOException
+	 */
 	public RepositoryResources getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		updateSignature = new UpdateSignature();
@@ -364,7 +385,7 @@ public class ServiceManager {
 		taskUpdate.accept("Loading milestones...", 0.5f);
 		List<Milestone> milestones = getMilestones();
 		taskUpdate.accept("Loading issues...", 0.75f);
-		List<Issue> issues = getAllIssues(taskUpdate);
+		List<Issue> issues = getAllIssues(repoId, taskUpdate);
 
 		return RepositoryResources.fromGitHub(issues, labels, milestones, users);
 	}
@@ -444,42 +465,45 @@ public class ServiceManager {
 	 * model will be of the given repoId.
 	 *
 	 * @param repoId the repository to switch to
+	 * @param taskUpdate a callback to handle progress updates
 	 * @throws IOException
 	 */
-	public void switchRepository(RepositoryId repoId, BiConsumer<String, Float> updateTask) throws IOException {
+	public void switchRepository(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		timer.pause();
-		model.populateComponents(repoId, getResources(repoId, updateTask));
+		model.populateComponents(repoId, getResources(repoId, taskUpdate));
 		timer.resume();
 
-		updateTask.accept("Making sure everything is updated...", 1f);
+		taskUpdate.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		updateTask.accept("Done!", 1f);
+		taskUpdate.accept("Done!", 1f);
 	}
 
 	/**
 	 * Compound, synchronous action. After being called the contents of the
 	 * model reflect the latest version of the currently-loaded repository.
+	 *
+	 * @param taskUpdate a callback to handle progress updates
 	 */
-	public void forceRefresh(BiConsumer<String, Float> updateTask) {
+	public void forceRefresh(BiConsumer<String, Float> taskUpdate) {
 		timer.pause();
 		try {
-			model.forceReloadComponents(updateTask);
+			model.forceReloadComponents(taskUpdate);
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		timer.resume();
 
-		updateTask.accept("Making sure everything is updated...", 1f);
+		taskUpdate.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		updateTask.accept("Done!", 1f);
+		taskUpdate.accept("Done!", 1f);
 	}
 
 	private void ______LABELS______() {
@@ -545,7 +569,15 @@ public class ServiceManager {
 	private void ______ISSUES______() {
 	}
 
-	public List<Issue> getAllIssues(BiConsumer<String, Float> taskUpdate) throws IOException {
+	/**
+	 * Retrieves issues from the given repository.
+	 * @param repoId the repository to get issues from
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested issues
+	 * @throws IOException
+	 */
+	public List<Issue> getAllIssues(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
+		// TODO make this an assertion
 		if (repoId != null) {
 			Map<String, String> filters = new HashMap<>();
 			filters.put(IssueService.FIELD_FILTER, ISSUE_STATE_ALL);
@@ -729,7 +761,7 @@ public class ServiceManager {
 	 * Gets events for a issue from GitHub. This only includes information
 	 * that GitHub exposes, such as milestones being added, labels being
 	 * removed, etc. Events like comments being added must be gotten separately.
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 * @throws IOException

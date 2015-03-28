@@ -448,7 +448,6 @@ public class UI extends Application implements EventDispatcher {
 			logger.error(err.getLocalizedMessage(), err);
 			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
 		});
-
 	}
 
 	public MenuControl getMenuControl() {

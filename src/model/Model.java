@@ -135,7 +135,8 @@ public class Model {
 	 * Does not perform network operations in test mode, and always loads
 	 * stub data from cache.
 	 *
-	 * @param repoId
+	 * @param repoId the repository to load
+	 * @param taskUpdate a callback to handle progress updates
 	 * @return true on success, false otherwise
 	 * @throws IOException
 	 */
@@ -175,15 +176,16 @@ public class Model {
 	 * Does not perform network operations in test mode, instead loading stub
 	 * data from cache.
 	 *
+	 * @param taskUpdate a callback to handle progress updates
 	 * @throws IOException
 	 */
-	public void forceReloadComponents(BiConsumer<String, Float> updateTask) throws IOException {
+	public void forceReloadComponents(BiConsumer<String, Float> taskUpdate) throws IOException {
 		if (isInTestMode) {
 			populateComponents(repoId, TestUtils.getStubResources(this, 10));
 			return;
 		}
 
-		RepositoryResources items = ServiceManager.getInstance().getGitHubResources(updateTask);
+		RepositoryResources items = ServiceManager.getInstance().getGitHubResources(taskUpdate);
 		populateComponents(repoId, items);
 	}
 
@@ -654,7 +656,7 @@ public class Model {
 
 	private void ______TESTING______() {
 	}
-	
+
 	public EventBus getTestEvents() {
 		assert isInTestMode : "This function should not be called outside test mode";
 		return testEvents;
