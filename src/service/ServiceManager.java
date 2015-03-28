@@ -9,10 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 
 import javafx.application.Platform;
-import model.Model;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
+import model.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -348,13 +345,14 @@ public class ServiceManager {
 			List<TurboLabel> labels = repo.getLabels();
 			taskUpdate.accept("Loading milestones...", 0.5f);
 			List<TurboMilestone> milestones = repo.getMilestones();
-			// Delay getting of issues until labels and milestones are loaded in Model
 			taskUpdate.accept("Loading issues...", 0.75f);
+			List<TurboIssue> issues = repo.getIssues(model);
 
 			HashMap<String, List> map = new HashMap<>();
 			map.put(KEY_COLLABORATORS, collaborators);
 			map.put(KEY_LABELS, labels);
 			map.put(KEY_MILESTONES, milestones);
+			map.put(KEY_ISSUES, issues);
 			return map;
 		} else {
 			logger.info("Cache not found, loading data from GitHub...");

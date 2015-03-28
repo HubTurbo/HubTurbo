@@ -251,12 +251,10 @@ public class Model {
 			loadTurboMilestones((List<TurboMilestone>) turboResources.get(ServiceManager.KEY_MILESTONES));
 			latch.countDown();
 
-			// Load issues last, as this would require having references to other resources
-			
 			List<TurboIssue> issues = isInTestMode
 					? TestUtils.getStubTurboIssues(this, 10)
-					: dcHandler.getRepo().getIssues(this);
-			
+					: turboResources.get(ServiceManager.KEY_ISSUES);
+
 			logger.info("Loading issues from cache...");
 			loadTurboIssues(issues);
 			enableModelChanges();
