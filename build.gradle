@@ -12,10 +12,6 @@ plugins {
 
 allprojects {
 
-    task wrapper(type: Wrapper) {
-        gradleVersion = '2.3'
-    }
-
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
