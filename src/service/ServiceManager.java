@@ -4,18 +4,12 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 
 import javafx.application.Platform;
-import model.Model;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
+import model.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +22,7 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -75,11 +68,6 @@ public class ServiceManager {
 	private static final Logger logger = LogManager.getLogger(ServiceManager.class.getName());
 
 	public static final int SYNC_PERIOD = 60;
-
-	public static final String KEY_ISSUES = "issues";
-	public static final String KEY_MILESTONES = "milestones";
-	public static final String KEY_LABELS = "labels";
-	public static final String KEY_COLLABORATORS = "collaborators";
 
 	// Login state
 
@@ -193,12 +181,13 @@ public class ServiceManager {
 	 * Assumes that authentication has already been done, so should be called
 	 * after {@link #login(String, String) login}.
 	 *
-	 * @param owner
-	 * @param name
+	 * @param owner the owner of the repository
+	 * @param name the repository name
+	 * @param taskUpdate a callback to handle progress updates
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean setupRepository(String owner, String name) throws IOException {
+	public boolean setupRepository(String owner, String name, BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		assert lastUsedPassword != null : "setupRepository should be called only after login";
 		logger.info("Authenticating...");
@@ -206,7 +195,7 @@ public class ServiceManager {
 		this.repoId = RepositoryId.create(owner, name);
 
 		if (isRepositoryValid(repoId)) {
-			return model.loadComponents(repoId);
+			return model.loadComponents(repoId, taskUpdate);
 		} else {
 			// TODO: create specific exception for this
 			throw new IOException("Cannot access repository");
@@ -320,8 +309,15 @@ public class ServiceManager {
 	private void ______MODEL______() {
 	}
 
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getResources(RepositoryId repoId) throws IOException {
+	/**
+	 * Retrieves resources for the given repository. Abstracts away differences
+	 * between a cache and online source
+	 * @param repoId the repository to load
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return all requested resources for the given repository
+	 * @throws IOException
+	 */
+	public RepositoryResources getResources(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		this.repoId = repoId;
 
 		CacheFileHandler dcHandler = new CacheFileHandler(repoId.toString());
@@ -337,42 +333,61 @@ public class ServiceManager {
 		}
 
 		if (!needToGetResources) {
-			logger.info("Loading from cache...");
-
-			Date issueCheckTime = repo.getIssueCheckTime() == null
-				? new Date()
-				: Utility.localDateTimeToDate(repo .getIssueCheckTime());
-
-			updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
-				repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
-
-			List<TurboUser> collaborators = repo.getCollaborators();
-			List<TurboLabel> labels = repo.getLabels();
-			List<TurboMilestone> milestones = repo.getMilestones();
-			// Delay getting of issues until labels and milestones are loaded in Model
-
-			HashMap<String, List> map = new HashMap<>();
-			map.put(KEY_COLLABORATORS, collaborators);
-			map.put(KEY_LABELS, labels);
-			map.put(KEY_MILESTONES, milestones);
-			return map;
+			return getCacheResources(repo, taskUpdate);
 		} else {
 			logger.info("Cache not found, loading data from GitHub...");
-			return getGitHubResources();
+			return getGitHubResources(taskUpdate);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public HashMap<String, List> getGitHubResources() throws IOException {
+	/**
+	 * Loads resources from the cache.
+	 * @param repo the repository to load
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested resources
+	 */
+	private RepositoryResources getCacheResources(CachedRepoData repo, BiConsumer<String, Float> taskUpdate) {
+		logger.info("Loading from cache...");
+
+		Date issueCheckTime = repo.getIssueCheckTime() == null
+			? new Date()
+			: Utility.localDateTimeToDate(repo.getIssueCheckTime());
+
+		updateSignature = new UpdateSignature(repo.getIssuesETag(), repo.getLabelsETag(),
+			repo.getMilestonesETag(), repo.getCollaboratorsETag(), issueCheckTime);
+
+		taskUpdate.accept("Loading collaborators...", 0f);
+		List<TurboUser> collaborators = repo.getCollaborators();
+		taskUpdate.accept("Loading labels...", 0.25f);
+		List<TurboLabel> labels = repo.getLabels();
+		taskUpdate.accept("Loading milestones...", 0.5f);
+		List<TurboMilestone> milestones = repo.getMilestones();
+		taskUpdate.accept("Loading issues...", 0.75f);
+		List<TurboIssue> issues = repo.getIssues(model);
+
+		return RepositoryResources.fromCache(issues, labels, milestones, collaborators);
+	}
+
+	/**
+	 * Loads resources from github
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested resources
+	 * @throws IOException
+	 */
+	public RepositoryResources getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
 
 		updateSignature = new UpdateSignature();
 
-		HashMap<String, List> map = new HashMap<>();
-		map.put(KEY_COLLABORATORS, new ArrayList<>());
-		map.put(KEY_LABELS, getLabels());
-		map.put(KEY_MILESTONES, getMilestones());
-		map.put(KEY_ISSUES, getAllIssues());
-		return map;
+		taskUpdate.accept("Loading collaborators...", 0f);
+		List<User> users = new ArrayList<>();
+		taskUpdate.accept("Loading labels...", 0.25f);
+		List<Label> labels = getLabels();
+		taskUpdate.accept("Loading milestones...", 0.5f);
+		List<Milestone> milestones = getMilestones();
+		taskUpdate.accept("Loading issues...", 0.75f);
+		List<Issue> issues = getAllIssues(repoId, taskUpdate);
+
+		return RepositoryResources.fromGitHub(issues, labels, milestones, users);
 	}
 
 	public Model getModel() {
@@ -450,36 +465,45 @@ public class ServiceManager {
 	 * model will be of the given repoId.
 	 *
 	 * @param repoId the repository to switch to
+	 * @param taskUpdate a callback to handle progress updates
 	 * @throws IOException
 	 */
-	public void switchRepository(RepositoryId repoId) throws IOException {
+	public void switchRepository(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
 		timer.pause();
-		model.populateComponents(repoId, getResources(repoId));
+		model.populateComponents(repoId, getResources(repoId, taskUpdate));
 		timer.resume();
+
+		taskUpdate.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		taskUpdate.accept("Done!", 1f);
 	}
 
 	/**
 	 * Compound, synchronous action. After being called the contents of the
 	 * model reflect the latest version of the currently-loaded repository.
+	 *
+	 * @param taskUpdate a callback to handle progress updates
 	 */
-	public void forceRefresh() {
+	public void forceRefresh(BiConsumer<String, Float> taskUpdate) {
 		timer.pause();
 		try {
-			model.forceReloadComponents();
+			model.forceReloadComponents(taskUpdate);
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		timer.resume();
+
+		taskUpdate.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		taskUpdate.accept("Done!", 1f);
 	}
 
 	private void ______LABELS______() {
@@ -545,14 +569,53 @@ public class ServiceManager {
 	private void ______ISSUES______() {
 	}
 
-	public List<Issue> getAllIssues() throws IOException {
+	/**
+	 * Retrieves issues from the given repository.
+	 * @param repoId the repository to get issues from
+	 * @param taskUpdate a callback to handle progress updates
+	 * @return the requested issues
+	 * @throws IOException
+	 */
+	public List<Issue> getAllIssues(RepositoryId repoId, BiConsumer<String, Float> taskUpdate) throws IOException {
+		// TODO make this an assertion
 		if (repoId != null) {
 			Map<String, String> filters = new HashMap<>();
 			filters.put(IssueService.FIELD_FILTER, ISSUE_STATE_ALL);
 			filters.put(IssueService.FILTER_STATE, ISSUE_STATE_ALL);
-			return issueService.getIssues(repoId, filters);
+			return getAllIssuesPaged(repoId, filters, taskUpdate);
 		}
 		return new ArrayList<>();
+	}
+
+	private List<Issue> getAllIssuesPaged(IRepositoryIdProvider repoId, Map<String, String> filters,
+	                                      BiConsumer<String, Float> taskUpdate) throws IOException {
+		return getAll(issueService.pageIssues(repoId, filters), taskUpdate);
+	}
+
+	private List<Issue> getAll(PageIterator<Issue> iterator, BiConsumer<String, Float> taskUpdate) throws IOException {
+		List<Issue> elements = new ArrayList<>();
+		int totalIssueCount;
+
+		try {
+			while (iterator.hasNext()) {
+				Collection<Issue> additions = iterator.next();
+				elements.addAll(additions);
+
+				// Compute progress
+
+				// Total is only available after iterator.next() is called at least once.
+				// Even then it's approximate: always >= the actual amount.
+				totalIssueCount = iterator.getLastPage() * PagedRequest.PAGE_SIZE;
+				assert totalIssueCount >= elements.size();
+
+				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
+
+				taskUpdate.accept("Loaded " + elements.size() + " issues...", progress);
+			}
+		} catch (NoSuchPageException pageException) {
+			throw pageException.getCause();
+		}
+		return elements;
 	}
 
 	public Issue createIssue(Issue issue) throws IOException {
@@ -698,7 +761,7 @@ public class ServiceManager {
 	 * Gets events for a issue from GitHub. This only includes information
 	 * that GitHub exposes, such as milestones being added, labels being
 	 * removed, etc. Events like comments being added must be gotten separately.
-	 * 
+	 *
 	 * @param issueId
 	 * @return
 	 * @throws IOException

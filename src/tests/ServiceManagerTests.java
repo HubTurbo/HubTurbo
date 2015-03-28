@@ -33,7 +33,7 @@ public class ServiceManagerTests {
 		assertFalse(wrongCred);
 		assertTrue(serviceManager.login(TEST_GITHUB_USERNAME, TEST_GITHUB_PASSWORD));
 		try {
-			serviceManager.setupRepository(TEST_GITHUB_USERNAME, TEST_REPO_NAME);
+			serviceManager.setupRepository(TEST_GITHUB_USERNAME, TEST_REPO_NAME, (a, b) -> {});
 		} catch (IOException e) {
 			fail();
 		}
@@ -42,7 +42,7 @@ public class ServiceManagerTests {
 	@Test
 	public void setupRepositoryTest() {
 		try {
-			serviceManager.setupRepository(TEST_GITHUB_USERNAME, TEST_REPO_NAME);
+			serviceManager.setupRepository(TEST_GITHUB_USERNAME, TEST_REPO_NAME, (a, b) -> {});
 		} catch (IOException e) {
 			fail();
 		}

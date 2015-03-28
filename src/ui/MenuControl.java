@@ -279,11 +279,16 @@ public class MenuControl extends MenuBar {
 			protected Boolean call() throws IOException {
 				try {
 					logger.info("Menu: View > Force Refresh");
-					ServiceManager.getInstance().forceRefresh();
 
-                    PlatformEx.runAndWait(() -> {
-                        columns.recreateColumns();
-                    });
+					updateProgress(0, 1);
+					updateMessage(String.format("Reloading %s...",
+						ServiceManager.getInstance().getRepoId().generateId()));
+
+					ServiceManager.getInstance().forceRefresh((message, progress) -> {
+						updateProgress(progress * 100, 100);
+						updateMessage(message);
+					});
+                    PlatformEx.runAndWait(columns::recreateColumns);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					return false;
@@ -309,8 +314,7 @@ public class MenuControl extends MenuBar {
 				});
 			}
 		};
-		DialogMessage.showProgressDialog(task,
-				"Reloading issues for current repo... This may take awhile, please wait.");
+		DialogMessage.showProgressDialog(task, "Reloading repoistory...");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
