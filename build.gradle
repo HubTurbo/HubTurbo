@@ -8,6 +8,7 @@
 // Plugins
 plugins {
     id "com.github.kt3k.coveralls" version "2.3.1"
+    id "com.github.johnrengelman.shadow" version "1.2.1"
 }
 
 allprojects {
@@ -78,8 +79,16 @@ allprojects {
     }
 
     coveralls {
-        sourceDirs = sourceSets.main.allJava.flatten()
+        sourceDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util']
         jacocoReportPath = "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+
+    assemble.dependsOn shadowJar
+
+    shadowJar {
+        manifest {
+            attributes 'Main-Class': 'ui.UI'
+        }
     }
 
     // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package])
