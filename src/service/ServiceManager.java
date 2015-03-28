@@ -446,15 +446,18 @@ public class ServiceManager {
 	 * @param repoId the repository to switch to
 	 * @throws IOException
 	 */
-	public void switchRepository(RepositoryId repoId) throws IOException {
+	public void switchRepository(RepositoryId repoId, BiConsumer<String, Float> updateTask) throws IOException {
 		timer.pause();
-		model.populateComponents(repoId, getResources(repoId, (a, b) -> {}));
+		model.populateComponents(repoId, getResources(repoId, updateTask));
 		timer.resume();
+
+		updateTask.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		updateTask.accept("Done!", 1f);
 	}
 
 	/**

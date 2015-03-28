@@ -408,7 +408,7 @@ public class UI extends Application implements EventDispatcher {
 			return;
 		}
 
-		logger.info("Switching repository to " + repoString + " in progress");
+		logger.info("Switching repository to " + repoString + "...");
 
 		columns.saveSession();
 		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
@@ -417,7 +417,14 @@ public class UI extends Application implements EventDispatcher {
 			@Override
 			protected Boolean call() throws IOException {
 
-				ServiceManager.getInstance().switchRepository(repoId);
+				updateProgress(0, 1);
+				updateMessage(String.format("Switching to %s...",
+					ServiceManager.getInstance().getRepoId().generateId()));
+
+				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
+					updateProgress(progress * 100, 100);
+					updateMessage(message);
+				});
 
                 PlatformEx.runAndWait(() -> {
                     columns.restoreColumns();
@@ -426,7 +433,7 @@ public class UI extends Application implements EventDispatcher {
 				return true;
 			}
 		};
-		DialogMessage.showProgressDialog(task, "Loading issues from " + repoId.generateId() + "...");
+		DialogMessage.showProgressDialog(task, "Switching to " + repoId.generateId() + "...");
 		Thread thread = new Thread(task);
 		thread.setDaemon(true);
 		thread.start();
@@ -439,7 +446,7 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnFailed(wse -> {
 			Throwable err = task.getException();
 			logger.error(err.getLocalizedMessage(), err);
-			HTStatusBar.displayMessage("An error occurred: " + err);
+			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
 		});
 
 	}
