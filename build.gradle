@@ -66,7 +66,14 @@ allprojects {
         compile "junit:junit:$junitVersion"
     }
 
+    jacoco {
+        toolVersion = "0.7.4.201502262128"
+    }
+
     jacocoTestReport {
+        dependsOn test
+        sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
+        classDirectories =  project.files(sourceSets.main.output)
         afterEvaluate {
             classDirectories = files(classDirectories.files.collect {
                 fileTree(dir: it, exclude: 'tests/**')
@@ -76,11 +83,6 @@ allprojects {
             xml.enabled = true
             html.enabled = true
         }
-    }
-
-    coveralls {
-        sourceDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util']
-        jacocoReportPath = "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 
     assemble.dependsOn shadowJar
