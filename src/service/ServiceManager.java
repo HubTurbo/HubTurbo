@@ -461,19 +461,22 @@ public class ServiceManager {
 	 * Compound, synchronous action. After being called the contents of the
 	 * model reflect the latest version of the currently-loaded repository.
 	 */
-	public void forceRefresh() {
+	public void forceRefresh(BiConsumer<String, Float> updateTask) {
 		timer.pause();
 		try {
-			model.forceReloadComponents();
+			model.forceReloadComponents(updateTask);
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 		timer.resume();
+
+		updateTask.accept("Making sure everything is updated...", 1f);
 		try {
 			updateModelNow().await();
 		} catch (InterruptedException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
+		updateTask.accept("Done!", 1f);
 	}
 
 	private void ______LABELS______() {

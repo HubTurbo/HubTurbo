@@ -177,13 +177,13 @@ public class Model {
 	 *
 	 * @throws IOException
 	 */
-	public void forceReloadComponents() throws IOException {
+	public void forceReloadComponents(BiConsumer<String, Float> updateTask) throws IOException {
 		if (isInTestMode) {
 			populateComponents(repoId, TestUtils.getStubResources(this, 10));
 			return;
 		}
 
-		RepositoryResources items = ServiceManager.getInstance().getGitHubResources((a, b) -> {});
+		RepositoryResources items = ServiceManager.getInstance().getGitHubResources(updateTask);
 		populateComponents(repoId, items);
 	}
 
