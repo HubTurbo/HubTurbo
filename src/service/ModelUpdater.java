@@ -1,6 +1,5 @@
 package service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -38,19 +37,27 @@ public class ModelUpdater {
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 	}
 	
-	public void updateModel(CountDownLatch latch, String repoId) {
+	public void updateModel(String repoId) {
 		logger.info("Updating model...");
+
+		CountDownLatch latch = new CountDownLatch(4);
 		model.disableModelChanges();
-		// TODO all these should return CompletableFuture<Integer> with the number of resources updated
+
 	    updateModelCollaborators(latch, repoId);
 	   	updateModelLabels(latch, repoId);
 	  	updateModelMilestones(latch, repoId);
 	  	updateModelIssues(latch, repoId);
+
 	  	model.enableModelChanges();
+
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
 	}
 	
 	private void updateModelIssues(CountDownLatch latch, String repoId) {
-		// TODO turn this into an assertion, same for the rest
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
@@ -59,6 +66,9 @@ public class ModelUpdater {
 				logger.info("No issues to update");
 				latch.countDown();
 			}
+		} else {
+			logger.info("Repository has changed; not updating issues");
+			latch.countDown();
 		}
 	}
 
@@ -72,6 +82,9 @@ public class ModelUpdater {
 				latch.countDown();
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating collaborators");
+			latch.countDown();
 		}
 	}
 
@@ -85,6 +98,9 @@ public class ModelUpdater {
 				latch.countDown();
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating labels");
+			latch.countDown();
 		}
 	}
 
@@ -98,6 +114,9 @@ public class ModelUpdater {
 				latch.countDown();
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating milestones");
+			latch.countDown();
 		}
 	}
 

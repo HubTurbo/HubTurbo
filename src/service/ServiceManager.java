@@ -415,13 +415,9 @@ public class ServiceManager {
 		});
 
 		// Wait for the update to complete
-		CountDownLatch latch = new CountDownLatch(4);
-		modelUpdater.updateModel(latch, repoId);
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
+
+		modelUpdater.updateModel(repoId);
+
 		updateSignature = modelUpdater.getNewUpdateSignature();
 		model.updateCache(updateSignature);
 
