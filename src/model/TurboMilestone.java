@@ -101,17 +101,19 @@ public class TurboMilestone implements TurboResource {
 		ghMilestone.setDueOn(toDate(dueOn));
 		return ghMilestone;
 	}
-	
-	public void copyValues(Object other){
-		if(other.getClass() == TurboMilestone.class){
-			TurboMilestone obj = (TurboMilestone)other;
-			setTitle(obj.getTitle());
-			this.state = obj.getState();
-			this.description = obj.getDescription();
-			setDueOn(obj.getDueOn());
-			setClosed(obj.getClosed());
-			setOpen(obj.getOpen());
-		}
+
+	@Override
+	public void copyValuesFrom(TurboResource other) {
+		assert other != null;
+		assert other instanceof TurboMilestone;
+
+		TurboMilestone obj = (TurboMilestone) other;
+		setTitle(obj.getTitle());
+		setState(obj.getState());
+		setDescription(obj.getDescription());
+		setDueOn(obj.getDueOn());
+		setClosed(obj.getClosed());
+		setOpen(obj.getOpen());
 	}
 	
 	public double getProgress(){

@@ -1,5 +1,5 @@
 package model;
 
 public interface TurboResource {
-	public void copyValues(Object other);
+	public void copyValuesFrom(TurboResource other);
 }

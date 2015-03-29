@@ -295,29 +295,31 @@ public class Model {
 	 * @param newList
 	 * @param repoId
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void updateCachedList(List list, List newList, String repoId, CountDownLatch latch) {
-		HashMap<String, HashSet> changes = CollectionUtilities.getChangesToList(list, newList);
-		HashSet removed = changes.get(CollectionUtilities.REMOVED_TAG);
+	private <T extends TurboResource> void updateCachedList(List<T> list, List<T> newList,
+	                                                        String repoId, CountDownLatch latch) {
+		if (newList.size() == 0) {
+			// No updates to speak of
+			return;
+		}
+		assert !(newList.get(0) instanceof TurboIssue) : "updatedCachedIssues should be used for issues";
+
+		HashMap<String, HashSet<T>> changes = CollectionUtilities.getChangesToList(list, newList);
+		HashSet<T> removed = changes.get(CollectionUtilities.REMOVED_TAG);
 
 		run(() -> {
 			list.removeAll(removed);
 
-			TurboResource listItem = (TurboResource) newList.get(0);
-			if (listItem instanceof TurboMilestone) {
-				logNumOfUpdates(newList, "milestone(s)");
-			} else if (listItem instanceof TurboLabel) {
-				logNumOfUpdates(newList, "label(s)");
-			} else if (listItem instanceof TurboUser) {
-				logNumOfUpdates(newList, "collaborator(s)");
-			}
+			assert newList.size() > 0;
+			String resourceName = newList.get(0).getClass().getSimpleName()
+				.replaceAll("Turbo", "").toLowerCase() + "(s)";
+			logNumOfUpdates(newList, resourceName);
 
-			ArrayList<Object> buffer = new ArrayList<>();
-			for (Object item : newList) {
+			ArrayList<T> buffer = new ArrayList<>();
+			for (T item : newList) {
 				int index = list.indexOf(item);
 				if (index != -1) {
-					TurboResource old = (TurboResource) list.get(index);
-					old.copyValues(item);
+					T existingItem = list.get(index);
+					existingItem.copyValuesFrom(item);
 				} else {
 					buffer.add(item);
 				}
@@ -332,8 +334,7 @@ public class Model {
 		});
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void logNumOfUpdates(List newList, String type) {
+	private <T> void logNumOfUpdates(List<T> newList, String type) {
 		if (!isInTestMode) {
 			logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
 		}
@@ -460,8 +461,8 @@ public class Model {
 	public void updateCachedIssue(TurboIssue issue) {
 		TurboIssue tIssue = getIssueWithId(issue.getId());
 		if (tIssue != null) {
-			tIssue.copyValues(issue);
-			logger.debug("Updated issue: " + issue.getId());
+			tIssue.copyValuesFrom(issue);
+			logger.info("Updated issue: " + issue.getId());
 		} else {
 			issues.add(0, issue);
 			logger.info("Added issue: " + issue.getId());

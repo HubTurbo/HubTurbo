@@ -72,15 +72,16 @@ public class TurboLabel implements TurboResource {
 		}
 		setColour(label.getColor());
 	}
-	
-	public void copyValues(Object other){
-		if(other.getClass() == TurboLabel.class){
-			TurboLabel obj = (TurboLabel)other;
-			setName(obj.getName());
-			setColour(obj.getColour());
-			setGroup(obj.getGroup());
-			setExclusive(obj.isExclusive);
-		}
+
+	@Override
+	public void copyValuesFrom(TurboResource other) {
+		assert other != null;
+		assert other instanceof TurboLabel;
+
+		TurboLabel obj = (TurboLabel) other;
+		setName(obj.getName());
+		setColour(obj.getColour());
+		setGroup(obj.getGroup());
 	}
 	
 	public Label toGhResource() {

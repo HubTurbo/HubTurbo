@@ -1,5 +1,6 @@
 package model;
 
+import com.sun.source.tree.AssertTree;
 import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;
@@ -79,14 +80,16 @@ public class TurboUser implements TurboResource {
 		ghUser.setLogin(githubName);
 		return ghUser;
 	}
-	
-	public void copyValues(Object other){
-		if(other.getClass() == TurboUser.class){
-			TurboUser obj = (TurboUser)other;
-			setGithubName(obj.getGithubName());
-			setRealName(obj.getRealName());
-			setAvatarUrl(obj.getAvatarUrl());
-		}
+
+	@Override
+	public void copyValuesFrom(TurboResource other) {
+		assert other != null;
+		assert other instanceof TurboUser;
+
+		TurboUser obj = (TurboUser) other;
+		setGithubName(obj.getGithubName());
+		setRealName(obj.getRealName());
+		setAvatarUrl(obj.getAvatarUrl());
 	}
 	
 	/*
