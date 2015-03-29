@@ -38,7 +38,15 @@ public class ModelUpdater {
 		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 	}
-	
+
+	/**
+	 * Updates the model given a source repository. May fail if the repository changes halfway through.
+	 * This should not happen under normal circumstances and is a safeguard against concurrency issues.
+	 * Getting an empty update does not constitute a failure.
+	 *
+	 * @param repoId the repository to get updates from
+	 * @return true if the model update completed successfully
+	 */
 	public boolean updateModel(String repoId) {
 		logger.info("Updating model...");
 
@@ -63,6 +71,14 @@ public class ModelUpdater {
 		return result;
 	}
 
+	/**
+	 * Gets updates for issues. Returns a future which is completed on success and cancelled on failure.
+	 * Failure means that the repository was changed halfway. It's a safeguard against concurrency issues.
+	 * See {@link #updateModel(String)} for details.
+	 *
+	 * @param repoId the repository to get updates from
+	 * @return a future which completes on success, and is cancelled upon failure
+	 */
 	private CompletableFuture<Void> updateModelIssues(String repoId) {
 		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
@@ -80,6 +96,9 @@ public class ModelUpdater {
 		return response;
 	}
 
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
 	private CompletableFuture<Void> updateModelCollaborators(String repoId) {
 		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
@@ -98,6 +117,9 @@ public class ModelUpdater {
 		return response;
 	}
 
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
 	private CompletableFuture<Void> updateModelLabels(String repoId) {
 		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
@@ -116,6 +138,9 @@ public class ModelUpdater {
 		return response;
 	}
 
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
 	private CompletableFuture<Void> updateModelMilestones(String repoId) {
 		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
