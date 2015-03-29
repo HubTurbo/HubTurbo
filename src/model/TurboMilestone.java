@@ -10,7 +10,7 @@ import java.util.Date;
 
 import org.eclipse.egit.github.core.Milestone;
 
-public class TurboMilestone implements Listable {
+public class TurboMilestone implements TurboResource {
 	
 	private static final String CUSTOM_DATETIME_PATTERN = "d MMMM yyyy";
 	/*
@@ -101,17 +101,19 @@ public class TurboMilestone implements Listable {
 		ghMilestone.setDueOn(toDate(dueOn));
 		return ghMilestone;
 	}
-	
-	public void copyValues(Object other){
-		if(other.getClass() == TurboMilestone.class){
-			TurboMilestone obj = (TurboMilestone)other;
-			setTitle(obj.getTitle());
-			this.state = obj.getState();
-			this.description = obj.getDescription();
-			setDueOn(obj.getDueOn());
-			setClosed(obj.getClosed());
-			setOpen(obj.getOpen());
-		}
+
+	@Override
+	public void copyValuesFrom(TurboResource other) {
+		assert other != null;
+		assert other instanceof TurboMilestone;
+
+		TurboMilestone obj = (TurboMilestone) other;
+		setTitle(obj.getTitle());
+		setState(obj.getState());
+		setDescription(obj.getDescription());
+		setDueOn(obj.getDueOn());
+		setClosed(obj.getClosed());
+		setOpen(obj.getOpen());
 	}
 	
 	public double getProgress(){
@@ -184,11 +186,6 @@ public class TurboMilestone implements Listable {
 	/*
 	 * Overridden Methods
 	 */
-
-	@Override
-	public String getListName() {
-		return getTitle();
-	}
 
 	@Override
 	public int hashCode() {
