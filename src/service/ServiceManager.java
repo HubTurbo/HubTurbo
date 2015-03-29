@@ -416,13 +416,15 @@ public class ServiceManager {
 
 		// Wait for the update to complete
 
-		modelUpdater.updateModel(repoId);
+		if (modelUpdater.updateModel(repoId)) {
+			updateSignature = modelUpdater.getNewUpdateSignature();
+			model.updateCache(updateSignature);
 
-		updateSignature = modelUpdater.getNewUpdateSignature();
-		model.updateCache(updateSignature);
-
-		updatedIssueMetadata.download();
-		model.triggerModelChangeEvent();
+			updatedIssueMetadata.download();
+			model.triggerModelChangeEvent();
+		} else {
+			logger.warn("Model update stopped due to repository changing halfway -- likely concurrency problem!");
+		}
 
 		// Reset progress UI
 		HTStatusBar.updateProgress(0);
