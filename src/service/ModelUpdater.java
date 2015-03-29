@@ -1,8 +1,9 @@
 package service;
 
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import model.Model;
 
@@ -37,68 +38,125 @@ public class ModelUpdater {
 		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 	}
-	
-	public void updateModel(CountDownLatch latch, String repoId) {
+
+	/**
+	 * Updates the model given a source repository. May fail if the repository changes halfway through.
+	 * This should not happen under normal circumstances and is a safeguard against concurrency issues.
+	 * Getting an empty update does not constitute a failure.
+	 *
+	 * @param repoId the repository to get updates from
+	 * @return true if the model update completed successfully
+	 */
+	public boolean updateModel(String repoId) {
 		logger.info("Updating model...");
+
 		model.disableModelChanges();
-		// TODO all these should return CompletableFuture<Integer> with the number of resources updated
-	    updateModelCollaborators(latch, repoId);
-	   	updateModelLabels(latch, repoId);
-	  	updateModelMilestones(latch, repoId);
-	  	updateModelIssues(latch, repoId);
-	  	model.enableModelChanges();
+		boolean result = true;
+
+		try {
+			updateModelCollaborators(repoId).get();
+			updateModelLabels(repoId).get();
+			updateModelMilestones(repoId).get();
+			updateModelIssues(repoId).get();
+		} catch (CancellationException e) {
+			// Control jumping here means that one of the get methods
+			// failed, i.e. one of the CompletableFutures was cancelled.
+			// In that case we return false to stop the model update.
+			result = false;
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+
+		model.enableModelChanges();
+		return result;
 	}
-	
-	private void updateModelIssues(CountDownLatch latch, String repoId) {
-		// TODO turn this into an assertion, same for the rest
+
+	/**
+	 * Gets updates for issues. Returns a future which is completed on success and cancelled on failure.
+	 * Failure means that the repository was changed halfway. It's a safeguard against concurrency issues.
+	 * See {@link #updateModel(String)} for details.
+	 *
+	 * @param repoId the repository to get updates from
+	 * @return a future which completes on success, and is cancelled upon failure
+	 */
+	private CompletableFuture<Void> updateModelIssues(String repoId) {
+		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
-				model.updateCachedIssues(latch, updatedIssues, repoId);
+				model.updateCachedIssues(response, updatedIssues, repoId);
 			} else {
 				logger.info("No issues to update");
-				latch.countDown();
+				response.complete(null);
 			}
+		} else {
+			logger.info("Repository has changed; not updating issues");
+			response.cancel(true);
 		}
+		return response;
 	}
 
-	private void updateModelCollaborators(CountDownLatch latch, String repoId) {
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
+	private CompletableFuture<Void> updateModelCollaborators(String repoId) {
+		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
-				model.updateCachedCollaborators(latch, collaborators, repoId);
+				model.updateCachedCollaborators(response, collaborators, repoId);
 			} else {
 				logger.info("No collaborators to update");
-				latch.countDown();
+				response.complete(null);
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating collaborators");
+			response.cancel(true);
 		}
+		return response;
 	}
 
-	private void updateModelLabels(CountDownLatch latch, String repoId) {
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
+	private CompletableFuture<Void> updateModelLabels(String repoId) {
+		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
-				model.updateCachedLabels(latch, labels, repoId);
+				model.updateCachedLabels(response, labels, repoId);
 			} else {
 				logger.info("No labels to update");
-				latch.countDown();
+				response.complete(null);
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating labels");
+			response.cancel(true);
 		}
+		return response;
 	}
 
-	private void updateModelMilestones(CountDownLatch latch, String repoId) {
+	/**
+	 * See {@link #updateModelIssues(String)} for details.
+	 */
+	private CompletableFuture<Void> updateModelMilestones(String repoId) {
+		CompletableFuture<Void> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
-				model.updateCachedMilestones(latch, milestones, repoId);
+				model.updateCachedMilestones(response, milestones, repoId);
 			} else {
 				logger.info("No milestones to update");
-				latch.countDown();
+				response.complete(null);
 				HTStatusBar.addProgress(0.25);
 			}
+		} else {
+			logger.info("Repository has changed; not updating milestones");
+			response.cancel(true);
 		}
+		return response;
 	}
 
 	public UpdateSignature getNewUpdateSignature() {

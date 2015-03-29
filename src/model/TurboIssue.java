@@ -34,7 +34,7 @@ import util.Utility;
 
 
 @SuppressWarnings("unused")
-public class TurboIssue implements Listable {
+public class TurboIssue implements TurboResource {
 
 	private static final Logger logger = LogManager.getLogger(TurboIssue.class.getName());
 
@@ -132,7 +132,7 @@ public class TurboIssue implements Listable {
 
 	public TurboIssue(TurboIssue other) {
 		assert other != null;
-		copyValues(other);
+		copyValuesFrom(other);
 	}
 
 	private void log(String field, String change) {
@@ -143,86 +143,80 @@ public class TurboIssue implements Listable {
 	    logger.info(String.format("Issue %d %s: '%s' -> '%s'", this.getId(), field, before, after));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void copyValues(Object other) {
+	@Override
+	public void copyValuesFrom(TurboResource other) {
 	    assert other != null;
-	    if (other.getClass() == TurboIssue.class) {
-	        TurboIssue otherIssue = (TurboIssue)other;
-	        model = otherIssue.model;
+		assert other instanceof TurboIssue;
 
-	        setHtmlUrl(otherIssue.getHtmlUrl());
+		TurboIssue otherIssue = (TurboIssue) other;
+		model = otherIssue.model;
 
-	        // Logging is done with the assumption that this method is used for
-	        // updating the values of TurboIssue in mind
-	        if (!otherIssue.getTitle().equals(this.getTitle())) {
-	            log("title", this.getTitle(), otherIssue.getTitle());
-	        }
-	        setTitle(otherIssue.getTitle());
-	        setOpen(otherIssue.isOpen());
-	        setId(otherIssue.getId());
+		setHtmlUrl(otherIssue.getHtmlUrl());
 
-	        if (otherIssue.getDescription() != null && this.getDescription() != null) {
-	            if (!otherIssue.getDescription().equals(this.getDescription())) {
-	                log("desc", this.getDescription(), otherIssue.getDescription());
-	            }
-	        } else if (otherIssue.getDescription() == null && this.getDescription() != null) {
-	            log("desc", "removed");
-	        } else if (otherIssue.getDescription() != null
-	                && this.getDescription() == null) {
-	            log("desc", "added");
-	        }
-	        setDescription(otherIssue.getDescription());
+		// Logging is done with the assumption that this method is used for
+		// updating the values of TurboIssue in mind
+		if (!otherIssue.getTitle().equals(this.getTitle())) {
+			log("title", this.getTitle(), otherIssue.getTitle());
+		}
+		setTitle(otherIssue.getTitle());
+		setOpen(otherIssue.isOpen());
+		setId(otherIssue.getId());
 
-	        if (otherIssue.getAssignee() != null && this.getAssignee() != null) {
-	            if (!otherIssue.getAssignee().equals(this.getAssignee())) {
-	                log("assignee", this.getAssignee().logString(), otherIssue.getAssignee().logString());
-	            }
-	        } else if (otherIssue.getAssignee() == null && this.getAssignee() != null) {
-	            log("assignee", "removed");
-	        } else if (otherIssue.getAssignee() != null && this.getAssignee() == null) {
-	            log("assignee", "added");
-	        }
-	        setAssignee(otherIssue.getAssignee());
+		if (otherIssue.getDescription() != null && this.getDescription() != null) {
+			if (!otherIssue.getDescription().equals(this.getDescription())) {
+				log("desc", this.getDescription(), otherIssue.getDescription());
+			}
+		} else if (otherIssue.getDescription() == null && this.getDescription() != null) {
+			log("desc", "removed");
+		} else if (otherIssue.getDescription() != null
+			&& this.getDescription() == null) {
+			log("desc", "added");
+		}
+		setDescription(otherIssue.getDescription());
 
-	        if (otherIssue.getMilestone() != null && this.getMilestone() != null) {
-	            if (!otherIssue.getMilestone().equals(this.getMilestone())) {
-	                log("milestone", this.getMilestone().logString(), otherIssue.getMilestone().logString());
-	            }
-	        } else if (otherIssue.getMilestone() == null && this.getMilestone() != null) {
-	            log("milestone", "removed");
-	        } else if (otherIssue.getMilestone() != null && this.getMilestone() == null) {
-	            log("milestone", "added");
-	        }
-	        setMilestone(otherIssue.getMilestone());
+		if (otherIssue.getAssignee() != null && this.getAssignee() != null) {
+			if (!otherIssue.getAssignee().equals(this.getAssignee())) {
+				log("assignee", this.getAssignee().logString(), otherIssue.getAssignee().logString());
+			}
+		} else if (otherIssue.getAssignee() == null && this.getAssignee() != null) {
+			log("assignee", "removed");
+		} else if (otherIssue.getAssignee() != null && this.getAssignee() == null) {
+			log("assignee", "added");
+		}
+		setAssignee(otherIssue.getAssignee());
 
-	        List oldList = new ArrayList<TurboLabel>();
-	        List newList = new ArrayList<TurboLabel>();
-	        for (TurboLabel label : this.getLabels()) {
-	            oldList.add(label);
-	        }
-	        for (TurboLabel label : otherIssue.getLabels()) {
-	            newList.add(label);
-	        }
-	        HashMap<String, HashSet> changes = CollectionUtilities
-	                .getChangesToList(oldList, newList);
-	        HashSet<TurboLabel> removed = changes
-	                .get(CollectionUtilities.REMOVED_TAG);
-	        HashSet<TurboLabel> added = changes
-	                .get(CollectionUtilities.ADDED_TAG);
-	        if (removed.size() > 0) {
-	            logger.info(String.format("Issue %d labels removed: %s", this.getId(), Utility.stringify(removed)));
-	        }
-	        if (added.size() > 0) {
-	            logger.info(String.format("Issue %d labels added: %s", this.getId(), Utility.stringify(added)));
-	        }
-	        setLabels(otherIssue.getLabels());
-	        setParentIssue(otherIssue.getParentIssue());
-	        setPullRequest(otherIssue.getPullRequest());
-	        setCommentCount(otherIssue.getCommentCount());
-	        setCreator(otherIssue.getCreator());
-	        setCreatedAt(otherIssue.getCreatedAt());
-	        setUpdatedAt(otherIssue.getUpdatedAt());
-	    }
+		if (otherIssue.getMilestone() != null && this.getMilestone() != null) {
+			if (!otherIssue.getMilestone().equals(this.getMilestone())) {
+				log("milestone", this.getMilestone().logString(), otherIssue.getMilestone().logString());
+			}
+		} else if (otherIssue.getMilestone() == null && this.getMilestone() != null) {
+			log("milestone", "removed");
+		} else if (otherIssue.getMilestone() != null && this.getMilestone() == null) {
+			log("milestone", "added");
+		}
+		setMilestone(otherIssue.getMilestone());
+
+		List<TurboLabel> oldList = new ArrayList<>(this.getLabels());
+		List<TurboLabel> newList = new ArrayList<>(otherIssue.getLabels());
+		HashMap<String, HashSet<TurboLabel>> changes = CollectionUtilities
+			.getChangesToList(oldList, newList);
+		HashSet<TurboLabel> removed = changes
+			.get(CollectionUtilities.REMOVED_TAG);
+		HashSet<TurboLabel> added = changes
+			.get(CollectionUtilities.ADDED_TAG);
+		if (removed.size() > 0) {
+			logger.info(String.format("Issue %d labels removed: %s", this.getId(), Utility.stringify(removed)));
+		}
+		if (added.size() > 0) {
+			logger.info(String.format("Issue %d labels added: %s", this.getId(), Utility.stringify(added)));
+		}
+		setLabels(otherIssue.getLabels());
+		setParentIssue(otherIssue.getParentIssue());
+		setPullRequest(otherIssue.getPullRequest());
+		setCommentCount(otherIssue.getCommentCount());
+		setCreator(otherIssue.getCreator());
+		setCreatedAt(otherIssue.getCreatedAt());
+		setUpdatedAt(otherIssue.getUpdatedAt());
 	}
 
 	@Override
@@ -236,11 +230,6 @@ public class TurboIssue implements Listable {
 	 */
 	public String logString() {
 	    return "Issue #" + getId() + ": " + getTitle();
-	}
-
-	@Override
-	public String getListName() {
-		return "#" + getId() + " " + getTitle();
 	}
 
 	private void ______UTILITY_METHODS______() {

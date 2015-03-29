@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
-public class TurboLabel implements Listable {
+public class TurboLabel implements TurboResource {
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -72,15 +72,16 @@ public class TurboLabel implements Listable {
 		}
 		setColour(label.getColor());
 	}
-	
-	public void copyValues(Object other){
-		if(other.getClass() == TurboLabel.class){
-			TurboLabel obj = (TurboLabel)other;
-			setName(obj.getName());
-			setColour(obj.getColour());
-			setGroup(obj.getGroup());
-			setExclusive(obj.isExclusive);
-		}
+
+	@Override
+	public void copyValuesFrom(TurboResource other) {
+		assert other != null;
+		assert other instanceof TurboLabel;
+
+		TurboLabel obj = (TurboLabel) other;
+		setName(obj.getName());
+		setColour(obj.getColour());
+		setGroup(obj.getGroup());
 	}
 	
 	public Label toGhResource() {
@@ -187,11 +188,6 @@ public class TurboLabel implements Listable {
 	/*
 	 * Overriden Methods
 	 */
-
-	@Override
-	public String getListName() {
-		return getName();
-	}
 
 	@Override
 	public int hashCode() {

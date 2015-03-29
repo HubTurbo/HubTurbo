@@ -3,7 +3,7 @@ package tests;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 
 import model.Model;
 import model.TurboIssue;
@@ -18,13 +18,9 @@ import org.eclipse.egit.github.core.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import tests.stubs.ModelEventDispatcherStub;
-import ui.UI;
 import util.events.EventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-
-import com.google.common.eventbus.EventBus;
 
 import static org.junit.Assert.*;
 
@@ -194,7 +190,7 @@ public class ModelTests {
 		assertEquals(model.getIssueWithId(3).getTitle(), "issue3");
 		assertEquals(model.getIssueWithId(11), null);
 
-		model.updateCachedIssues(new CountDownLatch(4), Arrays.asList(issue1, issue2), "testing/test");
+		model.updateCachedIssues(new CompletableFuture<>(), Arrays.asList(issue1, issue2), "testing/test");
 
 		// 3 is there and has been changed
 		// 11 is not there but is there after
@@ -331,7 +327,7 @@ public class ModelTests {
 		assertEquals(model.getLabels().get(3).getName(), "label4");
 		assertEquals(model.getLabelByGhName("something else"), null);
 
-		model.updateCachedLabels(new CountDownLatch(4), Arrays.asList(label1, label2), "testing/test");
+		model.updateCachedLabels(new CompletableFuture<>(), Arrays.asList(label1, label2), "testing/test");
 		assertEquals(model.getLabels().size(), 2);
 
 		// label1 is there and has been changed
@@ -433,7 +429,7 @@ public class ModelTests {
 	    assertEquals(model.getMilestones().get(3).getTitle(), "v0.4");
 	    assertEquals(model.getMilestoneByTitle("anothermilestone"), null);
 
-	    model.updateCachedMilestones(new CountDownLatch(4), Arrays.asList(milestone1, milestone2), "testing/test");
+	    model.updateCachedMilestones(new CompletableFuture<>(), Arrays.asList(milestone1, milestone2), "testing/test");
 	    assertEquals(model.getMilestones().size(), 2);
 
 	    // milestone1 is there and has been changed
@@ -521,7 +517,7 @@ public class ModelTests {
         assertEquals(model.getCollaborators().get(3).getGithubName(), "user4");
         assertEquals(model.getUserByGhName("anotheruser"), null);
 
-        model.updateCachedCollaborators(new CountDownLatch(4), Arrays.asList(user1, user2), "testing/test");
+        model.updateCachedCollaborators(new CompletableFuture<>(), Arrays.asList(user1, user2), "testing/test");
         assertEquals(model.getCollaborators().size(), 2);
 
         // user1 is there and has been changed
