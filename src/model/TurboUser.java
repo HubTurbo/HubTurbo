@@ -6,7 +6,7 @@ import org.eclipse.egit.github.core.User;
 
 import storage.DataManager;
 
-public class TurboUser implements Listable {
+public class TurboUser implements TurboResource {
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -93,11 +93,6 @@ public class TurboUser implements Listable {
 	 * Overriden Methods
 	 */
 	
-	@Override
-	public String getListName() {
-		return getAlias();
-	}
-
 	@Override
 	public String toString() {
 		return "TurboUser [githubName=" + githubName + "]";

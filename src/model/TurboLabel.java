@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
-public class TurboLabel implements Listable {
+public class TurboLabel implements TurboResource {
 	
 	/*
 	 * Attributes, Getters & Setters
@@ -187,11 +187,6 @@ public class TurboLabel implements Listable {
 	/*
 	 * Overriden Methods
 	 */
-
-	@Override
-	public String getListName() {
-		return getName();
-	}
 
 	@Override
 	public int hashCode() {

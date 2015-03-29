@@ -34,7 +34,7 @@ import util.Utility;
 
 
 @SuppressWarnings("unused")
-public class TurboIssue implements Listable {
+public class TurboIssue implements TurboResource {
 
 	private static final Logger logger = LogManager.getLogger(TurboIssue.class.getName());
 
@@ -236,11 +236,6 @@ public class TurboIssue implements Listable {
 	 */
 	public String logString() {
 	    return "Issue #" + getId() + ": " + getTitle();
-	}
-
-	@Override
-	public String getListName() {
-		return "#" + getId() + " " + getTitle();
 	}
 
 	private void ______UTILITY_METHODS______() {

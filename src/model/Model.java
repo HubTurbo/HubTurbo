@@ -303,7 +303,7 @@ public class Model {
 		run(() -> {
 			list.removeAll(removed);
 
-			Listable listItem = (Listable) newList.get(0);
+			TurboResource listItem = (TurboResource) newList.get(0);
 			if (listItem instanceof TurboMilestone) {
 				logNumOfUpdates(newList, "milestone(s)");
 			} else if (listItem instanceof TurboLabel) {
@@ -316,7 +316,7 @@ public class Model {
 			for (Object item : newList) {
 				int index = list.indexOf(item);
 				if (index != -1) {
-					Listable old = (Listable) list.get(index);
+					TurboResource old = (TurboResource) list.get(index);
 					old.copyValues(item);
 				} else {
 					buffer.add(item);

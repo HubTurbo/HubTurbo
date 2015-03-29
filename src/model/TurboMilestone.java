@@ -10,7 +10,7 @@ import java.util.Date;
 
 import org.eclipse.egit.github.core.Milestone;
 
-public class TurboMilestone implements Listable {
+public class TurboMilestone implements TurboResource {
 	
 	private static final String CUSTOM_DATETIME_PATTERN = "d MMMM yyyy";
 	/*
@@ -184,11 +184,6 @@ public class TurboMilestone implements Listable {
 	/*
 	 * Overridden Methods
 	 */
-
-	@Override
-	public String getListName() {
-		return getTitle();
-	}
 
 	@Override
 	public int hashCode() {
