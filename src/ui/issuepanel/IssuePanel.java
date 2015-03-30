@@ -140,6 +140,9 @@ public class IssuePanel extends IssueColumn {
 						listView.selectFirstItem();
 					}
 				}
+				else {
+					KeyPress.resetLastKeyPressedCodeAndTime();
+				}
 			}
 		});
 		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {

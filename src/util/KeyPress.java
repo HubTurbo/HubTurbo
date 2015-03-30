@@ -37,4 +37,9 @@ public class KeyPress {
 		lastKeyEventTime = System.currentTimeMillis();
 		
 	}
+
+	public static void resetLastKeyPressedCodeAndTime() {
+		lastKeyPressedCode = null;
+		lastKeyEventTime = 0;
+	}
 }
