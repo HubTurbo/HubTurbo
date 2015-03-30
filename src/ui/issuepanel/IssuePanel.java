@@ -139,8 +139,7 @@ public class IssuePanel extends IssueColumn {
 					if (KeyPress.isDoublePress(event.getCode())) {
 						listView.selectFirstItem();
 					}
-				}
-				else {
+				} else {
 					KeyPress.resetLastKeyPressedCodeAndTime();
 				}
 			}
