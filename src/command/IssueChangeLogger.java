@@ -105,7 +105,7 @@ public class IssueChangeLogger {
 		if (label == null) {
 			return "<none>";
 		} else {
-			return label.getListName();
+			return label.logString();
 		}
 	}
 	
