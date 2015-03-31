@@ -229,8 +229,19 @@ public class ColumnControl extends HBox {
 	
 	public void closeCurrentColumn() {
 		if (currentlySelectedColumn.isPresent()) {
-			closeColumn(currentlySelectedColumn.get());
-			currentlySelectedColumn = (getChildren() == null || getChildren().size() == 0) ? Optional.empty(): Optional.of(0);
+			int columnIndex = currentlySelectedColumn.get();
+			System.out.println("Going to close column " + columnIndex);
+			closeColumn(columnIndex);
+			if (getChildren() == null || getChildren().size() == 0) {
+				currentlySelectedColumn = Optional.empty();
+			} else {
+				int newColumnIndex = (columnIndex > getChildren().size() - 1)
+									 ? columnIndex - 1
+									 : columnIndex;
+				System.out.println("jumping to column " + newColumnIndex);
+				currentlySelectedColumn = Optional.of(newColumnIndex);
+				getColumn(currentlySelectedColumn.get()).requestFocus();
+			}
 		}
 	}
 	
