@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,10 +18,10 @@ import org.eclipse.egit.github.core.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import test.TestUtils;
 import util.events.EventHandler;
 import util.events.ModelChangedEvent;
 import util.events.ModelChangedEventHandler;
-
 import static org.junit.Assert.*;
 
 @SuppressWarnings("unused")

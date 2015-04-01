@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import java.util.ArrayList;
 import java.util.Date;

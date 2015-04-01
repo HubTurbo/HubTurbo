@@ -1,4 +1,4 @@
-package tests.stubs;
+package test.stubs;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import service.ServiceManager;
-import tests.ServiceManagerTests;
+import test.ServiceManagerTests;
 
 public class ServiceManagerStub extends ServiceManager {
 

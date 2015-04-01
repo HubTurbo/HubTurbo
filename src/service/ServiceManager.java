@@ -32,7 +32,7 @@ import org.markdown4j.Markdown4jProcessor;
 
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
-import tests.stubs.ServiceManagerStub;
+import test.stubs.ServiceManagerStub;
 import ui.UI;
 import ui.components.HTStatusBar;
 import util.PlatformEx;

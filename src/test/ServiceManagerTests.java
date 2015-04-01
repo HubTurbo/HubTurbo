@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import service.ServiceManager;
-import tests.stubs.ServiceManagerStub;
+import test.TestUtils;
+import test.stubs.ServiceManagerStub;
 
 public class ServiceManagerTests {
 

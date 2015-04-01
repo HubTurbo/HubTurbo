@@ -1,4 +1,4 @@
-package tests.stubs;
+package test.stubs;
 
 import util.events.Event;
 import util.events.EventDispatcher;
