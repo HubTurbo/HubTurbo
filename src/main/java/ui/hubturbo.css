@@ -1,0 +1,192 @@
+
+.borders {
+	-fx-border-color: grey;
+	-fx-border-width: 1px;
+}
+
+.bottom-borders {
+	-fx-border-color: transparent transparent grey transparent;
+	-fx-border-width: 1px;
+}
+
+.top-borders {
+	-fx-border-color: lightgray transparent transparent transparent;
+	-fx-border-width: 1px;
+}
+
+.faded-borders {
+	-fx-border-color: #B2B1AE;
+	-fx-border-width: 1px;
+	-fx-border-radius: 3;
+}
+
+.faded {
+	-fx-text-fill: #B2B1AE;
+}
+
+.rounded-borders {
+	-fx-border-radius: 5;
+}
+
+.sidepanel {
+	-fx-border-radius: 0 5 5 0;
+	-fx-border-width: 1px;
+	-fx-border-color: grey grey grey transparent;
+}
+
+.display-box-padding {
+	-fx-padding: 1;
+}
+
+.dragged-over {
+	-fx-background-color: #FFFA73;
+}
+
+.github-icon {
+	-fx-font-family: github-octicons;
+	-fx-font-size: 22px;
+	-fx-background-color: transparent;
+	-fx-padding: 0 5 0 0;
+}
+
+.issue-panel-name {
+	-fx-font-size: 14px;
+}
+
+.issue-panel-closed {
+	-fx-strikethrough: true;
+}
+
+.issue-panel-feed {
+	-fx-font-size: 12px;
+}
+
+.panel-focused {
+    -fx-background-color: #A9BCF5;
+}
+
+.issue-creator {
+	-fx-font-style: italic;
+	-fx-text-fill: grey;
+}
+
+.has-comments {
+	-fx-text-fill: red;
+}
+
+.issue-comment-events {
+	-fx-font-size: 11px;
+	-fx-text-fill: grey;
+}
+
+.issue-comment-details {
+	-fx-font-size: 11px;
+	/*-fx-padding: 15 0 0 0;*/
+}
+
+.labels {
+	-fx-background-radius: 3; -fx-padding: 1 5;
+}
+
+/* For buttons that are used as labels (the + and x buttons on columns) */
+.label-button {
+	-fx-font-size: 13pt;
+}
+
+.octicon {
+	-fx-font-family: github-octicons;
+}
+
+.issue-pull-request-icon {
+	-fx-font-size: 16px;
+	-fx-padding: -2 0 2 3;
+}
+
+.issue-event-icon {
+	-fx-padding: -4 0 0 0;
+}
+
+.button-github-octicon {
+	-fx-padding: 0;
+	-fx-font-family: github-octicons;
+}
+
+.button {
+	-fx-padding: 2;
+}
+
+.toggle-button {
+	-fx-padding: 2;
+}
+
+.borderless-toggle-button {
+	-fx-border-color: transparent;
+	-fx-background-color: transparent;
+}
+
+.borderless-button {
+	-fx-border-color: transparent;
+	-fx-background-color: transparent;
+}
+
+.comments-label-button {
+	-fx-background-color: transparent;
+}
+
+.comments-list-cell,
+.comments-list-cell:selected {
+    -fx-background-color: #F3F3F3;
+}
+
+.list-cell:empty {
+    -fx-opacity: 0;
+    -fx-cell-size: 0;
+}
+
+.transparent-bg {
+	-fx-background-color: transparent;
+}
+
+/*Scrollbar styling*/
+/* The main scrollbar **track** CSS class  */
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+	-fx-background-radius: 0em;
+	-fx-border-radius:2em;
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color:transparent;
+	-fx-background-radius: 0em;
+	-fx-padding:0 0 10 0;
+
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+
+.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .decrement-button {
+
+    -fx-background-color:transparent;
+	-fx-background-radius: 0em;
+	-fx-padding:0 10 0 0;
+
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+	-fx-shape: " ";
+	-fx-padding:0;
+}
+
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color:derive(black,90%);
+	-fx-background-insets: 2, 0, 0;
+	-fx-background-radius: 2em;
+}
