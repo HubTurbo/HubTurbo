@@ -151,16 +151,41 @@ public class UI extends Application implements EventDispatcher {
 	private static String CSS = "";
 
 	public void initCSS() {
-		CSS = this.getClass().getResource("hubturbo.css").toString();
+		System.out.println(getClass().getResource("octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("resources/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/resources/octicons/octicons-local.ttf"));
+
+		System.out.println(getClass().getResource("src/resources/ui/UI/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/src/resources/ui/UI/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("src/resources/ui/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/src/resources/ui/octicons/octicons-local.ttf"));
+		
+		Font.loadFont(getClass().getResource("resources/octicons/octicons-local.ttf").toExternalForm(), 32);
+
+		CSS = getClass().getResource("hubturbo.css").toString();
 	}
 
-	public static void applyCSS(Scene scene) {
+	public void applyCSS(Scene scene) {
+		
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(CSS);
 	}
 
-	public static void loadFonts(){
-		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
+	public void loadFonts(){
+		System.out.println(getClass());
+		
+		System.out.println(getClass().getResource("octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("resources/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/resources/octicons/octicons-local.ttf"));
+
+		System.out.println(getClass().getResource("src/resources/ui/UI/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/src/resources/ui/UI/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("src/resources/ui/octicons/octicons-local.ttf"));
+		System.out.println(getClass().getResource("/src/resources/ui/octicons/octicons-local.ttf"));
+		
+		Font.loadFont(getClass().getResource("resources/octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
 
 	private void setupMainStage(Scene scene) {

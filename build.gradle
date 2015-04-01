@@ -92,26 +92,6 @@ allprojects {
     }
 
     assemble.dependsOn shadowJar
-
-    // TODO: Follow correct project structure to remove below (src/main/java/[package], src/test/java/[package])
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util', 'src/tests']
-            }
-            resources {
-                srcDirs = ['src/resources']
-            }
-        }
-        test {
-            java {
-                srcDirs = ['src/browserview', 'src/command', 'src/filter', 'src/handler', 'src/main', 'src/model', 'src/service', 'src/storage', 'src/ui', 'src/util', 'src/tests']
-            }
-            resources {
-                srcDirs = ['src/resources']
-            }
-        }
-    }
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
