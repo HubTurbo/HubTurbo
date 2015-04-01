@@ -1,0 +1,18 @@
+language: java
+
+jdk:
+    - oraclejdk8
+
+env:
+    - TERM=dumb
+
+script:
+    - "./gradlew clean check -i"
+
+after_success:
+    - "./gradlew jacocoRootReport coveralls"
+
+branches:
+  only:
+    - master
+    - ci
