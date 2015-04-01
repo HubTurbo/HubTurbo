@@ -8,13 +8,13 @@ public class KeyPress {
     private static long lastKeyEventTime = 0;
     private static KeyCode lastKeyPressedCode;
 
-	public static boolean isDoublePress(KeyCode code) {
+	public static boolean isDoublePress(KeyCode matchingKeyCode, KeyCode currentKeyCode) {
 		long keyEventTime = System.currentTimeMillis();
-		if ((keyEventTime - lastKeyEventTime) < keyPressSpeed && code.equals(lastKeyPressedCode)) {
+		if ((keyEventTime - lastKeyEventTime) < keyPressSpeed && currentKeyCode.equals(lastKeyPressedCode) && currentKeyCode.equals(matchingKeyCode)) {
 			lastKeyEventTime = 0;
 			return true;
 	    } else {
-	    	lastKeyPressedCode = code;
+	    	lastKeyPressedCode = currentKeyCode;
 	        lastKeyEventTime = keyEventTime;
 	    }
 	    return false;

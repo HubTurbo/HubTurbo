@@ -135,10 +135,11 @@ public class IssuePanel extends IssueColumn {
 					listView.selectFirstItem();
 				}
 				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event.getCode())) {
-						event.consume();
-						listView.selectFirstItem();
-					}
+					event.consume();
+				}
+				if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+				    event.consume();
+					listView.selectFirstItem();
 				}
 			}
 		});
@@ -217,10 +218,8 @@ public class IssuePanel extends IssueColumn {
 				if (keyCombListToBox.match(event)) {
 					filterTextField.requestFocus();
 				}
-				if(event.getCode() == KeyCode.SPACE){
-					if (KeyPress.isDoublePress(event.getCode())) {
-						filterTextField.requestFocus();
-					}
+				if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+					filterTextField.requestFocus();
 				}
 			}
 		});
