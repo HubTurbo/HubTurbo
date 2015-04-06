@@ -179,7 +179,6 @@ public class IssuePanel extends IssueColumn {
 				}
 				if(event.getCode() == KeyCode.K) {
 					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						System.out.println("g and k pressed on column");
 						ui.getBrowserComponent().showKeyboardShortcuts();
 					}
 				}
