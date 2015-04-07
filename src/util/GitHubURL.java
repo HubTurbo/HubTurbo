@@ -68,4 +68,11 @@ public class GitHubURL {
 		return String.format("https://github.com/%s/%s/graphs/contributors", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
 	}
 	
+	public static boolean isUrlIssue(String url) {
+		if (url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)")) {
+			return true;
+		}
+		return false;
+	}
+	
 }

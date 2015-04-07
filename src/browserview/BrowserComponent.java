@@ -528,10 +528,7 @@ public class BrowserComponent {
 	}
 
 	public boolean isCurrentUrlIssue() {
-		if (driver.getCurrentUrl().matches("https://github.com/(.+)/(.+)/(issues|pull)/([0-9]+)")) {
-			return true;
-		}
-		return false;
+		return GitHubURL.isUrlIssue(driver.getCurrentUrl());
 	}
 
 }
