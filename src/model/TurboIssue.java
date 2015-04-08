@@ -1,19 +1,5 @@
 package model;
 
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -21,17 +7,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.PullRequest;
-
+import org.eclipse.egit.github.core.*;
 import service.ServiceManager;
 import service.TurboIssueEvent;
 import storage.DataManager;
 import util.CollectionUtilities;
 import util.Utility;
 
+import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class TurboIssue implements TurboResource {
@@ -65,14 +54,26 @@ public class TurboIssue implements TurboResource {
 	private int parentIssue = 0;
 	private boolean state = false;
 	private TurboUser assignee;
-	private TurboMilestone milestone;
 	private String htmlUrl;
-	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+
+	/**
+	 * These fields should not be accessed directly. They are lazily
+	 * loaded and may not yet be available at an arbitrary point.
+	 * Access them through getLabels() or getMilestone() instead.
+	 */
+	private Optional<TurboMilestone> milestone = Optional.empty();
+	private Optional<List<TurboLabel>> labels = Optional.empty();
+
+	/**
+	 * These fields contain references to information required for lazy loading.
+	 */
+	private Optional<Milestone> temporaryMilestone = Optional.empty();
+	private Optional<List<Label>> temporaryLabels = Optional.empty();
 
 	private void ______MISCELLANEOUS_FIELDS______() {
 	}
 
-	private WeakReference<Model> model;
+	private Model model;
 
 	private List<TurboIssueEvent> events = new ArrayList<>();
 
@@ -88,7 +89,7 @@ public class TurboIssue implements TurboResource {
 		assert title != null;
 		assert desc != null;
 		assert model != null;
-		this.model = new WeakReference<Model>(model);
+		this.model = model;
 
 		setTitle(title);
 		setDescription(desc);
@@ -98,10 +99,10 @@ public class TurboIssue implements TurboResource {
 	public TurboIssue(Issue issue, Model model) {
 		assert issue != null;
 		assert model != null;
-		this.model = new WeakReference<Model>(model);
+		this.model = model;
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
-		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
+		setOpen(issue.getState().equals(STATE_OPEN));
 		setId(issue.getNumber());
 		setDescription(extractDescription(issue.getBody()));
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
@@ -124,8 +125,8 @@ public class TurboIssue implements TurboResource {
 		if (assignee != null)
 			ghIssue.setAssignee(assignee.toGhResource());
 		if (milestone != null)
-			ghIssue.setMilestone(milestone.toGhResource());
-		ghIssue.setLabels(TurboLabel.toGhLabels(labels));
+			ghIssue.setMilestone(getMilestone().toGhResource());
+		ghIssue.setLabels(TurboLabel.toGhLabels(getLabelCollection()));
 		ghIssue.setBody(buildGithubBody());
 		return ghIssue;
 	}
@@ -226,7 +227,7 @@ public class TurboIssue implements TurboResource {
 
 	/**
 	 * A convenient string representation of this object, for purposes of readable logs.
-	 * @return
+	 * @return a string representation suitable for logs
 	 */
 	public String logString() {
 	    return "Issue #" + getId() + ": " + getTitle();
@@ -241,7 +242,7 @@ public class TurboIssue implements TurboResource {
 
 	public final TurboIssue parentReference() {
 		if (getParentIssue() != -1) {
-			return model.get().getIssueWithId(getParentIssue());
+			return model.getIssueWithId(getParentIssue());
 		}
 		return null;
 	}
@@ -267,29 +268,23 @@ public class TurboIssue implements TurboResource {
 	}
 
 	private TurboLabel getLabelReference(TurboLabel label) {
-		List<TurboLabel> allLabels = model.get().getLabels();
+		assert label != null;
+		List<TurboLabel> allLabels = model.getLabels();
 		int index = allLabels.indexOf(label);
 		assert index != -1;
-		if (index >= 0) {
-			return allLabels.get(index);
-		} else {
-			// Should not happen
-			return label;
-		}
+		return allLabels.get(index);
 	}
 
 	private TurboMilestone getMilestoneReference(TurboMilestone milestone) {
-		List<TurboMilestone> allMilestones = model.get().getMilestones();
+		assert milestone != null;
+		List<TurboMilestone> allMilestones = model.getMilestones();
 		int index = allMilestones.indexOf(milestone);
-		if (index != -1) {
-			return allMilestones.get(index);
-		} else {
-			return milestone;
-		}
+		assert index != -1;
+		return allMilestones.get(index);
 	}
 
 	private TurboUser getCollaboratorReference(TurboUser user) {
-		List<TurboUser> allCollaborators = model.get().getCollaborators();
+		List<TurboUser> allCollaborators = model.getCollaborators();
 		int index = allCollaborators.indexOf(user);
 		if (index != -1) {
 			return allCollaborators.get(index);
@@ -299,11 +294,11 @@ public class TurboIssue implements TurboResource {
 	}
 
 	public boolean hasLabel(TurboLabel label) {
-		return labels.contains(label);
+		return getLabelCollection().contains(label);
 	}
 
 	public void addLabel(TurboLabel label) {
-		if (labels.contains(label)) {
+		if (getLabelCollection().contains(label)) {
 			return;
 		}
 		if (label.isExclusive()) {
@@ -319,36 +314,32 @@ public class TurboIssue implements TurboResource {
 	}
 
 	private List<TurboLabel> getLabelsWithGroup(String group) {
-		return labels.stream().filter(label -> group.equalsIgnoreCase(label.getGroup())).collect(Collectors.toList());
+		return getLabelCollection().stream()
+			.filter(label -> group.equalsIgnoreCase(label.getGroup()))
+			.collect(Collectors.toList());
 	}
 
-	public void addLabels(List<TurboLabel> labList) {
-		for (TurboLabel label : labList) {
-			addLabel(label);
-		}
+	public void addLabels(List<TurboLabel> newLabels) {
+		newLabels.forEach(this::addLabel);
 	}
 
 	public void removeLabel(TurboLabel label) {
-		if (!labels.remove(label)) {
-			return;
-		}
+		getLabelCollection().remove(label);
 	}
 
-	public void removeLabels(List<TurboLabel> labList) {
-		for (TurboLabel label : labList) {
-			removeLabel(label);
-		}
+	public void removeLabels(List<TurboLabel> toRemove) {
+		toRemove.forEach(this::removeLabel);
 	}
 
 	private void addToLabels(TurboLabel label) {
-		labels.add(getLabelReference(label));
+		getLabelCollection().add(getLabelReference(label));
 	}
 
 	public static String extractDescription(String issueBody) {
-		if (issueBody == null)
+		if (issueBody == null) {
 			return "";
-		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
-		return description;
+		}
+		return issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 	}
 
 	public static int extractIssueParent(String issueBody) {
@@ -363,18 +354,18 @@ public class TurboIssue implements TurboResource {
 			if (line.startsWith(METADATA_HEADER_PARENT)) {
 				String value = line.replace(METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-				for (int j = 0; j < valueTokens.length; j++) {
-					if (!valueTokens[j].trim().isEmpty()) {
-						return Integer.parseInt(valueTokens[j].trim());
+				for (String valueToken : valueTokens) {
+					if (!valueToken.trim().isEmpty()) {
+						return Integer.parseInt(valueToken.trim());
 					}
 				}
 			} else if (line.startsWith(OLD_METADATA_HEADER_PARENT)) {
 				// legacy
 				String value = line.replace(OLD_METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-				for (int j = 0; j < valueTokens.length; j++) {
-					if (!valueTokens[j].trim().isEmpty()) {
-						return Integer.parseInt(valueTokens[j].trim());
+				for (String valueToken : valueTokens) {
+					if (!valueToken.trim().isEmpty()) {
+						return Integer.parseInt(valueToken.trim());
 					}
 				}
 			}
@@ -384,8 +375,8 @@ public class TurboIssue implements TurboResource {
 
 	/**
 	 * Creates a JavaFX node containing a graphical display of this issue's events.
-	 * @param withinHours
-	 * @return
+	 * @param withinHours the number of hours to bound the returned events by
+	 * @return the node
 	 */
 	public Node getEventDisplay(final int withinHours) {
 		final LocalDateTime now = LocalDateTime.now();
@@ -412,6 +403,7 @@ public class TurboIssue implements TurboResource {
 	/**
 	 * Given a list of issue events, returns a JavaFX node laying them out properly.
 	 * @param events
+	 * @param comments
 	 * @return
 	 */
 	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
@@ -446,6 +438,7 @@ public class TurboIssue implements TurboResource {
 	 * Given a list of issue events, returns a textual representation of them,
 	 * concatenated together with newlines.
 	 * @param events
+	 * @param width
 	 * @return
 	 */
 	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
@@ -469,14 +462,15 @@ public class TurboIssue implements TurboResource {
 		return feeds;
 	}
 
-	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
-		if (labels == null)
+	private List<TurboLabel> translateLabels(List<Label> labels) {
+		List<TurboLabel> turboLabels = new ArrayList<>();
+		if (labels == null) {
 			return turboLabels;
-
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
 		}
+
+		turboLabels.addAll(labels.stream()
+			.map(label -> new TurboLabel(label))
+			.collect(Collectors.toList()));
 
 		return turboLabels;
 	}
@@ -628,11 +622,21 @@ public class TurboIssue implements TurboResource {
 	}
 
 	public TurboMilestone getMilestone() {
-		return milestone;
+		if (!milestone.isPresent()) {
+			if (!temporaryMilestone.isPresent()) {
+				return null;
+			}
+			milestone = Optional.of(model.getMilestoneByTitle(temporaryMilestone.get().getTitle()));
+		}
+		return milestone.get();
 	}
 
 	public void setMilestone(TurboMilestone milestone) {
-		this.milestone = getMilestoneReference(milestone);
+		if (milestone == null) {
+			this.milestone = Optional.empty();
+		} else {
+			this.milestone = Optional.of(getMilestoneReference(milestone));
+		}
 	}
 
 	public String getHtmlUrl() {
@@ -643,16 +647,32 @@ public class TurboIssue implements TurboResource {
 		this.htmlUrl = htmlUrl;
 	}
 
-	public ObservableList<TurboLabel> getLabels() {
-		return FXCollections.observableArrayList(labels);
+	public List<TurboLabel> getLabels() {
+		return new ArrayList<>(getLabelCollection());
+	}
+
+	private List<TurboLabel> getLabelCollection() {
+		if (!labels.isPresent()) {
+			if (!temporaryLabels.isPresent()) {
+				return new ArrayList<>();
+			}
+			List<TurboLabel> newLabels = temporaryLabels.get().stream()
+				.map(label -> model.getLabelByGhName(label.getName()))
+				.collect(Collectors.toList());
+			labels = Optional.of(newLabels);
+		}
+		return labels.get();
 	}
 
 	public void setLabels(List<TurboLabel> labels) {
-		if (this.labels != labels) {
-			this.labels.clear();
-			for (TurboLabel label : labels) {
-				addLabel(label);
-			}
-		}
+		this.labels = Optional.of(labels);
+	}
+
+	public void setTemporaryLabels(Optional<List<Label>> labels) {
+		this.temporaryLabels = labels;
+	}
+
+	public void setTemporaryMilestone(Optional<Milestone> milestone) {
+		this.temporaryMilestone = milestone;
 	}
 }
