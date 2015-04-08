@@ -526,4 +526,9 @@ public class BrowserComponent {
 			}
 		});
 	}
+
+	public boolean isCurrentUrlIssue() {
+		return GitHubURL.isUrlIssue(driver.getCurrentUrl());
+	}
+
 }
