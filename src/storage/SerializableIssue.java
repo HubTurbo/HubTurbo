@@ -1,17 +1,13 @@
 package storage;
 
+import model.*;
+import org.eclipse.egit.github.core.PullRequest;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
-
-import org.eclipse.egit.github.core.PullRequest;
 
 class SerializableIssue {
 	private String creator;
@@ -24,9 +20,6 @@ class SerializableIssue {
 	private String title;
 	private String description;
 	
-	// for comments, but not used for current version
-	//private String cachedDescriptionMarkup;
-
 	private int parentIssue;
 	private boolean state;
 	
@@ -86,26 +79,27 @@ class SerializableIssue {
 		tI.setPullRequest(pullRequest);
 		
 		tI.setId(id);
-		//tI.setDescriptionMarkup(cachedDescriptionMarkup);
-		
+
 		tI.setParentIssue(parentIssue);
 		tI.setOpen(state);
 		tI.setAssignee(assignee);
-		if (milestone == null) {
-			tI.setMilestone(null);
-		} else {
-			tI.setMilestone(milestone.toTurboMilestone());
-		}
-			
 		tI.setHtmlUrl(htmlUrl);
 
-		if (labels == null) {
-			tI.setLabels(new ArrayList<>());
+		if (milestone == null) {
+			tI.setTemporaryMilestone(Optional.empty());
 		} else {
-			tI.setLabels(labels.stream()
-				.map(SerializableLabel::toTurboLabel)
-				.collect(Collectors.toList()));
+			tI.setTemporaryMilestone(Optional.of(milestone.toTurboMilestone().toGhResource()));
 		}
+
+		if (labels == null) {
+			tI.setTemporaryLabels(Optional.empty());
+		} else {
+			tI.setTemporaryLabels(Optional.of(labels.stream()
+				.map(SerializableLabel::toTurboLabel)
+				.map(TurboLabel::toGhResource)
+				.collect(Collectors.toList())));
+		}
+
 		return tI;
 	}
 }
