@@ -227,5 +227,12 @@ public class IssuePanel extends IssueColumn {
 		filterTextField.setText(filterTextField.getText().trim());
 		filterTextField.positionCaret(filterTextField.getLength());
 		
+		addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
+					listView.selectFirstItem();
+				}
+			}
+		});
 	}
 }
