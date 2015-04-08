@@ -67,7 +67,7 @@ public class TurboIssue implements TurboResource {
 	private TurboUser assignee;
 	private TurboMilestone milestone;
 	private String htmlUrl;
-	private ObservableList<TurboLabel> labels = FXCollections.observableArrayList();
+	private List<TurboLabel> labels = new ArrayList<>();
 
 	private void ______MISCELLANEOUS_FIELDS______() {
 	}
@@ -465,8 +465,8 @@ public class TurboIssue implements TurboResource {
 		return feeds;
 	}
 
-	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
-		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
+	private List<TurboLabel> translateLabels(List<Label> labels) {
+		List<TurboLabel> turboLabels = new ArrayList<>();
 		if (labels == null) {
 			return turboLabels;
 		}

@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.Model;
 import model.TurboIssue;
 import model.TurboLabel;
@@ -47,8 +45,7 @@ class SerializableIssue {
 		this.id = issue.getId();
 		this.title = issue.getTitle();
 		this.description = issue.getDescription();
-		//this.cachedDescriptionMarkup = issue.getDescriptionMarkup();
-		
+
 		this.parentIssue = issue.getParentIssue();
 		this.state = issue.isOpen();
 		this.assignee = issue.getAssignee();
@@ -62,7 +59,7 @@ class SerializableIssue {
 		
 		this.htmlUrl = issue.getHtmlUrl();
 		
-		ObservableList<TurboLabel> turboLabelObservableList = issue.getLabels();
+		List<TurboLabel> turboLabelObservableList = issue.getLabels();
 		List<TurboLabel> turboLabelList = turboLabelObservableList.stream().collect(Collectors.toList());
 		this.labels = convertFromListOfTurboLabels(turboLabelList);
 	}
@@ -102,14 +99,12 @@ class SerializableIssue {
 			
 		tI.setHtmlUrl(htmlUrl);
 
-		ObservableList<TurboLabel> turboLabelList = FXCollections.observableArrayList();
 		if (labels == null) {
-			tI.setLabels(turboLabelList);
+			tI.setLabels(new ArrayList<>());
 		} else {
-			for (SerializableLabel label : labels) {
-				turboLabelList.add(label.toTurboLabel());
-			}
-			tI.setLabels(turboLabelList);
+			tI.setLabels(labels.stream()
+				.map(SerializableLabel::toTurboLabel)
+				.collect(Collectors.toList()));
 		}
 		return tI;
 	}
