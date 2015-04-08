@@ -1,17 +1,15 @@
 package tests.stubs;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import model.Model;
-
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
-
 import service.ServiceManager;
 import tests.ServiceManagerTests;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServiceManagerStub extends ServiceManager {
 
@@ -35,32 +33,22 @@ public class ServiceManagerStub extends ServiceManager {
 	}
 
 	@Override
-	public int getRemainingRequests() {
-		return 100;
-	}
-
-	@Override
-	public int getRequestLimit() {
-		return 100;
-	}
-
-	@Override
 	public List<Repository> getRepositories() throws IOException {
-		return new ArrayList<Repository>();
+		return new ArrayList<>();
 	}
 
 	@Override
 	public List<String> getRepositoriesNames() throws IOException {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 	@Override
 	public List<Repository> getAllRepositories() throws IOException {
-		return new ArrayList<Repository>();
+		return new ArrayList<>();
 	}
 
 	@Override
 	public List<String> getAllRepositoryNames() throws IOException {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 }

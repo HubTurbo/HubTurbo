@@ -242,12 +242,8 @@ public class ServiceManager {
 		}
 	}
 
-	public int getRemainingRequests() {
-		return githubClient.getRemainingRequests();
-	}
-
-	public int getRequestLimit() {
-		return githubClient.getRequestLimit();
+	public String getRemainingRequestsDesc() {
+		return githubClient.getRemainingRequests() + "/" + githubClient.getRequestLimit();
 	}
 
 	/**
