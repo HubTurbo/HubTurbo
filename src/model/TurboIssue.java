@@ -268,25 +268,19 @@ public class TurboIssue implements TurboResource {
 	}
 
 	private TurboLabel getLabelReference(TurboLabel label) {
+		assert label != null;
 		List<TurboLabel> allLabels = model.get().getLabels();
 		int index = allLabels.indexOf(label);
 		assert index != -1;
-		if (index >= 0) {
-			return allLabels.get(index);
-		} else {
-			// Should not happen
-			return label;
-		}
+		return allLabels.get(index);
 	}
 
 	private TurboMilestone getMilestoneReference(TurboMilestone milestone) {
+		assert milestone != null;
 		List<TurboMilestone> allMilestones = model.get().getMilestones();
 		int index = allMilestones.indexOf(milestone);
-		if (index != -1) {
-			return allMilestones.get(index);
-		} else {
-			return milestone;
-		}
+		assert index != -1;
+		return allMilestones.get(index);
 	}
 
 	private TurboUser getCollaboratorReference(TurboUser user) {
@@ -638,7 +632,11 @@ public class TurboIssue implements TurboResource {
 	}
 
 	public void setMilestone(TurboMilestone milestone) {
-		this.milestone = Optional.of(getMilestoneReference(milestone));
+		if (milestone == null) {
+			this.milestone = Optional.empty();
+		} else {
+			this.milestone = Optional.of(getMilestoneReference(milestone));
+		}
 	}
 
 	public String getHtmlUrl() {
