@@ -135,9 +135,11 @@ public class BrowserComponent {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 		}
 		ChromeDriver driver = new ChromeDriver(options);
+		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
-		driver.manage().window().setPosition(new Point((int) availableDimensions.getCenterX(), (int)availableDimensions.getCenterY() - 100));		
-		driver.manage().window().setSize(new Dimension(100, 100));
+		driver.manage().window().setSize(new Dimension(
+				(int) availableDimensions.getWidth(),
+				(int) availableDimensions.getHeight()));
 		initialiseJNA();
 		return driver;
 	}
