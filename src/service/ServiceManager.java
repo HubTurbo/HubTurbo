@@ -420,6 +420,7 @@ public class ServiceManager {
 		}
 
 		// Reset progress UI
+		HTStatusBar.displayMessage("Sync complete!");
 		HTStatusBar.updateProgress(0);
 
 		// Enable repository switching

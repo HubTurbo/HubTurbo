@@ -88,6 +88,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No issues to update");
 				response.complete(null);
+				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating issues");
@@ -108,7 +109,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No collaborators to update");
 				response.complete(null);
-				HTStatusBar.addProgress(0.25);
+				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating collaborators");
@@ -129,7 +130,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No labels to update");
 				response.complete(null);
-				HTStatusBar.addProgress(0.25);
+				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating labels");
@@ -150,7 +151,7 @@ public class ModelUpdater {
 			} else {
 				logger.info("No milestones to update");
 				response.complete(null);
-				HTStatusBar.addProgress(0.25);
+				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating milestones");
