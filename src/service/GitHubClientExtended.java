@@ -1,17 +1,22 @@
 package service;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import util.IOUtilities;
+import util.Utility;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-
-import util.IOUtilities;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
 public class GitHubClientExtended extends GitHubClient {
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
@@ -162,5 +167,23 @@ public class GitHubClientExtended extends GitHubClient {
 	 */
 	public void sendParams(HttpURLConnection request, Object params) throws IOException {
 		super.sendParams(request, params);
+	}
+
+	public Optional<LocalDateTime> getRateLimitResetTime() {
+		try {
+			HttpURLConnection httpRequest = createGet("/rate_limit");
+			if (isOk(httpRequest.getResponseCode())) {
+				String json = String.valueOf(IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
+				Map<String, Object> map =
+					new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+				double unixSeconds = ((Map<String, Map<String, Double>>) map.get("resources"))
+					.get("core").get("reset");
+				return Optional.of(Utility.longToLocalDateTime((long) unixSeconds * 1000));
+			} else {
+				return Optional.empty();
+			}
+		} catch (IOException e) {
+			return Optional.empty();
+		}
 	}
 }

@@ -310,8 +310,8 @@ public class Model {
 
 			assert newList.size() > 0;
 			String resourceName = newList.get(0).getClass().getSimpleName()
-				.replaceAll("Turbo", "").toLowerCase() + "(s)";
-			logNumOfUpdates(newList, resourceName);
+				.replaceAll("Turbo", "").toLowerCase();
+			logNumOfUpdates(newList, resourceName + "(s)");
 
 			ArrayList<T> buffer = new ArrayList<>();
 			for (T item : newList) {
@@ -328,7 +328,8 @@ public class Model {
 			response.complete(null);
 
 			if (!isInTestMode) {
-				HTStatusBar.addProgress(0.25);
+				HTStatusBar.displayMessage(String.format("Updating %ss...", resourceName));
+				HTStatusBar.addProgress(0.167);
 			}
 		});
 	}
@@ -438,6 +439,9 @@ public class Model {
 			assert false : "updateCachedIssues should not be called before issues have been loaded";
 			return;
 		}
+
+		HTStatusBar.displayMessage("Updating issues...");
+		HTStatusBar.addProgress(0.167);
 
 		run(() -> {
 			logger.info(newIssues.size() + " issues changed/added since last sync");

@@ -8,6 +8,7 @@ import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.*;
 import org.markdown4j.Markdown4jProcessor;
+import org.ocpsoft.prettytime.PrettyTime;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import tests.stubs.ServiceManagerStub;
@@ -18,6 +19,7 @@ import util.Utility;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
@@ -242,12 +244,12 @@ public class ServiceManager {
 		}
 	}
 
-	public int getRemainingRequests() {
-		return githubClient.getRemainingRequests();
+	public String getRemainingRequestsDesc() {
+		return githubClient.getRemainingRequests() + "/" + githubClient.getRequestLimit();
 	}
 
-	public int getRequestLimit() {
-		return githubClient.getRequestLimit();
+	public boolean hasRemainingRequests() {
+		return githubClient.getRequestLimit() > 0;
 	}
 
 	/**
@@ -393,6 +395,11 @@ public class ServiceManager {
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
+		if (!hasRemainingRequests()) {
+			handleNoMoreRequests();
+			return;
+		}
+
 		modelUpdater = new ModelUpdater(githubClient, model, updateSignature);
 
 		// Disable repository selection
@@ -413,12 +420,25 @@ public class ServiceManager {
 		}
 
 		// Reset progress UI
+		HTStatusBar.displayMessage("Sync complete!");
 		HTStatusBar.updateProgress(0);
 
 		// Enable repository switching
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
+	}
+
+	private void handleNoMoreRequests() {
+		Optional<LocalDateTime> resetTime = githubClient.getRateLimitResetTime();
+		if (resetTime.isPresent()) {
+			String prettyTime = new PrettyTime().format(Utility.localDateTimeToDate(resetTime.get()));
+			HTStatusBar.displayMessage("No requests remaining! More " + prettyTime);
+			logger.info("No remaining requests -- more reset at " + resetTime + ", " + prettyTime);
+		} else {
+			HTStatusBar.displayMessage("No requests remaining!");
+			logger.info("No remaining requests -- reset time unknown");
+		}
 	}
 
 	/**

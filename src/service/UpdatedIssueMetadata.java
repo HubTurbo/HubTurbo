@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 
 import ui.UI;
+import ui.components.HTStatusBar;
 
 
 public class UpdatedIssueMetadata {
@@ -38,6 +39,8 @@ public class UpdatedIssueMetadata {
 			}
 			serviceManager.getModel().getIssueWithId(issueId).setEvents(events);
 		}
+		HTStatusBar.displayMessage("Updating events...");
+		HTStatusBar.addProgress(0.167);
 		logger.info("Downloaded events for " + issueCount + " issues");
 	}
 
@@ -53,6 +56,8 @@ public class UpdatedIssueMetadata {
 			}
 			serviceManager.getModel().getIssueWithId(issueId).setComments(comments);
 		}
+		HTStatusBar.displayMessage("Updating comments...");
+		HTStatusBar.addProgress(0.167);
 		logger.info("Downloaded comments for " + issueCount + " issues");
 	}
 }
