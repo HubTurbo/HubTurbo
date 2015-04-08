@@ -51,8 +51,8 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 public class UI extends Application implements EventDispatcher {
 
 	private static final int VERSION_MAJOR = 2;
-	private static final int VERSION_MINOR = 4;
-	private static final int VERSION_PATCH = 2;
+	private static final int VERSION_MINOR = 5;
+	private static final int VERSION_PATCH = 0;
 
 	public static final String ARG_UPDATED_TO = "--updated-to";
 
