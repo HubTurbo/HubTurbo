@@ -88,7 +88,7 @@ public class TurboIssue implements TurboResource {
 		assert title != null;
 		assert desc != null;
 		assert model != null;
-		this.model = new WeakReference<Model>(model);
+		this.model = new WeakReference<>(model);
 
 		setTitle(title);
 		setDescription(desc);
@@ -98,10 +98,10 @@ public class TurboIssue implements TurboResource {
 	public TurboIssue(Issue issue, Model model) {
 		assert issue != null;
 		assert model != null;
-		this.model = new WeakReference<Model>(model);
+		this.model = new WeakReference<>(model);
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
-		setOpen(new Boolean(issue.getState().equals(STATE_OPEN)));
+		setOpen(issue.getState().equals(STATE_OPEN));
 		setId(issue.getNumber());
 		setDescription(extractDescription(issue.getBody()));
 		setAssignee(issue.getAssignee() == null ? null : new TurboUser(issue.getAssignee()));
@@ -226,7 +226,7 @@ public class TurboIssue implements TurboResource {
 
 	/**
 	 * A convenient string representation of this object, for purposes of readable logs.
-	 * @return
+	 * @return a string representation suitable for logs
 	 */
 	public String logString() {
 	    return "Issue #" + getId() + ": " + getTitle();
@@ -322,22 +322,16 @@ public class TurboIssue implements TurboResource {
 		return labels.stream().filter(label -> group.equalsIgnoreCase(label.getGroup())).collect(Collectors.toList());
 	}
 
-	public void addLabels(List<TurboLabel> labList) {
-		for (TurboLabel label : labList) {
-			addLabel(label);
-		}
+	public void addLabels(List<TurboLabel> newLabels) {
+		newLabels.forEach(this::addLabel);
 	}
 
 	public void removeLabel(TurboLabel label) {
-		if (!labels.remove(label)) {
-			return;
-		}
+		labels.remove(label);
 	}
 
-	public void removeLabels(List<TurboLabel> labList) {
-		for (TurboLabel label : labList) {
-			removeLabel(label);
-		}
+	public void removeLabels(List<TurboLabel> toRemove) {
+		toRemove.forEach(this::removeLabel);
 	}
 
 	private void addToLabels(TurboLabel label) {
@@ -345,10 +339,10 @@ public class TurboIssue implements TurboResource {
 	}
 
 	public static String extractDescription(String issueBody) {
-		if (issueBody == null)
+		if (issueBody == null) {
 			return "";
-		String description = issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
-		return description;
+		}
+		return issueBody.replaceAll(REGEX_REPLACE_DESC, "").trim();
 	}
 
 	public static int extractIssueParent(String issueBody) {
@@ -363,18 +357,18 @@ public class TurboIssue implements TurboResource {
 			if (line.startsWith(METADATA_HEADER_PARENT)) {
 				String value = line.replace(METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-				for (int j = 0; j < valueTokens.length; j++) {
-					if (!valueTokens[j].trim().isEmpty()) {
-						return Integer.parseInt(valueTokens[j].trim());
+				for (String valueToken : valueTokens) {
+					if (!valueToken.trim().isEmpty()) {
+						return Integer.parseInt(valueToken.trim());
 					}
 				}
 			} else if (line.startsWith(OLD_METADATA_HEADER_PARENT)) {
 				// legacy
 				String value = line.replace(OLD_METADATA_HEADER_PARENT, "");
 				String[] valueTokens = value.split(REGEX_SPLIT_PARENT);
-				for (int j = 0; j < valueTokens.length; j++) {
-					if (!valueTokens[j].trim().isEmpty()) {
-						return Integer.parseInt(valueTokens[j].trim());
+				for (String valueToken : valueTokens) {
+					if (!valueToken.trim().isEmpty()) {
+						return Integer.parseInt(valueToken.trim());
 					}
 				}
 			}
@@ -384,8 +378,8 @@ public class TurboIssue implements TurboResource {
 
 	/**
 	 * Creates a JavaFX node containing a graphical display of this issue's events.
-	 * @param withinHours
-	 * @return
+	 * @param withinHours the number of hours to bound the returned events by
+	 * @return the node
 	 */
 	public Node getEventDisplay(final int withinHours) {
 		final LocalDateTime now = LocalDateTime.now();
@@ -412,6 +406,7 @@ public class TurboIssue implements TurboResource {
 	/**
 	 * Given a list of issue events, returns a JavaFX node laying them out properly.
 	 * @param events
+	 * @param comments
 	 * @return
 	 */
 	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
@@ -446,6 +441,7 @@ public class TurboIssue implements TurboResource {
 	 * Given a list of issue events, returns a textual representation of them,
 	 * concatenated together with newlines.
 	 * @param events
+	 * @param width
 	 * @return
 	 */
 	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
@@ -471,12 +467,13 @@ public class TurboIssue implements TurboResource {
 
 	private ObservableList<TurboLabel> translateLabels(List<Label> labels) {
 		ObservableList<TurboLabel> turboLabels = FXCollections.observableArrayList();
-		if (labels == null)
+		if (labels == null) {
 			return turboLabels;
-
-		for (Label label : labels) {
-			turboLabels.add(new TurboLabel(label));
 		}
+
+		turboLabels.addAll(labels.stream()
+			.map(label -> new TurboLabel(label))
+			.collect(Collectors.toList()));
 
 		return turboLabels;
 	}
@@ -650,9 +647,7 @@ public class TurboIssue implements TurboResource {
 	public void setLabels(List<TurboLabel> labels) {
 		if (this.labels != labels) {
 			this.labels.clear();
-			for (TurboLabel label : labels) {
-				addLabel(label);
-			}
+			labels.forEach(this::addLabel);
 		}
 	}
 }
