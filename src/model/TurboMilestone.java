@@ -206,7 +206,7 @@ public class TurboMilestone implements TurboResource {
 		TurboMilestone other = (TurboMilestone) obj;
 		if (number != other.number)
 			return false;
-		if (title != other.title)
+		if (!title.equals(other.title))
 			return false;
 		return true;
 	}
