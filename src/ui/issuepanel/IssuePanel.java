@@ -143,29 +143,20 @@ public class IssuePanel extends IssueColumn {
 				}
 			}
 		});
-		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+
+		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if(event.getCode() == KeyCode.C) {
-					ui.getBrowserComponent().jumpToComment();
+				if (event.getCode() == KeyCode.F5) {
+					ServiceManager.getInstance().updateModelNow();
 				}
-				if(event.getCode() == KeyCode.L) {
-					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().newLabel();
-					}
-					else {
-						ui.getBrowserComponent().manageLabels(event.getCode().toString());
-					}
+				if (event.getCode() == KeyCode.F1) {
+					ui.getBrowserComponent().showDocs();
 				}
-				if(event.getCode() == KeyCode.A) {
-					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				if (keyCombListToBox.match(event)) {
+					filterTextField.requestFocus();
 				}
-				if(event.getCode() == KeyCode.M) {
-					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showMilestones();
-					}
-					else {
-					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
-					}
+				if (event.getCode() == KeyCode.SPACE && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+					filterTextField.requestFocus();
 				}
 				if(event.getCode() == KeyCode.I) {
 					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
@@ -205,21 +196,27 @@ public class IssuePanel extends IssueColumn {
 				if(event.getCode() == KeyCode.G) {
 					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
 				}
-			}
-		});
-		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F5) {
-					ServiceManager.getInstance().updateModelNow();
+				if(event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
+					ui.getBrowserComponent().jumpToComment();
 				}
-				if (event.getCode() == KeyCode.F1) {
-					ui.getBrowserComponent().showDocs();
+				if(event.getCode() == KeyCode.L) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().newLabel();
+					}
+					else if(ui.getBrowserComponent().isCurrentUrlIssue()){
+						ui.getBrowserComponent().manageLabels(event.getCode().toString());
+					}
 				}
-				if (keyCombListToBox.match(event)) {
-					filterTextField.requestFocus();
+				if(event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
+					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
 				}
-				if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
-					filterTextField.requestFocus();
+				if(event.getCode() == KeyCode.M) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showMilestones();
+					}
+					else if(ui.getBrowserComponent().isCurrentUrlIssue()){
+					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+					}
 				}
 			}
 		});
