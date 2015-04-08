@@ -73,7 +73,7 @@ public class TurboIssue implements TurboResource {
 	private void ______MISCELLANEOUS_FIELDS______() {
 	}
 
-	private WeakReference<Model> model;
+	private Model model;
 
 	private List<TurboIssueEvent> events = new ArrayList<>();
 
@@ -89,7 +89,7 @@ public class TurboIssue implements TurboResource {
 		assert title != null;
 		assert desc != null;
 		assert model != null;
-		this.model = new WeakReference<>(model);
+		this.model = model;
 
 		setTitle(title);
 		setDescription(desc);
@@ -99,7 +99,7 @@ public class TurboIssue implements TurboResource {
 	public TurboIssue(Issue issue, Model model) {
 		assert issue != null;
 		assert model != null;
-		this.model = new WeakReference<>(model);
+		this.model = model;
 		setHtmlUrl(issue.getHtmlUrl());
 		setTitle(issue.getTitle());
 		setOpen(issue.getState().equals(STATE_OPEN));
@@ -242,7 +242,7 @@ public class TurboIssue implements TurboResource {
 
 	public final TurboIssue parentReference() {
 		if (getParentIssue() != -1) {
-			return model.get().getIssueWithId(getParentIssue());
+			return model.getIssueWithId(getParentIssue());
 		}
 		return null;
 	}
@@ -269,7 +269,7 @@ public class TurboIssue implements TurboResource {
 
 	private TurboLabel getLabelReference(TurboLabel label) {
 		assert label != null;
-		List<TurboLabel> allLabels = model.get().getLabels();
+		List<TurboLabel> allLabels = model.getLabels();
 		int index = allLabels.indexOf(label);
 		assert index != -1;
 		return allLabels.get(index);
@@ -277,14 +277,14 @@ public class TurboIssue implements TurboResource {
 
 	private TurboMilestone getMilestoneReference(TurboMilestone milestone) {
 		assert milestone != null;
-		List<TurboMilestone> allMilestones = model.get().getMilestones();
+		List<TurboMilestone> allMilestones = model.getMilestones();
 		int index = allMilestones.indexOf(milestone);
 		assert index != -1;
 		return allMilestones.get(index);
 	}
 
 	private TurboUser getCollaboratorReference(TurboUser user) {
-		List<TurboUser> allCollaborators = model.get().getCollaborators();
+		List<TurboUser> allCollaborators = model.getCollaborators();
 		int index = allCollaborators.indexOf(user);
 		if (index != -1) {
 			return allCollaborators.get(index);
@@ -626,7 +626,7 @@ public class TurboIssue implements TurboResource {
 			if (!temporaryMilestone.isPresent()) {
 				return null;
 			}
-			milestone = Optional.of(model.get().getMilestoneByTitle(temporaryMilestone.get().getTitle()));
+			milestone = Optional.of(model.getMilestoneByTitle(temporaryMilestone.get().getTitle()));
 		}
 		return milestone.get();
 	}
@@ -657,7 +657,7 @@ public class TurboIssue implements TurboResource {
 				return new ArrayList<>();
 			}
 			List<TurboLabel> newLabels = temporaryLabels.get().stream()
-				.map(label -> model.get().getLabelByGhName(label.getName()))
+				.map(label -> model.getLabelByGhName(label.getName()))
 				.collect(Collectors.toList());
 			labels = Optional.of(newLabels);
 		}
