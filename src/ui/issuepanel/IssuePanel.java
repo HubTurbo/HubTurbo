@@ -153,10 +153,10 @@ public class IssuePanel extends IssueColumn {
 					ui.getBrowserComponent().showDocs();
 				}
 				if (keyCombListToBox.match(event)) {
-					filterTextField.requestFocus();
+					setFocusToFilterBox();
 				}
 				if (event.getCode() == KeyCode.SPACE && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
-					filterTextField.requestFocus();
+					setFocusToFilterBox();
 				}
 				if(event.getCode() == KeyCode.I) {
 					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
@@ -220,6 +220,12 @@ public class IssuePanel extends IssueColumn {
 				}
 			}
 		});
+	}
+
+	private void setFocusToFilterBox() {
+		filterTextField.requestFocus();
+		filterTextField.setText(filterTextField.getText().trim());
+		filterTextField.positionCaret(filterTextField.getLength());
 		
 	}
 }
