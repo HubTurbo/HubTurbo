@@ -41,9 +41,6 @@ public class ColumnControl extends HBox {
 
 	private TurboCommandExecutor dragAndDropExecutor;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
-	private final KeyCombination maximizeWindow = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination minimizeWindow = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	
 	public ColumnControl(UI ui, Stage stage, Model model) {
 		this.ui = ui;
@@ -257,16 +254,6 @@ public class ColumnControl extends HBox {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				if (maximizeWindow.match(event)) {
-					ui.maximizeWindow();
-				}
-				if (minimizeWindow.match(event)) {
-					stage.setIconified(true);
-				}
-				if (defaultSizeWindow.match(event)) {
-					ui.setDefaultWidth();
-					scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
-				}
 				if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
 					handleKeys(event.getCode() == KeyCode.F);
 					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";

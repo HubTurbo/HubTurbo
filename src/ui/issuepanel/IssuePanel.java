@@ -33,7 +33,10 @@ public class IssuePanel extends IssueColumn {
 	private NavigableListView<TurboIssue> listView;
 	private final KeyCombination keyCombBoxToList = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination keyCombListToBox = new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();;
+	private final KeyCombination maximizeWindow = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination minimizeWindow = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
@@ -141,6 +144,15 @@ public class IssuePanel extends IssueColumn {
 				    event.consume();
 					listView.selectFirstItem();
 				}
+				if (maximizeWindow.match(event)) {
+					ui.maximizeWindow();
+				}
+				if (minimizeWindow.match(event)) {
+					ui.minimizeWindow();
+				}
+				if (defaultSizeWindow.match(event)) {
+					ui.setDefaultWidth();
+				}
 			}
 		});
 
@@ -217,6 +229,15 @@ public class IssuePanel extends IssueColumn {
 					else if(ui.getBrowserComponent().isCurrentUrlIssue()){
 					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
 					}
+				}
+				if (maximizeWindow.match(event)) {
+					ui.maximizeWindow();
+				}
+				if (minimizeWindow.match(event)) {
+					ui.minimizeWindow();
+				}
+				if (defaultSizeWindow.match(event)) {
+					ui.setDefaultWidth();
 				}
 			}
 		});
