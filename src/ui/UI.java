@@ -137,6 +137,7 @@ public class UI extends Application implements EventDispatcher {
 				triggerEvent(new BoardSavedEvent());
 				if(columns.getCurrentlySelectedColumn().isPresent()) {
 					getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+					columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
 				}
 			} else {
 				quit();
@@ -441,6 +442,10 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 			logger.info("Repository " + repoString + " successfully switched to!");
+			if(columns.getCurrentlySelectedColumn().isPresent()) {
+				getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+				columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
+			}
 		});
 
 		task.setOnFailed(wse -> {
