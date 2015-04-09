@@ -79,15 +79,15 @@ public class ModelUpdater {
 	 * @param repoId the repository to get updates from
 	 * @return a future which completes on success, and is cancelled upon failure
 	 */
-	private CompletableFuture<Void> updateModelIssues(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelIssues(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
 				model.updateCachedIssues(response, updatedIssues, repoId);
 			} else {
 				logger.info("No issues to update");
-				response.complete(null);
+				response.complete(0);
 				HTStatusBar.addProgress(0.167);
 			}
 		} else {
@@ -100,15 +100,15 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelCollaborators(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelCollaborators(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
 				model.updateCachedCollaborators(response, collaborators, repoId);
 			} else {
 				logger.info("No collaborators to update");
-				response.complete(null);
+				response.complete(0);
 				HTStatusBar.addProgress(0.167);
 			}
 		} else {
@@ -121,15 +121,15 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelLabels(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelLabels(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
 				model.updateCachedLabels(response, labels, repoId);
 			} else {
 				logger.info("No labels to update");
-				response.complete(null);
+				response.complete(0);
 				HTStatusBar.addProgress(0.167);
 			}
 		} else {
@@ -142,15 +142,15 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelMilestones(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelMilestones(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
 				model.updateCachedMilestones(response, milestones, repoId);
 			} else {
 				logger.info("No milestones to update");
-				response.complete(null);
+				response.complete(0);
 				HTStatusBar.addProgress(0.167);
 			}
 		} else {
