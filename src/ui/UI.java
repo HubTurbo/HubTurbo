@@ -135,10 +135,7 @@ public class UI extends Application implements EventDispatcher {
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
-				if(columns.getCurrentlySelectedColumn().isPresent()) {
-					getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-					columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
-				}
+				ensureSelectedPanelHasFocus();
 			} else {
 				quit();
 			}
@@ -442,10 +439,7 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 			logger.info("Repository " + repoString + " successfully switched to!");
-			if(columns.getCurrentlySelectedColumn().isPresent()) {
-				getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-				columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
-			}
+			ensureSelectedPanelHasFocus();
 		});
 
 		task.setOnFailed(wse -> {
@@ -453,6 +447,13 @@ public class UI extends Application implements EventDispatcher {
 			logger.error(err.getLocalizedMessage(), err);
 			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
 		});
+	}
+
+	private void ensureSelectedPanelHasFocus() {
+		if(columns.getCurrentlySelectedColumn().isPresent()) {
+			getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+			columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
+		}
 	}
 
 	public MenuControl getMenuControl() {
