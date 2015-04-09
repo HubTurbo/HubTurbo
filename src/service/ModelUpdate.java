@@ -21,22 +21,26 @@ import service.updateservice.LabelUpdateService;
 import service.updateservice.MilestoneUpdateService;
 import ui.components.HTStatusBar;
 
-public class ModelUpdater {
-	
-	private static final Logger logger = LogManager.getLogger(ModelUpdater.class.getName());
+public class ModelUpdate {
 
-	private Model model;
-	private IssueUpdateService issueUpdateService;
-	private CollaboratorUpdateService collaboratorUpdateService;
-	private LabelUpdateService labelUpdateService;
-	private MilestoneUpdateService milestoneUpdateService;
+	private static final Logger logger = LogManager.getLogger(ModelUpdate.class.getName());
+	public static final double PROGRESS_INTERVAL = 1 / 6;
 
-	public ModelUpdater(GitHubClientExtended client, Model model, UpdateSignature updateSignature) {
+	private final Model model;
+	private final IssueUpdateService issueUpdateService;
+	private final CollaboratorUpdateService collaboratorUpdateService;
+	private final LabelUpdateService labelUpdateService;
+	private final MilestoneUpdateService milestoneUpdateService;
+	private final UpdatedIssueMetadata updatedIssueMetadata;
+
+	public ModelUpdate(ServiceManager serviceManager, GitHubClientExtended client,
+	                   Model model, UpdateSignature updateSignature) {
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client, updateSignature.issuesETag, updateSignature.lastCheckTime);
 		this.collaboratorUpdateService = new CollaboratorUpdateService(client, updateSignature.collaboratorsETag);
 		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
+		updatedIssueMetadata = new UpdatedIssueMetadata(serviceManager);
 	}
 
 	/**
@@ -70,12 +74,14 @@ public class ModelUpdater {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 
+		updatedIssueMetadata.download();
+
 		model.enableModelChanges();
 		return result;
 	}
 
 	private static void log(int updated, String currentResourceName, String nextResourceName) {
-		HTStatusBar.addProgressAndDisplayMessage(0.167, "Updating " + nextResourceName + "...");
+		HTStatusBar.addProgressAndDisplayMessage(PROGRESS_INTERVAL, "Updating " + nextResourceName + "...");
 		if (updated == 0) {
 			logger.info("No " + currentResourceName + " to update");
 		} else {

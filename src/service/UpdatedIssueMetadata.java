@@ -24,9 +24,9 @@ public class UpdatedIssueMetadata {
 
 	public void download() {
 		downloadComments();
-		HTStatusBar.addProgressAndDisplayMessage(0.167, "Updating events...");
+		HTStatusBar.addProgressAndDisplayMessage(ModelUpdate.PROGRESS_INTERVAL, "Updating events...");
 		downloadEvents();
-		HTStatusBar.addProgress(0.167);
+		HTStatusBar.addProgress(ModelUpdate.PROGRESS_INTERVAL);
 	}
 
 	public void downloadEvents() {

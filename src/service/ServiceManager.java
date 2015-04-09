@@ -75,8 +75,7 @@ public class ServiceManager {
 
 	// Model updates
 
-	private ModelUpdater modelUpdater;
-	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
+	private ModelUpdate modelUpdate;
 	protected Model model;
 	protected RepositoryId repoId;
 
@@ -400,7 +399,7 @@ public class ServiceManager {
 			return;
 		}
 
-		modelUpdater = new ModelUpdater(githubClient, model, updateSignature);
+		modelUpdate = new ModelUpdate(this, githubClient, model, updateSignature);
 
 		// Disable repository selection
 		PlatformEx.runAndWait(() -> {
@@ -409,11 +408,9 @@ public class ServiceManager {
 
 		// Wait for the update to complete
 
-		if (modelUpdater.updateModel(repoId)) {
-			updateSignature = modelUpdater.getNewUpdateSignature();
+		if (modelUpdate.updateModel(repoId)) {
+			updateSignature = modelUpdate.getNewUpdateSignature();
 			model.updateCache(updateSignature);
-
-			updatedIssueMetadata.download();
 			model.triggerModelChangeEvent();
 		} else {
 			logger.warn("Model update stopped due to repository changing halfway -- likely concurrency problem!");
