@@ -21,22 +21,26 @@ import service.updateservice.LabelUpdateService;
 import service.updateservice.MilestoneUpdateService;
 import ui.components.HTStatusBar;
 
-public class ModelUpdater {
-	
-	private static final Logger logger = LogManager.getLogger(ModelUpdater.class.getName());
+public class ModelUpdate {
 
-	private Model model;
-	private IssueUpdateService issueUpdateService;
-	private CollaboratorUpdateService collaboratorUpdateService;
-	private LabelUpdateService labelUpdateService;
-	private MilestoneUpdateService milestoneUpdateService;
+	private static final Logger logger = LogManager.getLogger(ModelUpdate.class.getName());
+	public static final double PROGRESS_INTERVAL = 1 / 6;
 
-	public ModelUpdater(GitHubClientExtended client, Model model, UpdateSignature updateSignature) {
+	private final Model model;
+	private final IssueUpdateService issueUpdateService;
+	private final CollaboratorUpdateService collaboratorUpdateService;
+	private final LabelUpdateService labelUpdateService;
+	private final MilestoneUpdateService milestoneUpdateService;
+	private final UpdatedIssueMetadata updatedIssueMetadata;
+
+	public ModelUpdate(ServiceManager serviceManager, GitHubClientExtended client,
+	                   Model model, UpdateSignature updateSignature) {
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client, updateSignature.issuesETag, updateSignature.lastCheckTime);
 		this.collaboratorUpdateService = new CollaboratorUpdateService(client, updateSignature.collaboratorsETag);
 		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
+		updatedIssueMetadata = new UpdatedIssueMetadata(serviceManager);
 	}
 
 	/**
@@ -53,11 +57,14 @@ public class ModelUpdater {
 		model.disableModelChanges();
 		boolean result = true;
 
+		HTStatusBar.updateProgress(0.01);
+		HTStatusBar.displayMessage("Updating collaborators...");
+
 		try {
-			updateModelCollaborators(repoId).get();
-			updateModelLabels(repoId).get();
-			updateModelMilestones(repoId).get();
-			updateModelIssues(repoId).get();
+			log(updateModelCollaborators(repoId).get(), "collaborators", "labels");
+			log(updateModelLabels(repoId).get(), "labels", "milestones");
+			log(updateModelMilestones(repoId).get(), "milestones", "issues");
+			log(updateModelIssues(repoId).get(), "issues", "comments");
 		} catch (CancellationException e) {
 			// Control jumping here means that one of the get methods
 			// failed, i.e. one of the CompletableFutures was cancelled.
@@ -67,8 +74,19 @@ public class ModelUpdater {
 			logger.error(e.getLocalizedMessage(), e);
 		}
 
+		updatedIssueMetadata.download();
+
 		model.enableModelChanges();
 		return result;
+	}
+
+	private static void log(int updated, String currentResourceName, String nextResourceName) {
+		HTStatusBar.addProgressAndDisplayMessage(PROGRESS_INTERVAL, "Updating " + nextResourceName + "...");
+		if (updated == 0) {
+			logger.info("No " + currentResourceName + " to update");
+		} else {
+			logger.info(updated + " " + currentResourceName + " updated");
+		}
 	}
 
 	/**
@@ -79,16 +97,14 @@ public class ModelUpdater {
 	 * @param repoId the repository to get updates from
 	 * @return a future which completes on success, and is cancelled upon failure
 	 */
-	private CompletableFuture<Void> updateModelIssues(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelIssues(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Issue> updatedIssues = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (updatedIssues.size() > 0) {
 				model.updateCachedIssues(response, updatedIssues, repoId);
 			} else {
-				logger.info("No issues to update");
-				response.complete(null);
-				HTStatusBar.addProgress(0.167);
+				response.complete(0);
 			}
 		} else {
 			logger.info("Repository has changed; not updating issues");
@@ -100,16 +116,14 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelCollaborators(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelCollaborators(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
 				model.updateCachedCollaborators(response, collaborators, repoId);
 			} else {
-				logger.info("No collaborators to update");
-				response.complete(null);
-				HTStatusBar.addProgress(0.167);
+				response.complete(0);
 			}
 		} else {
 			logger.info("Repository has changed; not updating collaborators");
@@ -121,16 +135,14 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelLabels(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelLabels(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Label> labels = labelUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (labels.size() > 0) {
 				model.updateCachedLabels(response, labels, repoId);
 			} else {
-				logger.info("No labels to update");
-				response.complete(null);
-				HTStatusBar.addProgress(0.167);
+				response.complete(0);
 			}
 		} else {
 			logger.info("Repository has changed; not updating labels");
@@ -142,16 +154,14 @@ public class ModelUpdater {
 	/**
 	 * See {@link #updateModelIssues(String)} for details.
 	 */
-	private CompletableFuture<Void> updateModelMilestones(String repoId) {
-		CompletableFuture<Void> response = new CompletableFuture<>();
+	private CompletableFuture<Integer> updateModelMilestones(String repoId) {
+		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
 			List<Milestone> milestones = milestoneUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (milestones.size() > 0) {
 				model.updateCachedMilestones(response, milestones, repoId);
 			} else {
-				logger.info("No milestones to update");
-				response.complete(null);
-				HTStatusBar.addProgress(0.167);
+				response.complete(0);
 			}
 		} else {
 			logger.info("Repository has changed; not updating milestones");
