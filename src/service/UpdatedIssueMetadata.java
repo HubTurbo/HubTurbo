@@ -24,7 +24,9 @@ public class UpdatedIssueMetadata {
 
 	public void download() {
 		downloadComments();
+		HTStatusBar.addProgressAndDisplayMessage(0.167, "Updating events...");
 		downloadEvents();
+		HTStatusBar.addProgress(0.167);
 	}
 
 	public void downloadEvents() {
@@ -39,8 +41,6 @@ public class UpdatedIssueMetadata {
 			}
 			serviceManager.getModel().getIssueWithId(issueId).setEvents(events);
 		}
-		HTStatusBar.displayMessage("Updating events...");
-		HTStatusBar.addProgress(0.167);
 		logger.info("Downloaded events for " + issueCount + " issues");
 	}
 
@@ -56,8 +56,6 @@ public class UpdatedIssueMetadata {
 			}
 			serviceManager.getModel().getIssueWithId(issueId).setComments(comments);
 		}
-		HTStatusBar.displayMessage("Updating comments...");
-		HTStatusBar.addProgress(0.167);
 		logger.info("Downloaded comments for " + issueCount + " issues");
 	}
 }

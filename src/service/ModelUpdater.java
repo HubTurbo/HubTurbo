@@ -53,11 +53,14 @@ public class ModelUpdater {
 		model.disableModelChanges();
 		boolean result = true;
 
+		HTStatusBar.updateProgress(0.01);
+		HTStatusBar.displayMessage("Updating collaborators...");
+
 		try {
-			updateModelCollaborators(repoId).get();
-			updateModelLabels(repoId).get();
-			updateModelMilestones(repoId).get();
-			updateModelIssues(repoId).get();
+			log(updateModelCollaborators(repoId).get(), "collaborators", "labels");
+			log(updateModelLabels(repoId).get(), "labels", "milestones");
+			log(updateModelMilestones(repoId).get(), "milestones", "issues");
+			log(updateModelIssues(repoId).get(), "issues", "comments");
 		} catch (CancellationException e) {
 			// Control jumping here means that one of the get methods
 			// failed, i.e. one of the CompletableFutures was cancelled.
@@ -69,6 +72,15 @@ public class ModelUpdater {
 
 		model.enableModelChanges();
 		return result;
+	}
+
+	private static void log(int updated, String currentResourceName, String nextResourceName) {
+		HTStatusBar.addProgressAndDisplayMessage(0.167, "Updating " + nextResourceName + "...");
+		if (updated == 0) {
+			logger.info("No " + currentResourceName + " to update");
+		} else {
+			logger.info(updated + " " + currentResourceName + " updated");
+		}
 	}
 
 	/**
@@ -86,9 +98,7 @@ public class ModelUpdater {
 			if (updatedIssues.size() > 0) {
 				model.updateCachedIssues(response, updatedIssues, repoId);
 			} else {
-				logger.info("No issues to update");
 				response.complete(0);
-				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating issues");
@@ -107,9 +117,7 @@ public class ModelUpdater {
 			if (collaborators.size() > 0) {
 				model.updateCachedCollaborators(response, collaborators, repoId);
 			} else {
-				logger.info("No collaborators to update");
 				response.complete(0);
-				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating collaborators");
@@ -128,9 +136,7 @@ public class ModelUpdater {
 			if (labels.size() > 0) {
 				model.updateCachedLabels(response, labels, repoId);
 			} else {
-				logger.info("No labels to update");
 				response.complete(0);
-				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating labels");
@@ -149,9 +155,7 @@ public class ModelUpdater {
 			if (milestones.size() > 0) {
 				model.updateCachedMilestones(response, milestones, repoId);
 			} else {
-				logger.info("No milestones to update");
 				response.complete(0);
-				HTStatusBar.addProgress(0.167);
 			}
 		} else {
 			logger.info("Repository has changed; not updating milestones");

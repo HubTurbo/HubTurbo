@@ -309,9 +309,6 @@ public class Model {
 			list.removeAll(removed);
 
 			assert newList.size() > 0;
-			String resourceName = newList.get(0).getClass().getSimpleName()
-				.replaceAll("Turbo", "").toLowerCase();
-			logNumOfUpdates(newList, resourceName + "(s)");
 
 			ArrayList<T> buffer = new ArrayList<>();
 			for (T item : newList) {
@@ -326,18 +323,7 @@ public class Model {
 			list.addAll(buffer);
 
 			response.complete(newList.size());
-
-			if (!isInTestMode) {
-				HTStatusBar.displayMessage(String.format("Updating %ss...", resourceName));
-				HTStatusBar.addProgress(0.167);
-			}
 		});
-	}
-
-	private <T> void logNumOfUpdates(List<T> newList, String type) {
-		if (!isInTestMode) {
-			logger.info("Retrieved " + newList.size() + " updated " + type + " since last sync");
-		}
 	}
 
 	/**
@@ -440,11 +426,7 @@ public class Model {
 			return;
 		}
 
-		HTStatusBar.displayMessage("Updating issues...");
-		HTStatusBar.addProgress(0.167);
-
 		run(() -> {
-			logger.info(newIssues.size() + " issues changed/added since last sync");
 			for (int i = newIssues.size() - 1; i >= 0; i--) {
 				Issue issue = newIssues.get(i);
 				TurboIssue newCached = new TurboIssue(issue, Model.this);
