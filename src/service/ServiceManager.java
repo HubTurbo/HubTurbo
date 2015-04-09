@@ -417,7 +417,7 @@ public class ServiceManager {
 		}
 
 		// Reset progress UI
-		HTStatusBar.displayMessage("Sync complete!");
+		HTStatusBar.displayMessage("Sync complete! " + getRemainingRequestsDesc());
 		HTStatusBar.updateProgress(0);
 
 		// Enable repository switching
