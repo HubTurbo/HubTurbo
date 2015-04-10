@@ -6,8 +6,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -67,14 +65,14 @@ public class ColumnControl extends HBox {
 		ui.registerEvent(new IssueSelectedEventHandler() {
 			@Override
 			public void handle(IssueSelectedEvent e) {
-				currentlySelectedColumn = Optional.of(e.columnIndex);
+				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
 			}
 		});
 		
 		ui.registerEvent(new ColumnClickedEventHandler() {
 			@Override
 			public void handle(ColumnClickedEvent e) {
-				currentlySelectedColumn = Optional.of(e.columnIndex);
+				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
 			}
 		});
 
@@ -146,8 +144,22 @@ public class ColumnControl extends HBox {
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
-		currentlySelectedColumn = Optional.of(index);
+		setCurrentlySelectedColumn(Optional.of(index));
 		return panel;
+	}
+
+	private void setCurrentlySelectedColumn(Optional<Integer> selectedColumn) {
+		currentlySelectedColumn = selectedColumn;
+		updateCSSforColumns();
+	}
+
+	private void updateCSSforColumns() {
+		if(currentlySelectedColumn.isPresent()) {
+			for(int index = 0; index < getChildren().size();index++) {
+				getColumn(index).getStyleClass().remove("panel-focused");
+			}
+			getColumn(currentlySelectedColumn.get()).getStyleClass().add("panel-focused");
+		}	
 	}
 
 	public Column getColumn(int index) {
@@ -229,12 +241,12 @@ public class ColumnControl extends HBox {
 			int columnIndex = currentlySelectedColumn.get();
 			closeColumn(columnIndex);
 			if (getChildren().size() == 0) {
-				currentlySelectedColumn = Optional.empty();
+				setCurrentlySelectedColumn(Optional.empty());
 			} else {
 				int newColumnIndex = (columnIndex > getChildren().size() - 1)
 									 ? columnIndex - 1
 									 : columnIndex;
-				currentlySelectedColumn = Optional.of(newColumnIndex);
+				setCurrentlySelectedColumn(Optional.of(newColumnIndex));
 				getColumn(currentlySelectedColumn.get()).requestFocus();
 			}
 		}
@@ -276,7 +288,7 @@ public class ColumnControl extends HBox {
 					newIndex = getChildren().size() - 1;
 				else if (newIndex > getChildren().size() - 1)
 					newIndex = 0;
-				currentlySelectedColumn = Optional.of(newIndex);
+				setCurrentlySelectedColumn(Optional.of(newIndex));
 				selectedColumn = getColumn(currentlySelectedColumn.get());
 				((IssueColumn) selectedColumn).requestFocus();
 			}
