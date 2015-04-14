@@ -107,7 +107,7 @@ public class UI extends Application implements EventDispatcher {
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
-		stage.setAlwaysOnTop(true);
+//		stage.setAlwaysOnTop(true);
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
@@ -165,29 +165,27 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
 		initialiseJNA(mainStage.getTitle());
-		if (browserComponent.isBrowserActive()) {
-			mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-					if (!isFocused) {
-						return;
-					}
-					if (PlatformSpecific.isOnWindows()) {
-						browserComponent.focus(mainWindowHandle);
-					}
-					PlatformEx.runLaterDelayed(() -> {
-						// A refresh is triggered if:
-						// 1. Repo-switching is not disabled (meaning an update is not in progress)
-						// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-						boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
-						if (shouldRefresh) {
-							logger.info("Gained focus; refreshing");
-							ServiceManager.getInstance().updateModelNow();
-						}
-					});
+		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
+				if (!isFocused) {
+					return;
 				}
-			});
-		}
+				if (PlatformSpecific.isOnWindows()) {
+					browserComponent.focus(mainWindowHandle);
+				}
+				PlatformEx.runLaterDelayed(() -> {
+					// A refresh is triggered if:
+					// 1. Repo-switching is not disabled (meaning an update is not in progress)
+					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
+					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+					if (shouldRefresh) {
+						logger.info("Gained focus; refreshing");
+						ServiceManager.getInstance().updateModelNow();
+					}
+				});
+			}
+		});
 	}
 
 	private static void initialiseJNA(String windowTitle) {
