@@ -41,7 +41,6 @@ import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
-import util.events.LoginEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -105,10 +104,10 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
-		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
+		stage.setAlwaysOnTop(true);
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
@@ -131,7 +130,6 @@ public class UI extends Application implements EventDispatcher {
 			if (success) {
 				setExpandedWidth(false);
 				columns.loadIssues();
-				triggerEvent(new LoginEvent());
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
@@ -167,27 +165,29 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
 		initialiseJNA(mainStage.getTitle());
-		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (!isFocused) {
-					return;
-				}
-				if (PlatformSpecific.isOnWindows()) {
-					browserComponent.focus(mainWindowHandle);
-				}
-				PlatformEx.runLaterDelayed(() -> {
-					// A refresh is triggered if:
-					// 1. Repo-switching is not disabled (meaning an update is not in progress)
-					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
-					if (shouldRefresh) {
-						logger.info("Gained focus; refreshing");
-						ServiceManager.getInstance().updateModelNow();
+		if (browserComponent.isBrowserActive()) {
+			mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
+					if (!isFocused) {
+						return;
 					}
-				});
-			}
-		});
+					if (PlatformSpecific.isOnWindows()) {
+						browserComponent.focus(mainWindowHandle);
+					}
+					PlatformEx.runLaterDelayed(() -> {
+						// A refresh is triggered if:
+						// 1. Repo-switching is not disabled (meaning an update is not in progress)
+						// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
+						boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+						if (shouldRefresh) {
+							logger.info("Gained focus; refreshing");
+							ServiceManager.getInstance().updateModelNow();
+						}
+					});
+				}
+			});
+		}
 	}
 
 	private static void initialiseJNA(String windowTitle) {
@@ -485,5 +485,13 @@ public class UI extends Application implements EventDispatcher {
 	public void minimizeWindow() {
 		mainStage.setIconified(true);
 		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+	}
+
+	public Stage getMainStage() {
+		return mainStage;
+	}
+
+	public HWND getMainWindowHandle() {
+		return mainWindowHandle;
 	}
 }

@@ -260,7 +260,7 @@ public class BrowserComponent {
 		bringToTop();
 	}
 	
-	private boolean isBrowserActive(){
+	public boolean isBrowserActive(){
 		if (driver == null){
 			logger.warn("chromedriver process was killed !");
 			return false;
@@ -336,6 +336,7 @@ public class BrowserComponent {
 				searchBox = driver.findElement(By.name("password"));
 				searchBox.sendKeys(ServiceManager.getInstance().getLastUsedPassword());
 				searchBox.submit();
+				focus(ui.getMainWindowHandle());
 			} catch (NoSuchElementException e) {
 				// Already logged in; do nothing
 			}
