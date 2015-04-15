@@ -41,7 +41,6 @@ import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
-import util.events.LoginEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -105,10 +104,10 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
-		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
+//		stage.setAlwaysOnTop(true);
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
@@ -131,7 +130,6 @@ public class UI extends Application implements EventDispatcher {
 			if (success) {
 				setExpandedWidth(false);
 				columns.loadIssues();
-				triggerEvent(new LoginEvent());
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
@@ -485,5 +483,13 @@ public class UI extends Application implements EventDispatcher {
 	public void minimizeWindow() {
 		mainStage.setIconified(true);
 		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+	}
+
+	public Stage getMainStage() {
+		return mainStage;
+	}
+
+	public HWND getMainWindowHandle() {
+		return mainWindowHandle;
 	}
 }
