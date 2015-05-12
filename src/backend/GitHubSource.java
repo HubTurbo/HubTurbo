@@ -2,10 +2,9 @@ package backend;
 
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
-import backend.updates.DownloadTask;
+import backend.updates.github.GHDownloadTask;
 import backend.updates.RepoTask;
-import backend.updates.UpdateModelTask;
-import org.eclipse.egit.github.core.Issue;
+import backend.updates.github.GHUpdateModelTask;
 
 import java.util.concurrent.*;
 
@@ -47,14 +46,14 @@ public class GitHubSource implements RepoSource {
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		DownloadTask task = new DownloadTask(tasks, gitHub, repoId);
+		GHDownloadTask task = new GHDownloadTask(tasks, gitHub, repoId);
 		tasks.add(task);
 		return task.response;
 	}
 
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
-		UpdateModelTask task = new UpdateModelTask(tasks, gitHub, model);
+		GHUpdateModelTask task = new GHUpdateModelTask(tasks, gitHub, model);
 		tasks.add(task);
 		return task.response;
 	}
