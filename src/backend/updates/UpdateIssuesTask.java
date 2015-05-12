@@ -3,19 +3,19 @@ package backend.updates;
 import backend.Model;
 import backend.TurboIssue;
 import backend.interfaces.Repo;
+import backend.updates.github.GHRepoTask;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
 
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 
-public class UpdateIssuesTask extends RepoTask<UpdateIssuesTask.Result> {
+public class UpdateIssuesTask extends GHRepoTask<UpdateIssuesTask.Result> {
 
 	private final Model model;
 
-	public UpdateIssuesTask(BlockingQueue<RepoTask<?>> tasks, Repo repo, Model model) {
+	public UpdateIssuesTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo repo, Model model) {
 		super(tasks, repo);
 		this.model = model;
 	}

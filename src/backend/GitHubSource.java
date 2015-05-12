@@ -5,6 +5,7 @@ import backend.interfaces.RepoSource;
 import backend.updates.DownloadTask;
 import backend.updates.RepoTask;
 import backend.updates.UpdateModelTask;
+import org.eclipse.egit.github.core.Issue;
 
 import java.util.concurrent.*;
 
@@ -13,7 +14,7 @@ public class GitHubSource implements RepoSource {
 	private static final int POOL_SIZE = 2;
 
 	private final Repo gitHub = new GitHubRepo();
-	private final BlockingQueue<RepoTask<?>> tasks = new LinkedBlockingQueue<>();
+	private final BlockingQueue<RepoTask<?, ?>> tasks = new LinkedBlockingQueue<>();
 	private final ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	@Override

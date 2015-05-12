@@ -13,11 +13,11 @@ import java.util.List;
 // generic parameters to all related classes to replace concrete Issues,
 // Labels, etc.
 
-public interface Repo {
-	public List<Issue> getIssues(String repoId);
+public interface Repo<I> {
+	public List<I> getIssues(String repoId);
 	public boolean login(UserCredentials credentials);
 
 	// Returns a tuple in order to be maximally generic
-	public ImmutableTriple<List<Issue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime);
+	public ImmutableTriple<List<I>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime);
 
 }

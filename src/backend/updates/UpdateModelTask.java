@@ -3,16 +3,16 @@ package backend.updates;
 import backend.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
+import backend.updates.github.GHRepoTask;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class UpdateModelTask extends RepoTask<Model> {
+public class UpdateModelTask extends GHRepoTask<Model> {
 
 	private final Model model;
 
-	public UpdateModelTask(BlockingQueue<RepoTask<?>> tasks, Repo repo, Model model) {
+	public UpdateModelTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo repo, Model model) {
 		super(tasks, repo);
 		this.model = model;
 	}
