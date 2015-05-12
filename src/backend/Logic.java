@@ -1,10 +1,16 @@
 package backend;
 
 import javafx.application.Platform;
+import util.Utility;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class Logic {
 
-	private final MultiModel models = new MultiModel();
+	private MultiModel models = new MultiModel();
 
 //	private final UIManager uiManager;
 
@@ -20,9 +26,13 @@ public class Logic {
 
 	public void login(String username, String password) {
 		credentials = new UserCredentials(username, password);
-		repoIO.login(credentials).thenAccept(success -> {
-			System.out.println(success);
-		});
+		repoIO.login(credentials).thenAccept(System.out::println);
+	}
+
+	public void refresh() {
+		Utility.sequence(models.toModels().stream()
+			.map(repoIO::updateModel)
+			.collect(Collectors.toList())).thenAccept(models::replace);
 	}
 
 	public void openRepository(String repoId) {

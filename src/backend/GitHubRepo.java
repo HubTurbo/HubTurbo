@@ -1,26 +1,33 @@
 package backend;
 
+import backend.interfaces.Repo;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.NoSuchPageException;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.IssueService;
 import service.GitHubClientExtended;
+import service.updateservice.IssueUpdateService;
 
 import java.io.IOException;
 import java.util.*;
 
-public class GitHub {
+public class GitHubRepo implements Repo {
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
 	//	private final ExecutorService pool = Executors.newFixedThreadPool(1);
 	private final IssueService issueService = new IssueService();
 //	private final IssueUpdateService issueUpdateService = new IssueUpdateService();
 
-	public GitHub() {
+	public GitHubRepo() {
 //		pool.execute(this::login);
 //		login();
 	}
 
+	@Override
 	public boolean login(UserCredentials credentials) {
 		client.setCredentials(credentials.username, credentials.password);
 
@@ -39,6 +46,14 @@ public class GitHub {
 //		UI.instance.events.post(new LoginEvent());
 	}
 
+	@Override
+	public ImmutableTriple<List<Issue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
+		IssueUpdateService issueUpdateService = new IssueUpdateService(client, ETag, lastCheckTime);
+		return new ImmutableTriple<>(issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId)),
+			issueUpdateService.getUpdatedETag(),  issueUpdateService.getUpdatedCheckTime());
+	}
+
+	@Override
 	public List<Issue> getIssues(String repoName) {
 		Map<String, String> filters = new HashMap<>();
 		filters.put(IssueService.FIELD_FILTER, "all");

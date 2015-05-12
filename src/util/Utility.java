@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,6 +29,17 @@ import com.google.common.base.Joiner;
 public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
+
+
+	public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
+		CompletableFuture<Void> allDoneFuture =
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		return allDoneFuture.thenApply(v ->
+				futures.stream().
+					map(CompletableFuture::join)
+					.collect(Collectors.<T>toList())
+		);
+	}
 
 	public static String stringify(Collection<TurboLabel> labels) {
 		return "[" + Joiner.on(", ").join(labels.stream().map(TurboLabel::logString).collect(Collectors.toList())) + "]";

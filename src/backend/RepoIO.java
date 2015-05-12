@@ -7,8 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class RepoIO {
 
-	RepoSource repoSource = new GitHubSource();
-	RepoCache repoCache = new JSONCache();
+	private final RepoSource repoSource = new GitHubSource();
+	private final RepoCache repoCache = new JSONCache();
 
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		return repoSource.login(credentials);
@@ -23,5 +23,9 @@ public class RepoIO {
 				return model;
 			});
 		}
+	}
+
+	public CompletableFuture<Model> updateModel(Model model) {
+		return repoSource.updateModel(model);
 	}
 }

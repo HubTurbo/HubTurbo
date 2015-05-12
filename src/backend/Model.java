@@ -14,31 +14,62 @@ public class Model implements IModel {
 	private final IRepositoryIdProvider repoId;
 	private final List<TurboIssue> issues;
 
-	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues) {
-		this.updateSignature = UpdateSignature.empty;
-		this.repoId = repoId;
-		this.issues = issues;
-	}
-
+	/**
+	 * Standard constructor
+	 */
 	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues, UpdateSignature updateSignature) {
 		this.updateSignature = updateSignature;
 		this.repoId = repoId;
 		this.issues = issues;
 	}
 
-	// Constructor for the empty model
+	/**
+	 * Standard constructor with empty update signature -- for use when
+	 * a model is first downloaded
+	 */
+	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues) {
+		this.updateSignature = UpdateSignature.empty;
+		this.repoId = repoId;
+		this.issues = issues;
+	}
+
+	/**
+	 * Constructor for the empty model
+	 */
 	public Model(IRepositoryIdProvider repoId, UpdateSignature updateSignature) {
 		this.updateSignature = updateSignature;
 		this.repoId = repoId;
 		this.issues = new ArrayList<>();
 	}
 
+	/**
+	 * Means of translating to SerializableModel
+	 */
 	public Model(SerializableModel model) {
 		this.updateSignature = model.updateSignature;
 		this.repoId = RepositoryId.createFromId(model.repoId);
 		this.issues = model.issues.stream()
 			.map(TurboIssue::new)
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * Copy constructor
+	 */
+	public Model(Model model) {
+		this.updateSignature = model.updateSignature;
+		this.repoId = model.getRepoId();
+		this.issues = new ArrayList<>(model.getIssues());
+	}
+
+	/**
+	 * For immutable updates
+	 */
+	public Model withIssues(List<TurboIssue> issues) {
+		Model result = new Model(this);
+		result.issues.clear();
+		result.issues.addAll(issues);
+		return result;
 	}
 
 	public IRepositoryIdProvider getRepoId() {
