@@ -4,17 +4,25 @@ import org.eclipse.egit.github.core.Issue;
 
 public class TurboIssue {
 	private String title;
+	private final int id;
 
-	public TurboIssue(String title) {
+	public TurboIssue(int id, String title) {
+		this.id = id;
 		this.title = title;
 	}
 
 	public TurboIssue(Issue issue) {
-		this.title = "#" + issue.getNumber() + " " + issue.getTitle();
+		this.id = issue.getNumber();
+		this.title = issue.getTitle();
 	}
 
 	public TurboIssue(SerializableIssue issue) {
 		this.title = issue.title;
+		this.id = issue.id;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public String getTitle() {
@@ -23,6 +31,6 @@ public class TurboIssue {
 
 	@Override
 	public String toString() {
-		return title;
+		return "#" + id + " " + title;
 	}
 }

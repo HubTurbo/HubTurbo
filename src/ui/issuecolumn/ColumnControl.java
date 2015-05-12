@@ -1,5 +1,7 @@
 package ui.issuecolumn;
 
+import backend.ModelUpdatedEventHandler;
+import model.TurboIssue;
 import command.TurboCommandExecutor;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -48,6 +50,19 @@ public class ColumnControl extends HBox {
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
+
+		ui.registerEvent((ModelUpdatedEventHandler) e ->
+			Platform.runLater(() -> {
+				forEach(child -> {
+					if (child instanceof IssueColumn) {
+						// TODO integrate when ready
+//						List<TurboIssue> issues = e.model.getIssues().stream()
+//							.map(TurboIssue::new)
+//							((IssueColumn) child).setItems(e.model.getIssues());
+					}
+				});
+			}
+		));
 
 		ui.registerEvent(new ModelChangedEventHandler() {
 			@Override
