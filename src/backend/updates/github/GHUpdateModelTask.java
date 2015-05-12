@@ -4,6 +4,7 @@ import backend.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.updates.RepoTask;
+import org.eclipse.egit.github.core.Issue;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -12,7 +13,7 @@ public class GHUpdateModelTask extends GHRepoTask<Model> {
 
 	private final Model model;
 
-	public GHUpdateModelTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo repo, Model model) {
+	public GHUpdateModelTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, Model model) {
 		super(tasks, repo);
 		this.model = model;
 	}

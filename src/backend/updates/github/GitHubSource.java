@@ -4,12 +4,13 @@ import backend.Model;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
+import org.eclipse.egit.github.core.Issue;
 
 import java.util.concurrent.*;
 
 public class GitHubSource extends RepoSource {
 
-	private final Repo gitHub = new GitHubRepo();
+	private final Repo<Issue> gitHub = new GitHubRepo();
 
 	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {

@@ -15,7 +15,7 @@ public class GHUpdateIssuesTask extends GHRepoTask<GHUpdateIssuesTask.Result> {
 
 	private final Model model;
 
-	public GHUpdateIssuesTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo repo, Model model) {
+	public GHUpdateIssuesTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, Model model) {
 		super(tasks, repo);
 		this.model = model;
 	}

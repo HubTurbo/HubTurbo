@@ -16,7 +16,7 @@ import service.updateservice.IssueUpdateService;
 import java.io.IOException;
 import java.util.*;
 
-public class GitHubRepo implements Repo {
+public class GitHubRepo implements Repo<Issue> {
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
 	//	private final ExecutorService pool = Executors.newFixedThreadPool(1);
