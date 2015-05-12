@@ -11,15 +11,13 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
-public class UpdateIssuesTask extends RepoTask {
+public class UpdateIssuesTask extends RepoTask<UpdateIssuesTask.Result> {
 
 	private final Model model;
-	private final CompletableFuture<Result> response;
 
-	public UpdateIssuesTask(BlockingQueue<RepoTask> tasks, Repo repo, Model model, CompletableFuture<Result> response) {
+	public UpdateIssuesTask(BlockingQueue<RepoTask<?>> tasks, Repo repo, Model model) {
 		super(tasks, repo);
 		this.model = model;
-		this.response = response;
 	}
 
 	@Override

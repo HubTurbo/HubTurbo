@@ -12,16 +12,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class DownloadTask extends RepoTask {
+public class DownloadTask extends RepoTask<Model> {
 
 	private final String repoId;
-	private final CompletableFuture<Model> response;
 
-	public DownloadTask(BlockingQueue<RepoTask> tasks, Repo repo, String repoId, CompletableFuture<Model>
-		response) {
+	public DownloadTask(BlockingQueue<RepoTask<?>> tasks, Repo repo, String repoId) {
 		super(tasks, repo);
 		this.repoId = repoId;
-		this.response = response;
 	}
 
 	@Override

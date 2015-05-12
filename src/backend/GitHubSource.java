@@ -6,17 +6,14 @@ import backend.updates.DownloadTask;
 import backend.updates.RepoTask;
 import backend.updates.UpdateModelTask;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 public class GitHubSource implements RepoSource {
 
 	private static final int POOL_SIZE = 2;
 
 	private final Repo gitHub = new GitHubRepo();
-	private final LinkedBlockingQueue<RepoTask> tasks = new LinkedBlockingQueue<>();
+	private final BlockingQueue<RepoTask<?>> tasks = new LinkedBlockingQueue<>();
 	private final ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	@Override
@@ -49,15 +46,15 @@ public class GitHubSource implements RepoSource {
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		CompletableFuture<Model> response = new CompletableFuture<>();
-		tasks.add(new DownloadTask(tasks, gitHub, repoId, response));
-		return response;
+		DownloadTask task = new DownloadTask(tasks, gitHub, repoId);
+		tasks.add(task);
+		return task.response;
 	}
 
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
-		CompletableFuture<Model> response = new CompletableFuture<>();
-		tasks.add(new UpdateModelTask(tasks, gitHub, model, response));
-		return response;
+		UpdateModelTask task = new UpdateModelTask(tasks, gitHub, model);
+		tasks.add(task);
+		return task.response;
 	}
 }
