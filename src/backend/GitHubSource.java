@@ -3,45 +3,22 @@ package backend;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.updates.github.GHDownloadTask;
-import backend.updates.RepoTask;
 import backend.updates.github.GHUpdateModelTask;
 
 import java.util.concurrent.*;
 
-public class GitHubSource implements RepoSource {
-
-	private static final int POOL_SIZE = 2;
+public class GitHubSource extends RepoSource {
 
 	private final Repo gitHub = new GitHubRepo();
-	private final BlockingQueue<RepoTask<?, ?>> tasks = new LinkedBlockingQueue<>();
-	private final ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
 		pool.execute(() -> response.complete(gitHub.login(credentials)));
 
-		init();
+		busyThreads();
 
 		return response;
-	}
-
-	private void init() {
-		for (int i=0; i<POOL_SIZE; i++) {
-			pool.execute(this::handleTask);
-		}
-	}
-
-	public void handleTask() {
-		try {
-			// Perform action
-			tasks.take().update();
-
-			// Recurse
-			pool.execute(this::handleTask);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
