@@ -1,5 +1,6 @@
 package service;
 
+import backend.UpdateSignature;
 import javafx.application.Platform;
 import model.*;
 import org.apache.logging.log4j.LogManager;
@@ -79,7 +80,7 @@ public class ServiceManager {
 	protected Model model;
 	protected RepositoryId repoId;
 
-	private UpdateSignature updateSignature = new UpdateSignature();
+	private UpdateSignature updateSignature = UpdateSignature.empty;
 
 	private final TickingTimer timer;
 
@@ -363,7 +364,7 @@ public class ServiceManager {
 	 */
 	public RepositoryResources getGitHubResources(BiConsumer<String, Float> taskUpdate) throws IOException {
 
-		updateSignature = new UpdateSignature();
+		updateSignature = UpdateSignature.empty;
 
 		taskUpdate.accept("Loading collaborators...", 0f);
 		List<User> users = new ArrayList<>();

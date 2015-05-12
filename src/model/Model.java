@@ -22,12 +22,11 @@ import org.eclipse.egit.github.core.User;
 
 import service.RepositoryResources;
 import service.ServiceManager;
-import service.UpdateSignature;
+import backend.UpdateSignature;
 import storage.CacheFileHandler;
 import tests.TestUtils;
 import tests.stubs.ModelEventDispatcherStub;
 import ui.UI;
-import ui.components.HTStatusBar;
 import util.CollectionUtilities;
 import util.DialogMessage;
 import util.events.EventDispatcher;

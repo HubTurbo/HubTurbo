@@ -5,6 +5,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import backend.UpdateSignature;
 import model.Model;
 
 import org.apache.logging.log4j.LogManager;

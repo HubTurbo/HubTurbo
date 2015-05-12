@@ -1,12 +1,14 @@
-package service;
+package backend;
 
 import java.util.Date;
 
 /**
- * An immutable class for aggregating resource ETags and last check time.
- * Characterises an
+ * Aggregation of resource ETags and last-check time.
+ * Characterises the state of a Model after the last update that occurred.
  */
 public class UpdateSignature {
+
+	public static final UpdateSignature empty = new UpdateSignature();
 
 	public final String issuesETag;
 	public final String labelsETag;
@@ -14,7 +16,7 @@ public class UpdateSignature {
 	public final String collaboratorsETag;
 	public final Date lastCheckTime;
 
-	public UpdateSignature() {
+	private UpdateSignature() {
 		issuesETag = null;
 		labelsETag = null;
 		milestonesETag = null;
@@ -32,5 +34,9 @@ public class UpdateSignature {
 		this.milestonesETag = milestonesETag;
 		this.collaboratorsETag = collaboratorsETag;
 		this.lastCheckTime = lastCheckTime;
+	}
+
+	public boolean isEmpty() {
+		return this == empty;
 	}
 }
