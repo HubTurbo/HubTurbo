@@ -1,9 +1,9 @@
-package backend;
+package backend.updates.github;
 
+import backend.Model;
+import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
-import backend.updates.github.GHDownloadTask;
-import backend.updates.github.GHUpdateModelTask;
 
 import java.util.concurrent.*;
 

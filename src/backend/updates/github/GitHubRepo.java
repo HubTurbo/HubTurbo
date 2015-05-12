@@ -1,5 +1,6 @@
-package backend;
+package backend.updates.github;
 
+import backend.UserCredentials;
 import backend.interfaces.Repo;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
