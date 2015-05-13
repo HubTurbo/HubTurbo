@@ -1,4 +1,4 @@
-package backend.updates.github;
+package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;

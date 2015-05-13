@@ -1,4 +1,4 @@
-package backend.updates.github;
+package backend.github;
 
 import backend.Model;
 import backend.UserCredentials;
@@ -15,24 +15,20 @@ public class GitHubSource extends RepoSource {
 	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
-		pool.execute(() -> response.complete(gitHub.login(credentials)));
+		execute(() -> response.complete(gitHub.login(credentials)));
 
-		busyThreads();
+		activateThreads();
 
 		return response;
 	}
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		GHDownloadTask task = new GHDownloadTask(tasks, gitHub, repoId);
-		tasks.add(task);
-		return task.response;
+		return addTask(new DownloadTask(tasks, gitHub, repoId)).response;
 	}
 
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
-		GHUpdateModelTask task = new GHUpdateModelTask(tasks, gitHub, model);
-		tasks.add(task);
-		return task.response;
+		return addTask(new UpdateModelTask(tasks, gitHub, model)).response;
 	}
 }

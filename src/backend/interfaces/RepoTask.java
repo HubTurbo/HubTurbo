@@ -1,7 +1,4 @@
-package backend.updates;
-
-import backend.interfaces.Repo;
-import org.eclipse.egit.github.core.Issue;
+package backend.interfaces;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;

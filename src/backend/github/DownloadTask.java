@@ -1,11 +1,10 @@
-package backend.updates.github;
+package backend.github;
 
 import backend.Model;
 import backend.TurboIssue;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
-import backend.updates.RepoTask;
-import backend.updates.github.GHRepoTask;
+import backend.interfaces.RepoTask;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 
@@ -13,11 +12,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
-public class GHDownloadTask extends GHRepoTask<Model> {
+class DownloadTask extends GitHubRepoTask<Model> {
 
 	private final String repoId;
 
-	public GHDownloadTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, String repoId) {
+	public DownloadTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, String repoId) {
 		super(tasks, repo);
 		this.repoId = repoId;
 	}
