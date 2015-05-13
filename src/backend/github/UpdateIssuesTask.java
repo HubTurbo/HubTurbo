@@ -7,8 +7,10 @@ import backend.interfaces.RepoTask;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
@@ -24,43 +26,45 @@ class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 	public void run() {
 		ImmutableTriple<List<Issue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId().generateId(),
 			model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
-		// TODO reconcile changes
-		response.complete(new Result(model.getIssues(), changes.middle, changes.right));
+
+		// Reconcile changes
+		List<TurboIssue> existing = model.getIssues();
+		System.out.println("existing " + existing);
+		List<Issue> changed = changes.left;
+		System.out.println("changed " + changed);
+		List<TurboIssue> updated = reconcile(existing, changed);
+		System.out.println("updated " + updated);
+
+		response.complete(new Result(updated, changes.middle, changes.right));
 	}
 
-//	public void updateCachedIssues(CompletableFuture<Integer> response, List<Issue> newIssues, String repoId) {
-//
-//		if (newIssues.size() == 0) {
-//			assert false : "updateCachedIssues should not be called before issues have been loaded";
-//			return;
-//		}
-//
-//		run(() -> {
-//			for (int i = newIssues.size() - 1; i >= 0; i--) {
-//				Issue issue = newIssues.get(i);
-//				TurboIssue newCached = new TurboIssue(issue, Model.this);
-//				updateCachedIssue(newCached);
-//			}
-//			response.complete(newIssues.size());
-//		});
-//	}
-//
-//	/**
-//	 * Given a TurboIssue, adds it to the model if it is not yet in it,
-//	 * otherwise updates the corresponding issue in the model with its fields.
-//	 *
-//	 * @param issue
-//	 */
-//	public void updateCachedIssue(TurboIssue issue) {
-//		TurboIssue tIssue = getIssueWithId(issue.getId());
-//		if (tIssue != null) {
-//			tIssue.copyValuesFrom(issue);
-//			logger.info("Updated issue: " + issue.getId());
-//		} else {
-//			issues.add(0, issue);
-//			logger.info("Added issue: " + issue.getId());
-//		}
-//	}
+	private List<TurboIssue> reconcile(List<TurboIssue> existing, List<Issue> changed) {
+		existing = new ArrayList<>(existing);
+		for (Issue issue : changed) {
+			int id = issue.getNumber();
+
+			// TODO O(n^2)
+			Optional<Integer> corresponding = findIssueWithId(existing, id);
+			if (corresponding.isPresent()) {
+				existing.set(corresponding.get(), new TurboIssue(issue));
+			} else {
+				existing.add(new TurboIssue(issue));
+			}
+		}
+		return existing;
+	}
+
+	private Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
+		int i = 0;
+		for (TurboIssue issue : existing) {
+			if (issue.getId() == id) {
+				return Optional.of(i);
+			}
+			++i;
+		}
+		return Optional.empty();
+	}
+
 
 	public static class Result {
 		public final List<TurboIssue> issues;
