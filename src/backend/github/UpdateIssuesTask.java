@@ -21,7 +21,7 @@ class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 	}
 
 	@Override
-	public void update() {
+	public void run() {
 		ImmutableTriple<List<Issue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId().generateId(),
 			model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
 		// TODO reconcile changes

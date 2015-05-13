@@ -21,7 +21,7 @@ public abstract class RepoSource {
 	protected void handleTask() {
 		try {
 			// Perform action
-			tasks.take().update();
+			tasks.take().run();
 
 			// Recurse
 			pool.execute(this::handleTask);

@@ -19,7 +19,7 @@ class UpdateModelTask extends GitHubRepoTask<Model> {
 	}
 
 	@Override
-	public void update() {
+	public void run() {
 		UpdateIssuesTask issuesTask = new UpdateIssuesTask(tasks, repo, model);
 		tasks.add(issuesTask);
 

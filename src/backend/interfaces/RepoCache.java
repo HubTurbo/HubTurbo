@@ -20,7 +20,7 @@ public abstract class RepoCache {
 
 	public void handleTask() {
 		try {
-			tasks.take().update();
+			tasks.take().run();
 			// Recurse
 			pool.execute(this::handleTask);
 		} catch (InterruptedException e) {

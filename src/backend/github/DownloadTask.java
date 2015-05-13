@@ -22,7 +22,7 @@ class DownloadTask extends GitHubRepoTask<Model> {
 	}
 
 	@Override
-	public void update() {
+	public void run() {
 		List<TurboIssue> issues = repo.getIssues(repoId).stream()
 			.map(TurboIssue::new)
 			.collect(Collectors.toList());

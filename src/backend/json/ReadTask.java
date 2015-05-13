@@ -22,7 +22,7 @@ class ReadTask extends CacheTask {
 	}
 
 	@Override
-	public void update() {
+	public void run() {
 		Model model = load(repoName);
 		response.complete(model);
 	}

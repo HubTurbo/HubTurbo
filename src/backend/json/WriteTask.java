@@ -15,7 +15,7 @@ class WriteTask extends CacheTask {
 	}
 
 	@Override
-	public void update() {
+	public void run() {
 		save(repoName, toSave);
 	}
 
