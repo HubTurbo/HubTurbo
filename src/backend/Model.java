@@ -82,7 +82,7 @@ public class Model implements IModel {
 
 	@Override
 	public List<TurboIssue> getIssues() {
-		return issues;
+		return new ArrayList<>(issues);
 	}
 
 	@Override
