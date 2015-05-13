@@ -5,37 +5,18 @@ import backend.UserCredentials;
 
 import java.util.concurrent.*;
 
-public abstract class RepoSource {
+public abstract class RepoSource implements TaskRunner {
 
-	private static final int POOL_SIZE = 2;
+	private final ExecutorService pool = Executors.newCachedThreadPool();
 
-	protected final BlockingQueue<RepoTask<?, ?>> tasks = new LinkedBlockingQueue<>();
-	private final ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
-
-	protected void activateThreads() {
-		for (int i=0; i<POOL_SIZE; i++) {
-			pool.execute(this::handleTask);
-		}
-	}
-
-	protected void handleTask() {
-		try {
-			// Perform action
-			tasks.take().run();
-
-			// Recurse
-			pool.execute(this::handleTask);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected <R, I> RepoTask<R, I> addTask(RepoTask<R, I> task) {
-		tasks.add(task);
+	@Override
+	public <R, I> RepoTask<R, I> addTask(RepoTask<R, I> task) {
+		execute(task);
 		return task;
 	}
 
-	protected void execute(Runnable r) {
+	@Override
+	public void execute(Runnable r) {
 		pool.execute(r);
 	}
 

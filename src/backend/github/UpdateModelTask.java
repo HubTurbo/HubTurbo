@@ -4,6 +4,7 @@ import backend.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoTask;
+import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 
 import java.util.concurrent.BlockingQueue;
@@ -13,15 +14,15 @@ class UpdateModelTask extends GitHubRepoTask<Model> {
 
 	private final Model model;
 
-	public UpdateModelTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, Model model) {
-		super(tasks, repo);
+	public UpdateModelTask(TaskRunner taskRunner, Repo<Issue> repo, Model model) {
+		super(taskRunner, repo);
 		this.model = model;
 	}
 
 	@Override
 	public void run() {
-		UpdateIssuesTask issuesTask = new UpdateIssuesTask(tasks, repo, model);
-		tasks.add(issuesTask);
+		UpdateIssuesTask issuesTask = new UpdateIssuesTask(taskRunner, repo, model);
+		taskRunner.execute(issuesTask);
 
 		try {
 			UpdateIssuesTask.Result issuesResult = issuesTask.response.get();

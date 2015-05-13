@@ -6,7 +6,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import org.eclipse.egit.github.core.Issue;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
 
@@ -17,18 +17,16 @@ public class GitHubSource extends RepoSource {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
 		execute(() -> response.complete(gitHub.login(credentials)));
 
-		activateThreads();
-
 		return response;
 	}
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		return addTask(new DownloadTask(tasks, gitHub, repoId)).response;
+		return addTask(new DownloadTask(this, gitHub, repoId)).response;
 	}
 
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
-		return addTask(new UpdateModelTask(tasks, gitHub, model)).response;
+		return addTask(new UpdateModelTask(this, gitHub, model)).response;
 	}
 }

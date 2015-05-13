@@ -3,7 +3,7 @@ package backend.github;
 import backend.Model;
 import backend.TurboIssue;
 import backend.interfaces.Repo;
-import backend.interfaces.RepoTask;
+import backend.interfaces.TaskRunner;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
 
@@ -11,14 +11,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
 
 class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 
 	private final Model model;
 
-	public UpdateIssuesTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, Model model) {
-		super(tasks, repo);
+	public UpdateIssuesTask(TaskRunner taskRunner, Repo<Issue> repo, Model model) {
+		super(taskRunner, repo);
 		this.model = model;
 	}
 

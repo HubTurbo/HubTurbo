@@ -5,6 +5,7 @@ import backend.TurboIssue;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoTask;
+import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 
@@ -16,8 +17,8 @@ class DownloadTask extends GitHubRepoTask<Model> {
 
 	private final String repoId;
 
-	public DownloadTask(BlockingQueue<RepoTask<?, ?>> tasks, Repo<Issue> repo, String repoId) {
-		super(tasks, repo);
+	public DownloadTask(TaskRunner taskRunner, Repo<Issue> repo, String repoId) {
+		super(taskRunner, repo);
 		this.repoId = repoId;
 	}
 
