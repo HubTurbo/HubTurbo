@@ -1,6 +1,7 @@
 package backend.json;
 
 import backend.SerializableModel;
+import backend.interfaces.CacheTask;
 import backend.interfaces.RepoCache;
 import com.google.gson.Gson;
 import util.Utility;

@@ -1,4 +1,4 @@
-package backend.json;
+package backend.interfaces;
 
 public abstract class CacheTask implements Runnable {
 	public final String repoName;

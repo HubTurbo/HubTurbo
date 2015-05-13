@@ -3,6 +3,7 @@ package backend.json;
 import backend.Model;
 import backend.SerializableModel;
 import backend.UpdateSignature;
+import backend.interfaces.CacheTask;
 import backend.interfaces.RepoCache;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

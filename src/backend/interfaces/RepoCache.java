@@ -2,7 +2,6 @@ package backend.interfaces;
 
 import backend.Model;
 import backend.SerializableModel;
-import backend.json.CacheTask;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
