@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
-class DownloadTask extends GitHubRepoTask<Model> {
+public class DownloadTask extends GitHubRepoTask<Model> {
 
 	private final String repoId;
 

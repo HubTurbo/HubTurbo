@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
+public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 
 	private final Model model;
 

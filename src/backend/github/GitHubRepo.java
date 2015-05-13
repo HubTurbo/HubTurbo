@@ -51,15 +51,15 @@ public class GitHubRepo implements Repo<Issue> {
 	public ImmutableTriple<List<Issue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
 		IssueUpdateService issueUpdateService = new IssueUpdateService(client, ETag, lastCheckTime);
 		return new ImmutableTriple<>(issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId)),
-			issueUpdateService.getUpdatedETag(),  issueUpdateService.getUpdatedCheckTime());
+			issueUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
 	}
 
 	@Override
-	public List<Issue> getIssues(String repoName) {
+	public List<Issue> getIssues(String repoId) {
 		Map<String, String> filters = new HashMap<>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
-		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoName), filters));
+		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters));
 	}
 
 	private List<Issue> getAll(PageIterator<Issue> iterator) {

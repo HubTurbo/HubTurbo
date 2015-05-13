@@ -3,14 +3,12 @@ package backend.github;
 import backend.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
-import backend.interfaces.RepoTask;
 import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 
-class UpdateModelTask extends GitHubRepoTask<Model> {
+public class UpdateModelTask extends GitHubRepoTask<Model> {
 
 	private final Model model;
 
