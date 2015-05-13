@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.io.*;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,25 @@ public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
+	public static Optional<String> readFile(String filename) {
+		try {
+			return Optional.of(new String(Files.readAllBytes(new File(filename).toPath())));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		return Optional.empty();
+	}
+
+	public static void writeFile(String fileName, String content) {
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(fileName, "UTF-8");
+			writer.println(content);
+			writer.close();
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
 
 	public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
 		CompletableFuture<Void> allDoneFuture =

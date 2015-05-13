@@ -3,6 +3,7 @@ package backend;
 import backend.interfaces.RepoCache;
 import backend.interfaces.RepoSource;
 import backend.github.GitHubSource;
+import backend.json.JSONCache;
 
 import java.util.concurrent.CompletableFuture;
 
