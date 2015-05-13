@@ -37,16 +37,9 @@ public class Logic {
 
 	public void openRepository(String repoId) {
 		repoIO.openRepository(repoId).thenAccept(newModel -> {
-			// Thread confinement
-			// TODO Would this cause problems? State wouldn't update immediately
-			// Maybe a synchronized instance method?
 			System.out.println("done getting " + repoId);
 			System.out.println(newModel.getIssues());
-			Platform.runLater(() -> {
-				models.add(newModel);
-				System.out.println(newModel);
-//				uiManager.update(newModel);
-			});
+			models.add(newModel);
 		});
 	}
 }
