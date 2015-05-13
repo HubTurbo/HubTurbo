@@ -13,6 +13,10 @@ public abstract class RepoCache {
 	private final LinkedBlockingQueue<CacheTask> tasks = new LinkedBlockingQueue<>();
 	private final ExecutorService pool = Executors.newFixedThreadPool(1);
 
+	public RepoCache() {
+		init();
+	}
+
 	public void init() {
 		pool.execute(this::handleTask);
 	}
