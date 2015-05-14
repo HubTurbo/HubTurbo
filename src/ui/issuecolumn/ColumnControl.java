@@ -1,7 +1,6 @@
 package ui.issuecolumn;
 
-import backend.ModelUpdatedEventHandler;
-import model.TurboIssue;
+import backend.assumed.ModelUpdatedEventHandler;
 import command.TurboCommandExecutor;
 import javafx.application.Platform;
 import javafx.event.EventHandler;

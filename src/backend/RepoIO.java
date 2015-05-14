@@ -4,6 +4,8 @@ import backend.interfaces.RepoCache;
 import backend.interfaces.RepoSource;
 import backend.github.GitHubSource;
 import backend.json.JSONCache;
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
 
 import java.util.concurrent.CompletableFuture;
 

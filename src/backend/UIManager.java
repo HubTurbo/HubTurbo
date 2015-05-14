@@ -1,5 +1,7 @@
 package backend;
 
+import backend.assumed.ModelUpdatedEvent;
+import backend.resource.Model;
 import javafx.application.Platform;
 import ui.UI;
 

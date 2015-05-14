@@ -1,4 +1,6 @@
-package backend;
+package backend.resource.serialization;
+
+import backend.resource.TurboUser;
 
 public class SerializableUser {
 	public final String loginName;

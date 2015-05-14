@@ -1,4 +1,4 @@
-package backend;
+package backend.resource;
 
 import backend.interfaces.IModel;
 

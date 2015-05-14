@@ -1,6 +1,6 @@
 package backend.json;
 
-import backend.SerializableModel;
+import backend.resource.serialization.SerializableModel;
 import backend.interfaces.CacheTask;
 import backend.interfaces.RepoCache;
 import com.google.gson.Gson;

@@ -1,6 +1,6 @@
 package backend.stub;
 
-import backend.Model;
+import backend.resource.Model;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;

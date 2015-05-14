@@ -1,6 +1,6 @@
 package backend.interfaces;
 
-import backend.Model;
+import backend.resource.Model;
 import backend.UserCredentials;
 
 import java.util.concurrent.*;

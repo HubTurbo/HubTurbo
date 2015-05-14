@@ -1,4 +1,6 @@
-package backend;
+package backend.resource.serialization;
+
+import backend.resource.TurboIssue;
 
 import java.time.LocalDateTime;
 import java.util.List;

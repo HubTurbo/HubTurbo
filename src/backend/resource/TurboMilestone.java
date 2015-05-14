@@ -1,4 +1,4 @@
-package backend;
+package backend.resource;
 
 import org.eclipse.egit.github.core.Milestone;
 import util.Utility;

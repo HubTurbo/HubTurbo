@@ -1,7 +1,7 @@
 package backend.github;
 
-import backend.Model;
-import backend.TurboIssue;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.apache.commons.lang3.tuple.ImmutableTriple;

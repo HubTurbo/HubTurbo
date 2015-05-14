@@ -1,4 +1,6 @@
-package backend;
+package backend.resource.serialization;
+
+import backend.resource.TurboLabel;
 
 public class SerializableLabel {
 

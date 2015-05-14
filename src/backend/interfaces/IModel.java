@@ -1,6 +1,6 @@
 package backend.interfaces;
 
-import backend.TurboIssue;
+import backend.resource.TurboIssue;
 
 import java.util.List;
 

@@ -1,16 +1,14 @@
 package backend.github;
 
-import backend.Model;
-import backend.TurboIssue;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
-import backend.interfaces.RepoTask;
 import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
 public class DownloadTask extends GitHubRepoTask<Model> {

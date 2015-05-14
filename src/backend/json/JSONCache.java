@@ -1,7 +1,7 @@
 package backend.json;
 
-import backend.Model;
-import backend.SerializableModel;
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
 import backend.interfaces.RepoCache;
 
 import java.io.File;

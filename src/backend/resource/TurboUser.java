@@ -1,4 +1,4 @@
-package backend;
+package backend.resource;
 
 import javafx.scene.image.Image;
 import org.eclipse.egit.github.core.User;

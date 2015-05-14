@@ -1,4 +1,6 @@
-package backend;
+package backend.resource.serialization;
+
+import backend.resource.TurboMilestone;
 
 import java.time.LocalDate;
 

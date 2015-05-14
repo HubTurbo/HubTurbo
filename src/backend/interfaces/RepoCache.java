@@ -1,12 +1,11 @@
 package backend.interfaces;
 
-import backend.Model;
-import backend.SerializableModel;
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class RepoCache {
 

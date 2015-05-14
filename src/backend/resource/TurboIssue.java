@@ -1,5 +1,6 @@
-package backend;
+package backend.resource;
 
+import backend.resource.serialization.SerializableIssue;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import util.Utility;

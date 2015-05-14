@@ -1,11 +1,8 @@
 package backend;
 
-import javafx.application.Platform;
+import backend.resource.MultiModel;
 import util.Utility;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class Logic {

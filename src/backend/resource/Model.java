@@ -1,6 +1,8 @@
-package backend;
+package backend.resource;
 
+import backend.UpdateSignature;
 import backend.interfaces.IModel;
+import backend.resource.serialization.SerializableModel;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 

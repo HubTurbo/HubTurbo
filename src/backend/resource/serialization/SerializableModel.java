@@ -1,4 +1,7 @@
-package backend;
+package backend.resource.serialization;
+
+import backend.resource.Model;
+import backend.UpdateSignature;
 
 import java.util.List;
 import java.util.stream.Collectors;

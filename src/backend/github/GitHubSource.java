@@ -1,6 +1,6 @@
 package backend.github;
 
-import backend.Model;
+import backend.resource.Model;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
