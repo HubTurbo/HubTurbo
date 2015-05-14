@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 
 import ui.UI;
+import ui.components.HTStatusBar;
 
 
 public class UpdatedIssueMetadata {
@@ -23,7 +24,9 @@ public class UpdatedIssueMetadata {
 
 	public void download() {
 		downloadComments();
+		HTStatusBar.addProgressAndDisplayMessage(ModelUpdate.PROGRESS_INTERVAL, "Updating events...");
 		downloadEvents();
+		HTStatusBar.addProgress(ModelUpdate.PROGRESS_INTERVAL);
 	}
 
 	public void downloadEvents() {

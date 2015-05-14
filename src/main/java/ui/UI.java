@@ -41,7 +41,6 @@ import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
-import util.events.LoginEvent;
 import browserview.BrowserComponent;
 
 import com.google.common.eventbus.EventBus;
@@ -51,8 +50,8 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 public class UI extends Application implements EventDispatcher {
 
 	private static final int VERSION_MAJOR = 2;
-	private static final int VERSION_MINOR = 4;
-	private static final int VERSION_PATCH = 1;
+	private static final int VERSION_MINOR = 6;
+	private static final int VERSION_PATCH = 0;
 
 	public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -105,10 +104,10 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector = createRepoSelector();
 
 		browserComponent = new BrowserComponent(this);
-		browserComponent.initialise();
 		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
+//		stage.setAlwaysOnTop(true);
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
 		loadFonts();
@@ -131,13 +130,10 @@ public class UI extends Application implements EventDispatcher {
 			if (success) {
 				setExpandedWidth(false);
 				columns.loadIssues();
-				triggerEvent(new LoginEvent());
 				repoSelector.setDisable(false);
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
-				if(columns.getCurrentlySelectedColumn().isPresent()) {
-					getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-				}
+				ensureSelectedPanelHasFocus();
 			} else {
 				quit();
 			}
@@ -466,6 +462,7 @@ public class UI extends Application implements EventDispatcher {
 		task.setOnSucceeded(wse -> {
 			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 			logger.info("Repository " + repoString + " successfully switched to!");
+			ensureSelectedPanelHasFocus();
 		});
 
 		task.setOnFailed(wse -> {
@@ -473,6 +470,13 @@ public class UI extends Application implements EventDispatcher {
 			logger.error(err.getLocalizedMessage(), err);
 			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
 		});
+	}
+
+	private void ensureSelectedPanelHasFocus() {
+		if(columns.getCurrentlySelectedColumn().isPresent()) {
+			getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+			columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
+		}
 	}
 
 	public MenuControl getMenuControl() {
@@ -499,5 +503,18 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);
+	}
+
+	public void minimizeWindow() {
+		mainStage.setIconified(true);
+		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+	}
+
+	public Stage getMainStage() {
+		return mainStage;
+	}
+
+	public HWND getMainWindowHandle() {
+		return mainWindowHandle;
 	}
 }

@@ -100,11 +100,12 @@ public class FilterTextField extends TextField {
 		});
 		
 		setOnKeyReleased(e -> {
+			e.consume();
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
 				if(getText().equals(previousText)) {
-					getParent().requestFocus();
+					getParent().getParent().requestFocus();
 				} else {
 					revertEdit();
 					selectAll();

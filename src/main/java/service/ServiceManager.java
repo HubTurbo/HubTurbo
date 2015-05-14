@@ -1,41 +1,29 @@
 package service;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.BiConsumer;
-
 import javafx.application.Platform;
 import model.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.*;
-import org.eclipse.egit.github.core.service.CollaboratorService;
-import org.eclipse.egit.github.core.service.ContentsService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.MarkdownService;
-import org.eclipse.egit.github.core.service.MilestoneService;
+import org.eclipse.egit.github.core.service.*;
 import org.markdown4j.Markdown4jProcessor;
-
+import org.ocpsoft.prettytime.PrettyTime;
 import storage.CacheFileHandler;
 import storage.CachedRepoData;
 import ui.UI;
 import ui.components.HTStatusBar;
 import util.PlatformEx;
 import util.Utility;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 /**
  * Singleton class that provides access to the GitHub API services required by
@@ -88,8 +76,7 @@ public class ServiceManager {
 
 	// Model updates
 
-	private ModelUpdater modelUpdater;
-	private UpdatedIssueMetadata updatedIssueMetadata = new UpdatedIssueMetadata(this);
+	private ModelUpdate modelUpdate;
 	protected Model model;
 	protected RepositoryId repoId;
 
@@ -257,12 +244,12 @@ public class ServiceManager {
 		}
 	}
 
-	public int getRemainingRequests() {
-		return githubClient.getRemainingRequests();
+	public String getRemainingRequestsDesc() {
+		return githubClient.getRemainingRequests() + "/" + githubClient.getRequestLimit();
 	}
 
-	public int getRequestLimit() {
-		return githubClient.getRequestLimit();
+	public boolean hasRemainingRequests() {
+		return githubClient.getRequestLimit() > 0;
 	}
 
 	/**
@@ -408,7 +395,12 @@ public class ServiceManager {
 	 */
 	private void preventRepoSwitchingAndUpdateModel(String repoId) {
 
-		modelUpdater = new ModelUpdater(githubClient, model, updateSignature);
+		if (!hasRemainingRequests()) {
+			handleNoMoreRequests();
+			return;
+		}
+
+		modelUpdate = new ModelUpdate(this, githubClient, model, updateSignature);
 
 		// Disable repository selection
 		PlatformEx.runAndWait(() -> {
@@ -417,23 +409,34 @@ public class ServiceManager {
 
 		// Wait for the update to complete
 
-		if (modelUpdater.updateModel(repoId)) {
-			updateSignature = modelUpdater.getNewUpdateSignature();
+		if (modelUpdate.updateModel(repoId)) {
+			updateSignature = modelUpdate.getNewUpdateSignature();
 			model.updateCache(updateSignature);
-
-			updatedIssueMetadata.download();
 			model.triggerModelChangeEvent();
 		} else {
 			logger.warn("Model update stopped due to repository changing halfway -- likely concurrency problem!");
 		}
 
 		// Reset progress UI
+		HTStatusBar.displayMessage("Sync complete! " + getRemainingRequestsDesc());
 		HTStatusBar.updateProgress(0);
 
 		// Enable repository switching
 		Platform.runLater(() -> {
 			UI.getInstance().enableRepositorySwitching();
 		});
+	}
+
+	private void handleNoMoreRequests() {
+		Optional<LocalDateTime> resetTime = githubClient.getRateLimitResetTime();
+		if (resetTime.isPresent()) {
+			String prettyTime = new PrettyTime().format(Utility.localDateTimeToDate(resetTime.get()));
+			HTStatusBar.displayMessage("No requests remaining! More " + prettyTime);
+			logger.info("No remaining requests -- more reset at " + resetTime + ", " + prettyTime);
+		} else {
+			HTStatusBar.displayMessage("No requests remaining!");
+			logger.info("No remaining requests -- reset time unknown");
+		}
 	}
 
 	/**
@@ -593,7 +596,9 @@ public class ServiceManager {
 
 	private List<Issue> getAll(PageIterator<Issue> iterator, BiConsumer<String, Float> taskUpdate) throws IOException {
 		List<Issue> elements = new ArrayList<>();
-		int totalIssueCount;
+
+		// Assume there is at least one page
+		int knownLastPage = 1;
 
 		try {
 			while (iterator.hasNext()) {
@@ -602,13 +607,18 @@ public class ServiceManager {
 
 				// Compute progress
 
-				// Total is only available after iterator.next() is called at least once.
-				// Even then it's approximate: always >= the actual amount.
-				totalIssueCount = iterator.getLastPage() * PagedRequest.PAGE_SIZE;
+				// iterator.getLastPage() only has a value after iterator.next() is called,
+				// so it's used directly in this loop. It returns the 1-based index of the last
+				// page, except when we are actually on the last page, in which case it returns -1.
+				// This portion deals with all these quirks.
+
+				knownLastPage = Math.max(knownLastPage, iterator.getLastPage());
+				int totalIssueCount = knownLastPage * PagedRequest.PAGE_SIZE;
+				// Total is approximate: always >= the actual amount
 				assert totalIssueCount >= elements.size();
 
 				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
-
+				logger.info(String.format("Loaded %d issues (%.2f%% done)", elements.size(), progress * 100));
 				taskUpdate.accept("Loaded " + elements.size() + " issues...", progress);
 			}
 		} catch (NoSuchPageException pageException) {

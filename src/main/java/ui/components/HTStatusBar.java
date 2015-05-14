@@ -50,6 +50,14 @@ public class HTStatusBar extends StatusBar {
 		});
 	}
 
+	public static void addProgressAndDisplayMessage(double increment, String message) {
+		double progress = Math.min(Math.max(0, getInstance().getProgress() + increment), 1);
+		Platform.runLater(() -> {
+			getInstance().setText(message);
+			getInstance().setProgress(progress);
+		});
+	}
+
 	public static void updateProgress(double progress) {
 		Platform.runLater(() -> {
 			getInstance().setProgress(progress);
