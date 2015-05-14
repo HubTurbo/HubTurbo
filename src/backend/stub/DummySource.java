@@ -13,6 +13,11 @@ public class DummySource extends RepoSource {
 	private final Repo<Issue> dummy = new DummyRepo();
 
 	@Override
+	public String getName() {
+		return "Dummy Repository";
+	}
+
+	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
 		execute(() -> response.complete(dummy.login(credentials)));

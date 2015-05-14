@@ -13,8 +13,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class RepoIO {
 
-	private static final Logger logger = LogManager.getLogger(RepoIO.class.getName());
-
 	private final RepoSource repoSource = new GitHubSource();
 	private final RepoCache repoCache = new JSONCache();
 
@@ -24,10 +22,8 @@ public class RepoIO {
 
 	public CompletableFuture<Model> openRepository(String repoId) {
 		if (repoCache.isRepoCached(repoId)) {
-			logger.info("Loading " + repoId + " from cache");
 			return repoCache.loadRepository(repoId);
 		} else {
-			logger.info("Loading " + repoId + " from " + repoSource.getName());
 			return repoSource.downloadRepository(repoId).thenApply(model -> {
 				repoCache.saveRepository(repoId, new SerializableModel(model));
 				return model;

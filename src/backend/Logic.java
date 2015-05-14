@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Utility;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class Logic {
@@ -26,10 +27,10 @@ public class Logic {
 //		this.uiManager = uiManager;
 	}
 
-	public void login(String username, String password) {
+	public CompletableFuture<Boolean> login(String username, String password) {
 		logger.info("Logging in as " + username);
 		credentials = new UserCredentials(username, password);
-		repoIO.login(credentials);
+		return repoIO.login(credentials);
 	}
 
 	public void refresh() {
@@ -41,11 +42,8 @@ public class Logic {
 	}
 
 	public void openRepository(String repoId) {
-		logger.info("Opening repository " + repoId);
-		repoIO.openRepository(repoId).thenAccept(newModel -> {
-			logger.info("Got " + newModel.getIssues().size() + " issues from " + repoId);
-			models.add(newModel);
-		});
+		logger.info("Opening " + repoId);
+		repoIO.openRepository(repoId).thenAccept(models::add);
 	}
 }
 

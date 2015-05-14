@@ -4,11 +4,15 @@ import backend.resource.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 
 import java.util.concurrent.ExecutionException;
 
 public class UpdateModelTask extends GitHubRepoTask<Model> {
+
+	private static final Logger logger = LogManager.getLogger(UpdateModelTask.class.getName());
 
 	private final Model model;
 
@@ -28,9 +32,10 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 			UpdateSignature newSignature =
 				new UpdateSignature(issuesResult.ETag, null, null, null, issuesResult.lastCheckTime);
 			Model result = new Model(model.getRepoId(), newSignature).withIssues(issuesResult.issues);
+			logger.info("Updated model with " + result.summarise());
 			response.complete(result);
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 }

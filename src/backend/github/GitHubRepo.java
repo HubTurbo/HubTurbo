@@ -19,13 +19,9 @@ import java.util.*;
 public class GitHubRepo implements Repo<Issue> {
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
-	//	private final ExecutorService pool = Executors.newFixedThreadPool(1);
 	private final IssueService issueService = new IssueService();
-//	private final IssueUpdateService issueUpdateService = new IssueUpdateService();
 
 	public GitHubRepo() {
-//		pool.execute(this::login);
-//		login();
 	}
 
 	@Override
@@ -39,12 +35,9 @@ public class GitHubRepo implements Repo<Issue> {
 			client.get(request);
 		} catch (IOException e) {
 			// Login failed
-			e.printStackTrace();
 			return false;
 		}
 		return true;
-//		UI.instance.log("logged in");
-//		UI.instance.events.post(new LoginEvent());
 	}
 
 	@Override
@@ -95,3 +88,4 @@ public class GitHubRepo implements Repo<Issue> {
 		return elements;
 	}
 }
+

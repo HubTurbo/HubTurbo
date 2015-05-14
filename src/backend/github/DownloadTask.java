@@ -5,6 +5,8 @@ import backend.resource.TurboIssue;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DownloadTask extends GitHubRepoTask<Model> {
+
+	private static final Logger logger = LogManager.getLogger(DownloadTask.class.getName());
 
 	private final String repoId;
 
@@ -25,7 +29,9 @@ public class DownloadTask extends GitHubRepoTask<Model> {
 		List<TurboIssue> issues = repo.getIssues(repoId).stream()
 			.map(TurboIssue::new)
 			.collect(Collectors.toList());
+		// TODO construct Model with other resources
 		Model result = new Model(RepositoryId.createFromId(repoId), issues, UpdateSignature.empty);
+		logger.info("Downloaded " + result.summarise());
 		response.complete(result);
 	}
 }

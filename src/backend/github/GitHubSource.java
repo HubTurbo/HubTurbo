@@ -4,11 +4,16 @@ import backend.resource.Model;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
+
+	private static final Logger logger = LogManager.getLogger(GitHubSource.class.getName());
 
 	private final Repo<Issue> gitHub = new GitHubRepo();
 
@@ -20,7 +25,13 @@ public class GitHubSource extends RepoSource {
 	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
-		execute(() -> response.complete(gitHub.login(credentials)));
+		execute(() -> {
+			boolean success = gitHub.login(credentials);
+			logger.info(String.format("%s to %s as %s",
+				success ? "Logged in" : "Failed to log in",
+				getName(), credentials.username));
+			response.complete(success);
+		});
 
 		return response;
 	}

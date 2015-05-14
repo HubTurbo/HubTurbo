@@ -33,7 +33,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 		// Reconcile changes
 		List<TurboIssue> existing = model.getIssues();
 		List<Issue> changed = changes.left;
-		logger.info(changed.size() + " issues changed: " + changed);
+		logger.info(changed.size() + " issues changed" + (changed.size() == 0 ? "" : ": " + changed));
 		List<TurboIssue> updated = reconcile(existing, changed);
 
 		response.complete(new Result(updated, changes.middle, changes.right));
@@ -44,7 +44,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 		for (Issue issue : changed) {
 			int id = issue.getNumber();
 
-			// TODO O(n^2)
+			// TODO O(n^2), fix by preprocessing and copying into a map
 			Optional<Integer> corresponding = findIssueWithId(existing, id);
 			if (corresponding.isPresent()) {
 				existing.set(corresponding.get(), new TurboIssue(issue));
