@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,8 @@ public class DownloadTask extends GitHubRepoTask<Model> {
 		List<TurboIssue> issues = repo.getIssues(repoId).stream()
 			.map(TurboIssue::new)
 			.collect(Collectors.toList());
-		// TODO construct Model with other resources
-		Model result = new Model(RepositoryId.createFromId(repoId), issues, UpdateSignature.empty);
+		Model result = new Model(RepositoryId.createFromId(repoId), issues,
+			new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), UpdateSignature.empty);
 		logger.info("Downloaded " + result.summarise());
 		response.complete(result);
 	}

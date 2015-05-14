@@ -40,5 +40,26 @@ public class MultiModel implements IModel {
 		models.values().forEach(m -> result.addAll(m.getIssues()));
 		return result;
 	}
+
+	@Override
+	public synchronized List<TurboLabel> getLabels() {
+		List<TurboLabel> result = new ArrayList<>();
+		models.values().forEach(m -> result.addAll(m.getLabels()));
+		return result;
+	}
+
+	@Override
+	public synchronized List<TurboMilestone> getMilestones() {
+		List<TurboMilestone> result = new ArrayList<>();
+		models.values().forEach(m -> result.addAll(m.getMilestones()));
+		return result;
+	}
+
+	@Override
+	public synchronized List<TurboUser> getUsers() {
+		List<TurboUser> result = new ArrayList<>();
+		models.values().forEach(m -> result.addAll(m.getUsers()));
+		return result;
+	}
 }
 

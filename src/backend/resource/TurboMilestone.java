@@ -1,5 +1,6 @@
 package backend.resource;
 
+import backend.resource.serialization.SerializableMilestone;
 import org.eclipse.egit.github.core.Milestone;
 import util.Utility;
 
@@ -47,6 +48,16 @@ public class TurboMilestone {
 		this.isOpen = milestone.getState().equals(STATE_OPEN);
 		this.openIssues = milestone.getOpenIssues();
 		this.closedIssues = milestone.getClosedIssues();
+	}
+
+	public TurboMilestone(SerializableMilestone milestone) {
+		this.id = milestone.id;
+		this.title = milestone.title;
+		this.dueDate = milestone.dueDate;
+		this.description = milestone.description;
+		this.isOpen = milestone.isOpen;
+		this.openIssues = milestone.openIssues;
+		this.closedIssues = milestone.closedIssues;
 	}
 
 	private void ______METHODS______() {

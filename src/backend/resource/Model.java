@@ -15,24 +15,38 @@ public class Model implements IModel {
 	private final UpdateSignature updateSignature;
 	private final IRepositoryIdProvider repoId;
 	private final List<TurboIssue> issues;
+	private final List<TurboLabel> labels;
+	private final List<TurboMilestone> milestones;
+	private final List<TurboUser> users;
 
 	/**
 	 * Standard constructor
 	 */
-	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues, UpdateSignature updateSignature) {
+	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues,
+		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
+		UpdateSignature updateSignature) {
+
 		this.updateSignature = updateSignature;
 		this.repoId = repoId;
 		this.issues = issues;
+		this.labels = labels;
+		this.milestones = milestones;
+		this.users = users;
 	}
 
 	/**
 	 * Standard constructor with empty update signature -- for use when
 	 * a model is first downloaded
 	 */
-	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues) {
+	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues,
+		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
+
 		this.updateSignature = UpdateSignature.empty;
 		this.repoId = repoId;
 		this.issues = issues;
+		this.labels = labels;
+		this.milestones = milestones;
+		this.users = users;
 	}
 
 	/**
@@ -42,17 +56,9 @@ public class Model implements IModel {
 		this.updateSignature = updateSignature;
 		this.repoId = repoId;
 		this.issues = new ArrayList<>();
-	}
-
-	/**
-	 * Means of translating to SerializableModel
-	 */
-	public Model(SerializableModel model) {
-		this.updateSignature = model.updateSignature;
-		this.repoId = RepositoryId.createFromId(model.repoId);
-		this.issues = model.issues.stream()
-			.map(TurboIssue::new)
-			.collect(Collectors.toList());
+		this.labels = new ArrayList<>();
+		this.milestones = new ArrayList<>();
+		this.users = new ArrayList<>();
 	}
 
 	/**
@@ -62,6 +68,26 @@ public class Model implements IModel {
 		this.updateSignature = model.updateSignature;
 		this.repoId = model.getRepoId();
 		this.issues = new ArrayList<>(model.getIssues());
+		this.labels = new ArrayList<>(model.getLabels());
+		this.milestones = new ArrayList<>(model.getMilestones());
+		this.users = new ArrayList<>(model.getUsers());
+	}
+
+	public Model(SerializableModel model) {
+		this.updateSignature = model.updateSignature;
+		this.repoId = RepositoryId.createFromId(model.repoId);
+		this.issues = model.issues.stream()
+			.map(TurboIssue::new)
+			.collect(Collectors.toList());
+		this.labels = model.labels.stream()
+			.map(TurboLabel::new)
+			.collect(Collectors.toList());
+		this.milestones = model.milestones.stream()
+			.map(TurboMilestone::new)
+			.collect(Collectors.toList());
+		this.users = model.users.stream()
+			.map(TurboUser::new)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -85,6 +111,21 @@ public class Model implements IModel {
 	@Override
 	public List<TurboIssue> getIssues() {
 		return new ArrayList<>(issues);
+	}
+
+	@Override
+	public List<TurboLabel> getLabels() {
+		return new ArrayList<>(labels);
+	}
+
+	@Override
+	public List<TurboMilestone> getMilestones() {
+		return new ArrayList<>(milestones);
+	}
+
+	@Override
+	public List<TurboUser> getUsers() {
+		return new ArrayList<>(users);
 	}
 
 	@Override

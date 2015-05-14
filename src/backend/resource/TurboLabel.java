@@ -1,6 +1,7 @@
 package backend.resource;
 
 
+import backend.resource.serialization.SerializableLabel;
 import org.eclipse.egit.github.core.Label;
 
 @SuppressWarnings("unused")
@@ -38,6 +39,12 @@ public class TurboLabel {
 		this.exclusive = true;
 		this.actualName = label.getName();
 		this.colour = label.getColor();
+	}
+
+	public TurboLabel(SerializableLabel label) {
+		this.exclusive = label.exclusive;
+		this.actualName = label.actualName;
+		this.colour = label.colour;
 	}
 
 	private void ______METHODS______() {
