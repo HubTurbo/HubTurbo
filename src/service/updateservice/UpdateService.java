@@ -85,7 +85,9 @@ public class UpdateService<T> extends GitHubService{
 
 		ArrayList<T> result = new ArrayList<>();
 
-		logger.info(String.format("Starting update of %s with ETag %s", apiSuffix, lastETag));
+		String resourceDesc = repoId.generateId() + apiSuffix;
+
+		logger.info(String.format("Updating %s with ETag %s", resourceDesc, lastETag));
 		try {
 
 			PagedRequest<T> request = createUpdatedRequest(repoId);
@@ -100,13 +102,13 @@ public class UpdateService<T> extends GitHubService{
 				// The assumption is that updates are cheap and we can do them as frequently as needed.
 
 			} else {
-				logger.info("UpdateService response: " + responseCode);
+				logger.info(String.format("%s: %d", resourceDesc, responseCode));
 				if(responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
 					logger.info("Nothing to update");
 				} else {
-					result = new ArrayList<>(getPagedItems(new PageIterator<>(request, client)));
+					result = new ArrayList<>(getPagedItems(resourceDesc, new PageIterator<>(request, client)));
 					updatedETag = Optional.of(Utility.stripQuotes(connection.getHeaderField("ETag")));
-					logger.info(String.format("New ETag for resource %s: %s", apiSuffix, updatedETag));
+					logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETag));
 				}
 			}
 
@@ -127,8 +129,7 @@ public class UpdateService<T> extends GitHubService{
 	 * @return a list of items
 	 * @throws IOException
 	 */
-	private List<T> getPagedItems(PageIterator<T> iterator) throws IOException {
-		logger.info("Getting paged items from " + apiSuffix + ": " + (iterator.getLastPage()+1) + " pages");
+	private List<T> getPagedItems(String resourceDesc, PageIterator<T> iterator) throws IOException {
 		List<T> elements = new ArrayList<>();
 		int length = 0;
 		int page = 0;
@@ -137,7 +138,7 @@ public class UpdateService<T> extends GitHubService{
 				elements.addAll(iterator.next());
 				int diff = elements.size() - length;
 				length = elements.size();
-				logger.info("Page " + page++ + ": " + diff + " items");
+				logger.info(resourceDesc + " | " + (page++) + ": " + diff + " items");
 			}
 		} catch (NoSuchPageException pageException) {
 			throw pageException.getCause();

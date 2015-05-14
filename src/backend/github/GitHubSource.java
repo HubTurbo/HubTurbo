@@ -13,6 +13,11 @@ public class GitHubSource extends RepoSource {
 	private final Repo<Issue> gitHub = new GitHubRepo();
 
 	@Override
+	public String getName() {
+		return "GitHub";
+	}
+
+	@Override
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		CompletableFuture<Boolean> response = new CompletableFuture<>();
 		execute(() -> response.complete(gitHub.login(credentials)));

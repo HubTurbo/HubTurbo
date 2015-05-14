@@ -20,6 +20,7 @@ public abstract class RepoSource implements TaskRunner {
 		pool.execute(r);
 	}
 
+	public abstract String getName();
 	public abstract CompletableFuture<Boolean> login(UserCredentials credentials);
 	public abstract CompletableFuture<Model> downloadRepository(String repoId);
 	public abstract CompletableFuture<Model> updateModel(Model model);

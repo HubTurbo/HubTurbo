@@ -5,6 +5,8 @@ import backend.resource.TurboIssue;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
+
+	private static final Logger logger = LogManager.getLogger(UpdateIssuesTask.class.getName());
 
 	private final Model model;
 
@@ -28,11 +32,9 @@ public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 
 		// Reconcile changes
 		List<TurboIssue> existing = model.getIssues();
-		System.out.println("existing " + existing);
 		List<Issue> changed = changes.left;
-		System.out.println("changed " + changed);
+		logger.info(changed.size() + " issues changed: " + changed);
 		List<TurboIssue> updated = reconcile(existing, changed);
-		System.out.println("updated " + updated);
 
 		response.complete(new Result(updated, changes.middle, changes.right));
 	}
