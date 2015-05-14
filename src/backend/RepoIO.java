@@ -20,7 +20,7 @@ public class RepoIO {
 
 	public CompletableFuture<Model> openRepository(String repoId) {
 		if (repoCache.isRepoCached(repoId)) {
-			return repoCache.loadRepository(repoId);
+			return repoCache.loadRepository(repoId).thenCompose(this::updateModel);
 		} else {
 			return repoSource.downloadRepository(repoId).thenApply(model -> {
 				repoCache.saveRepository(repoId, new SerializableModel(model));
