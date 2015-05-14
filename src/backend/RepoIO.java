@@ -1,13 +1,11 @@
 package backend;
 
+import backend.github.GitHubSource;
 import backend.interfaces.RepoCache;
 import backend.interfaces.RepoSource;
-import backend.github.GitHubSource;
 import backend.json.JSONCache;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -32,6 +30,9 @@ public class RepoIO {
 	}
 
 	public CompletableFuture<Model> updateModel(Model model) {
-		return repoSource.updateModel(model);
+		return repoSource.updateModel(model).thenApply(newModel -> {
+			repoCache.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
+			return model;
+		});
 	}
 }
