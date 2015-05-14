@@ -1,36 +1,258 @@
 package backend;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import util.Utility;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * The guidelines in this class apply to all TurboResources.
+ */
+@SuppressWarnings("unused")
 public class TurboIssue {
-	private String title;
-	private final int id;
 
+	public static final String STATE_CLOSED = "closed";
+	public static final String STATE_OPEN = "open";
+
+	/**
+	 * Must have reasonable, NON-NULL defaults.
+	 * Should be primitive types, or at least easily-serializable ones.
+	 * Should be specified in order.
+	 * Should be immutable as much as possible.
+	 */
+	private void ______SERIALIZED_FIELDS______() {
+	}
+
+	// Immutable
+	private final int id;
+	private final String creator;
+	private final LocalDateTime createdAt;
+	private final boolean isPullRequest;
+
+
+	// Mutable
+	private String title;
+	private String description;
+	private LocalDateTime updatedAt;
+	private int commentCount;
+	private boolean isOpen;
+	private Optional<String> assignee;
+	private List<String> labels;
+	private Optional<Integer> milestone;
+
+	/**
+	 * Metadata associated with issues that is not serialized.
+	 */
+	private void ______TRANSIENT_FIELDS______() {
+	}
+
+	// TODO Model
+	// TODO Issue metadata: comments, events
+
+	private void ______CONSTRUCTORS______() {
+	}
+
+	/**
+	 * Default constructor: provides reasonable defaults for things
+	 */
 	public TurboIssue(int id, String title) {
 		this.id = id;
+		this.creator = "";
+		this.createdAt = LocalDateTime.now();
+		this.isPullRequest = false;
+
+		mutableFieldDefaults();
+
+		this.title = title;
+	}
+
+	/**
+	 * Immutable-conscious constructor
+	 */
+	public TurboIssue(int id, String title, String creator, LocalDateTime createdAt, boolean isPullRequest) {
+		this.id = id;
+		this.creator = creator;
+		this.createdAt = createdAt;
+		this.isPullRequest = isPullRequest;
+
+		mutableFieldDefaults();
+
 		this.title = title;
 	}
 
 	public TurboIssue(Issue issue) {
 		this.id = issue.getNumber();
 		this.title = issue.getTitle();
+		this.creator = issue.getUser().getLogin();
+		this.createdAt = Utility.dateToLocalDateTime(issue.getCreatedAt());
+		this.isPullRequest = isPullRequest(issue);
+
+		this.description = issue.getBody();
+		this.updatedAt = Utility.dateToLocalDateTime(issue.getUpdatedAt());
+		this.commentCount = issue.getComments();
+		this.isOpen = issue.getState().equals(STATE_OPEN);
+		this.assignee = issue.getAssignee() == null
+			? Optional.empty()
+			: Optional.of(issue.getAssignee().getLogin());
+		this.labels = issue.getLabels().stream()
+			.map(Label::getName)
+			.collect(Collectors.toList());
+		this.milestone = issue.getMilestone() == null
+			? Optional.empty()
+			: Optional.of(issue.getMilestone().getNumber());
 	}
 
 	public TurboIssue(SerializableIssue issue) {
-		this.title = issue.title;
 		this.id = issue.id;
+		this.creator = issue.creator;
+		this.createdAt = issue.createdAt;
+		this.isPullRequest = issue.isPullRequest;
+
+		this.title = issue.title;
+		this.description = issue.description;
+		this.updatedAt = issue.updatedAt;
+		this.commentCount = issue.commentCount;
+		this.isOpen = issue.isOpen;
+		this.assignee = issue.assignee;
+		this.labels = issue.labels;
+		this.milestone = issue.milestone;
 	}
 
-	public int getId() {
-		return id;
+	private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
 	}
 
-	public String getTitle() {
-		return title;
+	private static boolean isPullRequest(Issue issue) {
+		return issue.getPullRequest() != null && issue.getPullRequest().getUrl() != null;
+	}
+
+	private void mutableFieldDefaults() {
+		this.title = "";
+		this.description = "";
+		this.updatedAt = LocalDateTime.now();
+		this.commentCount = 0;
+		this.isOpen = true;
+		this.assignee = Optional.empty();
+		this.labels = new ArrayList<>();
+		this.milestone = Optional.empty();
+	}
+
+	/**
+	 * Conceptually, operations on issues. They should only modify non-serialized fields.
+	 */
+	private void ______METHODS______() {
 	}
 
 	@Override
 	public String toString() {
 		return "#" + id + " " + title;
+	}
+
+	private void ______BOILERPLATE______() {
+	}
+
+	public int getId() {
+		return id;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public boolean isPullRequest() {
+		return isPullRequest;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+	public int getCommentCount() {
+		return commentCount;
+	}
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+	public boolean isOpen() {
+		return isOpen;
+	}
+	public void setOpen(boolean isOpen) {
+		this.isOpen = isOpen;
+	}
+	public Optional<String> getAssignee() {
+		return assignee;
+	}
+	public void setAssignee(Optional<String> assignee) {
+		this.assignee = assignee;
+	}
+	public List<String> getLabels() {
+		return labels;
+	}
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
+	}
+	public Optional<Integer> getMilestone() {
+		return milestone;
+	}
+	public void setMilestone(Optional<Integer> milestone) {
+		this.milestone = milestone;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TurboIssue issue = (TurboIssue) o;
+
+		if (commentCount != issue.commentCount) return false;
+		if (id != issue.id) return false;
+		if (isOpen != issue.isOpen) return false;
+		if (isPullRequest != issue.isPullRequest) return false;
+		if (assignee != null ? !assignee.equals(issue.assignee) : issue.assignee != null) return false;
+		if (createdAt != null ? !createdAt.equals(issue.createdAt) : issue.createdAt != null) return false;
+		if (creator != null ? !creator.equals(issue.creator) : issue.creator != null) return false;
+		if (description != null ? !description.equals(issue.description) : issue.description != null) return false;
+		if (labels != null ? !labels.equals(issue.labels) : issue.labels != null) return false;
+		if (milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) return false;
+		if (title != null ? !title.equals(issue.title) : issue.title != null) return false;
+		if (updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id;
+		result = 31 * result + (creator != null ? creator.hashCode() : 0);
+		result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
+		result = 31 * result + (isPullRequest ? 1 : 0);
+		result = 31 * result + (title != null ? title.hashCode() : 0);
+		result = 31 * result + (description != null ? description.hashCode() : 0);
+		result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);
+		result = 31 * result + commentCount;
+		result = 31 * result + (isOpen ? 1 : 0);
+		result = 31 * result + (assignee != null ? assignee.hashCode() : 0);
+		result = 31 * result + (labels != null ? labels.hashCode() : 0);
+		result = 31 * result + (milestone != null ? milestone.hashCode() : 0);
+		return result;
 	}
 }
