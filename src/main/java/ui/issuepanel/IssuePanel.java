@@ -33,7 +33,10 @@ public class IssuePanel extends IssueColumn {
 	private NavigableListView<TurboIssue> listView;
 	private final KeyCombination keyCombBoxToList = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination keyCombListToBox = new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();;
+	private final KeyCombination maximizeWindow = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination minimizeWindow = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
@@ -141,31 +144,31 @@ public class IssuePanel extends IssueColumn {
 				    event.consume();
 					listView.selectFirstItem();
 				}
+				if (maximizeWindow.match(event)) {
+					ui.maximizeWindow();
+				}
+				if (minimizeWindow.match(event)) {
+					ui.minimizeWindow();
+				}
+				if (defaultSizeWindow.match(event)) {
+					ui.setDefaultWidth();
+				}
 			}
 		});
-		listView.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+
+		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if(event.getCode() == KeyCode.C) {
-					ui.getBrowserComponent().jumpToComment();
+				if (event.getCode() == KeyCode.F5) {
+					ServiceManager.getInstance().updateModelNow();
 				}
-				if(event.getCode() == KeyCode.L) {
-					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().newLabel();
-					}
-					else {
-						ui.getBrowserComponent().manageLabels(event.getCode().toString());
-					}
+				if (event.getCode() == KeyCode.F1) {
+					ui.getBrowserComponent().showDocs();
 				}
-				if(event.getCode() == KeyCode.A) {
-					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				if (keyCombListToBox.match(event)) {
+					setFocusToFilterBox();
 				}
-				if(event.getCode() == KeyCode.M) {
-					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showMilestones();
-					}
-					else {
-					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
-					}
+				if (event.getCode() == KeyCode.SPACE && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+					setFocusToFilterBox();
 				}
 				if(event.getCode() == KeyCode.I) {
 					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
@@ -205,24 +208,52 @@ public class IssuePanel extends IssueColumn {
 				if(event.getCode() == KeyCode.G) {
 					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
 				}
+				if(event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
+					ui.getBrowserComponent().jumpToComment();
+				}
+				if(event.getCode() == KeyCode.L) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().newLabel();
+					}
+					else if(ui.getBrowserComponent().isCurrentUrlIssue()){
+						ui.getBrowserComponent().manageLabels(event.getCode().toString());
+					}
+				}
+				if(event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
+					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+				}
+				if(event.getCode() == KeyCode.M) {
+					if(KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+						ui.getBrowserComponent().showMilestones();
+					}
+					else if(ui.getBrowserComponent().isCurrentUrlIssue()){
+					ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+					}
+				}
+				if (maximizeWindow.match(event)) {
+					ui.maximizeWindow();
+				}
+				if (minimizeWindow.match(event)) {
+					ui.minimizeWindow();
+				}
+				if (defaultSizeWindow.match(event)) {
+					ui.setDefaultWidth();
+				}
 			}
 		});
-		this.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F5) {
-					ServiceManager.getInstance().updateModelNow();
-				}
-				if (event.getCode() == KeyCode.F1) {
-					ui.getBrowserComponent().showDocs();
-				}
-				if (keyCombListToBox.match(event)) {
-					filterTextField.requestFocus();
-				}
-				if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
-					filterTextField.requestFocus();
-				}
-			}
-		});
+	}
+
+	private void setFocusToFilterBox() {
+		filterTextField.requestFocus();
+		filterTextField.setText(filterTextField.getText().trim());
+		filterTextField.positionCaret(filterTextField.getLength());
 		
+		addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
+					listView.selectFirstItem();
+				}
+			}
+		});
 	}
 }

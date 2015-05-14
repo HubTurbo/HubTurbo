@@ -1,15 +1,5 @@
 package ui;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
@@ -27,12 +17,10 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
-
 import service.ServiceManager;
 import storage.DataManager;
 import ui.components.Dialog;
@@ -41,12 +29,18 @@ import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.PlatformEx;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
 public class LoginDialog extends Dialog<Boolean> {
-	
+
 	private static final String DIALOG_TITLE = "GitHub Login";
 	private static final int DIALOG_HEIGHT = 200;
 	private static final int DIALOG_WIDTH = 570;
-	
+
 	private static final String LABEL_REPO = "Repository:";
 	private static final String LABEL_GITHUB = "github.com /";
 	private static final String FIELD_DEFAULT_REPO_OWNER = "<owner/organization>";
@@ -56,7 +50,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	private static final String BUTTON_SIGN_IN = "Sign in";
 
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
-	
+
 	private TextField repoOwnerField;
 	private TextField repoNameField;
 	private TextField usernameField;
@@ -68,25 +62,25 @@ public class LoginDialog extends Dialog<Boolean> {
 		super(parentStage);
 		this.columns = columns;
 	}
-	
+
 	@Override
 	protected void onClose(WindowEvent e) {
 		completeResponse(false);
 	}
-	
+
 	@Override
 	protected Parent content() {
 
 		setTitle(DIALOG_TITLE);
 		setSize(DIALOG_WIDTH, DIALOG_HEIGHT);
 		setStageStyle(StageStyle.UTILITY);
-		
+
 		GridPane grid = new GridPane();
 		setupGridPane(grid);
-	    
+
 		Label repoLabel = new Label(LABEL_REPO);
 		grid.add(repoLabel, 0, 0);
-		
+
 		Label githubLabel = new Label(LABEL_GITHUB);
 		grid.add(githubLabel, 1, 0);
 
@@ -112,7 +106,7 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
-		
+
 		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
@@ -126,7 +120,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		loginButton.setOnAction(this::login);
 		buttons.getChildren().add(loginButton);
 		grid.add(buttons, 4, 3);
-		
+
 		return grid;
 	}
 
@@ -144,7 +138,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		if (!lastLoginName.isEmpty()) {
 			usernameField.setText(lastLoginName);
 		}
-		
+
 		String lastLoginPassword = DataManager.getInstance().getLastLoginPassword();
 		if (!lastLoginPassword.isEmpty()) {
 			passwordField.setText(lastLoginPassword);
@@ -172,10 +166,10 @@ public class LoginDialog extends Dialog<Boolean> {
 		grid.setPadding(new Insets(25));
 	    grid.setPrefSize(390, 100);
 	    grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-	    
+
 	    applyColumnConstraints(grid, 20, 16, 33, 2, 29);
 	}
-	
+
 	/**
 	 * A variadic function that applies percentage-width column constraints to
 	 * the given grid pane.
@@ -183,14 +177,14 @@ public class LoginDialog extends Dialog<Boolean> {
 	 * @param values an array of integer values which should add up to 100
 	 */
 	private static void applyColumnConstraints(GridPane grid, int... values) {
-		
+
 		// The values should sum up to 100%
 		int sum = 0;
 		for (int i=0; i<values.length; i++) {
 			sum += values[i];
 		}
 		assert sum == 100 : "Column constraints should sum up to 100%!";
-		
+
 		// Apply constraints to grid
 		ColumnConstraints column;
 		for (int i=0; i<values.length; i++) {
@@ -201,14 +195,14 @@ public class LoginDialog extends Dialog<Boolean> {
 	}
 
 	private void login(Event e) {
-		
+
 		// Resolve username and password
-		
+
 		String owner = repoOwnerField.getText();
 		String repo = repoNameField.getText();
 		String username = usernameField.getText();
 		String password = passwordField.getText();
-		
+
 		// If either field is empty, try to load credentials.txt
 		if (username.isEmpty() || password.isEmpty()) {
 			BufferedReader reader;
@@ -227,13 +221,13 @@ public class LoginDialog extends Dialog<Boolean> {
 				logger.info("Failed to find or open credentials.txt");
 			}
 		}
-		
+
 		// Update UI
 
 		enableElements(false);
-		
+
 		// Run blocking operations in the background
-		
+
 		HTStatusBar.displayMessage("Signing in at GitHub...");
     	boolean couldLogIn = ServiceManager.getInstance().login(username, password);
 
@@ -255,7 +249,11 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
-				HTStatusBar.displayMessage("Issues loaded successfully!");
+				HTStatusBar.displayMessage(String.format("%s loaded successfully! (%s)",
+					ServiceManager.getInstance().getRepoId().generateId(),
+					ServiceManager.getInstance().getRemainingRequestsDesc()));
+				logger.info("Remaining requests: " +
+					ServiceManager.getInstance().getRemainingRequestsDesc());
 				completeResponse(true);
 				close();
 			} else {
@@ -267,13 +265,13 @@ public class LoginDialog extends Dialog<Boolean> {
 			logger.error(thrown.getLocalizedMessage(), thrown);
 			handleError("An error occurred: " + task.getException());
 		});
-		
+
 		if (couldLogIn) {
 
 			// Save login details only on successful login
 			DataManager.getInstance().setLastLoginUsername(username);
 			DataManager.getInstance().setLastLoginPassword(password);
-		
+
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
 			th.setDaemon(true);
@@ -281,7 +279,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		} else {
 			handleError("Failed to sign in. Please try again.");
 		}
-		
+
 	}
 
 	private void handleError(String message) {
@@ -300,7 +298,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		usernameField.setDisable(disable);
 		passwordField.setDisable(disable);
 	}
-	
+
 	private boolean loadRepository(String owner, String repoName,
 	                               BiConsumer<String, Float> taskUpdate) throws IOException {
 		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName, taskUpdate);

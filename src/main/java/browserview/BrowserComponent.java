@@ -135,9 +135,11 @@ public class BrowserComponent {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 		}
 		ChromeDriver driver = new ChromeDriver(options);
+		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
-		driver.manage().window().setPosition(new Point((int) availableDimensions.getCenterX(), (int)availableDimensions.getCenterY() - 100));		
-		driver.manage().window().setSize(new Dimension(100, 100));
+		driver.manage().window().setSize(new Dimension(
+				(int) availableDimensions.getWidth(),
+				(int) availableDimensions.getHeight()));
 		initialiseJNA();
 		return driver;
 	}
@@ -280,7 +282,6 @@ public class BrowserComponent {
 		logger.info("Relaunching chrome.");
 		quit(); // if the driver hangs
 		driver = createChromeDriver();
-		initialiseJNA();
 		login();
 	}
 	
@@ -326,6 +327,8 @@ public class BrowserComponent {
 	 */
 	public void login() {
 		logger.info("Logging in on GitHub...");
+		focus(ui.getMainWindowHandle());
+		initialiseJNA();
 		runBrowserOperation(() -> {
 			driver.get(GitHubURL.LOGIN_PAGE);
 			try {
@@ -431,11 +434,14 @@ public class BrowserComponent {
 	}
 	
 	public boolean hasBviewChanged() {
-		if (getCurrentPageSource().equals(pageContentOnLoad)){
+		if (isBrowserActive()) { 
+			if (getCurrentPageSource().equals(pageContentOnLoad)){
 			return false;
 		}
 		pageContentOnLoad = getCurrentPageSource();
 		return true;
+		}
+		return false;
 	}
 
 	public void scrollToTop() {
@@ -526,4 +532,9 @@ public class BrowserComponent {
 			}
 		});
 	}
+
+	public boolean isCurrentUrlIssue() {
+		return GitHubURL.isUrlIssue(driver.getCurrentUrl());
+	}
+
 }

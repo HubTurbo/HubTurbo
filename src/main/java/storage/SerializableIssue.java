@@ -1,19 +1,13 @@
 package storage;
 
+import model.*;
+import org.eclipse.egit.github.core.PullRequest;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-import model.TurboUser;
-
-import org.eclipse.egit.github.core.PullRequest;
 
 class SerializableIssue {
 	private String creator;
@@ -26,9 +20,6 @@ class SerializableIssue {
 	private String title;
 	private String description;
 	
-	// for comments, but not used for current version
-	//private String cachedDescriptionMarkup;
-
 	private int parentIssue;
 	private boolean state;
 	
@@ -47,8 +38,7 @@ class SerializableIssue {
 		this.id = issue.getId();
 		this.title = issue.getTitle();
 		this.description = issue.getDescription();
-		//this.cachedDescriptionMarkup = issue.getDescriptionMarkup();
-		
+
 		this.parentIssue = issue.getParentIssue();
 		this.state = issue.isOpen();
 		this.assignee = issue.getAssignee();
@@ -62,7 +52,7 @@ class SerializableIssue {
 		
 		this.htmlUrl = issue.getHtmlUrl();
 		
-		ObservableList<TurboLabel> turboLabelObservableList = issue.getLabels();
+		List<TurboLabel> turboLabelObservableList = issue.getLabels();
 		List<TurboLabel> turboLabelList = turboLabelObservableList.stream().collect(Collectors.toList());
 		this.labels = convertFromListOfTurboLabels(turboLabelList);
 	}
@@ -89,28 +79,27 @@ class SerializableIssue {
 		tI.setPullRequest(pullRequest);
 		
 		tI.setId(id);
-		//tI.setDescriptionMarkup(cachedDescriptionMarkup);
-		
+
 		tI.setParentIssue(parentIssue);
 		tI.setOpen(state);
 		tI.setAssignee(assignee);
-		if (milestone == null) {
-			tI.setMilestone(null);
-		} else {
-			tI.setMilestone(milestone.toTurboMilestone());
-		}
-			
 		tI.setHtmlUrl(htmlUrl);
 
-		ObservableList<TurboLabel> turboLabelList = FXCollections.observableArrayList();
-		if (labels == null) {
-			tI.setLabels(turboLabelList);
+		if (milestone == null) {
+			tI.setTemporaryMilestone(Optional.empty());
 		} else {
-			for (SerializableLabel label : labels) {
-				turboLabelList.add(label.toTurboLabel());
-			}
-			tI.setLabels(turboLabelList);
+			tI.setTemporaryMilestone(Optional.of(milestone.toTurboMilestone().toGhResource()));
 		}
+
+		if (labels == null) {
+			tI.setTemporaryLabels(Optional.empty());
+		} else {
+			tI.setTemporaryLabels(Optional.of(labels.stream()
+				.map(SerializableLabel::toTurboLabel)
+				.map(TurboLabel::toGhResource)
+				.collect(Collectors.toList())));
+		}
+
 		return tI;
 	}
 }
