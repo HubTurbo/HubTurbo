@@ -1,17 +1,15 @@
-package test;
-
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.Date;
+package tests;
 
 import org.eclipse.egit.github.core.Issue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import service.ServiceManager;
-import test.TestUtils;
-import test.stubs.ServiceManagerStub;
+import tests.stubs.ServiceManagerStub;
+
+import java.io.IOException;
+import java.util.Date;
+
+import static org.junit.Assert.*;
 
 public class ServiceManagerTests {
 

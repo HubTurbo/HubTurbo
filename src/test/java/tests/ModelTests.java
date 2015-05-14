@@ -1,27 +1,21 @@
-package test;
+package tests;
+
+import model.Model;
+import model.TurboIssue;
+import model.TurboLabel;
+import model.TurboMilestone;
+import org.eclipse.egit.github.core.*;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import util.events.EventHandler;
+import util.events.ModelChangedEvent;
+import util.events.ModelChangedEventHandler;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import model.Model;
-import model.TurboIssue;
-import model.TurboLabel;
-import model.TurboMilestone;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import test.TestUtils;
-import util.events.EventHandler;
-import util.events.ModelChangedEvent;
-import util.events.ModelChangedEventHandler;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("unused")

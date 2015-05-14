@@ -1,11 +1,11 @@
-package test.stubs;
+package tests.stubs;
 
 import model.Model;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import service.ServiceManager;
-import test.ServiceManagerTests;
+import tests.ServiceManagerTests;
 
 import java.io.IOException;
 import java.util.ArrayList;

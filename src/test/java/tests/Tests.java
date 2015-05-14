@@ -1,5 +1,4 @@
-
-package test;
+package tests;
 
 import model.Model;
 
@@ -8,13 +7,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import service.ServiceManager;
-import test.DataManagerTests;
-import test.EventTests;
-import test.FilterEvalTests;
-import test.FilterParserTests;
-import test.ModelTests;
-import test.ServiceManagerTests;
-import test.TickingTimerTests;
 
 @RunWith(Suite.class)
 
