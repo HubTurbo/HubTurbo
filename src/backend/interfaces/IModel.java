@@ -1,9 +1,6 @@
 package backend.interfaces;
 
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboUser;
-import backend.resource.TurboMilestone;
+import backend.resource.*;
 
 import java.util.List;
 
@@ -19,5 +16,12 @@ public interface IModel {
 			getLabels().size(),
 			getMilestones().size(),
 			getUsers().size());
+	}
+
+	public default boolean equals(Model other) {
+		return getIssues().equals(other.getIssues())
+			&& getLabels().equals(other.getLabels())
+			&& getMilestones().equals(other.getMilestones())
+			&& getUsers().equals(other.getUsers());
 	}
 }
