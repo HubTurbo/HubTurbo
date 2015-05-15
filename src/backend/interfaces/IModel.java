@@ -17,11 +17,4 @@ public interface IModel {
 			getMilestones().size(),
 			getUsers().size());
 	}
-
-	public default boolean equals(Model other) {
-		return getIssues().equals(other.getIssues())
-			&& getLabels().equals(other.getLabels())
-			&& getMilestones().equals(other.getMilestones())
-			&& getUsers().equals(other.getUsers());
-	}
 }

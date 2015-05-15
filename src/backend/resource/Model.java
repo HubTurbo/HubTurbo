@@ -135,19 +135,24 @@ public class Model implements IModel {
 
 		Model model = (Model) o;
 
-		if (issues != null ? !issues.equals(model.issues) : model.issues != null) return false;
-		if (repoId != null ? !repoId.equals(model.repoId) : model.repoId != null) return false;
-		if (updateSignature != null ? !updateSignature.equals(model.updateSignature) : model.updateSignature != null)
-			return false;
+		if (!issues.equals(model.issues)) return false;
+		if (!labels.equals(model.labels)) return false;
+		if (!milestones.equals(model.milestones)) return false;
+		if (!repoId.equals(model.repoId)) return false;
+		if (!updateSignature.equals(model.updateSignature)) return false;
+		if (!users.equals(model.users)) return false;
 
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = updateSignature != null ? updateSignature.hashCode() : 0;
-		result = 31 * result + (repoId != null ? repoId.hashCode() : 0);
-		result = 31 * result + (issues != null ? issues.hashCode() : 0);
+		int result = updateSignature.hashCode();
+		result = 31 * result + repoId.hashCode();
+		result = 31 * result + issues.hashCode();
+		result = 31 * result + labels.hashCode();
+		result = 31 * result + milestones.hashCode();
+		result = 31 * result + users.hashCode();
 		return result;
 	}
 }

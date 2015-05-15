@@ -61,5 +61,22 @@ public class MultiModel implements IModel {
 		models.values().forEach(m -> result.addAll(m.getUsers()));
 		return result;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		MultiModel that = (MultiModel) o;
+
+		if (!models.equals(that.models)) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return models.hashCode();
+	}
 }
 
