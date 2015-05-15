@@ -7,10 +7,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.*;
 import service.GitHubClientExtended;
 import service.IssueServiceExtended;
@@ -111,10 +108,16 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	public List<User> getCollaborators(String repoId) {
 		try {
 			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId));
+		} catch (RequestException e) {
+			if (e.getStatus() == 403) {
+				logger.info("Unable to get collaborators for " + repoId + ": " + e.getLocalizedMessage());
+			} else {
+				logger.error(e.getLocalizedMessage(), e);
+			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
-			return new ArrayList<>();
 		}
+		return new ArrayList<>();
 	}
 
 	private List<Issue> getAll(PageIterator<Issue> iterator) {
