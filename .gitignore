@@ -9,3 +9,5 @@ chromedriver_linux
 chromedriver.exe
 .hubturbocache/
 
+.idea
+HubTurbo.iml
