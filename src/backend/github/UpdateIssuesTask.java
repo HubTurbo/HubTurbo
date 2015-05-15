@@ -30,52 +30,13 @@ public class UpdateIssuesTask extends GitHubRepoTask<UpdateIssuesTask.Result> {
 		ImmutableTriple<List<Issue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId().generateId(),
 			model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
 
-		// Reconcile changes
 		List<TurboIssue> existing = model.getIssues();
 		List<Issue> changed = changes.left;
-		logger.info(changed.size() + " issues changed" + (changed.size() == 0 ? "" : ": " + changed));
-		List<TurboIssue> updated = reconcile(existing, changed);
+		logger.info(changed.size() + " issue(s) changed" + (changed.size() == 0 ? "" : ": " + changed));
 
-		response.complete(new Result(updated, changes.middle, changes.right));
-	}
+		List<TurboIssue> updated = Utility.reconcile(existing, changed,
+			TurboIssue::getId, Issue::getNumber, TurboIssue::new);
 
-	private List<TurboIssue> reconcile(List<TurboIssue> existing, List<Issue> changed) {
-		existing = new ArrayList<>(existing);
-		for (Issue issue : changed) {
-			int id = issue.getNumber();
-
-			// TODO O(n^2), fix by preprocessing and copying into a map
-			Optional<Integer> corresponding = findIssueWithId(existing, id);
-			if (corresponding.isPresent()) {
-				existing.set(corresponding.get(), new TurboIssue(issue));
-			} else {
-				existing.add(new TurboIssue(issue));
-			}
-		}
-		return existing;
-	}
-
-	private Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
-		int i = 0;
-		for (TurboIssue issue : existing) {
-			if (issue.getId() == id) {
-				return Optional.of(i);
-			}
-			++i;
-		}
-		return Optional.empty();
-	}
-
-
-	public static class Result {
-		public final List<TurboIssue> issues;
-		public final String ETag;
-		public final Date lastCheckTime;
-
-		public Result(List<TurboIssue> issues, String eTag, Date lastCheckTime) {
-			this.issues = issues;
-			ETag = eTag;
-			this.lastCheckTime = lastCheckTime;
-		}
+		response.complete(new Result<>(updated, changes.middle, changes.right));
 	}
 }

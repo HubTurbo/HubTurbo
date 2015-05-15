@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -167,5 +168,59 @@ public class Utility {
 		return Optional.empty();
 	}
 
+	/**
+	 * Takes a list of TurboResources and a list of Resources, and reconciles the changes
+	 * between them, returning a list of TurboResources with updates from the Resources.
+	 *
+	 * Abstractly this is what happens:
+	 *
+	 * - Resources are matched to TurboResources with a common key
+	 * - TurboResources are constructed from the Resources
+	 * - If a Resource has a corresponding TurboResource, that TurboResource is replaced with the new one
+	 * - If a Resource does not have a corresponding TurboResource, the new TurboResource is appending to the list
+	 *
+	 * The new list is returned.
+	 *
+	 * This is a generic operation so it takes a few function parameters for mapping Resources to
+	 * TurboResources, and for mapping both TurboResources and Resources to their common key.
+	 *
+	 * @param existing the list of existing TurboResources
+	 * @param changed the list of new Resources
+	 * @param getKeyR maps a Resource to a key
+	 * @param getKeyTR maps a TurboResource to a key
+	 * @param construct maps a Resource to a TurboResource
+	 * @param <TR> TurboResource
+	 * @param <R> Resource
+	 * @param <K> common key
+	 * @return a new list with changes from Resources taken into account
+	 */
+	public static <TR, R, K> List<TR> reconcile(List<TR> existing, List<R> changed,
+	                                            Function<TR, K> getKeyTR, Function<R, K> getKeyR,
+	                                            Function<R, TR> construct) {
+		existing = new ArrayList<>(existing);
+		for (R label : changed) {
+			K id = getKeyR.apply(label);
+
+			// TODO O(n^2), fix by preprocessing and copying into a map
+			Optional<Integer> corresponding = findResource(existing, id, getKeyTR);
+			if (corresponding.isPresent()) {
+				existing.set(corresponding.get(), construct.apply(label));
+			} else {
+				existing.add(construct.apply(label));
+			}
+		}
+		return existing;
+	}
+
+	private static <TR, K> Optional<Integer> findResource(List<TR> existing, K key, Function<TR, K> getKey) {
+		int i = 0;
+		for (TR label : existing) {
+			if (getKey.apply(label).equals(key)) {
+				return Optional.of(i);
+			}
+			++i;
+		}
+		return Optional.empty();
+	}
 }
 
