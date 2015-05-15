@@ -27,9 +27,9 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
 	private final IssueServiceExtended issueService = new IssueServiceExtended(client);
-	private final CollaboratorService collaboratorService = new CollaboratorService();
-	private final LabelServiceFixed labelService = new LabelServiceFixed();
-	final private MilestoneService milestoneService = new MilestoneService();
+	private final CollaboratorService collaboratorService = new CollaboratorService(client);
+	private final LabelServiceFixed labelService = new LabelServiceFixed(client);
+	final private MilestoneService milestoneService = new MilestoneService(client);
 
 	public GitHubRepo() {
 	}
