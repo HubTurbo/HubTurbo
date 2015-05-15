@@ -11,7 +11,7 @@ public interface IModel {
 	public List<TurboUser> getUsers();
 
 	public default String summarise() {
-		return String.format("%d issues, %d labels, %d milestones, %d users",
+		return String.format("%d issue(s), %d label(s), %d milestone(s), %d user(s)",
 			getIssues().size(),
 			getLabels().size(),
 			getMilestones().size(),

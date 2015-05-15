@@ -10,6 +10,8 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import sun.net.www.protocol.http.HttpCallerInfo;
+import util.HTLog;
 import util.Utility;
 
 import java.util.Optional;
@@ -17,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 class ReadTask extends CacheTask {
 
-	private static final Logger logger = LogManager.getLogger(ReadTask.class.getName());
+	private static final Logger logger = HTLog.get(ReadTask.class);
 
 	public final CompletableFuture<Model> response;
 
@@ -39,7 +41,7 @@ class ReadTask extends CacheTask {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
 			return new Model(RepositoryId.createFromId(repoId), UpdateSignature.empty);
 		} else {
-			logger.info("Loaded " + repoId + " from JSON cache");
+			logger.info(HTLog.format(repoId, "Loaded from JSON cache"));
 			SerializableModel sModel = new Gson().fromJson(input.get(),
 				new TypeToken<SerializableModel>(){}.getType());
 			return new Model(sModel);

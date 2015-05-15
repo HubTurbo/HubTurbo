@@ -13,6 +13,7 @@ import service.GitHubClientExtended;
 import service.IssueServiceExtended;
 import service.LabelServiceFixed;
 import service.updateservice.*;
+import util.HTLog;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,7 +21,7 @@ import java.util.function.BiFunction;
 
 public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
-	private static final Logger logger = LogManager.getLogger(GitHubRepo.class.getName());
+	private static final Logger logger = HTLog.get(GitHubRepo.class);
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
 	private final IssueServiceExtended issueService = new IssueServiceExtended(client);
@@ -81,7 +82,7 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 		try {
 			return labelService.getLabels(RepositoryId.createFromId(repoId));
 		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+			HTLog.error(logger, e);
 			return new ArrayList<>();
 		}
 	}
@@ -91,7 +92,7 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 		try {
 			return milestoneService.getMilestones(RepositoryId.createFromId(repoId), "all");
 		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+			HTLog.error(logger, e);
 			return new ArrayList<>();
 		}
 	}
@@ -102,12 +103,12 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId));
 		} catch (RequestException e) {
 			if (e.getStatus() == 403) {
-				logger.info("Unable to get collaborators for " + repoId + ": " + e.getLocalizedMessage());
+				logger.info(HTLog.format(repoId, "Unable to get collaborators: " + e.getLocalizedMessage()));
 			} else {
-				logger.error(e.getLocalizedMessage(), e);
+				HTLog.error(logger, e);
 			}
 		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+			HTLog.error(logger, e);
 		}
 		return new ArrayList<>();
 	}
@@ -144,14 +145,13 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 				assert totalIssueCount >= elements.size();
 
 				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
-				logger.info(String.format("%s | Loaded %d issues (%.2f%% done)", repoId,
-					elements.size(), progress * 100));
+				logger.info(HTLog.format(repoId, "Loaded %d issues (%.2f%% done)", elements.size(), progress * 100));
 			}
 		} catch (NoSuchPageException pageException) {
 			try {
 				throw pageException.getCause();
 			} catch (IOException e) {
-				e.printStackTrace();
+				HTLog.error(logger, e);
 			}
 		}
 		return elements;

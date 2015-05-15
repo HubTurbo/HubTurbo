@@ -11,13 +11,14 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import util.HTLog;
 import util.Utility;
 
 import java.util.List;
 
 public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
-	private static final Logger logger = LogManager.getLogger(UpdateLabelsTask.class.getName());
+	private static final Logger logger = HTLog.get(UpdateLabelsTask.class);
 
 	private final Model model;
 
@@ -33,7 +34,8 @@ public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
 		List<TurboLabel> existing = model.getLabels();
 		List<Label> changed = changes.left;
-		logger.info(changed.size() + " label(s) changed" + (changed.size() == 0 ? "" : ": " + changed));
+		logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
+			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
 		List<TurboLabel> updated = Utility.reconcile(existing, changed,
 			TurboLabel::getName, Label::getName, TurboLabel::new);

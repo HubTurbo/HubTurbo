@@ -10,12 +10,13 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import util.HTLog;
 
 import java.util.concurrent.ExecutionException;
 
 public class UpdateModelTask extends GitHubRepoTask<Model> {
 
-	private static final Logger logger = LogManager.getLogger(UpdateModelTask.class.getName());
+	private static final Logger logger = HTLog.get(UpdateModelTask.class);
 
 	private final Model model;
 
@@ -49,10 +50,10 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 			Model result = new Model(model.getRepoId(), model.getIssues(),
 				model.getLabels(), model.getMilestones(), model.getUsers(), newSignature);
 
-			logger.info("Updated model with " + result.summarise());
+			logger.info(HTLog.format(model.getRepoId(), "Updated model with " + result.summarise()));
 			response.complete(result);
 		} catch (InterruptedException | ExecutionException e) {
-			logger.error(e.getLocalizedMessage(), e);
+			HTLog.error(logger, e);
 		}
 	}
 }

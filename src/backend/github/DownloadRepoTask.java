@@ -7,13 +7,14 @@ import backend.resource.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
+import util.HTLog;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DownloadRepoTask extends GitHubRepoTask<Model> {
 
-	private static final Logger logger = LogManager.getLogger(DownloadRepoTask.class.getName());
+	private static final Logger logger = HTLog.get(DownloadRepoTask.class);
 
 	private final String repoId;
 
@@ -38,7 +39,7 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 			.collect(Collectors.toList());
 		Model result = new Model(RepositoryId.createFromId(repoId), issues,
 			labels, milestones, users, UpdateSignature.empty);
-		logger.info("Downloaded " + result.summarise());
+		logger.info(HTLog.format(repoId, "Downloaded " + result.summarise()));
 		response.complete(result);
 	}
 }

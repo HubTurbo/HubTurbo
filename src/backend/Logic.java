@@ -4,6 +4,7 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.HTLog;
 import util.Utility;
 
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class Logic {
 
-	private static final Logger logger = LogManager.getLogger(Logic.class.getName());
+	private static final Logger logger = HTLog.get(Logic.class);
 
 	private MultiModel models = new MultiModel();
 

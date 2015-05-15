@@ -8,12 +8,13 @@ import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.HTLog;
 
 import java.util.concurrent.CompletableFuture;
 
 public class RepoIO {
 
-	private static final Logger logger = LogManager.getLogger(RepoIO.class.getName());
+	private static final Logger logger = HTLog.get(RepoIO.class);
 
 	private final RepoSource repoSource = new GitHubSource();
 	private final RepoStore repoStore = new JSONStore();
@@ -38,7 +39,7 @@ public class RepoIO {
 			if (!model.equals(newModel)) {
 				repoStore.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
 			} else {
-				logger.info("Nothing has changed in " + model.getRepoId().generateId() + "; not writing to store");
+				logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
 			}
 			return model;
 		});

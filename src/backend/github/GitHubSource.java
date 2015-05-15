@@ -10,12 +10,13 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import util.HTLog;
 
 import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
 
-	private static final Logger logger = LogManager.getLogger(GitHubSource.class.getName());
+	private static final Logger logger = HTLog.get(GitHubSource.class);
 
 	private final Repo<Issue, Label, Milestone, User> gitHub = new GitHubRepo();
 

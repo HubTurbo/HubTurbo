@@ -11,13 +11,14 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
+import util.HTLog;
 import util.Utility;
 
 import java.util.List;
 
 public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
-	private static final Logger logger = LogManager.getLogger(UpdateUsersTask.class.getName());
+	private static final Logger logger = HTLog.get(UpdateUsersTask.class);
 
 	private final Model model;
 
@@ -33,7 +34,8 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
 		List<TurboUser> existing = model.getUsers();
 		List<User> changed = changes.left;
-		logger.info(changed.size() + " user(s) changed" + (changed.size() == 0 ? "" : ": " + changed));
+		logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
+			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
 		List<TurboUser> updated = Utility.reconcile(existing, changed,
 			TurboUser::getLoginName, User::getLogin, TurboUser::new);
