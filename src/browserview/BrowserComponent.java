@@ -1,40 +1,31 @@
 package browserview;
 
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import javafx.concurrent.Task;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-
 import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
 import util.PlatformSpecific;
+
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -62,6 +53,8 @@ public class BrowserComponent {
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
 	private static User32 user32;
+
+	private static ArrayList<Future<?>> browserQueue;
 	
 	static {
 		setupJNA();
@@ -81,11 +74,12 @@ public class BrowserComponent {
 	
 	// The first is not desirable and the second does not seem to be possible
 	// at the moment.
-	private Executor executor;
+	private ExecutorService executor;
 	
 	public BrowserComponent(UI ui) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
+		browserQueue = new ArrayList<>();
 	}
 
 	/**
@@ -292,7 +286,13 @@ public class BrowserComponent {
 	 */
 	
 	private void runBrowserOperation (Runnable operation) {
-		executor.execute(new Task<Void>() {
+		if (!browserQueue.isEmpty()) {
+			for (Future<?> task : browserQueue) {
+				logger.info("Canceling previous browser request. ");
+				task.cancel(true);
+			}
+		}
+		browserQueue.add(executor.submit(new Task<Void>() {
 			@Override
 			protected Void call() {
 				if (isBrowserActive()) {
@@ -301,14 +301,14 @@ public class BrowserComponent {
 						pageContentOnLoad = getCurrentPageSource();
 					} catch (WebDriverException e) {
 						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-						case NoSuchWindow:
-							resetBrowser();
-							runBrowserOperation(operation); // Recurse and repeat
-						case NoSuchElement:
-							logger.info("Warning: no such element! " + e.getMessage());
-							break;
-						default:
-							break;
+							case NoSuchWindow:
+								resetBrowser();
+								runBrowserOperation(operation); // Recurse and repeat
+							case NoSuchElement:
+								logger.info("Warning: no such element! " + e.getMessage());
+								break;
+							default:
+								break;
 						}
 					}
 				} else {
@@ -317,7 +317,7 @@ public class BrowserComponent {
 				}
 				return null;
 			}
-		});
+		}));
 	}
 
 	/**
