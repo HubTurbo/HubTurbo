@@ -7,8 +7,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 
 	private final String repoId;
 
-	public DownloadRepoTask(TaskRunner taskRunner, Repo<Issue> repo, String repoId) {
+	public DownloadRepoTask(TaskRunner taskRunner, Repo<Issue, Label, Milestone, User> repo, String repoId) {
 		super(taskRunner, repo);
 		this.repoId = repoId;
 	}

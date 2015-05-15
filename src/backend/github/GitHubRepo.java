@@ -2,9 +2,9 @@ package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
@@ -16,7 +16,7 @@ import service.updateservice.IssueUpdateService;
 import java.io.IOException;
 import java.util.*;
 
-public class GitHubRepo implements Repo<Issue> {
+public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
 	private final GitHubClientExtended client = new GitHubClientExtended();
 	private final IssueService issueService = new IssueService();
@@ -48,11 +48,41 @@ public class GitHubRepo implements Repo<Issue> {
 	}
 
 	@Override
+	public ImmutablePair<List<Label>, String> getUpdatedLabels(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
+	public ImmutablePair<List<Milestone>, String> getUpdatedMilestones(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
+	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
 	public List<Issue> getIssues(String repoId) {
 		Map<String, String> filters = new HashMap<>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
 		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters));
+	}
+
+	@Override
+	public List<Label> getLabels(String repoId) {
+		return null;
+	}
+
+	@Override
+	public List<Milestone> getMilestones(String repoId) {
+		return null;
+	}
+
+	@Override
+	public List<User> getUsers(String repoId) {
+		return null;
 	}
 
 	private List<Issue> getAll(PageIterator<Issue> iterator) {

@@ -10,7 +10,7 @@ public abstract class RepoSource implements TaskRunner {
 	private final ExecutorService pool = Executors.newCachedThreadPool();
 
 	@Override
-	public <R, I> RepoTask<R, I> addTask(RepoTask<R, I> task) {
+	public <R, I, L, M, U> RepoTask<R, I, L, M, U> addTask(RepoTask<R, I, L, M, U> task) {
 		execute(task);
 		return task;
 	}

@@ -2,14 +2,18 @@ package backend.stub;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DummyRepo implements Repo<Issue> {
+public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 
 	private static int counter = 10;
 
@@ -46,11 +50,41 @@ public class DummyRepo implements Repo<Issue> {
 	}
 
 	@Override
+	public ImmutablePair<List<Label>, String> getUpdatedLabels(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
+	public ImmutablePair<List<Milestone>, String> getUpdatedMilestones(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
+	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
+		return null;
+	}
+
+	@Override
 	public List<Issue> getIssues(String repoName) {
 		List<Issue> issues = new ArrayList<>();
 		for (int i=0; i<10; i++) {
 			issues.add(makeDummyIssue());
 		}
 		return issues;
+	}
+
+	@Override
+	public List<Label> getLabels(String repoId) {
+		return null;
+	}
+
+	@Override
+	public List<Milestone> getMilestones(String repoId) {
+		return null;
+	}
+
+	@Override
+	public List<User> getUsers(String repoId) {
+		return null;
 	}
 }

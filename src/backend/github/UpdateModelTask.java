@@ -1,12 +1,15 @@
 package backend.github;
 
-import backend.resource.Model;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
+import backend.resource.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import java.util.concurrent.ExecutionException;
 
@@ -16,7 +19,7 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 
 	private final Model model;
 
-	public UpdateModelTask(TaskRunner taskRunner, Repo<Issue> repo, Model model) {
+	public UpdateModelTask(TaskRunner taskRunner, Repo<Issue, Label, Milestone, User> repo, Model model) {
 		super(taskRunner, repo);
 		this.model = model;
 	}
@@ -24,14 +27,28 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 	@Override
 	public void run() {
 		UpdateIssuesTask issuesTask = new UpdateIssuesTask(taskRunner, repo, model);
+		UpdateLabelsTask labelsTask = new UpdateLabelsTask(taskRunner, repo, model);
+		UpdateMilestonesTask milestonesTask = new UpdateMilestonesTask(taskRunner, repo, model);
+		UpdateUsersTask usersTask = new UpdateUsersTask(taskRunner, repo, model);
+
 		taskRunner.execute(issuesTask);
+		taskRunner.execute(labelsTask);
+		taskRunner.execute(milestonesTask);
+		taskRunner.execute(usersTask);
 
 		try {
-			UpdateIssuesTask.Result issuesResult = issuesTask.response.get();
+			GitHubRepoTask.Result issuesResult = issuesTask.response.get();
+			GitHubRepoTask.Result labelsResult = labelsTask.response.get();
+			GitHubRepoTask.Result milestonesResult = milestonesTask.response.get();
+			GitHubRepoTask.Result usersResult = usersTask.response.get();
+
 			// TODO fill out the others, don't leave them as null
 			UpdateSignature newSignature =
-				new UpdateSignature(issuesResult.ETag, null, null, null, issuesResult.lastCheckTime);
-			Model result = new Model(model.getRepoId(), newSignature).withIssues(issuesResult.issues);
+				new UpdateSignature(issuesResult.ETag, labelsResult.ETag,
+					milestonesResult.ETag, usersResult.ETag, issuesResult.lastCheckTime);
+
+			Model result = new Model(model.getRepoId(), newSignature).withIssues(issuesResult.items);
+
 			logger.info("Updated model with " + result.summarise());
 			response.complete(result);
 		} catch (InterruptedException | ExecutionException e) {

@@ -7,6 +7,9 @@ import backend.interfaces.RepoSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -14,7 +17,7 @@ public class GitHubSource extends RepoSource {
 
 	private static final Logger logger = LogManager.getLogger(GitHubSource.class.getName());
 
-	private final Repo<Issue> gitHub = new GitHubRepo();
+	private final Repo<Issue, Label, Milestone, User> gitHub = new GitHubRepo();
 
 	@Override
 	public String getName() {

@@ -1,16 +1,14 @@
 package backend.stub;
 
-import backend.resource.Model;
 import backend.UserCredentials;
-import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
-import org.eclipse.egit.github.core.Issue;
+import backend.resource.Model;
 
 import java.util.concurrent.CompletableFuture;
 
 public class DummySource extends RepoSource {
 
-	private final Repo<Issue> dummy = new DummyRepo();
+	private final DummyRepo dummy = new DummyRepo();
 
 	@Override
 	public String getName() {
