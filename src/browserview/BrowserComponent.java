@@ -12,6 +12,10 @@ import java.util.concurrent.Executors;
 
 import javafx.concurrent.Task;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -62,6 +66,7 @@ public class BrowserComponent {
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
 	private static User32 user32;
+	private static ScriptEngine scriptEngine;
 	
 	static {
 		setupJNA();
@@ -97,7 +102,7 @@ public class BrowserComponent {
 		driver = createChromeDriver();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
-	
+
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
@@ -290,8 +295,9 @@ public class BrowserComponent {
 	 * Takes care of running it on a separate thread, and normalises error-handling across
 	 * all types of code.
 	 */
-	
-	private void runBrowserOperation (Runnable operation) {
+
+	private void runBrowserOperation(Runnable operation) {
+		bringToFront();
 		executor.execute(new Task<Void>() {
 			@Override
 			protected Void call() {
@@ -301,14 +307,14 @@ public class BrowserComponent {
 						pageContentOnLoad = getCurrentPageSource();
 					} catch (WebDriverException e) {
 						switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-						case NoSuchWindow:
-							resetBrowser();
-							runBrowserOperation(operation); // Recurse and repeat
-						case NoSuchElement:
-							logger.info("Warning: no such element! " + e.getMessage());
-							break;
-						default:
-							break;
+							case NoSuchWindow:
+								resetBrowser();
+								runBrowserOperation(operation); // Recurse and repeat
+							case NoSuchElement:
+								logger.info("Warning: no such element! " + e.getMessage());
+								break;
+							default:
+								break;
 						}
 					}
 				} else {
@@ -349,6 +355,9 @@ public class BrowserComponent {
 	private static void setupJNA() {
 		if (PlatformSpecific.isOnWindows()) {
 			user32 = User32.INSTANCE;
+		} else if (PlatformSpecific.isOnMac()) {
+			ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+			scriptEngine = scriptEngineManager.getEngineByName("AppleScript");
 		}
 	}
 	
@@ -417,6 +426,18 @@ public class BrowserComponent {
 			user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
 			user32.SetForegroundWindow(browserWindowHandle);
 		} 
+	}
+
+	public void bringToFront() {
+		if (PlatformSpecific.isOnMac()) {
+			try {
+				scriptEngine.eval("tell application \"System Events\" to repeat with p in (every application process whose name contains \"Chrome\" and name does not contain \"Helper\")\nif (title of window of p as string) contains \"" + driver.getTitle() + "\" then tell process p to perform action \"AXRaise\" of window 1 of p\nend repeat");
+			} catch (ScriptException e) {
+				logger.info("Bring browser window to front script exception! " + e.getLocalizedMessage());
+			} catch (Exception e) {
+				logger.info("Bring browser window to front exception! " + e.getLocalizedMessage());
+			}
+		}
 	}
 	
 	public void focus(HWND mainWindowHandle){
