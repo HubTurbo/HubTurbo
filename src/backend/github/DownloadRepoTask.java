@@ -4,7 +4,6 @@ import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.*;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import util.HTLog;

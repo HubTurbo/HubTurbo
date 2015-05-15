@@ -1,12 +1,11 @@
 package backend;
 
 import backend.github.GitHubSource;
-import backend.interfaces.RepoStore;
 import backend.interfaces.RepoSource;
+import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 

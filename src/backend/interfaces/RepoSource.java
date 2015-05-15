@@ -1,9 +1,11 @@
 package backend.interfaces;
 
-import backend.resource.Model;
 import backend.UserCredentials;
+import backend.resource.Model;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class RepoSource implements TaskRunner {
 

@@ -1,8 +1,8 @@
 package backend.json;
 
-import backend.resource.serialization.SerializableModel;
 import backend.interfaces.CacheTask;
 import backend.interfaces.RepoStore;
+import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;

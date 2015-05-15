@@ -2,7 +2,6 @@ package backend;
 
 import backend.resource.Model;
 import backend.resource.MultiModel;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 import util.Utility;

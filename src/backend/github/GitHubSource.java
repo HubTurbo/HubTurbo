@@ -1,10 +1,9 @@
 package backend.github;
 
-import backend.resource.Model;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
-import org.apache.logging.log4j.LogManager;
+import backend.resource.Model;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;

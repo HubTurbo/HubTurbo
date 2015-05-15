@@ -5,7 +5,6 @@ import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -36,7 +35,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 		List<TurboIssue> existing = model.getIssues();
 		List<Issue> changed = changes.left;
 		logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" :  ": " + changed));
+			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
 		List<TurboIssue> updated = Utility.reconcile(existing, changed,
 			TurboIssue::getId, Issue::getNumber, TurboIssue::new);

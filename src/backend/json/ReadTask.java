@@ -1,16 +1,14 @@
 package backend.json;
 
-import backend.resource.Model;
-import backend.resource.serialization.SerializableModel;
 import backend.UpdateSignature;
 import backend.interfaces.CacheTask;
 import backend.interfaces.RepoStore;
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
-import sun.net.www.protocol.http.HttpCallerInfo;
 import util.HTLog;
 import util.Utility;
 
