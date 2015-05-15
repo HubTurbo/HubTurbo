@@ -4,6 +4,8 @@ package backend.resource;
 import backend.resource.serialization.SerializableLabel;
 import org.eclipse.egit.github.core.Label;
 
+import java.util.Optional;
+
 @SuppressWarnings("unused")
 public class TurboLabel {
 
@@ -54,16 +56,28 @@ public class TurboLabel {
 		return exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER;
 	}
 
+	private boolean isDelimited(String labelName) {
+		return labelName.contains(EXCLUSIVE_DELIMITER) || labelName.contains(NONEXCLUSIVE_DELIMITER);
+	}
+
 	private String join(String group, String name) {
 		return group + getDelimiter() + name;
 	}
 
-	public String getGroup() {
-		return actualName.split(getDelimiter())[0];
+	public Optional<String> getGroup() {
+		if (isDelimited(actualName)) {
+			return Optional.of(actualName.split(getDelimiter())[0]);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	public String getName() {
-		return actualName.split(getDelimiter())[1];
+		if (isDelimited(actualName)) {
+			return actualName.split(getDelimiter())[1];
+		} else {
+			return actualName;
+		}
 	}
 
 	private void ______BOILERPLATE______() {
