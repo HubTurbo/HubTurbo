@@ -138,7 +138,7 @@ public class UpdateService<T> extends GitHubService{
 				elements.addAll(iterator.next());
 				int diff = elements.size() - length;
 				length = elements.size();
-				logger.info(resourceDesc + " | " + (page++) + ": " + diff + " items");
+				logger.info(resourceDesc + " | page " + (page++) + ": " + diff + " items");
 			}
 		} catch (NoSuchPageException pageException) {
 			throw pageException.getCause();

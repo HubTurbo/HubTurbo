@@ -77,14 +77,6 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<Issue> getIssues(String repoId) {
-		Map<String, String> filters = new HashMap<>();
-		filters.put(IssueService.FIELD_FILTER, "all");
-		filters.put(IssueService.FILTER_STATE, "all");
-		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters));
-	}
-
-	@Override
 	public List<Label> getLabels(String repoId) {
 		try {
 			return labelService.getLabels(RepositoryId.createFromId(repoId));
@@ -120,7 +112,15 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 		return new ArrayList<>();
 	}
 
-	private List<Issue> getAll(PageIterator<Issue> iterator) {
+	@Override
+	public List<Issue> getIssues(String repoId) {
+		Map<String, String> filters = new HashMap<>();
+		filters.put(IssueService.FIELD_FILTER, "all");
+		filters.put(IssueService.FILTER_STATE, "all");
+		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters), repoId);
+	}
+
+	private List<Issue> getAll(PageIterator<Issue> iterator, String repoId) {
 		List<Issue> elements = new ArrayList<>();
 
 		// Assume there is at least one page
@@ -142,6 +142,10 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 				int totalIssueCount = knownLastPage * PagedRequest.PAGE_SIZE;
 				// Total is approximate: always >= the actual amount
 				assert totalIssueCount >= elements.size();
+
+				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
+				logger.info(String.format("%s | Loaded %d issues (%.2f%% done)", repoId,
+					elements.size(), progress * 100));
 			}
 		} catch (NoSuchPageException pageException) {
 			try {
