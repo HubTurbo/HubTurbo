@@ -90,16 +90,6 @@ public class Model implements IModel {
 			.collect(Collectors.toList());
 	}
 
-	/**
-	 * For immutable updates
-	 */
-	public Model withIssues(List<TurboIssue> issues) {
-		Model result = new Model(this);
-		result.issues.clear();
-		result.issues.addAll(issues);
-		return result;
-	}
-
 	public IRepositoryIdProvider getRepoId() {
 		return RepositoryId.createFromId(repoId.generateId());
 	}
