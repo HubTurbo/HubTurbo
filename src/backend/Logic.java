@@ -41,9 +41,9 @@ public class Logic {
 			.collect(Collectors.toList())).thenAccept(models::replace);
 	}
 
-	public void openRepository(String repoId) {
+	public CompletableFuture<Void> openRepository(String repoId) {
 		logger.info("Opening " + repoId);
-		repoIO.openRepository(repoId).thenAccept(models::add);
+		return repoIO.openRepository(repoId).thenAccept(models::add);
 	}
 }
 
