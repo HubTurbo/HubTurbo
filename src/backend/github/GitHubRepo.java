@@ -68,7 +68,7 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
+	public ImmutablePair<List<User>, String> getUpdatedCollaborators(String repoId, String ETag) {
 		return getUpdatedResource(repoId, ETag, UserUpdateService::new);
 	}
 
@@ -108,7 +108,7 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<User> getUsers(String repoId) {
+	public List<User> getCollaborators(String repoId) {
 		try {
 			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId));
 		} catch (IOException e) {

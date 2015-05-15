@@ -33,7 +33,7 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 		List<TurboMilestone> milestones = repo.getMilestones(repoId).stream()
 			.map(TurboMilestone::new)
 			.collect(Collectors.toList());
-		List<TurboUser> users = repo.getUsers(repoId).stream()
+		List<TurboUser> users = repo.getCollaborators(repoId).stream()
 			.map(TurboUser::new)
 			.collect(Collectors.toList());
 		Model result = new Model(RepositoryId.createFromId(repoId), issues,

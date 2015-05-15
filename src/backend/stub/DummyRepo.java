@@ -53,7 +53,7 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
+	public ImmutablePair<List<User>, String> getUpdatedCollaborators(String repoId, String ETag) {
 		List<User> users = new ArrayList<>();
 		users.add(updateRandomUser());
 		users.add(makeDummyUser());
@@ -88,7 +88,7 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<User> getUsers(String repoId) {
+	public List<User> getCollaborators(String repoId) {
 		List<User> users = new ArrayList<>();
 		for (int i=0; i<10; i++) {
 			users.add(makeDummyUser());
