@@ -26,7 +26,7 @@ public class DummySource extends RepoSource {
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		return addTask(new DownloadTask(this, dummy, repoId)).response;
+		return addTask(new DownloadRepoTask(this, dummy, repoId)).response;
 	}
 
 	@Override

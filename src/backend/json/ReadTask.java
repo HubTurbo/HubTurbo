@@ -4,7 +4,7 @@ import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.UpdateSignature;
 import backend.interfaces.CacheTask;
-import backend.interfaces.RepoCache;
+import backend.interfaces.RepoStore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +34,7 @@ class ReadTask extends CacheTask {
 
 
 	private Model load(String repoId) {
-		Optional<String> input = Utility.readFile(RepoCache.escapeRepoName(repoId));
+		Optional<String> input = Utility.readFile(RepoStore.escapeRepoName(repoId));
 		if (!input.isPresent()) {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
 			return new Model(RepositoryId.createFromId(repoId), UpdateSignature.empty);

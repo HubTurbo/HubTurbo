@@ -2,15 +2,15 @@ package backend.json;
 
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import backend.interfaces.RepoCache;
+import backend.interfaces.RepoStore;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
-public class JSONCache extends RepoCache {
+public class JSONStore extends RepoStore {
 
 	@Override
-	public boolean isRepoCached(String repoName) {
+	public boolean isRepoStored(String repoName) {
 		File file = new File(escapeRepoName(repoName));
 		return file.exists() && file.isFile();
 	}

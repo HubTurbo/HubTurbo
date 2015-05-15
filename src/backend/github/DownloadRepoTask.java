@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DownloadTask extends GitHubRepoTask<Model> {
+public class DownloadRepoTask extends GitHubRepoTask<Model> {
 
-	private static final Logger logger = LogManager.getLogger(DownloadTask.class.getName());
+	private static final Logger logger = LogManager.getLogger(DownloadRepoTask.class.getName());
 
 	private final String repoId;
 
-	public DownloadTask(TaskRunner taskRunner, Repo<Issue> repo, String repoId) {
+	public DownloadRepoTask(TaskRunner taskRunner, Repo<Issue> repo, String repoId) {
 		super(taskRunner, repo);
 		this.repoId = repoId;
 	}

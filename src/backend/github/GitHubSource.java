@@ -7,7 +7,6 @@ import backend.interfaces.RepoSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
-import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +37,7 @@ public class GitHubSource extends RepoSource {
 
 	@Override
 	public CompletableFuture<Model> downloadRepository(String repoId) {
-		return addTask(new DownloadTask(this, gitHub, repoId)).response;
+		return addTask(new DownloadRepoTask(this, gitHub, repoId)).response;
 	}
 
 	@Override

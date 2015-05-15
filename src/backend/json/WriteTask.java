@@ -2,7 +2,7 @@ package backend.json;
 
 import backend.resource.serialization.SerializableModel;
 import backend.interfaces.CacheTask;
-import backend.interfaces.RepoCache;
+import backend.interfaces.RepoStore;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +26,7 @@ class WriteTask extends CacheTask {
 
 	private void save(String repoName, SerializableModel model) {
 		String output = new Gson().toJson(model);
-		String newRepoName = RepoCache.escapeRepoName(repoName);
+		String newRepoName = RepoStore.escapeRepoName(repoName);
 		Utility.writeFile(newRepoName, output);
 		logger.info("Written " + repoName + " to JSON cache");
 	}

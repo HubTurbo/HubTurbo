@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class RepoCache {
+public abstract class RepoStore {
 
 	private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
@@ -19,7 +19,7 @@ public abstract class RepoCache {
 		pool.execute(task);
 	}
 
-	public abstract boolean isRepoCached(String repoId);
+	public abstract boolean isRepoStored(String repoId);
 	public abstract CompletableFuture<Model> loadRepository(String repoId);
 	public abstract void saveRepository(String repoId, SerializableModel model);
 }
