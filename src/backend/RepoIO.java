@@ -6,10 +6,14 @@ import backend.interfaces.RepoSource;
 import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
 public class RepoIO {
+
+	private static final Logger logger = LogManager.getLogger(RepoIO.class.getName());
 
 	private final RepoSource repoSource = new GitHubSource();
 	private final RepoStore repoStore = new JSONStore();
@@ -31,7 +35,11 @@ public class RepoIO {
 
 	public CompletableFuture<Model> updateModel(Model model) {
 		return repoSource.updateModel(model).thenApply(newModel -> {
-			repoStore.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
+			if (!model.equals(newModel)) {
+				repoStore.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
+			} else {
+				logger.info("Nothing has changed in " + model.getRepoId().generateId() + "; not writing to store");
+			}
 			return model;
 		});
 	}

@@ -28,7 +28,7 @@ class WriteTask extends CacheTask {
 		String output = new Gson().toJson(model);
 		String newRepoName = RepoStore.escapeRepoName(repoName);
 		Utility.writeFile(newRepoName, output);
-		logger.info("Written " + repoName + " to JSON cache");
+		logger.info("Written " + repoName + " to JSON store");
 	}
 }
 
