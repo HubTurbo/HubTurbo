@@ -16,7 +16,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 
-import service.updateservice.CollaboratorUpdateService;
+import service.updateservice.UserUpdateService;
 import service.updateservice.IssueUpdateService;
 import service.updateservice.LabelUpdateService;
 import service.updateservice.MilestoneUpdateService;
@@ -29,7 +29,7 @@ public class ModelUpdate {
 
 	private final Model model;
 	private final IssueUpdateService issueUpdateService;
-	private final CollaboratorUpdateService collaboratorUpdateService;
+	private final UserUpdateService userUpdateService;
 	private final LabelUpdateService labelUpdateService;
 	private final MilestoneUpdateService milestoneUpdateService;
 	private final UpdatedIssueMetadata updatedIssueMetadata;
@@ -38,7 +38,7 @@ public class ModelUpdate {
 	                   Model model, UpdateSignature updateSignature) {
 		this.model = model;
 		this.issueUpdateService = new IssueUpdateService(client, updateSignature.issuesETag, updateSignature.lastCheckTime);
-		this.collaboratorUpdateService = new CollaboratorUpdateService(client, updateSignature.collaboratorsETag);
+		this.userUpdateService = new UserUpdateService(client, updateSignature.collaboratorsETag);
 		this.labelUpdateService = new LabelUpdateService(client, updateSignature.labelsETag);
 		this.milestoneUpdateService = new MilestoneUpdateService(client, updateSignature.milestonesETag);
 		updatedIssueMetadata = new UpdatedIssueMetadata(serviceManager);
@@ -120,7 +120,7 @@ public class ModelUpdate {
 	private CompletableFuture<Integer> updateModelCollaborators(String repoId) {
 		CompletableFuture<Integer> response = new CompletableFuture<>();
 		if (model.getRepoId().generateId().equals(repoId)) {
-			List<User> collaborators = collaboratorUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+			List<User> collaborators = userUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 			if (collaborators.size() > 0) {
 				model.updateCachedCollaborators(response, collaborators, repoId);
 			} else {
@@ -174,6 +174,6 @@ public class ModelUpdate {
 	public UpdateSignature getNewUpdateSignature() {
 		return new UpdateSignature(issueUpdateService.getUpdatedETag(),
 			labelUpdateService.getUpdatedETag(), milestoneUpdateService.getUpdatedETag(),
-			collaboratorUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
+			userUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
 	}
 }

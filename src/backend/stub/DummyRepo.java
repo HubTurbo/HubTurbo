@@ -15,23 +15,10 @@ import java.util.List;
 
 public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 
-	private static int counter = 10;
-
-	private static Issue updateRandomIssue() {
-		int i = (int) (Math.random() * counter);
-		Issue issue = new Issue();
-		issue.setNumber(i);
-		issue.setTitle("Issue " + i + " " + Math.random());
-		return issue;
-	}
-
-	private static Issue makeDummyIssue() {
-		Issue issue = new Issue();
-		issue.setNumber(counter + 1);
-		issue.setTitle("Issue " + (counter + 1));
-		counter++;
-		return issue;
-	}
+	private static int issueCounter = 10;
+	private static int labelCounter = 10;
+	private static int milestoneCounter = 10;
+	private static int userCounter = 10;
 
 	public DummyRepo() {
 	}
@@ -51,17 +38,26 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 
 	@Override
 	public ImmutablePair<List<Label>, String> getUpdatedLabels(String repoId, String ETag) {
-		return null;
+		List<Label> labels = new ArrayList<>();
+		labels.add(updateRandomLabel());
+		labels.add(makeDummyLabel());
+		return new ImmutablePair<>(labels, ETag);
 	}
 
 	@Override
 	public ImmutablePair<List<Milestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		return null;
+		List<Milestone> milestones = new ArrayList<>();
+		milestones.add(updateRandomMilestone());
+		milestones.add(makeDummyMilestone());
+		return new ImmutablePair<>(milestones, ETag);
 	}
 
 	@Override
 	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
-		return null;
+		List<User> users = new ArrayList<>();
+		users.add(updateRandomUser());
+		users.add(makeDummyUser());
+		return new ImmutablePair<>(users, ETag);
 	}
 
 	@Override
@@ -75,16 +71,87 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 
 	@Override
 	public List<Label> getLabels(String repoId) {
-		return null;
+		List<Label> labels = new ArrayList<>();
+		for (int i=0; i<10; i++) {
+			labels.add(makeDummyLabel());
+		}
+		return labels;
 	}
 
 	@Override
 	public List<Milestone> getMilestones(String repoId) {
-		return null;
+		List<Milestone> milestones = new ArrayList<>();
+		for (int i=0; i<10; i++) {
+			milestones.add(makeDummyMilestone());
+		}
+		return milestones;
 	}
 
 	@Override
 	public List<User> getUsers(String repoId) {
-		return null;
+		List<User> users = new ArrayList<>();
+		for (int i=0; i<10; i++) {
+			users.add(makeDummyUser());
+		}
+		return users;
+	}
+
+	private static Issue updateRandomIssue() {
+		int i = (int) (Math.random() * issueCounter);
+		Issue issue = new Issue();
+		issue.setNumber(i);
+		issue.setTitle("Issue " + i + " " + Math.random());
+		return issue;
+	}
+
+	private static Issue makeDummyIssue() {
+		Issue issue = new Issue();
+		issue.setNumber(issueCounter + 1);
+		issue.setTitle("Issue " + (issueCounter + 1));
+		issueCounter++;
+		return issue;
+	}
+
+	private static Label updateRandomLabel() {
+		int i = (int) (Math.random() * issueCounter);
+		Label label = new Label();
+		label.setName("Label " + i + " " + Math.random());
+		return label;
+	}
+
+	private static Label makeDummyLabel() {
+		Label label = new Label();
+		label.setName("Label " + (labelCounter + 1));
+		labelCounter++;
+		return label;
+	}
+
+	private static Milestone updateRandomMilestone() {
+		int i = (int) (Math.random() * milestoneCounter);
+		Milestone milestone = new Milestone();
+		milestone.setNumber(i);
+		milestone.setTitle("Milestone " + i + " " + Math.random());
+		return milestone;
+	}
+
+	private static Milestone makeDummyMilestone() {
+		Milestone milestone = new Milestone();
+		milestone.setTitle("Milestone " + (milestoneCounter + 1));
+		milestoneCounter++;
+		return milestone;
+	}
+
+	private static User updateRandomUser() {
+		int i = (int) (Math.random() * userCounter);
+		User user = new User();
+		user.setName("User " + i + " " + Math.random());
+		return user;
+	}
+
+	private static User makeDummyUser() {
+		User user = new User();
+		user.setLogin("User " + (userCounter + 1));
+		userCounter++;
+		return user;
 	}
 }

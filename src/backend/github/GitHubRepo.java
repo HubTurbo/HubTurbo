@@ -4,22 +4,32 @@ import backend.UserCredentials;
 import backend.interfaces.Repo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
-import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.*;
 import service.GitHubClientExtended;
-import service.updateservice.IssueUpdateService;
+import service.IssueServiceExtended;
+import service.LabelServiceFixed;
+import service.updateservice.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
+	private static final Logger logger = LogManager.getLogger(GitHubRepo.class.getName());
+
 	private final GitHubClientExtended client = new GitHubClientExtended();
-	private final IssueService issueService = new IssueService();
+	private final IssueServiceExtended issueService = new IssueServiceExtended(client);
+	private final CollaboratorService collaboratorService = new CollaboratorService();
+	private final LabelServiceFixed labelService = new LabelServiceFixed();
+	final private MilestoneService milestoneService = new MilestoneService();
 
 	public GitHubRepo() {
 	}
@@ -49,17 +59,24 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
 	@Override
 	public ImmutablePair<List<Label>, String> getUpdatedLabels(String repoId, String ETag) {
-		return null;
+		return getUpdatedResource(repoId, ETag, LabelUpdateService::new);
 	}
 
 	@Override
 	public ImmutablePair<List<Milestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		return null;
+		return getUpdatedResource(repoId, ETag, MilestoneUpdateService::new);
 	}
 
 	@Override
 	public ImmutablePair<List<User>, String> getUpdatedUsers(String repoId, String ETag) {
-		return null;
+		return getUpdatedResource(repoId, ETag, UserUpdateService::new);
+	}
+
+	private <R, S extends UpdateService<R>> ImmutablePair<List<R>, String> getUpdatedResource(
+		String repoId, String ETag, BiFunction<GitHubClientExtended, String, S> construct) {
+		S updateService = construct.apply(client, ETag);
+		return new ImmutablePair<>(updateService.getUpdatedItems(RepositoryId.createFromId(repoId)),
+			updateService.getUpdatedETag());
 	}
 
 	@Override
@@ -72,17 +89,32 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
 	@Override
 	public List<Label> getLabels(String repoId) {
-		return null;
+		try {
+			return labelService.getLabels(RepositoryId.createFromId(repoId));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ArrayList<>();
+		}
 	}
 
 	@Override
 	public List<Milestone> getMilestones(String repoId) {
-		return null;
+		try {
+			return milestoneService.getMilestones(RepositoryId.createFromId(repoId), "all");
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ArrayList<>();
+		}
 	}
 
 	@Override
 	public List<User> getUsers(String repoId) {
-		return null;
+		try {
+			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ArrayList<>();
+		}
 	}
 
 	private List<Issue> getAll(PageIterator<Issue> iterator) {

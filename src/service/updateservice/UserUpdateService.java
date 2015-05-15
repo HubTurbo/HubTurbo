@@ -13,9 +13,9 @@ import service.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 
-public class CollaboratorUpdateService extends UpdateService<User>{	
+public class UserUpdateService extends UpdateService<User>{
 
-	public CollaboratorUpdateService(GitHubClientExtended client, String collabsETag){
+	public UserUpdateService(GitHubClientExtended client, String collabsETag){
 		super(client, SEGMENT_COLLABORATORS, collabsETag);
 	}
 	
