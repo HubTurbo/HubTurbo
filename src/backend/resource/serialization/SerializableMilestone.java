@@ -3,11 +3,12 @@ package backend.resource.serialization;
 import backend.resource.TurboMilestone;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class SerializableMilestone {
 	public final int id;
 	public final String title;
-	public final LocalDate dueDate;
+	public final Optional<LocalDate> dueDate;
 	public final String description;
 	public final boolean isOpen;
 	public final int openIssues;

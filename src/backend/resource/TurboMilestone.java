@@ -5,6 +5,7 @@ import org.eclipse.egit.github.core.Milestone;
 import util.Utility;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class TurboMilestone {
@@ -18,7 +19,7 @@ public class TurboMilestone {
 	private final int id;
 
 	private String title;
-	private LocalDate dueDate;
+	private Optional<LocalDate> dueDate;
 	private String description;
 	private boolean isOpen;
 	private int openIssues;
@@ -33,7 +34,7 @@ public class TurboMilestone {
 	public TurboMilestone(int id, String title) {
 		this.id = id;
 		this.title = title;
-		this.dueDate = LocalDate.now();
+		this.dueDate = Optional.empty();
 		this.description = "";
 		this.isOpen = true;
 		this.openIssues = 0;
@@ -43,7 +44,9 @@ public class TurboMilestone {
 	public TurboMilestone(Milestone milestone) {
 		this.id = milestone.getNumber();
 		this.title = milestone.getTitle();
-		this.dueDate = Utility.dateToLocalDateTime(milestone.getDueOn()).toLocalDate();
+		this.dueDate = milestone.getDueOn() == null
+			? Optional.empty()
+			: Optional.of(Utility.dateToLocalDateTime(milestone.getDueOn()).toLocalDate());
 		this.description = milestone.getDescription();
 		this.isOpen = milestone.getState().equals(STATE_OPEN);
 		this.openIssues = milestone.getOpenIssues();
@@ -75,10 +78,10 @@ public class TurboMilestone {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public LocalDate getDueDate() {
+	public Optional<LocalDate> getDueDate() {
 		return dueDate;
 	}
-	public void setDueDate(LocalDate dueDate) {
+	public void setDueDate(Optional<LocalDate> dueDate) {
 		this.dueDate = dueDate;
 	}
 	public String getDescription() {
@@ -116,9 +119,9 @@ public class TurboMilestone {
 		if (id != that.id) return false;
 		if (isOpen != that.isOpen) return false;
 		if (openIssues != that.openIssues) return false;
-		if (description != null ? !description.equals(that.description) : that.description != null) return false;
-		if (dueDate != null ? !dueDate.equals(that.dueDate) : that.dueDate != null) return false;
-		if (title != null ? !title.equals(that.title) : that.title != null) return false;
+		if (!description.equals(that.description)) return false;
+		if (!dueDate.equals(that.dueDate)) return false;
+		if (!title.equals(that.title)) return false;
 
 		return true;
 	}
@@ -126,9 +129,9 @@ public class TurboMilestone {
 	@Override
 	public int hashCode() {
 		int result = id;
-		result = 31 * result + (title != null ? title.hashCode() : 0);
-		result = 31 * result + (dueDate != null ? dueDate.hashCode() : 0);
-		result = 31 * result + (description != null ? description.hashCode() : 0);
+		result = 31 * result + title.hashCode();
+		result = 31 * result + dueDate.hashCode();
+		result = 31 * result + description.hashCode();
 		result = 31 * result + (isOpen ? 1 : 0);
 		result = 31 * result + openIssues;
 		result = 31 * result + closedIssues;
