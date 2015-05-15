@@ -5,6 +5,8 @@ import backend.resource.serialization.SerializableLabel;
 import org.eclipse.egit.github.core.Label;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class TurboLabel {
@@ -15,7 +17,6 @@ public class TurboLabel {
 	private void ______SERIALIZED_FIELDS______() {
 	}
 
-	private final boolean exclusive;
 	private final String actualName;
 	private final String colour;
 
@@ -28,23 +29,19 @@ public class TurboLabel {
 	public TurboLabel(String name) {
 		this.actualName = name;
 		this.colour = "#ffffff";
-		this.exclusive = true;
 	}
 
 	public TurboLabel(String group, String name) {
-		this.exclusive = true;
 		this.actualName = join(group, name);
 		this.colour = "#ffffff";
 	}
 
 	public TurboLabel(Label label) {
-		this.exclusive = true;
 		this.actualName = label.getName();
 		this.colour = label.getColor();
 	}
 
 	public TurboLabel(SerializableLabel label) {
-		this.exclusive = label.exclusive;
 		this.actualName = label.actualName;
 		this.colour = label.colour;
 	}
@@ -52,39 +49,58 @@ public class TurboLabel {
 	private void ______METHODS______() {
 	}
 
-	private String getDelimiter() {
-		return exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER;
+	private Optional<String> getDelimiter() {
+
+		Pattern p = Pattern.compile(String.format("^[^%s%s](%s|%s)",
+			EXCLUSIVE_DELIMITER,
+			NONEXCLUSIVE_DELIMITER,
+			EXCLUSIVE_DELIMITER,
+			NONEXCLUSIVE_DELIMITER));
+		Matcher m = p.matcher(actualName);
+
+		if (m.find()) {
+			return Optional.of(m.group(1));
+		} else {
+			return Optional.empty();
+		}
 	}
 
-	private boolean isDelimited(String labelName) {
-		return labelName.contains(EXCLUSIVE_DELIMITER) || labelName.contains(NONEXCLUSIVE_DELIMITER);
+	private boolean isDelimited() {
+		return actualName.contains(EXCLUSIVE_DELIMITER) || actualName.contains(NONEXCLUSIVE_DELIMITER);
 	}
 
 	private String join(String group, String name) {
 		return group + getDelimiter() + name;
 	}
 
+	public boolean isExclusive() {
+		if (isDelimited()) {
+			assert getDelimiter().isPresent();
+			return getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
+		} else {
+			return false;
+		}
+	}
+
 	public Optional<String> getGroup() {
-		if (isDelimited(actualName)) {
-			return Optional.of(actualName.split(getDelimiter())[0]);
+		if (isDelimited()) {
+			assert getDelimiter().isPresent();
+			return Optional.of(actualName.split(getDelimiter().get())[0]);
 		} else {
 			return Optional.empty();
 		}
 	}
 
 	public String getName() {
-		if (isDelimited(actualName)) {
-			return actualName.split(getDelimiter())[1];
+		if (isDelimited()) {
+			assert getDelimiter().isPresent();
+			return actualName.split(getDelimiter().get())[1];
 		} else {
 			return actualName;
 		}
 	}
 
 	private void ______BOILERPLATE______() {
-	}
-
-	public boolean isExclusive() {
-		return exclusive;
 	}
 
 	public String getColour() {
@@ -102,18 +118,16 @@ public class TurboLabel {
 
 		TurboLabel that = (TurboLabel) o;
 
-		if (exclusive != that.exclusive) return false;
-		if (actualName != null ? !actualName.equals(that.actualName) : that.actualName != null) return false;
-		if (colour != null ? !colour.equals(that.colour) : that.colour != null) return false;
+		if (!actualName.equals(that.actualName)) return false;
+		if (!colour.equals(that.colour)) return false;
 
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = (exclusive ? 1 : 0);
-		result = 31 * result + (actualName != null ? actualName.hashCode() : 0);
-		result = 31 * result + (colour != null ? colour.hashCode() : 0);
+		int result = actualName.hashCode();
+		result = 31 * result + colour.hashCode();
 		return result;
 	}
 }
