@@ -314,6 +314,7 @@ public class BrowserComponent {
 				} else {
 					logger.info("Chrome window not responding.");
 					resetBrowser();
+					runBrowserOperation(operation);
 				}
 				return null;
 			}
