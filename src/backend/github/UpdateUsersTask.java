@@ -14,6 +14,7 @@ import util.HTLog;
 import util.Utility;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
@@ -34,11 +35,17 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 		List<TurboUser> existing = model.getUsers();
 		List<User> changed = changes.left;
 		logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
+			changed.size(), changed.size() == 0 ? "" : ": " + stringify(changed)));
 
 		List<TurboUser> updated = Utility.reconcile(existing, changed,
 			TurboUser::getLoginName, User::getLogin, TurboUser::new);
 
 		response.complete(new Result<>(updated, changes.right));
+	}
+
+	private String stringify(List<User> users) {
+		return "[" + users.stream()
+			.map(User::getLogin)
+			.collect(Collectors.joining(", ")) + "]";
 	}
 }

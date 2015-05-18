@@ -14,6 +14,7 @@ import util.HTLog;
 import util.Utility;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
@@ -34,11 +35,18 @@ public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result> 
 		List<TurboMilestone> existing = model.getMilestones();
 		List<Milestone> changed = changes.left;
 		logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
+			changed.size(), changed.size() == 0 ? "" : ": " + stringify(changed)));
 
 		List<TurboMilestone> updated = Utility.reconcile(existing, changed,
 			TurboMilestone::getTitle, Milestone::getTitle, TurboMilestone::new);
 
 		response.complete(new Result<>(updated, changes.right));
 	}
+
+	private String stringify(List<Milestone> milestones) {
+		return "[" + milestones.stream()
+			.map(Milestone::getTitle)
+			.collect(Collectors.joining(", ")) + "]";
+	}
+
 }
