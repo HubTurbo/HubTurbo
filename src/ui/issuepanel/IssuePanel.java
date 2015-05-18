@@ -3,6 +3,7 @@ package ui.issuepanel;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 import javafx.event.EventHandler;
 import javafx.scene.control.ListCell;
@@ -39,7 +40,7 @@ public class IssuePanel extends IssueColumn {
 	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
-	private static final int BROWSER_REQUEST_DELAY = 1;
+	private static final int BROWSER_REQUEST_DELAY = 500; //milliseconds
 	private static TickingTimer timer;
 	private static int nextIssueId;
 	private static int nextColumnIndex;
@@ -150,14 +151,14 @@ public class IssuePanel extends IssueColumn {
 
 	private TickingTimer createTickingTimer() {
 		return new TickingTimer("Browser Request Delay Timer", BROWSER_REQUEST_DELAY, integer -> {
-            // do nothing each tick
+            // do nothing for each tick
         }, () -> {
 			if (nextIssueId >= 0) {
 				System.out.println("navigating to issue #" + nextIssueId + " from column: " + nextColumnIndex);
 				ui.triggerEvent(new IssueSelectedEvent(nextIssueId, nextColumnIndex));
 			}
 			timer.pause();
-		});
+		}, TimeUnit.MILLISECONDS);
 	}
 	
 	private void setupKeyboardShortcuts(){

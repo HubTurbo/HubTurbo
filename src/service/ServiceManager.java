@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
@@ -384,7 +385,7 @@ public class ServiceManager {
 	private TickingTimer createTickingTimer() {
 		return new TickingTimer("Sync Timer", SYNC_PERIOD, HTStatusBar::updateRefreshTimer, () -> {
 			preventRepoSwitchingAndUpdateModel(model.getRepoId().generateId());
-		});
+		}, TimeUnit.SECONDS);
 	}
 
 	/**
