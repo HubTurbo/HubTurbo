@@ -135,7 +135,6 @@ public class IssuePanel extends IssueColumn {
 		setupKeyboardShortcuts();
 		listView.setOnItemSelected(i -> {
 			TurboIssue issue = listView.getItems().get(i);
-//			ui.triggerEvent(new IssueSelectedEvent(issue.getId(), columnIndex));
 			nextIssueId = issue.getId();
 			nextColumnIndex = columnIndex;
 			timer.restart();
