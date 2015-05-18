@@ -430,7 +430,7 @@ public class BrowserComponent {
 			try {
 				if (scriptEngine == null) {
 					ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-					scriptEngine = scriptEngineManager.getEngineByName("AppleScript");
+					scriptEngine = scriptEngineManager.getEngineByName("AppleScriptEngine");
 				}
 				scriptEngine.eval("tell application \"System Events\" to repeat with p in (every application process whose name contains \"Chrome\" and name does not contain \"Helper\")\nif (title of window of p as string) contains \"" + driver.getTitle() + "\" then tell process p to perform action \"AXRaise\" of window 1 of p\nend repeat");
 			} catch (ScriptException e) {
