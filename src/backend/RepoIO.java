@@ -26,10 +26,7 @@ public class RepoIO {
 		if (repoStore.isRepoStored(repoId)) {
 			return repoStore.loadRepository(repoId).thenCompose(this::updateModel);
 		} else {
-			return repoSource.downloadRepository(repoId).thenApply(model -> {
-				repoStore.saveRepository(repoId, new SerializableModel(model));
-				return model;
-			});
+			return repoSource.downloadRepository(repoId).thenCompose(this::updateModel);
 		}
 	}
 
