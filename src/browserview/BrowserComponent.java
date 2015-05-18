@@ -355,9 +355,6 @@ public class BrowserComponent {
 	private static void setupJNA() {
 		if (PlatformSpecific.isOnWindows()) {
 			user32 = User32.INSTANCE;
-		} else if (PlatformSpecific.isOnMac()) {
-			ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-			scriptEngine = scriptEngineManager.getEngineByName("AppleScript");
 		}
 	}
 	
@@ -431,6 +428,10 @@ public class BrowserComponent {
 	public void bringToFront() {
 		if (PlatformSpecific.isOnMac()) {
 			try {
+				if (scriptEngine == null) {
+					ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+					scriptEngine = scriptEngineManager.getEngineByName("AppleScript");
+				}
 				scriptEngine.eval("tell application \"System Events\" to repeat with p in (every application process whose name contains \"Chrome\" and name does not contain \"Helper\")\nif (title of window of p as string) contains \"" + driver.getTitle() + "\" then tell process p to perform action \"AXRaise\" of window 1 of p\nend repeat");
 			} catch (ScriptException e) {
 				logger.info("Bring browser window to front script exception! " + e.getLocalizedMessage());
