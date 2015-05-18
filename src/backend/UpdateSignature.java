@@ -39,4 +39,33 @@ public class UpdateSignature {
 	public boolean isEmpty() {
 		return this == empty;
 	}
+
+	/**
+	 * lastCheckTime does not contribute to equality of signatures
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		UpdateSignature that = (UpdateSignature) o;
+
+		if (collaboratorsETag != null ? !collaboratorsETag.equals(that.collaboratorsETag) : that.collaboratorsETag != null)
+			return false;
+		if (issuesETag != null ? !issuesETag.equals(that.issuesETag) : that.issuesETag != null) return false;
+		if (labelsETag != null ? !labelsETag.equals(that.labelsETag) : that.labelsETag != null) return false;
+		if (milestonesETag != null ? !milestonesETag.equals(that.milestonesETag) : that.milestonesETag != null)
+			return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = issuesETag != null ? issuesETag.hashCode() : 0;
+		result = 31 * result + (labelsETag != null ? labelsETag.hashCode() : 0);
+		result = 31 * result + (milestonesETag != null ? milestonesETag.hashCode() : 0);
+		result = 31 * result + (collaboratorsETag != null ? collaboratorsETag.hashCode() : 0);
+		return result;
+	}
 }
