@@ -17,6 +17,7 @@ import javafx.util.Callback;
 import model.Model;
 import model.TurboIssue;
 import service.ServiceManager;
+import service.TickingTimer;
 import ui.UI;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
@@ -38,6 +39,11 @@ public class IssuePanel extends IssueColumn {
 	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
+	private static final int BROWSER_REQUEST_DELAY = 1;
+	private static TickingTimer timer;
+	private static int nextIssueId;
+	private static int nextColumnIndex;
+
 	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
 		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
 		this.model = model;
@@ -46,6 +52,12 @@ public class IssuePanel extends IssueColumn {
 		listView = new NavigableListView<>();
 		setupListView();
 		getChildren().add(listView);
+		if (timer == null) {
+			nextIssueId = -1;
+			nextColumnIndex = -1;
+			timer = createTickingTimer();
+			timer.start();
+		}
 
 		refreshItems();
 	}
@@ -122,11 +134,29 @@ public class IssuePanel extends IssueColumn {
 		setupKeyboardShortcuts();
 		listView.setOnItemSelected(i -> {
 			TurboIssue issue = listView.getItems().get(i);
-			ui.triggerEvent(new IssueSelectedEvent(issue.getId(), columnIndex));
+//			ui.triggerEvent(new IssueSelectedEvent(issue.getId(), columnIndex));
+			nextIssueId = issue.getId();
+			nextColumnIndex = columnIndex;
+			timer.restart();
+			if (timer.isPaused()) {
+				timer.resume();
+			}
 			if (issueHasNewComments(issue)) {
 				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
 				refreshItems();
 			}
+		});
+	}
+
+	private TickingTimer createTickingTimer() {
+		return new TickingTimer("Browser Request Delay Timer", BROWSER_REQUEST_DELAY, integer -> {
+            // do nothing each tick
+        }, () -> {
+			if (nextIssueId >= 0) {
+				System.out.println("navigating to issue #" + nextIssueId + " from column: " + nextColumnIndex);
+				ui.triggerEvent(new IssueSelectedEvent(nextIssueId, nextColumnIndex));
+			}
+			timer.pause();
 		});
 	}
 	
