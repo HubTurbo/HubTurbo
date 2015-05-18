@@ -54,13 +54,13 @@ public class TurboMilestone {
 	}
 
 	public TurboMilestone(SerializableMilestone milestone) {
-		this.id = milestone.id;
-		this.title = milestone.title;
-		this.dueDate = milestone.dueDate;
-		this.description = milestone.description;
-		this.isOpen = milestone.isOpen;
-		this.openIssues = milestone.openIssues;
-		this.closedIssues = milestone.closedIssues;
+		this.id = milestone.getId();
+		this.title = milestone.getTitle();
+		this.dueDate = milestone.getDueDate();
+		this.description = milestone.getDescription();
+		this.isOpen = milestone.isOpen();
+		this.openIssues = milestone.getOpenIssues();
+		this.closedIssues = milestone.getClosedIssues();
 	}
 
 	private void ______METHODS______() {

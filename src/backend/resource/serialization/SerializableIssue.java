@@ -3,22 +3,23 @@ package backend.resource.serialization;
 import backend.resource.TurboIssue;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class SerializableIssue {
-	public final int id;
-	public final String title;
-	public final String creator;
-	public final LocalDateTime createdAt;
-	public final boolean isPullRequest;
-	public final String description;
-	public final LocalDateTime updatedAt;
-	public final int commentCount;
-	public final boolean isOpen;
-	public final Optional<String> assignee;
-	public final List<String> labels;
-	public final Optional<Integer> milestone;
+	private int id = 0;
+	private String title = "";
+	private String creator = "";
+	private LocalDateTime createdAt = LocalDateTime.now();
+	private boolean isPullRequest = false;
+	private String description = "";
+	private LocalDateTime updatedAt = LocalDateTime.now();
+	private int commentCount = 0;
+	private boolean isOpen = true;
+	private Optional<String> assignee = Optional.empty();
+	private List<String> labels = new ArrayList<>();
+	private Optional<Integer> milestone = Optional.empty();
 
 	public SerializableIssue(TurboIssue issue) {
 		this.id = issue.getId();
@@ -33,5 +34,42 @@ public class SerializableIssue {
 		this.assignee = issue.getAssignee();
 		this.labels = issue.getLabels();
 		this.milestone = issue.getMilestone();
+	}
+
+	public int getId() {
+		return id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public boolean isPullRequest() {
+		return isPullRequest;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+	public int getCommentCount() {
+		return commentCount;
+	}
+	public boolean isOpen() {
+		return isOpen;
+	}
+	public Optional<String> getAssignee() {
+		return assignee;
+	}
+	public List<String> getLabels() {
+		return labels;
+	}
+	public Optional<Integer> getMilestone() {
+		return milestone;
 	}
 }

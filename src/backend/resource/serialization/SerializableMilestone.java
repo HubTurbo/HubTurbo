@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public class SerializableMilestone {
-	public final int id;
-	public final String title;
-	public final Optional<LocalDate> dueDate;
-	public final String description;
-	public final boolean isOpen;
-	public final int openIssues;
-	public final int closedIssues;
+	private int id;
+	private String title;
+	private Optional<LocalDate> dueDate;
+	private String description;
+	private boolean isOpen;
+	private int openIssues;
+	private int closedIssues;
 
 	public SerializableMilestone(TurboMilestone milestone) {
 		this.id = milestone.getId();
@@ -22,5 +22,27 @@ public class SerializableMilestone {
 		this.isOpen = milestone.isOpen();
 		this.openIssues = milestone.getOpenIssues();
 		this.closedIssues = milestone.getClosedIssues();
+	}
+
+	public int getId() {
+		return id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public Optional<LocalDate> getDueDate() {
+		return dueDate;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public boolean isOpen() {
+		return isOpen;
+	}
+	public int getOpenIssues() {
+		return openIssues;
+	}
+	public int getClosedIssues() {
+		return closedIssues;
 	}
 }

@@ -42,8 +42,8 @@ public class TurboLabel {
 	}
 
 	public TurboLabel(SerializableLabel label) {
-		this.actualName = label.actualName;
-		this.colour = label.colour;
+		this.actualName = label.getActualName();
+		this.colour = label.getColour();
 	}
 
 	private void ______METHODS______() {

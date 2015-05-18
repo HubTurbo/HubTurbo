@@ -109,19 +109,19 @@ public class TurboIssue {
 	}
 
 	public TurboIssue(SerializableIssue issue) {
-		this.id = issue.id;
-		this.creator = issue.creator;
-		this.createdAt = issue.createdAt;
-		this.isPullRequest = issue.isPullRequest;
+		this.id = issue.getId();
+		this.creator = issue.getCreator();
+		this.createdAt = issue.getCreatedAt();
+		this.isPullRequest = issue.isPullRequest();
 
-		this.title = issue.title;
-		this.description = issue.description;
-		this.updatedAt = issue.updatedAt;
-		this.commentCount = issue.commentCount;
-		this.isOpen = issue.isOpen;
-		this.assignee = issue.assignee;
-		this.labels = issue.labels;
-		this.milestone = issue.milestone;
+		this.title = issue.getTitle();
+		this.description = issue.getDescription();
+		this.updatedAt = issue.getUpdatedAt();
+		this.commentCount = issue.getCommentCount();
+		this.isOpen = issue.isOpen();
+		this.assignee = issue.getAssignee();
+		this.labels = issue.getLabels();
+		this.milestone = issue.getMilestone();
 	}
 
 	private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {

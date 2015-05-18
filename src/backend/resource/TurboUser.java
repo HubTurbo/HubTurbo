@@ -38,9 +38,9 @@ public class TurboUser {
 	}
 
 	public TurboUser(SerializableUser user) {
-		this.loginName = user.loginName;
-		this.realName = user.realName;
-		this.avatarURL = user.avatarURL;
+		this.loginName = user.getLoginName();
+		this.realName = user.getRealName();
+		this.avatarURL = user.getAvatarURL();
 	}
 
 	private void ______METHODS______() {
