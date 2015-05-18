@@ -29,7 +29,7 @@ public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result> 
 	@Override
 	public void run() {
 		ImmutablePair<List<Milestone>, String> changes = repo.getUpdatedMilestones(model.getRepoId().generateId(),
-			model.getUpdateSignature().labelsETag);
+			model.getUpdateSignature().milestonesETag);
 
 		List<TurboMilestone> existing = model.getMilestones();
 		List<Milestone> changed = changes.left;
