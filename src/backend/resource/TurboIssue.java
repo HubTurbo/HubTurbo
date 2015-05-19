@@ -1,5 +1,6 @@
 package backend.resource;
 
+import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -52,8 +53,7 @@ public class TurboIssue {
 	private void ______TRANSIENT_FIELDS______() {
 	}
 
-	// TODO Model
-	// TODO Issue metadata: comments, events
+	private IssueMetadata metadata;
 
 	private void ______CONSTRUCTORS______() {
 	}
@@ -216,7 +216,17 @@ public class TurboIssue {
 	public void setMilestone(Optional<Integer> milestone) {
 		this.milestone = milestone;
 	}
+	public IssueMetadata getMetadata() {
+		return metadata;
+	}
+	public void setMetadata(IssueMetadata metadata) {
+		this.metadata = metadata;
+	}
 
+	/**
+	 * Metadata is not considered for equality.
+	 * In general only serialised fields are.
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -49,8 +49,9 @@ public class Logic {
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+		logger.info("Getting metadata for issues " + issues);
 		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
-			// TODO process the metadata by inserting it into the model
+			models.insertMetadata(repoId, metadata);
 			return metadata;
 		});
 	}

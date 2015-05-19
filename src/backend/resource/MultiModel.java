@@ -1,10 +1,13 @@
 package backend.resource;
 
+import backend.IssueMetadata;
 import backend.interfaces.IModel;
+import com.sun.tools.corba.se.idl.ValueRepositoryId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Thread-safe. The only top-level state in the application.
@@ -32,6 +35,14 @@ public class MultiModel implements IModel {
 	public synchronized void replace(List<Model> models) {
 		this.models.clear();
 		models.forEach(this::add);
+	}
+
+	public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata) {
+		models.get(repoId).getIssues().forEach(issue -> {
+			if (metadata.containsKey(issue.getId())) {
+				issue.setMetadata(new IssueMetadata(metadata.get(issue.getId())));
+			}
+		});
 	}
 
 	@Override

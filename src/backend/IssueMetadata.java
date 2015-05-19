@@ -15,6 +15,11 @@ public class IssueMetadata {
 		this.comments = comments;
 	}
 
+	public IssueMetadata(IssueMetadata other) {
+		this.events = new ArrayList<>(other.events);
+		this.comments = new ArrayList<>(other.comments);
+	}
+
 	public String summarise() {
 		return String.format("%d events, %d comments", events.size(), comments.size());
 	}
