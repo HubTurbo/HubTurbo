@@ -3,8 +3,8 @@ package filter.expression;
 import java.util.List;
 import java.util.function.Predicate;
 
-import model.Model;
-import model.TurboIssue;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
@@ -13,7 +13,7 @@ public interface FilterExpression {
 	// Determines if an issue satisfies this filter expression.
 	// If so, it is shown in the issue panel.
 	
-	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info);
+	public boolean isSatisfiedBy(Model model, TurboIssue issue, MetaQualifierInfo info);
 	
 	// Filter expressions may only be applied if they contain no ambiguity
 	// => they must contain only qualifiers or conjunctions thereof. Disjunctions

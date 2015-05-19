@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import model.Model;
-import model.TurboIssue;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
@@ -52,8 +52,9 @@ public class Conjunction implements FilterExpression {
 		return true;
 	}
 
-	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
-		return left.isSatisfiedBy(issue, info) && right.isSatisfiedBy(issue, info);
+	@Override
+	public boolean isSatisfiedBy(Model model, TurboIssue issue, MetaQualifierInfo info) {
+		return left.isSatisfiedBy(model, issue, info) && right.isSatisfiedBy(model, issue, info);
 	}
 	
 	private boolean containsDuplicateQualifierNames() {
