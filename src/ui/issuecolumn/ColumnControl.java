@@ -1,7 +1,7 @@
 package ui.issuecolumn;
 
 import backend.assumed.ModelUpdatedEventHandler;
-import command.TurboCommandExecutor;
+import backend.resource.Model;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -10,17 +10,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import model.Model;
 import storage.DataManager;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.ColumnClickedEvent;
-import util.events.ColumnClickedEventHandler;
-import util.events.IssueSelectedEvent;
-import util.events.IssueSelectedEventHandler;
-import util.events.ModelChangedEvent;
-import util.events.ModelChangedEventHandler;
+import util.events.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,19 +27,15 @@ public class ColumnControl extends HBox {
 
 	private final UI ui;
 	private final Stage stage;
-	private final Model model;
+	private Model model;
 	
-	@SuppressWarnings("unused")
 	private final UIBrowserBridge uiBrowserBridge;
 
-	private TurboCommandExecutor dragAndDropExecutor;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
-	public ColumnControl(UI ui, Stage stage, Model model) {
+	public ColumnControl(UI ui, Stage stage) {
 		this.ui = ui;
 		this.stage = stage;
-		this.model = model;
-		this.dragAndDropExecutor = new TurboCommandExecutor();
 		this.uiBrowserBridge = new UIBrowserBridge(ui);
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
@@ -63,32 +53,15 @@ public class ColumnControl extends HBox {
 			}
 		));
 
-		ui.registerEvent(new ModelChangedEventHandler() {
-			@Override
-			public void handle(ModelChangedEvent e) {
-				Platform.runLater(() -> {
-					forEach(child -> {
-						if (child instanceof IssueColumn) {
-							((IssueColumn) child).setItems(e.issues);
-						}
-					});
-				});
-			}
-		});
-
-		ui.registerEvent(new IssueSelectedEventHandler() {
-			@Override
-			public void handle(IssueSelectedEvent e) {
-				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
-			}
-		});
-		
-		ui.registerEvent(new ColumnClickedEventHandler() {
-			@Override
-			public void handle(ColumnClickedEvent e) {
-				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
-			}
-		});
+		ui.registerEvent((ModelUpdatedEventHandler) e -> Platform.runLater(() -> {
+			forEach(child -> {
+				if (child instanceof IssueColumn) {
+					((IssueColumn) child).setItems(e.model.getIssues());
+				}
+			});
+		}));
+		ui.registerEvent((IssueSelectedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+		ui.registerEvent((ColumnClickedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 
 		setupKeyEvents();
 	}
@@ -154,7 +127,7 @@ public class ColumnControl extends HBox {
 	}
 
 	public IssueColumn addColumnAt(int index) {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
+		IssueColumn panel = new IssuePanel(ui, model, this, index);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();

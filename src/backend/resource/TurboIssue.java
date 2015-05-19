@@ -86,6 +86,25 @@ public class TurboIssue {
 		this.title = title;
 	}
 
+	// Copy constructor
+	public TurboIssue(TurboIssue issue) {
+		this.id = issue.id;
+		this.title = issue.title;
+		this.creator = issue.creator;
+		this.createdAt = issue.createdAt;
+		this.isPullRequest = issue.isPullRequest;
+
+		this.description = issue.description;
+		this.updatedAt = issue.updatedAt;
+		this.commentCount = issue.commentCount;
+		this.isOpen = issue.isOpen;
+		this.assignee = issue.assignee;
+		this.labels = new ArrayList<>(issue.labels);
+		this.milestone = issue.milestone;
+
+		this.metadata = new IssueMetadata();
+	}
+
 	public TurboIssue(Issue issue) {
 		this.id = issue.getNumber();
 		this.title = issue.getTitle();
@@ -159,6 +178,8 @@ public class TurboIssue {
 		return "#" + id + " " + title;
 	}
 
+
+
 	private void ______BOILERPLATE______() {
 	}
 
@@ -207,8 +228,11 @@ public class TurboIssue {
 	public Optional<String> getAssignee() {
 		return assignee;
 	}
-	public void setAssignee(Optional<String> assignee) {
-		this.assignee = assignee;
+	public void setAssignee(String assignee) {
+		this.assignee = Optional.of(assignee);
+	}
+	public void setAssignee(TurboUser assignee) {
+		setAssignee(assignee.getLoginName());
 	}
 	public List<String> getLabels() {
 		return labels;
@@ -216,11 +240,20 @@ public class TurboIssue {
 	public void setLabels(List<String> labels) {
 		this.labels = labels;
 	}
+	public void addLabel(String label) {
+		this.labels.add(label);
+	}
+	public void addLabel(TurboLabel label) {
+		addLabel(label.getActualName());
+	}
 	public Optional<Integer> getMilestone() {
 		return milestone;
 	}
-	public void setMilestone(Optional<Integer> milestone) {
-		this.milestone = milestone;
+	public void setMilestone(Integer milestone) {
+		this.milestone = Optional.of(milestone);
+	}
+	public void setMilestone(TurboMilestone milestone) {
+		setMilestone(milestone.getId());
 	}
 	public IssueMetadata getMetadata() {
 		return metadata;

@@ -34,7 +34,6 @@ import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import service.ServiceManager;
 import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
@@ -257,7 +256,7 @@ public class MenuControl extends MenuBar {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
-			ServiceManager.getInstance().updateModelNow();
+			ui.logic.refresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
@@ -281,13 +280,14 @@ public class MenuControl extends MenuBar {
 					logger.info("Menu: View > Force Refresh");
 
 					updateProgress(0, 1);
-					updateMessage(String.format("Reloading %s...",
-						ServiceManager.getInstance().getRepoId().generateId()));
+//					updateMessage(String.format("Reloading %s...",
+//						ServiceManager.getInstance().getRepoId().generateId()));
 
-					ServiceManager.getInstance().forceRefresh((message, progress) -> {
-						updateProgress(progress * 100, 100);
-						updateMessage(message);
-					});
+					// TODO
+//					ServiceManager.getInstance().forceRefresh((message, progress) -> {
+//						updateProgress(progress * 100, 100);
+//						updateMessage(message);
+//					});
                     PlatformEx.runAndWait(columns::recreateColumns);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);

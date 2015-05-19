@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import model.TurboLabel;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -136,23 +135,27 @@ public class TurboIssueEvent {
 				return display;
 			}
 			case Labeled: {
-				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+				// TODO re-enable this
+//				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
 					new Text(String.format("%s added label ", actorName)),
-					label.getNode(),
+//					label.getNode(),
+					new Label(getLabelName()),
 					new Text(String.format(" %s.", time))
 				);
 				return display;
 			}
 			case Unlabeled: {
-				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+				// TODO re-enable this
+//				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
 					new Text(String.format("%s removed label ", actorName)),
-					label.getNode(),
+//					label.getNode(),
+					new Label(getLabelName()),
 					new Text(String.format(" %s.", time))
 				);
 				return display;

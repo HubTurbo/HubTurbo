@@ -30,7 +30,6 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
 
-import service.ServiceManager;
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
@@ -333,9 +332,9 @@ public class BrowserComponent {
 			driver.get(GitHubURL.LOGIN_PAGE);
 			try {
 				WebElement searchBox = driver.findElement(By.name("login"));
-				searchBox.sendKeys(ServiceManager.getInstance().getUserId());
+				searchBox.sendKeys(ui.logic.credentials.username);
 				searchBox = driver.findElement(By.name("password"));
-				searchBox.sendKeys(ServiceManager.getInstance().getLastUsedPassword());
+				searchBox.sendKeys(ui.logic.credentials.password);
 				searchBox.submit();
 			} catch (NoSuchElementException e) {
 				// Already logged in; do nothing

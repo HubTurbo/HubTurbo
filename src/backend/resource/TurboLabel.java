@@ -2,6 +2,8 @@ package backend.resource;
 
 
 import backend.resource.serialization.SerializableLabel;
+import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
 import java.util.Optional;
@@ -98,6 +100,27 @@ public class TurboLabel {
 		} else {
 			return actualName;
 		}
+	}
+
+	private String getStyle() {
+		String colour = getColour();
+		int R = Integer.parseInt(colour.substring(0, 2), 16);
+		int G = Integer.parseInt(colour.substring(2, 4), 16);
+		int B = Integer.parseInt(colour.substring(4, 6), 16);
+		double L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+		boolean bright = L > 128;
+		return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
+	}
+
+	public Node getNode() {
+		javafx.scene.control.Label node = new javafx.scene.control.Label(getName());
+		node.getStyleClass().add("labels");
+		node.setStyle(getStyle());
+		if (getGroup().isPresent()) {
+			Tooltip groupTooltip = new Tooltip(getGroup().get());
+			node.setTooltip(groupTooltip);
+		}
+		return node;
 	}
 
 	private void ______BOILERPLATE______() {

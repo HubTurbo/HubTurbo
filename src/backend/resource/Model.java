@@ -8,8 +8,10 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class Model implements IModel {
 
 	private final UpdateSignature updateSignature;
@@ -116,6 +118,77 @@ public class Model implements IModel {
 	@Override
 	public List<TurboUser> getUsers() {
 		return new ArrayList<>(users);
+	}
+
+	private void ______OPERATIONS_____() {
+	}
+
+	public Optional<TurboIssue> getIssueById(int issueId) {
+		assert issueId >= 1 : "Invalid issue id " + issueId;
+		for (TurboIssue issue : getIssues()) {
+			if (issue.getId() == issueId) {
+				return Optional.of(issue);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public Optional<TurboLabel> getLabelByName(String labelName) {
+		assert labelName != null && !labelName.isEmpty() : "Invalid label name " + labelName;
+		for (TurboLabel label : getLabels()) {
+			if (label.getName().equals(labelName)) {
+				return Optional.of(label);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public Optional<TurboUser> getUserByLogin(String login) {
+		assert login != null && !login.isEmpty() : "Invalid user name " + login;
+		for (TurboUser user : getUsers()) {
+			if (user.getLoginName().equals(login)) {
+				return Optional.of(user);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public Optional<TurboMilestone> getMilestoneByTitle(String title) {
+		assert title != null && !title.isEmpty() : "Invalid milestone title " + title;
+		for (TurboMilestone milestone : getMilestones()) {
+			if (milestone.getTitle().equals(title)) {
+				return Optional.of(milestone);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public Optional<TurboMilestone> getMilestoneById(int id) {
+		assert id >= 1 : "Invalid milestone id " + id;
+		for (TurboMilestone milestone : getMilestones()) {
+			if (milestone.getId() == id) {
+				return Optional.of(milestone);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
+		return issue.getMilestone().flatMap(this::getMilestoneById);
+	}
+
+	public Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue) {
+		return issue.getAssignee().flatMap(this::getUserByLogin);
+	}
+
+	public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
+		return issue.getLabels().stream()
+			.map(this::getLabelByName)
+			.filter(Optional::isPresent).map(Optional::get)
+			.collect(Collectors.toList());
+	}
+
+	private void ______BOILERPLATE______() {
 	}
 
 	@Override

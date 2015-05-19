@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+
+import backend.Logic;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -28,8 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
-import service.ServiceManager;
-import storage.CacheFileHandler;
 import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
@@ -59,6 +59,8 @@ public class UI extends Application implements EventDispatcher {
 
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
+
+	public Logic logic = new Logic();
 
 	// Main UI elements
 
@@ -120,7 +122,8 @@ public class UI extends Application implements EventDispatcher {
 	 */
 	private void clearCacheIfNecessary() {
 		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
-			CacheFileHandler.deleteCacheDirectory();
+			// TODO
+//			CacheFileHandler.deleteCacheDirectory();
 		}
 	}
 
@@ -131,7 +134,8 @@ public class UI extends Application implements EventDispatcher {
 				setExpandedWidth(false);
 				columns.loadIssues();
 				repoSelector.setDisable(false);
-				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+				// TODO
+//				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
 				ensureSelectedPanelHasFocus();
 			} else {
@@ -181,7 +185,7 @@ public class UI extends Application implements EventDispatcher {
 					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
 					if (shouldRefresh) {
 						logger.info("Gained focus; refreshing");
-						ServiceManager.getInstance().updateModelNow();
+						logic.refresh();
 					}
 				});
 			}
@@ -206,7 +210,6 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public void quit() {
-		ServiceManager.getInstance().stopModelUpdate();
 		columns.saveSession();
 		DataManager.getInstance().saveLocalConfig();
 		DataManager.getInstance().saveSessionConfig();
@@ -217,7 +220,7 @@ public class UI extends Application implements EventDispatcher {
 
 	private Parent createRoot() throws IOException {
 
-		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
+		columns = new ColumnControl(this, mainStage);
 
 		VBox top = new VBox();
 
@@ -357,24 +360,25 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
-		try {
-			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
-				Platform.runLater(() -> {
-					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
-				});
-				return false;
-			}
-		} catch (SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection Timeout",
-					"Timeout while connecting to GitHub, please check your internet connection.");
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection",
-					"Please check your internet connection and try again.");
-			logger.error(e.getLocalizedMessage(), e);
-		}catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
+		// TODO
+//		try {
+//			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
+//				Platform.runLater(() -> {
+//					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
+//				});
+//				return false;
+//			}
+//		} catch (SocketTimeoutException e){
+//			DialogMessage.showWarningDialog("Internet Connection Timeout",
+//					"Timeout while connecting to GitHub, please check your internet connection.");
+//			logger.error(e.getLocalizedMessage(), e);
+//		} catch (UnknownHostException e){
+//			DialogMessage.showWarningDialog("No Internet Connection",
+//					"Please check your internet connection and try again.");
+//			logger.error(e.getLocalizedMessage(), e);
+//		}catch (IOException e) {
+//			logger.error(e.getLocalizedMessage(), e);
+//		}
 		return true;
 	}
 
@@ -399,7 +403,7 @@ public class UI extends Application implements EventDispatcher {
 	private void loadRepo(String repoString) {
 		RepositoryId repoId = RepositoryId.createFromId(repoString);
 		if(repoId == null
-		  || repoId.equals(ServiceManager.getInstance().getRepoId())
+//		  || repoId.equals(ServiceManager.getInstance().getRepoId())
 		  || !checkRepoAccess(repoId)){
 			return;
 		}
@@ -413,14 +417,16 @@ public class UI extends Application implements EventDispatcher {
 			@Override
 			protected Boolean call() throws IOException {
 
-				updateProgress(0, 1);
-				updateMessage(String.format("Switching to %s...",
-					ServiceManager.getInstance().getRepoId().generateId()));
-
-				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
-					updateProgress(progress * 100, 100);
-					updateMessage(message);
-				});
+//				updateProgress(0, 1);
+//				updateMessage(String.format("Switching to %s...",
+//					ServiceManager.getInstance().getRepoId().generateId()));
+//
+//				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
+//					updateProgress(progress * 100, 100);
+//					updateMessage(message);
+//				});
+				// TODO
+				logic.openRepository(repoId.generateId());
 
                 PlatformEx.runAndWait(() -> {
                     columns.restoreColumns();
@@ -435,7 +441,7 @@ public class UI extends Application implements EventDispatcher {
 		thread.start();
 
 		task.setOnSucceeded(wse -> {
-			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+//			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 			logger.info("Repository " + repoString + " successfully switched to!");
 			ensureSelectedPanelHasFocus();
 		});

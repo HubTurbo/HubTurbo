@@ -1,15 +1,13 @@
 package ui.issuecolumn;
 
+import backend.resource.Model;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import model.Model;
 import ui.DragData;
-
-import command.TurboCommandExecutor;
 
 /**
  * A Column is a JavaFX node that is contained by a ColumnControl.
@@ -29,14 +27,11 @@ public abstract class Column extends VBox {
 	protected final ColumnControl parentColumnControl;
 	protected int columnIndex;
 	
-	protected TurboCommandExecutor dragAndDropExecutor;
-
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+	public Column(Model model, ColumnControl parentColumnControl, int columnIndex) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
-		this.dragAndDropExecutor = dragAndDropExecutor;
-		
+
 		setupColumn();
 		setupColumnDragEvents();
 	}
@@ -76,16 +71,9 @@ public abstract class Column extends VBox {
 			event.consume();
 		});
 		
-		setOnDragDone((event) -> {
-			event.consume();
-		});
+		setOnDragDone(Event::consume);
 	}
 	
-	public boolean isThisColumnSelected() {
-		return parentColumnControl.getCurrentlySelectedColumn().isPresent()
-			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex;
-	}
-
 	/**
 	 * To be called by ColumnControl in order to have indices updated.
 	 * Should not be called externally.

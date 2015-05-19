@@ -22,7 +22,7 @@ public class Logic {
 	private RepoIO repoIO = new RepoIO();
 
 	// Assumed to be always present when app starts
-	private UserCredentials credentials = null;
+	public UserCredentials credentials = null;
 
 	public Logic() {
 //		UIManager uiManager

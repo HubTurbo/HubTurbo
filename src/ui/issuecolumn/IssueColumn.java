@@ -1,20 +1,21 @@
 package ui.issuecolumn;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import backend.assumed.ModelUpdatedEvent;
 import backend.assumed.ModelUpdatedEventHandler;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import backend.resource.TurboUser;
+import filter.ParseException;
+import filter.Parser;
+import filter.QualifierApplicationException;
+import filter.expression.Disjunction;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,26 +25,19 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import model.Model;
-import model.TurboIssue;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import service.ServiceManager;
 import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
 import util.events.ColumnClickedEvent;
-import command.CommandType;
-import command.TurboCommandExecutor;
-import filter.ParseException;
-import filter.Parser;
-import filter.QualifierApplicationException;
-import filter.expression.Disjunction;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * An IssueColumn is a Column meant for containing issues. The main additions to
@@ -68,9 +62,8 @@ public abstract class IssueColumn extends Column {
 	protected FilterTextField filterTextField;
 	private UI ui;
 
-	public IssueColumn(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl,
-			int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
-		super(mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
+	public IssueColumn(UI ui, Model model, ColumnControl parentColumnControl, int columnIndex) {
+		super(model, parentColumnControl, columnIndex);
 		this.ui = ui;
 		getChildren().add(createFilterBox());
 		setupIssueColumnDragEvents(model, columnIndex);
@@ -108,8 +101,9 @@ public abstract class IssueColumn extends Column {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getColumnIndex() != columnIndex) {
-					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
-					applyCurrentFilterExpressionToIssue(rightIssue, true);
+					Optional<TurboIssue> rightIssue = model.getIssueById(dd.getIssueIndex());
+					assert rightIssue.isPresent();
+					applyCurrentFilterExpressionToIssue(rightIssue.get(), true);
 				}
 			}
 			e.setDropCompleted(success);
@@ -141,7 +135,7 @@ public abstract class IssueColumn extends Column {
 			filterTextField.setKeywords(all);
 		});
 
-		filterTextField.setOnMouseClicked(e-> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
+		filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
 
 		setupIssueDragEvents(filterTextField);
 
@@ -227,7 +221,9 @@ public abstract class IssueColumn extends Column {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-					TurboIssue rightIssue = model.getIssueWithId(dd.getIssueIndex());
+
+					assert model.getIssueById(dd.getIssueIndex()).isPresent();
+					TurboIssue rightIssue = model.getIssueById(dd.getIssueIndex()).get();
 					if (rightIssue.getLabels().size() == 0) {
 						// If the issue has no labels, show it by its title to inform
 						// the user that there are no similar issues
@@ -235,11 +231,12 @@ public abstract class IssueColumn extends Column {
 					} else {
 						// Otherwise, take the disjunction of its labels to show similar
 						// issues.
-						FilterExpression result = new Qualifier("label", rightIssue.getLabels().get(0).getName());
-						List<FilterExpression> rest = rightIssue.getLabels().stream()
-								.skip(1)
-								.map(label -> new Qualifier("label", label.getName()))
-								.collect(Collectors.toList());
+						List<TurboLabel> labels = model.getLabelsOfIssue(rightIssue);
+						FilterExpression result = new Qualifier("label", labels.get(0).getName());
+						List<FilterExpression> rest = labels.stream()
+							.skip(1)
+							.map(label -> new Qualifier("label", label.getName()))
+							.collect(Collectors.toList());
 
 						for (FilterExpression label : rest) {
 							result = new Disjunction(label, result);
@@ -292,14 +289,13 @@ public abstract class IssueColumn extends Column {
 
 	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
-		predicate = issue -> Qualifier.process(filter, issue);
+		predicate = issue -> Qualifier.process(model, filter, issue);
 		refreshItems();
 	}
 
 	// An odd workaround for the above problem: serialising, then
 	// immediately parsing a filter expression, just so the update can be
-	// triggered
-	// through the text contents of the input area changing.
+	// triggered through the text contents of the input area changing.
 
 	public void filter(FilterExpression filterExpr) {
 		filterByString(filterExpr.toString());
@@ -321,10 +317,12 @@ public abstract class IssueColumn extends Column {
 		if (currentFilterExpression != EMPTY) {
 			try {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
-					TurboIssue clone = new TurboIssue(issue);
+					// TODO re-enable
+//					TurboIssue clone = new TurboIssue(issue);
 					currentFilterExpression.applyTo(issue, model);
 					if (updateModel) {
-						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, model, clone, issue);
+						// TODO re-enable
+//						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, model, clone, issue);
 					}
 					parentColumnControl.refresh();
 				} else {
@@ -357,19 +355,6 @@ public abstract class IssueColumn extends Column {
 
 	@Override
 	public void refreshItems() {
-		transformedIssueList = new FilteredList<TurboIssue>(issues, predicate);
-
-		// If parent issue, sort child issues by depth
-		if (currentFilterExpression instanceof filter.expression.Qualifier) {
-			List<String> names = ((filter.expression.Qualifier) currentFilterExpression).getQualifierNames();
-			if (names.size() == 1 && names.get(0).equals("parent")) {
-				transformedIssueList = new SortedList<>(transformedIssueList, new Comparator<TurboIssue>() {
-					@Override
-					public int compare(TurboIssue a, TurboIssue b) {
-						return a.getDepth() - b.getDepth();
-					}
-				});
-			}
-		}
+		transformedIssueList = new FilteredList<>(issues, predicate);
 	}
 }
