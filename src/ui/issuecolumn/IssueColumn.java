@@ -1,10 +1,14 @@
 package ui.issuecolumn;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import backend.assumed.ModelUpdatedEvent;
+import backend.assumed.ModelUpdatedEventHandler;
+import backend.resource.TurboUser;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -119,12 +123,26 @@ public abstract class IssueColumn extends Column {
 			applyStringFilter(text);
 			return text;
 		});
-		
-		List<String> collaboratorNames = ServiceManager.getInstance().getModel().getCollaborators()
-			.stream().map(c -> c.getGithubName()).collect(Collectors.toList());
-		
-		filterTextField.addKeywords(collaboratorNames);
-		filterTextField.setOnMouseClicked(e-> {ui.triggerEvent(new ColumnClickedEvent(columnIndex));});
+
+		ui.registerEvent((ModelUpdatedEventHandler) e -> {
+			List<String> all = Arrays.asList(
+				"label", "milestone",
+				"involves", "assignee", "author",
+				"title", "body",
+				"is", "issue", "pr", "merged", "unmerged",
+				"no", "type", "has",
+				"state", "open", "closed",
+				"created",
+				"updated");
+			all.addAll(e.model.getUsers().stream()
+				.map(TurboUser::getLoginName)
+				.collect(Collectors.toList()));
+
+			filterTextField.setKeywords(all);
+		});
+
+		filterTextField.setOnMouseClicked(e-> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
+
 		setupIssueDragEvents(filterTextField);
 
 		HBox buttonsBox = new HBox();
