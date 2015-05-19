@@ -13,6 +13,7 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import service.GitHubClientExtended;
 import service.IssueServiceExtended;
 import service.LabelServiceFixed;
+import service.TurboIssueEvent;
 import service.updateservice.*;
 import util.HTLog;
 
@@ -156,6 +157,24 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 			}
 		}
 		return elements;
+	}
+
+	public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+		try {
+			return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId).getTurboIssueEvents();
+		} catch (IOException e) {
+			HTLog.error(logger, e);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<Comment> getComments(String repoId, int issueId) {
+		try {
+			return issueService.getComments(RepositoryId.createFromId(repoId), issueId);
+		} catch (IOException e) {
+			HTLog.error(logger, e);
+			return new ArrayList<>();
+		}
 	}
 }
 

@@ -1,9 +1,13 @@
 package backend.stub;
 
+import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class DummySource extends RepoSource {
@@ -30,5 +34,12 @@ public class DummySource extends RepoSource {
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
 		return addTask(new UpdateModelTask(this, dummy, model)).response;
+	}
+
+	@Override
+	public CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues) {
+		// TODO
+		assert false : "Not yet implemented";
+		return null;
 	}
 }

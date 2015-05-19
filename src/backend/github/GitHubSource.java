@@ -1,5 +1,6 @@
 package backend.github;
 
+import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
@@ -11,6 +12,8 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import util.HTLog;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
@@ -46,5 +49,10 @@ public class GitHubSource extends RepoSource {
 	@Override
 	public CompletableFuture<Model> updateModel(Model model) {
 		return addTask(new UpdateModelTask(this, gitHub, model)).response;
+	}
+
+	@Override
+	public CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues) {
+		return addTask(new DownloadMetadataTask(this, gitHub, repoId, issues)).response;
 	}
 }

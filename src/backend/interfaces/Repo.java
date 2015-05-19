@@ -3,6 +3,8 @@ package backend.interfaces;
 import backend.UserCredentials;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+import service.TurboIssueEvent;
 
 import java.util.Date;
 import java.util.List;
@@ -22,4 +24,6 @@ public interface Repo<I, L, M, U> {
 	public ImmutablePair<List<M>, String> getUpdatedMilestones(String repoId, String ETag);
 	public ImmutablePair<List<U>, String> getUpdatedCollaborators(String repoId, String ETag);
 
+	public List<TurboIssueEvent> getEvents(String repoId, int issueId);
+	public List<Comment> getComments(String repoId, int issueId);
 }

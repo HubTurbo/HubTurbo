@@ -6,9 +6,13 @@ import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
+import org.apache.bcel.verifier.statics.StringRepresentation;
 import org.apache.logging.log4j.Logger;
+import service.UpdatedIssueMetadata;
 import util.HTLog;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class RepoIO {
@@ -39,5 +43,9 @@ public class RepoIO {
 			}
 			return model;
 		});
+	}
+
+	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+		return repoSource.dowloadMetadata(repoId, issues);
 	}
 }

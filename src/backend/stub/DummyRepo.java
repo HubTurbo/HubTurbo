@@ -4,10 +4,8 @@ import backend.UserCredentials;
 import backend.interfaces.Repo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.*;
+import service.TurboIssueEvent;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -154,4 +152,15 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 		userCounter++;
 		return user;
 	}
+
+	@Override
+	public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public List<Comment> getComments(String repoId, int issueId) {
+		return new ArrayList<>();
+	}
+
 }

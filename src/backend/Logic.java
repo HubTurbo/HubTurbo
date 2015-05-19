@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import util.HTLog;
 import util.Utility;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,13 @@ public class Logic {
 	public CompletableFuture<Void> openRepository(String repoId) {
 		logger.info("Opening " + repoId);
 		return repoIO.openRepository(repoId).thenAccept(models::add);
+	}
+
+	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
+			// TODO process the metadata by inserting it into the model
+			return metadata;
+		});
 	}
 }
 

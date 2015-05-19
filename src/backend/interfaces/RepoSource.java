@@ -1,8 +1,12 @@
 package backend.interfaces;
 
+import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.resource.Model;
+import service.TurboIssueEvent;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,4 +30,5 @@ public abstract class RepoSource implements TaskRunner {
 	public abstract CompletableFuture<Boolean> login(UserCredentials credentials);
 	public abstract CompletableFuture<Model> downloadRepository(String repoId);
 	public abstract CompletableFuture<Model> updateModel(Model model);
+	public abstract CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues);
 }
