@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.UIManager;
 
-import model.TurboLabel;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
@@ -61,10 +59,6 @@ public class Utility {
 					map(CompletableFuture::join)
 					.collect(Collectors.<T>toList())
 		);
-	}
-
-	public static String stringify(Collection<TurboLabel> labels) {
-		return "[" + Joiner.on(", ").join(labels.stream().map(TurboLabel::logString).collect(Collectors.toList())) + "]";
 	}
 
 	public static String stripQuotes(String s) {
