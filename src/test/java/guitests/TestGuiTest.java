@@ -8,10 +8,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.utils.UserInputDetector;
 import ui.UI;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assume.assumeTrue;
 
 public class TestGuiTest extends GuiTest {
 
@@ -32,7 +35,7 @@ public class TestGuiTest extends GuiTest {
     @Before
     @Override
     public void setupStage() throws Throwable {
-//        assumeTrue(!UserInputDetector.instance.hasDetectedUserInput());
+        assumeTrue(!UserInputDetector.instance.hasDetectedUserInput());
 
         FXTestUtils.launchApp(TestUI.class); // You can add start parameters here
         try {
