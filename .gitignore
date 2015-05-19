@@ -128,3 +128,4 @@ session-config.json
 local-config.json
 hubturbo-log.log
 .hubturbocache/
+chromedriver
