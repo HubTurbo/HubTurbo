@@ -10,7 +10,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import storage.DataManager;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
@@ -69,14 +68,14 @@ public class ColumnControl extends HBox {
 	public void restoreColumns() {
 		getChildren().clear();
 		
-		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
-		if (filters != null && !filters.isEmpty()) {
-			for (String filter : filters) {
-				addColumn().filterByString(filter);
-			}
-		} else {
-			addColumn();
-		}
+//		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
+//		if (filters != null && !filters.isEmpty()) {
+//			for (String filter : filters) {
+//				addColumn().filterByString(filter);
+//			}
+//		} else {
+//			addColumn();
+//		}
 	}
 
 	public void displayMessage(String message) {
@@ -193,7 +192,7 @@ public class ColumnControl extends HBox {
 				sessionFilters.add(filter);
 			}
 		});
-		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
+//		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {

@@ -1,11 +1,9 @@
 package util;
 
-import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import service.ServiceManager;
+import java.util.Optional;
 
 public class GitHubURL {
 	private static final Logger logger = LogManager.getLogger(GitHubURL.class.getName());
@@ -15,24 +13,24 @@ public class GitHubURL {
 	public static final String CHANGELOG_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog";
 	public static final String CHANGELOG_PAGE_FORMAT = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
 	
-	public static String getPathForAllIssues() {
-		return String.format("https://github.com/%s/%s/issues", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForAllIssues(String repoId) {
+		return String.format("https://github.com/%s/issues", repoId);
 	}
 	
-	public static String getPathForIssue(int id) {
-		return String.format("https://github.com/%s/%s/issues/%d", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName(), id);
+	public static String getPathForIssue(String repoId, int id) {
+		return String.format("https://github.com/%s/issues/%d", repoId, id);
 	}
 	
-	public static String getPathForNewIssue() {
-		return String.format("https://github.com/%s/%s/issues/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForNewIssue(String repoId) {
+		return String.format("https://github.com/%s/issues/new", repoId);
 	}
 
-	public static String getPathForNewLabel() {
-		return String.format("https://github.com/%s/%s/labels", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForNewLabel(String repoId) {
+		return String.format("https://github.com/%s/labels", repoId);
 	}
 
-	public static String getPathForNewMilestone() {
-		return String.format("https://github.com/%s/%s/milestones/new", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForNewMilestone(String repoId) {
+		return String.format("https://github.com/%s/milestones/new", repoId);
 	}
 
 	public static String getPathForDocsPage() {
@@ -52,20 +50,20 @@ public class GitHubURL {
 		}
 	}
 
-	public static String getPathForPullRequests() {
-		return String.format("https://github.com/%s/%s/pulls", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForPullRequests(String repoId) {
+		return String.format("https://github.com/%s/pulls", repoId);
 	}
 
 	public static String getPathForKeyboardShortcuts() {
 		return String.format("https://github.com/HubTurbo/HubTurbo/wiki/Keyboard-Shortcuts");
 	}
 	
-	public static String getPathForMilestones() {
-		return String.format("https://github.com/%s/%s/milestones", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForMilestones(String repoId) {
+		return String.format("https://github.com/%s/milestones", repoId);
 	}
 
-	public static String getPathForContributors() {
-		return String.format("https://github.com/%s/%s/graphs/contributors", ServiceManager.getInstance().getRepoOwner(), ServiceManager.getInstance().getRepoName());
+	public static String getPathForContributors(String repoId) {
+		return String.format("https://github.com/%s/graphs/contributors", repoId);
 	}
 	
 	public static boolean isUrlIssue(String url) {
@@ -74,5 +72,4 @@ public class GitHubURL {
 		}
 		return false;
 	}
-	
 }

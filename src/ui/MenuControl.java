@@ -3,6 +3,7 @@ package ui;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +35,6 @@ import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import storage.DataManager;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
@@ -83,7 +83,7 @@ public class MenuControl extends MenuBar {
 		MenuItem logout = new MenuItem("Logout");
 		logout.setOnAction(e -> {
 			logger.info("Logging out of HT");
-			DataManager.getInstance().setLastLoginPassword("");
+//			DataManager.getInstance().setLastLoginPassword("");
 			ui.quit();
 		});
 		return logout;
@@ -155,7 +155,7 @@ public class MenuControl extends MenuBar {
             Optional<String> response = dlg.showAndWait();
 
 	    	if (response.isPresent()) {
-	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
+//	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
 	        	ui.triggerEvent(new BoardSavedEvent());
 	        	logger.info("New board" + response.get() + " saved, containing " + filterStrings);
 	        	return;
@@ -188,7 +188,7 @@ public class MenuControl extends MenuBar {
         Optional<ButtonType> response = dlg.showAndWait();
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
-			DataManager.getInstance().removeBoard(boardName);
+//			DataManager.getInstance().removeBoard(boardName);
 			ui.triggerEvent(new BoardSavedEvent());
 			logger.info(boardName + " was deleted");
         } else {
@@ -203,25 +203,23 @@ public class MenuControl extends MenuBar {
 		Menu open = new Menu("Open");
 		Menu delete = new Menu("Delete");
 
-		ui.registerEvent(new BoardSavedEventHandler() {
-			@Override
-			public void handle(BoardSavedEvent e) {
-				open.getItems().clear();
-				delete.getItems().clear();
+		ui.registerEvent((BoardSavedEventHandler) e -> {
+			open.getItems().clear();
+			delete.getItems().clear();
 
-				Map<String, List<String>> boards = DataManager.getInstance().getAllBoards();
+//				Map<String, List<String>> boards = DataManager.getInstance().getAllBoards();
+			Map<String, List<String>> boards = new HashMap<>();
 
-				for (final String boardName : boards.keySet()) {
-					final List<String> filterSet = boards.get(boardName);
+			for (final String boardName : boards.keySet()) {
+				final List<String> filterSet = boards.get(boardName);
 
-					MenuItem openItem = new MenuItem(boardName);
-					openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
-					open.getItems().add(openItem);
+				MenuItem openItem = new MenuItem(boardName);
+				openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
+				open.getItems().add(openItem);
 
-					MenuItem deleteItem = new MenuItem(boardName);
-					deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
-					delete.getItems().add(deleteItem);
-				}
+				MenuItem deleteItem = new MenuItem(boardName);
+				deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
+				delete.getItems().add(deleteItem);
 			}
 		});
 
@@ -346,7 +344,7 @@ public class MenuControl extends MenuBar {
 	}
 	
 	public void scrollTo(int columnIndex, int NumOfColumns){
-		setHvalue(columnIndex * (columnsScrollPane.getHmax())/(NumOfColumns-1));
+		setHvalue(columnIndex * (columnsScrollPane.getHmax()) / (NumOfColumns - 1));
 	}
 	private void setHvalue(double val) {
 		columnsScrollPane.setHvalue(val);

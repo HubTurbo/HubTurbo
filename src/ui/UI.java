@@ -30,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 
-import storage.DataManager;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
@@ -100,7 +99,7 @@ public class UI extends Application implements EventDispatcher {
 		events = new EventBus();
 
 		commandLineArgs = initialiseCommandLineArguments();
-		DataManager.getInstance();
+//		DataManager.getInstance();
 		clearCacheIfNecessary();
 
 		repoSelector = createRepoSelector();
@@ -129,7 +128,7 @@ public class UI extends Application implements EventDispatcher {
 
 	private void getUserCredentials() {
 		repoSelector.setDisable(true);
-		new LoginDialog(mainStage, columns).show().thenApply(success -> {
+		new LoginDialog(this, mainStage, columns).show().thenApply(success -> {
 			if (success) {
 				setExpandedWidth(false);
 				columns.loadIssues();
@@ -211,8 +210,8 @@ public class UI extends Application implements EventDispatcher {
 
 	public void quit() {
 		columns.saveSession();
-		DataManager.getInstance().saveLocalConfig();
-		DataManager.getInstance().saveSessionConfig();
+//		DataManager.getInstance().saveLocalConfig();
+//		DataManager.getInstance().saveSessionConfig();
 		browserComponent.onAppQuit();
 		Platform.exit();
 		System.exit(0);
@@ -411,7 +410,7 @@ public class UI extends Application implements EventDispatcher {
 		logger.info("Switching repository to " + repoString + "...");
 
 		columns.saveSession();
-		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+//		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
 
 		Task<Boolean> task = new Task<Boolean>(){
 			@Override

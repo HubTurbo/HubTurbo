@@ -183,9 +183,9 @@ public class BrowserComponent {
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
-				driver.get(GitHubURL.getPathForNewLabel());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
+//				driver.get(GitHubURL.getPathForNewLabel());
+//			}
 		});
 	}
 
@@ -196,9 +196,9 @@ public class BrowserComponent {
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
-				driver.get(GitHubURL.getPathForNewMilestone());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
+//				driver.get(GitHubURL.getPathForNewMilestone());
+//			}
 		});
 		bringToTop();
 	}
@@ -210,9 +210,9 @@ public class BrowserComponent {
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
-				driver.get(GitHubURL.getPathForNewIssue());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
+//				driver.get(GitHubURL.getPathForNewIssue());
+//			}
 		});
 		bringToTop();
 	}
@@ -247,9 +247,9 @@ public class BrowserComponent {
 	public void showIssue(int id) {
 		logger.info("Showing issue #" + id);
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-				driver.get(GitHubURL.getPathForIssue(id));
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
+//				driver.get(GitHubURL.getPathForIssue(id));
+//			}
 		});
 	}
 	
@@ -490,18 +490,18 @@ public class BrowserComponent {
 	public void showIssues() {
 		logger.info("Navigating to Issues page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues())) {
-				driver.get(GitHubURL.getPathForAllIssues());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues())) {
+//				driver.get(GitHubURL.getPathForAllIssues());
+//			}
 		});
 	}
 
 	public void showPullRequests() {
 		logger.info("Navigating to Pull requests page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests())) {
-				driver.get(GitHubURL.getPathForPullRequests());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests())) {
+//				driver.get(GitHubURL.getPathForPullRequests());
+//			}
 		});
 	}
 
@@ -517,18 +517,18 @@ public class BrowserComponent {
 	public void showMilestones() {
 		logger.info("Navigating to Milestones page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones())) {
-				driver.get(GitHubURL.getPathForMilestones());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones())) {
+//				driver.get(GitHubURL.getPathForMilestones());
+//			}
 		});
 	}
 
 	public void showContributors() {
 		logger.info("Navigating to Contributors page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors())) {
-				driver.get(GitHubURL.getPathForContributors());
-			}
+//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors())) {
+//				driver.get(GitHubURL.getPathForContributors());
+//			}
 		});
 	}
 

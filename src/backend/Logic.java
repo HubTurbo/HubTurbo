@@ -3,6 +3,8 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 import util.Utility;
 
@@ -54,6 +56,13 @@ public class Logic {
 			models.insertMetadata(repoId, metadata);
 			return metadata;
 		});
+	}
+
+	public List<String> getOpenRepositories() {
+		return models.toModels().stream()
+			.map(Model::getRepoId)
+			.map(IRepositoryIdProvider::generateId)
+			.collect(Collectors.toList());
 	}
 }
 

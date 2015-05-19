@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -8,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import storage.DataManager;
 
 public class RepositorySelector extends HBox {
 	private final ComboBox<String> comboBox = new ComboBox<>();
@@ -65,7 +65,8 @@ public class RepositorySelector extends HBox {
 	}
 
 	private void loadComboBoxContents() {
-		List<String> items = DataManager.getInstance().getLastViewedRepositories();
+//		List<String> items = DataManager.getInstance().getLastViewedRepositories();
+		List<String> items = new ArrayList<>();
 		comboBox.getItems().addAll(items);
 	}
 

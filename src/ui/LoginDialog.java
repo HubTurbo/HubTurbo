@@ -20,19 +20,17 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
-import service.ServiceManager;
-import storage.DataManager;
 import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
+import util.HTLog;
 import util.PlatformEx;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 
 public class LoginDialog extends Dialog<Boolean> {
@@ -50,6 +48,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	private static final String BUTTON_SIGN_IN = "Sign in";
 
 	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
+	private final UI ui;
 
 	private TextField repoOwnerField;
 	private TextField repoNameField;
@@ -58,8 +57,9 @@ public class LoginDialog extends Dialog<Boolean> {
 	private ColumnControl columns;
 	private Button loginButton;
 
-	public LoginDialog(Stage parentStage, ColumnControl columns) {
+	public LoginDialog(UI ui, Stage parentStage, ColumnControl columns) {
 		super(parentStage);
+		this.ui = ui;
 		this.columns = columns;
 	}
 
@@ -128,31 +128,31 @@ public class LoginDialog extends Dialog<Boolean> {
 	 * Fills in fields which have values at this point.
 	 */
 	private void populateSavedFields() {
-		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
-		if (lastViewed.isPresent()) {
-			repoOwnerField.setText(lastViewed.get().getOwner());
-			repoNameField.setText(lastViewed.get().getName());
-		}
-
-		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
-		if (!lastLoginName.isEmpty()) {
-			usernameField.setText(lastLoginName);
-		}
-
-		String lastLoginPassword = DataManager.getInstance().getLastLoginPassword();
-		if (!lastLoginPassword.isEmpty()) {
-			passwordField.setText(lastLoginPassword);
-		}
-		// Change focus depending on what fields are present
-		Platform.runLater(() -> {
-			if(!lastLoginPassword.isEmpty()){
-				login(null);
-			} else if (!lastLoginName.isEmpty()) {
-				passwordField.requestFocus();
-			} else if (lastViewed.isPresent()) {
-				usernameField.requestFocus();
-			}
-		});
+//		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
+//		if (lastViewed.isPresent()) {
+//			repoOwnerField.setText(lastViewed.get().getOwner());
+//			repoNameField.setText(lastViewed.get().getName());
+//		}
+//
+//		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
+//		if (!lastLoginName.isEmpty()) {
+//			usernameField.setText(lastLoginName);
+//		}
+//
+//		String lastLoginPassword = DataManager.getInstance().getLastLoginPassword();
+//		if (!lastLoginPassword.isEmpty()) {
+//			passwordField.setText(lastLoginPassword);
+//		}
+//		// Change focus depending on what fields are present
+//		Platform.runLater(() -> {
+//			if(!lastLoginPassword.isEmpty()){
+//				login(null);
+//			} else if (!lastLoginName.isEmpty()) {
+//				passwordField.requestFocus();
+//			} else if (lastViewed.isPresent()) {
+//				usernameField.requestFocus();
+//			}
+//		});
 	}
 
 	/**
@@ -229,7 +229,12 @@ public class LoginDialog extends Dialog<Boolean> {
 		// Run blocking operations in the background
 
 		HTStatusBar.displayMessage("Signing in at GitHub...");
-    	boolean couldLogIn = ServiceManager.getInstance().login(username, password);
+		boolean couldLogIn = false;
+		try {
+			couldLogIn = ui.logic.login(username, password).get();
+		} catch (InterruptedException | ExecutionException e1) {
+			HTLog.error(logger, e1);
+		}
 
 		Task<Boolean> task = new Task<Boolean>() {
 		    @Override
@@ -249,11 +254,11 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		task.setOnSucceeded(wse -> {
 			if (task.getValue()) {
-				HTStatusBar.displayMessage(String.format("%s loaded successfully! (%s)",
-					ServiceManager.getInstance().getRepoId().generateId(),
-					ServiceManager.getInstance().getRemainingRequestsDesc()));
-				logger.info("Remaining requests: " +
-					ServiceManager.getInstance().getRemainingRequestsDesc());
+//				HTStatusBar.displayMessage(String.format("%s loaded successfully! (%s)",
+//					ServiceManager.getInstance().getRepoId().generateId(),
+//					ServiceManager.getInstance().getRemainingRequestsDesc()));
+//				logger.info("Remaining requests: " +
+//					ServiceManager.getInstance().getRemainingRequestsDesc());
 				completeResponse(true);
 				close();
 			} else {
@@ -269,8 +274,8 @@ public class LoginDialog extends Dialog<Boolean> {
 		if (couldLogIn) {
 
 			// Save login details only on successful login
-			DataManager.getInstance().setLastLoginUsername(username);
-			DataManager.getInstance().setLastLoginPassword(password);
+//			DataManager.getInstance().setLastLoginUsername(username);
+//			DataManager.getInstance().setLastLoginPassword(password);
 
 			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
 			Thread th = new Thread(task);
@@ -301,13 +306,14 @@ public class LoginDialog extends Dialog<Boolean> {
 
 	private boolean loadRepository(String owner, String repoName,
 	                               BiConsumer<String, Float> taskUpdate) throws IOException {
-		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName, taskUpdate);
-		ServiceManager.getInstance().startModelUpdate();
-		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
-		if (currRepo != null) {
-			String repoId = currRepo.generateId();
-			DataManager.getInstance().addToLastViewedRepositories(repoId);
-		}
-		return loaded;
+//		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName, taskUpdate);
+//		ServiceManager.getInstance().startModelUpdate();
+//		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
+//		if (currRepo != null) {
+//			String repoId = currRepo.generateId();
+//			DataManager.getInstance().addToLastViewedRepositories(repoId);
+//		}
+//		return loaded;
+		return true;
 	}
 }
