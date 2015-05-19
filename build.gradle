@@ -66,6 +66,10 @@ allprojects {
         testCompile "org.loadui:testFx:$testFxVersion"
     }
 
+    test {
+        exclude 'guitests'
+    }
+
     jacoco {
         toolVersion = "0.7.4.201502262128"
     }
