@@ -10,6 +10,11 @@ public class IssueMetadata {
 	private final List<TurboIssueEvent> events;
 	private final List<Comment> comments;
 
+	public IssueMetadata() {
+		events = new ArrayList<>();
+		comments = new ArrayList<>();
+	}
+
 	public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
 		this.events = events;
 		this.comments = comments;

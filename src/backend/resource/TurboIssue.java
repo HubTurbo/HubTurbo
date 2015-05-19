@@ -106,6 +106,8 @@ public class TurboIssue {
 		this.milestone = issue.getMilestone() == null
 			? Optional.empty()
 			: Optional.of(issue.getMilestone().getNumber());
+
+		this.metadata = new IssueMetadata();
 	}
 
 	public TurboIssue(SerializableIssue issue) {
@@ -122,6 +124,8 @@ public class TurboIssue {
 		this.assignee = issue.getAssignee();
 		this.labels = issue.getLabels();
 		this.milestone = issue.getMilestone();
+
+		this.metadata = new IssueMetadata();
 	}
 
 	private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
@@ -140,6 +144,8 @@ public class TurboIssue {
 		this.assignee = Optional.empty();
 		this.labels = new ArrayList<>();
 		this.milestone = Optional.empty();
+
+		this.metadata = new IssueMetadata();
 	}
 
 	/**
