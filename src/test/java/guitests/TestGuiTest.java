@@ -8,13 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
-import org.loadui.testfx.utils.UserInputDetector;
 import ui.UI;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assume.assumeTrue;
 
 public class TestGuiTest extends GuiTest {
 
@@ -35,7 +32,7 @@ public class TestGuiTest extends GuiTest {
     @Before
     @Override
     public void setupStage() throws Throwable {
-        assumeTrue(!UserInputDetector.instance.hasDetectedUserInput());
+//        assumeTrue(!UserInputDetector.instance.hasDetectedUserInput());
 
         FXTestUtils.launchApp(TestUI.class); // You can add start parameters here
         try {
@@ -54,13 +51,17 @@ public class TestGuiTest extends GuiTest {
     @Test
     public void testLogin() throws InterruptedException {
         for (int i = 0; i < 1; i++) {
-            type("HubTurbo").push(KeyCode.TAB);
-            type("HubTurbo").push(KeyCode.TAB);
-            type("test").push(KeyCode.TAB);
-            type("test");
+//            type("HubTurbo").push(KeyCode.TAB);
+//            type("HubTurbo").push(KeyCode.TAB);
+            sleep(5000);
+//            type("test").push(KeyCode.TAB);
+//            type("test");
             click("Sign in");
-            sleep(1000);
+//            sleep(1000);
             push(KeyCode.ENTER);
+            sleep(5000);
+            click("Preferences");
+            click("Logout");
         }
     }
 }

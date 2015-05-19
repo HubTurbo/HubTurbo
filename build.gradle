@@ -45,7 +45,7 @@ allprojects {
         seleniumServerVersion = '2.45.0'
 
         junitVersion = '4.12'
-        testFxVersion = '3.1.2'
+        testFxVersion = '3.1.0'
     }
 
     dependencies {
