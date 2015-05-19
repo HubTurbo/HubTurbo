@@ -80,8 +80,6 @@ public class TurboIssue implements TurboResource {
 	private List<Comment> comments = new ArrayList<>();
 	private boolean hasNewComments = false;
 
-	private LocalDateTime lastModifiedTime;
-
 	private void ______ESSENTIALS______() {
 	}
 

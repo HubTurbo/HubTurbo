@@ -23,9 +23,10 @@ public class TurboIssueEvent {
 	private static final String OCTICON_PERSON = "\uf018";
 	public static final String OCTICON_QUOTE = "\uf063";
 
-	private Date date;
-	private IssueEventType type;
-	private User actor;
+	private final Date date;
+	private final IssueEventType type;
+	private final User actor;
+
 	private String labelName, labelColour;
 	private String milestoneTitle;
 	private String renamedFrom, renamedTo;
@@ -36,6 +37,7 @@ public class TurboIssueEvent {
 		this.actor = actor;
 		this.date = date;
 	}
+
 	public IssueEventType getType() {
 		return type;
 	}
@@ -45,7 +47,9 @@ public class TurboIssueEvent {
 	public Date getDate() {
 		return date;
 	}
-	
+
+	// Mutable fields
+
 	public String getLabelName() {
 		assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
 		return labelName;
@@ -71,19 +75,19 @@ public class TurboIssueEvent {
 		this.milestoneTitle = milestoneTitle;
 	}
 	public String getRenamedFrom() {
-		assert type == IssueEventType.Renamed || type == IssueEventType.Renamed;
+		assert type == IssueEventType.Renamed;
 		return renamedFrom;
 	}
 	public void setRenamedFrom(String renamedFrom) {
-		assert type == IssueEventType.Renamed || type == IssueEventType.Renamed;
+		assert type == IssueEventType.Renamed;
 		this.renamedFrom = renamedFrom;
 	}
 	public String getRenamedTo() {
-		assert type == IssueEventType.Renamed || type == IssueEventType.Renamed;
+		assert type == IssueEventType.Renamed;
 		return renamedTo;
 	}
 	public void setRenamedTo(String renamedTo) {
-		assert type == IssueEventType.Renamed || type == IssueEventType.Renamed;
+		assert type == IssueEventType.Renamed;
 		this.renamedTo = renamedTo;
 	}
 	public User getAssignedUser() {
