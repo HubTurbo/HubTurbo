@@ -1,5 +1,6 @@
 package ui.issuepanel;
 
+import backend.interfaces.IModel;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
@@ -20,7 +21,7 @@ import java.util.HashSet;
 
 public class IssuePanel extends IssueColumn {
 
-	private final Model model;
+	private final IModel model;
 	private final UI ui;
 
 	private NavigableListView<TurboIssue> listView;
@@ -31,7 +32,7 @@ public class IssuePanel extends IssueColumn {
 	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
-	public IssuePanel(UI ui, Model model, ColumnControl parentColumnControl, int columnIndex) {
+	public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
 		super(ui, model, parentColumnControl, columnIndex);
 		this.model = model;
 		this.ui = ui;
@@ -87,7 +88,7 @@ public class IssuePanel extends IssueColumn {
 		final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
 		
 		// Set the cell factory every time - this forces the list view to update
-		listView.setCellFactory(list -> new IssuePanelCell(ui, model, IssuePanel.this, columnIndex, issuesWithNewComments));
+		listView.setCellFactory(list -> new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
 		listView.saveSelection();
 
 		// Supposedly this also causes the list view to update - not sure

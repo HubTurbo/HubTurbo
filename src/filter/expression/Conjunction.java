@@ -1,15 +1,15 @@
 package filter.expression;
 
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import backend.resource.Model;
-import backend.resource.TurboIssue;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
 
 public class Conjunction implements FilterExpression {
 	private FilterExpression left;
@@ -53,7 +53,7 @@ public class Conjunction implements FilterExpression {
 	}
 
 	@Override
-	public boolean isSatisfiedBy(Model model, TurboIssue issue, MetaQualifierInfo info) {
+	public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
 		return left.isSatisfiedBy(model, issue, info) && right.isSatisfiedBy(model, issue, info);
 	}
 	
@@ -71,7 +71,7 @@ public class Conjunction implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
+	public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
 		left.applyTo(issue, model);
 		right.applyTo(issue, model);
 	}

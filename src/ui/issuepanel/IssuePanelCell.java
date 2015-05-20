@@ -1,5 +1,6 @@
 package ui.issuepanel;
 
+import backend.interfaces.IModel;
 import backend.resource.*;
 import javafx.event.Event;
 import javafx.geometry.Pos;
@@ -15,12 +16,13 @@ import java.util.Optional;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
-	private final Model model;
+	private final IModel model;
 	private final int parentColumnIndex;
 	private final IssuePanel parent;
 	private final HashSet<Integer> issuesWithNewComments;
 		
-	public IssuePanelCell(UI ui, Model model, IssuePanel parent, int parentColumnIndex, HashSet<Integer> issuesWithNewComments) {
+	public IssuePanelCell(IModel model, IssuePanel parent,
+	                      int parentColumnIndex, HashSet<Integer> issuesWithNewComments) {
 		super();
 		this.model = model;
 		this.parent = parent;
@@ -31,10 +33,13 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
-		if (issue == null)
+		if (issue == null) {
 			return;
-		
-		setGraphic(new IssuePanelCard(model, issue, parent, issuesWithNewComments));
+		}
+		Optional<Model> currentModel = model.getModelById(issue.getRepoId());
+		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
+
+		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
 
@@ -89,16 +94,16 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
-					Optional<TurboLabel> label = model.getLabelByName(dd.getEntityName());
-					assert label.isPresent();
+//					Optional<TurboLabel> label = model.getLabelByName(dd.getEntityName());
+//					assert label.isPresent();
 //					(new TurboIssueAddLabels(model, issue, Arrays.asList(label.get()))).execute();
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-					Optional<TurboUser> user = model.getUserByLogin(dd.getEntityName());
-					assert user.isPresent();
+//					Optional<TurboUser> user = model.getUserByLogin(dd.getEntityName());
+//					assert user.isPresent();
 //					(new TurboIssueSetAssignee(model, issue, user.get())).execute();
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-					Optional<TurboMilestone> milestone = model.getMilestoneByTitle(dd.getEntityName());
-					assert milestone.isPresent();
+//					Optional<TurboMilestone> milestone = model.getMilestoneByTitle(dd.getEntityName());
+//					assert milestone.isPresent();
 //					(new TurboIssueSetMilestone(model, issue, milestone.get())).execute();
 				}
 			}

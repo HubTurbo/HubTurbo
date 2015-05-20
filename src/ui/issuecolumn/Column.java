@@ -1,5 +1,6 @@
 package ui.issuecolumn;
 
+import backend.interfaces.IModel;
 import backend.resource.Model;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -23,11 +24,11 @@ public abstract class Column extends VBox {
 	
 	public static final String CLOSE_COLUMN = "\u2716";
 	
-	protected final Model model;
+	protected final IModel model;
 	protected final ColumnControl parentColumnControl;
 	protected int columnIndex;
 	
-	public Column(Model model, ColumnControl parentColumnControl, int columnIndex) {
+	public Column(IModel model, ColumnControl parentColumnControl, int columnIndex) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;

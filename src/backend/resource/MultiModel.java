@@ -3,14 +3,12 @@ package backend.resource;
 import backend.IssueMetadata;
 import backend.interfaces.IModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Thread-safe. The only top-level state in the application.
  */
+@SuppressWarnings("unused")
 public class MultiModel implements IModel {
 
 	private final HashMap<String, Model> models;
@@ -73,6 +71,35 @@ public class MultiModel implements IModel {
 	}
 
 	@Override
+	public Optional<Model> getModelById(String repoId) {
+		return models.containsKey(repoId)
+			? Optional.of(models.get(repoId))
+			: Optional.empty();
+	}
+
+	@Override
+	public Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue) {
+		return getModelById(issue.getRepoId())
+			.flatMap(m -> m.getAssigneeOfIssue(issue));
+	}
+
+	@Override
+	public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
+		return getModelById(issue.getRepoId())
+			.flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
+			.get();
+	}
+
+	@Override
+	public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
+		return getModelById(issue.getRepoId())
+			.flatMap(m -> m.getMilestoneOfIssue(issue));
+	}
+
+	private void ______BOILERPLATE______() {
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -88,5 +115,6 @@ public class MultiModel implements IModel {
 	public int hashCode() {
 		return models.hashCode();
 	}
+
 }
 

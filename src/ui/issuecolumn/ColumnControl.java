@@ -1,7 +1,9 @@
 package ui.issuecolumn;
 
 import backend.assumed.ModelUpdatedEventHandler;
+import backend.interfaces.IModel;
 import backend.resource.Model;
+import backend.resource.TurboIssue;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -26,7 +28,7 @@ public class ColumnControl extends HBox {
 
 	private final UI ui;
 	private final Stage stage;
-	private Model model;
+	private IModel model;
 	
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
@@ -43,7 +45,7 @@ public class ColumnControl extends HBox {
 		ui.registerEvent((ModelUpdatedEventHandler) e -> Platform.runLater(() -> {
 			forEach(child -> {
 				if (child instanceof IssueColumn) {
-					((IssueColumn) child).setItems(e.models.getIssues());
+					((IssueColumn) child).setItems(e.model.getIssues());
 				}
 			});
 		}));
@@ -86,8 +88,8 @@ public class ColumnControl extends HBox {
 			IssueColumn panel = (IssueColumn) child;
 			if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
 				panel.getIssueList().stream()
-						.map(issue -> issue.getId()).
-						forEach(issueId -> result.add(issueId));
+					.map(TurboIssue::getId)
+					.forEach(result::add);
 			}
 		}
 		return new ArrayList<>(result);

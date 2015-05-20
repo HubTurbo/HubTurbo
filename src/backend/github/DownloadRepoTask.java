@@ -28,13 +28,13 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 			.map(i -> new TurboIssue(repoId,  i))
 			.collect(Collectors.toList());
 		List<TurboLabel> labels = repo.getLabels(repoId).stream()
-			.map(TurboLabel::new)
+			.map(l -> new TurboLabel(repoId, l))
 			.collect(Collectors.toList());
 		List<TurboMilestone> milestones = repo.getMilestones(repoId).stream()
-			.map(TurboMilestone::new)
+			.map(m -> new TurboMilestone(repoId, m))
 			.collect(Collectors.toList());
 		List<TurboUser> users = repo.getCollaborators(repoId).stream()
-			.map(TurboUser::new)
+			.map(u -> new TurboUser(repoId, u))
 			.collect(Collectors.toList());
 		Model result = new Model(RepositoryId.createFromId(repoId), issues,
 			labels, milestones, users, UpdateSignature.empty);

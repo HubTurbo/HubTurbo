@@ -1,7 +1,7 @@
 package backend.resource;
 
 import backend.UpdateSignature;
-import backend.interfaces.IModel;
+import backend.interfaces.IBaseModel;
 import backend.resource.serialization.SerializableModel;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
-public class Model implements IModel {
+public class Model implements IBaseModel {
 
 	private final UpdateSignature updateSignature;
 	private final IRepositoryIdProvider repoId;

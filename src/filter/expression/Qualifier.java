@@ -1,5 +1,6 @@
 package filter.expression;
 
+import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
@@ -76,7 +77,7 @@ public class Qualifier implements FilterExpression {
 	 * Ensures that meta-qualifiers are taken care of.
 	 * Should always be used over isSatisfiedBy.
 	 */
-	public static boolean process(Model model, FilterExpression expr, TurboIssue issue) {
+	public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
 		
 		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::isNotMetaQualifier);
 		List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
@@ -106,7 +107,7 @@ public class Qualifier implements FilterExpression {
 	}
 
 	@Override
-    public boolean isSatisfiedBy(Model model, TurboIssue issue, MetaQualifierInfo info) {
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert name != null && content != null;
 		
         // The empty qualifier is satisfied by anything
@@ -153,7 +154,7 @@ public class Qualifier implements FilterExpression {
     }
 
 	@Override
-    public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
+    public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
         assert name != null && content != null;
         
         // The empty qualifier should not be applied to anything
@@ -393,7 +394,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private boolean assigneeSatisfies(Model model, TurboIssue issue) {
+    private boolean assigneeSatisfies(IModel model, TurboIssue issue) {
 	    if (!content.isPresent()) return false;
 	    Optional<TurboUser> assignee = model.getAssigneeOfIssue(issue);
 
@@ -414,11 +415,11 @@ public class Qualifier implements FilterExpression {
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
     
-    private boolean involvesSatisfies(Model model, TurboIssue issue) {
+    private boolean involvesSatisfies(IModel model, TurboIssue issue) {
     	return authorSatisfies(issue) || assigneeSatisfies(model, issue);
     }
 
-    private boolean labelsSatisfy(Model model, TurboIssue issue) {
+    private boolean labelsSatisfy(IModel model, TurboIssue issue) {
     	if (!content.isPresent()) return false;
 
 	    // Make use of TurboLabel constructor to parse the string, to avoid duplication
@@ -445,7 +446,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean milestoneSatisfies(Model model, TurboIssue issue) {
+    private boolean milestoneSatisfies(IModel model, TurboIssue issue) {
     	if (!content.isPresent()) return false;
 	    Optional<TurboMilestone> milestone = model.getMilestoneOfIssue(issue);
 
@@ -498,7 +499,7 @@ public class Qualifier implements FilterExpression {
 	    }
 	}
 
-	private void applyMilestone(TurboIssue issue, Model model) throws QualifierApplicationException {
+	private void applyMilestone(TurboIssue issue, IModel model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
     		throw new QualifierApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
@@ -512,7 +513,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private void applyLabel(TurboIssue issue, Model model) throws QualifierApplicationException {
+    private void applyLabel(TurboIssue issue, IModel model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
     		throw new QualifierApplicationException("Invalid label " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
@@ -529,7 +530,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private void applyAssignee(TurboIssue issue, Model model) throws QualifierApplicationException {
+    private void applyAssignee(TurboIssue issue, IModel model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
     		throw new QualifierApplicationException("Invalid assignee " + (date.isPresent() ? date.get() : dateRange.get()));
     	}

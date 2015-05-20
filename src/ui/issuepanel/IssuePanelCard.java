@@ -1,5 +1,6 @@
 package ui.issuepanel;
 
+import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
