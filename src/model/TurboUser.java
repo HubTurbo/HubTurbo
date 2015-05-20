@@ -50,7 +50,7 @@ public class TurboUser implements TurboResource {
 			return null;
 		}
 		if(avatar == null){
-			avatar = new Image(getAvatarUrl(), 12, 12, true, false);
+			avatar = new Image(getAvatarUrl(), 12, 12, true, false, true);
 		}
 		return avatar;
 	}
