@@ -15,7 +15,7 @@ public class ModelEventDispatcherStub implements EventDispatcher {
 	}
 
 	@Override
-	public <T extends Event> void registerEvent(EventHandler handler) {
+	public void registerEvent(EventHandler handler) {
 		events.register(handler);
 	}
 

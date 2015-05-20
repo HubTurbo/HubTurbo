@@ -52,6 +52,7 @@ public class UI extends Application implements EventDispatcher {
 
 	public UIManager uiManager = new UIManager(this);
 	public Logic logic = new Logic(uiManager);
+	public static EventDispatcher events;
 
 	// Main UI elements
 
@@ -63,7 +64,7 @@ public class UI extends Application implements EventDispatcher {
 
 	// Events
 
-	private EventBus events;
+	public EventBus eventBus;
 
 	// Application arguments
 
@@ -106,7 +107,9 @@ public class UI extends Application implements EventDispatcher {
 	private void initApplicationState() {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
-		events = new EventBus();
+		eventBus = new EventBus();
+
+		UI.events = this;
 
 		commandLineArgs = initialiseCommandLineArguments();
 //		DataManager.getInstance();
@@ -249,14 +252,14 @@ public class UI extends Application implements EventDispatcher {
 
 	@Override
 	public void registerEvent(EventHandler handler) {
-		events.register(handler);
+		eventBus.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 
 	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
-		events.post(event);
+		eventBus.post(event);
 		logger.info("Triggered event " + event.getClass().getSimpleName());
 	}
 
