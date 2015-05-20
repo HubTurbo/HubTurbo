@@ -52,6 +52,7 @@ public class Logic {
 	public CompletableFuture<Boolean> openRepository(String repoId) {
 		logger.info("Opening " + repoId);
 		return repoIO.openRepository(repoId).thenAccept(models::add)
+			.thenRun(this::updateUI)
 			.thenApply(n -> true)
 			.exceptionally(e -> false);
 	}

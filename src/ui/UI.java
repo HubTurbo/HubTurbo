@@ -2,6 +2,7 @@ package ui;
 
 import backend.Logic;
 import backend.UIManager;
+import backend.assumed.ModelUpdatedEvent;
 import browserview.BrowserComponent;
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
@@ -212,7 +213,7 @@ public class UI extends Application implements EventDispatcher {
 
 	private Parent createRoot() {
 
-		columns = new ColumnControl(this, mainStage);
+		columns = new ColumnControl(this);
 
 		VBox top = new VBox();
 

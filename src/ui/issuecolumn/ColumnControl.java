@@ -2,7 +2,6 @@ package ui.issuecolumn;
 
 import backend.assumed.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -11,11 +10,11 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.*;
+import util.events.ColumnClickedEventHandler;
+import util.events.IssueSelectedEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,14 +26,11 @@ import java.util.function.Consumer;
 public class ColumnControl extends HBox {
 
 	private final UI ui;
-	private final Stage stage;
 	private IModel model;
-	
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
-	public ColumnControl(UI ui, Stage stage) {
+	public ColumnControl(UI ui) {
 		this.ui = ui;
-		this.stage = stage;
 
 		// Set up the connection to the browser
 		new UIBrowserBridge(ui);
@@ -43,6 +39,7 @@ public class ColumnControl extends HBox {
 		setPadding(new Insets(0,10,0,10));
 
 		ui.registerEvent((ModelUpdatedEventHandler) e -> Platform.runLater(() -> {
+			updateModel(e.model);
 			forEach(child -> {
 				if (child instanceof IssueColumn) {
 					((IssueColumn) child).setItems(e.model.getIssues());
@@ -50,10 +47,16 @@ public class ColumnControl extends HBox {
 			});
 		}));
 
-		ui.registerEvent((IssueSelectedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
-		ui.registerEvent((ColumnClickedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+		ui.registerEvent((IssueSelectedEventHandler) e ->
+			setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+		ui.registerEvent((ColumnClickedEventHandler) e ->
+			setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 
 		setupKeyEvents();
+	}
+
+	private void updateModel(IModel newModel) {
+		model = newModel;
 	}
 	
 	public void restoreColumns() {
