@@ -207,7 +207,9 @@ public class UI extends Application implements EventDispatcher {
 		columns.saveSession();
 //		DataManager.getInstance().saveLocalConfig();
 //		DataManager.getInstance().saveSessionConfig();
-		browserComponent.onAppQuit();
+		if (browserComponent != null) {
+			browserComponent.onAppQuit();
+		}
 		Platform.exit();
 		System.exit(0);
 	}
