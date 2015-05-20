@@ -1,33 +1,23 @@
 package ui;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
+import javafx.scene.layout.HBox;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-
 public class RepositorySelector extends HBox {
+
 	private final ComboBox<String> comboBox = new ComboBox<>();
-//	private final Label label = new Label();
-	private Consumer<String> onValueChangeCallback = null;
+	private Consumer<String> onValueChangeCallback = e -> {};
 
 	public RepositorySelector() {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
-//		getChildren().addAll(label);
-	}
-
-	/**
-	 * Meant as a replacement for {@link #isInFocus isInFocus} (which is final).
-	 * @return true if the combobox portion of this element is in focus
-	 */
-	public boolean isInFocus() {
-		return comboBox.isFocused();
 	}
 
 	private void setupLayout() {
@@ -40,39 +30,25 @@ public class RepositorySelector extends HBox {
 	private void setupComboBox() {
 		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
-		loadComboBoxContents();
+		loadContents();
 		comboBox.valueProperty().addListener((observable, old, newVal) -> {
-			if (onValueChangeCallback != null) {
-				onValueChangeCallback.accept(newVal);
-			}
+			onValueChangeCallback.accept(newVal);
 		});
 	}
 	
-	public void setLabelText(String text) {
-//		label.setText(text);
-	}
-
-	public void enable() {
-		comboBox.setDisable(false);
-	}
-
-	public void disable() {
-		comboBox.setDisable(true);
-	}
-
 	public void setOnValueChange(Consumer<String> callback) {
 		onValueChangeCallback = callback;
 	}
 
-	private void loadComboBoxContents() {
+	private void loadContents() {
 //		List<String> items = DataManager.getInstance().getLastViewedRepositories();
 		List<String> items = new ArrayList<>();
 		comboBox.getItems().addAll(items);
 	}
 
-	public void refreshComboBoxContents(String repoId) {
+	public void refreshContents(String repoId) {
 		comboBox.getItems().clear();
-		loadComboBoxContents();
+		loadContents();
 		comboBox.setValue(repoId);
 	}
 }

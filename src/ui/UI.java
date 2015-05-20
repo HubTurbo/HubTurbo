@@ -22,7 +22,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
@@ -51,10 +50,14 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
+	// Application-level state
+
 	public UIManager uiManager;
 	public Logic logic;
 	public UIState state;
 	public static EventDispatcher events;
+	public EventBus eventBus;
+	private HashMap<String, String> commandLineArgs;
 
 	// Main UI elements
 
@@ -63,14 +66,6 @@ public class UI extends Application implements EventDispatcher {
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
 	private RepositorySelector repoSelector;
-
-	// Events
-
-	public EventBus eventBus;
-
-	// Application arguments
-
-	private HashMap<String, String> commandLineArgs;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -89,8 +84,7 @@ public class UI extends Application implements EventDispatcher {
 //		repoSelector.setDisable(true);
 		new LoginDialog(this, mainStage).show().thenApply(result -> {
 			if (result.success) {
-//				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
-//				repoSelector.setDisable(false);
+				repoSelector.refreshContents(result.repoId);
 				logic.openRepository(result.repoId);
 				state = new UIState(result.repoId);
 //              DataManager.getInstance().addToLastViewedRepositories(repoId);
@@ -124,7 +118,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void initUI(Stage stage) {
-//		repoSelector = createRepoSelector();
+		repoSelector = createRepoSelector();
 		mainStage = stage;
 		stage.setMaximized(false);
 
@@ -231,7 +225,7 @@ public class UI extends Application implements EventDispatcher {
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
 
 		menuBar = new MenuControl(this, columns, columnsScrollPane);
-		top.getChildren().addAll(menuBar);//, repoSelector);
+		top.getChildren().addAll(menuBar, repoSelector);
 
 		BorderPane root = new BorderPane();
 		root.setTop(top);
@@ -336,11 +330,16 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-//	private RepositorySelector createRepoSelector() {
-//		RepositorySelector repoSelector = new RepositorySelector();
-//		repoSelector.setOnValueChange(this::loadRepo);
-//		return repoSelector;
-//	}
+	private RepositorySelector createRepoSelector() {
+		RepositorySelector repoSelector = new RepositorySelector();
+		repoSelector.setOnValueChange(this::primaryRepoChanged);
+		return repoSelector;
+	}
+
+	private void primaryRepoChanged(String repoId) {
+		state.setPrimaryRepo(repoId);
+		columns.refresh();
+	}
 
 //	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		// TODO
