@@ -2,6 +2,7 @@ package guitests;
 
 import com.google.common.util.concurrent.SettableFuture;
 import javafx.scene.Parent;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.Before;
@@ -12,6 +13,11 @@ import ui.UI;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.loadui.testfx.controls.Commons.hasLabel;
+import static org.loadui.testfx.controls.Commons.hasText;
 
 public class TestGuiTest extends GuiTest {
 
@@ -49,19 +55,15 @@ public class TestGuiTest extends GuiTest {
     }
 
     @Test
-    public void testLogin() throws InterruptedException {
-        for (int i = 0; i < 1; i++) {
-//            type("HubTurbo").push(KeyCode.TAB);
-//            type("HubTurbo").push(KeyCode.TAB);
-            sleep(5000);
-//            type("test").push(KeyCode.TAB);
-//            type("test");
-            click("Sign in");
-//            sleep(1000);
-            push(KeyCode.ENTER);
-            sleep(5000);
-            click("Preferences");
-            click("Logout");
-        }
+    public void testBadLogin() throws InterruptedException {
+        TextField repoOwnerField = find("#repoOwnerField");
+        doubleClick(repoOwnerField);
+        type("HubTurbo").push(KeyCode.TAB);
+        type("HubTurbo").push(KeyCode.TAB);
+        type("test").push(KeyCode.TAB);
+        type("test");
+        click("Sign in");
+        sleep(2000);
+        assertNotNull(hasText("Failed to sign in. Please try again."));
     }
 }

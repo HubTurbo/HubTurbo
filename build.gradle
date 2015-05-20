@@ -67,7 +67,7 @@ allprojects {
     }
 
     test {
-        exclude 'guitests'
+        // exclude 'guitests'
     }
 
     jacoco {
