@@ -12,14 +12,14 @@ import javafx.scene.layout.HBox;
 
 public class RepositorySelector extends HBox {
 	private final ComboBox<String> comboBox = new ComboBox<>();
-	private final Label label = new Label();
+//	private final Label label = new Label();
 	private Consumer<String> onValueChangeCallback = null;
 
 	public RepositorySelector() {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
-		getChildren().addAll(label);
+//		getChildren().addAll(label);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class RepositorySelector extends HBox {
 	}
 	
 	public void setLabelText(String text) {
-		label.setText(text);
+//		label.setText(text);
 	}
 
 	public void enable() {

@@ -57,7 +57,6 @@ public class BrowserComponent {
 	}
 	
 	private final UI ui;
-	private final String primaryRepo;
 	private ChromeDriver driver = null;
 	
 	// We want browser commands to be run on a separate thread, but not to
@@ -72,9 +71,8 @@ public class BrowserComponent {
 	// at the moment.
 	private Executor executor;
 	
-	public BrowserComponent(UI ui, String primaryRepo) {
+	public BrowserComponent(UI ui) {
 		this.ui = ui;
-		this.primaryRepo = primaryRepo;
 		this.executor = Executors.newSingleThreadExecutor();
 	}
 
@@ -174,8 +172,8 @@ public class BrowserComponent {
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(primaryRepo))) {
-				driver.get(GitHubURL.getPathForNewLabel(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForNewLabel(ui.state.getPrimaryRepo()));
 			}
 		});
 	}
@@ -187,8 +185,8 @@ public class BrowserComponent {
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(primaryRepo))) {
-				driver.get(GitHubURL.getPathForNewMilestone(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForNewMilestone(ui.state.getPrimaryRepo()));
 			}
 		});
 		bringToTop();
@@ -201,8 +199,8 @@ public class BrowserComponent {
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(primaryRepo))) {
-				driver.get(GitHubURL.getPathForNewIssue(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForNewIssue(ui.state.getPrimaryRepo()));
 			}
 		});
 		bringToTop();
@@ -481,8 +479,8 @@ public class BrowserComponent {
 	public void showIssues() {
 		logger.info("Navigating to Issues page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(primaryRepo))) {
-				driver.get(GitHubURL.getPathForAllIssues(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForAllIssues(ui.state.getPrimaryRepo()));
 			}
 		});
 	}
@@ -490,8 +488,8 @@ public class BrowserComponent {
 	public void showPullRequests() {
 		logger.info("Navigating to Pull requests page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(primaryRepo))) {
-				driver.get(GitHubURL.getPathForPullRequests(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForPullRequests(ui.state.getPrimaryRepo()));
 			}
 		});
 	}
@@ -508,8 +506,8 @@ public class BrowserComponent {
 	public void showMilestones() {
 		logger.info("Navigating to Milestones page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(primaryRepo))) {
-				driver.get(GitHubURL.getPathForMilestones(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForMilestones(ui.state.getPrimaryRepo()));
 			}
 		});
 	}
@@ -517,8 +515,8 @@ public class BrowserComponent {
 	public void showContributors() {
 		logger.info("Navigating to Contributors page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(primaryRepo))) {
-				driver.get(GitHubURL.getPathForContributors(primaryRepo));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(ui.state.getPrimaryRepo()))) {
+				driver.get(GitHubURL.getPathForContributors(ui.state.getPrimaryRepo()));
 			}
 		});
 	}

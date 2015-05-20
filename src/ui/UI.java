@@ -22,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
@@ -52,6 +53,7 @@ public class UI extends Application implements EventDispatcher {
 
 	public UIManager uiManager;
 	public Logic logic;
+	public UIState state;
 	public static EventDispatcher events;
 
 	// Main UI elements
@@ -60,7 +62,7 @@ public class UI extends Application implements EventDispatcher {
 	private ColumnControl columns;
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
-//	private RepositorySelector repoSelector;
+	private RepositorySelector repoSelector;
 
 	// Events
 
@@ -90,9 +92,10 @@ public class UI extends Application implements EventDispatcher {
 //				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 //				repoSelector.setDisable(false);
 				logic.openRepository(result.repoId);
+				state = new UIState(result.repoId);
 //              DataManager.getInstance().addToLastViewedRepositories(repoId);
 				triggerEvent(new BoardSavedEvent());
-				browserComponent = new BrowserComponent(this, result.repoId);
+				browserComponent = new BrowserComponent(this);
 				setExpandedWidth(false);
 				ensureSelectedPanelHasFocus();
 			} else {
@@ -108,6 +111,7 @@ public class UI extends Application implements EventDispatcher {
 	private void initApplicationState() {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
+
 		eventBus = new EventBus();
 		uiManager = new UIManager(this);
 		logic = new Logic(uiManager);
