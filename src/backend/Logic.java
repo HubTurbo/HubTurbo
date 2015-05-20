@@ -26,6 +26,9 @@ public class Logic {
 
 	public Logic(UIManager uiManager) {
 		this.uiManager = uiManager;
+
+		// Pass the currently-empty model to the UI
+		updateUI();
 	}
 
 	public CompletableFuture<Boolean> login(String username, String password) {

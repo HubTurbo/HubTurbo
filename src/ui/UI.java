@@ -50,8 +50,8 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
-	public UIManager uiManager = new UIManager(this);
-	public Logic logic = new Logic(uiManager);
+	public UIManager uiManager;
+	public Logic logic;
 	public static EventDispatcher events;
 
 	// Main UI elements
@@ -108,6 +108,8 @@ public class UI extends Application implements EventDispatcher {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
 		eventBus = new EventBus();
+		uiManager = new UIManager(this);
+		logic = new Logic(uiManager);
 
 		UI.events = this;
 
