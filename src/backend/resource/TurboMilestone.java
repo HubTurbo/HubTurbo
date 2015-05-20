@@ -28,10 +28,12 @@ public class TurboMilestone {
 	private void ______TRANSIENT_FIELDS______() {
 	}
 
+	private final String repoId;
+
 	private void ______CONSTRUCTORS______() {
 	}
 
-	public TurboMilestone(int id, String title) {
+	public TurboMilestone(String repoId, int id, String title) {
 		this.id = id;
 		this.title = title;
 		this.dueDate = Optional.empty();
@@ -39,9 +41,10 @@ public class TurboMilestone {
 		this.isOpen = true;
 		this.openIssues = 0;
 		this.closedIssues = 0;
+		this.repoId = repoId;
 	}
 
-	public TurboMilestone(Milestone milestone) {
+	public TurboMilestone(String repoId, Milestone milestone) {
 		this.id = milestone.getNumber();
 		this.title = milestone.getTitle();
 		this.dueDate = milestone.getDueOn() == null
@@ -51,9 +54,10 @@ public class TurboMilestone {
 		this.isOpen = milestone.getState().equals(STATE_OPEN);
 		this.openIssues = milestone.getOpenIssues();
 		this.closedIssues = milestone.getClosedIssues();
+		this.repoId = repoId;
 	}
 
-	public TurboMilestone(SerializableMilestone milestone) {
+	public TurboMilestone(String repoId, SerializableMilestone milestone) {
 		this.id = milestone.getId();
 		this.title = milestone.getTitle();
 		this.dueDate = milestone.getDueDate();
@@ -61,6 +65,7 @@ public class TurboMilestone {
 		this.isOpen = milestone.isOpen();
 		this.openIssues = milestone.getOpenIssues();
 		this.closedIssues = milestone.getClosedIssues();
+		this.repoId = repoId;
 	}
 
 	private void ______METHODS______() {
@@ -69,6 +74,9 @@ public class TurboMilestone {
 	private void ______BOILERPLATE______() {
 	}
 
+	public String getRepoId() {
+		return repoId;
+	}
 	public int getId() {
 		return id;
 	}

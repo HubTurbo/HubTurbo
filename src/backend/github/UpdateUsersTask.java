@@ -38,7 +38,7 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 			changed.size(), changed.size() == 0 ? "" : ": " + stringify(changed)));
 
 		List<TurboUser> updated = Utility.reconcile(existing, changed,
-			TurboUser::getLoginName, User::getLogin, TurboUser::new);
+			TurboUser::getLoginName, User::getLogin, u -> new TurboUser(model.getRepoId().generateId(), u));
 
 		response.complete(new Result<>(updated, changes.right));
 	}

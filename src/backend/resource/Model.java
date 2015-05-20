@@ -79,16 +79,16 @@ public class Model implements IModel {
 		this.updateSignature = model.updateSignature;
 		this.repoId = RepositoryId.createFromId(model.repoId);
 		this.issues = model.issues.stream()
-			.map(TurboIssue::new)
+			.map(i -> new TurboIssue(model.repoId, i))
 			.collect(Collectors.toList());
 		this.labels = model.labels.stream()
-			.map(TurboLabel::new)
+			.map(l -> new TurboLabel(model.repoId, l))
 			.collect(Collectors.toList());
 		this.milestones = model.milestones.stream()
-			.map(TurboMilestone::new)
+			.map(m -> new TurboMilestone(model.repoId, m))
 			.collect(Collectors.toList());
 		this.users = model.users.stream()
-			.map(TurboUser::new)
+			.map(u -> new TurboUser(model.repoId, u))
 			.collect(Collectors.toList());
 	}
 

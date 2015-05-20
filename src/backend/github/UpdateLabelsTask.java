@@ -37,7 +37,7 @@ public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
 		List<TurboLabel> updated = Utility.reconcile(existing, changed,
-			TurboLabel::getName, Label::getName, TurboLabel::new);
+			TurboLabel::getName, Label::getName, l -> new TurboLabel(model.getRepoId().generateId(), l));
 
 		response.complete(new Result<>(updated, changes.right));
 	}

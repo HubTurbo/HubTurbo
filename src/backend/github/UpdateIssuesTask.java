@@ -38,7 +38,8 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
 		List<TurboIssue> updated = Utility.reconcile(existing, changed,
-			TurboIssue::getId, Issue::getNumber, TurboIssue::new);
+			TurboIssue::getId, Issue::getNumber,
+			i -> new TurboIssue(model.getRepoId().generateId(), i));
 
 		response.complete(new Result<>(updated, changes.middle, changes.right));
 	}

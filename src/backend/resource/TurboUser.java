@@ -17,6 +17,7 @@ public class TurboUser {
 	private void ______TRANSIENT_FIELDS______() {
 	}
 
+	private final String repoId;
 	private transient Image avatar = null;
 
 	private void ______CONSTRUCTORS______() {
@@ -25,22 +26,25 @@ public class TurboUser {
 	/**
 	 * Default constructor
 	 */
-	public TurboUser(String loginName) {
+	public TurboUser(String repoId, String loginName) {
 		this.loginName = loginName;
 		this.realName = "";
 		this.avatarURL = "";
+		this.repoId = repoId;
 	}
 
-	public TurboUser(User user) {
+	public TurboUser(String repoId, User user) {
 		this.loginName = user.getLogin();
 		this.realName = user.getName();
 		this.avatarURL = user.getAvatarUrl();
+		this.repoId = repoId;
 	}
 
-	public TurboUser(SerializableUser user) {
+	public TurboUser(String repoId, SerializableUser user) {
 		this.loginName = user.getLoginName();
 		this.realName = user.getRealName();
 		this.avatarURL = user.getAvatarURL();
+		this.repoId = repoId;
 	}
 
 	private void ______METHODS______() {
@@ -56,14 +60,15 @@ public class TurboUser {
 	private void ______BOILERPLATE______() {
 	}
 
+	public String getRepoId() {
+		return repoId;
+	}
 	public String getRealName() {
 		return realName;
 	}
-
 	public String getLoginName() {
 		return loginName;
 	}
-
 	public String getAvatarURL() {
 		return avatarURL;
 	}

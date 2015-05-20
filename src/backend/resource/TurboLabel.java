@@ -25,27 +25,33 @@ public class TurboLabel {
 	private void ______TRANSIENT_FIELDS______() {
 	}
 
+	private final String repoId;
+
 	private void ______CONSTRUCTORS______() {
 	}
 
-	public TurboLabel(String name) {
+	public TurboLabel(String repoId, String name) {
 		this.actualName = name;
 		this.colour = "#ffffff";
+		this.repoId = repoId;
 	}
 
-	public TurboLabel(String group, String name) {
+	public TurboLabel(String repoId, String group, String name) {
 		this.actualName = join(group, name);
 		this.colour = "#ffffff";
+		this.repoId = repoId;
 	}
 
-	public TurboLabel(Label label) {
+	public TurboLabel(String repoId, Label label) {
 		this.actualName = label.getName();
 		this.colour = label.getColor();
+		this.repoId = repoId;
 	}
 
-	public TurboLabel(SerializableLabel label) {
+	public TurboLabel(String repoId, SerializableLabel label) {
 		this.actualName = label.getActualName();
 		this.colour = label.getColour();
+		this.repoId = repoId;
 	}
 
 	private void ______METHODS______() {
@@ -126,10 +132,12 @@ public class TurboLabel {
 	private void ______BOILERPLATE______() {
 	}
 
+	public String getRepoId() {
+		return repoId;
+	}
 	public String getColour() {
 		return colour;
 	}
-
 	public String getActualName() {
 		return actualName;
 	}

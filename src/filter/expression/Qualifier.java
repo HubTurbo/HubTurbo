@@ -421,7 +421,8 @@ public class Qualifier implements FilterExpression {
     private boolean labelsSatisfy(Model model, TurboIssue issue) {
     	if (!content.isPresent()) return false;
 
-	    TurboLabel tokens = new TurboLabel(content.get().toLowerCase());
+	    // Make use of TurboLabel constructor to parse the string, to avoid duplication
+	    TurboLabel tokens = new TurboLabel("", content.get().toLowerCase());
 
 	    String group = "";
 		if (tokens.getGroup().isPresent()) {

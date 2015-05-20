@@ -38,7 +38,8 @@ public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result> 
 			changed.size(), changed.size() == 0 ? "" : ": " + stringify(changed)));
 
 		List<TurboMilestone> updated = Utility.reconcile(existing, changed,
-			TurboMilestone::getTitle, Milestone::getTitle, TurboMilestone::new);
+			TurboMilestone::getTitle, Milestone::getTitle,
+			m -> new TurboMilestone(model.getRepoId().generateId(), m));
 
 		response.complete(new Result<>(updated, changes.right));
 	}

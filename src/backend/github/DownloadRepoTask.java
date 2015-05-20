@@ -25,7 +25,7 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 	@Override
 	public void run() {
 		List<TurboIssue> issues = repo.getIssues(repoId).stream()
-			.map(TurboIssue::new)
+			.map(i -> new TurboIssue(repoId,  i))
 			.collect(Collectors.toList());
 		List<TurboLabel> labels = repo.getLabels(repoId).stream()
 			.map(TurboLabel::new)

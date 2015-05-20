@@ -53,6 +53,7 @@ public class TurboIssue {
 	private void ______TRANSIENT_FIELDS______() {
 	}
 
+	private final String repoId;
 	private IssueMetadata metadata;
 
 	private void ______CONSTRUCTORS______() {
@@ -61,7 +62,7 @@ public class TurboIssue {
 	/**
 	 * Default constructor: provides reasonable defaults for things
 	 */
-	public TurboIssue(int id, String title) {
+	public TurboIssue(String repoId, int id, String title) {
 		this.id = id;
 		this.creator = "";
 		this.createdAt = LocalDateTime.now();
@@ -70,12 +71,14 @@ public class TurboIssue {
 		mutableFieldDefaults();
 
 		this.title = title;
+		this.repoId = repoId;
 	}
 
 	/**
 	 * Immutable-conscious constructor
 	 */
-	public TurboIssue(int id, String title, String creator, LocalDateTime createdAt, boolean isPullRequest) {
+	public TurboIssue(String repoId, int id, String title,
+	                  String creator, LocalDateTime createdAt, boolean isPullRequest) {
 		this.id = id;
 		this.creator = creator;
 		this.createdAt = createdAt;
@@ -84,6 +87,7 @@ public class TurboIssue {
 		mutableFieldDefaults();
 
 		this.title = title;
+		this.repoId = repoId;
 	}
 
 	// Copy constructor
@@ -102,10 +106,11 @@ public class TurboIssue {
 		this.labels = new ArrayList<>(issue.labels);
 		this.milestone = issue.milestone;
 
-		this.metadata = new IssueMetadata();
+		this.metadata = new IssueMetadata(issue.metadata);
+		this.repoId = issue.repoId;
 	}
 
-	public TurboIssue(Issue issue) {
+	public TurboIssue(String repoId, Issue issue) {
 		this.id = issue.getNumber();
 		this.title = issue.getTitle();
 		this.creator = issue.getUser().getLogin();
@@ -127,9 +132,10 @@ public class TurboIssue {
 			: Optional.of(issue.getMilestone().getNumber());
 
 		this.metadata = new IssueMetadata();
+		this.repoId = repoId;
 	}
 
-	public TurboIssue(SerializableIssue issue) {
+	public TurboIssue(String repoId, SerializableIssue issue) {
 		this.id = issue.getId();
 		this.creator = issue.getCreator();
 		this.createdAt = issue.getCreatedAt();
@@ -145,6 +151,7 @@ public class TurboIssue {
 		this.milestone = issue.getMilestone();
 
 		this.metadata = new IssueMetadata();
+		this.repoId = repoId;
 	}
 
 	private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
@@ -183,6 +190,9 @@ public class TurboIssue {
 	private void ______BOILERPLATE______() {
 	}
 
+	public String getRepoId() {
+		return repoId;
+	}
 	public int getId() {
 		return id;
 	}
