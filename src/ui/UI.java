@@ -87,12 +87,13 @@ public class UI extends Application implements EventDispatcher {
 //		repoSelector.setDisable(true);
 		new LoginDialog(this, mainStage).show().thenApply(result -> {
 			if (result.success) {
-				setExpandedWidth(false);
-//				repoSelector.setDisable(false);
 //				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+//				repoSelector.setDisable(false);
 				logic.openRepository(result.repoId);
 //              DataManager.getInstance().addToLastViewedRepositories(repoId);
 				triggerEvent(new BoardSavedEvent());
+				browserComponent = new BrowserComponent(this, result.repoId);
+				setExpandedWidth(false);
 				ensureSelectedPanelHasFocus();
 			} else {
 				quit();
@@ -120,7 +121,6 @@ public class UI extends Application implements EventDispatcher {
 
 	private void initUI(Stage stage) {
 //		repoSelector = createRepoSelector();
-		browserComponent = new BrowserComponent(this);
 		mainStage = stage;
 		stage.setMaximized(false);
 

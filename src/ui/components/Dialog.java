@@ -14,8 +14,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public abstract class Dialog<T> {
-	protected static final KeyCombination BUTTON_TRIGGER_SHORTCUT = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
-	
+
 	private final Stage parentStage;
 	private Stage stage = null;
 	private CompletableFuture<T> response;
@@ -27,7 +26,7 @@ public abstract class Dialog<T> {
 
 	public Dialog(Stage parentStage) {
 		this.parentStage = parentStage;
-		this.response = new CompletableFuture<T>();
+		this.response = new CompletableFuture<>();
 	}
 
 	public CompletableFuture<T> show() {
@@ -35,7 +34,7 @@ public abstract class Dialog<T> {
 		stage = new Stage();
 		stage.setScene(scene);
 		stage.setTitle(title);
-		stage.setOnCloseRequest(e -> onClose(e));
+		stage.setOnCloseRequest(this::onClose);
 		stage.initOwner(parentStage);
 		stage.initModality(modality);
 		stage.initStyle(stageStyle);

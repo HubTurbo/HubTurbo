@@ -1,39 +1,28 @@
 package browserview;
 
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import javafx.concurrent.Task;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-
 import ui.UI;
 import util.GitHubURL;
 import util.IOUtilities;
 import util.PlatformSpecific;
+
+import java.awt.*;
+import java.io.*;
+import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -68,6 +57,7 @@ public class BrowserComponent {
 	}
 	
 	private final UI ui;
+	private final String primaryRepo;
 	private ChromeDriver driver = null;
 	
 	// We want browser commands to be run on a separate thread, but not to
@@ -82,8 +72,9 @@ public class BrowserComponent {
 	// at the moment.
 	private Executor executor;
 	
-	public BrowserComponent(UI ui) {
+	public BrowserComponent(UI ui, String primaryRepo) {
 		this.ui = ui;
+		this.primaryRepo = primaryRepo;
 		this.executor = Executors.newSingleThreadExecutor();
 	}
 
@@ -183,9 +174,9 @@ public class BrowserComponent {
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel())) {
-//				driver.get(GitHubURL.getPathForNewLabel());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(primaryRepo))) {
+				driver.get(GitHubURL.getPathForNewLabel(primaryRepo));
+			}
 		});
 	}
 
@@ -196,9 +187,9 @@ public class BrowserComponent {
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone())) {
-//				driver.get(GitHubURL.getPathForNewMilestone());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(primaryRepo))) {
+				driver.get(GitHubURL.getPathForNewMilestone(primaryRepo));
+			}
 		});
 		bringToTop();
 	}
@@ -210,9 +201,9 @@ public class BrowserComponent {
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue())) {
-//				driver.get(GitHubURL.getPathForNewIssue());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(primaryRepo))) {
+				driver.get(GitHubURL.getPathForNewIssue(primaryRepo));
+			}
 		});
 		bringToTop();
 	}
@@ -244,12 +235,12 @@ public class BrowserComponent {
 	 * driver window.
 	 * Run on a separate thread.
 	 */
-	public void showIssue(int id) {
+	public void showIssue(String repoId, int id) {
 		logger.info("Showing issue #" + id);
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(id))) {
-//				driver.get(GitHubURL.getPathForIssue(id));
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(repoId, id))) {
+				driver.get(GitHubURL.getPathForIssue(repoId, id));
+			}
 		});
 	}
 	
@@ -490,18 +481,18 @@ public class BrowserComponent {
 	public void showIssues() {
 		logger.info("Navigating to Issues page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues())) {
-//				driver.get(GitHubURL.getPathForAllIssues());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(primaryRepo))) {
+				driver.get(GitHubURL.getPathForAllIssues(primaryRepo));
+			}
 		});
 	}
 
 	public void showPullRequests() {
 		logger.info("Navigating to Pull requests page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests())) {
-//				driver.get(GitHubURL.getPathForPullRequests());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(primaryRepo))) {
+				driver.get(GitHubURL.getPathForPullRequests(primaryRepo));
+			}
 		});
 	}
 
@@ -517,18 +508,18 @@ public class BrowserComponent {
 	public void showMilestones() {
 		logger.info("Navigating to Milestones page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones())) {
-//				driver.get(GitHubURL.getPathForMilestones());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(primaryRepo))) {
+				driver.get(GitHubURL.getPathForMilestones(primaryRepo));
+			}
 		});
 	}
 
 	public void showContributors() {
 		logger.info("Navigating to Contributors page");
 		runBrowserOperation(() -> {
-//			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors())) {
-//				driver.get(GitHubURL.getPathForContributors());
-//			}
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(primaryRepo))) {
+				driver.get(GitHubURL.getPathForContributors(primaryRepo));
+			}
 		});
 	}
 

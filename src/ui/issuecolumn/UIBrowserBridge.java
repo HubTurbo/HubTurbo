@@ -23,37 +23,24 @@ import util.events.MilestoneCreatedEventHandler;
  */
 public class UIBrowserBridge {
 
-	private UI ui;
-
 	public UIBrowserBridge(UI ui) {
-		this.ui = ui;
-		ui.registerEvent(new IssueSelectedEventHandler() {
-			@Override public void handle(IssueSelectedEvent e) {
-				ui.getBrowserComponent().showIssue(e.id);
+		ui.registerEvent((IssueSelectedEventHandler) e ->
+			ui.getBrowserComponent().showIssue(e.repoId, e.id));
+
+		ui.registerEvent((IssueCreatedEventHandler) e ->
+			ui.getBrowserComponent().newIssue());
+
+		ui.registerEvent((LoginEventHandler) e -> {
+			ui.getBrowserComponent().login();
+			if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
+				ui.getBrowserComponent().showChangelog(ui.getCommandLineArgs().get(UI.ARG_UPDATED_TO));
 			}
 		});
-		ui.registerEvent(new IssueCreatedEventHandler() {
-			@Override public void handle(IssueCreatedEvent e) {
-				ui.getBrowserComponent().newIssue();
-			}
-		});
-		ui.registerEvent(new LoginEventHandler() {
-			@Override public void handle(LoginEvent e) {
-				ui.getBrowserComponent().login();
-				if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
-					ui.getBrowserComponent().showChangelog(ui.getCommandLineArgs().get(UI.ARG_UPDATED_TO));
-				}
-			}
-		});
-		ui.registerEvent(new LabelCreatedEventHandler() {
-			@Override public void handle(LabelCreatedEvent e) {
-				ui.getBrowserComponent().newLabel();
-			}
-		});
-		ui.registerEvent(new MilestoneCreatedEventHandler() {
-			@Override public void handle(MilestoneCreatedEvent e) {
-				ui.getBrowserComponent().newMilestone();
-			}
-		});
+
+		ui.registerEvent((LabelCreatedEventHandler) e ->
+			ui.getBrowserComponent().newLabel());
+
+		ui.registerEvent((MilestoneCreatedEventHandler) e ->
+			ui.getBrowserComponent().newMilestone());
 	}
 }
