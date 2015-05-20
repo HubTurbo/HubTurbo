@@ -14,9 +14,7 @@ import ui.UI;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.loadui.testfx.controls.Commons.hasLabel;
 import static org.loadui.testfx.controls.Commons.hasText;
 
 public class TestGuiTest extends GuiTest {
