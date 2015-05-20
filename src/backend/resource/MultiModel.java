@@ -2,7 +2,6 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.interfaces.IModel;
-import com.sun.tools.corba.se.idl.ValueRepositoryId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
