@@ -1,7 +1,7 @@
 package backend;
 
 import backend.assumed.ModelUpdatedEvent;
-import backend.resource.Model;
+import backend.resource.MultiModel;
 import javafx.application.Platform;
 import ui.UI;
 
@@ -13,10 +13,8 @@ public class UIManager {
 		this.ui = ui;
 	}
 
-	public void update(Model model) {
-		Platform.runLater(() -> {
-			ui.triggerEvent(new ModelUpdatedEvent(model));
-		});
+	public void update(MultiModel models) {
+		Platform.runLater(() -> ui.triggerEvent(new ModelUpdatedEvent(models)));
 	}
 }
 

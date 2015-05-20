@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import backend.Logic;
+import backend.UIManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -59,7 +60,8 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
-	public Logic logic = new Logic();
+	public UIManager uiManager = new UIManager(this);
+	public Logic logic = new Logic(uiManager);
 
 	// Main UI elements
 

@@ -4,7 +4,6 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 import util.Utility;
 
@@ -17,18 +16,16 @@ public class Logic {
 
 	private static final Logger logger = HTLog.get(Logic.class);
 
-	private MultiModel models = new MultiModel();
-
-//	private final UIManager uiManager;
+	private final MultiModel models = new MultiModel();
+	private final UIManager uiManager;
 
 	private RepoIO repoIO = new RepoIO();
 
 	// Assumed to be always present when app starts
 	public UserCredentials credentials = null;
 
-	public Logic() {
-//		UIManager uiManager
-//		this.uiManager = uiManager;
+	public Logic(UIManager uiManager) {
+		this.uiManager = uiManager;
 	}
 
 	public CompletableFuture<Boolean> login(String username, String password) {
@@ -39,10 +36,17 @@ public class Logic {
 
 	public void refresh() {
 		logger.info("Refreshing " + models.toModels().stream()
-			.map(Model::getRepoId).collect(Collectors.toList()));
+			.map(Model::getRepoId)
+			.collect(Collectors.toList()));
 		Utility.sequence(models.toModels().stream()
-			.map(repoIO::updateModel)
-			.collect(Collectors.toList())).thenAccept(models::replace);
+				.map(repoIO::updateModel)
+				.collect(Collectors.toList()))
+			.thenAccept(models::replace)
+			.thenRun(this::updateUI);
+	}
+
+	private void updateUI() {
+		uiManager.update(models);
 	}
 
 	public CompletableFuture<Void> openRepository(String repoId) {

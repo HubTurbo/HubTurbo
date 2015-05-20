@@ -28,37 +28,26 @@ public class ColumnControl extends HBox {
 	private final Stage stage;
 	private Model model;
 	
-	private final UIBrowserBridge uiBrowserBridge;
-
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
 	
 	public ColumnControl(UI ui, Stage stage) {
 		this.ui = ui;
 		this.stage = stage;
-		this.uiBrowserBridge = new UIBrowserBridge(ui);
+
+		// Set up the connection to the browser
+		new UIBrowserBridge(ui);
+
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
-
-		ui.registerEvent((ModelUpdatedEventHandler) e ->
-			Platform.runLater(() -> {
-				forEach(child -> {
-					if (child instanceof IssueColumn) {
-						// TODO integrate when ready
-//						List<TurboIssue> issues = e.model.getIssues().stream()
-//							.map(TurboIssue::new)
-//							((IssueColumn) child).setItems(e.model.getIssues());
-					}
-				});
-			}
-		));
 
 		ui.registerEvent((ModelUpdatedEventHandler) e -> Platform.runLater(() -> {
 			forEach(child -> {
 				if (child instanceof IssueColumn) {
-					((IssueColumn) child).setItems(e.model.getIssues());
+					((IssueColumn) child).setItems(e.models.getIssues());
 				}
 			});
 		}));
+
 		ui.registerEvent((IssueSelectedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 		ui.registerEvent((ColumnClickedEventHandler) e -> setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 
@@ -68,7 +57,7 @@ public class ColumnControl extends HBox {
 	public void restoreColumns() {
 		getChildren().clear();
 		
-//		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
+//		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(models.getRepoId());
 //		if (filters != null && !filters.isEmpty()) {
 //			for (String filter : filters) {
 //				addColumn().filterByString(filter);
@@ -192,7 +181,7 @@ public class ColumnControl extends HBox {
 				sessionFilters.add(filter);
 			}
 		});
-//		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
+//		DataManager.getInstance().setFiltersForNextSession(models.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {

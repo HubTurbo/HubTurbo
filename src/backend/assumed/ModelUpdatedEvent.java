@@ -1,12 +1,12 @@
 package backend.assumed;
 
-import backend.resource.Model;
+import backend.resource.MultiModel;
 import util.events.Event;
 
 public class ModelUpdatedEvent extends Event {
-	public Model model;
+	public MultiModel models;
 
-    public ModelUpdatedEvent(Model model) {
-	    this.model = model;
+    public ModelUpdatedEvent(MultiModel models) {
+	    this.models = models;
 	}
 }

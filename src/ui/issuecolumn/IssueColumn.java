@@ -24,7 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.DragData;
@@ -128,7 +127,7 @@ public abstract class IssueColumn extends Column {
 				"state", "open", "closed",
 				"created",
 				"updated");
-			all.addAll(e.model.getUsers().stream()
+			all.addAll(e.models.getUsers().stream()
 				.map(TurboUser::getLoginName)
 				.collect(Collectors.toList()));
 
@@ -322,7 +321,7 @@ public abstract class IssueColumn extends Column {
 					currentFilterExpression.applyTo(issue, model);
 					if (updateModel) {
 						// TODO re-enable
-//						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, model, clone, issue);
+//						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, models, clone, issue);
 					}
 					parentColumnControl.refresh();
 				} else {
