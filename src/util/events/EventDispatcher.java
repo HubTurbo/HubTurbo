@@ -3,9 +3,14 @@ package util.events;
 public interface EventDispatcher {
 	/**
 	 * Publish/subscribe API making use of Guava's EventBus.
-	 * Takes a lambda expression to be called upon an event being fired.
+	 * Takes an event handler to be called upon an event being fired.
 	 */
 	public void registerEvent(EventHandler handler);
+
+	/**
+	 * Takes an event handler to be unregistered.
+	 */
+	public void unregisterEvent(EventHandler handler);
 
 	/**
 	 * Publish/subscribe API making use of Guava's EventBus.

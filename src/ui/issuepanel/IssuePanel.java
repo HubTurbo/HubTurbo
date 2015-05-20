@@ -57,10 +57,6 @@ public class IssuePanel extends IssueColumn {
 		return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
 	}
 
-	@Override
-	public void deselect() {
-	}
-
 	/**
 	 * Updates {@link #issueCommentCounts} with the latest counts.
 	 * Returns a list of issues which have new comments.

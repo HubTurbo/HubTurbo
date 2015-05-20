@@ -2,7 +2,6 @@ package ui;
 
 import backend.Logic;
 import backend.UIManager;
-import backend.assumed.ModelUpdatedEvent;
 import browserview.BrowserComponent;
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
@@ -255,6 +254,12 @@ public class UI extends Application implements EventDispatcher {
 	public void registerEvent(EventHandler handler) {
 		eventBus.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
+	}
+
+	@Override
+	public void unregisterEvent(EventHandler handler) {
+		eventBus.unregister(handler);
+		logger.info("Unregistered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 
 	@Override

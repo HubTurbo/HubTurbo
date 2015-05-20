@@ -97,5 +97,5 @@ public abstract class Column extends VBox {
 	 * This method is called when the column control is deselected. It used to happen when
 	 * the issue panel was closed.
 	 */
-	public abstract void deselect();
+	public abstract void close();
 }

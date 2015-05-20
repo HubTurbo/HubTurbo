@@ -150,8 +150,9 @@ public class ColumnControl extends HBox {
 	}
 
 	public void closeColumn(int index) {
-		getChildren().remove(index);
+		Node child = getChildren().remove(index);
 		updateColumnIndices();
+		((Column) child).close();
 	}
 
 	private void updateColumnIndices() {

@@ -112,28 +112,30 @@ public abstract class IssueColumn extends Column {
 //		});
 //	}
 
+	private final ModelUpdatedEventHandler onModelUpdate = e -> {
+		List<String> all = Arrays.asList(
+			"label", "milestone",
+			"involves", "assignee", "author",
+			"title", "body",
+			"is", "issue", "pr", "merged", "unmerged",
+			"no", "type", "has",
+			"state", "open", "closed",
+			"created",
+			"updated");
+		all.addAll(e.model.getUsers().stream()
+			.map(TurboUser::getLoginName)
+			.collect(Collectors.toList()));
+
+		filterTextField.setKeywords(all);
+	};
+
 	private Node createFilterBox() {
 		filterTextField = new FilterTextField("", 0).setOnConfirm((text) -> {
 			applyStringFilter(text);
 			return text;
 		});
 
-		ui.registerEvent((ModelUpdatedEventHandler) e -> {
-			List<String> all = Arrays.asList(
-				"label", "milestone",
-				"involves", "assignee", "author",
-				"title", "body",
-				"is", "issue", "pr", "merged", "unmerged",
-				"no", "type", "has",
-				"state", "open", "closed",
-				"created",
-				"updated");
-			all.addAll(e.model.getUsers().stream()
-				.map(TurboUser::getLoginName)
-				.collect(Collectors.toList()));
-
-			filterTextField.setKeywords(all);
-		});
+		ui.registerEvent(onModelUpdate);
 
 		filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
 
@@ -344,14 +346,11 @@ public abstract class IssueColumn extends Column {
 		refreshItems();
 	}
 
-	/**
-	 * To be overridden by subclasses.
-	 * 
-	 * See docs in Column for refreshItems.
-	 * 
-	 */
+	@Override
+	public void close() {
+		ui.unregisterEvent(onModelUpdate);
+	}
 
-	// deselect is not overriden
 
 	@Override
 	public void refreshItems() {
