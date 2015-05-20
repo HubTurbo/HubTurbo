@@ -49,9 +49,11 @@ public class Logic {
 		uiManager.update(models);
 	}
 
-	public CompletableFuture<Void> openRepository(String repoId) {
+	public CompletableFuture<Boolean> openRepository(String repoId) {
 		logger.info("Opening " + repoId);
-		return repoIO.openRepository(repoId).thenAccept(models::add);
+		return repoIO.openRepository(repoId).thenAccept(models::add)
+			.thenApply(n -> true)
+			.exceptionally(e -> false);
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
