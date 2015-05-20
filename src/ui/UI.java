@@ -33,10 +33,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
-import util.DialogMessage;
-import util.PlatformEx;
-import util.PlatformSpecific;
-import util.Utility;
+import util.*;
 import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
@@ -69,7 +66,7 @@ public class UI extends Application implements EventDispatcher {
 	private ColumnControl columns;
 	private MenuControl menuBar;
 	private BrowserComponent browserComponent;
-	private RepositorySelector repoSelector;
+//	private RepositorySelector repoSelector;
 
 	// Events
 
@@ -83,39 +80,38 @@ public class UI extends Application implements EventDispatcher {
 		Application.launch(args);
 	}
 
-	private static UI instance;
-	public static UI getInstance() {
-		return instance;
+	@Override
+	public void start(Stage stage) {
+
+		initApplicationState();
+		initUI(stage);
+
+		getUserCredentials();
 	}
 
-	@Override
-	public void start(Stage stage) throws IOException {
-
-		instance = this;
-
-		//log all uncaught exceptions
+	private void initApplicationState() {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
-            logger.error(throwable.getMessage(), throwable);
-        });
-
+			logger.error(throwable.getMessage(), throwable);
+		});
 		events = new EventBus();
 
 		commandLineArgs = initialiseCommandLineArguments();
 //		DataManager.getInstance();
 		clearCacheIfNecessary();
+	}
 
-		repoSelector = createRepoSelector();
-
+	private void initUI(Stage stage) {
+//		repoSelector = createRepoSelector();
 		browserComponent = new BrowserComponent(this);
-		initCSS();
 		mainStage = stage;
 		stage.setMaximized(false);
-//		stage.setAlwaysOnTop(true);
+
 		Scene scene = new Scene(createRoot());
 		setupMainStage(scene);
+
 		loadFonts();
+		initCSS();
 		applyCSS(scene);
-		getUserCredentials();
 	}
 
 	/**
@@ -129,13 +125,13 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void getUserCredentials() {
-		repoSelector.setDisable(true);
-		new LoginDialog(this, mainStage, columns).show().thenApply(success -> {
-			if (success) {
+//		repoSelector.setDisable(true);
+		new LoginDialog(this, mainStage).show().thenApply(result -> {
+			if (result.success) {
 				setExpandedWidth(false);
 				columns.loadIssues();
-				repoSelector.setDisable(false);
-				// TODO
+//				repoSelector.setDisable(false);
+//				TODO
 //				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
 				ensureSelectedPanelHasFocus();
@@ -183,7 +179,9 @@ public class UI extends Application implements EventDispatcher {
 					// A refresh is triggered if:
 					// 1. Repo-switching is not disabled (meaning an update is not in progress)
 					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+//					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+					boolean shouldRefresh = browserComponent.hasBviewChanged();
+
 					if (shouldRefresh) {
 						logger.info("Gained focus; refreshing");
 						logic.refresh();
@@ -219,7 +217,7 @@ public class UI extends Application implements EventDispatcher {
 		System.exit(0);
 	}
 
-	private Parent createRoot() throws IOException {
+	private Parent createRoot() {
 
 		columns = new ColumnControl(this, mainStage);
 
@@ -232,7 +230,7 @@ public class UI extends Application implements EventDispatcher {
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
 
 		menuBar = new MenuControl(this, columns, columnsScrollPane);
-		top.getChildren().addAll(menuBar, repoSelector);
+		top.getChildren().addAll(menuBar);//, repoSelector);
 
 		BorderPane root = new BorderPane();
 		root.setTop(top);
@@ -383,23 +381,23 @@ public class UI extends Application implements EventDispatcher {
 		return true;
 	}
 
-	private boolean repoSwitchingAllowed = true;
+//	private boolean repoSwitchingAllowed = true;
 
-	public boolean isRepoSwitchingAllowed() {
-		return repoSwitchingAllowed;
-	}
+//	public boolean isRepoSwitchingAllowed() {
+//		return repoSwitchingAllowed;
+//	}
 
-	public void enableRepositorySwitching() {
-		repoSwitchingAllowed = true;
-		repoSelector.setLabelText("");
-		repoSelector.enable();
-	}
+//	public void enableRepositorySwitching() {
+//		repoSwitchingAllowed = true;
+//		repoSelector.setLabelText("");
+//		repoSelector.enable();
+//	}
 
-	public void disableRepositorySwitching() {
-		repoSwitchingAllowed = false;
-		repoSelector.setLabelText("Syncing...");
-		repoSelector.disable();
-	}
+//	public void disableRepositorySwitching() {
+//		repoSwitchingAllowed = false;
+//		repoSelector.setLabelText("Syncing...");
+//		repoSelector.disable();
+//	}
 
 	private void loadRepo(String repoString) {
 		RepositoryId repoId = RepositoryId.createFromId(repoString);

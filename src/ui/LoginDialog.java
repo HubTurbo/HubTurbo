@@ -1,7 +1,6 @@
 package ui;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,21 +18,21 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import ui.components.Dialog;
 import ui.components.HTStatusBar;
-import ui.issuecolumn.ColumnControl;
 import util.DialogMessage;
 import util.HTLog;
-import util.PlatformEx;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class LoginDialog extends Dialog<Boolean> {
+public class LoginDialog extends Dialog<LoginDialog.Result> {
+
+	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
 
 	private static final String DIALOG_TITLE = "GitHub Login";
 	private static final int DIALOG_HEIGHT = 200;
@@ -47,25 +46,94 @@ public class LoginDialog extends Dialog<Boolean> {
 	private static final String USERNAME_LABEL = "Username:";
 	private static final String BUTTON_SIGN_IN = "Sign in";
 
-	private static final Logger logger = LogManager.getLogger(LoginDialog.class.getName());
 	private final UI ui;
 
 	private TextField repoOwnerField;
 	private TextField repoNameField;
 	private TextField usernameField;
 	private PasswordField passwordField;
-	private ColumnControl columns;
 	private Button loginButton;
 
-	public LoginDialog(UI ui, Stage parentStage, ColumnControl columns) {
+	private String owner;
+	private String repo;
+	private String username;
+	private String password;
+
+	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+	public LoginDialog(UI ui, Stage parentStage) {
 		super(parentStage);
 		this.ui = ui;
-		this.columns = columns;
+	}
+
+	private void login(Event e) {
+
+		resolveCredentials();
+		enableUI(false);
+
+		HTStatusBar.displayMessage("Signing in to GitHub...");
+
+		CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
+			if (success) {
+				// Save login details only on successful login
+//				DataManager.getInstance().setLastLoginUsername(username);
+//				DataManager.getInstance().setLastLoginPassword(password);
+				Platform.runLater(() -> {
+					completeResponse(new Result(owner, repo));
+					close();
+				});
+			} else {
+				handleError("Failed to sign in. Please try again.");
+			}
+		});
+	}
+
+	private boolean attemptLogin() {
+		try {
+			return ui.logic.login(username, password).get();
+		} catch (InterruptedException | ExecutionException e1) {
+			HTLog.error(logger, e1);
+		}
+		return false;
+	}
+
+	private void resolveCredentials() {
+		owner = repoOwnerField.getText();
+		repo = repoNameField.getText();
+		username = usernameField.getText();
+		password = passwordField.getText();
+
+		// If either field is empty, try to load credentials.txt
+		if (username.isEmpty() || password.isEmpty()) {
+			BufferedReader reader;
+			try {
+				reader = new BufferedReader(new FileReader("credentials.txt"));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					if (username.isEmpty()) {
+						username = line;
+					} else {
+						password = line;
+					}
+				}
+				logger.info("Logged in using credentials.txt");
+			} catch (Exception ex) {
+				logger.info("Failed to find or open credentials.txt");
+			}
+		}
+	}
+
+	private void handleError(String message) {
+		Platform.runLater(()->{
+			enableUI(true);
+			HTStatusBar.displayMessage(message);
+			DialogMessage.showWarningDialog("Error", message);
+		});
 	}
 
 	@Override
 	protected void onClose(WindowEvent e) {
-		completeResponse(false);
+		completeResponse(new Result());
 	}
 
 	@Override
@@ -107,7 +175,7 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
 
-		populateSavedFields();
+//		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
@@ -127,7 +195,7 @@ public class LoginDialog extends Dialog<Boolean> {
 	/**
 	 * Fills in fields which have values at this point.
 	 */
-	private void populateSavedFields() {
+//	private void populateSavedFields() {
 //		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
 //		if (lastViewed.isPresent()) {
 //			repoOwnerField.setText(lastViewed.get().getOwner());
@@ -153,11 +221,10 @@ public class LoginDialog extends Dialog<Boolean> {
 //				usernameField.requestFocus();
 //			}
 //		});
-	}
+//	}
 
 	/**
 	 * Configures the central grid pane before it's used.
-	 * @param grid
 	 */
 	private static void setupGridPane(GridPane grid) {
 		grid.setAlignment(Pos.CENTER);
@@ -180,122 +247,21 @@ public class LoginDialog extends Dialog<Boolean> {
 
 		// The values should sum up to 100%
 		int sum = 0;
-		for (int i=0; i<values.length; i++) {
-			sum += values[i];
+		for (int value : values) {
+			sum += value;
 		}
 		assert sum == 100 : "Column constraints should sum up to 100%!";
 
 		// Apply constraints to grid
 		ColumnConstraints column;
-		for (int i=0; i<values.length; i++) {
+		for (int value : values) {
 			column = new ColumnConstraints();
-			column.setPercentWidth(values[i]);
+			column.setPercentWidth(value);
 			grid.getColumnConstraints().add(column);
 		}
 	}
 
-	private void login(Event e) {
-
-		// Resolve username and password
-
-		String owner = repoOwnerField.getText();
-		String repo = repoNameField.getText();
-		String username = usernameField.getText();
-		String password = passwordField.getText();
-
-		// If either field is empty, try to load credentials.txt
-		if (username.isEmpty() || password.isEmpty()) {
-			BufferedReader reader;
-			try {
-				reader = new BufferedReader(new FileReader("credentials.txt"));
-				String line = null;
-				while ((line = reader.readLine()) != null) {
-					if (username.isEmpty()) {
-						username = line;
-					} else {
-						password = line;
-					}
-				}
-				logger.info("Logged in using credentials.txt");
-			} catch (Exception ex) {
-				logger.info("Failed to find or open credentials.txt");
-			}
-		}
-
-		// Update UI
-
-		enableElements(false);
-
-		// Run blocking operations in the background
-
-		HTStatusBar.displayMessage("Signing in at GitHub...");
-		boolean couldLogIn = false;
-		try {
-			couldLogIn = ui.logic.login(username, password).get();
-		} catch (InterruptedException | ExecutionException e1) {
-			HTLog.error(logger, e1);
-		}
-
-		Task<Boolean> task = new Task<Boolean>() {
-		    @Override
-		    protected Boolean call() throws Exception {
-
-			    HTStatusBar.displayMessage("Signed in; loading data...");
-			    updateProgress(0, 1);
-			    updateMessage("Loading data from " + owner + "/" + repo + "...");
-			    boolean loadSuccess = loadRepository(owner, repo, (message, progress) -> {
-				    updateProgress(progress * 100, 100);
-				    updateMessage(message);
-			    });
-                PlatformEx.runAndWait(columns::restoreColumns);
-		    	return loadSuccess;
-		    }
-		};
-
-		task.setOnSucceeded(wse -> {
-			if (task.getValue()) {
-//				HTStatusBar.displayMessage(String.format("%s loaded successfully! (%s)",
-//					ServiceManager.getInstance().getRepoId().generateId(),
-//					ServiceManager.getInstance().getRemainingRequestsDesc()));
-//				logger.info("Remaining requests: " +
-//					ServiceManager.getInstance().getRemainingRequestsDesc());
-				completeResponse(true);
-				close();
-			} else {
-				handleError("Issues failed to load. Please try again.");
-			}
-		});
-		task.setOnFailed(wse -> {
-			Throwable thrown = task.getException();
-			logger.error(thrown.getLocalizedMessage(), thrown);
-			handleError("An error occurred: " + task.getException());
-		});
-
-		if (couldLogIn) {
-
-			// Save login details only on successful login
-//			DataManager.getInstance().setLastLoginUsername(username);
-//			DataManager.getInstance().setLastLoginPassword(password);
-
-			DialogMessage.showProgressDialog(task, "Loading issues from " + owner + "/" + repo + "...");
-			Thread th = new Thread(task);
-			th.setDaemon(true);
-			th.start();
-		} else {
-			handleError("Failed to sign in. Please try again.");
-		}
-
-	}
-
-	private void handleError(String message) {
-		Platform.runLater(()->{
-			enableElements(true);
-			HTStatusBar.displayMessage(message);
-			DialogMessage.showWarningDialog("Warning", message);
-		});
-	}
-
-	private void enableElements(boolean enable) {
+	private void enableUI(boolean enable) {
 		boolean disable = !enable;
 		loginButton.setDisable(disable);
 		repoOwnerField.setDisable(disable);
@@ -304,16 +270,21 @@ public class LoginDialog extends Dialog<Boolean> {
 		passwordField.setDisable(disable);
 	}
 
-	private boolean loadRepository(String owner, String repoName,
-	                               BiConsumer<String, Float> taskUpdate) throws IOException {
-//		boolean loaded = ServiceManager.getInstance().setupRepository(owner, repoName, taskUpdate);
-//		ServiceManager.getInstance().startModelUpdate();
-//		IRepositoryIdProvider currRepo = ServiceManager.getInstance().getRepoId();
-//		if (currRepo != null) {
-//			String repoId = currRepo.generateId();
-//			DataManager.getInstance().addToLastViewedRepositories(repoId);
-//		}
-//		return loaded;
-		return true;
+	public static class Result {
+
+		public final String owner;
+		public final String repo;
+		public final boolean success;
+
+		public Result() {
+			this.success = false;
+			this.owner = this.repo = "";
+		}
+
+		public Result(String owner, String repo) {
+			this.success = true;
+			this.owner = owner;
+			this.repo = repo;
+		}
 	}
 }
