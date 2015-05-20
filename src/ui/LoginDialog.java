@@ -18,6 +18,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import util.DialogMessage;
@@ -272,19 +273,17 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 
 	public static class Result {
 
-		public final String owner;
-		public final String repo;
+		public final String repoId;
 		public final boolean success;
 
 		public Result() {
 			this.success = false;
-			this.owner = this.repo = "";
+			this.repoId = "";
 		}
 
 		public Result(String owner, String repo) {
 			this.success = true;
-			this.owner = owner;
-			this.repo = repo;
+			this.repoId = RepositoryId.create(owner, repo).generateId();
 		}
 	}
 }

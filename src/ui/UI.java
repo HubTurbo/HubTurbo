@@ -1,20 +1,15 @@
 package ui;
 
-import java.awt.Rectangle;
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
 import backend.Logic;
 import backend.UIManager;
+import browserview.BrowserComponent;
+import com.google.common.eventbus.EventBus;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -25,24 +20,22 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
-
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
-import util.*;
+import util.PlatformEx;
+import util.PlatformSpecific;
+import util.Utility;
 import util.events.BoardSavedEvent;
 import util.events.Event;
 import util.events.EventDispatcher;
 import util.events.EventHandler;
-import browserview.BrowserComponent;
 
-import com.google.common.eventbus.EventBus;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -89,10 +82,30 @@ public class UI extends Application implements EventDispatcher {
 		getUserCredentials();
 	}
 
-	private void initApplicationState() {
-		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
-			logger.error(throwable.getMessage(), throwable);
+	private void getUserCredentials() {
+//		repoSelector.setDisable(true);
+		new LoginDialog(this, mainStage).show().thenApply(result -> {
+			if (result.success) {
+				setExpandedWidth(false);
+//				repoSelector.setDisable(false);
+//				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+				logic.openRepository(result.repoId);
+//              DataManager.getInstance().addToLastViewedRepositories(repoId);
+				triggerEvent(new BoardSavedEvent());
+				ensureSelectedPanelHasFocus();
+			} else {
+				quit();
+			}
+			return true;
+		}).exceptionally(e -> {
+			logger.error(e.getLocalizedMessage(), e);
+			return false;
 		});
+	}
+
+	private void initApplicationState() {
+		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
+			logger.error(throwable.getMessage(), throwable));
 		events = new EventBus();
 
 		commandLineArgs = initialiseCommandLineArguments();
@@ -110,8 +123,8 @@ public class UI extends Application implements EventDispatcher {
 		setupMainStage(scene);
 
 		loadFonts();
-		initCSS();
-		applyCSS(scene);
+		String css = initCSS();
+		applyCSS(css, scene);
 	}
 
 	/**
@@ -124,36 +137,13 @@ public class UI extends Application implements EventDispatcher {
 		}
 	}
 
-	private void getUserCredentials() {
-//		repoSelector.setDisable(true);
-		new LoginDialog(this, mainStage).show().thenApply(result -> {
-			if (result.success) {
-				setExpandedWidth(false);
-				columns.loadIssues();
-//				repoSelector.setDisable(false);
-//				TODO
-//				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
-				triggerEvent(new BoardSavedEvent());
-				ensureSelectedPanelHasFocus();
-			} else {
-				quit();
-			}
-			return true;
-		}).exceptionally(e -> {
-			logger.error(e.getLocalizedMessage(), e);
-			return false;
-		});
+	public String initCSS() {
+		return getClass().getResource("hubturbo.css").toString();
 	}
 
-	private static String CSS = "";
-
-	public void initCSS() {
-		CSS = this.getClass().getResource("hubturbo.css").toString();
-	}
-
-	public static void applyCSS(Scene scene) {
+	public static void applyCSS(String css, Scene scene) {
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add(CSS);
+		scene.getStylesheets().add(css);
 	}
 
 	public static void loadFonts(){
@@ -258,7 +248,7 @@ public class UI extends Application implements EventDispatcher {
 	 */
 
 	@Override
-	public <T extends Event> void registerEvent(EventHandler handler) {
+	public void registerEvent(EventHandler handler) {
 		events.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
@@ -270,30 +260,8 @@ public class UI extends Application implements EventDispatcher {
 		logger.info("Triggered event " + event.getClass().getSimpleName());
 	}
 
-	public ColumnControl getColumnControl() {
-		return columns;
-	}
-
 	public BrowserComponent getBrowserComponent() {
 		return browserComponent;
-	}
-
-	/**
-	 * Tracks whether or not the window is in an expanded state.
-	 */
-	private boolean expanded = false;
-
-	public boolean isExpanded() {
-		return expanded;
-	}
-
-	/**
-	 * Toggles the expansion state of the window.
-	 */
-	public boolean toggleExpandedWidth() {
-		expanded = !expanded;
-		setExpandedWidth(expanded);
-		return expanded;
 	}
 
 	/**
@@ -332,7 +300,6 @@ public class UI extends Application implements EventDispatcher {
 	 * @param expanded
 	 */
 	private void setExpandedWidth(boolean expanded) {
-		this.expanded = expanded;
 		Rectangle dimensions = getDimensions();
 		double width = expanded
 				? dimensions.getWidth()
@@ -352,13 +319,13 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-	private RepositorySelector createRepoSelector() {
-		RepositorySelector repoSelector = new RepositorySelector();
-		repoSelector.setOnValueChange(this::loadRepo);
-		return repoSelector;
-	}
+//	private RepositorySelector createRepoSelector() {
+//		RepositorySelector repoSelector = new RepositorySelector();
+//		repoSelector.setOnValueChange(this::loadRepo);
+//		return repoSelector;
+//	}
 
-	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
+//	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
 		// TODO
 //		try {
 //			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
@@ -378,8 +345,8 @@ public class UI extends Application implements EventDispatcher {
 //		}catch (IOException e) {
 //			logger.error(e.getLocalizedMessage(), e);
 //		}
-		return true;
-	}
+//		return true;
+//	}
 
 //	private boolean repoSwitchingAllowed = true;
 
@@ -399,58 +366,58 @@ public class UI extends Application implements EventDispatcher {
 //		repoSelector.disable();
 //	}
 
-	private void loadRepo(String repoString) {
-		RepositoryId repoId = RepositoryId.createFromId(repoString);
-		if(repoId == null
-//		  || repoId.equals(ServiceManager.getInstance().getRepoId())
-		  || !checkRepoAccess(repoId)){
-			return;
-		}
-
-		logger.info("Switching repository to " + repoString + "...");
-
-		columns.saveSession();
-//		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
-
-		Task<Boolean> task = new Task<Boolean>(){
-			@Override
-			protected Boolean call() throws IOException {
-
-//				updateProgress(0, 1);
-//				updateMessage(String.format("Switching to %s...",
-//					ServiceManager.getInstance().getRepoId().generateId()));
+//	private void loadRepo(String repoString) {
+//		RepositoryId repoId = RepositoryId.createFromId(repoString);
+//		if(repoId == null
+////		  || repoId.equals(ServiceManager.getInstance().getRepoId())
+//		  || !checkRepoAccess(repoId)){
+//			return;
+//		}
 //
-//				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
-//					updateProgress(progress * 100, 100);
-//					updateMessage(message);
-//				});
-				// TODO
-				logic.openRepository(repoId.generateId());
-
-                PlatformEx.runAndWait(() -> {
-                    columns.restoreColumns();
-                    triggerEvent(new BoardSavedEvent());
-                });
-				return true;
-			}
-		};
-		DialogMessage.showProgressDialog(task, "Switching to " + repoId.generateId() + "...");
-		Thread thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
-
-		task.setOnSucceeded(wse -> {
-//			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
-			logger.info("Repository " + repoString + " successfully switched to!");
-			ensureSelectedPanelHasFocus();
-		});
-
-		task.setOnFailed(wse -> {
-			Throwable err = task.getException();
-			logger.error(err.getLocalizedMessage(), err);
-			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
-		});
-	}
+//		logger.info("Switching repository to " + repoString + "...");
+//
+//		columns.saveSession();
+////		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
+//
+//		Task<Boolean> task = new Task<Boolean>(){
+//			@Override
+//			protected Boolean call() throws IOException {
+//
+////				updateProgress(0, 1);
+////				updateMessage(String.format("Switching to %s...",
+////					ServiceManager.getInstance().getRepoId().generateId()));
+////
+////				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
+////					updateProgress(progress * 100, 100);
+////					updateMessage(message);
+////				});
+//				// TODO
+//				logic.openRepository(repoId.generateId());
+//
+//                PlatformEx.runAndWait(() -> {
+//                    columns.restoreColumns();
+//                    triggerEvent(new BoardSavedEvent());
+//                });
+//				return true;
+//			}
+//		};
+//		DialogMessage.showProgressDialog(task, "Switching to " + repoId.generateId() + "...");
+//		Thread thread = new Thread(task);
+//		thread.setDaemon(true);
+//		thread.start();
+//
+//		task.setOnSucceeded(wse -> {
+////			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+//			logger.info("Repository " + repoString + " successfully switched to!");
+//			ensureSelectedPanelHasFocus();
+//		});
+//
+//		task.setOnFailed(wse -> {
+//			Throwable err = task.getException();
+//			logger.error(err.getLocalizedMessage(), err);
+//			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
+//		});
+//	}
 
 	private void ensureSelectedPanelHasFocus() {
 		if(columns.getCurrentlySelectedColumn().isPresent()) {
@@ -488,10 +455,6 @@ public class UI extends Application implements EventDispatcher {
 	public void minimizeWindow() {
 		mainStage.setIconified(true);
 		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-	}
-
-	public Stage getMainStage() {
-		return mainStage;
 	}
 
 	public HWND getMainWindowHandle() {

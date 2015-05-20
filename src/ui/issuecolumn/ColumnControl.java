@@ -101,15 +101,6 @@ public class ColumnControl extends HBox {
 		forEach(child -> child.refreshItems());
 	}
 	
-	public void loadIssues() {
-		for (Node node : getChildren()) {
-			if (node instanceof IssueColumn) {
-				IssueColumn panel = (IssueColumn) node;
-				panel.setItems(model.getIssues());
-			}
-		}
-	}
-	
 	private IssueColumn addColumn() {
 		return addColumnAt(getChildren().size());
 	}
