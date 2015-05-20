@@ -20,6 +20,10 @@ public class HTLog {
 		return repoId + " | " + String.format(formatString, args);
 	}
 
+	public static void error(Logger logger, String message) {
+		logger.error(message);
+	}
+
 	public static void error(Logger logger, Exception e) {
 		logger.error(e.getLocalizedMessage(), e);
 	}
