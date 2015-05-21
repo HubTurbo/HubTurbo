@@ -285,12 +285,7 @@ public abstract class IssueColumn extends Column {
 
 	private void applyFilterExpression(FilterExpression filter) {
 		currentFilterExpression = filter;
-		predicate = issue -> Qualifier.process(model, filter, issue);
-		Qualifier.processMetaQualifierEffects(filter, qualifier -> {
-			if (qualifier.getName().equals("repo") && qualifier.getContent().isPresent()) {
-				ui.logic.openRepository(qualifier.getContent().get());
-			}
-		});
+		applyCurrentFilterExpression();
 		refreshItems();
 	}
 
