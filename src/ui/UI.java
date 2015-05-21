@@ -89,7 +89,6 @@ public class UI extends Application implements EventDispatcher {
 				logic.openRepository(result.repoId);
 				logic.setDefaultRepo(result.repoId);
 				repoSelector.refreshContents(result.repoId);
-                prefs.addToLastViewedRepositories(result.repoId);
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
 				setExpandedWidth(false);
@@ -116,7 +115,7 @@ public class UI extends Application implements EventDispatcher {
 
 	private void initApplicationState() {
 		uiManager = new UIManager(this);
-		logic = new Logic(uiManager);
+		logic = new Logic(uiManager, prefs);
 
 		UI.events = this;
 
@@ -332,13 +331,15 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private RepositorySelector createRepoSelector() {
-		RepositorySelector repoSelector = new RepositorySelector();
+		RepositorySelector repoSelector = new RepositorySelector(prefs);
 		repoSelector.setOnValueChange(this::primaryRepoChanged);
 		return repoSelector;
 	}
 
 	private void primaryRepoChanged(String repoId) {
 		logic.setDefaultRepo(repoId);
+		logic.openRepository(repoId);
+		repoSelector.refreshContents(repoId);
 		columns.refresh();
 	}
 

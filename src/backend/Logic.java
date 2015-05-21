@@ -4,6 +4,7 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import storage.Preferences;
 import util.HTLog;
 import util.Utility;
 
@@ -19,14 +20,16 @@ public class Logic {
 
 	private final MultiModel models = new MultiModel();
 	private final UIManager uiManager;
+	private final Preferences prefs;
 
 	private RepoIO repoIO = new RepoIO();
 
 	// Assumed to be always present when app starts
 	public UserCredentials credentials = null;
 
-	public Logic(UIManager uiManager) {
+	public Logic(UIManager uiManager, Preferences prefs) {
 		this.uiManager = uiManager;
+		this.prefs = prefs;
 
 		// Pass the currently-empty model to the UI
 		updateUI();
@@ -57,6 +60,7 @@ public class Logic {
 		if (isAlreadyOpen(repoId)) {
 			return Utility.unitFutureOf(false);
 		}
+		prefs.addToLastViewedRepositories(repoId);
 		logger.info("Opening " + repoId);
 		return repoIO.openRepository(repoId)
 			.thenAccept(models::add)
