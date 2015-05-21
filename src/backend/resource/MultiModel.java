@@ -13,6 +13,9 @@ public class MultiModel implements IModel {
 
 	private final HashMap<String, Model> models;
 
+	// Guaranteed to have a value throughout
+	private String defaultRepo = null;
+
 	public MultiModel() {
 		this.models = new HashMap<>();
 	}
@@ -40,6 +43,16 @@ public class MultiModel implements IModel {
 				issue.setMetadata(new IssueMetadata(metadata.get(issue.getId())));
 			}
 		});
+	}
+
+	@Override
+	public synchronized String getDefaultRepo() {
+		return defaultRepo;
+	}
+
+	@Override
+	public synchronized void setDefaultRepo(String repoId) {
+		this.defaultRepo = repoId;
 	}
 
 	@Override

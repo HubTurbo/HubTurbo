@@ -29,14 +29,14 @@ import java.util.concurrent.Executors;
  * It depends minimally on UI for width adjustments.
  */
 public class BrowserComponent {
-	
+
 	private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
-	
+
 	private static final boolean USE_MOBILE_USER_AGENT = false;
 
 	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
 			? "ui/issuepanel/expanded/mobileHideUI.js"
-			: "ui/issuepanel/expanded/hideUI.js";	
+			: "ui/issuepanel/expanded/hideUI.js";
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
@@ -50,15 +50,15 @@ public class BrowserComponent {
 	private static final int SWP_NOMOVE = 0x0002;
 	private static HWND browserWindowHandle;
 	private static User32 user32;
-	
+
 	static {
 		setupJNA();
 		setupChromeDriverExecutable();
 	}
-	
+
 	private final UI ui;
 	private ChromeDriver driver = null;
-	
+
 	// We want browser commands to be run on a separate thread, but not to
 	// interfere with each other. This executor is limited to a single instance,
 	// so it ensures that browser commands are queued and executed in sequence.
@@ -66,11 +66,11 @@ public class BrowserComponent {
 	// The alternatives would be to:
 	// - allow race conditions
 	// - interrupt the blocking WebDriver::get method
-	
+
 	// The first is not desirable and the second does not seem to be possible
 	// at the moment.
 	private Executor executor;
-	
+
 	public BrowserComponent(UI ui) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
@@ -85,7 +85,7 @@ public class BrowserComponent {
 		driver = createChromeDriver();
 		logger.info("Successfully initialised browser component and ChromeDriver");
 	}
-	
+
 	/**
 	 * Called when application quits. Guaranteed to only happen once.
 	 */
@@ -99,20 +99,20 @@ public class BrowserComponent {
 	 */
 	private void quit() {
 		logger.info("Quitting browser component");
-		
+
 		// The application may quit before the browser is initialised.
 		// In that case, do nothing.
 		if (driver == null) {
 			return;
 		}
-		
+
 		try {
 			driver.quit();
 		} catch (WebDriverException e) {
 			// Chrome was closed; do nothing
 		}
 	}
-	
+
 	/**
 	 * Creates, initialises, and returns a ChromeDriver.
 	 * @return
@@ -152,7 +152,7 @@ public class BrowserComponent {
 		}
 		logger.info("Executed JavaScript " + script.substring(0, Math.min(script.length(), 10)));
 	}
-	
+
 	/**
 	 * Runs a script in the currently-active driver window to hide GitHub UI elements.
 	 */
@@ -172,8 +172,8 @@ public class BrowserComponent {
 	public void newLabel() {
 		logger.info("Navigating to New Label page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForNewLabel(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo()));
 			}
 		});
 	}
@@ -185,8 +185,8 @@ public class BrowserComponent {
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForNewMilestone(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()));
 			}
 		});
 		bringToTop();
@@ -199,13 +199,13 @@ public class BrowserComponent {
 	public void newIssue() {
 		logger.info("Navigating to New Issue page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForNewIssue(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo()));
 			}
 		});
 		bringToTop();
 	}
-	
+
 	/**
 	 * Navigates to the HubTurbo documentation page.
 	 * Run on a separate thread.
@@ -241,13 +241,13 @@ public class BrowserComponent {
 			}
 		});
 	}
-	
+
 	public void jumpToComment(){
 		WebElement comment = driver.findElementById("new_comment_field");
 		comment.click();
 		bringToTop();
 	}
-	
+
 	private boolean isBrowserActive(){
 		if (driver == null){
 			logger.warn("chromedriver process was killed !");
@@ -272,13 +272,13 @@ public class BrowserComponent {
 		driver = createChromeDriver();
 		login();
 	}
-	
+
 	/**
 	 * A helper function for running browser operations.
 	 * Takes care of running it on a separate thread, and normalises error-handling across
 	 * all types of code.
 	 */
-	
+
 	private void runBrowserOperation (Runnable operation) {
 		executor.execute(new Task<Void>() {
 			@Override
@@ -330,7 +330,7 @@ public class BrowserComponent {
 			}
 		});
 	}
-	
+
 	/**
 	 * One-time JNA setup.
 	 */
@@ -339,7 +339,7 @@ public class BrowserComponent {
 			user32 = User32.INSTANCE;
 		}
 	}
-	
+
 	/**
 	 * JNA initialisation. Should happen whenever the Chrome window is recreated.
 	 */
@@ -378,7 +378,7 @@ public class BrowserComponent {
 		} else {
 			logger.info("Located " + CHROME_DRIVER_BINARY_NAME);
 		}
-		
+
 		System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
 	}
 
@@ -399,14 +399,14 @@ public class BrowserComponent {
 			}
 		});
 	}
-	
+
 	private void bringToTop(){
 		if (PlatformSpecific.isOnWindows()) {
 			user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
 			user32.SetForegroundWindow(browserWindowHandle);
-		} 
+		}
 	}
-	
+
 	public void focus(HWND mainWindowHandle){
 		if (PlatformSpecific.isOnWindows()) {
 			user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
@@ -420,9 +420,9 @@ public class BrowserComponent {
 		String result = StringEscapeUtils.escapeHtml4((String) executor.executeScript("return document.documentElement.outerHTML"));
 		return result;
 	}
-	
+
 	public boolean hasBviewChanged() {
-		if (isBrowserActive()) { 
+		if (isBrowserActive()) {
 			if (getCurrentPageSource().equals(pageContentOnLoad)){
 			return false;
 		}
@@ -479,8 +479,8 @@ public class BrowserComponent {
 	public void showIssues() {
 		logger.info("Navigating to Issues page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForAllIssues(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()));
 			}
 		});
 	}
@@ -488,8 +488,8 @@ public class BrowserComponent {
 	public void showPullRequests() {
 		logger.info("Navigating to Pull requests page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForPullRequests(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()));
 			}
 		});
 	}
@@ -506,8 +506,8 @@ public class BrowserComponent {
 	public void showMilestones() {
 		logger.info("Navigating to Milestones page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForMilestones(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()));
 			}
 		});
 	}
@@ -515,8 +515,8 @@ public class BrowserComponent {
 	public void showContributors() {
 		logger.info("Navigating to Contributors page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(ui.state.getPrimaryRepo()))) {
-				driver.get(GitHubURL.getPathForContributors(ui.state.getPrimaryRepo()));
+			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()))) {
+				driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()));
 			}
 		});
 	}

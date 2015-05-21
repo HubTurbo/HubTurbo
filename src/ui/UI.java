@@ -54,7 +54,6 @@ public class UI extends Application implements EventDispatcher {
 
 	public UIManager uiManager;
 	public Logic logic;
-	public UIState state;
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
@@ -85,7 +84,7 @@ public class UI extends Application implements EventDispatcher {
 		new LoginDialog(this, mainStage).show().thenApply(result -> {
 			if (result.success) {
 				logic.openRepository(result.repoId);
-				state = new UIState(result.repoId);
+				logic.setDefaultRepo(result.repoId);
 				repoSelector.refreshContents(result.repoId);
 //              DataManager.getInstance().addToLastViewedRepositories(repoId);
 				triggerEvent(new BoardSavedEvent());
@@ -338,7 +337,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void primaryRepoChanged(String repoId) {
-		state.setPrimaryRepo(repoId);
+		logic.setDefaultRepo(repoId);
 		columns.refresh();
 	}
 

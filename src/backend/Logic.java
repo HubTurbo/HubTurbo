@@ -82,5 +82,13 @@ public class Logic {
 	public boolean isAlreadyOpen(String repoId) {
 		return getOpenRepositories().contains(repoId);
 	}
+
+	public void setDefaultRepo(String repoId) {
+		models.setDefaultRepo(repoId);
+	}
+
+	public String getDefaultRepo() {
+		return models.getDefaultRepo();
+	}
 }
 
