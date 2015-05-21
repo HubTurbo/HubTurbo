@@ -84,6 +84,8 @@ public class UI extends Application implements EventDispatcher {
 		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
 			if (result.success) {
 				logic.openRepository(result.repoId);
+				logic.setDefaultRepo(result.repoId);
+				repoSelector.setText(result.repoId);
 
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
@@ -101,21 +103,21 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void initPreApplicationState() {
+		UI.events = this;
+
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
 
 		prefs = new Preferences(this, columns);
 
 		eventBus = new EventBus();
-		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened(e.repoId));
+		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
+
+		uiManager = new UIManager(this);
+		logic = new Logic(uiManager, prefs);
 	}
 
 	private void initApplicationState() {
-		uiManager = new UIManager(this);
-		logic = new Logic(uiManager, prefs);
-
-		UI.events = this;
-
 		commandLineArgs = initialiseCommandLineArguments();
 		clearCacheIfNecessary();
 	}
@@ -143,9 +145,8 @@ public class UI extends Application implements EventDispatcher {
 		System.exit(0);
 	}
 
-	public void onRepoOpened(String repoId) {
-		logic.setDefaultRepo(repoId);
-		repoSelector.refreshContents(repoId);
+	public void onRepoOpened() {
+		repoSelector.refreshContents();
 	}
 
 	/**
@@ -333,13 +334,15 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private RepositorySelector createRepoSelector() {
-		RepositorySelector repoSelector = new RepositorySelector(prefs);
+		RepositorySelector repoSelector = new RepositorySelector(this);
 		repoSelector.setOnValueChange(this::primaryRepoChanged);
 		return repoSelector;
 	}
 
 	private void primaryRepoChanged(String repoId) {
 		logic.openRepository(repoId);
+		logic.setDefaultRepo(repoId);
+		repoSelector.setText(repoId);
 		columns.refresh();
 	}
 

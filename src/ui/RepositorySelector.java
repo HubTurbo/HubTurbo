@@ -4,8 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
-import prefs.Preferences;
-import util.PlatformEx;
 import util.Utility;
 
 import java.util.function.Consumer;
@@ -13,12 +11,12 @@ import java.util.function.Consumer;
 public class RepositorySelector extends HBox {
 
 	private final ComboBox<String> comboBox = new ComboBox<>();
-	private final Preferences prefs;
+	private final UI ui;
 	private Consumer<String> onValueChangeCallback = e -> {};
 	private boolean changesDisabled = false;
 
-	public RepositorySelector(Preferences prefs) {
-		this.prefs = prefs;
+	public RepositorySelector(UI ui) {
+		this.ui = ui;
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
@@ -48,16 +46,25 @@ public class RepositorySelector extends HBox {
 	}
 
 	private void loadContents() {
-		comboBox.getItems().addAll(prefs.getLastViewedRepositories());
+		comboBox.getItems().addAll(ui.logic.getOpenRepositories());
 	}
 
-	public void refreshContents(String repoId) {
-		PlatformEx.runLaterDelayed(() -> {
-			comboBox.getItems().clear();
-			loadContents();
-			changesDisabled = true;
-			comboBox.setValue(repoId);
-			changesDisabled = false;
-		});
+	private String getText() {
+		return comboBox.getValue();
+	}
+
+	public void setText(String repoId) {
+		changesDisabled = true;
+		comboBox.setValue(repoId);
+		changesDisabled = false;
+	}
+
+	public void refreshContents() {
+		String text = getText();
+
+		comboBox.getItems().clear();
+		loadContents();
+
+		setText(text);
 	}
 }

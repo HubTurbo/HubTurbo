@@ -68,7 +68,6 @@ public class Logic {
 			return Utility.unitFutureOf(false);
 		}
 		models.addPendingRepository(repoId);
-		UI.events.triggerEvent(new RepoOpenedEvent(repoId));
 		return isRepositoryValid(repoId).thenCompose(valid -> {
 			if (!valid) {
 				return Utility.unitFutureOf(false);
@@ -78,6 +77,7 @@ public class Logic {
 				return repoIO.openRepository(repoId)
 					.thenAccept(models::add)
 					.thenRun(this::updateUI)
+					.thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
 					.thenApply(n -> true)
 					.exceptionally(e -> false);
 			}
