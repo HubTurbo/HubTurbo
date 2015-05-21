@@ -65,13 +65,19 @@ public class Logic {
 		if (isAlreadyOpen(repoId)) {
 			return Utility.unitFutureOf(false);
 		}
-		prefs.addToLastViewedRepositories(repoId);
-		logger.info("Opening " + repoId);
-		return repoIO.openRepository(repoId)
-			.thenAccept(models::add)
-			.thenRun(this::updateUI)
-			.thenApply(n -> true)
-			.exceptionally(e -> false);
+		return isRepositoryValid(repoId).thenCompose(valid -> {
+			if (!valid) {
+				return Utility.unitFutureOf(false);
+			} else {
+				prefs.addToLastViewedRepositories(repoId);
+				logger.info("Opening " + repoId);
+				return repoIO.openRepository(repoId)
+					.thenAccept(models::add)
+					.thenRun(this::updateUI)
+					.thenApply(n -> true)
+					.exceptionally(e -> false);
+			}
+		});
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
