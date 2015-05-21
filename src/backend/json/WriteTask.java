@@ -1,6 +1,6 @@
 package backend.json;
 
-import backend.interfaces.CacheTask;
+import backend.interfaces.StoreTask;
 import backend.interfaces.RepoStore;
 import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
@@ -10,7 +10,7 @@ import util.Utility;
 
 import java.io.File;
 
-class WriteTask extends CacheTask {
+class WriteTask extends StoreTask {
 
 	private static final Logger logger = HTLog.get(WriteTask.class);
 
@@ -28,8 +28,7 @@ class WriteTask extends CacheTask {
 
 	private void save(String repoId, SerializableModel model) {
 		String output = new Gson().toJson(model);
-		String newRepoName = RepoStore.escapeRepoName(repoId);
-		Utility.writeFile(new File(RepoStore.DIRECTORY, newRepoName).getAbsolutePath(), output);
+		write(repoId, output);
 		logger.info(HTLog.format(repoId, "Written to JSON store"));
 	}
 }

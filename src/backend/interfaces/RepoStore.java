@@ -16,7 +16,7 @@ public abstract class RepoStore {
 		return repoName.replace("/", "-") + ".json";
 	}
 
-	protected void addTask(CacheTask task) {
+	protected void addTask(StoreTask task) {
 		pool.execute(task);
 	}
 

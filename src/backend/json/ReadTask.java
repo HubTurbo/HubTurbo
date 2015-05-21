@@ -1,7 +1,7 @@
 package backend.json;
 
 import backend.UpdateSignature;
-import backend.interfaces.CacheTask;
+import backend.interfaces.StoreTask;
 import backend.interfaces.RepoStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-class ReadTask extends CacheTask {
+class ReadTask extends StoreTask {
 
 	private static final Logger logger = HTLog.get(ReadTask.class);
 
@@ -34,8 +34,8 @@ class ReadTask extends CacheTask {
 	}
 
 	private Model load(String repoId) {
-		Optional<String> input = Utility.readFile(
-			new File(RepoStore.DIRECTORY, RepoStore.escapeRepoName(repoId)).getAbsolutePath());
+		Optional<String> input = read(repoId);
+
 		if (!input.isPresent()) {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
 			return new Model(RepositoryId.createFromId(repoId), UpdateSignature.empty);
