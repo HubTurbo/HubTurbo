@@ -186,14 +186,9 @@ public class UI extends Application implements EventDispatcher {
 					browserComponent.focus(mainWindowHandle);
 				}
 				PlatformEx.runLaterDelayed(() -> {
-					// A refresh is triggered if:
-					// 1. Repo-switching is not disabled (meaning an update is not in progress)
-					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-//					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
 					boolean shouldRefresh = browserComponent.hasBviewChanged();
-
 					if (shouldRefresh) {
-						logger.info("Gained focus; refreshing");
+						logger.info("Browser view has changed; refreshing");
 						logic.refresh();
 					}
 				});
