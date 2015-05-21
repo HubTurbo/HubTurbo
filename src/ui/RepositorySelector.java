@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import storage.Preferences;
+import util.PlatformEx;
 import util.Utility;
 
 import java.util.function.Consumer;
@@ -52,10 +53,12 @@ public class RepositorySelector extends HBox {
 	}
 
 	public void refreshContents(String repoId) {
-		comboBox.getItems().clear();
-		loadContents();
-		changesDisabled = true;
-		comboBox.setValue(repoId);
-		changesDisabled = false;
+		PlatformEx.runLaterDelayed(() -> {
+			comboBox.getItems().clear();
+			loadContents();
+			changesDisabled = true;
+			comboBox.setValue(repoId);
+			changesDisabled = false;
+		});
 	}
 }
