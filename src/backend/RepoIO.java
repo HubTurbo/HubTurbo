@@ -24,6 +24,10 @@ public class RepoIO {
 		return repoSource.login(credentials);
 	}
 
+	public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+		return repoSource.isRepositoryValid(repoId);
+	}
+
 	public CompletableFuture<Model> openRepository(String repoId) {
 		if (repoStore.isRepoStored(repoId)) {
 			return repoStore.loadRepository(repoId).thenCompose(this::updateModel);

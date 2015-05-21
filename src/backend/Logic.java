@@ -35,6 +35,10 @@ public class Logic {
 		updateUI();
 	}
 
+	private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+		return repoIO.isRepositoryValid(repoId);
+	}
+
 	public CompletableFuture<Boolean> login(String username, String password) {
 		logger.info("Logging in as " + username);
 		credentials = new UserCredentials(username, password);

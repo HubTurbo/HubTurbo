@@ -4,6 +4,7 @@ import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
+import util.Utility;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,5 +42,10 @@ public class DummySource extends RepoSource {
 		// TODO
 		assert false : "Not yet implemented";
 		return null;
+	}
+
+	@Override
+	public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+		return Utility.unitFutureOf(true);
 	}
 }

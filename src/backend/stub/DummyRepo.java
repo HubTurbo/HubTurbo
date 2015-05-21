@@ -163,4 +163,9 @@ public class DummyRepo implements Repo<Issue, Label, Milestone, User> {
 		return new ArrayList<>();
 	}
 
+	@Override
+	public boolean isRepositoryValid(String repoId) {
+		return true;
+	}
+
 }

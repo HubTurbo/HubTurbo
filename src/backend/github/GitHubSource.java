@@ -55,4 +55,9 @@ public class GitHubSource extends RepoSource {
 	public CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues) {
 		return addTask(new DownloadMetadataTask(this, gitHub, repoId, issues)).response;
 	}
+
+	@Override
+	public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+		return addTask(new RepoValidityTask(this, gitHub, repoId)).response;
+	}
 }

@@ -344,29 +344,6 @@ public class UI extends Application implements EventDispatcher {
 		columns.refresh();
 	}
 
-//	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
-		// TODO
-//		try {
-//			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
-//				Platform.runLater(() -> {
-//					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
-//				});
-//				return false;
-//			}
-//		} catch (SocketTimeoutException e){
-//			DialogMessage.showWarningDialog("Internet Connection Timeout",
-//					"Timeout while connecting to GitHub, please check your internet connection.");
-//			logger.error(e.getLocalizedMessage(), e);
-//		} catch (UnknownHostException e){
-//			DialogMessage.showWarningDialog("No Internet Connection",
-//					"Please check your internet connection and try again.");
-//			logger.error(e.getLocalizedMessage(), e);
-//		}catch (IOException e) {
-//			logger.error(e.getLocalizedMessage(), e);
-//		}
-//		return true;
-//	}
-
 	private void ensureSelectedPanelHasFocus() {
 		if(columns.getCurrentlySelectedColumn().isPresent()) {
 			getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());

@@ -2,6 +2,7 @@ package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
+import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
@@ -18,9 +19,10 @@ import service.updateservice.*;
 import util.HTLog;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.*;
 import java.util.function.BiFunction;
-
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 
 	private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -175,6 +177,25 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 			HTLog.error(logger, e);
 			return new ArrayList<>();
 		}
+	}
+
+	@Override
+	public boolean isRepositoryValid(String repoId) {
+		String repoURL = SEGMENT_REPOS + "/" + repoId;
+		try {
+			GitHubRequest req = new GitHubRequest();
+			client.get(req.setUri(repoURL));
+			return true;
+		} catch (RequestException e) {
+			if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+				return false;
+			} else {
+				HTLog.error(logger, e);
+			}
+		} catch (IOException e) {
+			HTLog.error(logger, e);
+		}
+		return false;
 	}
 }
 

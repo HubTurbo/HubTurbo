@@ -26,4 +26,6 @@ public interface Repo<I, L, M, U> {
 
 	public List<TurboIssueEvent> getEvents(String repoId, int issueId);
 	public List<Comment> getComments(String repoId, int issueId);
+
+	public boolean isRepositoryValid(String repoId);
 }
