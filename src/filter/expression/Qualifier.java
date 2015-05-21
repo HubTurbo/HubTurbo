@@ -1,20 +1,23 @@
 package filter.expression;
 
 import backend.interfaces.IModel;
-import backend.resource.*;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+import ui.UI;
 import util.Utility;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Qualifier implements FilterExpression {
 	
@@ -84,7 +87,11 @@ public class Qualifier implements FilterExpression {
 		
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
-	
+
+	public static void processMetaQualifierEffects(FilterExpression expr, Consumer<Qualifier> callback) {
+		expr.find(Qualifier::isMetaQualifier).forEach(callback);
+	}
+
 	private static LocalDateTime currentTime = null;
 	
 	private static LocalDateTime getCurrentTime() {
@@ -309,6 +316,7 @@ public class Qualifier implements FilterExpression {
 	private static boolean isMetaQualifier(Qualifier q) {
 		switch (q.getName()) {
 		case "in":
+		case "repo":
 			return true;
 		default:
 			return false;
