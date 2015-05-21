@@ -33,6 +33,7 @@ import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
 import util.events.ColumnClickedEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -113,7 +114,7 @@ public abstract class IssueColumn extends Column {
 //	}
 
 	private final ModelUpdatedEventHandler onModelUpdate = e -> {
-		List<String> all = Arrays.asList(
+		List<String> all = new ArrayList<>(Arrays.asList(
 			"label", "milestone",
 			"involves", "assignee", "author",
 			"title", "body",
@@ -121,7 +122,7 @@ public abstract class IssueColumn extends Column {
 			"no", "type", "has",
 			"state", "open", "closed",
 			"created",
-			"updated");
+			"updated"));
 		all.addAll(e.model.getUsers().stream()
 			.map(TurboUser::getLoginName)
 			.collect(Collectors.toList()));
