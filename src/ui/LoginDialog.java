@@ -19,7 +19,7 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
-import storage.Preferences;
+import prefs.Preferences;
 import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import util.DialogMessage;

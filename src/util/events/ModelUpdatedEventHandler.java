@@ -1,7 +1,6 @@
-package backend.assumed;
+package util.events;
 
 import com.google.common.eventbus.Subscribe;
-import util.events.EventHandler;
 
 @FunctionalInterface
 public interface ModelUpdatedEventHandler extends EventHandler {

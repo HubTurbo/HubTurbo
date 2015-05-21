@@ -1,7 +1,7 @@
 package backend;
 
 import org.eclipse.egit.github.core.Comment;
-import service.TurboIssueEvent;
+import github.TurboIssueEvent;
 
 import java.util.ArrayList;
 import java.util.List;

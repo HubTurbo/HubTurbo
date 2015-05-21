@@ -1,6 +1,6 @@
 package backend;
 
-import backend.assumed.ModelUpdatedEvent;
+import util.events.ModelUpdatedEvent;
 import backend.resource.MultiModel;
 import javafx.application.Platform;
 import ui.UI;

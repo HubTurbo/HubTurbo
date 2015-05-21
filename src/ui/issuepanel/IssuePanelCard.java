@@ -1,6 +1,5 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
@@ -15,7 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.Comment;
-import service.TurboIssueEvent;
+import github.TurboIssueEvent;
 import ui.issuecolumn.IssueColumn;
 import util.Utility;
 

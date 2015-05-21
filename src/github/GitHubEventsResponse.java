@@ -1,4 +1,4 @@
-package service;
+package github;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
 

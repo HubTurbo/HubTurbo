@@ -1,12 +1,10 @@
-package service.updateservice;
+package github.update;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +16,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.GitHubService;
 
-import service.GitHubClientExtended;
+import github.GitHubClientExtended;
 import util.Utility;
 
 /**

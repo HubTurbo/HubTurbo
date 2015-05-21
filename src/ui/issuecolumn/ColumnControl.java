@@ -1,17 +1,15 @@
 package ui.issuecolumn;
 
-import backend.assumed.ModelUpdatedEventHandler;
+import util.events.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import com.opera.core.systems.scope.services.Prefs;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import org.eclipse.egit.github.core.RepositoryId;
-import storage.Preferences;
+import prefs.Preferences;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;

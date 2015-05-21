@@ -1,4 +1,4 @@
-package storage;
+package prefs;
 
 import java.time.LocalDateTime;
 

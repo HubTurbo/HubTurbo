@@ -1,13 +1,9 @@
 package ui;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +31,7 @@ import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import storage.Preferences;
+import prefs.Preferences;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;

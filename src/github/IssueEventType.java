@@ -1,4 +1,4 @@
-package service;
+package github;
 
 import util.Utility;
 

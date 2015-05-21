@@ -1,6 +1,5 @@
-package storage;
+package prefs;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;

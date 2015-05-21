@@ -1,11 +1,10 @@
 package ui;
 
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
-import storage.Preferences;
+import prefs.Preferences;
 import util.PlatformEx;
 import util.Utility;
 

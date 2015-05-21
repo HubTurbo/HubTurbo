@@ -22,7 +22,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import storage.Preferences;
+import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;

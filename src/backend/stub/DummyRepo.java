@@ -5,7 +5,7 @@ import backend.interfaces.Repo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.*;
-import service.TurboIssueEvent;
+import github.TurboIssueEvent;
 
 import java.util.ArrayList;
 import java.util.Date;

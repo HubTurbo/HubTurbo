@@ -1,4 +1,4 @@
-package storage;
+package prefs;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

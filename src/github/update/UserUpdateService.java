@@ -1,4 +1,4 @@
-package service.updateservice;
+package github.update;
 
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COLLABORATORS;
@@ -9,7 +9,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
-import service.GitHubClientExtended;
+import github.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 

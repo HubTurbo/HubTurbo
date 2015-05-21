@@ -1,4 +1,4 @@
-package service;
+package github;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;

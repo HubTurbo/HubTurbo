@@ -4,7 +4,7 @@ import backend.UserCredentials;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
-import service.TurboIssueEvent;
+import github.TurboIssueEvent;
 
 import java.util.Date;
 import java.util.List;

@@ -4,7 +4,7 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import storage.Preferences;
+import prefs.Preferences;
 import util.HTLog;
 import util.Utility;
 

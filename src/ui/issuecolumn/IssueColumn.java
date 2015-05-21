@@ -1,15 +1,12 @@
 package ui.issuecolumn;
 
-import backend.assumed.ModelUpdatedEventHandler;
+import util.events.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
 import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
 import filter.QualifierApplicationException;
-import filter.expression.Disjunction;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import javafx.beans.value.ChangeListener;
@@ -22,12 +19,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ui.DragData;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
@@ -36,7 +30,6 @@ import util.events.ColumnClickedEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

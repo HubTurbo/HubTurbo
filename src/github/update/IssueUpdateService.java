@@ -1,16 +1,14 @@
-package service.updateservice;
+package github.update;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
-import service.GitHubClientExtended;
+import github.GitHubClientExtended;
 
 import com.google.gson.reflect.TypeToken;
 import util.Utility;

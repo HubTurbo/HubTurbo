@@ -1,4 +1,4 @@
-package service;
+package github;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;

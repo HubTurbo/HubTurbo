@@ -5,7 +5,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
-import service.TurboIssueEvent;
+import github.TurboIssueEvent;
 import util.HTLog;
 
 import java.util.*;

@@ -1,67 +1,61 @@
-package storage;
+package prefs;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 
 /**
- * Abstractions for the contents of the global config file.
+ * Abstractions for the contents of the session file.
  */
 @SuppressWarnings("unused")
-public class GlobalConfig {
+public class SessionConfiguration {
 
-	private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
+	private static final Logger logger = LogManager.getLogger(SessionConfiguration.class.getName());
 
-	private List<String> lastOpenFilters = new ArrayList<>();
+	private HashMap<String, List<String>> projectFilters = new HashMap<>();
 	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
 	private String lastLoginUsername = "";
-	private byte[] lastLoginPassword = new byte[0];
-	private Map<String, List<String>> boards = new HashMap<>();
-
-	public GlobalConfig() {
+	private byte[] lastLoginEncrypted = new byte[0];
+	private String lastLoginPassword = "";
+	
+	public SessionConfiguration() {
 	}
-
-	public void addBoard(String name, List<String> filterExprs) {
-		boards.put(name, filterExprs);
+	
+	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
+		if (project != null) {
+			projectFilters.put(project.generateId().toLowerCase(), filter);
+		}
 	}
-
-	public List<String> getBoardPanels(String name) {
-		return boards.get(name);
+	
+	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
+		if (project == null) {
+			return new ArrayList<>();
+		}
+		return projectFilters.get(project.generateId().toLowerCase());
 	}
-
-	public Map<String, List<String>> getAllBoards() {
-		return new HashMap<>(boards);
-	}
-
-	public void removeBoard(String name) {
-		boards.remove(name);
-	}
-
-	public void setLastOpenFilters(List<String> filter) {
-		lastOpenFilters = new ArrayList<>(filter);
-	}
-
-	public List<String> getLastOpenFilters() {
-		return new ArrayList<>(lastOpenFilters);
-	}
-
+	
 	/**
 	 * Adds a repository to the list of last-viewed repositories.
 	 * The list will always have 10 or fewer items.
 	 */
 	public void addToLastViewedRepositories(String repository) {
 		repository = repository.toLowerCase();
-
+		
 		// Create record for this repository
 		RepoViewRecord latestRepoView = new RepoViewRecord(repository);
 		int index = lastViewedRepositories.indexOf(latestRepoView);
@@ -70,7 +64,7 @@ public class GlobalConfig {
 		} else {
 			lastViewedRepositories.get(index).setTimestamp(latestRepoView.getTimestamp());
 		}
-
+		
 		// Keep only the 10 latest records
 		Collections.sort(lastViewedRepositories);
 		while (lastViewedRepositories.size() > 10) {
@@ -78,14 +72,14 @@ public class GlobalConfig {
 		}
 		assert lastViewedRepositories.size() <= 10;
 	}
-
+	
 	/**
 	 * Returns last-viewed repositories in owner/name format.
 	 * They are sorted by access date, latest first.
 	 */
 	public List<String> getLastViewedRepositories() {
 		return lastViewedRepositories.stream()
-				.map(RepoViewRecord::getRepository)
+				.map(repoViewRecord -> repoViewRecord.getRepository())
 				.collect(Collectors.toList());
 	}
 
@@ -93,30 +87,34 @@ public class GlobalConfig {
 		return lastLoginUsername;
 	}
 
+	public void setLastLoginUsername(String lastLoginUsername) {
+		this.lastLoginUsername = lastLoginUsername;
+	}
+	
+	public void setLastLoginPassword(String lastPassword){
+		this.lastLoginPassword = encryptData(lastPassword);
+	}
+
 	public String getLastLoginPassword() {
-		return decrypt(lastLoginPassword);
+		return decryptData();
 	}
 
-	public void setLastLoginCredentials(String username, String password) {
-		this.lastLoginUsername = username;
-		this.lastLoginPassword = encrypt(password);
-	}
-
-	private static byte[] encrypt(String lastPassword) {
-		byte[] result = new byte[0];
+	private String encryptData(String lastPassword) {
+		String result = "";
 		try {
 			String key = "HubTurboHubTurbo";
 		    Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-			result = cipher.doFinal(lastPassword.getBytes());
+			lastLoginEncrypted = cipher.doFinal(lastPassword.getBytes());
+			result = new String(lastLoginEncrypted);
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
 			logger.error("Cannot encrypt data " + e.getMessage(), e);
 		}
 		return result;
 	}
 
-	private static String decrypt(byte[] lastLoginEncrypted) {
+	private String decryptData() {
 		String result = "";
 		try {
 			String key = "HubTurboHubTurbo";

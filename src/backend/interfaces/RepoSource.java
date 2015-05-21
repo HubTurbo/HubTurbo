@@ -3,7 +3,6 @@ package backend.interfaces;
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.resource.Model;
-import service.TurboIssueEvent;
 
 import java.util.List;
 import java.util.Map;

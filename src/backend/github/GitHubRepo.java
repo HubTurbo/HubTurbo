@@ -2,7 +2,6 @@ package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
@@ -11,11 +10,11 @@ import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
-import service.GitHubClientExtended;
-import service.IssueServiceExtended;
-import service.LabelServiceFixed;
-import service.TurboIssueEvent;
-import service.updateservice.*;
+import github.GitHubClientExtended;
+import github.IssueServiceExtended;
+import github.LabelServiceFixed;
+import github.TurboIssueEvent;
+import github.update.*;
 import util.HTLog;
 
 import java.io.IOException;
