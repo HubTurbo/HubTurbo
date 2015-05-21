@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class TurboLabel {
 
-	public static final String EXCLUSIVE_DELIMITER = ".";
-	public static final String NONEXCLUSIVE_DELIMITER = "-";
+	private static final String EXCLUSIVE_DELIMITER = ".";
+	private static final String NONEXCLUSIVE_DELIMITER = "-";
 
 	private void ______SERIALIZED_FIELDS______() {
 	}
@@ -59,7 +59,8 @@ public class TurboLabel {
 
 	private Optional<String> getDelimiter() {
 
-		Pattern p = Pattern.compile(String.format("^[^%s%s](%s|%s)",
+		// Escaping due to constants not being valid regexes
+		Pattern p = Pattern.compile(String.format("^[^\\%s\\%s]+(\\%s|\\%s)",
 			EXCLUSIVE_DELIMITER,
 			NONEXCLUSIVE_DELIMITER,
 			EXCLUSIVE_DELIMITER,
@@ -73,17 +74,12 @@ public class TurboLabel {
 		}
 	}
 
-	private boolean isDelimited() {
-		return actualName.contains(EXCLUSIVE_DELIMITER) || actualName.contains(NONEXCLUSIVE_DELIMITER);
-	}
-
 	private String join(String group, String name) {
 		return group + getDelimiter() + name;
 	}
 
 	public boolean isExclusive() {
-		if (isDelimited()) {
-			assert getDelimiter().isPresent();
+		if (getDelimiter().isPresent()) {
 			return getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
 		} else {
 			return false;
@@ -91,18 +87,18 @@ public class TurboLabel {
 	}
 
 	public Optional<String> getGroup() {
-		if (isDelimited()) {
-			assert getDelimiter().isPresent();
-			return Optional.of(actualName.split(getDelimiter().get())[0]);
+		if (getDelimiter().isPresent()) {
+			// Escaping due to constants not being valid regexes
+			return Optional.of(actualName.split("\\" + getDelimiter().get())[0]);
 		} else {
 			return Optional.empty();
 		}
 	}
 
 	public String getName() {
-		if (isDelimited()) {
-			assert getDelimiter().isPresent();
-			return actualName.split(getDelimiter().get())[1];
+		if (getDelimiter().isPresent()) {
+			// Escaping due to constants not being valid regexes
+			return actualName.split("\\" + getDelimiter().get())[1];
 		} else {
 			return actualName;
 		}
