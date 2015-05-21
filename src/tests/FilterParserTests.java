@@ -1,31 +1,24 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import filter.ParseException;
 import filter.Parser;
-import filter.expression.Conjunction;
-import filter.expression.DateRange;
-import filter.expression.Disjunction;
-import filter.expression.Negation;
-import filter.expression.NumberRange;
-import filter.expression.Qualifier;
+import filter.expression.*;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
+import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class FilterParserTests {
 
     @Test
     public void basics() {
-        assertEquals(Parser.parse(null), null);
+        assertEquals(Parser.parse(null), Qualifier.EMPTY);
         assertEquals(Parser.parse(""), Qualifier.EMPTY);
     }
     
@@ -53,11 +46,11 @@ public class FilterParserTests {
         try {
             Parser.parse("~");
             fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException e) {}
+        } catch (ParseException ignored) {}
         try {
             Parser.parse("a(b) ||");
             fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException e) {}
+        } catch (ParseException ignored) {}
     }
     
     @Test
@@ -66,12 +59,12 @@ public class FilterParserTests {
         try {
         	Parser.parse("-milestone: label:priority.high");
             fail("'label:' can't be the input to a qualifier => empty qualifier => parse exception");
-        } catch (ParseException e) {}
+        } catch (ParseException ignored) {}
     	
         try {
         	Parser.parse("label:priority.high -milestone:");
             fail("Empty qualifiers should cause a parse exception");
-        } catch (ParseException e) {}
+        } catch (ParseException ignored) {}
     }
     
     @Test
@@ -137,16 +130,16 @@ public class FilterParserTests {
     @Test
     public void dateRanges() {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15))));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
 
         assertEquals(Parser.parse("created:2014-06-01 .. *"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), null)));
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
         		new Conjunction(
         				new Conjunction(
         						new Qualifier("keyword", "a"),
-        						new Qualifier("created", new DateRange(LocalDate.of(2014, 06, 01), LocalDate.of(2013, 03, 15)))),
+        						new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 03, 15)))),
         				new Qualifier("keyword", "b"))
         );
     }
@@ -223,7 +216,7 @@ public class FilterParserTests {
         		new Conjunction(
         				new Conjunction(
         						new Qualifier("keyword", "a"),
-        						new Qualifier("created", LocalDate.of(2014, 06, 01))),
+        						new Qualifier("created", LocalDate.of(2014, 6, 1))),
 						new Qualifier("keyword", "b")));
     }
 
@@ -259,13 +252,13 @@ public class FilterParserTests {
     
     @Test
     public void lexer() {
-        assertEquals(new Lexer("").lex(), new ArrayList<Token>(Arrays.asList(
-                new Token(TokenType.EOF, "", 0))));
-        assertEquals(new Lexer("a' b' c'").lex(), new ArrayList<Token>(Arrays.asList(
+        assertEquals(new Lexer("").lex(), Arrays.asList(
+                new Token(TokenType.EOF, "", 0)));
+        assertEquals(new Lexer("a' b' c'").lex(), Arrays.asList(
                 new Token(TokenType.SYMBOL, "a'", 0),
                 new Token(TokenType.SYMBOL, "b'", 0),
                 new Token(TokenType.SYMBOL, "c'", 0),
-                new Token(TokenType.EOF, "", 0))));
+                new Token(TokenType.EOF, "", 0)));
     }
     
     @Test
@@ -293,10 +286,11 @@ public class FilterParserTests {
 			"created:2014-12-4 .. 2014-12-6", // Date ranges
     	};
 
-    	// We want to ensure that parsing some filter, and parsing the serialised version
-    	// of that filter, results in the same data structure.
-    	for (int i=0; i<tests.length; i++) {
-        	assertEquals(Parser.parse(Parser.parse(tests[i]).toString()), Parser.parse(tests[i]));
-    	}
+    	// We want to ensure that parsing some filter and parsing the serialised version
+    	// of that filter result in the same data structure.
+	    for (String test : tests) {
+		    assert test != null;
+		    assertEquals(Parser.parse(Parser.parse(test).toString()), Parser.parse(test));
+	    }
     }
 }
