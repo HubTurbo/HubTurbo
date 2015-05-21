@@ -62,9 +62,10 @@ public class Logic {
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
 		assert Utility.isWellFormedRepoId(repoId);
-		if (isAlreadyOpen(repoId)) {
+		if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
 			return Utility.unitFutureOf(false);
 		}
+		models.addPendingRepository(repoId);
 		return isRepositoryValid(repoId).thenCompose(valid -> {
 			if (!valid) {
 				return Utility.unitFutureOf(false);

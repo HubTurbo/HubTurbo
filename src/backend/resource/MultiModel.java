@@ -13,15 +13,24 @@ public class MultiModel implements IModel {
 
 	private final HashMap<String, Model> models;
 
+	// A pending repository is one that has been requested to load but has
+	// not finished loading. We keep track of it because we don't want repeated
+	// requests for the same repository to load it multiple times.
+	private final HashSet<String> pendingRepositories;
+
 	// Guaranteed to have a value throughout
 	private String defaultRepo = null;
 
 	public MultiModel() {
 		this.models = new HashMap<>();
+		this.pendingRepositories = new HashSet<>();
 	}
 
 	public synchronized void add(Model model) {
-		models.put(model.getRepoId().generateId(), model);
+		String repoId = model.getRepoId().generateId();
+		assert pendingRepositories.contains(repoId);
+		pendingRepositories.remove(repoId);
+		models.put(repoId, model);
 	}
 
 	public synchronized Model get(String repoId) {
@@ -107,6 +116,14 @@ public class MultiModel implements IModel {
 	public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
 		return getModelById(issue.getRepoId())
 			.flatMap(m -> m.getMilestoneOfIssue(issue));
+	}
+
+	public synchronized boolean isRepositoryPending(String repoId) {
+		return pendingRepositories.contains(repoId);
+	}
+
+	public void addPendingRepository(String repoId) {
+		pendingRepositories.add(repoId);
 	}
 
 	private void ______BOILERPLATE______() {
