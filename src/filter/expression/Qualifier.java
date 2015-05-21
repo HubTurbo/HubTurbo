@@ -155,7 +155,9 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-            return satisfiesUpdatedHours(issue);
+	        return satisfiesUpdatedHours(issue);
+        case "repo":
+            return satisfiesRepo(issue);
         default:
             return false;
         }
@@ -348,6 +350,11 @@ public class Qualifier implements FilterExpression {
 		} else {
 			return false;
 		}
+	}
+
+	private boolean satisfiesRepo(TurboIssue issue) {
+		if (!content.isPresent()) return false;
+		return issue.getRepoId().equals(content.get());
 	}
 
     private boolean satisfiesCreationDate(TurboIssue issue) {
