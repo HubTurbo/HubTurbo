@@ -28,10 +28,8 @@ import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.Utility;
-import util.events.BoardSavedEvent;
+import util.events.*;
 import util.events.Event;
-import util.events.EventDispatcher;
-import util.events.EventHandler;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -83,12 +81,9 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void getUserCredentials() {
-//		repoSelector.setDisable(true);
 		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
 			if (result.success) {
-				logic.setDefaultRepo(result.repoId);
 				logic.openRepository(result.repoId);
-				repoSelector.refreshContents(result.repoId);
 
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
@@ -112,6 +107,7 @@ public class UI extends Application implements EventDispatcher {
 		prefs = new Preferences(this, columns);
 
 		eventBus = new EventBus();
+		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened(e.repoId));
 	}
 
 	private void initApplicationState() {
@@ -145,6 +141,11 @@ public class UI extends Application implements EventDispatcher {
 		}
 		Platform.exit();
 		System.exit(0);
+	}
+
+	public void onRepoOpened(String repoId) {
+		logic.setDefaultRepo(repoId);
+		repoSelector.refreshContents(repoId);
 	}
 
 	/**
@@ -338,9 +339,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void primaryRepoChanged(String repoId) {
-		logic.setDefaultRepo(repoId);
 		logic.openRepository(repoId);
-		repoSelector.refreshContents(repoId);
 		columns.refresh();
 	}
 

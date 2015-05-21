@@ -5,8 +5,10 @@ import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import prefs.Preferences;
+import ui.UI;
 import util.HTLog;
 import util.Utility;
+import util.events.RepoOpenedEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,7 @@ public class Logic {
 			return Utility.unitFutureOf(false);
 		}
 		models.addPendingRepository(repoId);
+		UI.events.triggerEvent(new RepoOpenedEvent(repoId));
 		return isRepositoryValid(repoId).thenCompose(valid -> {
 			if (!valid) {
 				return Utility.unitFutureOf(false);
