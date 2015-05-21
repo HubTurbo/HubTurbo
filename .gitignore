@@ -10,4 +10,5 @@ chromedriver.exe
 .hubturbocache/
 .gradle/
 build/
+config/
 
