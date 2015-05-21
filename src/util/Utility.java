@@ -1,9 +1,10 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.DateFormat;
@@ -13,23 +14,41 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.swing.UIManager;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-
-import com.google.common.base.Joiner;
-
 public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
+
+	/**
+	 * Returns a CompletableFuture that will be completed 'later' with the given result.
+	 * 'Later' is defined loosely. This implementation utilises a secondary thread to do it.
+	 *
+	 * The use case is if you want to return a CompletableFuture that just completes
+	 * trivially, for example if you detect an error occurring early and don't want/need
+	 * to go through the whole async task that the CompletableFuture represents. You can't
+	 * complete the future synchronously because that wouldn't trigger all the callbacks
+	 * attached to it.
+	 *
+	 * The name comes from the monadic interpretation of CompletableFutures.
+	 * @param result the result that the unit CompletableFuture will be completed with
+	 * @param <T> the type of the CompletableFuture result
+	 * @return the unit future
+	 */
+	private static Executor unitFutureExecutor = Executors.newSingleThreadExecutor();
+	public static <T> CompletableFuture<T> unitFutureOf(T result) {
+		CompletableFuture<T> f = new CompletableFuture<>();
+//		Platform.runLater(() -> f.complete(result));
+		unitFutureExecutor.execute(() -> f.complete(result));
+		return f;
+	}
 
 	public static Optional<String> readFile(String filename) {
 		try {

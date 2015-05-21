@@ -9,6 +9,7 @@ import util.Utility;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,9 @@ public class Logic {
 	}
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
+		if (isAlreadyOpen(repoId)) {
+			return Utility.unitFutureOf(false);
+		}
 		logger.info("Opening " + repoId);
 		return repoIO.openRepository(repoId).thenAccept(models::add)
 			.thenRun(this::updateUI)
@@ -68,11 +72,15 @@ public class Logic {
 		});
 	}
 
-	public List<String> getOpenRepositories() {
+	public Set<String> getOpenRepositories() {
 		return models.toModels().stream()
 			.map(Model::getRepoId)
 			.map(IRepositoryIdProvider::generateId)
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
+	}
+
+	public boolean isAlreadyOpen(String repoId) {
+		return getOpenRepositories().contains(repoId);
 	}
 }
 
