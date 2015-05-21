@@ -51,6 +51,13 @@ public class Utility {
 		return f;
 	}
 
+	public static boolean isWellFormedRepoId(String owner, String repo) {
+		if (owner == null || owner.isEmpty() || repo == null || repo.isEmpty()) {
+			return false;
+		}
+		return isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
+	}
+
 	public static boolean isWellFormedRepoId(String repoId) {
 		return repoId != null && !repoId.isEmpty()
 			&& RepositoryId.createFromId(repoId).generateId().equals(repoId);

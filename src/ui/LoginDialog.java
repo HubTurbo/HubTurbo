@@ -24,6 +24,7 @@ import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import util.DialogMessage;
 import util.HTLog;
+import util.Utility;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -94,7 +95,10 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 
 	private boolean attemptLogin() {
 		try {
-			return ui.logic.login(username, password).get();
+			if (Utility.isWellFormedRepoId(owner, repo)) {
+				return ui.logic.login(username, password).get();
+			}
+			return false;
 		} catch (InterruptedException | ExecutionException e1) {
 			HTLog.error(logger, e1);
 		}
