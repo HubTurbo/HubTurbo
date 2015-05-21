@@ -1,50 +1,33 @@
 package ui;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import service.ServiceManager;
-import storage.DataManager;
+import prefs.Preferences;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
 import util.PlatformEx;
-import util.events.IssueCreatedEvent;
-import util.events.LabelCreatedEvent;
-import util.events.MilestoneCreatedEvent;
-import util.events.BoardSavedEvent;
-import util.events.BoardSavedEventHandler;
+import util.events.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class MenuControl extends MenuBar {
@@ -54,9 +37,11 @@ public class MenuControl extends MenuBar {
 	private final ColumnControl columns;
 	private final ScrollPane columnsScrollPane;
 	private final UI ui;
+	private final Preferences prefs;
 
-	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane) {
+	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
 		this.columns = columns;
+		this.prefs = prefs;
 		this.columnsScrollPane = columnsScrollPane;
 		this.ui = ui;
 		createMenuItems();
@@ -84,7 +69,7 @@ public class MenuControl extends MenuBar {
 		MenuItem logout = new MenuItem("Logout");
 		logout.setOnAction(e -> {
 			logger.info("Logging out of HT");
-			DataManager.getInstance().setLastLoginPassword("");
+//			DataManager.getInstance().setLastLoginPassword("");
 			ui.quit();
 		});
 		return logout;
@@ -148,21 +133,22 @@ public class MenuControl extends MenuBar {
 
 		List<String> filterStrings = getCurrentFilterExprs();
 
-	    if (!filterStrings.isEmpty()) {
-            TextInputDialog dlg = new TextInputDialog("");
-            dlg.setTitle("Board Name");
-            dlg.getDialogPane().setContentText("What should this board be called?");
-    		dlg.getDialogPane().setHeaderText("Please name this board");
-            Optional<String> response = dlg.showAndWait();
-
-	    	if (response.isPresent()) {
-	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
-	        	ui.triggerEvent(new BoardSavedEvent());
-	        	logger.info("New board" + response.get() + " saved, containing " + filterStrings);
-	        	return;
-	    	}
+	    if (filterStrings.isEmpty()) {
+		    logger.info("Did not save new board");
+		    return;
 	    }
-    	logger.info("Did not save new board");
+
+		TextInputDialog dlg = new TextInputDialog("");
+		dlg.setTitle("Board Name");
+		dlg.getDialogPane().setContentText("What should this board be called?");
+		dlg.getDialogPane().setHeaderText("Please name this board");
+		Optional<String> response = dlg.showAndWait();
+
+		if (response.isPresent()) {
+			prefs.addBoard(response.get(), filterStrings);
+			ui.triggerEvent(new BoardSavedEvent());
+			logger.info("New board" + response.get() + " saved, containing " + filterStrings);
+		}
 	}
 
 	/**
@@ -185,11 +171,11 @@ public class MenuControl extends MenuBar {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Confirmation");
 		dlg.getDialogPane().setHeaderText("Delete board '" + boardName + "'?");
-        dlg.getDialogPane().setContentText("Are you sure you want to delete this panelboard?");
+        dlg.getDialogPane().setContentText("Are you sure you want to delete this board?");
         Optional<ButtonType> response = dlg.showAndWait();
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
-			DataManager.getInstance().removeBoard(boardName);
+			prefs.removeBoard(boardName);
 			ui.triggerEvent(new BoardSavedEvent());
 			logger.info(boardName + " was deleted");
         } else {
@@ -204,25 +190,22 @@ public class MenuControl extends MenuBar {
 		Menu open = new Menu("Open");
 		Menu delete = new Menu("Delete");
 
-		ui.registerEvent(new BoardSavedEventHandler() {
-			@Override
-			public void handle(BoardSavedEvent e) {
-				open.getItems().clear();
-				delete.getItems().clear();
+		ui.registerEvent((BoardSavedEventHandler) e -> {
+			open.getItems().clear();
+			delete.getItems().clear();
 
-				Map<String, List<String>> boards = DataManager.getInstance().getAllBoards();
+			Map<String, List<String>> boards = prefs.getAllBoards();
 
-				for (final String boardName : boards.keySet()) {
-					final List<String> filterSet = boards.get(boardName);
+			for (final String boardName : boards.keySet()) {
+				final List<String> filterSet = boards.get(boardName);
 
-					MenuItem openItem = new MenuItem(boardName);
-					openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
-					open.getItems().add(openItem);
+				MenuItem openItem = new MenuItem(boardName);
+				openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
+				open.getItems().add(openItem);
 
-					MenuItem deleteItem = new MenuItem(boardName);
-					deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
-					delete.getItems().add(deleteItem);
-				}
+				MenuItem deleteItem = new MenuItem(boardName);
+				deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
+				delete.getItems().add(deleteItem);
 			}
 		});
 
@@ -257,7 +240,7 @@ public class MenuControl extends MenuBar {
 		MenuItem refreshMenuItem = new MenuItem("Refresh");
 		refreshMenuItem.setOnAction((e) -> {
 			logger.info("Menu: View > Refresh");
-			ServiceManager.getInstance().updateModelNow();
+			ui.logic.refresh();
 		});
 		refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 		return refreshMenuItem;
@@ -281,13 +264,14 @@ public class MenuControl extends MenuBar {
 					logger.info("Menu: View > Force Refresh");
 
 					updateProgress(0, 1);
-					updateMessage(String.format("Reloading %s...",
-						ServiceManager.getInstance().getRepoId().generateId()));
+//					updateMessage(String.format("Reloading %s...",
+//						ServiceManager.getInstance().getRepoId().generateId()));
 
-					ServiceManager.getInstance().forceRefresh((message, progress) -> {
-						updateProgress(progress * 100, 100);
-						updateMessage(message);
-					});
+					// TODO
+//					ServiceManager.getInstance().forceRefresh((message, progress) -> {
+//						updateProgress(progress * 100, 100);
+//						updateMessage(message);
+//					});
                     PlatformEx.runAndWait(columns::recreateColumns);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
@@ -346,7 +330,7 @@ public class MenuControl extends MenuBar {
 	}
 	
 	public void scrollTo(int columnIndex, int NumOfColumns){
-		setHvalue(columnIndex * (columnsScrollPane.getHmax())/(NumOfColumns-1));
+		setHvalue(columnIndex * (columnsScrollPane.getHmax()) / (NumOfColumns - 1));
 	}
 	private void setHvalue(double val) {
 		columnsScrollPane.setHvalue(val);

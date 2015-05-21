@@ -1,30 +1,28 @@
 package ui.issuepanel;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
+import backend.interfaces.IModel;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
+import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import model.Model;
-import model.TurboIssue;
 import ui.DragData;
-import ui.UI;
 
-import command.TurboIssueAddLabels;
-import command.TurboIssueSetAssignee;
-import command.TurboIssueSetMilestone;
+import java.util.HashSet;
+import java.util.Optional;
 
 public class IssuePanelCell extends ListCell<TurboIssue> {
 
-	private final Model model;
+	private final IModel model;
 	private final int parentColumnIndex;
 	private final IssuePanel parent;
 	private final HashSet<Integer> issuesWithNewComments;
 		
-	public IssuePanelCell(UI ui, Model model, IssuePanel parent, int parentColumnIndex, HashSet<Integer> issuesWithNewComments) {
+	public IssuePanelCell(IModel model, IssuePanel parent,
+	                      int parentColumnIndex, HashSet<Integer> issuesWithNewComments) {
 		super();
 		this.model = model;
 		this.parent = parent;
@@ -35,15 +33,16 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
-		if (issue == null)
+		if (issue == null) {
 			return;
-		
-		setGraphic(new IssuePanelCard(issue, parent, issuesWithNewComments));
+		}
+		Optional<Model> currentModel = model.getModelById(issue.getRepoId());
+		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
+
+		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("bottom-borders");
-		
-//		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
-		
+
 		registerDragEvents(issue);
 	}
 
@@ -57,9 +56,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			event.consume();
 		});
 		
-		setOnDragDone((event) -> {
-			event.consume();
-		});
+		setOnDragDone(Event::consume);
 		
 		setOnDragOver(e -> {
 			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
@@ -97,11 +94,17 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
-					(new TurboIssueAddLabels(model, issue, Arrays.asList(model.getLabelByGhName(dd.getEntityName())))).execute();
+//					Optional<TurboLabel> label = model.getLabelByName(dd.getEntityName());
+//					assert label.isPresent();
+//					(new TurboIssueAddLabels(model, issue, Arrays.asList(label.get()))).execute();
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-					(new TurboIssueSetAssignee(model, issue, model.getUserByGhName(dd.getEntityName()))).execute();
+//					Optional<TurboUser> user = model.getUserByLogin(dd.getEntityName());
+//					assert user.isPresent();
+//					(new TurboIssueSetAssignee(model, issue, user.get())).execute();
 				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-					(new TurboIssueSetMilestone(model, issue, model.getMilestoneByTitle(dd.getEntityName()))).execute();
+//					Optional<TurboMilestone> milestone = model.getMilestoneByTitle(dd.getEntityName());
+//					assert milestone.isPresent();
+//					(new TurboIssueSetMilestone(model, issue, milestone.get())).execute();
 				}
 			}
 			e.setDropCompleted(success);

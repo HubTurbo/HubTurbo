@@ -1,17 +1,15 @@
 package ui;
 
-import java.awt.Rectangle;
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import backend.Logic;
+import backend.UIManager;
+import browserview.BrowserComponent;
+import com.google.common.eventbus.EventBus;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -22,30 +20,21 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import service.ServiceManager;
-import storage.CacheFileHandler;
-import storage.DataManager;
+import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
-import util.DialogMessage;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.Utility;
-import util.events.BoardSavedEvent;
+import util.events.*;
 import util.events.Event;
-import util.events.EventDispatcher;
-import util.events.EventHandler;
-import browserview.BrowserComponent;
 
-import com.google.common.eventbus.EventBus;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -60,6 +49,15 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
+	// Application-level state
+
+	public UIManager uiManager;
+	public Logic logic;
+	public Preferences prefs;
+	public static EventDispatcher events;
+	public EventBus eventBus;
+	private HashMap<String, String> commandLineArgs;
+
 	// Main UI elements
 
 	private Stage mainStage;
@@ -68,72 +66,32 @@ public class UI extends Application implements EventDispatcher {
 	private BrowserComponent browserComponent;
 	private RepositorySelector repoSelector;
 
-	// Events
-
-	private EventBus events;
-
-	// Application arguments
-
-	private HashMap<String, String> commandLineArgs;
-
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
 
-	private static UI instance;
-	public static UI getInstance() {
-		return instance;
-	}
-
 	@Override
-	public void start(Stage stage) throws IOException {
+	public void start(Stage stage) {
 
-		instance = this;
+		initPreApplicationState();
+		initUI(stage);
+		initApplicationState();
 
-		//log all uncaught exceptions
-		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
-            logger.error(throwable.getMessage(), throwable);
-        });
-
-		events = new EventBus();
-
-		commandLineArgs = initialiseCommandLineArguments();
-		DataManager.getInstance();
-		clearCacheIfNecessary();
-
-		repoSelector = createRepoSelector();
-
-		browserComponent = new BrowserComponent(this);
-		initCSS();
-		mainStage = stage;
-		stage.setMaximized(false);
-//		stage.setAlwaysOnTop(true);
-		Scene scene = new Scene(createRoot());
-		setupMainStage(scene);
-		loadFonts();
-		applyCSS(scene);
 		getUserCredentials();
 	}
 
-	/**
-	 * TODO Stop-gap measure pending a more robust updater
-	 */
-	private void clearCacheIfNecessary() {
-		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
-			CacheFileHandler.deleteCacheDirectory();
-		}
-	}
-
 	private void getUserCredentials() {
-		repoSelector.setDisable(true);
-		new LoginDialog(mainStage, columns).show().thenApply(success -> {
-			if (success) {
-				setExpandedWidth(false);
-				columns.loadIssues();
-				repoSelector.setDisable(false);
-				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
+		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
+			if (result.success) {
+				logic.openRepository(result.repoId);
+				logic.setDefaultRepo(result.repoId);
+				repoSelector.setText(result.repoId);
+
 				triggerEvent(new BoardSavedEvent());
+				browserComponent = new BrowserComponent(this);
+				setExpandedWidth(false);
 				ensureSelectedPanelHasFocus();
+				columns.init();
 			} else {
 				quit();
 			}
@@ -144,15 +102,70 @@ public class UI extends Application implements EventDispatcher {
 		});
 	}
 
-	private static String CSS = "";
+	private void initPreApplicationState() {
+		UI.events = this;
 
-	public void initCSS() {
-		CSS = this.getClass().getResource("hubturbo.css").toString();
+		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
+			logger.error(throwable.getMessage(), throwable));
+
+		prefs = new Preferences(this, columns);
+
+		eventBus = new EventBus();
+		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
+
+		uiManager = new UIManager(this);
+		logic = new Logic(uiManager, prefs);
 	}
 
-	public static void applyCSS(Scene scene) {
+	private void initApplicationState() {
+		commandLineArgs = initialiseCommandLineArguments();
+		clearCacheIfNecessary();
+	}
+
+	private void initUI(Stage stage) {
+		repoSelector = createRepoSelector();
+		mainStage = stage;
+		stage.setMaximized(false);
+
+		Scene scene = new Scene(createRoot());
+		setupMainStage(scene);
+
+		loadFonts();
+		String css = initCSS();
+		applyCSS(css, scene);
+	}
+
+	public void quit() {
+		columns.saveSession();
+		prefs.saveGlobalConfig();
+		if (browserComponent != null) {
+			browserComponent.onAppQuit();
+		}
+		Platform.exit();
+		System.exit(0);
+	}
+
+	public void onRepoOpened() {
+		repoSelector.refreshContents();
+	}
+
+	/**
+	 * TODO Stop-gap measure pending a more robust updater
+	 */
+	private void clearCacheIfNecessary() {
+		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
+			// TODO
+//			CacheFileHandler.deleteCacheDirectory();
+		}
+	}
+
+	public String initCSS() {
+		return getClass().getResource("hubturbo.css").toString();
+	}
+
+	public static void applyCSS(String css, Scene scene) {
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add(CSS);
+		scene.getStylesheets().add(css);
 	}
 
 	public static void loadFonts(){
@@ -175,13 +188,10 @@ public class UI extends Application implements EventDispatcher {
 					browserComponent.focus(mainWindowHandle);
 				}
 				PlatformEx.runLaterDelayed(() -> {
-					// A refresh is triggered if:
-					// 1. Repo-switching is not disabled (meaning an update is not in progress)
-					// 2. The repo-switching box is not in focus (clicks on it won't trigger this)
-					boolean shouldRefresh = isRepoSwitchingAllowed() && !repoSelector.isInFocus() && browserComponent.hasBviewChanged();
+					boolean shouldRefresh = browserComponent.hasBviewChanged();
 					if (shouldRefresh) {
-						logger.info("Gained focus; refreshing");
-						ServiceManager.getInstance().updateModelNow();
+						logger.info("Browser view has changed; refreshing");
+						logic.refresh();
 					}
 				});
 			}
@@ -205,19 +215,9 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs;
 	}
 
-	public void quit() {
-		ServiceManager.getInstance().stopModelUpdate();
-		columns.saveSession();
-		DataManager.getInstance().saveLocalConfig();
-		DataManager.getInstance().saveSessionConfig();
-		browserComponent.onAppQuit();
-		Platform.exit();
-		System.exit(0);
-	}
+	private Parent createRoot() {
 
-	private Parent createRoot() throws IOException {
-
-		columns = new ColumnControl(this, mainStage, ServiceManager.getInstance().getModel());
+		columns = new ColumnControl(this, prefs);
 
 		VBox top = new VBox();
 
@@ -227,7 +227,7 @@ public class UI extends Application implements EventDispatcher {
 		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
 
-		menuBar = new MenuControl(this, columns, columnsScrollPane);
+		menuBar = new MenuControl(this, columns, columnsScrollPane, prefs);
 		top.getChildren().addAll(menuBar, repoSelector);
 
 		BorderPane root = new BorderPane();
@@ -256,42 +256,26 @@ public class UI extends Application implements EventDispatcher {
 	 */
 
 	@Override
-	public <T extends Event> void registerEvent(EventHandler handler) {
-		events.register(handler);
+	public void registerEvent(EventHandler handler) {
+		eventBus.register(handler);
 		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
+	}
+
+	@Override
+	public void unregisterEvent(EventHandler handler) {
+		eventBus.unregister(handler);
+		logger.info("Unregistered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
 	}
 
 	@Override
 	public <T extends Event> void triggerEvent(T event) {
 		logger.info("About to trigger event " + event.getClass().getSimpleName());
-		events.post(event);
+		eventBus.post(event);
 		logger.info("Triggered event " + event.getClass().getSimpleName());
-	}
-
-	public ColumnControl getColumnControl() {
-		return columns;
 	}
 
 	public BrowserComponent getBrowserComponent() {
 		return browserComponent;
-	}
-
-	/**
-	 * Tracks whether or not the window is in an expanded state.
-	 */
-	private boolean expanded = false;
-
-	public boolean isExpanded() {
-		return expanded;
-	}
-
-	/**
-	 * Toggles the expansion state of the window.
-	 */
-	public boolean toggleExpandedWidth() {
-		expanded = !expanded;
-		setExpandedWidth(expanded);
-		return expanded;
 	}
 
 	/**
@@ -330,13 +314,12 @@ public class UI extends Application implements EventDispatcher {
 	 * @param expanded
 	 */
 	private void setExpandedWidth(boolean expanded) {
-		this.expanded = expanded;
 		Rectangle dimensions = getDimensions();
 		double width = expanded
 				? dimensions.getWidth()
 				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-		mainStage.setMinWidth(columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getPanelWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
@@ -351,100 +334,16 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private RepositorySelector createRepoSelector() {
-		RepositorySelector repoSelector = new RepositorySelector();
-		repoSelector.setOnValueChange(this::loadRepo);
+		RepositorySelector repoSelector = new RepositorySelector(this);
+		repoSelector.setOnValueChange(this::primaryRepoChanged);
 		return repoSelector;
 	}
 
-	private boolean checkRepoAccess(IRepositoryIdProvider currRepo){
-		try {
-			if(!ServiceManager.getInstance().isRepositoryValid(currRepo)){
-				Platform.runLater(() -> {
-					DialogMessage.showWarningDialog("Error loading repository", "Repository does not exist or you do not have permission to access the repository");
-				});
-				return false;
-			}
-		} catch (SocketTimeoutException e){
-			DialogMessage.showWarningDialog("Internet Connection Timeout",
-					"Timeout while connecting to GitHub, please check your internet connection.");
-			logger.error(e.getLocalizedMessage(), e);
-		} catch (UnknownHostException e){
-			DialogMessage.showWarningDialog("No Internet Connection",
-					"Please check your internet connection and try again.");
-			logger.error(e.getLocalizedMessage(), e);
-		}catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-		return true;
-	}
-
-	private boolean repoSwitchingAllowed = true;
-
-	public boolean isRepoSwitchingAllowed() {
-		return repoSwitchingAllowed;
-	}
-
-	public void enableRepositorySwitching() {
-		repoSwitchingAllowed = true;
-		repoSelector.setLabelText("");
-		repoSelector.enable();
-	}
-
-	public void disableRepositorySwitching() {
-		repoSwitchingAllowed = false;
-		repoSelector.setLabelText("Syncing...");
-		repoSelector.disable();
-	}
-
-	private void loadRepo(String repoString) {
-		RepositoryId repoId = RepositoryId.createFromId(repoString);
-		if(repoId == null
-		  || repoId.equals(ServiceManager.getInstance().getRepoId())
-		  || !checkRepoAccess(repoId)){
-			return;
-		}
-
-		logger.info("Switching repository to " + repoString + "...");
-
-		columns.saveSession();
-		DataManager.getInstance().addToLastViewedRepositories(repoId.generateId());
-
-		Task<Boolean> task = new Task<Boolean>(){
-			@Override
-			protected Boolean call() throws IOException {
-
-				updateProgress(0, 1);
-				updateMessage(String.format("Switching to %s...",
-					ServiceManager.getInstance().getRepoId().generateId()));
-
-				ServiceManager.getInstance().switchRepository(repoId, (message, progress) -> {
-					updateProgress(progress * 100, 100);
-					updateMessage(message);
-				});
-
-                PlatformEx.runAndWait(() -> {
-                    columns.restoreColumns();
-                    triggerEvent(new BoardSavedEvent());
-                });
-				return true;
-			}
-		};
-		DialogMessage.showProgressDialog(task, "Switching to " + repoId.generateId() + "...");
-		Thread thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
-
-		task.setOnSucceeded(wse -> {
-			repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
-			logger.info("Repository " + repoString + " successfully switched to!");
-			ensureSelectedPanelHasFocus();
-		});
-
-		task.setOnFailed(wse -> {
-			Throwable err = task.getException();
-			logger.error(err.getLocalizedMessage(), err);
-			HTStatusBar.displayMessage("An error occurred with repository switching: " + err);
-		});
+	private void primaryRepoChanged(String repoId) {
+		logic.openRepository(repoId);
+		logic.setDefaultRepo(repoId);
+		repoSelector.setText(repoId);
+		columns.refresh();
 	}
 
 	private void ensureSelectedPanelHasFocus() {
@@ -461,9 +360,9 @@ public class UI extends Application implements EventDispatcher {
 	public void setDefaultWidth() {
 		mainStage.setMaximized(false);
 		Rectangle dimensions = getDimensions();
-		mainStage.setMinWidth(columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getPanelWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
-		mainStage.setMaxWidth(columns.getColumnWidth());
+		mainStage.setMaxWidth(columns.getPanelWidth());
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);
@@ -483,10 +382,6 @@ public class UI extends Application implements EventDispatcher {
 	public void minimizeWindow() {
 		mainStage.setIconified(true);
 		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-	}
-
-	public Stage getMainStage() {
-		return mainStage;
 	}
 
 	public HWND getMainWindowHandle() {

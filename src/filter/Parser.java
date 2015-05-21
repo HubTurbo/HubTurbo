@@ -1,21 +1,15 @@
 package filter;
 
+import filter.expression.*;
+import filter.lexer.Lexer;
+import filter.lexer.Token;
+import filter.lexer.TokenType;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import filter.expression.Conjunction;
-import filter.expression.DateRange;
-import filter.expression.Disjunction;
-import filter.expression.FilterExpression;
-import filter.expression.Negation;
-import filter.expression.NumberRange;
-import filter.expression.Qualifier;
-import filter.lexer.Lexer;
-import filter.lexer.Token;
-import filter.lexer.TokenType;
 
 public class Parser {
 
@@ -31,8 +25,7 @@ public class Parser {
 		this.input = input;
 	}
 	public static FilterExpression parse(String input) {
-		if (input == null) return null;
-		else if (input.isEmpty()) return Qualifier.EMPTY;
+		if (input == null || input.isEmpty()) return Qualifier.EMPTY;
 		return new Parser(new Lexer(input).lex()).parseExpression(0);
 	}
 

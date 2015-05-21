@@ -1,17 +1,12 @@
 package tests;
 
+import com.google.common.eventbus.EventBus;
+import org.junit.Test;
+import util.events.*;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Test;
-
-import util.events.EventHandler;
-import util.events.IssueSelectedEvent;
-import util.events.IssueSelectedEventHandler;
-import util.events.ModelChangedEvent;
-import util.events.ModelChangedEventHandler;
-
-import com.google.common.eventbus.EventBus;
 
 public class EventTests {
 
@@ -23,8 +18,8 @@ public class EventTests {
         events.register(fail2);
         events.register(succeed1);
         
-        ModelChangedEvent te = new ModelChangedEvent(null, null, null, null);
-        IssueSelectedEvent te2 = new IssueSelectedEvent(1, 2);
+        BoardSavedEvent te = new BoardSavedEvent();
+        IssueSelectedEvent te2 = new IssueSelectedEvent("", 1, 2);
 
         events.post(te);
 
@@ -61,28 +56,8 @@ public class EventTests {
         events.post(te2);
     }
 
-    private final EventHandler succeed2 = new IssueSelectedEventHandler() {
-        @Override
-        public void handle(IssueSelectedEvent e) {
-            assertTrue(true);
-        }
-    };
-    private final EventHandler fail2 = new IssueSelectedEventHandler() {
-        @Override
-        public void handle(IssueSelectedEvent e) {
-            fail("IssueSelectedEventHandler failed");
-        }
-    };
-    private final EventHandler succeed1 = new ModelChangedEventHandler() {
-        @Override
-        public void handle(ModelChangedEvent e) {
-            assertTrue(true);
-        }
-    };
-    private final EventHandler fail1 = new ModelChangedEventHandler() {
-        @Override
-        public void handle(ModelChangedEvent e) {
-            fail("RefreshDoneEventHandler failed");
-        }
-    };
+    private final EventHandler succeed2 = (IssueSelectedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
+    private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
 }

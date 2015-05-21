@@ -1,13 +1,13 @@
 package filter.expression;
 
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import model.Model;
-import model.TurboIssue;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
 
 public class Disjunction implements FilterExpression {
 	private FilterExpression left;
@@ -50,9 +50,10 @@ public class Disjunction implements FilterExpression {
 			return false;
 		return true;
 	}
-	
-	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
-		return left.isSatisfiedBy(issue, info) || right.isSatisfiedBy(issue, info);
+
+	@Override
+	public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+		return left.isSatisfiedBy(model, issue, info) || right.isSatisfiedBy(model, issue, info);
 	}
 
 	@Override
@@ -61,7 +62,7 @@ public class Disjunction implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
+	public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
 		assert false;
 	}
 	

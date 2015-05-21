@@ -1,12 +1,12 @@
 package util;
 
-import java.awt.Desktop;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Browse {
 	private static final Logger logger = LogManager.getLogger(Browse.class.getName());

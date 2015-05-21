@@ -1,23 +1,20 @@
 package ui.components;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import filter.ParseException;
+import filter.Parser;
 import javafx.application.Platform;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 
-import filter.ParseException;
-import filter.Parser;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FilterTextField extends TextField {
 
@@ -25,15 +22,7 @@ public class FilterTextField extends TextField {
 	private Function<String, String> confirm = (s) -> s;
     private ValidationSupport validationSupport = new ValidationSupport();
     private String previousText;
-    private ArrayList<String> words = new ArrayList<>(Arrays.asList(
-    		"label", "milestone",
-    		"involves", "assignee", "author",
-    		"title", "body",
-    		"is", "issue", "pr", "merged", "unmerged",
-    		"no", "type", "has",
-    		"state", "open", "closed",
-    		"created",
-    		"updated"));
+	private List<String> keywords = new ArrayList<>();
 
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
@@ -120,58 +109,57 @@ public class FilterTextField extends TextField {
 			String before = getText().substring(0, caret);
 			String after = getText().substring(caret, getText().length());
 			setText(before + "()" + after);
-			Platform.runLater(() -> {
-				positionCaret(caret+1);
-			});
+			Platform.runLater(() -> positionCaret(caret+1));
 		}
 	}
 
 	private void performCompletion(KeyEvent e) {
 		String word = getCurrentWord() + e.getCharacter();
-		
-		for (int i=0; i<words.size(); i++) {
-			if (words.get(i).startsWith(word)) {
-				
-				e.consume();
-				
-				int caret = getCaretPosition();
-				
-				if (getSelectedText().isEmpty()) {
-					String before = getText().substring(0, caret);
-					String insertion = e.getCharacter();
-					String after = getText().substring(caret, getText().length());
-					
-					String addition = words.get(i).substring(word.length());
-					
-					setText(before + insertion + addition + after);
-					Platform.runLater(() -> {
-						selectRange(
-								before.length() + insertion.length() + addition.length(),
-								before.length() + insertion.length());
-					});
-				} else {
-					IndexRange sel = getSelection();
-//							boolean additionAfter = sel.getEnd() == caret;
-					int start = Math.min(sel.getStart(), sel.getEnd());
-					int end = Math.max(sel.getStart(), sel.getEnd());
-					
-					String before = getText().substring(0, start);
-					String after = getText().substring(end, getText().length());
-//							String selection = getText().substring(start, end);
-					String insertion = e.getCharacter();
-					
-					String addition = words.get(i).substring(word.length());
-					
-					setText(before + insertion + addition + after);
 
-					Platform.runLater(() -> {
-						selectRange(
-								before.length() + insertion.length() + addition.length(),
-								before.length() + insertion.length());
-					});
-				}
+		for (String candidateWord : keywords) {
+			if (candidateWord.startsWith(word)) {
+				performCompletionOfWord(e, word, candidateWord);
 				break;
 			}
+		}
+	}
+
+	private void performCompletionOfWord(KeyEvent e, String word, String candidateWord) {
+
+		e.consume();
+		int caret = getCaretPosition();
+
+		if (getSelectedText().isEmpty()) {
+			String before = getText().substring(0, caret);
+			String insertion = e.getCharacter();
+			String after = getText().substring(caret, getText().length());
+
+			String addition = candidateWord.substring(word.length());
+
+			setText(before + insertion + addition + after);
+			Platform.runLater(() -> {
+				selectRange(
+					before.length() + insertion.length() + addition.length(),
+					before.length() + insertion.length());
+			});
+		} else {
+			IndexRange sel = getSelection();
+//			boolean additionAfter = sel.getEnd() == caret;
+			int start = Math.min(sel.getStart(), sel.getEnd());
+			int end = Math.max(sel.getStart(), sel.getEnd());
+
+			String before = getText().substring(0, start);
+			String after = getText().substring(end, getText().length());
+//			String selection = getText().substring(start, end);
+			String insertion = e.getCharacter();
+
+			String addition = candidateWord.substring(word.length());
+
+			setText(before + insertion + addition + after);
+
+			Platform.runLater(() -> selectRange(
+				before.length() + insertion.length() + addition.length(),
+				before.length() + insertion.length()));
 		}
 	}
 
@@ -254,12 +242,8 @@ public class FilterTextField extends TextField {
 		this.confirm = confirm;
 		return this;
 	}
-	
-	public void addKeywords(String ... keywords) {
-		words.addAll(Arrays.asList(keywords));
-	}
-	
-	public void addKeywords(List<String> keywords) {
-		words.addAll(keywords);
+
+	public void setKeywords(List<String> words) {
+		keywords = new ArrayList<>(words);
 	}
 }

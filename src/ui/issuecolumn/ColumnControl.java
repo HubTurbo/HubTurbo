@@ -1,25 +1,20 @@
 package ui.issuecolumn;
 
-import command.TurboCommandExecutor;
-import javafx.application.Platform;
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-import model.Model;
-import storage.DataManager;
+import prefs.Preferences;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
-import util.events.ColumnClickedEvent;
 import util.events.ColumnClickedEventHandler;
-import util.events.IssueSelectedEvent;
 import util.events.IssueSelectedEventHandler;
-import util.events.ModelChangedEvent;
-import util.events.ModelChangedEventHandler;
+import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,67 +26,48 @@ import java.util.function.Consumer;
 public class ColumnControl extends HBox {
 
 	private final UI ui;
-	private final Stage stage;
-	private final Model model;
-	
-	@SuppressWarnings("unused")
-	private final UIBrowserBridge uiBrowserBridge;
-
-	private TurboCommandExecutor dragAndDropExecutor;
+	private final Preferences prefs;
+	private IModel model;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
-	
-	public ColumnControl(UI ui, Stage stage, Model model) {
+
+	public ColumnControl(UI ui, Preferences prefs) {
 		this.ui = ui;
-		this.stage = stage;
-		this.model = model;
-		this.dragAndDropExecutor = new TurboCommandExecutor();
-		this.uiBrowserBridge = new UIBrowserBridge(ui);
+		this.prefs = prefs;
+
+		// Set up the connection to the browser
+		new UIBrowserBridge(ui);
+
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
 
-		ui.registerEvent(new ModelChangedEventHandler() {
-			@Override
-			public void handle(ModelChangedEvent e) {
-				Platform.runLater(() -> {
-					forEach(child -> {
-						if (child instanceof IssueColumn) {
-							((IssueColumn) child).setItems(e.issues);
-						}
-					});
-				});
-			}
+		ui.registerEvent((ModelUpdatedEventHandler) e -> {
+			updateModel(e.model);
+			forEach(child -> {
+				if (child instanceof IssueColumn) {
+					((IssueColumn) child).setItems(e.model.getIssues());
+				}
+			});
 		});
 
-		ui.registerEvent(new IssueSelectedEventHandler() {
-			@Override
-			public void handle(IssueSelectedEvent e) {
-				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
-			}
-		});
-		
-		ui.registerEvent(new ColumnClickedEventHandler() {
-			@Override
-			public void handle(ColumnClickedEvent e) {
-				setCurrentlySelectedColumn(Optional.of(e.columnIndex));
-			}
-		});
+		ui.registerEvent((IssueSelectedEventHandler) e ->
+			setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+		ui.registerEvent((ColumnClickedEventHandler) e ->
+			setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 
 		setupKeyEvents();
 	}
-	
-	public void restoreColumns() {
-		getChildren().clear();
-		
-		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(model.getRepoId());
-		if (filters != null && !filters.isEmpty()) {
-			for (String filter : filters) {
-				addColumn().filterByString(filter);
-			}
-		} else {
-			addColumn();
-		}
+
+	/**
+	 * Called on login
+	 */
+	public void init() {
+		restoreColumns();
 	}
 
+	private void updateModel(IModel newModel) {
+		model = newModel;
+	}
+	
 	public void displayMessage(String message) {
 		HTStatusBar.displayMessage(message);
 	}
@@ -100,7 +76,33 @@ public class ColumnControl extends HBox {
 		saveSession();
 		restoreColumns();
 	}
-	
+
+	public void saveSession() {
+		List<String> sessionFilters = new ArrayList<>();
+		getChildren().forEach(child -> {
+			if (child instanceof IssueColumn) {
+				String filter = ((IssueColumn) child).getCurrentFilterString();
+				sessionFilters.add(filter);
+			}
+		});
+		prefs.setLastOpenFilters(sessionFilters);
+	}
+
+	public void restoreColumns() {
+		getChildren().clear();
+
+		List<String> filters = prefs.getLastOpenFilters();
+
+		if (filters.isEmpty()) {
+			addColumn();
+			return;
+		}
+
+		for (String filter : filters) {
+			addColumn().filterByString(filter);
+		}
+	}
+
 	/**
 	 * Returns a list of issues to download comments for
 	 * @return
@@ -111,8 +113,8 @@ public class ColumnControl extends HBox {
 			IssueColumn panel = (IssueColumn) child;
 			if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
 				panel.getIssueList().stream()
-						.map(issue -> issue.getId()).
-						forEach(issueId -> result.add(issueId));
+					.map(TurboIssue::getId)
+					.forEach(result::add);
 			}
 		}
 		return new ArrayList<>(result);
@@ -126,21 +128,12 @@ public class ColumnControl extends HBox {
 		forEach(child -> child.refreshItems());
 	}
 	
-	public void loadIssues() {
-		for (Node node : getChildren()) {
-			if (node instanceof IssueColumn) {
-				IssueColumn panel = (IssueColumn) node;
-				panel.setItems(model.getIssues());
-			}
-		}
-	}
-	
 	private IssueColumn addColumn() {
 		return addColumnAt(getChildren().size());
 	}
 
 	public IssueColumn addColumnAt(int index) {
-		IssueColumn panel = new IssuePanel(ui, stage, model, this, index, dragAndDropExecutor);
+		IssueColumn panel = new IssuePanel(ui, model, this, index);
 		getChildren().add(index, panel);
 		panel.setItems(model.getIssues());
 		updateColumnIndices();
@@ -179,8 +172,9 @@ public class ColumnControl extends HBox {
 	}
 
 	public void closeColumn(int index) {
-		getChildren().remove(index);
+		Node child = getChildren().remove(index);
 		updateColumnIndices();
+		((Column) child).close();
 	}
 
 	private void updateColumnIndices() {
@@ -196,17 +190,6 @@ public class ColumnControl extends HBox {
 
 	public void createNewPanelAtEnd() {
 		addColumn();
-	}
-
-	public void saveSession() {
-		List<String> sessionFilters = new ArrayList<String>();
-		getChildren().forEach(child -> {
-			if (child instanceof IssueColumn) {
-				String filter = ((IssueColumn) child).getCurrentFilterString();
-				sessionFilters.add(filter);
-			}
-		});
-		DataManager.getInstance().setFiltersForNextSession(model.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {
@@ -252,15 +235,13 @@ public class ColumnControl extends HBox {
 		}
 	}
 	
-	public double getColumnWidth() {
-		return (getChildren() == null || getChildren().size() == 0)
-				? 0
-				: 40 + Column.COLUMN_WIDTH;
+	public double getPanelWidth() {
 		// COLUMN_WIDTH is used instead of
 		// ((Column) getChildren().get(0)).getWidth();
 		// because when this function is called, columns may not have been sized yet.
-		// In any case column width is set to COLUMN_WIDTH at minimum, so we can assume
+		// In any case actual column width is COLUMN_WIDTH at minimum, so we can assume
 		// that they are that large.
+		return 40 + Column.COLUMN_WIDTH;
 	}
 	private void setupKeyEvents() {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
@@ -299,5 +280,4 @@ public class ColumnControl extends HBox {
 	private void scrollandShowColumn(int SelectedColumnIndex, int numOfColumns) {
 		ui.getMenuControl().scrollTo(SelectedColumnIndex, numOfColumns);
 	}
-
 }

@@ -8,4 +8,7 @@ chromedriver
 chromedriver_linux
 chromedriver.exe
 .hubturbocache/
-
+.gradle/
+build/
+config/
+store/
