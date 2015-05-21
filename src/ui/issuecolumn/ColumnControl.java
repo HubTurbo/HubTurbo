@@ -54,6 +54,15 @@ public class ColumnControl extends HBox {
 		setupKeyEvents();
 	}
 
+	/**
+	 * Called on login
+	 */
+	public void init() {
+		if (getChildren().isEmpty()) {
+			addColumn();
+		}
+	}
+
 	private void updateModel(IModel newModel) {
 		model = newModel;
 	}
@@ -268,5 +277,4 @@ public class ColumnControl extends HBox {
 	private void scrollandShowColumn(int SelectedColumnIndex, int numOfColumns) {
 		ui.getMenuControl().scrollTo(SelectedColumnIndex, numOfColumns);
 	}
-
 }
