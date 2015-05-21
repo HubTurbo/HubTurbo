@@ -38,14 +38,14 @@ public class ColumnControl extends HBox {
 		setSpacing(10);
 		setPadding(new Insets(0,10,0,10));
 
-		ui.registerEvent((ModelUpdatedEventHandler) e -> Platform.runLater(() -> {
+		ui.registerEvent((ModelUpdatedEventHandler) e -> {
 			updateModel(e.model);
 			forEach(child -> {
 				if (child instanceof IssueColumn) {
 					((IssueColumn) child).setItems(e.model.getIssues());
 				}
 			});
-		}));
+		});
 
 		ui.registerEvent((IssueSelectedEventHandler) e ->
 			setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
