@@ -2,6 +2,7 @@ package util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,6 +49,11 @@ public class Utility {
 //		Platform.runLater(() -> f.complete(result));
 		unitFutureExecutor.execute(() -> f.complete(result));
 		return f;
+	}
+
+	public static boolean isWellFormedRepoId(String repoId) {
+		return repoId != null && !repoId.isEmpty()
+			&& RepositoryId.createFromId(repoId).generateId().equals(repoId);
 	}
 
 	public static Optional<String> readFile(String filename) {

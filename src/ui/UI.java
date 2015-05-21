@@ -86,9 +86,10 @@ public class UI extends Application implements EventDispatcher {
 //		repoSelector.setDisable(true);
 		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
 			if (result.success) {
-				logic.openRepository(result.repoId);
 				logic.setDefaultRepo(result.repoId);
+				logic.openRepository(result.repoId);
 				repoSelector.refreshContents(result.repoId);
+
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
 				setExpandedWidth(false);

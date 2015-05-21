@@ -1,12 +1,13 @@
 package ui;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import storage.Preferences;
+import util.Utility;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class RepositorySelector extends HBox {
@@ -35,20 +36,19 @@ public class RepositorySelector extends HBox {
 		comboBox.setEditable(true);
 		loadContents();
 		comboBox.valueProperty().addListener((observable, old, newVal) -> {
-			System.out.println(old + " " + newVal);
-			if (!changesDisabled) {
+			if (Utility.isWellFormedRepoId(newVal) && !changesDisabled) {
 				onValueChangeCallback.accept(newVal);
 			}
 		});
 	}
 	
 	public void setOnValueChange(Consumer<String> callback) {
+		assert callback != null;
 		onValueChangeCallback = callback;
 	}
 
 	private void loadContents() {
-		List<String> items = prefs.getLastViewedRepositories();
-		comboBox.getItems().addAll(items);
+		comboBox.getItems().addAll(prefs.getLastViewedRepositories());
 	}
 
 	public void refreshContents(String repoId) {

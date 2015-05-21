@@ -57,6 +57,7 @@ public class Logic {
 	}
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
+		assert Utility.isWellFormedRepoId(repoId);
 		if (isAlreadyOpen(repoId)) {
 			return Utility.unitFutureOf(false);
 		}
