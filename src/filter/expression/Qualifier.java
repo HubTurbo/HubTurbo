@@ -7,24 +7,25 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-import ui.UI;
 import util.Utility;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Qualifier implements FilterExpression {
-	
+
 	public static final Qualifier EMPTY = new Qualifier("", "");
 
 	private final String name;
-	
+
 	// Only one of these will be present at a time
 	private Optional<DateRange> dateRange = Optional.empty();
 	private Optional<String> content = Optional.empty();
@@ -49,12 +50,12 @@ public class Qualifier implements FilterExpression {
 			assert false : "Unrecognised content type! You may have forgotten to add it above";
 		}
 	}
-	
+
 	public Qualifier(String name, String content) {
 		this.name = name;
 		this.content = Optional.of(content);
 	}
-	
+
 	public Qualifier(String name, NumberRange numberRange) {
 		this.name = name;
 		this.numberRange = Optional.of(numberRange);
@@ -69,22 +70,22 @@ public class Qualifier implements FilterExpression {
 		this.name = name;
 		this.date = Optional.of(date);
 	}
-	
+
 	public Qualifier(String name, int number) {
 		this.name = name;
 		this.number = Optional.of(number);
 	}
-	
+
 	/**
 	 * Helper function for testing a filter expression against an issue.
 	 * Ensures that meta-qualifiers are taken care of.
 	 * Should always be used over isSatisfiedBy.
 	 */
 	public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
-		
-		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::isNotMetaQualifier);
+
+		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
 		List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
-		
+
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
 
@@ -93,7 +94,7 @@ public class Qualifier implements FilterExpression {
 	}
 
 	private static LocalDateTime currentTime = null;
-	
+
 	private static LocalDateTime getCurrentTime() {
 		if (currentTime == null) {
 			return LocalDateTime.now();
@@ -101,7 +102,7 @@ public class Qualifier implements FilterExpression {
 			return currentTime;
 		}
 	}
-	
+
 	/**
 	 * For testing. Stubs the current time so time-related qualifiers work properly.
 	 */
@@ -116,7 +117,7 @@ public class Qualifier implements FilterExpression {
 	@Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert name != null && content != null;
-		
+
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;
 
@@ -163,7 +164,7 @@ public class Qualifier implements FilterExpression {
 	@Override
     public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
         assert name != null && content != null;
-        
+
         // The empty qualifier should not be applied to anything
         assert !isEmptyQualifier();
 
@@ -222,7 +223,7 @@ public class Qualifier implements FilterExpression {
 			return EMPTY;
 		}
 	}
-	
+
 	@Override
 	public List<Qualifier> find(Predicate<Qualifier> pred) {
 		if (pred.test(this)) {
@@ -265,7 +266,7 @@ public class Qualifier implements FilterExpression {
             return "";
         }
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -309,8 +310,17 @@ public class Qualifier implements FilterExpression {
         return true;
     }
 
-	private static boolean isNotMetaQualifier(Qualifier q) {
-		return !isMetaQualifier(q);
+	private static boolean shouldNotBeStripped(Qualifier q) {
+		return !shouldBeStripped(q);
+	}
+
+	private static boolean shouldBeStripped(Qualifier q) {
+		switch (q.getName()) {
+			case "in":
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	private static boolean isMetaQualifier(Qualifier q) {
@@ -322,7 +332,7 @@ public class Qualifier implements FilterExpression {
 			return false;
 		}
 	}
-	
+
     private boolean idSatisfies(TurboIssue issue) {
 	    return number.isPresent() && issue.getId() == number.get();
     }
@@ -414,7 +424,7 @@ public class Qualifier implements FilterExpression {
 
 	    return login.contains(content) || name.contains(content);
     }
-    
+
     private boolean authorSatisfies(TurboIssue issue) {
     	if (!content.isPresent()) return false;
 
@@ -422,7 +432,7 @@ public class Qualifier implements FilterExpression {
 
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
-    
+
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
     	return authorSatisfies(issue) || assigneeSatisfies(model, issue);
     }
@@ -467,7 +477,7 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
-    	
+
     	if (info.getIn().isPresent()) {
     		switch (info.getIn().get()) {
     		case "title":
@@ -511,7 +521,7 @@ public class Qualifier implements FilterExpression {
     	if (!content.isPresent()) {
     		throw new QualifierApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
     	}
-    	
+
         // Find milestones containing the partial title
         List<TurboMilestone> milestones = model.getMilestones().stream().filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase())).collect(Collectors.toList());
         if (milestones.size() > 1) {
@@ -566,7 +576,7 @@ public class Qualifier implements FilterExpression {
             issue.setOpen(false);
         }
     }
-    
+
 	public Optional<Integer> getNumber() {
 		return number;
 	}
