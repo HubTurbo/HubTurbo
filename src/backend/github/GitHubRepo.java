@@ -2,6 +2,11 @@ package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
+import github.GitHubClientExtended;
+import github.IssueServiceExtended;
+import github.LabelServiceFixed;
+import github.TurboIssueEvent;
+import github.update.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
@@ -10,17 +15,13 @@ import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
-import github.GitHubClientExtended;
-import github.IssueServiceExtended;
-import github.LabelServiceFixed;
-import github.TurboIssueEvent;
-import github.update.*;
 import util.HTLog;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
 import java.util.function.BiFunction;
+
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 

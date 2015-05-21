@@ -1,7 +1,8 @@
 package ui.issuepanel;
 
 import backend.interfaces.IModel;
-import backend.resource.*;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
@@ -9,7 +10,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import ui.DragData;
-import ui.UI;
 
 import java.util.HashSet;
 import java.util.Optional;

@@ -1,6 +1,5 @@
 package ui.issuecolumn;
 
-import util.events.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -26,6 +25,7 @@ import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.HTStatusBar;
 import util.events.ColumnClickedEvent;
+import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;

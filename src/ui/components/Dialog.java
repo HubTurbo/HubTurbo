@@ -1,17 +1,14 @@
 package ui.components;
 
-import java.util.concurrent.CompletableFuture;
-
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Dialog<T> {
 

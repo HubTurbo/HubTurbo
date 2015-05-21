@@ -1,16 +1,7 @@
 package ui.issuecolumn;
 
 import ui.UI;
-import util.events.IssueCreatedEvent;
-import util.events.IssueCreatedEventHandler;
-import util.events.IssueSelectedEvent;
-import util.events.IssueSelectedEventHandler;
-import util.events.LabelCreatedEvent;
-import util.events.LabelCreatedEventHandler;
-import util.events.LoginEvent;
-import util.events.LoginEventHandler;
-import util.events.MilestoneCreatedEvent;
-import util.events.MilestoneCreatedEventHandler;
+import util.events.*;
 
 /**
  * A abstract component in charge of creating, displaying, and enabling edits of issues.

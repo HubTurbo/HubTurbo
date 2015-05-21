@@ -1,17 +1,18 @@
 package github.update;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
-
-import java.util.*;
-
+import com.google.gson.reflect.TypeToken;
+import github.GitHubClientExtended;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.PagedRequest;
-
-import github.GitHubClientExtended;
-
-import com.google.gson.reflect.TypeToken;
 import util.Utility;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
 public class IssueUpdateService extends UpdateService<Issue>{
 

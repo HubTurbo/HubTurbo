@@ -1,12 +1,11 @@
 package ui.components;
 
-import java.util.Optional;
-import java.util.function.IntConsumer;
-
 import javafx.scene.input.KeyCode;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
+import java.util.function.IntConsumer;
 
 /**
  * A very specialized ListView subclass that:

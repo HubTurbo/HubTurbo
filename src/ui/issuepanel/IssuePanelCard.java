@@ -3,6 +3,7 @@ package ui.issuepanel;
 import backend.resource.*;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import github.TurboIssueEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -14,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.Comment;
-import github.TurboIssueEvent;
 import ui.issuecolumn.IssueColumn;
 import util.Utility;
 

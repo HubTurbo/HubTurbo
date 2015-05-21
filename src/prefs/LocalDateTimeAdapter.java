@@ -1,14 +1,13 @@
 package prefs;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-
-import util.Utility;
-
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import util.Utility;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
 	public LocalDateTime read(JsonReader reader) throws IOException {

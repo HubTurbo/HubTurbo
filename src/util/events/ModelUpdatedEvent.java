@@ -2,7 +2,6 @@ package util.events;
 
 import backend.interfaces.IModel;
 import backend.resource.MultiModel;
-import util.events.Event;
 
 public class ModelUpdatedEvent extends Event {
 	public IModel model;

@@ -1,7 +1,6 @@
 package ui.issuecolumn;
 
 import backend.interfaces.IModel;
-import backend.resource.Model;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.input.ClipboardContent;

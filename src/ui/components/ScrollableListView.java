@@ -1,14 +1,13 @@
 package ui.components;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import javafx.application.Platform;
+import javafx.scene.control.ListView;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
-
-import javafx.application.Platform;
-import javafx.scene.control.ListView;
-
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 /**
  * A ListView subclass that can be programmatically scrolled.

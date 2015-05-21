@@ -1,12 +1,6 @@
 package github.update;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.*;
-
+import github.GitHubClientExtended;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
@@ -15,9 +9,17 @@ import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.GitHubService;
-
-import github.GitHubClientExtended;
 import util.Utility;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.

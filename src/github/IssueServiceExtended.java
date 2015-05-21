@@ -1,22 +1,16 @@
 package github;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_EVENTS;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-import org.eclipse.egit.github.core.service.IssueService;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 public class IssueServiceExtended extends IssueService{
 	private GitHubClientExtended ghClient;

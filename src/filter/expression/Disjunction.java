@@ -1,7 +1,6 @@
 package filter.expression;
 
 import backend.interfaces.IModel;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;

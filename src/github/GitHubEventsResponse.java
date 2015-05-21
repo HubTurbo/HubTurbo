@@ -1,6 +1,12 @@
 package github;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubResponse;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -10,14 +16,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
 
 /**
  * A wrapper class for GitHubEvents that also contain event-specific

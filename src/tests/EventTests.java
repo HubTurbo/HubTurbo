@@ -1,13 +1,11 @@
 package tests;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import com.google.common.eventbus.EventBus;
 import org.junit.Test;
-
 import util.events.*;
 
-import com.google.common.eventbus.EventBus;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class EventTests {

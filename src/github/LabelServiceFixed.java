@@ -1,18 +1,15 @@
 package github;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
-
-import java.io.IOException;
-import java.util.List;
-
+import com.google.gson.reflect.TypeToken;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
-import com.google.gson.reflect.TypeToken;
+import java.io.IOException;
+import java.util.List;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 
 public class LabelServiceFixed extends LabelService {

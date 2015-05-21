@@ -1,6 +1,5 @@
 package ui.issuecolumn;
 
-import util.events.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
@@ -15,6 +14,7 @@ import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
+import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;

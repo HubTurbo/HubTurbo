@@ -1,7 +1,5 @@
 package github;
 
-import java.util.Date;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -9,6 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
+
+import java.util.Date;
 
 /**
  * Models an event that could happen to an issue.
