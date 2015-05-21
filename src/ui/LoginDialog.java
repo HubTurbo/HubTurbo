@@ -19,6 +19,7 @@ import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import storage.Preferences;
 import ui.components.Dialog;
 import ui.components.HTStatusBar;
 import util.DialogMessage;
@@ -26,6 +27,7 @@ import util.HTLog;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +50,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 	private static final String BUTTON_SIGN_IN = "Sign in";
 
 	private final UI ui;
+	private final Preferences prefs;
 
 	private TextField repoOwnerField;
 	private TextField repoNameField;
@@ -62,9 +65,10 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-	public LoginDialog(UI ui, Stage parentStage) {
+	public LoginDialog(UI ui, Preferences prefs, Stage parentStage) {
 		super(parentStage);
 		this.ui = ui;
+		this.prefs = prefs;
 	}
 
 	private void login(Event e) {
@@ -77,8 +81,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
 			if (success) {
 				// Save login details only on successful login
-//				DataManager.getInstance().setLastLoginUsername(username);
-//				DataManager.getInstance().setLastLoginPassword(password);
+				prefs.setLastLoginCredentials(username, password);
 				Platform.runLater(() -> {
 					completeResponse(new Result(owner, repo));
 					close();
@@ -176,7 +179,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
 
-//		populateSavedFields();
+		populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
@@ -196,33 +199,34 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 	/**
 	 * Fills in fields which have values at this point.
 	 */
-//	private void populateSavedFields() {
+	private void populateSavedFields() {
 //		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
 //		if (lastViewed.isPresent()) {
 //			repoOwnerField.setText(lastViewed.get().getOwner());
 //			repoNameField.setText(lastViewed.get().getName());
 //		}
-//
-//		String lastLoginName = DataManager.getInstance().getLastLoginUsername();
-//		if (!lastLoginName.isEmpty()) {
-//			usernameField.setText(lastLoginName);
-//		}
-//
-//		String lastLoginPassword = DataManager.getInstance().getLastLoginPassword();
-//		if (!lastLoginPassword.isEmpty()) {
-//			passwordField.setText(lastLoginPassword);
-//		}
-//		// Change focus depending on what fields are present
-//		Platform.runLater(() -> {
-//			if(!lastLoginPassword.isEmpty()){
-//				login(null);
-//			} else if (!lastLoginName.isEmpty()) {
-//				passwordField.requestFocus();
+
+		String lastLoginName = prefs.getLastLoginUsername();
+		if (!lastLoginName.isEmpty()) {
+			usernameField.setText(lastLoginName);
+		}
+
+		String lastLoginPassword = prefs.getLastLoginPassword();
+		if (!lastLoginPassword.isEmpty()) {
+			passwordField.setText(lastLoginPassword);
+		}
+
+		// Change focus depending on what fields are present
+		Platform.runLater(() -> {
+			if(!lastLoginPassword.isEmpty()){
+				login(null);
+			} else if (!lastLoginName.isEmpty()) {
+				passwordField.requestFocus();
 //			} else if (lastViewed.isPresent()) {
 //				usernameField.requestFocus();
-//			}
-//		});
-//	}
+			}
+		});
+	}
 
 	/**
 	 * Configures the central grid pane before it's used.

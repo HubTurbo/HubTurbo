@@ -58,7 +58,8 @@ public class Logic {
 			return Utility.unitFutureOf(false);
 		}
 		logger.info("Opening " + repoId);
-		return repoIO.openRepository(repoId).thenAccept(models::add)
+		return repoIO.openRepository(repoId)
+			.thenAccept(models::add)
 			.thenRun(this::updateUI)
 			.thenApply(n -> true)
 			.exceptionally(e -> false);

@@ -22,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import storage.Preferences;
 import ui.components.HTStatusBar;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
@@ -54,6 +55,7 @@ public class UI extends Application implements EventDispatcher {
 
 	public UIManager uiManager;
 	public Logic logic;
+	public Preferences prefs;
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
@@ -73,15 +75,16 @@ public class UI extends Application implements EventDispatcher {
 	@Override
 	public void start(Stage stage) {
 
-		initApplicationState();
+		initPreApplicationState();
 		initUI(stage);
+		initApplicationState();
 
 		getUserCredentials();
 	}
 
 	private void getUserCredentials() {
 //		repoSelector.setDisable(true);
-		new LoginDialog(this, mainStage).show().thenApply(result -> {
+		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
 			if (result.success) {
 				logic.openRepository(result.repoId);
 				logic.setDefaultRepo(result.repoId);
@@ -102,18 +105,22 @@ public class UI extends Application implements EventDispatcher {
 		});
 	}
 
-	private void initApplicationState() {
+	private void initPreApplicationState() {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
 
+		prefs = new Preferences(this, columns);
+
 		eventBus = new EventBus();
+	}
+
+	private void initApplicationState() {
 		uiManager = new UIManager(this);
 		logic = new Logic(uiManager);
 
 		UI.events = this;
 
 		commandLineArgs = initialiseCommandLineArguments();
-//		DataManager.getInstance();
 		clearCacheIfNecessary();
 	}
 
@@ -128,6 +135,16 @@ public class UI extends Application implements EventDispatcher {
 		loadFonts();
 		String css = initCSS();
 		applyCSS(css, scene);
+	}
+
+	public void quit() {
+//		columns.saveSession();
+		prefs.saveGlobalConfig();
+		if (browserComponent != null) {
+			browserComponent.onAppQuit();
+		}
+		Platform.exit();
+		System.exit(0);
 	}
 
 	/**
@@ -199,17 +216,6 @@ public class UI extends Application implements EventDispatcher {
 			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
 		}
 		return commandLineArgs;
-	}
-
-	public void quit() {
-		columns.saveSession();
-//		DataManager.getInstance().saveLocalConfig();
-//		DataManager.getInstance().saveSessionConfig();
-		if (browserComponent != null) {
-			browserComponent.onAppQuit();
-		}
-		Platform.exit();
-		System.exit(0);
 	}
 
 	private Parent createRoot() {

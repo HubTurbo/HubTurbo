@@ -1,136 +1,83 @@
 package storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Modifier;
+import com.google.gson.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import util.HTLog;
+
+import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.channels.NonWritableChannelException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
 public class ConfigFileHandler {
 
-	private static final String CHARSET = "UTF-8";
 	private static final Logger logger = LogManager.getLogger(ConfigFileHandler.class.getName());
-	
+
+	private static final String CHARSET = "UTF-8";
+	private final String globalConfigFileName;
+	private final String configDirectory;
+
 	private Gson gson;
 
-	private final String sessionConfigFilePath;
-	private final String localConfigFilePath;
-
-	public ConfigFileHandler(String sessionConfigFilePath, String localConfigFilePath) {
-
-		this.localConfigFilePath = localConfigFilePath;
-		this.sessionConfigFilePath = sessionConfigFilePath;
+	public ConfigFileHandler(String configDirectory, String globalConfigFileName) {
+		this.globalConfigFileName = globalConfigFileName;
+		this.configDirectory = configDirectory;
 
 		setupGson();
+		ensureDirectoryExists();
 	}
 
-	/**
-	 * Local and session configuration
-	 */
-	
-	/**
-	 * Writes to the session configuration file.
-	 */
-	public void saveSessionConfig(SessionConfiguration config) {
-		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(sessionConfigFilePath) , CHARSET);
-			gson.toJson(config, SessionConfiguration.class, writer);
-			writer.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
+	private void ensureDirectoryExists() {
+		File directory = new File(configDirectory);
+		if (!directory.exists() || !directory.isDirectory()) {
+			directory.mkdir();
 		}
 	}
 
-	/**
-	 * Locals session configuration file, creating it if it doesn't exist.
-	 */
-	public SessionConfiguration loadSessionConfig() {
+	private File getGlobalConfigFile() {
+		return new File(configDirectory, globalConfigFileName).getAbsoluteFile();
+	}
+
+	public void saveGlobalConfig(GlobalConfig config) {
+		File configFile = getGlobalConfigFile();
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(configFile) , CHARSET);
+			gson.toJson(config, GlobalConfig.class, writer);
+			writer.close();
+		} catch (IOException e) {
+			HTLog.error(logger, e);
+		}
+	}
+
+	public GlobalConfig loadGlobalConfig() {
 		
 		// Default to an empty configuration
-		SessionConfiguration config = new SessionConfiguration();
+		GlobalConfig config = new GlobalConfig();
 		
-		File configFile = new File(sessionConfigFilePath);
+		File configFile = getGlobalConfigFile();
 		if (configFile.exists()) {
 			try {
-				Reader reader = new InputStreamReader(new FileInputStream(sessionConfigFilePath), CHARSET);
-				config = gson.fromJson(reader, SessionConfiguration.class);
+				Reader reader = new InputStreamReader(new FileInputStream(configFile), CHARSET);
+				config = gson.fromJson(reader, GlobalConfig.class);
 				reader.close();
 			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
+				HTLog.error(logger, e);
 			}
 		} else {
 			try {
 				configFile.createNewFile();
-				saveSessionConfig(config);
+				saveGlobalConfig(config);
 			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
+				HTLog.error(logger, e);
 			}
 		}
+		System.out.println(config);
 		return config;
 	}
 
-	/**
-	 * Writes to the local configuration file.
-	 */
-	public void saveLocalConfig(LocalConfiguration config) {
-		try {
-			Writer writer = new OutputStreamWriter(new FileOutputStream(localConfigFilePath), CHARSET);
-			gson.toJson(config, LocalConfiguration.class, writer);
-			writer.close();
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	/**
-	 * Locals local configuration file, creating it if it doesn't exist.
-	 */
-	public LocalConfiguration loadLocalConfig() {
-		
-		// Default to an empty configuration
-		LocalConfiguration config = new LocalConfiguration();
-		
-		File configFile = new File(localConfigFilePath);
-		if (configFile.exists()) {
-			try {
-				Reader reader = new InputStreamReader(new FileInputStream(localConfigFilePath), CHARSET);
-				config = gson.fromJson(reader, LocalConfiguration.class);
-				reader.close();
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		} else {
-			try {
-				configFile.createNewFile();
-				saveLocalConfig(config);
-			} catch (IOException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		}
-		return config;
-	}
-	
 	private void setupGson() {
 		 gson = new GsonBuilder()
 			.setPrettyPrinting()
@@ -145,16 +92,11 @@ public class ConfigFileHandler {
 				}
 				
 			})
-			.registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-				@Override
-				public LocalDateTime deserialize(
-						JsonElement json, Type typeOfT,
-						JsonDeserializationContext context)
-						throws JsonParseException {
+			.registerTypeAdapter(LocalDateTime.class,
+				(JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
 					Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-			        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-				}								
-			})
-			.create();
+					return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+				}
+			).create();
 	}
 }
