@@ -138,7 +138,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public void quit() {
-//		columns.saveSession();
+		columns.saveSession();
 		prefs.saveGlobalConfig();
 		if (browserComponent != null) {
 			browserComponent.onAppQuit();
@@ -215,7 +215,7 @@ public class UI extends Application implements EventDispatcher {
 
 	private Parent createRoot() {
 
-		columns = new ColumnControl(this);
+		columns = new ColumnControl(this, prefs);
 
 		VBox top = new VBox();
 

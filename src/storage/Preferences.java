@@ -1,5 +1,6 @@
 package storage;
 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryId;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
@@ -26,10 +27,6 @@ public class Preferences {
 		loadGlobalConfig();
 	}
 
-	/**
-	 * Operations
-	 */
-
 	public void saveGlobalConfig() {
 		fileHandler.saveGlobalConfig(global);
 	}
@@ -50,13 +47,13 @@ public class Preferences {
 		global.setLastLoginCredentials(username, password);
 	}
 
-//	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
-//		sessionConfiguration.setFiltersForNextSession(project, filter);
-//	}
+	public List<String> getLastOpenFilters() {
+		return global.getLastOpenFilters();
+	}
 
-//	public void setLastLoginUsername(String name) {
-//		sessionConfiguration.setLastLoginUsername(name);
-//	}
+	public void setLastOpenFilters(List<String> filter) {
+		global.setLastOpenFilters(filter);
+	}
 
 	/**
 	 * Interface to configuration files
@@ -88,10 +85,6 @@ public class Preferences {
 	 * Session configuration
 	 */
 
-//	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
-//		return sessionConfiguration.getFiltersFromPreviousSession(project);
-//	}
-//
 	public void addToLastViewedRepositories(String repository) {
 		global.addToLastViewedRepositories(repository);
 	}
@@ -114,18 +107,6 @@ public class Preferences {
 	public List<String> getLastViewedRepositories() {
 		return global.getLastViewedRepositories();
 	}
-//
-//	public String getLastLoginUsername() {
-//		return sessionConfiguration.getLastLoginUsername();
-//	}
-//
-//	public void setLastLoginPassword(String password) {
-//		sessionConfiguration.setLastLoginPassword(password);
-//	}
-//
-//	public String getLastLoginPassword() {
-//		return sessionConfiguration.getLastLoginPassword();
-//	}
 
 	/**
 	 * Testing

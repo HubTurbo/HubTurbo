@@ -54,13 +54,13 @@
 //		String lastLogin = "testertest";
 //		RepositoryId repo = new RepositoryId("hubturbo", "hubturbo");
 //
-//		dataManager.setFiltersForNextSession(repo, filters);
+//		dataManager.setLastOpenFilters(repo, filters);
 //		dataManager.setLastLoginUsername(lastLogin);
 //
 //		dataManager.saveSessionConfig();
 //		reload();
 //
-//		List<String> loadedFilters = dataManager.getFiltersFromPreviousSession(repo);
+//		List<String> loadedFilters = dataManager.getLastOpenFilters(repo);
 //		String loadedLogin = dataManager.getLastLoginUsername();
 //		assertEquals(filters, loadedFilters);
 //		assertEquals(lastLogin, loadedLogin);

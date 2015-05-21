@@ -3,12 +3,15 @@ package ui.issuecolumn;
 import backend.assumed.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
+import com.opera.core.systems.scope.services.Prefs;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import org.eclipse.egit.github.core.RepositoryId;
+import storage.Preferences;
 import ui.UI;
 import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
@@ -25,11 +28,13 @@ import java.util.function.Consumer;
 public class ColumnControl extends HBox {
 
 	private final UI ui;
+	private final Preferences prefs;
 	private IModel model;
 	private Optional<Integer> currentlySelectedColumn = Optional.empty();
-	
-	public ColumnControl(UI ui) {
+
+	public ColumnControl(UI ui, Preferences prefs) {
 		this.ui = ui;
+		this.prefs = prefs;
 
 		// Set up the connection to the browser
 		new UIBrowserBridge(ui);
@@ -58,28 +63,13 @@ public class ColumnControl extends HBox {
 	 * Called on login
 	 */
 	public void init() {
-		if (getChildren().isEmpty()) {
-			addColumn();
-		}
+		restoreColumns();
 	}
 
 	private void updateModel(IModel newModel) {
 		model = newModel;
 	}
 	
-	public void restoreColumns() {
-		getChildren().clear();
-		
-//		List<String> filters = DataManager.getInstance().getFiltersFromPreviousSession(models.getRepoId());
-//		if (filters != null && !filters.isEmpty()) {
-//			for (String filter : filters) {
-//				addColumn().filterByString(filter);
-//			}
-//		} else {
-//			addColumn();
-//		}
-	}
-
 	public void displayMessage(String message) {
 		HTStatusBar.displayMessage(message);
 	}
@@ -88,7 +78,33 @@ public class ColumnControl extends HBox {
 		saveSession();
 		restoreColumns();
 	}
-	
+
+	public void saveSession() {
+		List<String> sessionFilters = new ArrayList<>();
+		getChildren().forEach(child -> {
+			if (child instanceof IssueColumn) {
+				String filter = ((IssueColumn) child).getCurrentFilterString();
+				sessionFilters.add(filter);
+			}
+		});
+		prefs.setLastOpenFilters(sessionFilters);
+	}
+
+	public void restoreColumns() {
+		getChildren().clear();
+
+		List<String> filters = prefs.getLastOpenFilters();
+
+		if (filters.isEmpty()) {
+			addColumn();
+			return;
+		}
+
+		for (String filter : filters) {
+			addColumn().filterByString(filter);
+		}
+	}
+
 	/**
 	 * Returns a list of issues to download comments for
 	 * @return
@@ -176,17 +192,6 @@ public class ColumnControl extends HBox {
 
 	public void createNewPanelAtEnd() {
 		addColumn();
-	}
-
-	public void saveSession() {
-		List<String> sessionFilters = new ArrayList<String>();
-		getChildren().forEach(child -> {
-			if (child instanceof IssueColumn) {
-				String filter = ((IssueColumn) child).getCurrentFilterString();
-				sessionFilters.add(filter);
-			}
-		});
-//		DataManager.getInstance().setFiltersForNextSession(models.getRepoId(), sessionFilters);
 	}
 
 	public void swapColumns(int columnIndex, int columnIndex2) {

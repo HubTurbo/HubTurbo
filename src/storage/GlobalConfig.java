@@ -11,9 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,7 +22,7 @@ public class GlobalConfig {
 
 	private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
-//	private HashMap<String, List<String>> projectFilters = new HashMap<>();
+	private List<String> lastOpenFilters = new ArrayList<>();
 	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
 	private String lastLoginUsername = "";
 	private byte[] lastLoginPassword = new byte[0];
@@ -32,19 +30,14 @@ public class GlobalConfig {
 	public GlobalConfig() {
 	}
 	
-//	public void setFiltersForNextSession(IRepositoryIdProvider project, List<String> filter) {
-//		if (project != null) {
-//			projectFilters.put(project.generateId().toLowerCase(), filter);
-//		}
-//	}
-//
-//	public List<String> getFiltersFromPreviousSession(IRepositoryIdProvider project) {
-//		if (project == null) {
-//			return new ArrayList<>();
-//		}
-//		return projectFilters.get(project.generateId().toLowerCase());
-//	}
-//
+	public void setLastOpenFilters(List<String> filter) {
+		lastOpenFilters = new ArrayList<>(filter);
+	}
+
+	public List<String> getLastOpenFilters() {
+		return new ArrayList<>(lastOpenFilters);
+	}
+
 	/**
 	 * Adds a repository to the list of last-viewed repositories.
 	 * The list will always have 10 or fewer items.
