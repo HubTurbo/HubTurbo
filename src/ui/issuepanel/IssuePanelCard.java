@@ -209,12 +209,12 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(label.getNode());
 		}
 
-		if (issue.getMilestone().isPresent()) {
+		if (issue.getMilestone().isPresent() && model.getMilestoneOfIssue(issue).isPresent()) {
 			TurboMilestone milestone = model.getMilestoneOfIssue(issue).get();
 			issueDetails.getChildren().add(new Label(milestone.getTitle()));
 		}
 
-		if (issue.getAssignee().isPresent()) {
+		if (issue.getAssignee().isPresent() && model.getAssigneeOfIssue(issue).isPresent()) {
 			TurboUser assignee = model.getAssigneeOfIssue(issue).get();
 			Label assigneeNameLabel = new Label(issue.getAssignee().get());
 			assigneeNameLabel.getStyleClass().add("display-box-padding");
