@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import util.HTLog;
 import util.Utility;
 
+import java.io.File;
+
 class WriteTask extends CacheTask {
 
 	private static final Logger logger = HTLog.get(WriteTask.class);
@@ -27,7 +29,7 @@ class WriteTask extends CacheTask {
 	private void save(String repoId, SerializableModel model) {
 		String output = new Gson().toJson(model);
 		String newRepoName = RepoStore.escapeRepoName(repoId);
-		Utility.writeFile(newRepoName, output);
+		Utility.writeFile(new File(RepoStore.DIRECTORY, newRepoName).getAbsolutePath(), output);
 		logger.info(HTLog.format(repoId, "Written to JSON store"));
 	}
 }

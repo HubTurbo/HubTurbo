@@ -12,6 +12,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 import util.Utility;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,9 +33,9 @@ class ReadTask extends CacheTask {
 		response.complete(model);
 	}
 
-
 	private Model load(String repoId) {
-		Optional<String> input = Utility.readFile(RepoStore.escapeRepoName(repoId));
+		Optional<String> input = Utility.readFile(
+			new File(RepoStore.DIRECTORY, RepoStore.escapeRepoName(repoId)).getAbsolutePath());
 		if (!input.isPresent()) {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
 			return new Model(RepositoryId.createFromId(repoId), UpdateSignature.empty);
