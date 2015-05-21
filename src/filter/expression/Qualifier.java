@@ -86,6 +86,18 @@ public class Qualifier implements FilterExpression {
 		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
 		List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
+		// Preprocessing for repo qualifier
+		boolean containsRepoQualifier = metaQualifiers.stream()
+				.map(Qualifier::getName)
+				.collect(Collectors.toList())
+			.contains("repo");
+
+		if (!containsRepoQualifier) {
+			exprWithNormalQualifiers = new Conjunction(
+				new Qualifier("repo", model.getDefaultRepo()),
+				exprWithNormalQualifiers);
+		}
+
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
 
