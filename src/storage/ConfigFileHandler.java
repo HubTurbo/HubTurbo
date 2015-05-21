@@ -74,7 +74,6 @@ public class ConfigFileHandler {
 				HTLog.error(logger, e);
 			}
 		}
-		System.out.println(config);
 		return config;
 	}
 

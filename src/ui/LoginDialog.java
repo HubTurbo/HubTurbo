@@ -71,7 +71,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		this.prefs = prefs;
 	}
 
-	private void login(Event e) {
+	private void login(Event unused) {
 
 		resolveCredentials();
 		enableUI(false);
@@ -200,11 +200,11 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 	 * Fills in fields which have values at this point.
 	 */
 	private void populateSavedFields() {
-//		Optional<RepositoryId> lastViewed = DataManager.getInstance().getLastViewedRepository();
-//		if (lastViewed.isPresent()) {
-//			repoOwnerField.setText(lastViewed.get().getOwner());
-//			repoNameField.setText(lastViewed.get().getName());
-//		}
+		Optional<RepositoryId> lastViewed = prefs.getLastViewedRepository();
+		if (lastViewed.isPresent()) {
+			repoOwnerField.setText(lastViewed.get().getOwner());
+			repoNameField.setText(lastViewed.get().getName());
+		}
 
 		String lastLoginName = prefs.getLastLoginUsername();
 		if (!lastLoginName.isEmpty()) {
@@ -222,8 +222,8 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 				login(null);
 			} else if (!lastLoginName.isEmpty()) {
 				passwordField.requestFocus();
-//			} else if (lastViewed.isPresent()) {
-//				usernameField.requestFocus();
+			} else if (lastViewed.isPresent()) {
+				usernameField.requestFocus();
 			}
 		});
 	}

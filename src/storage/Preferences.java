@@ -1,7 +1,11 @@
 package storage;
 
+import org.eclipse.egit.github.core.RepositoryId;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
+
+import java.util.List;
+import java.util.Optional;
 
 public class Preferences {
 
@@ -88,28 +92,28 @@ public class Preferences {
 //		return sessionConfiguration.getFiltersFromPreviousSession(project);
 //	}
 //
-//	public void addToLastViewedRepositories(String repository) {
-//		sessionConfiguration.addToLastViewedRepositories(repository);
-//	}
-//
-//	/**
-//	 * Helper method to get the most recently viewed repository,
-//	 * allowing for failure if there are none (on first run)
-//	 * @return
-//	 */
-//	public Optional<RepositoryId> getLastViewedRepository() {
-//		List<String> lastViewed = sessionConfiguration.getLastViewedRepositories();
-//		if (lastViewed.isEmpty()) {
-//			return Optional.empty();
-//		} else {
-//			String id = lastViewed.get(lastViewed.size()-1);
-//			return Optional.of(RepositoryId.createFromId(id));
-//		}
-//	}
-//
-//	public List<String> getLastViewedRepositories() {
-//		return sessionConfiguration.getLastViewedRepositories();
-//	}
+	public void addToLastViewedRepositories(String repository) {
+		global.addToLastViewedRepositories(repository);
+	}
+
+	/**
+	 * Helper method to get the most recently viewed repository,
+	 * allowing for failure if there are none (on first run)
+	 * @return
+	 */
+	public Optional<RepositoryId> getLastViewedRepository() {
+		List<String> lastViewed = global.getLastViewedRepositories();
+		if (lastViewed.isEmpty()) {
+			return Optional.empty();
+		} else {
+			String id = lastViewed.get(lastViewed.size()-1);
+			return Optional.of(RepositoryId.createFromId(id));
+		}
+	}
+
+	public List<String> getLastViewedRepositories() {
+		return global.getLastViewedRepositories();
+	}
 //
 //	public String getLastLoginUsername() {
 //		return sessionConfiguration.getLastLoginUsername();

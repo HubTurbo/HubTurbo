@@ -89,7 +89,7 @@ public class UI extends Application implements EventDispatcher {
 				logic.openRepository(result.repoId);
 				logic.setDefaultRepo(result.repoId);
 				repoSelector.refreshContents(result.repoId);
-//              DataManager.getInstance().addToLastViewedRepositories(repoId);
+                prefs.addToLastViewedRepositories(result.repoId);
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
 				setExpandedWidth(false);
