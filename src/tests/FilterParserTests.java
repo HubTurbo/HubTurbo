@@ -259,6 +259,9 @@ public class FilterParserTests {
                 new Token(TokenType.SYMBOL, "b'", 0),
                 new Token(TokenType.SYMBOL, "c'", 0),
                 new Token(TokenType.EOF, "", 0)));
+	    assertEquals(new Lexer("test/test").lex(), Arrays.asList(
+		    new Token(TokenType.SYMBOL, "test/test", 0),
+		    new Token(TokenType.EOF, "", 0)));
     }
     
     @Test
