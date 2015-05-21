@@ -316,7 +316,7 @@ public class UI extends Application implements EventDispatcher {
 				? dimensions.getWidth()
 				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-		mainStage.setMinWidth(columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getPanelWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
 		mainStage.setMaxWidth(width);
 		mainStage.setMaxHeight(dimensions.getHeight());
@@ -449,9 +449,9 @@ public class UI extends Application implements EventDispatcher {
 	public void setDefaultWidth() {
 		mainStage.setMaximized(false);
 		Rectangle dimensions = getDimensions();
-		mainStage.setMinWidth(columns.getColumnWidth());
+		mainStage.setMinWidth(columns.getPanelWidth());
 		mainStage.setMinHeight(dimensions.getHeight());
-		mainStage.setMaxWidth(columns.getColumnWidth());
+		mainStage.setMaxWidth(columns.getPanelWidth());
 		mainStage.setMaxHeight(dimensions.getHeight());
 		mainStage.setX(0);
 		mainStage.setY(0);

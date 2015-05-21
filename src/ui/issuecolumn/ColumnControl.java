@@ -3,7 +3,6 @@ package ui.issuecolumn;
 import backend.assumed.ModelUpdatedEventHandler;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -224,15 +223,13 @@ public class ColumnControl extends HBox {
 		}
 	}
 	
-	public double getColumnWidth() {
-		return (getChildren() == null || getChildren().size() == 0)
-				? 0
-				: 40 + Column.COLUMN_WIDTH;
+	public double getPanelWidth() {
 		// COLUMN_WIDTH is used instead of
 		// ((Column) getChildren().get(0)).getWidth();
 		// because when this function is called, columns may not have been sized yet.
-		// In any case column width is set to COLUMN_WIDTH at minimum, so we can assume
+		// In any case actual column width is COLUMN_WIDTH at minimum, so we can assume
 		// that they are that large.
+		return 40 + Column.COLUMN_WIDTH;
 	}
 	private void setupKeyEvents() {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
