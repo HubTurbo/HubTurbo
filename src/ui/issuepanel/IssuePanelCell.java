@@ -30,6 +30,8 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		this.parent = parent;
 		this.parentColumnIndex = parentColumnIndex;
 		this.issuesWithNewComments = issuesWithNewComments;
+		setAlignment(Pos.CENTER);
+		getStyleClass().add("bottom-borders");
 	}
 
 	@Override
@@ -39,8 +41,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 			return;
 		
 		setGraphic(new IssuePanelCard(issue, parent, issuesWithNewComments));
-		setAlignment(Pos.CENTER);
-		getStyleClass().add("bottom-borders");
 		
 //		setContextMenu(new IssuePanelContextMenu(model, sidePanel, parentColumnControl, issue).get());
 		
