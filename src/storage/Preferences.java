@@ -6,6 +6,7 @@ import ui.UI;
 import ui.issuecolumn.ColumnControl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Preferences {
@@ -63,23 +64,22 @@ public class Preferences {
 	 * Boards
 	 */
 
-	// TODO temporarily disabled
-//	public void addBoard(String name, List<String> filterExprs) {
-//		assert name != null && filterExprs != null;
-//		localConfiguration.addBoard(, name, filterExprs);
-//	}
+	public void addBoard(String name, List<String> filterExprs) {
+		assert name != null && filterExprs != null;
+		global.addBoard(name, filterExprs);
+	}
 
 //	public List<String> getBoardPanels(String name) {
-//		return localConfiguration.getBoardPanels(ui.logic.get, name);
+//		return global.getBoardPanels(name);
 //	}
-//
-//	public Map<String, List<String>> getAllBoards() {
-//		return localConfiguration.getAllBoards(getCurrentRepoId());
-//	}
-//
-//	public void removeBoard(String name) {
-//		localConfiguration.removeBoard(getCurrentRepoId(), name);
-//	}
+
+	public Map<String, List<String>> getAllBoards() {
+		return global.getAllBoards();
+	}
+
+	public void removeBoard(String name) {
+		global.removeBoard(name);
+	}
 
 	/**
 	 * Session configuration

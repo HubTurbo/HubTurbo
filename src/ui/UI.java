@@ -225,7 +225,7 @@ public class UI extends Application implements EventDispatcher {
 		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
 
-		menuBar = new MenuControl(this, columns, columnsScrollPane);
+		menuBar = new MenuControl(this, columns, columnsScrollPane, prefs);
 		top.getChildren().addAll(menuBar, repoSelector);
 
 		BorderPane root = new BorderPane();

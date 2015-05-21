@@ -26,10 +26,27 @@ public class GlobalConfig {
 	private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
 	private String lastLoginUsername = "";
 	private byte[] lastLoginPassword = new byte[0];
+	private Map<String, List<String>> boards = new HashMap<>();
 
 	public GlobalConfig() {
 	}
-	
+
+	public void addBoard(String name, List<String> filterExprs) {
+		boards.put(name, filterExprs);
+	}
+
+	public List<String> getBoardPanels(String name) {
+		return boards.get(name);
+	}
+
+	public Map<String, List<String>> getAllBoards() {
+		return new HashMap<>(boards);
+	}
+
+	public void removeBoard(String name) {
+		boards.remove(name);
+	}
+
 	public void setLastOpenFilters(List<String> filter) {
 		lastOpenFilters = new ArrayList<>(filter);
 	}

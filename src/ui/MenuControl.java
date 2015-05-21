@@ -35,6 +35,7 @@ import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import storage.Preferences;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
@@ -53,9 +54,11 @@ public class MenuControl extends MenuBar {
 	private final ColumnControl columns;
 	private final ScrollPane columnsScrollPane;
 	private final UI ui;
+	private final Preferences prefs;
 
-	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane) {
+	public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
 		this.columns = columns;
+		this.prefs = prefs;
 		this.columnsScrollPane = columnsScrollPane;
 		this.ui = ui;
 		createMenuItems();
@@ -147,21 +150,22 @@ public class MenuControl extends MenuBar {
 
 		List<String> filterStrings = getCurrentFilterExprs();
 
-	    if (!filterStrings.isEmpty()) {
-            TextInputDialog dlg = new TextInputDialog("");
-            dlg.setTitle("Board Name");
-            dlg.getDialogPane().setContentText("What should this board be called?");
-    		dlg.getDialogPane().setHeaderText("Please name this board");
-            Optional<String> response = dlg.showAndWait();
-
-	    	if (response.isPresent()) {
-//	        	DataManager.getInstance().addBoard(response.get(), filterStrings);
-	        	ui.triggerEvent(new BoardSavedEvent());
-	        	logger.info("New board" + response.get() + " saved, containing " + filterStrings);
-	        	return;
-	    	}
+	    if (filterStrings.isEmpty()) {
+		    logger.info("Did not save new board");
+		    return;
 	    }
-    	logger.info("Did not save new board");
+
+		TextInputDialog dlg = new TextInputDialog("");
+		dlg.setTitle("Board Name");
+		dlg.getDialogPane().setContentText("What should this board be called?");
+		dlg.getDialogPane().setHeaderText("Please name this board");
+		Optional<String> response = dlg.showAndWait();
+
+		if (response.isPresent()) {
+			prefs.addBoard(response.get(), filterStrings);
+			ui.triggerEvent(new BoardSavedEvent());
+			logger.info("New board" + response.get() + " saved, containing " + filterStrings);
+		}
 	}
 
 	/**
@@ -184,11 +188,11 @@ public class MenuControl extends MenuBar {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Confirmation");
 		dlg.getDialogPane().setHeaderText("Delete board '" + boardName + "'?");
-        dlg.getDialogPane().setContentText("Are you sure you want to delete this panelboard?");
+        dlg.getDialogPane().setContentText("Are you sure you want to delete this board?");
         Optional<ButtonType> response = dlg.showAndWait();
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
-//			DataManager.getInstance().removeBoard(boardName);
+			prefs.removeBoard(boardName);
 			ui.triggerEvent(new BoardSavedEvent());
 			logger.info(boardName + " was deleted");
         } else {
@@ -207,8 +211,7 @@ public class MenuControl extends MenuBar {
 			open.getItems().clear();
 			delete.getItems().clear();
 
-//				Map<String, List<String>> boards = DataManager.getInstance().getAllBoards();
-			Map<String, List<String>> boards = new HashMap<>();
+			Map<String, List<String>> boards = prefs.getAllBoards();
 
 			for (final String boardName : boards.keySet()) {
 				final List<String> filterSet = boards.get(boardName);
