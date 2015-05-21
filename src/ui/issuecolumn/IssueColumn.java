@@ -294,6 +294,20 @@ public abstract class IssueColumn extends Column {
 		refreshItems();
 	}
 
+	/**
+	 * Same as applyFilterExpression, but does not call refreshItems or change the
+	 * current filter. Meant to be called from refreshItems() so as not to go into
+	 * infinite mutual recursion.
+	 */
+	private void applyCurrentFilterExpression() {
+		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
+		Qualifier.processMetaQualifierEffects(currentFilterExpression, qualifier -> {
+			if (qualifier.getName().equals("repo") && qualifier.getContent().isPresent()) {
+				ui.logic.openRepository(qualifier.getContent().get());
+			}
+		});
+	}
+
 	// An odd workaround for the above problem: serialising, then
 	// immediately parsing a filter expression, just so the update can be
 	// triggered through the text contents of the input area changing.
@@ -327,8 +341,8 @@ public abstract class IssueColumn extends Column {
 					}
 					parentColumnControl.refresh();
 				} else {
-					throw new QualifierApplicationException("Could not apply predicate " + currentFilterExpression
-							+ ".");
+					throw new QualifierApplicationException(
+						"Could not apply predicate " + currentFilterExpression + ".");
 				}
 			} catch (QualifierApplicationException ex) {
 				parentColumnControl.displayMessage(ex.getMessage());
@@ -353,6 +367,7 @@ public abstract class IssueColumn extends Column {
 
 	@Override
 	public void refreshItems() {
+		applyCurrentFilterExpression();
 		transformedIssueList = new FilteredList<>(issues, predicate);
 	}
 }
