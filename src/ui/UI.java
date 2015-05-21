@@ -134,6 +134,7 @@ public class UI extends Application implements EventDispatcher {
 				repoSelector.refreshComboBoxContents(ServiceManager.getInstance().getRepoId().generateId());
 				triggerEvent(new BoardSavedEvent());
 				ensureSelectedPanelHasFocus();
+				browserComponent.initialise();
 			} else {
 				quit();
 			}

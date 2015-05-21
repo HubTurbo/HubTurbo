@@ -94,8 +94,11 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
-		driver = createChromeDriver();
-		logger.info("Successfully initialised browser component and ChromeDriver");
+		executor.execute(() -> {
+			driver = createChromeDriver();
+			logger.info("Successfully initialised browser component and ChromeDriver");
+        });
+		login();
 	}
 	
 	/**
