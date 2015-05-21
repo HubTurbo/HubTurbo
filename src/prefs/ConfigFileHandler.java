@@ -32,7 +32,7 @@ public class ConfigFileHandler {
 	private void ensureDirectoryExists() {
 		File directory = new File(configDirectory);
 		if (!directory.exists() || !directory.isDirectory()) {
-			directory.mkdir();
+			directory.mkdirs();
 		}
 	}
 

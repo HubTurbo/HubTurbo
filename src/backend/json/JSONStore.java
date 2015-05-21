@@ -10,12 +10,6 @@ import java.util.concurrent.CompletableFuture;
 public class JSONStore extends RepoStore {
 
 	@Override
-	public boolean isRepoStored(String repoName) {
-		File file = new File(escapeRepoName(repoName));
-		return file.exists() && file.isFile();
-	}
-
-	@Override
 	public CompletableFuture<Model> loadRepository(String repoName) {
 		CompletableFuture<Model> response = new CompletableFuture<>();
 		addTask(new ReadTask(repoName, response));

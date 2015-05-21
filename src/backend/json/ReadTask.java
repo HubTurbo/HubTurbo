@@ -34,7 +34,7 @@ class ReadTask extends StoreTask {
 	}
 
 	private Model load(String repoId) {
-		Optional<String> input = read(repoId);
+		Optional<String> input = RepoStore.read(repoId);
 
 		if (!input.isPresent()) {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");

@@ -5,6 +5,7 @@ import backend.interfaces.RepoStore;
 import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 import util.Utility;
 
@@ -28,7 +29,7 @@ class WriteTask extends StoreTask {
 
 	private void save(String repoId, SerializableModel model) {
 		String output = new Gson().toJson(model);
-		write(repoId, output);
+		RepoStore.write(repoId, output);
 		logger.info(HTLog.format(repoId, "Written to JSON store"));
 	}
 }
