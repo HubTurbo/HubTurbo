@@ -224,15 +224,15 @@ public class Utility {
 	                                            Function<TR, K> getKeyTR, Function<R, K> getKeyR,
 	                                            Function<R, TR> construct) {
 		existing = new ArrayList<>(existing);
-		for (R label : changed) {
-			K id = getKeyR.apply(label);
+		for (R resource : changed) {
+			K id = getKeyR.apply(resource);
 
 			// TODO O(n^2), fix by preprocessing and copying into a map
 			Optional<Integer> corresponding = findResource(existing, id, getKeyTR);
 			if (corresponding.isPresent()) {
-				existing.set(corresponding.get(), construct.apply(label));
+				existing.set(corresponding.get(), construct.apply(resource));
 			} else {
-				existing.add(construct.apply(label));
+				existing.add(construct.apply(resource));
 			}
 		}
 		return existing;
@@ -240,8 +240,8 @@ public class Utility {
 
 	private static <TR, K> Optional<Integer> findResource(List<TR> existing, K key, Function<TR, K> getKey) {
 		int i = 0;
-		for (TR label : existing) {
-			if (getKey.apply(label).equals(key)) {
+		for (TR turboResource : existing) {
+			if (getKey.apply(turboResource).equals(key)) {
 				return Optional.of(i);
 			}
 			++i;

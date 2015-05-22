@@ -11,9 +11,9 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import util.HTLog;
-import util.Utility;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 
@@ -31,13 +31,14 @@ public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 		ImmutablePair<List<Label>, String> changes = repo.getUpdatedLabels(model.getRepoId().generateId(),
 			model.getUpdateSignature().labelsETag);
 
-		List<TurboLabel> existing = model.getLabels();
 		List<Label> changed = changes.left;
+
 		logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
 			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
-		List<TurboLabel> updated = Utility.reconcile(existing, changed,
-			TurboLabel::getName, Label::getName, l -> new TurboLabel(model.getRepoId().generateId(), l));
+		List<TurboLabel> updated = changed.stream()
+			.map(l -> new TurboLabel(model.getRepoId().generateId(), l))
+			.collect(Collectors.toList());
 
 		response.complete(new Result<>(updated, changes.right));
 	}

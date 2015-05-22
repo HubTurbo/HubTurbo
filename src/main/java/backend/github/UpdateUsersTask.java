@@ -11,7 +11,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import util.HTLog;
-import util.Utility;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,13 +31,14 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 		ImmutablePair<List<User>, String> changes = repo.getUpdatedCollaborators(model.getRepoId().generateId(),
 			model.getUpdateSignature().collaboratorsETag);
 
-		List<TurboUser> existing = model.getUsers();
 		List<User> changed = changes.left;
+
 		logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
 			changed.size(), changed.size() == 0 ? "" : ": " + stringify(changed)));
 
-		List<TurboUser> updated = Utility.reconcile(existing, changed,
-			TurboUser::getLoginName, User::getLogin, u -> new TurboUser(model.getRepoId().generateId(), u));
+		List<TurboUser> updated = changed.stream()
+			.map(u -> new TurboUser(model.getRepoId().generateId(), u))
+			.collect(Collectors.toList());
 
 		response.complete(new Result<>(updated, changes.right));
 	}
