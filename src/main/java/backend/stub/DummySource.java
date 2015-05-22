@@ -16,7 +16,7 @@ public class DummySource extends RepoSource {
 
 	@Override
 	public String getName() {
-		return "Dummy Repository";
+		return "Dummy Source";
 	}
 
 	@Override
