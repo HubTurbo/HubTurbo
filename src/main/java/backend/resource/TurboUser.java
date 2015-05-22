@@ -52,7 +52,7 @@ public class TurboUser {
 
 	public Image getAvatar() {
 		if (avatar == null) {
-			avatar = new Image(avatarURL, 12, 12, true, true, false);
+			avatar = new Image(avatarURL, 12, 12, true, true, true);
 		}
 		return avatar;
 	}
