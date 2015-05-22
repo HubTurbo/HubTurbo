@@ -48,6 +48,6 @@ public class RepoIO {
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
-		return repoSource.dowloadMetadata(repoId, issues);
+		return repoSource.downloadMetadata(repoId, issues);
 	}
 }
