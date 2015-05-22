@@ -54,8 +54,8 @@ public class Model implements IBaseModel {
 	/**
 	 * Constructor for the empty model
 	 */
-	public Model(IRepositoryIdProvider repoId, UpdateSignature updateSignature) {
-		this.updateSignature = updateSignature;
+	public Model(IRepositoryIdProvider repoId) {
+		this.updateSignature = UpdateSignature.empty;
 		this.repoId = repoId;
 		this.issues = new ArrayList<>();
 		this.labels = new ArrayList<>();

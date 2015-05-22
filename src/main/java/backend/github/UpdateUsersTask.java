@@ -30,9 +30,11 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboU
 		List<TurboUser> changed = changes.left;
 
 		logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
+			changed.size(), changed.isEmpty() ? "" : ": " + changed));
 
-		List<TurboUser> updated = new ArrayList<>(changed);
+		List<TurboUser> updated = changed.isEmpty()
+			? model.getUsers()
+			: new ArrayList<>(changed);
 
 		response.complete(new Result<>(updated, changes.right));
 	}

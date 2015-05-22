@@ -29,10 +29,13 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 
 		List<TurboIssue> existing = model.getIssues();
 		List<TurboIssue> changed = changes.left;
-		logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
-		List<TurboIssue> updated = TurboIssue.reconcile(model.getRepoId().generateId(), existing, changed);
+		logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
+			changed.size(), changed.isEmpty() ? "" : ": " + changed));
+
+		List<TurboIssue> updated = changed.isEmpty()
+			? existing
+			: TurboIssue.reconcile(model.getRepoId().generateId(), existing, changed);
 
 		response.complete(new Result<>(updated, changes.middle, changes.right));
 	}

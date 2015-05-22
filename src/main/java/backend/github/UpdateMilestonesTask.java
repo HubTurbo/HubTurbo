@@ -30,9 +30,11 @@ public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result<T
 		List<TurboMilestone> changed = changes.left;
 
 		logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
+			changed.size(), changed.isEmpty() ? "" : ": " + changed));
 
-		List<TurboMilestone> updated = new ArrayList<>(changed);
+		List<TurboMilestone> updated = changed.isEmpty()
+			? model.getMilestones()
+			: new ArrayList<>(changed);
 
 		response.complete(new Result<>(updated, changes.right));
 	}

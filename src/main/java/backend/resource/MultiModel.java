@@ -26,11 +26,17 @@ public class MultiModel implements IModel {
 		this.pendingRepositories = new HashSet<>();
 	}
 
-	public synchronized void add(Model model) {
+	public synchronized MultiModel addPending(Model model) {
 		String repoId = model.getRepoId().generateId();
-		assert pendingRepositories.contains(repoId);
+		assert pendingRepositories.contains(repoId) : "No pending repository " + repoId + "!";
 		pendingRepositories.remove(repoId);
-		models.put(repoId, model);
+		add(model);
+		return this;
+	}
+
+	public synchronized MultiModel add(Model model) {
+		this.models.put(model.getRepoId().generateId(), model);
+		return this;
 	}
 
 	public synchronized Model get(String repoId) {
@@ -41,9 +47,10 @@ public class MultiModel implements IModel {
 		return new ArrayList<>(models.values());
 	}
 
-	public synchronized void replace(List<Model> models) {
+	public synchronized MultiModel replace(List<Model> newModels) {
 		this.models.clear();
-		models.forEach(this::add);
+		newModels.forEach(this::add);
+		return this;
 	}
 
 	public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata) {

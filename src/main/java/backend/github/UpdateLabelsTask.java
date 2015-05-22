@@ -30,9 +30,11 @@ public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 		List<TurboLabel> changed = changes.left;
 
 		logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
-			changed.size(), changed.size() == 0 ? "" : ": " + changed));
+			changed.size(), changed.isEmpty() ? "" : ": " + changed));
 
-		List<TurboLabel> updated = new ArrayList<>(changed);
+		List<TurboLabel> updated = changed.isEmpty()
+			? model.getLabels()
+			: new ArrayList<>(changed);
 
 		response.complete(new Result<>(updated, changes.right));
 	}
