@@ -28,21 +28,17 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		this.parent = parent;
 		this.parentColumnIndex = parentColumnIndex;
 		this.issuesWithNewComments = issuesWithNewComments;
+		setAlignment(Pos.CENTER);
+		getStyleClass().add("bottom-borders");
 	}
 
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
-		if (issue == null) {
-			return;
-		}
+		if (issue == null) { return; }
 		Optional<Model> currentModel = model.getModelById(issue.getRepoId());
 		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
-
 		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
-		setAlignment(Pos.CENTER);
-		getStyleClass().add("bottom-borders");
-
 		registerDragEvents(issue);
 	}
 
