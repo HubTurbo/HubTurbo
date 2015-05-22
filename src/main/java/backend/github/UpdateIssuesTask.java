@@ -11,12 +11,11 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 import util.HTLog;
-import util.Utility;
 
 import java.util.Date;
 import java.util.List;
 
-public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
+public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboIssue>> {
 
 	private static final Logger logger = HTLog.get(UpdateIssuesTask.class);
 
@@ -37,9 +36,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
 		logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
 			changed.size(), changed.size() == 0 ? "" : ": " + changed));
 
-		List<TurboIssue> updated = Utility.reconcile(existing, changed,
-			TurboIssue::getId, Issue::getNumber,
-			i -> new TurboIssue(model.getRepoId().generateId(), i));
+		List<TurboIssue> updated = TurboIssue.reconcile(model.getRepoId().generateId(), existing, changed);
 
 		response.complete(new Result<>(updated, changes.middle, changes.right));
 	}

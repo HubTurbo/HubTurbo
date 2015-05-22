@@ -15,7 +15,7 @@ import util.HTLog;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result> {
+public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboLabel>> {
 
 	private static final Logger logger = HTLog.get(UpdateLabelsTask.class);
 

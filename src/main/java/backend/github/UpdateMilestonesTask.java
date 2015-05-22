@@ -15,7 +15,7 @@ import util.HTLog;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result> {
+public class UpdateMilestonesTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboMilestone>> {
 
 	private static final Logger logger = HTLog.get(UpdateMilestonesTask.class);
 

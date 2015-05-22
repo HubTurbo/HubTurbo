@@ -3,7 +3,7 @@ package backend.github;
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
-import backend.resource.Model;
+import backend.resource.*;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -37,10 +37,10 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 		taskRunner.execute(usersTask);
 
 		try {
-			GitHubRepoTask.Result issuesResult = issuesTask.response.get();
-			GitHubRepoTask.Result labelsResult = labelsTask.response.get();
-			GitHubRepoTask.Result milestonesResult = milestonesTask.response.get();
-			GitHubRepoTask.Result usersResult = usersTask.response.get();
+			GitHubRepoTask.Result<TurboIssue> issuesResult = issuesTask.response.get();
+			GitHubRepoTask.Result<TurboLabel> labelsResult = labelsTask.response.get();
+			GitHubRepoTask.Result<TurboMilestone> milestonesResult = milestonesTask.response.get();
+			GitHubRepoTask.Result<TurboUser> usersResult = usersTask.response.get();
 
 			UpdateSignature newSignature =
 				new UpdateSignature(issuesResult.ETag, labelsResult.ETag,
