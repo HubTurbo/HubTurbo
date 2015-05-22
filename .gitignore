@@ -127,4 +127,7 @@ credentials.txt
 session-config.json
 local-config.json
 hubturbo-log.log
+chromedriver
+chromedriver_linux
+chromedriver.exe
 .hubturbocache/

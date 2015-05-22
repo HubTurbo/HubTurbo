@@ -1,16 +1,11 @@
 package util;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import ui.UI;
+
+import java.io.*;
+import java.util.Optional;
 
 public class IOUtilities {
 

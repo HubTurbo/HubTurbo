@@ -1,19 +1,19 @@
 package filter.expression;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import model.Model;
-import model.TurboIssue;
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public interface FilterExpression {
 	
 	// Determines if an issue satisfies this filter expression.
 	// If so, it is shown in the issue panel.
 	
-	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info);
+	public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info);
 	
 	// Filter expressions may only be applied if they contain no ambiguity
 	// => they must contain only qualifiers or conjunctions thereof. Disjunctions
@@ -25,7 +25,7 @@ public interface FilterExpression {
 	// an issue. This should be invoked for disjunctions and negations
 	// (i.e. call the above method to check first).
 	
-	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException;
+	public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException;
 	
 	// Walks the syntax tree to get all the qualifier names that appear.
 	
