@@ -94,7 +94,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
-//					Optional<TurboLabel> label = model.getLabelByName(dd.getEntityName());
+//					Optional<TurboLabel> label = model.getLabelByActualName(dd.getEntityName());
 //					assert label.isPresent();
 //					(new TurboIssueAddLabels(model, issue, Arrays.asList(label.get()))).execute();
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
