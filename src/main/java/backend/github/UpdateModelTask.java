@@ -46,8 +46,8 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 				new UpdateSignature(issuesResult.ETag, labelsResult.ETag,
 					milestonesResult.ETag, usersResult.ETag, issuesResult.lastCheckTime);
 
-			Model result = new Model(model.getRepoId(), model.getIssues(),
-				model.getLabels(), model.getMilestones(), model.getUsers(), newSignature);
+			Model result = new Model(model.getRepoId(), issuesResult.items,
+				labelsResult.items, milestonesResult.items, usersResult.items, newSignature);
 
 			logger.info(HTLog.format(model.getRepoId(), "Updated model with " + result.summarise()));
 			response.complete(result);
