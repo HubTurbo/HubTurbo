@@ -5,10 +5,6 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.*;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
 import util.HTLog;
 
 import java.util.concurrent.ExecutionException;
@@ -19,7 +15,7 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 
 	private final Model model;
 
-	public UpdateModelTask(TaskRunner taskRunner, Repo<Issue, Label, Milestone, User> repo, Model model) {
+	public UpdateModelTask(TaskRunner taskRunner, Repo repo, Model model) {
 		super(taskRunner, repo);
 		this.model = model;
 	}

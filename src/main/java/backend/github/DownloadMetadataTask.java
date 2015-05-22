@@ -20,7 +20,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
 	private final String repoId;
 	private final List<Integer> issueIds;
 
-	public DownloadMetadataTask(TaskRunner taskRunner, Repo<Issue, Label, Milestone, User> repo, String repoId,
+	public DownloadMetadataTask(TaskRunner taskRunner, Repo repo, String repoId,
 	                            List<Integer> issueIds) {
 		super(taskRunner, repo);
 		this.repoId = repoId;
