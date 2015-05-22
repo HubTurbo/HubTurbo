@@ -2,7 +2,6 @@ package backend.interfaces;
 
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import sun.java2d.loops.ProcessPath;
 import util.Utility;
 
 import java.io.File;

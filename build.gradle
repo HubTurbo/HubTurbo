@@ -1,0 +1,119 @@
+/*
+ * Gradle Configuration File
+ *
+ * For more details take a look at the Java Quickstart chapter in the Gradle
+ * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
+ */
+
+// Plugins
+plugins {
+    id "com.github.kt3k.coveralls" version "2.3.1"
+    id "com.github.johnrengelman.shadow" version "1.2.1"
+}
+
+allprojects {
+
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'maven'
+    apply plugin: 'jacoco'
+    // TODO: use a checkstyle configuration
+    // apply plugin: 'checkstyle'
+    apply plugin: 'java'
+
+    // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
+    version = '2.6.0'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    project.ext {
+        log4jVersion = '2.2'
+        controlsfxVersion = '8.20.8'
+        gsonVersion = '2.3.1'
+        guavaVersion = '18.0'
+        jnaVersion = '4.1.0'
+        markdown4jVersion = '2.2-cj-1.0'
+        openjfxDialogsVersion = '1.0.2'
+        egitVersion = '2.1.5_1'
+        prettytimeVersion = '3.2.7.Final'
+        seleniumJavaVersion = '2.45.0'
+        seleniumServerVersion = '2.45.0'
+
+        junitVersion = '4.12'
+    }
+
+    dependencies {
+        compile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+        compile "org.apache.logging.log4j:log4j-core:$log4jVersion"
+        compile "org.controlsfx:controlsfx:$controlsfxVersion"
+        compile "com.google.code.gson:gson:$gsonVersion"
+        compile "com.google.guava:guava:$guavaVersion"
+        compile "net.java.dev.jna:jna:$jnaVersion"
+        compile "org.commonjava.googlecode.markdown4j:markdown4j:$markdown4jVersion"
+        compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
+        compile "org.apache.servicemix.bundles:org.apache.servicemix.bundles.egit.github.core:$egitVersion"
+        compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
+        compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
+        compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
+
+        // TODO: move junit to test compile
+        // testCompile "junit:junit:$junitVersion"
+        compile "junit:junit:$junitVersion"
+    }
+
+    jacoco {
+        toolVersion = "0.7.4.201502262128"
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
+        classDirectories =  project.files(sourceSets.main.output)
+        afterEvaluate {
+            classDirectories = files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: 'tests/**')
+            })
+        }
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+
+    jar {
+        manifest {
+            attributes 'Main-Class': 'ui.UI'
+        }
+    }
+
+    assemble.dependsOn shadowJar
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = allprojects.test
+    sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories =  files(allprojects.sourceSets.main.output)
+    executionData = files(allprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+    }
+}
+
+coveralls {
+    sourceDirs = allprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
+tasks.coveralls {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn jacocoRootReport
+    onlyIf { System.env.'CI' }
+}

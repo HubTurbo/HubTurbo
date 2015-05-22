@@ -169,7 +169,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public static void loadFonts(){
-		Font.loadFont(UI.class.getResource("/resources/octicons/octicons-local.ttf").toExternalForm(), 32);
+		Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
 
 	private void setupMainStage(Scene scene) {
