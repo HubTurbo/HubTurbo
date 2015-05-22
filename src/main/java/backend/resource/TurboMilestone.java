@@ -50,7 +50,7 @@ public class TurboMilestone {
 		this.dueDate = milestone.getDueOn() == null
 			? Optional.empty()
 			: Optional.of(Utility.dateToLocalDateTime(milestone.getDueOn()).toLocalDate());
-		this.description = milestone.getDescription();
+		this.description = milestone.getDescription() == null ? "" : milestone.getDescription();
 		this.isOpen = milestone.getState().equals(STATE_OPEN);
 		this.openIssues = milestone.getOpenIssues();
 		this.closedIssues = milestone.getClosedIssues();
