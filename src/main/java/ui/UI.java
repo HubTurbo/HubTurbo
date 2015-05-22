@@ -89,6 +89,7 @@ public class UI extends Application implements EventDispatcher {
 
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
+				browserComponent.initialise();
 				setExpandedWidth(false);
 				ensureSelectedPanelHasFocus();
 				columns.init();
