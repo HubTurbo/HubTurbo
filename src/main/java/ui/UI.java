@@ -164,25 +164,12 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public static void applyCSS(String css, Scene scene) {
-		
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(css);
 	}
 
-	public void loadFonts(){
-		System.out.println(getClass());
-		
-		System.out.println(getClass().getResource("octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("/octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("resources/octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("/resources/octicons/octicons-local.ttf"));
-
-		System.out.println(getClass().getResource("src/resources/ui/UI/octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("/src/resources/ui/UI/octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("src/resources/ui/octicons/octicons-local.ttf"));
-		System.out.println(getClass().getResource("/src/resources/ui/octicons/octicons-local.ttf"));
-		
-		Font.loadFont(getClass().getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
+	public static void loadFonts(){
+		Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
 	}
 
 	private void setupMainStage(Scene scene) {
