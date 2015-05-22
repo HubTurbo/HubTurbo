@@ -71,6 +71,11 @@ public class TurboMilestone {
 	private void ______METHODS______() {
 	}
 
+	@Override
+	public String toString() {
+		return title;
+	}
+
 	private void ______BOILERPLATE______() {
 	}
 
