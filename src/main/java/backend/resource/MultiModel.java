@@ -27,7 +27,7 @@ public class MultiModel implements IModel {
 	}
 
 	public synchronized MultiModel addPending(Model model) {
-		String repoId = model.getRepoId().generateId();
+		String repoId = model.getRepoId();
 		assert pendingRepositories.contains(repoId) : "No pending repository " + repoId + "!";
 		pendingRepositories.remove(repoId);
 		add(model);
@@ -35,7 +35,7 @@ public class MultiModel implements IModel {
 	}
 
 	public synchronized MultiModel add(Model model) {
-		this.models.put(model.getRepoId().generateId(), model);
+		this.models.put(model.getRepoId(), model);
 		return this;
 	}
 

@@ -3,7 +3,6 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import prefs.Preferences;
 import ui.UI;
 import util.HTLog;
@@ -97,7 +96,6 @@ public class Logic {
 	public Set<String> getOpenRepositories() {
 		return models.toModels().stream()
 			.map(Model::getRepoId)
-			.map(IRepositoryIdProvider::generateId)
 			.collect(Collectors.toSet());
 	}
 

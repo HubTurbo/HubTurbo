@@ -7,7 +7,6 @@ import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 
 import java.util.Optional;
@@ -35,7 +34,7 @@ class ReadTask extends StoreTask {
 
 		if (!input.isPresent()) {
 			logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
-			return new Model(RepositoryId.createFromId(repoId));
+			return new Model(repoId);
 		} else {
 			logger.info(HTLog.format(repoId, "Loaded from JSON cache"));
 			SerializableModel sModel = new Gson().fromJson(input.get(),

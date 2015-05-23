@@ -19,7 +19,7 @@ public class SerializableModel {
 	public final List<SerializableUser> users;
 
 	public SerializableModel(Model model) {
-		this.repoId = model.getRepoId().generateId();
+		this.repoId = model.getRepoId();
 		this.updateSignature = model.getUpdateSignature();
 
 		this.issues = model.getIssues().stream()

@@ -7,7 +7,6 @@ import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
 
 import java.util.List;
@@ -33,11 +32,11 @@ public class RepoIO {
 		if (repoStore.isRepoStored(repoId)) {
 			return repoStore.loadRepository(repoId)
 				.thenCompose(this::updateModel)
-				.exceptionally(HTLog.withResult(new Model(RepositoryId.createFromId(repoId))));
+				.exceptionally(HTLog.withResult(new Model(repoId)));
 		} else {
 			return repoSource.downloadRepository(repoId)
 				.thenCompose(this::updateModel)
-				.exceptionally(HTLog.withResult(new Model(RepositoryId.createFromId(repoId))));
+				.exceptionally(HTLog.withResult(new Model(repoId)));
 		}
 	}
 
@@ -45,7 +44,7 @@ public class RepoIO {
 		return repoSource.updateModel(model)
 			.thenApply(newModel -> {
 				if (!model.equals(newModel)) {
-					repoStore.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
+					repoStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
 				} else {
 					logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
 				}

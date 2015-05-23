@@ -24,7 +24,7 @@ public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 
 	@Override
 	public void run() {
-		ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId().generateId(),
+		ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId(),
 			model.getUpdateSignature().labelsETag);
 
 		List<TurboLabel> changed = changes.left;

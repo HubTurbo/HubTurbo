@@ -24,7 +24,7 @@ public class UpdateUsersTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboU
 
 	@Override
 	public void run() {
-		ImmutablePair<List<TurboUser>, String> changes = repo.getUpdatedCollaborators(model.getRepoId().generateId(),
+		ImmutablePair<List<TurboUser>, String> changes = repo.getUpdatedCollaborators(model.getRepoId(),
 			model.getUpdateSignature().collaboratorsETag);
 
 		List<TurboUser> changed = changes.left;

@@ -24,7 +24,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 
 	@Override
 	public void run() {
-		ImmutableTriple<List<TurboIssue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId().generateId(),
+		ImmutableTriple<List<TurboIssue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId(),
 			model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
 
 		List<TurboIssue> existing = model.getIssues();
@@ -35,7 +35,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 
 		List<TurboIssue> updated = changed.isEmpty()
 			? existing
-			: TurboIssue.reconcile(model.getRepoId().generateId(), existing, changed);
+			: TurboIssue.reconcile(model.getRepoId(), existing, changed);
 
 		response.complete(new Result<>(updated, changes.middle, changes.right));
 	}
