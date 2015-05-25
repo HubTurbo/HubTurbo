@@ -28,21 +28,17 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		this.parent = parent;
 		this.parentColumnIndex = parentColumnIndex;
 		this.issuesWithNewComments = issuesWithNewComments;
+		setAlignment(Pos.CENTER);
+		getStyleClass().add("bottom-borders");
 	}
 
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
-		if (issue == null) {
-			return;
-		}
+		if (issue == null) { return; }
 		Optional<Model> currentModel = model.getModelById(issue.getRepoId());
 		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
-
 		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
-		setAlignment(Pos.CENTER);
-		getStyleClass().add("bottom-borders");
-
 		registerDragEvents(issue);
 	}
 
@@ -94,7 +90,7 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 				success = true;
 				DragData dd = DragData.deserialise(db.getString());
 				if (dd.getSource() == DragData.Source.LABEL_TAB) {
-//					Optional<TurboLabel> label = model.getLabelByName(dd.getEntityName());
+//					Optional<TurboLabel> label = model.getLabelByActualName(dd.getEntityName());
 //					assert label.isPresent();
 //					(new TurboIssueAddLabels(model, issue, Arrays.asList(label.get()))).execute();
 				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {

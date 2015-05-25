@@ -3,8 +3,6 @@ package backend.resource;
 import backend.UpdateSignature;
 import backend.interfaces.IBaseModel;
 import backend.resource.serialization.SerializableModel;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 public class Model implements IBaseModel {
 
 	private final UpdateSignature updateSignature;
-	private final IRepositoryIdProvider repoId;
+	private final String repoId;
 	private final List<TurboIssue> issues;
 	private final List<TurboLabel> labels;
 	private final List<TurboMilestone> milestones;
@@ -24,7 +22,7 @@ public class Model implements IBaseModel {
 	/**
 	 * Standard constructor
 	 */
-	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues,
+	public Model(String repoId, List<TurboIssue> issues,
 		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
 		UpdateSignature updateSignature) {
 
@@ -40,7 +38,7 @@ public class Model implements IBaseModel {
 	 * Standard constructor with empty update signature -- for use when
 	 * a model is first downloaded
 	 */
-	public Model(IRepositoryIdProvider repoId, List<TurboIssue> issues,
+	public Model(String repoId, List<TurboIssue> issues,
 		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
 
 		this.updateSignature = UpdateSignature.empty;
@@ -54,8 +52,8 @@ public class Model implements IBaseModel {
 	/**
 	 * Constructor for the empty model
 	 */
-	public Model(IRepositoryIdProvider repoId, UpdateSignature updateSignature) {
-		this.updateSignature = updateSignature;
+	public Model(String repoId) {
+		this.updateSignature = UpdateSignature.empty;
 		this.repoId = repoId;
 		this.issues = new ArrayList<>();
 		this.labels = new ArrayList<>();
@@ -77,7 +75,7 @@ public class Model implements IBaseModel {
 
 	public Model(SerializableModel model) {
 		this.updateSignature = model.updateSignature;
-		this.repoId = RepositoryId.createFromId(model.repoId);
+		this.repoId = model.repoId;
 		this.issues = model.issues.stream()
 			.map(i -> new TurboIssue(model.repoId, i))
 			.collect(Collectors.toList());
@@ -92,8 +90,8 @@ public class Model implements IBaseModel {
 			.collect(Collectors.toList());
 	}
 
-	public IRepositoryIdProvider getRepoId() {
-		return RepositoryId.createFromId(repoId.generateId());
+	public String getRepoId() {
+		return repoId;
 	}
 
 	public UpdateSignature getUpdateSignature() {
@@ -133,10 +131,10 @@ public class Model implements IBaseModel {
 		return Optional.empty();
 	}
 
-	public Optional<TurboLabel> getLabelByName(String labelName) {
+	public Optional<TurboLabel> getLabelByActualName(String labelName) {
 		assert labelName != null && !labelName.isEmpty() : "Invalid label name " + labelName;
 		for (TurboLabel label : getLabels()) {
-			if (label.getName().equals(labelName)) {
+			if (label.getActualName().equals(labelName)) {
 				return Optional.of(label);
 			}
 		}
@@ -183,7 +181,7 @@ public class Model implements IBaseModel {
 
 	public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
 		return issue.getLabels().stream()
-			.map(this::getLabelByName)
+			.map(this::getLabelByActualName)
 			.filter(Optional::isPresent).map(Optional::get)
 			.collect(Collectors.toList());
 	}

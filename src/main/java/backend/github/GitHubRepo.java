@@ -2,6 +2,10 @@ package backend.github;
 
 import backend.UserCredentials;
 import backend.interfaces.Repo;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
 import github.GitHubClientExtended;
 import github.IssueServiceExtended;
 import github.LabelServiceFixed;
@@ -10,7 +14,9 @@ import github.update.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -21,9 +27,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
+public class GitHubRepo implements Repo {
 
 	private static final Logger logger = HTLog.get(GitHubRepo.class);
 
@@ -53,38 +60,49 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public ImmutableTriple<List<Issue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
+	public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
 		IssueUpdateService issueUpdateService = new IssueUpdateService(client, ETag, lastCheckTime);
-		return new ImmutableTriple<>(issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId)),
-			issueUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
+		List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+		List<TurboIssue> items = updatedItems.stream()
+			.map(i -> new TurboIssue(repoId, i))
+			.collect(Collectors.toList());
+		return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
 	}
 
 	@Override
-	public ImmutablePair<List<Label>, String> getUpdatedLabels(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, LabelUpdateService::new);
+	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String ETag) {
+		return getUpdatedResource(repoId, ETag, LabelUpdateService::new, TurboLabel::new);
 	}
 
 	@Override
-	public ImmutablePair<List<Milestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, MilestoneUpdateService::new);
+	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String ETag) {
+		return getUpdatedResource(repoId, ETag, MilestoneUpdateService::new, TurboMilestone::new);
 	}
 
 	@Override
-	public ImmutablePair<List<User>, String> getUpdatedCollaborators(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, UserUpdateService::new);
+	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String ETag) {
+		return getUpdatedResource(repoId, ETag, UserUpdateService::new, TurboUser::new);
 	}
 
-	private <R, S extends UpdateService<R>> ImmutablePair<List<R>, String> getUpdatedResource(
-		String repoId, String ETag, BiFunction<GitHubClientExtended, String, S> construct) {
-		S updateService = construct.apply(client, ETag);
-		return new ImmutablePair<>(updateService.getUpdatedItems(RepositoryId.createFromId(repoId)),
+	private <TR, R, S extends UpdateService<R>> ImmutablePair<List<TR>, String> getUpdatedResource(
+		String repoId, String ETag, BiFunction<GitHubClientExtended, String, S> constructService,
+		BiFunction<String, R, TR> resourceConstructor) {
+
+		S updateService = constructService.apply(client, ETag);
+		List<R> updatedItems = updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+		List<TR> items = updatedItems.stream()
+			.map(i -> resourceConstructor.apply(repoId, i))
+			.collect(Collectors.toList());
+		return new ImmutablePair<>(items,
 			updateService.getUpdatedETag());
 	}
 
 	@Override
-	public List<Label> getLabels(String repoId) {
+	public List<TurboLabel> getLabels(String repoId) {
 		try {
-			return labelService.getLabels(RepositoryId.createFromId(repoId));
+			return labelService.getLabels(RepositoryId.createFromId(repoId)).stream()
+				.map(l -> new TurboLabel(repoId, l))
+				.collect(Collectors.toList());
 		} catch (IOException e) {
 			HTLog.error(logger, e);
 			return new ArrayList<>();
@@ -92,9 +110,11 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<Milestone> getMilestones(String repoId) {
+	public List<TurboMilestone> getMilestones(String repoId) {
 		try {
-			return milestoneService.getMilestones(RepositoryId.createFromId(repoId), "all");
+			return milestoneService.getMilestones(RepositoryId.createFromId(repoId), "all").stream()
+				.map(m -> new TurboMilestone(repoId, m))
+				.collect(Collectors.toList());
 		} catch (IOException e) {
 			HTLog.error(logger, e);
 			return new ArrayList<>();
@@ -102,9 +122,11 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<User> getCollaborators(String repoId) {
+	public List<TurboUser> getCollaborators(String repoId) {
 		try {
-			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId));
+			return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId)).stream()
+				.map(u -> new TurboUser(repoId, u))
+				.collect(Collectors.toList());
 		} catch (RequestException e) {
 			if (e.getStatus() == 403) {
 				logger.info(HTLog.format(repoId, "Unable to get collaborators: " + e.getLocalizedMessage()));
@@ -118,11 +140,13 @@ public class GitHubRepo implements Repo<Issue, Label, Milestone, User> {
 	}
 
 	@Override
-	public List<Issue> getIssues(String repoId) {
+	public List<TurboIssue> getIssues(String repoId) {
 		Map<String, String> filters = new HashMap<>();
 		filters.put(IssueService.FIELD_FILTER, "all");
 		filters.put(IssueService.FILTER_STATE, "all");
-		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters), repoId);
+		return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters), repoId).stream()
+			.map(i -> new TurboIssue(repoId, i))
+			.collect(Collectors.toList());
 	}
 
 	private List<Issue> getAll(PageIterator<Issue> iterator, String repoId) {

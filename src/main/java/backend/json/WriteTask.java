@@ -1,15 +1,11 @@
 package backend.json;
 
-import backend.interfaces.StoreTask;
 import backend.interfaces.RepoStore;
+import backend.interfaces.StoreTask;
 import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
 import util.HTLog;
-import util.Utility;
-
-import java.io.File;
 
 class WriteTask extends StoreTask {
 

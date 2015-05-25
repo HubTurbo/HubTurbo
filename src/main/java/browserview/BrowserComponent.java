@@ -82,8 +82,11 @@ public class BrowserComponent {
 	 */
 	public void initialise() {
 		assert driver == null;
-		driver = createChromeDriver();
-		logger.info("Successfully initialised browser component and ChromeDriver");
+		executor.execute(() -> {
+			driver = createChromeDriver();
+			logger.info("Successfully initialised browser component and ChromeDriver");
+        });
+		login();
 	}
 
 	/**
@@ -317,7 +320,6 @@ public class BrowserComponent {
 	public void login() {
 		logger.info("Logging in on GitHub...");
 		focus(ui.getMainWindowHandle());
-		initialiseJNA();
 		runBrowserOperation(() -> {
 			driver.get(GitHubURL.LOGIN_PAGE);
 			try {

@@ -3,17 +3,13 @@ package backend.github;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoTask;
 import backend.interfaces.TaskRunner;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
 
 import java.util.Date;
 import java.util.List;
 
-public abstract class GitHubRepoTask<R> extends RepoTask<R, Issue, Label, Milestone, User> {
+public abstract class GitHubRepoTask<R> extends RepoTask<R> {
 
-	public GitHubRepoTask(TaskRunner taskRunner, Repo<Issue, Label, Milestone, User> repo) {
+	public GitHubRepoTask(TaskRunner taskRunner, Repo repo) {
 		super(taskRunner, repo);
 	}
 

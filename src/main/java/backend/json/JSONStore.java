@@ -4,7 +4,6 @@ import backend.interfaces.RepoStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 
-import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 public class JSONStore extends RepoStore {

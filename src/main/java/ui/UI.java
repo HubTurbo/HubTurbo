@@ -89,6 +89,7 @@ public class UI extends Application implements EventDispatcher {
 
 				triggerEvent(new BoardSavedEvent());
 				browserComponent = new BrowserComponent(this);
+				browserComponent.initialise();
 				setExpandedWidth(false);
 				ensureSelectedPanelHasFocus();
 				columns.init();
@@ -326,7 +327,6 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setX(0);
 		mainStage.setY(0);
 		mainStage.setMaxWidth(dimensions.getWidth());
-		browserComponent.resize(mainStage.getWidth());
 	}
 
 	public HashMap<String, String> getCommandLineArgs() {

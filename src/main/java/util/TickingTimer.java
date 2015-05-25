@@ -33,7 +33,7 @@ public class TickingTimer {
 
     // TICK_PERIOD must divide period, so a small value is best
     private static final int TICK_PERIOD = 1;
-    private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
+    private final TimeUnit timeUnit;
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -56,11 +56,12 @@ public class TickingTimer {
     private boolean started = false;
     private List<CountDownLatch> latches = Collections.synchronizedList(new ArrayList<>());
 
-    public TickingTimer(String name, int period, Consumer<Integer> onTick, Runnable onTimeout) {
+    public TickingTimer(String name, int period, Consumer<Integer> onTick, Runnable onTimeout, TimeUnit timeUnit) {
         this.name = name;
         this.period = period;
         this.onTick = onTick;
         this.onTimeout = onTimeout;
+        this.timeUnit = timeUnit;
 
         this.time = period;
     }
@@ -128,7 +129,7 @@ public class TickingTimer {
                 latches.forEach(latch -> latch.countDown());
                 latches.clear();
             }
-        }, 0, TICK_PERIOD, TIME_UNIT);
+        }, 0, TICK_PERIOD, timeUnit);
         logger.info("Started TickingTimer " + name);
     }
 
@@ -144,7 +145,7 @@ public class TickingTimer {
         logger.info("Stopping TickingTimer " + name);
         executor.shutdown();
         try {
-            executor.awaitTermination(TICK_PERIOD, TIME_UNIT);
+            executor.awaitTermination(TICK_PERIOD, timeUnit);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

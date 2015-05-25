@@ -30,24 +30,29 @@ public class RepoIO {
 
 	public CompletableFuture<Model> openRepository(String repoId) {
 		if (repoStore.isRepoStored(repoId)) {
-			return repoStore.loadRepository(repoId).thenCompose(this::updateModel);
+			return repoStore.loadRepository(repoId)
+				.thenCompose(this::updateModel)
+				.exceptionally(HTLog.withResult(new Model(repoId)));
 		} else {
-			return repoSource.downloadRepository(repoId).thenCompose(this::updateModel);
+			return repoSource.downloadRepository(repoId)
+				.thenCompose(this::updateModel)
+				.exceptionally(HTLog.withResult(new Model(repoId)));
 		}
 	}
 
 	public CompletableFuture<Model> updateModel(Model model) {
-		return repoSource.updateModel(model).thenApply(newModel -> {
-			if (!model.equals(newModel)) {
-				repoStore.saveRepository(newModel.getRepoId().generateId(), new SerializableModel(newModel));
-			} else {
-				logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
-			}
-			return model;
-		});
+		return repoSource.updateModel(model)
+			.thenApply(newModel -> {
+				if (!model.equals(newModel)) {
+					repoStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
+				} else {
+					logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
+				}
+				return newModel;
+			}).exceptionally(HTLog.withResult(new Model(model.getRepoId())));
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
-		return repoSource.dowloadMetadata(repoId, issues);
+		return repoSource.downloadMetadata(repoId, issues);
 	}
 }
