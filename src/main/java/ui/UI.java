@@ -327,7 +327,6 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.setX(0);
 		mainStage.setY(0);
 		mainStage.setMaxWidth(dimensions.getWidth());
-		browserComponent.resize(mainStage.getWidth());
 	}
 
 	public HashMap<String, String> getCommandLineArgs() {

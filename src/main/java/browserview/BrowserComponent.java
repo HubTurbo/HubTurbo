@@ -320,7 +320,6 @@ public class BrowserComponent {
 	public void login() {
 		logger.info("Logging in on GitHub...");
 		focus(ui.getMainWindowHandle());
-		initialiseJNA();
 		runBrowserOperation(() -> {
 			driver.get(GitHubURL.LOGIN_PAGE);
 			try {
