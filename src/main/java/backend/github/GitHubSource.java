@@ -6,10 +6,6 @@ import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
 import util.HTLog;
 
 import java.util.List;
@@ -20,7 +16,7 @@ public class GitHubSource extends RepoSource {
 
 	private static final Logger logger = HTLog.get(GitHubSource.class);
 
-	private final Repo<Issue, Label, Milestone, User> gitHub = new GitHubRepo();
+	private final Repo gitHub = new GitHubRepo();
 
 	@Override
 	public String getName() {

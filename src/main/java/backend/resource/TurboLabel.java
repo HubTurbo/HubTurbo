@@ -125,6 +125,11 @@ public class TurboLabel {
 		return node;
 	}
 
+	@Override
+	public String toString() {
+		return actualName;
+	}
+
 	private void ______BOILERPLATE______() {
 	}
 

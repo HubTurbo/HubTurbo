@@ -185,7 +185,36 @@ public class TurboIssue {
 		return "#" + id + " " + title;
 	}
 
+	/**
+	 * Takes lists of TurboIssues and reconciles the changes between them,
+	 * returning a list of TurboIssues with updates from the second.
+	 */
+	public static List<TurboIssue> reconcile(String repoId, List<TurboIssue> existing, List<TurboIssue> changed) {
+		existing = new ArrayList<>(existing);
+		for (TurboIssue issue : changed) {
+			int id = issue.getId();
 
+			// TODO O(n^2), fix by preprocessing and copying into a map
+			Optional<Integer> corresponding = findIssueWithId(existing, id);
+			if (corresponding.isPresent()) {
+				existing.set(corresponding.get(), new TurboIssue(issue));
+			} else {
+				existing.add(new TurboIssue(issue));
+			}
+		}
+		return existing;
+	}
+
+	private static Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
+		int i = 0;
+		for (TurboIssue issue : existing) {
+			if (issue.getId() == id) {
+				return Optional.of(i);
+			}
+			++i;
+		}
+		return Optional.empty();
+	}
 
 	private void ______BOILERPLATE______() {
 	}

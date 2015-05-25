@@ -3,13 +3,13 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import prefs.Preferences;
 import ui.UI;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +34,7 @@ public class Logic {
 		this.prefs = prefs;
 
 		// Pass the currently-empty model to the UI
-		updateUI();
+		updateUI(models);
 	}
 
 	private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -54,11 +54,12 @@ public class Logic {
 		Utility.sequence(models.toModels().stream()
 				.map(repoIO::updateModel)
 				.collect(Collectors.toList()))
-			.thenAccept(models::replace)
-			.thenRun(this::updateUI);
+			.thenApply(models::replace)
+			.thenAccept(this::updateUI)
+			.exceptionally(HTLog::log);
 	}
 
-	private void updateUI() {
+	private void updateUI(MultiModel models) {
 		uiManager.update(models);
 	}
 
@@ -75,11 +76,11 @@ public class Logic {
 				prefs.addToLastViewedRepositories(repoId);
 				logger.info("Opening " + repoId);
 				return repoIO.openRepository(repoId)
-					.thenAccept(models::add)
-					.thenRun(this::updateUI)
+					.thenApply(models::addPending)
+					.thenAccept(this::updateUI)
 					.thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
 					.thenApply(n -> true)
-					.exceptionally(e -> false);
+					.exceptionally(HTLog.withResult(false));
 			}
 		});
 	}
@@ -89,13 +90,12 @@ public class Logic {
 		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
 			models.insertMetadata(repoId, metadata);
 			return metadata;
-		});
+		}).exceptionally(HTLog.withResult(new HashMap<>()));
 	}
 
 	public Set<String> getOpenRepositories() {
 		return models.toModels().stream()
 			.map(Model::getRepoId)
-			.map(IRepositoryIdProvider::generateId)
 			.collect(Collectors.toSet());
 	}
 
