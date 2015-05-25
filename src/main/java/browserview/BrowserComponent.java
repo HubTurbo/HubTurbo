@@ -252,20 +252,21 @@ public class BrowserComponent {
 	}
 
 	private boolean isBrowserActive(){
-		if (driver == null){
-			logger.warn("chromedriver process was killed !");
-			return false;
- 		}
 		try {
-			String url = driver.getCurrentUrl();
-			if(url.isEmpty() || url == null){
-				return false;
-			}
-		} catch (WebDriverException e){
-			logger.warn("Unable to read url from bview. Resetting.");
+			// Throws an exception if unable to switch to original HT tab
+			// which then triggers a browser reset when called from runBrowserOperation
+			driver.switchTo().window(driver.getWindowHandle());
+			// When the HT tab is closed (but the window is still alive),
+			// a lot of the operations on the driver (such as getCurrentURL)
+			// will hang (without throwing an exception, the thread will just freeze the UI forever),
+			// so we cannot use getCurrentURL/getTitle to check if the original HT tab
+			// is still open. The above line does not hang the driver but still throws
+			// an exception, thus letting us detect that the HT tab is not active any more.
+			return true;
+		} catch (WebDriverException e) {
+			logger.warn("Unable to reach bview. Resetting.");
 			return false;
 		}
-		return true;
 	}
 
 	//	A helper function for reseting browser.
