@@ -252,20 +252,13 @@ public class BrowserComponent {
 	}
 
 	private boolean isBrowserActive(){
-		if (driver == null){
-			logger.warn("chromedriver process was killed !");
-			return false;
- 		}
 		try {
-			String url = driver.getCurrentUrl();
-			if(url.isEmpty() || url == null){
-				return false;
-			}
-		} catch (WebDriverException e){
-			logger.warn("Unable to read url from bview. Resetting.");
+			driver.switchTo().window(driver.getWindowHandle());
+			return true;
+		} catch (WebDriverException e) {
+			logger.warn("Unable to reach bview. Resetting.");
 			return false;
 		}
-		return true;
 	}
 
 	//	A helper function for reseting browser.
