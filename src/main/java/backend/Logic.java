@@ -42,15 +42,22 @@ public class Logic {
 	}
 
 	public CompletableFuture<Boolean> login(String username, String password) {
-		logger.info("Logging in as " + username);
+		String message = "Logging in as " + username;
+		logger.info(message);
+		UI.status.displayMessage(message);
+
 		credentials = new UserCredentials(username, password);
 		return repoIO.login(credentials);
 	}
 
 	public void refresh() {
-		logger.info("Refreshing " + models.toModels().stream()
+		String message = "Refreshing " + models.toModels().stream()
 			.map(Model::getRepoId)
-			.collect(Collectors.toList()));
+			.collect(Collectors.joining(", "));
+
+		logger.info(message);
+		UI.status.displayMessage(message);
+
 		Utility.sequence(models.toModels().stream()
 				.map(repoIO::updateModel)
 				.collect(Collectors.toList()))
@@ -75,6 +82,7 @@ public class Logic {
 			} else {
 				prefs.addToLastViewedRepositories(repoId);
 				logger.info("Opening " + repoId);
+				UI.status.displayMessage("Opening " + repoId);
 				return repoIO.openRepository(repoId)
 					.thenApply(models::addPending)
 					.thenAccept(this::updateUI)

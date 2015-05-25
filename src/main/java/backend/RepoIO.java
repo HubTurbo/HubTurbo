@@ -7,6 +7,7 @@ import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import org.apache.logging.log4j.Logger;
+import ui.UI;
 import util.HTLog;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class RepoIO {
 	public CompletableFuture<Model> updateModel(Model model) {
 		return repoSource.updateModel(model)
 			.thenApply(newModel -> {
+				UI.status.displayMessage(model.getRepoId() + " is up to date!");
 				if (!model.equals(newModel)) {
 					repoStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
 				} else {

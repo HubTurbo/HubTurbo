@@ -21,7 +21,9 @@ import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+import ui.UI;
 import util.HTLog;
+import util.events.UpdateProgressEvent;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -172,9 +174,11 @@ public class GitHubRepo implements Repo {
 				// Total is approximate: always >= the actual amount
 				assert totalIssueCount >= elements.size();
 
-				float progress = 0.75f + 0.25f * ((float) elements.size() / (float) totalIssueCount);
-				logger.info(HTLog.format(repoId, "Loaded %d issues (%.2f%% done)", elements.size(), progress * 100));
+				float progress = ((float) elements.size() / (float) totalIssueCount);
+				UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
+				logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)", elements.size(), progress * 100));
 			}
+			UI.events.triggerEvent(new UpdateProgressEvent(repoId));
 		} catch (NoSuchPageException pageException) {
 			try {
 				throw pageException.getCause();

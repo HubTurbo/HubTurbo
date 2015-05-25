@@ -68,10 +68,6 @@ public class ColumnControl extends HBox {
 		model = newModel;
 	}
 	
-	public void displayMessage(String message) {
-		HTStatusBar.displayMessage(message);
-	}
-	
 	public void recreateColumns() {
 		saveSession();
 		restoreColumns();
