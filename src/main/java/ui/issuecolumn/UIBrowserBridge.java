@@ -1,7 +1,12 @@
 package ui.issuecolumn;
 
+import javafx.application.Platform;
 import ui.UI;
+import util.TickingTimer;
 import util.events.*;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A abstract component in charge of creating, displaying, and enabling edits of issues.
@@ -14,9 +19,21 @@ import util.events.*;
  */
 public class UIBrowserBridge {
 
+	private final int BROWSER_REQUEST_DELAY = 400; //milliseconds
+	private TickingTimer timer;
+	private Optional<String> nextRepoId = Optional.empty();
+	private Optional<Integer> nextIssueId = Optional.empty();
+
 	public UIBrowserBridge(UI ui) {
-		ui.registerEvent((IssueSelectedEventHandler) e ->
-			ui.getBrowserComponent().showIssue(e.repoId, e.id));
+		timer = createTickingTimer(ui);
+		timer.start();
+
+		ui.registerEvent((IssueSelectedEventHandler) e -> {
+			nextRepoId = Optional.of(e.repoId);
+			nextIssueId = Optional.of(e.id);
+			timer.restart();
+			if (timer.isPaused()) { timer.resume(); }
+		});
 
 		ui.registerEvent((IssueCreatedEventHandler) e ->
 			ui.getBrowserComponent().newIssue());
@@ -33,5 +50,18 @@ public class UIBrowserBridge {
 
 		ui.registerEvent((MilestoneCreatedEventHandler) e ->
 			ui.getBrowserComponent().newMilestone());
+	}
+
+	private TickingTimer createTickingTimer(UI ui) {
+		return new TickingTimer("Browser Request Delay Timer", BROWSER_REQUEST_DELAY, integer -> {
+			// do nothing for each tick
+		}, () -> {
+			Platform.runLater(() -> {
+				if (nextRepoId.isPresent() && nextIssueId.isPresent()) {
+					ui.getBrowserComponent().showIssue(nextRepoId.get(), nextIssueId.get());
+				}
+			});
+			timer.pause();
+		}, TimeUnit.MILLISECONDS);
 	}
 }
