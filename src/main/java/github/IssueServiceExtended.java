@@ -61,7 +61,7 @@ public class IssueServiceExtended extends IssueService{
 	@Override
 	public Issue createIssue(IRepositoryIdProvider repository, Issue issue) throws IOException{
 		Issue returnedIssue = super.createIssue(repository, issue);
-		if(returnedIssue.getState() != issue.getState()){
+		if(!returnedIssue.getState().equals(issue.getState())){
 			returnedIssue.setState(issue.getState());
 			editIssueState(repository, returnedIssue.getNumber(), returnedIssue.getState().equals(STATE_OPEN));
 		}
