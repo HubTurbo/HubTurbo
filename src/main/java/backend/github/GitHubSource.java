@@ -48,7 +48,7 @@ public class GitHubSource extends RepoSource {
 	}
 
 	@Override
-	public CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues) {
+	public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
 		return addTask(new DownloadMetadataTask(this, gitHub, repoId, issues)).response;
 	}
 

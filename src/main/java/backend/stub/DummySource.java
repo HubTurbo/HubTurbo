@@ -37,7 +37,7 @@ public class DummySource extends RepoSource {
 	}
 
 	@Override
-	public CompletableFuture<Map<Integer, IssueMetadata>> dowloadMetadata(String repoId, List<Integer> issues) {
+	public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
 		// TODO
 		assert false : "Not yet implemented";
 		return null;
