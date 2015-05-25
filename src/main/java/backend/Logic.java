@@ -48,9 +48,13 @@ public class Logic {
 	}
 
 	public void refresh() {
-		logger.info("Refreshing " + models.toModels().stream()
+		String message = "Refreshing " + models.toModels().stream()
 			.map(Model::getRepoId)
-			.collect(Collectors.toList()));
+			.collect(Collectors.toList());
+
+		logger.info(message);
+		UI.status.displayMessage(message);
+
 		Utility.sequence(models.toModels().stream()
 				.map(repoIO::updateModel)
 				.collect(Collectors.toList()))

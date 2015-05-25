@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
+import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
@@ -54,7 +55,7 @@ public class UI extends Application implements EventDispatcher {
 	public UIManager uiManager;
 	public Logic logic;
 	public Preferences prefs;
-	public static HTStatusBar status;
+	public static StatusUI status;
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
@@ -236,7 +237,7 @@ public class UI extends Application implements EventDispatcher {
 		BorderPane root = new BorderPane();
 		root.setTop(top);
 		root.setCenter(columnsScrollPane);
-		root.setBottom(status);
+		root.setBottom((HTStatusBar) status);
 
 		return root;
 	}

@@ -8,7 +8,7 @@ import util.events.UpdateProgressEventHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HTStatusBar extends StatusBar {
+public class HTStatusBar extends StatusBar implements StatusUI {
 
 	private final UI ui;
 	private final Map<String, TextProgressBar> progressBars;
