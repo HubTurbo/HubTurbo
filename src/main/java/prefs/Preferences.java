@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class Preferences {
 
-	public static final String DIRECTORY = "config";
+	public static final String DIRECTORY = "settings";
 	private static final String GLOBAL_CONFIG_FILE = "global.json";
 
 	private final ConfigFileHandler fileHandler;
