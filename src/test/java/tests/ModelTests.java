@@ -12,7 +12,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.Optional;
 
 public class ModelTests {
-    static Model model1, model2, emptyModel, copiedModel;
+
+    private static Model model1, model2, emptyModel, copiedModel;
 
     @BeforeClass
     public static void initialize() {
