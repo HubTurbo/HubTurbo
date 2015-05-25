@@ -54,6 +54,7 @@ public class UI extends Application implements EventDispatcher {
 	public UIManager uiManager;
 	public Logic logic;
 	public Preferences prefs;
+	public static HTStatusBar status;
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
@@ -116,6 +117,7 @@ public class UI extends Application implements EventDispatcher {
 
 		uiManager = new UIManager(this);
 		logic = new Logic(uiManager, prefs);
+		status = new HTStatusBar(this);
 	}
 
 	private void initApplicationState() {
@@ -234,7 +236,7 @@ public class UI extends Application implements EventDispatcher {
 		BorderPane root = new BorderPane();
 		root.setTop(top);
 		root.setCenter(columnsScrollPane);
-		root.setBottom(HTStatusBar.getInstance());
+		root.setBottom(status);
 
 		return root;
 	}
