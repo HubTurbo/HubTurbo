@@ -44,9 +44,14 @@ public class HTStatusBar extends StatusBar implements StatusUI {
 		getStyleClass().add("top-borders");
 	}
 
-	public static void displayMessage(String text) {
+	public void displayMessage(String text) {
 		Platform.runLater(() -> {
-			UI.status.setText(text);
+			setText(text);
 		});
+	}
+
+	@Override
+	public void clear() {
+		displayMessage("");
 	}
 }

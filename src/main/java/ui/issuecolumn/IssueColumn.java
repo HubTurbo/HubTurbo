@@ -23,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import ui.components.FilterTextField;
-import ui.components.HTStatusBar;
 import util.events.ColumnClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
@@ -274,12 +273,12 @@ public abstract class IssueColumn extends Column {
 			}
 			
 			// Clear displayed message on successful filter
-			HTStatusBar.displayMessage("");
+			UI.status.clear();
 		}
 		catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Overrides message in status bar
-			HTStatusBar.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
+			UI.status.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
 		}
 	}
 
@@ -340,7 +339,7 @@ public abstract class IssueColumn extends Column {
 						"Could not apply predicate " + currentFilterExpression + ".");
 				}
 			} catch (QualifierApplicationException ex) {
-				parentColumnControl.displayMessage(ex.getMessage());
+				UI.status.displayMessage(ex.getMessage());
 			}
 		}
 	}

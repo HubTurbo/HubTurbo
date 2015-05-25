@@ -50,7 +50,7 @@ public class Logic {
 	public void refresh() {
 		String message = "Refreshing " + models.toModels().stream()
 			.map(Model::getRepoId)
-			.collect(Collectors.toList());
+			.collect(Collectors.joining(", "));
 
 		logger.info(message);
 		UI.status.displayMessage(message);
