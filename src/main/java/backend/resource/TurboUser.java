@@ -77,4 +77,26 @@ public class TurboUser {
 	public String getAvatarURL() {
 		return avatarURL;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TurboUser that = (TurboUser) o;
+
+		if (!loginName.equals(that.loginName)) return false;
+		if (!realName.equals(that.realName)) return false;
+		if (!avatarURL.equals(that.avatarURL)) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = loginName.hashCode();
+		result = 31 * result + realName.hashCode();
+		result = 31 * result + avatarURL.hashCode();
+		return result;
+	}
 }
