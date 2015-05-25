@@ -1,65 +1,57 @@
 package ui.components;
 
 import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import org.controlsfx.control.StatusBar;
+import ui.UI;
+import util.events.UpdateProgressEventHandler;
 
-public class HTStatusBar extends StatusBar {
+import java.util.HashMap;
+import java.util.Map;
 
-	private static HTStatusBar instance = null;
+public class HTStatusBar extends StatusBar implements StatusUI {
 
-	public static HTStatusBar getInstance() {
-		if (instance == null) {
-			instance = new HTStatusBar();
-		}
-		return instance;
+	private final UI ui;
+	private final Map<String, TextProgressBar> progressBars;
+
+	public HTStatusBar(UI ui) {
+		this.ui = ui;
+		progressBars = new HashMap<>();
+
+		setup();
+
+		setupProgressEvents();
 	}
 
-	private Label timerLabel = new Label();
+	private void setupProgressEvents() {
+		ui.registerEvent((UpdateProgressEventHandler) e -> {
+			Platform.runLater(() -> {
+				if (progressBars.containsKey(e.repoId)) {
+					if (e.done) {
+						getRightItems().remove(progressBars.get(e.repoId));
+					} else {
+						progressBars.get(e.repoId).setProgress(e.progress);
+					}
+				} else {
+					TextProgressBar progressBar = new TextProgressBar(e.repoId);
+					progressBars.put(e.repoId, progressBar);
+					getRightItems().add(progressBar);
+				}
+			});
+		});
+	}
 
-	public HTStatusBar() {
+	private void setup() {
 		getStyleClass().add("top-borders");
-
-		setupTimerLabel();
-		getRightItems().add(timerLabel);
 	}
 
-	private void setupTimerLabel() {
-		HBox.setMargin(timerLabel, new Insets(3));
-	}
-
-	public static void displayMessage(String text) {
+	public void displayMessage(String text) {
 		Platform.runLater(() -> {
-			getInstance().setText(text);
+			setText(text);
 		});
 	}
 
-	public static void updateRefreshTimer(int time) {
-		Platform.runLater(() -> {
-			getInstance().timerLabel.setText(Integer.toString(time));
-		});
-	}
-	
-	public static void addProgress(double increment) {
-		double progress = Math.min(Math.max(0, getInstance().getProgress() + increment), 1);
-		Platform.runLater(() -> {
-			getInstance().setProgress(progress);
-		});
-	}
-
-	public static void addProgressAndDisplayMessage(double increment, String message) {
-		double progress = Math.min(Math.max(0, getInstance().getProgress() + increment), 1);
-		Platform.runLater(() -> {
-			getInstance().setText(message);
-			getInstance().setProgress(progress);
-		});
-	}
-
-	public static void updateProgress(double progress) {
-		Platform.runLater(() -> {
-			getInstance().setProgress(progress);
-		});
+	@Override
+	public void clear() {
+		displayMessage("");
 	}
 }

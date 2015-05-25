@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
 import prefs.Preferences;
 import ui.components.Dialog;
-import ui.components.HTStatusBar;
 import util.DialogMessage;
 import util.HTLog;
 import util.Utility;
@@ -77,7 +76,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		resolveCredentials();
 		enableUI(false);
 
-		HTStatusBar.displayMessage("Signing in to GitHub...");
+		UI.status.displayMessage("Signing in to GitHub...");
 
 		CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
 			if (success) {
@@ -134,7 +133,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 	private void handleError(String message) {
 		Platform.runLater(()->{
 			enableUI(true);
-			HTStatusBar.displayMessage(message);
+			UI.status.displayMessage(message);
 			DialogMessage.showWarningDialog("Error", message);
 		});
 	}
