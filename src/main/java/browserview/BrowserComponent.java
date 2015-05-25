@@ -253,6 +253,8 @@ public class BrowserComponent {
 
 	private boolean isBrowserActive(){
 		try {
+			// Throws an exception if unable to switch to original HT tab
+			// which then triggers a browser reset when called from runBrowserOperation
 			driver.switchTo().window(driver.getWindowHandle());
 			return true;
 		} catch (WebDriverException e) {
