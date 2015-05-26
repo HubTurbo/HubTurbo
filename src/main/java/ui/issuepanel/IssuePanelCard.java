@@ -1,24 +1,28 @@
 package ui.issuepanel;
 
-import java.util.HashSet;
-import java.util.List;
-
+import backend.resource.*;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import github.TurboIssueEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import model.TurboIssue;
-import model.TurboLabel;
+import org.eclipse.egit.github.core.Comment;
 import ui.issuecolumn.IssueColumn;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
+import util.Utility;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IssuePanelCard extends VBox {
 
@@ -31,11 +35,14 @@ public class IssuePanelCard extends VBox {
 	 */
 	
 	private final TurboIssue issue;
+	private final Model model;
 	private FlowPane issueDetails = new FlowPane();
 	private IssueColumn parentPanel;
 	private final HashSet<Integer> issuesWithNewComments;
 
-	public IssuePanelCard(TurboIssue issue, IssueColumn parentPanel, HashSet<Integer> issuesWithNewComments) {
+	public IssuePanelCard(Model model, TurboIssue issue, IssueColumn parentPanel, HashSet<Integer>
+		issuesWithNewComments) {
+		this.model = model;
 		this.issue = issue;
 		this.parentPanel = parentPanel;
 		this.issuesWithNewComments = issuesWithNewComments;
@@ -56,9 +63,88 @@ public class IssuePanelCard extends VBox {
 		getChildren().addAll(issueTitle, issueDetails);
 
 		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			Node feed = issue.getEventDisplay(getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
+			Node feed = getEventDisplay(issue, getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
 			getChildren().add(feed);
 		}
+	}
+
+	/**
+	 * Creates a JavaFX node containing a graphical display of this issue's events.
+	 * @param withinHours the number of hours to bound the returned events by
+	 * @return the node
+	 */
+	public Node getEventDisplay(TurboIssue issue, final int withinHours) {
+		final LocalDateTime now = LocalDateTime.now();
+
+		List<TurboIssueEvent> eventsWithinDuration = issue.getMetadata().getEvents().stream()
+			.filter(event -> {
+				LocalDateTime eventTime = Utility.longToLocalDateTime(event.getDate().getTime());
+				int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		List<Comment> commentsWithinDuration = issue.getMetadata().getComments().stream()
+			.filter(comment -> {
+				LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+				int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
+				return hours < withinHours;
+			})
+			.collect(Collectors.toList());
+
+		return layoutEvents(eventsWithinDuration, commentsWithinDuration);
+	}
+
+	/**
+	 * Given a list of issue events, returns a JavaFX node laying them out properly.
+	 * @param events
+	 * @param comments
+	 * @return
+	 */
+	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
+		VBox result = new VBox();
+		result.setSpacing(3);
+		VBox.setMargin(result, new Insets(3, 0, 0, 0));
+
+		// Events
+		events.stream()
+			.map(TurboIssueEvent::display)
+			.forEach(e -> result.getChildren().add(e));
+
+		// Comments
+		if (comments.size() > 0) {
+			String names = comments.stream()
+				.map(comment -> comment.getUser().getLogin())
+				.distinct()
+				.collect(Collectors.joining(", "));
+			HBox commentDisplay = new HBox();
+			commentDisplay.getChildren().addAll(
+				TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
+				new javafx.scene.control.Label(String.format("%d comments since, involving %s.", comments.size(),
+					names))
+			);
+			result.getChildren().add(commentDisplay);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Given a list of issue events, returns a textual representation of them,
+	 * concatenated together with newlines.
+	 * @param events
+	 * @param width
+	 * @return
+	 */
+	private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
+		String text = events.stream()
+			.map(TurboIssueEvent::toString)
+			.collect(Collectors.joining("\n"));
+
+		Text display = new Text(text);
+		display.setWrappingWidth(width);
+		display.getStyleClass().add("issue-panel-feed");
+		return display;
 	}
 	
 	private boolean isUpdateFilter(FilterExpression currentFilterExpression) {
@@ -118,36 +204,30 @@ public class IssuePanelCard extends VBox {
 			issueDetails.getChildren().add(commentIcon);
 			issueDetails.getChildren().add(commentCount);
 		}
-		
-		for (TurboLabel label : issue.getLabels()) {
+
+		for (TurboLabel label : model.getLabelsOfIssue(issue)) {
 			issueDetails.getChildren().add(label.getNode());
 		}
-		
-		if(issue.getParentIssue() >= 0){
-			String parentString = "#" + issue.getParentIssue();
-			Label parent = new Label(parentString);
-			parent.getStyleClass().addAll("display-box-padding");
-			issueDetails.getChildren().add(parent);
-		}
-		
-		if (issue.getMilestone() != null) {
-			Label milestone = new Label(issue.getMilestone().getTitle());
-			issueDetails.getChildren().add(milestone);
+
+		if (issue.getMilestone().isPresent() && model.getMilestoneOfIssue(issue).isPresent()) {
+			TurboMilestone milestone = model.getMilestoneOfIssue(issue).get();
+			issueDetails.getChildren().add(new Label(milestone.getTitle()));
 		}
 
-		if (issue.getAssignee() != null) {
-			
-			Label assigneeName = new Label((issue.getAssignee().getAlias()));
-			assigneeName.getStyleClass().add("display-box-padding");
-			Image image = issue.getAssignee().getAvatar();
+		if (issue.getAssignee().isPresent() && model.getAssigneeOfIssue(issue).isPresent()) {
+			TurboUser assignee = model.getAssigneeOfIssue(issue).get();
+			Label assigneeNameLabel = new Label(issue.getAssignee().get());
+			assigneeNameLabel.getStyleClass().add("display-box-padding");
+
+			Image image = assignee.getAvatar();
 			ImageView avatar = new ImageView();
-			if(image != null){
-				avatar.setImage(image);
-			}
-			HBox assignee = new HBox();
-			assignee.setAlignment(Pos.BASELINE_CENTER);
-			assignee.getChildren().addAll(avatar, assigneeName);
-			issueDetails.getChildren().add(assignee);
+			assert image != null;
+			avatar.setImage(image);
+
+			HBox assigneeBox = new HBox();
+			assigneeBox.setAlignment(Pos.BASELINE_CENTER);
+			assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
+			issueDetails.getChildren().add(assigneeBox);
 		}
 		
 	}

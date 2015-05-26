@@ -1,13 +1,13 @@
 package filter.expression;
 
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import model.Model;
-import model.TurboIssue;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
 
 public class Negation implements FilterExpression {
 	private FilterExpression expr;
@@ -41,9 +41,10 @@ public class Negation implements FilterExpression {
 			return false;
 		return true;
 	}
-	
-	public boolean isSatisfiedBy(TurboIssue issue, MetaQualifierInfo info) {
-		return !expr.isSatisfiedBy(issue, info);
+
+	@Override
+	public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+		return !expr.isSatisfiedBy(model, issue, info);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class Negation implements FilterExpression {
 	}
 
 	@Override
-	public void applyTo(TurboIssue issue, Model model) throws QualifierApplicationException {
+	public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
 		assert false;
 	}
 	

@@ -1,33 +1,25 @@
 package ui;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import storage.DataManager;
+import util.Utility;
+
+import java.util.function.Consumer;
 
 public class RepositorySelector extends HBox {
-	private final ComboBox<String> comboBox = new ComboBox<>();
-	private final Label label = new Label();
-	private Consumer<String> onValueChangeCallback = null;
 
-	public RepositorySelector() {
+	private final ComboBox<String> comboBox = new ComboBox<>();
+	private final UI ui;
+	private Consumer<String> onValueChangeCallback = e -> {};
+	private boolean changesDisabled = false;
+
+	public RepositorySelector(UI ui) {
+		this.ui = ui;
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
-		getChildren().addAll(label);
-	}
-
-	/**
-	 * Meant as a replacement for {@link #isInFocus isInFocus} (which is final).
-	 * @return true if the combobox portion of this element is in focus
-	 */
-	public boolean isInFocus() {
-		return comboBox.isFocused();
 	}
 
 	private void setupLayout() {
@@ -40,38 +32,39 @@ public class RepositorySelector extends HBox {
 	private void setupComboBox() {
 		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
-		loadComboBoxContents();
+		loadContents();
 		comboBox.valueProperty().addListener((observable, old, newVal) -> {
-			if (onValueChangeCallback != null) {
+			if (Utility.isWellFormedRepoId(newVal) && !changesDisabled) {
 				onValueChangeCallback.accept(newVal);
 			}
 		});
 	}
 	
-	public void setLabelText(String text) {
-		label.setText(text);
-	}
-
-	public void enable() {
-		comboBox.setDisable(false);
-	}
-
-	public void disable() {
-		comboBox.setDisable(true);
-	}
-
 	public void setOnValueChange(Consumer<String> callback) {
+		assert callback != null;
 		onValueChangeCallback = callback;
 	}
 
-	private void loadComboBoxContents() {
-		List<String> items = DataManager.getInstance().getLastViewedRepositories();
-		comboBox.getItems().addAll(items);
+	private void loadContents() {
+		comboBox.getItems().addAll(ui.logic.getOpenRepositories());
 	}
 
-	public void refreshComboBoxContents(String repoId) {
-		comboBox.getItems().clear();
-		loadComboBoxContents();
+	private String getText() {
+		return comboBox.getValue();
+	}
+
+	public void setText(String repoId) {
+		changesDisabled = true;
 		comboBox.setValue(repoId);
+		changesDisabled = false;
+	}
+
+	public void refreshContents() {
+		String text = getText();
+
+		comboBox.getItems().clear();
+		loadContents();
+
+		setText(text);
 	}
 }

@@ -1,12 +1,12 @@
 package filter.lexer;
 
+import filter.ParseException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import filter.ParseException;
 
 public class Lexer {
 
@@ -21,7 +21,7 @@ public class Lexer {
 			// These have higher priority than Symbol
 			new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
 			new Rule("[A-Za-z]+\\s*:", TokenType.QUALIFIER),
-			new Rule("[A-Za-z0-9#][A-Za-z0-9.'-]*", TokenType.SYMBOL),
+			new Rule("[A-Za-z0-9#][/A-Za-z0-9.'-]*", TokenType.SYMBOL),
 
 			new Rule("\\(", TokenType.LBRACKET),
 			new Rule("\\)", TokenType.RBRACKET),

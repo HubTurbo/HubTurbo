@@ -1,33 +1,26 @@
 package ui.issuepanel;
 
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.HashSet;
-
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
-import javafx.util.Callback;
-import model.Model;
-import model.TurboIssue;
-import service.ServiceManager;
 import ui.UI;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
-import command.TurboCommandExecutor;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class IssuePanel extends IssueColumn {
 
-	private final Model model;
+	private final IModel model;
 	private final UI ui;
 
 	private NavigableListView<TurboIssue> listView;
@@ -38,8 +31,8 @@ public class IssuePanel extends IssueColumn {
 	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
-	public IssuePanel(UI ui, Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
-		super(ui, mainStage, model, parentColumnControl, columnIndex, dragAndDropExecutor);
+	public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
+		super(ui, model, parentColumnControl, columnIndex);
 		this.model = model;
 		this.ui = ui;
 
@@ -61,10 +54,6 @@ public class IssuePanel extends IssueColumn {
 			return false;
 		}
 		return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
-	}
-
-	@Override
-	public void deselect() {
 	}
 
 	/**
@@ -91,22 +80,10 @@ public class IssuePanel extends IssueColumn {
 	@Override
 	public void refreshItems() {
 		super.refreshItems();
-		WeakReference<IssuePanel> that = new WeakReference<IssuePanel>(this);
-		
 		final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
 		
 		// Set the cell factory every time - this forces the list view to update
-		listView.setCellFactory(new Callback<ListView<TurboIssue>, ListCell<TurboIssue>>() {
-			@Override
-			public ListCell<TurboIssue> call(ListView<TurboIssue> list) {
-				if(that.get() != null){
-					return new IssuePanelCell(ui, model, that.get(), columnIndex, issuesWithNewComments);
-				} else{
-					return null;
-				}
-			}
-		});
-
+		listView.setCellFactory(list -> new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
 		listView.saveSelection();
 
 		// Supposedly this also causes the list view to update - not sure
@@ -122,7 +99,7 @@ public class IssuePanel extends IssueColumn {
 		setupKeyboardShortcuts();
 		listView.setOnItemSelected(i -> {
 			TurboIssue issue = listView.getItems().get(i);
-			ui.triggerEvent(new IssueSelectedEvent(issue.getId(), columnIndex));
+			ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
 			if (issueHasNewComments(issue)) {
 				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
 				refreshItems();
@@ -159,7 +136,7 @@ public class IssuePanel extends IssueColumn {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) {
-					ServiceManager.getInstance().updateModelNow();
+					ui.logic.refresh();
 				}
 				if (event.getCode() == KeyCode.F1) {
 					ui.getBrowserComponent().showDocs();

@@ -1,14 +1,13 @@
 package ui.components;
 
-import java.lang.ref.WeakReference;
-
 import com.sun.javafx.scene.control.behavior.TextAreaBehavior;
 import com.sun.javafx.scene.control.skin.TextAreaSkin;
-
 import javafx.event.EventHandler;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+
+import java.lang.ref.WeakReference;
 
 public class TraversableTextArea extends TextArea {
 	public TraversableTextArea(String text){

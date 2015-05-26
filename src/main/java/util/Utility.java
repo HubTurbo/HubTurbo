@@ -1,36 +1,97 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
-
-import model.TurboLabel;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-
-import com.google.common.base.Joiner;
 
 public class Utility {
 
 	private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
-	public static String stringify(Collection<TurboLabel> labels) {
-		return "[" + Joiner.on(", ").join(labels.stream().map(TurboLabel::logString).collect(Collectors.toList())) + "]";
+	/**
+	 * Returns a CompletableFuture that will be completed 'later' with the given result.
+	 * 'Later' is defined loosely. This implementation utilises a secondary thread to do it.
+	 *
+	 * The use case is if you want to return a CompletableFuture that just completes
+	 * trivially, for example if you detect an error occurring early and don't want/need
+	 * to go through the whole async task that the CompletableFuture represents. You can't
+	 * complete the future synchronously because that wouldn't trigger all the callbacks
+	 * attached to it.
+	 *
+	 * The name comes from the monadic interpretation of CompletableFutures.
+	 * @param result the result that the unit CompletableFuture will be completed with
+	 * @param <T> the type of the CompletableFuture result
+	 * @return the unit future
+	 */
+	private static Executor unitFutureExecutor = Executors.newSingleThreadExecutor();
+	public static <T> CompletableFuture<T> unitFutureOf(T result) {
+		CompletableFuture<T> f = new CompletableFuture<>();
+//		Platform.runLater(() -> f.complete(result));
+		unitFutureExecutor.execute(() -> f.complete(result));
+		return f;
+	}
+
+	public static boolean isWellFormedRepoId(String owner, String repo) {
+		if (owner == null || owner.isEmpty() || repo == null || repo.isEmpty()) {
+			return false;
+		}
+		return isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
+	}
+
+	public static boolean isWellFormedRepoId(String repoId) {
+		return repoId != null && !repoId.isEmpty()
+			&& RepositoryId.createFromId(repoId).generateId().equals(repoId);
+	}
+
+	public static Optional<String> readFile(String filename) {
+		try {
+			return Optional.of(new String(Files.readAllBytes(new File(filename).toPath())));
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		return Optional.empty();
+	}
+
+	public static void writeFile(String fileName, String content) {
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(fileName, "UTF-8");
+			writer.println(content);
+			writer.close();
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
+
+	public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
+		CompletableFuture<Void> allDoneFuture =
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		return allDoneFuture.thenApply(v ->
+				futures.stream().
+					map(CompletableFuture::join)
+					.collect(Collectors.<T>toList())
+		);
 	}
 
 	public static String stripQuotes(String s) {
@@ -133,6 +194,4 @@ public class Utility {
 		}
 		return Optional.empty();
 	}
-
 }
-

@@ -1,15 +1,13 @@
 package ui.issuecolumn;
 
+import backend.interfaces.IModel;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import model.Model;
 import ui.DragData;
-
-import command.TurboCommandExecutor;
 
 /**
  * A Column is a JavaFX node that is contained by a ColumnControl.
@@ -25,18 +23,15 @@ public abstract class Column extends VBox {
 	
 	public static final String CLOSE_COLUMN = "\u2716";
 	
-	protected final Model model;
+	protected final IModel model;
 	protected final ColumnControl parentColumnControl;
 	protected int columnIndex;
 	
-	protected TurboCommandExecutor dragAndDropExecutor;
-
-	public Column(Stage mainStage, Model model, ColumnControl parentColumnControl, int columnIndex, TurboCommandExecutor dragAndDropExecutor) {
+	public Column(IModel model, ColumnControl parentColumnControl, int columnIndex) {
 		this.model = model;
 		this.parentColumnControl = parentColumnControl;
 		this.columnIndex = columnIndex;
-		this.dragAndDropExecutor = dragAndDropExecutor;
-		
+
 		setupColumn();
 		setupColumnDragEvents();
 	}
@@ -76,16 +71,9 @@ public abstract class Column extends VBox {
 			event.consume();
 		});
 		
-		setOnDragDone((event) -> {
-			event.consume();
-		});
+		setOnDragDone(Event::consume);
 	}
 	
-	public boolean isThisColumnSelected() {
-		return parentColumnControl.getCurrentlySelectedColumn().isPresent()
-			&& parentColumnControl.getCurrentlySelectedColumn().get() == columnIndex;
-	}
-
 	/**
 	 * To be called by ColumnControl in order to have indices updated.
 	 * Should not be called externally.
@@ -108,5 +96,5 @@ public abstract class Column extends VBox {
 	 * This method is called when the column control is deselected. It used to happen when
 	 * the issue panel was closed.
 	 */
-	public abstract void deselect();
+	public abstract void close();
 }

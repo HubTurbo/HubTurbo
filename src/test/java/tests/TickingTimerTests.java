@@ -1,10 +1,11 @@
 package tests;
 
 import org.junit.Test;
-import service.TickingTimer;
+import util.TickingTimer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TickingTimerTests {
 
@@ -18,7 +19,7 @@ public class TickingTimerTests {
     }
 
     private static TickingTimer createTickingTimer() {
-        return new TickingTimer("test", 10, (i) -> {}, () -> {});
+        return new TickingTimer("test", 10, (i) -> {}, () -> {}, TimeUnit.SECONDS);
     }
 
     @Test(expected = AssertionError.class)

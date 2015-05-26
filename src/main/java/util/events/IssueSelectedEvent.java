@@ -1,10 +1,12 @@
 package util.events;
 
 public class IssueSelectedEvent extends Event {
-	public int id;
-	public int columnIndex;
+	public final String repoId;
+	public final int id;
+	public final int columnIndex;
 	
-	public IssueSelectedEvent(int id, int columnIndex) {
+	public IssueSelectedEvent(String repoId, int id, int columnIndex) {
+		this.repoId = repoId;
 		this.id = id;
 		this.columnIndex = columnIndex;
 	}
