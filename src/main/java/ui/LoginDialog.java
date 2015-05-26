@@ -170,6 +170,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		grid.add(githubLabel, 1, 0);
 
 		repoOwnerField = new TextField(FIELD_DEFAULT_REPO_OWNER);
+		repoOwnerField.setId("repoOwnerField");
 		repoOwnerField.setPrefWidth(140);
 		grid.add(repoOwnerField, 2, 0);
 

@@ -45,6 +45,7 @@ allprojects {
         seleniumServerVersion = '2.45.0'
 
         junitVersion = '4.12'
+        testFxVersion = '3.1.0'
     }
 
     dependencies {
@@ -61,9 +62,12 @@ allprojects {
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
-        // TODO: move junit to test compile
-        // testCompile "junit:junit:$junitVersion"
-        compile "junit:junit:$junitVersion"
+        testCompile "junit:junit:$junitVersion"
+        testCompile "org.loadui:testFx:$testFxVersion"
+    }
+
+    test {
+        // exclude 'guitests'
     }
 
     jacoco {
