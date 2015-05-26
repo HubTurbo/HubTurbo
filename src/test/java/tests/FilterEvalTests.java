@@ -30,6 +30,12 @@ public class FilterEvalTests {
 	}
 
 	@Test
+	public void invalid() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "title");
+		assertEquals(false, Qualifier.process(empty, Parser.parse("something:a"), issue));
+	}
+
+	@Test
 	public void id() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "title");
 
