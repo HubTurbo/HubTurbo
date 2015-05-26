@@ -37,7 +37,7 @@ public class TestGuiTest extends GuiTest {
     public void setupStage() throws Throwable {
 //        assumeTrue(!UserInputDetector.instance.hasDetectedUserInput());
 
-        FXTestUtils.launchApp(TestUI.class); // You can add start parameters here
+        FXTestUtils.launchApp(TestUI.class, "--test=true"); // You can add start parameters here
         try {
             stage = targetWindow(stageFuture.get(25, TimeUnit.SECONDS));
             FXTestUtils.bringToFront(stage);
