@@ -1,53 +1,33 @@
-//package tests;
-//
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.fail;
-//
-//import java.text.SimpleDateFormat;
-//import java.time.LocalDateTime;
-//import java.util.Date;
-//
-//import backend.resource.*;
-//import org.eclipse.egit.github.core.PullRequest;
-//import org.junit.BeforeClass;
-//import org.junit.Test;
-//
-//import util.Utility;
-//import filter.ParseException;
-//import filter.Parser;
-//import filter.expression.Qualifier;
-//
-//public class FilterEvalTests {
-//
-//	private final Model model = new Model();
-//
-//	@BeforeClass
-//	public static void setup() {
-//		Model.isInTestMode = true;
-//	}
-//
-//	/**
-//	 * Tests for the presence of keywords in a particular issue.
-//	 *
-//	 * @param issue
-//	 */
-//	private void testForKeywords(String prefix, TurboIssue issue) {
-//		assertEquals(Qualifier.process(Parser.parse("test"), issue), true);
-//
-//		// Substring
-//		assertEquals(Qualifier.process(Parser.parse("te"), issue), true);
-//
-//		// Implicit conjunction
-//		assertEquals(Qualifier.process(Parser.parse("is a"), issue), true);
-//
-//		// Like above but out of order
-//		assertEquals(Qualifier.process(Parser.parse("a is"), issue), true);
-//	}
-//
-//	private void testForKeywords(TurboIssue issue) {
-//		testForKeywords("", issue);
-//	}
-//
+package tests;
+
+import backend.interfaces.IModel;
+import backend.resource.*;
+import filter.ParseException;
+import filter.Parser;
+import filter.expression.Qualifier;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class FilterEvalTests {
+
+	private final MultiModel empty;
+	private static final String REPO = "test/test";
+
+	public FilterEvalTests() {
+		empty = new MultiModel();
+		empty.setDefaultRepo(REPO);
+	}
+
+	@BeforeClass
+	public static void setup() {
+	}
+
 //	/**
 //	 * Creates a milestone and takes care of adding it to the model.
 //	 *
@@ -55,11 +35,11 @@
 //	 * @return
 //	 */
 //	private TurboMilestone createMilestone(String title) {
-//		TurboMilestone milestone = new TurboMilestone(title);
+//		TurboMilestone milestone = new TurboMilestone(title, 0, REPO);
 //		model.addMilestone(milestone);
 //		return milestone;
 //	}
-//
+
 //	/**
 //	 * Creates a label and takes care of adding it to the model.
 //	 *
@@ -89,81 +69,142 @@
 //		model.addCollaborator(user);
 //		return user;
 //	}
-//
-//	@Test
-//	public void id() {
-//		TurboIssue issue = new TurboIssue("1", "desc", model);
-//		issue.setId(1);
-//
-//		assertEquals(Qualifier.process(Parser.parse("id:1"), issue), true);
-//
-//		// Non-number
-//		assertEquals(Qualifier.process(Parser.parse("id:a"), issue), false);
+
+//	private IModel singletonModelWith(TurboIssue issue) {
+//		ArrayList<TurboIssue> issues = new ArrayList<>();
+//		issues.add(issue);
+//		Model model = new Model(REPO, issues, new ArrayList<>(),
+//			new ArrayList<>(), new ArrayList<>(), UpdateSignature.empty);
+//		MultiModel multiModel = new MultiModel();
+//		multiModel.add(model);
+//		multiModel.setDefaultRepo(REPO);
+//		return multiModel;
 //	}
-//
-//	@Test
-//	public void keyword() {
-//		TurboIssue issue = new TurboIssue("", "this is a test", model);
-//		testForKeywords(issue);
-//	}
-//
-//	@Test
-//	public void title() {
-//		TurboIssue issue = new TurboIssue("this is a test", "", model);
-//		testForKeywords(issue);
-//	}
-//
-//	@Test
-//	public void body() {
-//		TurboIssue issue = new TurboIssue("", "this is a test", model);
-//		testForKeywords(issue);
-//	}
-//
-//	@Test
-//	public void in() {
-//		TurboIssue issue = new TurboIssue("", "this is a test", model);
-//		testForKeywords("in:body ", issue);
-//
-//		issue = new TurboIssue("this is a test", "", model);
-//		testForKeywords("in:title ", issue);
-//	}
-//
-//	@Test
-//	public void milestone() {
-//		TurboMilestone milestone = createMilestone("v1.0");
-//
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.setMilestone(milestone);
-//
-//		assertEquals(Qualifier.process(Parser.parse("milestone:v1.0"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("milestone:v1"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("milestone:1"), issue), false);
-//		try {
-//			assertEquals(Qualifier.process(Parser.parse("milestone:."), issue), true);
-//			fail(". is not a valid token on its own");
-//		} catch (ParseException e) {
-//		}
-//		assertEquals(Qualifier.process(Parser.parse("milestone:what"), issue), false);
-//	}
-//
-//	@Test
-//	public void parent() {
-//		// TODO implement when parent issue feature returns
-//	}
-//
-//	@Test
-//	public void label() {
-//		TurboLabel label = createLabel("type", "bug");
-//
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.addLabel(label);
-//
-//		assertEquals(Qualifier.process(Parser.parse("label:type"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("label:type."), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("label:type.bug"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("label:bug"), issue), true);
-//	}
-//
+
+	@Test
+	public void id() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "title");
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:1"), issue));
+
+		// Non-number
+		assertEquals(false, Qualifier.process(empty, Parser.parse("id:a"), issue));
+	}
+
+	private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
+
+		// Exact match
+		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "test"), issue));
+
+		// Substring
+		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "te"), issue));
+
+		// Implicit conjunction
+		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "is a"), issue));
+
+		// Like above but out of order
+		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "a is"), issue));
+	}
+
+	private void testForPresenceOfKeywords(TurboIssue issue) {
+		testForPresenceOfKeywords("", issue);
+	}
+
+	@Test
+	public void title() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "this is a test");
+		testForPresenceOfKeywords(issue);
+	}
+
+	@Test
+	public void body() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.setDescription("this is a test");
+		testForPresenceOfKeywords(issue);
+	}
+
+	@Test
+	public void in() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.setDescription("this is a test");
+		testForPresenceOfKeywords("in:body ", issue);
+
+		issue = new TurboIssue(REPO, 1, "this is a test");
+		testForPresenceOfKeywords("in:title ", issue);
+	}
+
+	private IModel singletonModel(Model model) {
+		MultiModel models = new MultiModel();
+		models.add(model);
+		models.setDefaultRepo(model.getRepoId());
+		return models;
+	}
+
+	private IModel modelWith(TurboIssue issue, TurboMilestone milestone) {
+		return singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(milestone)),
+			new ArrayList<>()));
+	}
+
+	private IModel modelWith(TurboIssue issue, TurboLabel label) {
+		return singletonModel(new Model(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(Arrays.asList(label)),
+			new ArrayList<>(),
+			new ArrayList<>())));
+	}
+
+	private IModel modelWith(TurboIssue issue, TurboUser user) {
+		return singletonModel(new Model(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(user)))));
+	}
+
+	@Test
+	public void milestone() {
+		TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
+
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.setMilestone(milestone);
+
+		IModel model = modelWith(issue, milestone);
+
+		assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
+		assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
+		assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue));
+		assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue));
+		try {
+			assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue));
+			fail(". is not a valid token on its own");
+		} catch (ParseException ignored) {
+		}
+		assertEquals(false, Qualifier.process(empty, Parser.parse("milestone:what"), issue));
+	}
+
+	@Test
+	public void label() {
+		TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
+
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.addLabel(label);
+
+		IModel model = modelWith(issue, label);
+
+		assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
+		assertEquals(true, Qualifier.process(model, Parser.parse("label:type."), issue));
+		assertEquals(true, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
+		assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue));
+		try {
+			assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue));
+			fail(". is not a valid token on its own");
+		} catch (ParseException ignored) {
+		}
+	}
+
 //	@Test
 //	public void assignee() {
 //		TurboUser user = createUser("bob", "alice");
@@ -357,5 +398,5 @@
 //		assertEquals(Qualifier.process(Parser.parse("updated:<26"), issue), true);
 //		assertEquals(Qualifier.process(Parser.parse("updated:>26"), issue), false);
 //	}
-//
-//}
+
+}
