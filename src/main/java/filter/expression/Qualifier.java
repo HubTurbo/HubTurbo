@@ -141,6 +141,8 @@ public class Qualifier implements FilterExpression {
         case "title":
             return titleSatisfies(issue);
         case "body":
+        case "desc":
+        case "description":
             return bodySatisfies(issue);
         case "milestone":
             return milestoneSatisfies(model, issue);
@@ -186,6 +188,7 @@ public class Qualifier implements FilterExpression {
         switch (name) {
         case "title":
         case "desc":
+        case "description":
         case "body":
         case "keyword":
             throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
@@ -507,6 +510,7 @@ public class Qualifier implements FilterExpression {
     	        return titleSatisfies(issue);
     		case "body":
     		case "desc":
+		    case "description":
     	        return bodySatisfies(issue);
     	    default:
     	    	return false;

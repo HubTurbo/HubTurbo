@@ -65,6 +65,8 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setDescription("this is a test");
 		testForPresenceOfKeywords("body:", issue);
+		testForPresenceOfKeywords("desc:", issue);
+		testForPresenceOfKeywords("description:", issue);
 	}
 
 	@Test
