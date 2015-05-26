@@ -390,10 +390,12 @@ public class Qualifier implements FilterExpression {
             return issue.getLabels().size() > 0;
         case "milestone":
         case "milestones":
-            return issue.getMilestone() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getMilestone().isPresent();
         case "assignee":
         case "assignees":
-            return issue.getAssignee() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getAssignee().isPresent();
         default:
             return false;
         }
