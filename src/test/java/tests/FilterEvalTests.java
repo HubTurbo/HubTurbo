@@ -168,18 +168,23 @@ public class FilterEvalTests {
 		assertEquals(Qualifier.process(model, Parser.parse("assignee:lic"), issue), true);
 	}
 
-//	@Test
-//	public void author() {
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.setCreator("bob");
-//
-//		assertEquals(Qualifier.process(Parser.parse("author:BOB"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("author:bob"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("author:alice"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("author:o"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("author:lic"), issue), false);
-//	}
-//
+	@Test
+	public void author() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
+
+		assertEquals(Qualifier.process(empty, Parser.parse("creator:BOB"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("creator:bob"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("creator:alice"), issue), false);
+		assertEquals(Qualifier.process(empty, Parser.parse("creator:o"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("creator:lic"), issue), false);
+
+		assertEquals(Qualifier.process(empty, Parser.parse("author:BOB"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("author:bob"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("author:alice"), issue), false);
+		assertEquals(Qualifier.process(empty, Parser.parse("author:o"), issue), true);
+		assertEquals(Qualifier.process(empty, Parser.parse("author:lic"), issue), false);
+	}
+
 //	@Test
 //	public void involves() {
 //		// involves = assignee || author

@@ -147,6 +147,7 @@ public class Qualifier implements FilterExpression {
         case "label":
             return labelsSatisfy(model, issue);
         case "author":
+        case "creator":
             return authorSatisfies(issue);
         case "assignee":
             return assigneeSatisfies(model, issue);
@@ -206,6 +207,7 @@ public class Qualifier implements FilterExpression {
             applyAssignee(issue, model);
             break;
         case "author":
+        case "creator":
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
         case "involves":
         case "user":
