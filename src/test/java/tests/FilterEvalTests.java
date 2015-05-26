@@ -54,21 +54,17 @@ public class FilterEvalTests {
 		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "a is"), issue));
 	}
 
-	private void testForPresenceOfKeywords(TurboIssue issue) {
-		testForPresenceOfKeywords("", issue);
-	}
-
 	@Test
 	public void title() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "this is a test");
-		testForPresenceOfKeywords(issue);
+		testForPresenceOfKeywords("title:", issue);
 	}
 
 	@Test
 	public void body() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setDescription("this is a test");
-		testForPresenceOfKeywords(issue);
+		testForPresenceOfKeywords("body:", issue);
 	}
 
 	@Test
