@@ -76,20 +76,30 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		resolveCredentials();
 		enableUI(false);
 
-		UI.status.displayMessage("Signing in to GitHub...");
+		if (isTestMode()) {
+			Platform.runLater(() -> {
+				completeResponse(new Result("dummy", "dummy"));
+				close();
+			});
+		} else {
+			CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
+				if (success) {
+					// Save login details only on successful login
+					prefs.setLastLoginCredentials(username, password);
+					Platform.runLater(() -> {
+						completeResponse(new Result(owner, repo));
+						close();
+					});
+				} else {
+					handleError("Failed to sign in. Please try again.");
+				}
+			});
+		}
+	}
 
-		CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
-			if (success) {
-				// Save login details only on successful login
-				prefs.setLastLoginCredentials(username, password);
-				Platform.runLater(() -> {
-					completeResponse(new Result(owner, repo));
-					close();
-				});
-			} else {
-				handleError("Failed to sign in. Please try again.");
-			}
-		});
+	private boolean isTestMode() {
+		String isTest = ui.getCommandLineArgs().get("test");
+		return isTest == null ? false : isTest.equalsIgnoreCase("true");
 	}
 
 	private boolean attemptLogin() {
