@@ -67,7 +67,15 @@ allprojects {
     }
 
     test {
-        // exclude 'guitests'
+        exclude 'guitests'
+        dependsOn 'guiTests'
+    }
+
+    task guiTests(type: Test) {
+        filter {
+            includeTestsMatching 'guitests.*'
+        }
+        forkEvery = 1
     }
 
     jacoco {
@@ -98,7 +106,7 @@ allprojects {
     assemble.dependsOn shadowJar
 }
 
-task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+task jacocoRootReport(type: JacocoReport) {
     dependsOn = allprojects.test
     sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)
     classDirectories =  files(allprojects.sourceSets.main.output)

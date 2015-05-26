@@ -1,26 +1,22 @@
 package guitests;
 
 import com.google.common.util.concurrent.SettableFuture;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
 import static org.loadui.testfx.controls.Commons.hasText;
 
-public class TestGuiTest extends GuiTest {
+public class TestGuiTest2 extends GuiTest {
 
     private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
@@ -33,11 +29,6 @@ public class TestGuiTest extends GuiTest {
         public void start(Stage primaryStage) {
             super.start(primaryStage);
             stageFuture.set(primaryStage);
-        }
-
-        @Override
-        public void quit() {
-            super.quit();
         }
     }
 
@@ -59,7 +50,7 @@ public class TestGuiTest extends GuiTest {
     }
 
     @Test
-    public void testBadLogin() throws InterruptedException {
+    public void testBadLoginAgain() throws InterruptedException {
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         type("HubTurbo").push(KeyCode.TAB);

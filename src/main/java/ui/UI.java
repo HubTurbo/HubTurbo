@@ -211,11 +211,11 @@ public class UI extends Application implements EventDispatcher {
 	private HashMap<String, String> initialiseCommandLineArguments() {
 		Parameters params = getParameters();
 		final List<String> parameters = params.getRaw();
-		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
+//		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
 		HashMap<String, String> commandLineArgs = new HashMap<>();
-		for (int i=0; i<parameters.size(); i+=2) {
-			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
-		}
+//		for (int i=0; i<parameters.size(); i+=2) {
+//			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
+//		}
 		return commandLineArgs;
 	}
 
