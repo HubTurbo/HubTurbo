@@ -477,14 +477,24 @@ public class Qualifier implements FilterExpression {
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
 	        if (label.getGroup().isPresent()) {
-		        // Check both
-		        if (label.getGroup().get().toLowerCase().contains(group)
-			        && label.getName().toLowerCase().contains(labelName)) {
-			        return true;
+		        if (labelName.isEmpty()) {
+			        // Check the group
+			        if (label.getGroup().get().toLowerCase().contains(group)) {
+				       return true;
+			        }
+		        } else {
+			        if (label.getGroup().get().toLowerCase().contains(group)
+				        && label.getName().toLowerCase().contains(labelName)) {
+				       return true;
+			        }
 		        }
 	        } else {
 		        // Check only the label name
-		        return label.getName().toLowerCase().contains(labelName);
+		        if (!group.isEmpty()) {
+			        return false;
+		        } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+			        return true;
+		        }
 	        }
         }
         return false;
