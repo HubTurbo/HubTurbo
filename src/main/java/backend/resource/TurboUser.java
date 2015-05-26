@@ -33,6 +33,13 @@ public class TurboUser {
 		this.repoId = repoId;
 	}
 
+	public TurboUser(String repoId, String loginName, String realName) {
+		this.loginName = loginName;
+		this.realName = realName;
+		this.avatarURL = "";
+		this.repoId = repoId;
+	}
+
 	public TurboUser(String repoId, User user) {
 		this.loginName = user.getLogin();
 		this.realName = user.getName();

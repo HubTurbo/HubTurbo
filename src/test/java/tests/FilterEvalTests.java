@@ -28,59 +28,6 @@ public class FilterEvalTests {
 	public static void setup() {
 	}
 
-//	/**
-//	 * Creates a milestone and takes care of adding it to the model.
-//	 *
-//	 * @param title
-//	 * @return
-//	 */
-//	private TurboMilestone createMilestone(String title) {
-//		TurboMilestone milestone = new TurboMilestone(title, 0, REPO);
-//		model.addMilestone(milestone);
-//		return milestone;
-//	}
-
-//	/**
-//	 * Creates a label and takes care of adding it to the model.
-//	 *
-//	 * @param group
-//	 * @param name
-//	 * @return
-//	 */
-//	private TurboLabel createLabel(String group, String name) {
-//		TurboLabel label = new TurboLabel();
-//		label.setGroup(group);
-//		label.setName(name);
-//		model.addLabel(label);
-//		return label;
-//	}
-//
-//	/**
-//	 * Creates a user and takes care of adding it to the model.
-//	 *
-//	 * @param realName
-//	 * @param gitHubName
-//	 * @return
-//	 */
-//	private TurboUser createUser(String gitHubName, String realName) {
-//		TurboUser user = new TurboUser();
-//		user.setGithubName(gitHubName);
-//		user.setRealName(realName);
-//		model.addCollaborator(user);
-//		return user;
-//	}
-
-//	private IModel singletonModelWith(TurboIssue issue) {
-//		ArrayList<TurboIssue> issues = new ArrayList<>();
-//		issues.add(issue);
-//		Model model = new Model(REPO, issues, new ArrayList<>(),
-//			new ArrayList<>(), new ArrayList<>(), UpdateSignature.empty);
-//		MultiModel multiModel = new MultiModel();
-//		multiModel.add(model);
-//		multiModel.setDefaultRepo(REPO);
-//		return multiModel;
-//	}
-
 	@Test
 	public void id() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "title");
@@ -205,21 +152,22 @@ public class FilterEvalTests {
 		}
 	}
 
-//	@Test
-//	public void assignee() {
-//		TurboUser user = createUser("bob", "alice");
-//		model.addCollaborator(user);
-//
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.setAssignee(user);
-//
-//		assertEquals(Qualifier.process(Parser.parse("assignee:BOB"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("assignee:bob"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("assignee:alice"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("assignee:o"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("assignee:lic"), issue), true);
-//	}
-//
+	@Test
+	public void assignee() {
+		TurboUser user = new TurboUser(REPO, "bob", "alice");
+
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.setAssignee(user);
+
+		IModel model = modelWith(issue, user);
+
+		assertEquals(Qualifier.process(model, Parser.parse("assignee:BOB"), issue), true);
+		assertEquals(Qualifier.process(model, Parser.parse("assignee:bob"), issue), true);
+		assertEquals(Qualifier.process(model, Parser.parse("assignee:alice"), issue), true);
+		assertEquals(Qualifier.process(model, Parser.parse("assignee:o"), issue), true);
+		assertEquals(Qualifier.process(model, Parser.parse("assignee:lic"), issue), true);
+	}
+
 //	@Test
 //	public void author() {
 //		TurboIssue issue = new TurboIssue("", "", model);
