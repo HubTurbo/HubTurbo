@@ -8,6 +8,7 @@ import filter.expression.Qualifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -326,64 +327,85 @@ public class FilterEvalTests {
 	public void type() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
-		assertEquals(Qualifier.process(empty, Parser.parse("is:issue"), issue), false);
-		assertEquals(Qualifier.process(empty, Parser.parse("is:pr"), issue), true);
-		assertEquals(Qualifier.process(empty, Parser.parse("is:sldkj"), issue), false);
+		assertEquals(false, Qualifier.process(empty, Parser.parse("type:issue"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("type:pr"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("type:sldkj"), issue));
 
 		issue = new TurboIssue(REPO, 1, "", "", null, false);
 
-		assertEquals(Qualifier.process(empty, Parser.parse("is:issue"), issue), true);
-		assertEquals(Qualifier.process(empty, Parser.parse("is:pr"), issue), false);
-		assertEquals(Qualifier.process(empty, Parser.parse("is:lkjs"), issue), false);
+		assertEquals(true, Qualifier.process(empty, Parser.parse("type:issue"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("type:pr"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("type:lkjs"), issue));
 	}
 
-//	@Test
-//	public void is() {
-//		PullRequest pr = new PullRequest();
-//		pr.setUrl("something");
-//
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.setPullRequest(pr);
-//		issue.setOpen(false);
-//
-//		assertEquals(Qualifier.process(Parser.parse("is:merged"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("is:unmerged"), issue), false);
-//
-//		issue.setOpen(true);
-//
-//		assertEquals(Qualifier.process(Parser.parse("is:merged"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("is:unmerged"), issue), true);
-//
-//		// The rest are delegated to state and type, so this should pass if they pass
-//	}
-//
-//	@Test
-//	public void created() {
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		Date date = new Date(Utility.localDateTimeToLong(LocalDateTime.of(2014, 12, 2, 12, 0)));
-//		issue.setCreatedAt(new SimpleDateFormat("d MMM yy, h:mm a").format(date));
-//
-//		assertEquals(Qualifier.process(Parser.parse("created:<2014-12-1"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("created:<=2014-12-1"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("created:>2014-12-1"), issue), true);
-//	}
-//
-//	@Test
-//	public void updated() {
-//		LocalDateTime now = LocalDateTime.now();
-//		Qualifier.setCurrentTime(now);
-//
-//		TurboIssue issue = new TurboIssue("", "", model);
-//		issue.setUpdatedAt(now.minusDays(2));
-//
-//		assertEquals(Qualifier.process(Parser.parse("updated:<24"), issue), false);
-//		assertEquals(Qualifier.process(Parser.parse("updated:>24"), issue), true);
-//
-//		issue = new TurboIssue("", "", model);
-//		issue.setUpdatedAt(now.minusDays(1));
-//
-//		assertEquals(Qualifier.process(Parser.parse("updated:<26"), issue), true);
-//		assertEquals(Qualifier.process(Parser.parse("updated:>26"), issue), false);
-//	}
+	@Test
+	public void is() {
 
+		TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:issue"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:pr"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:sldkj"), issue));
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+
+		issue.setOpen(false);
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:open"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+
+		issue = new TurboIssue(REPO, 1, "", "", null, false);
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:issue"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:pr"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:lkjs"), issue));
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+
+		// Not a PR
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+
+		issue.setOpen(false);
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:open"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+
+		// Not a PR
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+	}
+
+	@Test
+	public void created() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "", "", LocalDateTime.of(2014, 12, 2, 12, 0), false);
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("created:<2014-12-1"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("created:<=2014-12-1"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("created:>2014-12-1"), issue));
+	}
+
+	@Test
+	public void updated() {
+		LocalDateTime now = LocalDateTime.now();
+		Qualifier.setCurrentTime(now);
+
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+		issue.setUpdatedAt(now.minusDays(2));
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:<24"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("updated:>24"), issue));
+
+		issue = new TurboIssue(REPO, 1, "");
+		issue.setUpdatedAt(now.minusDays(1));
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("updated:<26"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:>26"), issue));
+	}
 }
