@@ -11,7 +11,6 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +26,7 @@ public class TestGuiTest extends GuiTest {
         }
 
         @Override
-        public void start(Stage primaryStage) throws IOException {
+        public void start(Stage primaryStage) {
             super.start(primaryStage);
             stageFuture.set(primaryStage);
         }
