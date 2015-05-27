@@ -165,8 +165,10 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public void quit() {
-		columns.saveSession();
-		prefs.saveGlobalConfig();
+		if (!isTestMode()) {
+			columns.saveSession();
+			prefs.saveGlobalConfig();
+		}
 		if (browserComponent != null) {
 			browserComponent.onAppQuit();
 		}
