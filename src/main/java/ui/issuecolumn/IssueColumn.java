@@ -13,12 +13,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.apache.bcel.generic.ReturnaddressType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
@@ -26,10 +28,7 @@ import ui.components.FilterTextField;
 import util.events.ColumnClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -370,7 +369,9 @@ public abstract class IssueColumn extends Column {
 	@Override
 	public void refreshItems() {
 		applyCurrentFilterExpression();
-		transformedIssueList = new FilteredList<>(issues, predicate);
+		transformedIssueList = new SortedList<>(
+			new FilteredList<>(issues, predicate),
+			(a, b) -> b.getId() - a.getId());
 
 		if (!triggerMetadataUpdate) {
 			triggerMetadataUpdate = true;
