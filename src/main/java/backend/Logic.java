@@ -5,6 +5,7 @@ import backend.resource.MultiModel;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.UI;
+import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
@@ -15,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static util.Futures.withResult;
 
 public class Logic {
 
@@ -60,37 +63,41 @@ public class Logic {
 		logger.info(message);
 		UI.status.displayMessage(message);
 
-		Utility.sequence(models.toModels().stream()
-				.map(repoIO::updateModel)
-				.collect(Collectors.toList()))
+		Futures.sequence(models.toModels().stream()
+			.map(repoIO::updateModel)
+			.collect(Collectors.toList()))
 			.thenApply(models::replace)
-			.thenAccept(this::updateUI)
-			.exceptionally(HTLog::log);
+			.thenRun(this::updateUI)
+			.exceptionally(Futures::log);
 	}
 
-	private void updateUI(MultiModel models) {
-		uiManager.update(models);
+	private void updateUI() {
+		uiManager.update(models, true);
+	}
+
+	private void updateUIWithoutMetadata() {
+		uiManager.update(models, false);
 	}
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
 		assert Utility.isWellFormedRepoId(repoId);
 		if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
-			return Utility.unitFutureOf(false);
+			return Futures.unit(false);
 		}
 		models.addPendingRepository(repoId);
 		return isRepositoryValid(repoId).thenCompose(valid -> {
 			if (!valid) {
-				return Utility.unitFutureOf(false);
+				return Futures.unit(false);
 			} else {
 				prefs.addToLastViewedRepositories(repoId);
 				logger.info("Opening " + repoId);
 				UI.status.displayMessage("Opening " + repoId);
 				return repoIO.openRepository(repoId)
 					.thenApply(models::addPending)
-					.thenAccept(this::updateUI)
+					.thenRun(this::updateUI)
 					.thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
 					.thenApply(n -> true)
-					.exceptionally(HTLog.withResult(false));
+					.exceptionally(withResult(false));
 			}
 		});
 	}
@@ -100,7 +107,8 @@ public class Logic {
 		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
 			models.insertMetadata(repoId, metadata);
 			return metadata;
-		}).exceptionally(HTLog.withResult(new HashMap<>()));
+		}).thenApply(Futures.tap(this::updateUIWithoutMetadata))
+		.exceptionally(withResult(new HashMap<>()));
 	}
 
 	public Set<String> getOpenRepositories() {
