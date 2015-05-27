@@ -33,7 +33,7 @@ public class IssuePanelCard extends VBox {
 	 * A card that is constructed with an issue as argument. Its components
 	 * are bound to the issue's fields and will update automatically.
 	 */
-	
+
 	private final TurboIssue issue;
 	private final Model model;
 	private FlowPane issueDetails = new FlowPane();
@@ -48,23 +48,26 @@ public class IssuePanelCard extends VBox {
 		this.issuesWithNewComments = issuesWithNewComments;
 		setup();
 	}
-	
+
 	private void setup() {
 		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueTitle.setWrappingWidth(CARD_WIDTH);
 		issueTitle.getStyleClass().add("issue-panel-name");
-		if (!issue.isOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
-	
+
+		if (!issue.isOpen()) {
+			issueTitle.getStyleClass().add("issue-panel-closed");
+		}
+
 		setupIssueDetailsBox();
-		
-		setPadding(new Insets(0,0,3,0));
+
+		setPadding(new Insets(0, 0, 3, 0));
 		setSpacing(1);
 
 		getChildren().addAll(issueTitle, issueDetails);
 
-		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			Node feed = getEventDisplay(issue, getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
-			getChildren().add(feed);
+		if (parentPanel.getCurrentFilterExpression().getQualifierNames().contains(Qualifier.UPDATED)) {
+			getChildren().add(getEventDisplay(issue,
+				getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
 		}
 	}
 
@@ -146,11 +149,7 @@ public class IssuePanelCard extends VBox {
 		display.getStyleClass().add("issue-panel-feed");
 		return display;
 	}
-	
-	private boolean isUpdateFilter(FilterExpression currentFilterExpression) {
-		return currentFilterExpression.getQualifierNames().contains("updated");
-	}
-	
+
 	private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
 		List<Qualifier> filters = currentFilterExpression.find(q -> q.getName().equals("updated"));
 		assert filters.size() > 0 : "Problem with isUpdateFilter";
@@ -178,29 +177,29 @@ public class IssuePanelCard extends VBox {
 		issueDetails.setMaxWidth(CARD_WIDTH);
 		issueDetails.setPrefWrapLength(CARD_WIDTH);
 		issueDetails.setHgap(3);
-		
+
 		updateDetails();
 	}
-	
+
 	private void updateDetails() {
 		issueDetails.getChildren().clear();
-		
+
 		if (issue.isPullRequest()) {
 			Label icon = new Label(OCTICON_PULL_REQUEST);
 			icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
 			issueDetails.getChildren().add(icon);
 		}
-		
+
 		if (issue.getCommentCount() > 0){
 			Label commentIcon = new Label(OCTICON_COMMENT);
 			commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
 			Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
-			
+
 			if (issuesWithNewComments.contains(issue.getId())) {
 				commentIcon.getStyleClass().add("has-comments");
 				commentCount.getStyleClass().add("has-comments");
 			}
-			
+
 			issueDetails.getChildren().add(commentIcon);
 			issueDetails.getChildren().add(commentCount);
 		}
@@ -229,6 +228,6 @@ public class IssuePanelCard extends VBox {
 			assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
 			issueDetails.getChildren().add(assigneeBox);
 		}
-		
+
 	}
 }

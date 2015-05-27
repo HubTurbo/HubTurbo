@@ -4,7 +4,7 @@ import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
-import util.Utility;
+import util.Futures;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +45,6 @@ public class DummySource extends RepoSource {
 
 	@Override
 	public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
-		return Utility.unitFutureOf(true);
+		return Futures.unit(true);
 	}
 }

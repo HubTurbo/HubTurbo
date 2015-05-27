@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static util.Futures.withResult;
+
 public class RepoIO {
 
 	private static final Logger logger = HTLog.get(RepoIO.class);
@@ -33,11 +35,11 @@ public class RepoIO {
 		if (repoStore.isRepoStored(repoId)) {
 			return repoStore.loadRepository(repoId)
 				.thenCompose(this::updateModel)
-				.exceptionally(HTLog.withResult(new Model(repoId)));
+				.exceptionally(withResult(new Model(repoId)));
 		} else {
 			return repoSource.downloadRepository(repoId)
 				.thenCompose(this::updateModel)
-				.exceptionally(HTLog.withResult(new Model(repoId)));
+				.exceptionally(withResult(new Model(repoId)));
 		}
 	}
 
@@ -51,7 +53,7 @@ public class RepoIO {
 					logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
 				}
 				return newModel;
-			}).exceptionally(HTLog.withResult(new Model(model.getRepoId())));
+			}).exceptionally(withResult(new Model(model.getRepoId())));
 	}
 
 	public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {

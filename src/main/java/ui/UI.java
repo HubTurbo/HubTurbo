@@ -26,6 +26,7 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
+import util.HTLog;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.Utility;
@@ -36,6 +37,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+
+import static util.Futures.withResult;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -99,10 +102,7 @@ public class UI extends Application implements EventDispatcher {
 				quit();
 			}
 			return true;
-		}).exceptionally(e -> {
-			logger.error(e.getLocalizedMessage(), e);
-			return false;
-		});
+		}).exceptionally(withResult(false));
 	}
 
 	private void initPreApplicationState() {

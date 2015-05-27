@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 
+	public static final String UPDATED = "updated";
 	public static final Qualifier EMPTY = new Qualifier("", "");
 
 	private final String name;
