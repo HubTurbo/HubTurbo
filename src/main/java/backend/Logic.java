@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static util.Futures.mapping;
 import static util.Futures.withResult;
 
 public class Logic {
@@ -102,6 +101,7 @@ public class Logic {
 		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
 			models.insertMetadata(repoId, metadata);
 			return metadata;
+		}).thenApply(Futures.tap(this::updateUI))
 		.exceptionally(withResult(new HashMap<>()));
 	}
 

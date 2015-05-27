@@ -29,6 +29,7 @@ import util.events.ModelUpdatedEventHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -271,11 +272,10 @@ public abstract class IssueColumn extends Column {
 			} else {
 				this.applyFilterExpression(EMPTY);
 			}
-			
+
 			// Clear displayed message on successful filter
 			UI.status.clear();
-		}
-		catch (ParseException ex) {
+		} catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Overrides message in status bar
 			UI.status.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
@@ -343,7 +343,7 @@ public abstract class IssueColumn extends Column {
 			}
 		}
 	}
-	
+
 	public TransformationList<TurboIssue, TurboIssue> getIssueList() {
 		return transformedIssueList;
 	}
@@ -358,10 +358,20 @@ public abstract class IssueColumn extends Column {
 		ui.unregisterEvent(onModelUpdate);
 	}
 
-
 	@Override
 	public void refreshItems() {
 		applyCurrentFilterExpression();
 		transformedIssueList = new FilteredList<>(issues, predicate);
+
+		if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
+			// Group all filtered issues by repo, then trigger updates for each group
+			transformedIssueList.stream()
+				.collect(Collectors.groupingBy(TurboIssue::getRepoId))
+				.entrySet().forEach(e ->
+				ui.logic.getIssueMetadata(e.getKey(),
+					e.getValue().stream()
+						.map(TurboIssue::getId)
+						.collect(Collectors.toList())));
+		}
 	}
 }

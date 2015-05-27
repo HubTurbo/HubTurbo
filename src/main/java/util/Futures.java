@@ -39,7 +39,7 @@ public class Futures {
 		return f;
 	}
 
-	public static <T> Function<T, T> mapping(Runnable runnable) {
+	public static <T> Function<T, T> tap(Runnable runnable) {
 		return a -> {
 			runnable.run();
 			return a;
@@ -73,6 +73,4 @@ public class Futures {
 					.collect(Collectors.<T>toList())
 		);
 	}
-
-
 }
