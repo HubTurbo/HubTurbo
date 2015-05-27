@@ -43,6 +43,14 @@ public class FilterParserTests {
     
     @Test
     public void unexpectedEOFs() {
+	    try {
+		    Parser.parse("a:.");
+		    fail("Inputs which end unexpectedly should throw a parse exception");
+	    } catch (ParseException ignored) {}
+	    try {
+		    Parser.parse("a:");
+		    fail("Inputs which end unexpectedly should throw a parse exception");
+	    } catch (ParseException ignored) {}
         try {
             Parser.parse("~");
             fail("Inputs which end unexpectedly should throw a parse exception");
