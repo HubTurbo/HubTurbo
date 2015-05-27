@@ -53,18 +53,21 @@ public class IssuePanelCard extends VBox {
 		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
 		issueTitle.setWrappingWidth(CARD_WIDTH);
 		issueTitle.getStyleClass().add("issue-panel-name");
-		if (!issue.isOpen()) issueTitle.getStyleClass().add("issue-panel-closed");
+
+		if (!issue.isOpen()) {
+			issueTitle.getStyleClass().add("issue-panel-closed");
+		}
 	
 		setupIssueDetailsBox();
 		
-		setPadding(new Insets(0,0,3,0));
+		setPadding(new Insets(0, 0, 3, 0));
 		setSpacing(1);
 
 		getChildren().addAll(issueTitle, issueDetails);
 
-		if (isUpdateFilter(parentPanel.getCurrentFilterExpression())) {
-			Node feed = getEventDisplay(issue, getUpdateFilterHours(parentPanel.getCurrentFilterExpression()));
-			getChildren().add(feed);
+		if (parentPanel.getCurrentFilterExpression().getQualifierNames().contains("update")) {
+			getChildren().add(getEventDisplay(issue,
+				getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
 		}
 	}
 
@@ -145,10 +148,6 @@ public class IssuePanelCard extends VBox {
 		display.setWrappingWidth(width);
 		display.getStyleClass().add("issue-panel-feed");
 		return display;
-	}
-	
-	private boolean isUpdateFilter(FilterExpression currentFilterExpression) {
-		return currentFilterExpression.getQualifierNames().contains("updated");
 	}
 	
 	private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
