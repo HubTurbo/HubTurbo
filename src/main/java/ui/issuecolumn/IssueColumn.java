@@ -306,6 +306,7 @@ public abstract class IssueColumn extends Column {
 	 */
 	private void applyCurrentFilterExpression() {
 		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
+		comparator = Qualifier.getSortComparator("id", true);
 		Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
 			if (!qualifier.getContent().isPresent()) {
 				return;

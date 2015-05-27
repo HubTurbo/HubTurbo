@@ -104,7 +104,8 @@ public class Qualifier implements FilterExpression {
 
 	public static void processMetaQualifierEffects(FilterExpression expr, BiConsumer<Qualifier, MetaQualifierInfo> callback) {
 		List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
-		qualifiers.forEach(q -> callback.accept(q, new MetaQualifierInfo(qualifiers)));
+		MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
+		qualifiers.forEach(q -> callback.accept(q, info));
 	}
 
 	private static LocalDateTime currentTime = null;
