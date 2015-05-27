@@ -19,7 +19,7 @@ public class UIManager {
 	}
 
 	public void updateNow(MultiModel models) {
-		ui.triggerEvent(new ModelUpdatedEvent(models));
+		ui.triggerEvent(new ModelUpdatedEvent(models, true));
 	}
 }
 
