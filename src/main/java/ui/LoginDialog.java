@@ -76,25 +76,18 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		resolveCredentials();
 		enableUI(false);
 
-		if (isTestMode()) {
-			Platform.runLater(() -> {
-				completeResponse(new Result("dummy", "dummy"));
-				close();
-			});
-		} else {
-			CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
-				if (success) {
-					// Save login details only on successful login
-					prefs.setLastLoginCredentials(username, password);
-					Platform.runLater(() -> {
-						completeResponse(new Result(owner, repo));
-						close();
-					});
-				} else {
-					handleError("Failed to sign in. Please try again.");
-				}
-			});
-		}
+		CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
+			if (success) {
+				// Save login details only on successful login
+				prefs.setLastLoginCredentials(username, password);
+				Platform.runLater(() -> {
+					completeResponse(new Result(owner, repo));
+					close();
+				});
+			} else {
+				handleError("Failed to sign in. Please try again.");
+			}
+		});
 	}
 
 	private boolean isTestMode() {

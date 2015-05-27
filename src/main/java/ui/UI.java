@@ -83,7 +83,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void getUserCredentials() {
-		if (isTestMode()) {
+		if (isBypassLogin()) {
 			showMainWindow("dummy/dummy");
 		} else {
 			new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
