@@ -20,6 +20,7 @@ public class RepositorySelector extends HBox {
 		setupLayout();
 		setupComboBox();
 		getChildren().addAll(comboBox);
+		this.setId("repositorySelector");
 	}
 
 	private void setupLayout() {
