@@ -3,6 +3,7 @@ package ui;
 import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
+import browserview.BrowserComponentStub;
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
@@ -106,8 +107,14 @@ public class UI extends Application implements EventDispatcher {
 		repoSelector.setText(repoId);
 
 		triggerEvent(new BoardSavedEvent());
-		browserComponent = new BrowserComponent(this);
-		browserComponent.initialise();
+
+		if (getCommandLineArgs().get("test").equalsIgnoreCase("true")) {
+			browserComponent = new BrowserComponentStub(this);
+		} else {
+			browserComponent = new BrowserComponent(this);
+			browserComponent.initialise();
+		}
+
 		setExpandedWidth(false);
 		ensureSelectedPanelHasFocus();
 		columns.init();
