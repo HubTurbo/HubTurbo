@@ -32,7 +32,6 @@ public class RepositorySelector extends HBox {
 	private void setupComboBox() {
 		comboBox.setFocusTraversable(false);
 		comboBox.setEditable(true);
-		loadContents();
 		comboBox.valueProperty().addListener((observable, old, newVal) -> {
 			if (Utility.isWellFormedRepoId(newVal) && !changesDisabled) {
 				onValueChangeCallback.accept(newVal);

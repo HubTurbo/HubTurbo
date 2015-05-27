@@ -83,26 +83,39 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void getUserCredentials() {
-		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
-			if (result.success) {
-				logic.openRepository(result.repoId);
-				logic.setDefaultRepo(result.repoId);
-				repoSelector.setText(result.repoId);
+		if (isTestMode()) {
+			logic.openRepository("dummy/dummy");
+			logic.setDefaultRepo("dummy/dummy");
+			repoSelector.setText("dummy/dummy");
 
-				triggerEvent(new BoardSavedEvent());
-				browserComponent = new BrowserComponent(this);
-				browserComponent.initialise();
-				setExpandedWidth(false);
-				ensureSelectedPanelHasFocus();
-				columns.init();
-			} else {
-				quit();
-			}
-			return true;
-		}).exceptionally(e -> {
-			logger.error(e.getLocalizedMessage(), e);
-			return false;
-		});
+			triggerEvent(new BoardSavedEvent());
+			browserComponent = new BrowserComponent(this);
+			browserComponent.initialise();
+			setExpandedWidth(false);
+			ensureSelectedPanelHasFocus();
+			columns.init();
+		} else {
+			new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
+				if (result.success) {
+					logic.openRepository(result.repoId);
+					logic.setDefaultRepo(result.repoId);
+					repoSelector.setText(result.repoId);
+
+					triggerEvent(new BoardSavedEvent());
+					browserComponent = new BrowserComponent(this);
+					browserComponent.initialise();
+					setExpandedWidth(false);
+					ensureSelectedPanelHasFocus();
+					columns.init();
+				} else {
+					quit();
+				}
+				return true;
+			}).exceptionally(e -> {
+				logger.error(e.getLocalizedMessage(), e);
+				return false;
+			});
+		}
 	}
 
 	private void initPreApplicationState() {
@@ -111,18 +124,19 @@ public class UI extends Application implements EventDispatcher {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
 
+		commandLineArgs = initialiseCommandLineArguments();
 		prefs = new Preferences(this, columns);
 
 		eventBus = new EventBus();
 		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
 
 		uiManager = new UIManager(this);
-		logic = new Logic(uiManager, prefs);
+//		logic = new Logic(uiManager, prefs);
 		status = new HTStatusBar(this);
 	}
 
 	private void initApplicationState() {
-		commandLineArgs = initialiseCommandLineArguments();
+		logic = new Logic(uiManager, prefs, isTestMode());
 		clearCacheIfNecessary();
 	}
 
@@ -137,6 +151,23 @@ public class UI extends Application implements EventDispatcher {
 		loadFonts();
 		String css = initCSS();
 		applyCSS(css, scene);
+	}
+
+	private boolean isTestMode() {
+		String isTest = getCommandLineArgs().get("test");
+		if (isTest != null) {
+			if (isTest.equalsIgnoreCase("true")) return true;
+			if (isBypassLogin()) return true;
+		}
+		return false;
+	}
+
+	private boolean isBypassLogin() {
+		String isBypassLogin = commandLineArgs.get("bypasslogin");
+		if (isBypassLogin != null) {
+			if (isBypassLogin.equalsIgnoreCase("true")) return true;
+		}
+		return false;
 	}
 
 	public void quit() {
@@ -210,12 +241,13 @@ public class UI extends Application implements EventDispatcher {
 
 	private HashMap<String, String> initialiseCommandLineArguments() {
 		Parameters params = getParameters();
-		final List<String> parameters = params.getRaw();
-		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
-		HashMap<String, String> commandLineArgs = new HashMap<>();
-		for (int i=0; i<parameters.size(); i+=2) {
-			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
-		}
+//		final List<String> parameters = params.getRaw();
+//		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
+//		HashMap<String, String> commandLineArgs = new HashMap<>();
+//		for (int i=0; i<parameters.size(); i+=2) {
+//			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
+//		}
+		HashMap<String, String> commandLineArgs = new HashMap<>(params.getNamed());
 		return commandLineArgs;
 	}
 

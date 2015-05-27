@@ -24,17 +24,20 @@ public class Logic {
 	private final UIManager uiManager;
 	private final Preferences prefs;
 
-	private RepoIO repoIO = new RepoIO();
+	private RepoIO repoIO;// = new RepoIO();
 
 	// Assumed to be always present when app starts
 	public UserCredentials credentials = null;
 
-	public Logic(UIManager uiManager, Preferences prefs) {
+	public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode) {
 		this.uiManager = uiManager;
 		this.prefs = prefs;
 
+		repoIO = new RepoIO(isTestMode);
+
 		// Pass the currently-empty model to the UI
-		updateUI(models);
+//		updateUI(models);
+		uiManager.updateNow(models);
 	}
 
 	private CompletableFuture<Boolean> isRepositoryValid(String repoId) {

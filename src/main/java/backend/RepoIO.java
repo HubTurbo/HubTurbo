@@ -6,6 +6,7 @@ import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
+import backend.stub.DummySource;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
@@ -18,8 +19,13 @@ public class RepoIO {
 
 	private static final Logger logger = HTLog.get(RepoIO.class);
 
-	private final RepoSource repoSource = new GitHubSource();
-	private final RepoStore repoStore = new JSONStore();
+	private final RepoSource repoSource;
+	private final RepoStore repoStore;
+
+	public RepoIO(boolean isTestMode) {
+		repoSource = isTestMode ? new DummySource() : new GitHubSource();
+		repoStore = new JSONStore();
+	}
 
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
 		return repoSource.login(credentials);
