@@ -313,10 +313,12 @@ public abstract class IssueColumn extends Column {
 			if (qualifier.getName().equals(Qualifier.REPO)) {
 				ui.logic.openRepository(qualifier.getContent().get());
 			} else if (qualifier.getName().equals(Qualifier.SORT)) {
-				assert metaQualifierInfo.isOrderAscending().isPresent();
-				comparator = Qualifier.getSortComparator(
-					qualifier.getName(),
-					metaQualifierInfo.isOrderAscending().get());
+				boolean ascending = metaQualifierInfo.isOrderAscending().isPresent()
+					? metaQualifierInfo.isOrderAscending().get()
+					: true;
+				assert qualifier.getContent().isPresent();
+
+				comparator = Qualifier.getSortComparator(qualifier.getContent().get(), ascending);
 			}
 		});
 	}
