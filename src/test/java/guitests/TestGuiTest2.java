@@ -51,13 +51,13 @@ public class TestGuiTest2 extends GuiTest {
 
     @Test
     public void testBadLoginAgain() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("test").push(KeyCode.TAB);
-        type("test");
-        click("Sign in");
+//        TextField repoOwnerField = find("#repoOwnerField");
+//        doubleClick(repoOwnerField);
+//        type("HubTurbo").push(KeyCode.TAB);
+//        type("HubTurbo").push(KeyCode.TAB);
+//        type("test").push(KeyCode.TAB);
+//        type("test");
+//        click("Sign in");
         sleep(2000);
         assertNotNull(hasText("Failed to sign in. Please try again."));
     }
