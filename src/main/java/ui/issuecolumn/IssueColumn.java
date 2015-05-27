@@ -20,7 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import org.apache.bcel.generic.ReturnaddressType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
@@ -28,7 +27,10 @@ import ui.components.FilterTextField;
 import util.events.ColumnClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -369,9 +371,15 @@ public abstract class IssueColumn extends Column {
 	@Override
 	public void refreshItems() {
 		applyCurrentFilterExpression();
+		Comparator<TurboIssue> idOrdering = (a, b) -> {
+			int result = a.getRepoId().compareTo(b.getRepoId());
+			if (result != 0) {
+				return result;
+			}
+			return b.getId() - a.getId();
+		};
 		transformedIssueList = new SortedList<>(
-			new FilteredList<>(issues, predicate),
-			(a, b) -> b.getId() - a.getId());
+			new FilteredList<>(issues, predicate), idOrdering);
 
 		if (!triggerMetadataUpdate) {
 			triggerMetadataUpdate = true;
