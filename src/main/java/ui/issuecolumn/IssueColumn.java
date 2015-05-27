@@ -56,6 +56,11 @@ public abstract class IssueColumn extends Column {
 	protected FilterTextField filterTextField;
 	private UI ui;
 
+	// This controls whether a metadata update will be triggered on the next refresh.
+	// It's toggled to false by model updates that are not supposed to trigger updates.
+	// It's toggled to true each time a refresh DOES NOT trigger an update.
+	private boolean triggerMetadataUpdate = true;
+
 	public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
 		super(model, parentColumnControl, columnIndex);
 		this.ui = ui;
@@ -121,6 +126,10 @@ public abstract class IssueColumn extends Column {
 			.collect(Collectors.toList()));
 
 		filterTextField.setKeywords(all);
+
+		if (!e.triggerMetadataUpdate) {
+			this.triggerMetadataUpdate = false;
+		}
 	};
 
 	private Node createFilterBox() {
@@ -363,7 +372,9 @@ public abstract class IssueColumn extends Column {
 		applyCurrentFilterExpression();
 		transformedIssueList = new FilteredList<>(issues, predicate);
 
-		if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
+		if (!triggerMetadataUpdate) {
+			triggerMetadataUpdate = true;
+		} else if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
 			// Group all filtered issues by repo, then trigger updates for each group
 			transformedIssueList.stream()
 				.collect(Collectors.groupingBy(TurboIssue::getRepoId))
