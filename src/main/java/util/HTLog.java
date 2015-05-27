@@ -7,7 +7,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import java.util.function.Function;
 
 /**
- * Nicer interface for using loggers
+ * A nicer interface for using loggers.
  */
 public class HTLog {
 
@@ -31,27 +31,5 @@ public class HTLog {
 
 	public static void error(Logger logger, Exception e) {
 		logger.error(e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * Combinators for dealing with CompletableFutures
-	 */
-
-	/**
-	 * For use as an argument to .exceptionally. Logs and returns null.
-	 */
-	public static <T> T log(Throwable e) {
-		logger.error(e.getLocalizedMessage(), e);
-		return null;
-	}
-
-	/**
-	 * For use as an argument to .exceptionally. Logs and returns a given result.
-	 */
-	public static <T> Function<Throwable, T> withResult(T value) {
-		return e -> {
-			logger.error(e.getLocalizedMessage(), e);
-			return value;
-		};
 	}
 }

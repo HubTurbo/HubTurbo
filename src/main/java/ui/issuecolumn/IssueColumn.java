@@ -29,6 +29,7 @@ import util.events.ModelUpdatedEventHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,11 @@ public abstract class IssueColumn extends Column {
 	private FilterExpression currentFilterExpression = EMPTY;
 	protected FilterTextField filterTextField;
 	private UI ui;
+
+	// This controls whether a metadata update will be triggered on the next refresh.
+	// It's toggled to false by model updates that are not supposed to trigger updates.
+	// It's toggled to true each time a refresh DOES NOT trigger an update.
+	private boolean triggerMetadataUpdate = true;
 
 	public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
 		super(model, parentColumnControl, columnIndex);
@@ -120,6 +126,10 @@ public abstract class IssueColumn extends Column {
 			.collect(Collectors.toList()));
 
 		filterTextField.setKeywords(all);
+
+		if (!e.triggerMetadataUpdate) {
+			this.triggerMetadataUpdate = false;
+		}
 	};
 
 	private Node createFilterBox() {
@@ -271,11 +281,10 @@ public abstract class IssueColumn extends Column {
 			} else {
 				this.applyFilterExpression(EMPTY);
 			}
-			
+
 			// Clear displayed message on successful filter
 			UI.status.clear();
-		}
-		catch (ParseException ex) {
+		} catch (ParseException ex) {
 			this.applyFilterExpression(EMPTY);
 			// Overrides message in status bar
 			UI.status.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
@@ -343,7 +352,7 @@ public abstract class IssueColumn extends Column {
 			}
 		}
 	}
-	
+
 	public TransformationList<TurboIssue, TurboIssue> getIssueList() {
 		return transformedIssueList;
 	}
@@ -358,10 +367,22 @@ public abstract class IssueColumn extends Column {
 		ui.unregisterEvent(onModelUpdate);
 	}
 
-
 	@Override
 	public void refreshItems() {
 		applyCurrentFilterExpression();
 		transformedIssueList = new FilteredList<>(issues, predicate);
+
+		if (!triggerMetadataUpdate) {
+			triggerMetadataUpdate = true;
+		} else if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
+			// Group all filtered issues by repo, then trigger updates for each group
+			transformedIssueList.stream()
+				.collect(Collectors.groupingBy(TurboIssue::getRepoId))
+				.entrySet().forEach(e ->
+				ui.logic.getIssueMetadata(e.getKey(),
+					e.getValue().stream()
+						.map(TurboIssue::getId)
+						.collect(Collectors.toList())));
+		}
 	}
 }

@@ -13,8 +13,9 @@ public class UIManager {
 		this.ui = ui;
 	}
 
-	public void update(MultiModel models) {
-		Platform.runLater(() -> ui.triggerEvent(new ModelUpdatedEvent(models)));
+	public void update(MultiModel models, boolean triggerMetadataUpdate) {
+		Platform.runLater(() ->
+			ui.triggerEvent(new ModelUpdatedEvent(models, triggerMetadataUpdate)));
 	}
 
 	public void updateNow(MultiModel models) {
