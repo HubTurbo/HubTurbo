@@ -357,6 +357,9 @@ public class Qualifier implements FilterExpression {
 		Comparator<TurboIssue> comparator;
 
 		switch (key) {
+			case "comments":
+				comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
+				break;
 			case "updated":
 				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
 				break;
