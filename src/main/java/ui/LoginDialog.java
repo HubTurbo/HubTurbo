@@ -98,8 +98,13 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 	}
 
 	private boolean isTestMode() {
-		String isTest = ui.getCommandLineArgs().get("test");
-		return isTest == null ? false : isTest.equalsIgnoreCase("true");
+		assert !isBypassLogin();
+		if (ui.getCommandLineArgs().getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
+		return false;
+	}
+
+	private boolean isBypassLogin() {
+		return ui.getCommandLineArgs().getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
 	}
 
 	private boolean attemptLogin() {

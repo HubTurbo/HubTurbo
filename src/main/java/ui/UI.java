@@ -107,7 +107,8 @@ public class UI extends Application implements EventDispatcher {
 
 		triggerEvent(new BoardSavedEvent());
 
-		if (getCommandLineArgs().get("test").equalsIgnoreCase("true")) {
+		// Use getOrDefault to avoid NullPointerException
+		if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) {
 			browserComponent = new BrowserComponentStub(this);
 		} else {
 			browserComponent = new BrowserComponent(this);
@@ -154,20 +155,13 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private boolean isTestMode() {
-		String isTest = getCommandLineArgs().get("test");
-		if (isTest != null) {
-			if (isTest.equalsIgnoreCase("true")) return true;
-			if (isBypassLogin()) return true;
-		}
+		if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
+		if (isBypassLogin()) return true;
 		return false;
 	}
 
 	private boolean isBypassLogin() {
-		String isBypassLogin = commandLineArgs.get("bypasslogin");
-		if (isBypassLogin != null) {
-			if (isBypassLogin.equalsIgnoreCase("true")) return true;
-		}
-		return false;
+		return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
 	}
 
 	public void quit() {
