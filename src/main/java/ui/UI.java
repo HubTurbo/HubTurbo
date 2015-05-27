@@ -84,29 +84,11 @@ public class UI extends Application implements EventDispatcher {
 
 	private void getUserCredentials() {
 		if (isTestMode()) {
-			logic.openRepository("dummy/dummy");
-			logic.setDefaultRepo("dummy/dummy");
-			repoSelector.setText("dummy/dummy");
-
-			triggerEvent(new BoardSavedEvent());
-			browserComponent = new BrowserComponent(this);
-			browserComponent.initialise();
-			setExpandedWidth(false);
-			ensureSelectedPanelHasFocus();
-			columns.init();
+			showMainWindow("dummy/dummy");
 		} else {
 			new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
 				if (result.success) {
-					logic.openRepository(result.repoId);
-					logic.setDefaultRepo(result.repoId);
-					repoSelector.setText(result.repoId);
-
-					triggerEvent(new BoardSavedEvent());
-					browserComponent = new BrowserComponent(this);
-					browserComponent.initialise();
-					setExpandedWidth(false);
-					ensureSelectedPanelHasFocus();
-					columns.init();
+					showMainWindow(result.repoId);
 				} else {
 					quit();
 				}
@@ -116,6 +98,19 @@ public class UI extends Application implements EventDispatcher {
 				return false;
 			});
 		}
+	}
+
+	private void showMainWindow(String repoId) {
+		logic.openRepository(repoId);
+		logic.setDefaultRepo(repoId);
+		repoSelector.setText(repoId);
+
+		triggerEvent(new BoardSavedEvent());
+		browserComponent = new BrowserComponent(this);
+		browserComponent.initialise();
+		setExpandedWidth(false);
+		ensureSelectedPanelHasFocus();
+		columns.init();
 	}
 
 	private void initPreApplicationState() {
@@ -131,7 +126,6 @@ public class UI extends Application implements EventDispatcher {
 		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
 
 		uiManager = new UIManager(this);
-//		logic = new Logic(uiManager, prefs);
 		status = new HTStatusBar(this);
 	}
 
@@ -241,12 +235,6 @@ public class UI extends Application implements EventDispatcher {
 
 	private HashMap<String, String> initialiseCommandLineArguments() {
 		Parameters params = getParameters();
-//		final List<String> parameters = params.getRaw();
-//		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
-//		HashMap<String, String> commandLineArgs = new HashMap<>();
-//		for (int i=0; i<parameters.size(); i+=2) {
-//			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
-//		}
 		HashMap<String, String> commandLineArgs = new HashMap<>(params.getNamed());
 		return commandLineArgs;
 	}

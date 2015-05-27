@@ -36,7 +36,6 @@ public class Logic {
 		repoIO = new RepoIO(isTestMode);
 
 		// Pass the currently-empty model to the UI
-//		updateUI(models);
 		uiManager.updateNow(models);
 	}
 
