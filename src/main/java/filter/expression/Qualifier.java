@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -102,8 +102,9 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
 
-	public static void processMetaQualifierEffects(FilterExpression expr, Consumer<Qualifier> callback) {
-		expr.find(Qualifier::isMetaQualifier).forEach(callback);
+	public static void processMetaQualifierEffects(FilterExpression expr, BiConsumer<Qualifier, MetaQualifierInfo> callback) {
+		List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
+		qualifiers.forEach(q -> callback.accept(q, new MetaQualifierInfo(qualifiers)));
 	}
 
 	private static LocalDateTime currentTime = null;
@@ -349,6 +350,26 @@ public class Qualifier implements FilterExpression {
 			return true;
 		default:
 			return false;
+		}
+	}
+
+	public static Comparator<TurboIssue> getSortComparator(String key, boolean inverted) {
+		Comparator<TurboIssue> comparator;
+
+		switch (key) {
+			case "updated":
+				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+				break;
+			case "id":
+			default:
+				comparator = (a, b) -> a.getId() - b.getId();
+				break;
+		}
+
+		if (!inverted) {
+			return comparator;
+		} else {
+			return (a, b) -> -comparator.compare(a, b);
 		}
 	}
 
