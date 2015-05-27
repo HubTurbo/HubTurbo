@@ -70,7 +70,11 @@ public class Logic {
 	}
 
 	private void updateUI() {
-		uiManager.update(models);
+		uiManager.update(models, true);
+	}
+
+	private void updateUIWithoutMetadata() {
+		uiManager.update(models, false);
 	}
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
@@ -101,7 +105,7 @@ public class Logic {
 		return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
 			models.insertMetadata(repoId, metadata);
 			return metadata;
-		}).thenApply(Futures.tap(this::updateUI))
+		}).thenApply(Futures.tap(this::updateUIWithoutMetadata))
 		.exceptionally(withResult(new HashMap<>()));
 	}
 
