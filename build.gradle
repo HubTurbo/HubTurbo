@@ -67,14 +67,6 @@ allprojects {
     }
 
     test {
-        exclude 'guitests'
-        dependsOn 'guiTests'
-    }
-
-    task guiTests(type: Test) {
-        filter {
-            includeTestsMatching 'guitests.*'
-        }
         forkEvery = 1
     }
 
