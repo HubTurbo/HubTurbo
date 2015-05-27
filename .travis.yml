@@ -17,3 +17,4 @@ branches:
     - master
     - ci
     - testfx
+    - tests
