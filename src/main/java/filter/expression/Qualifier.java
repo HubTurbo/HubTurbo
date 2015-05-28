@@ -12,17 +12,17 @@ import util.Utility;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 
 	public static final String UPDATED = "updated";
+	public static final String REPO = "repo";
+	public static final String SORT = "sort";
+
 	public static final Qualifier EMPTY = new Qualifier("", "");
 
 	private final String name;
@@ -102,8 +102,10 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
 
-	public static void processMetaQualifierEffects(FilterExpression expr, Consumer<Qualifier> callback) {
-		expr.find(Qualifier::isMetaQualifier).forEach(callback);
+	public static void processMetaQualifierEffects(FilterExpression expr, BiConsumer<Qualifier, MetaQualifierInfo> callback) {
+		List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
+		MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
+		qualifiers.forEach(q -> callback.accept(q, info));
 	}
 
 	private static LocalDateTime currentTime = null;
@@ -337,6 +339,8 @@ public class Qualifier implements FilterExpression {
 	private static boolean shouldBeStripped(Qualifier q) {
 		switch (q.getName()) {
 			case "in":
+			case "order":
+			case "sort":
 				return true;
 			default:
 				return false;
@@ -345,11 +349,36 @@ public class Qualifier implements FilterExpression {
 
 	private static boolean isMetaQualifier(Qualifier q) {
 		switch (q.getName()) {
+		case "sort":
+		case "order":
 		case "in":
 		case "repo":
 			return true;
 		default:
 			return false;
+		}
+	}
+
+	public static Comparator<TurboIssue> getSortComparator(String key, boolean inverted) {
+		Comparator<TurboIssue> comparator;
+
+		switch (key) {
+			case "comments":
+				comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
+				break;
+			case "updated":
+				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+				break;
+			case "id":
+			default:
+				comparator = (a, b) -> a.getId() - b.getId();
+				break;
+		}
+
+		if (!inverted) {
+			return comparator;
+		} else {
+			return (a, b) -> -comparator.compare(a, b);
 		}
 	}
 

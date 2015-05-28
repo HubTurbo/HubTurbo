@@ -2,19 +2,15 @@ package guitests;
 
 import com.google.common.util.concurrent.SettableFuture;
 import javafx.scene.Parent;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
+import ui.RepositorySelector;
 import ui.UI;
 
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertNotNull;
-import static org.loadui.testfx.controls.Commons.hasText;
 
 public class TestGuiTest extends GuiTest {
 
@@ -55,15 +51,13 @@ public class TestGuiTest extends GuiTest {
     }
 
     @Test
-    public void testBadLogin() throws InterruptedException {
-//        TextField repoOwnerField = find("#repoOwnerField");
-//        doubleClick(repoOwnerField);
-//        type("HubTurbo").push(KeyCode.TAB);
-//        type("HubTurbo").push(KeyCode.TAB);
-//        type("test").push(KeyCode.TAB);
-//        type("test");
-//        click("Sign in");
-        sleep(2000);
-        assertNotNull(hasText("Failed to sign in. Please try again."));
+    public void clickAround() throws InterruptedException {
+        RepositorySelector repositorySelector = find("#repositorySelector");
+        click(repositorySelector);
+        for (int i = 0; i < 10; i++) {
+            click("View");
+            click("Refresh");
+        }
+        sleep(5000);
     }
 }
