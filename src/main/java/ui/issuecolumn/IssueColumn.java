@@ -306,20 +306,12 @@ public abstract class IssueColumn extends Column {
 	 */
 	private void applyCurrentFilterExpression() {
 		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-		comparator = Qualifier.getSortComparator("id", true);
+		comparator = Qualifier.getSortComparator(model, "id", true);
 		Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
-			if (!qualifier.getContent().isPresent()) {
-				return;
-			}
-			if (qualifier.getName().equals(Qualifier.REPO)) {
+			if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
 				ui.logic.openRepository(qualifier.getContent().get());
 			} else if (qualifier.getName().equals(Qualifier.SORT)) {
-				boolean ascending = metaQualifierInfo.isOrderAscending().isPresent()
-					? metaQualifierInfo.isOrderAscending().get()
-					: true;
-				assert qualifier.getContent().isPresent();
-
-				comparator = Qualifier.getSortComparator(qualifier.getContent().get(), ascending);
+				comparator = qualifier.getCompoundSortComparator(model);
 			}
 		});
 	}
@@ -384,14 +376,7 @@ public abstract class IssueColumn extends Column {
 	public void refreshItems() {
 		applyCurrentFilterExpression();
 
-		transformedIssueList = new SortedList<>(
-			new FilteredList<>(issues, predicate), (a, b) -> {
-			int result = a.getRepoId().compareTo(b.getRepoId());
-			if (result != 0) {
-				return result;
-			}
-			return comparator.compare(a, b);
-		});
+		transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
 		if (!triggerMetadataUpdate) {
 			triggerMetadataUpdate = true;

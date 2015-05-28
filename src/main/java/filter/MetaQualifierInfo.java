@@ -13,32 +13,10 @@ import java.util.stream.Collectors;
 public class MetaQualifierInfo {
 
 	private Optional<String> in = Optional.empty();
-	private Optional<Boolean> ascending = Optional.empty();
 
 	public MetaQualifierInfo(List<Qualifier> qualifiers) {
 
 		this.in = processInQualifier(qualifiers);
-		this.ascending = processOrderQualifier(qualifiers);
-	}
-
-	private Optional<Boolean> processOrderQualifier(List<Qualifier> qualifiers) {
-		List<Qualifier> orderQualifiers = qualifiers.stream()
-			.filter(q -> q.getName().equals("order"))
-			.collect(Collectors.toList());
-
-		if (orderQualifiers.isEmpty()) {
-			return Optional.empty();
-		} else if (orderQualifiers.size() > 1) {
-			throw new ParseException("More than one meta-qualifier: order");
-		} else {
-			assert orderQualifiers.get(0).getContent().isPresent();
-			if ("descending".startsWith(orderQualifiers.get(0).getContent().get())) {
-				return Optional.of(false);
-			} else {
-				// Default to ascending if content is invalid
-				return Optional.of(true);
-			}
-		}
 	}
 
 	private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
@@ -53,10 +31,6 @@ public class MetaQualifierInfo {
 		} else {
 			return inQualifiers.get(0).getContent();
 		}
-	}
-
-	public Optional<Boolean> isOrderAscending() {
-		return ascending;
 	}
 
 	public Optional<String> getIn() {
