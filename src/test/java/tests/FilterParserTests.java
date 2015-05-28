@@ -3,13 +3,9 @@ package tests;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.*;
-import filter.lexer.Lexer;
-import filter.lexer.Token;
-import filter.lexer.TokenType;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -43,6 +39,14 @@ public class FilterParserTests {
     
     @Test
     public void unexpectedEOFs() {
+	    try {
+		    Parser.parse("a:.");
+		    fail("Inputs which end unexpectedly should throw a parse exception");
+	    } catch (ParseException ignored) {}
+	    try {
+		    Parser.parse("a:");
+		    fail("Inputs which end unexpectedly should throw a parse exception");
+	    } catch (ParseException ignored) {}
         try {
             Parser.parse("~");
             fail("Inputs which end unexpectedly should throw a parse exception");
@@ -249,21 +253,7 @@ public class FilterParserTests {
         assertEquals(Parser.parse("assignee:dar ius(one)"),
                 new Conjunction(new Conjunction(new Qualifier("assignee", "dar"), new Qualifier("keyword", "ius")), new Qualifier("keyword", "one")));
     }
-    
-    @Test
-    public void lexer() {
-        assertEquals(new Lexer("").lex(), Arrays.asList(
-                new Token(TokenType.EOF, "", 0)));
-        assertEquals(new Lexer("a' b' c'").lex(), Arrays.asList(
-                new Token(TokenType.SYMBOL, "a'", 0),
-                new Token(TokenType.SYMBOL, "b'", 0),
-                new Token(TokenType.SYMBOL, "c'", 0),
-                new Token(TokenType.EOF, "", 0)));
-	    assertEquals(new Lexer("test/test").lex(), Arrays.asList(
-		    new Token(TokenType.SYMBOL, "test/test", 0),
-		    new Token(TokenType.EOF, "", 0)));
-    }
-    
+
     @Test
     public void serialisation() {
     	

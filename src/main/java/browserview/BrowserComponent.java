@@ -432,10 +432,10 @@ public class BrowserComponent {
 	public boolean hasBviewChanged() {
 		if (isBrowserActive()) {
 			if (getCurrentPageSource().equals(pageContentOnLoad)){
-			return false;
-		}
-		pageContentOnLoad = getCurrentPageSource();
-		return true;
+				return false;
+			}
+			pageContentOnLoad = getCurrentPageSource();
+			return true;
 		}
 		return false;
 	}

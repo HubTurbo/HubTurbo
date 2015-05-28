@@ -33,6 +33,7 @@ public class Qualifier implements FilterExpression {
 	private Optional<LocalDate> date = Optional.empty();
 	private Optional<NumberRange> numberRange = Optional.empty();
 	private Optional<Integer> number = Optional.empty();
+	private List<SortKey> sortKeys = new ArrayList<>();
 
 	// Copy constructor
 	public Qualifier(Qualifier other) {
@@ -47,6 +48,8 @@ public class Qualifier implements FilterExpression {
 			this.numberRange = other.getNumberRange();
 		} else if (other.getNumber().isPresent()) {
 			this.number = other.getNumber();
+		} else if (!other.sortKeys.isEmpty()) {
+			this.sortKeys = new ArrayList<>(other.sortKeys);
 		} else {
 			assert false : "Unrecognised content type! You may have forgotten to add it above";
 		}
@@ -75,6 +78,11 @@ public class Qualifier implements FilterExpression {
 	public Qualifier(String name, int number) {
 		this.name = name;
 		this.number = Optional.of(number);
+	}
+
+	public Qualifier(String name, List<SortKey> keys) {
+		this.name = name;
+		this.sortKeys = new ArrayList<>(keys);
 	}
 
 	/**
@@ -144,12 +152,15 @@ public class Qualifier implements FilterExpression {
         case "title":
             return titleSatisfies(issue);
         case "body":
+        case "desc":
+        case "description":
             return bodySatisfies(issue);
         case "milestone":
             return milestoneSatisfies(model, issue);
         case "label":
             return labelsSatisfy(model, issue);
         case "author":
+        case "creator":
             return authorSatisfies(issue);
         case "assignee":
             return assigneeSatisfies(model, issue);
@@ -188,6 +199,7 @@ public class Qualifier implements FilterExpression {
         switch (name) {
         case "title":
         case "desc":
+        case "description":
         case "body":
         case "keyword":
             throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
@@ -209,6 +221,7 @@ public class Qualifier implements FilterExpression {
             applyAssignee(issue, model);
             break;
         case "author":
+        case "creator":
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
         case "involves":
         case "user":
@@ -273,7 +286,9 @@ public class Qualifier implements FilterExpression {
         } else if (date.isPresent()) {
             return name + ":" + date.get().toString();
         } else if (dateRange.isPresent()) {
-            return name + ":" + dateRange.get().toString();
+	        return name + ":" + dateRange.get().toString();
+        } else if (!sortKeys.isEmpty()) {
+            return name + ":" + sortKeys.toString();
         } else if (numberRange.isPresent()) {
         	return name + ":" + numberRange.get().toString();
         } else if (number.isPresent()) {
@@ -291,6 +306,7 @@ public class Qualifier implements FilterExpression {
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
+	    result = prime * result + ((sortKeys == null) ? 0 : sortKeys.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
@@ -314,11 +330,16 @@ public class Qualifier implements FilterExpression {
                 return false;
         } else if (!date.equals(other.date))
             return false;
-        if (dateRange == null) {
-            if (other.dateRange != null)
-                return false;
+	    if (dateRange == null) {
+		    if (other.dateRange != null)
+			    return false;
         } else if (!dateRange.equals(other.dateRange))
             return false;
+	    if (sortKeys == null) {
+		    if (other.sortKeys != null)
+			    return false;
+	    } else if (!sortKeys.equals(other.sortKeys))
+		    return false;
         if (name == null) {
             if (other.name != null)
                 return false;
@@ -334,7 +355,6 @@ public class Qualifier implements FilterExpression {
 	private static boolean shouldBeStripped(Qualifier q) {
 		switch (q.getName()) {
 			case "in":
-			case "order":
 			case "sort":
 				return true;
 			default:
@@ -345,7 +365,6 @@ public class Qualifier implements FilterExpression {
 	private static boolean isMetaQualifier(Qualifier q) {
 		switch (q.getName()) {
 		case "sort":
-		case "order":
 		case "in":
 		case "repo":
 			return true;
@@ -354,30 +373,112 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 
-	public static Comparator<TurboIssue> getSortComparator(String key, boolean inverted) {
-		Comparator<TurboIssue> comparator;
+	public Comparator<TurboIssue> getCompoundSortComparator(IModel model) {
+		if (sortKeys.isEmpty()) {
+			return (a, b) -> 0;
+		}
+		return (a, b) -> {
+			for (SortKey key : sortKeys) {
+				Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted);
+				int result = comparator.compare(a, b);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		};
+	}
+
+	public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
+		Comparator<TurboIssue> comparator = (a, b) -> 0;
+
+		boolean isLabelGroup = false;
 
 		switch (key) {
 			case "comments":
 				comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
 				break;
+			case "repo":
+				comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
+				break;
 			case "updated":
+			case "date":
 				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
 				break;
 			case "id":
-			default:
 				comparator = (a, b) -> a.getId() - b.getId();
+				break;
+			default:
+				// Doesn't match anything; assume it's a label group
+				isLabelGroup = true;
 				break;
 		}
 
-		if (!inverted) {
-			return comparator;
+		if (isLabelGroup) {
+			// Has a different notion of inversion
+			return getLabelGroupComparator(model, key, inverted);
 		} else {
-			return (a, b) -> -comparator.compare(a, b);
+			// Use default behaviour for inverting
+			if (!inverted) {
+				return comparator;
+			} else {
+				final Comparator<TurboIssue> finalComparator = comparator;
+				return (a, b) -> -finalComparator.compare(a, b);
+			}
 		}
 	}
 
-    private boolean idSatisfies(TurboIssue issue) {
+	private static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
+		// Strip trailing ., if any
+		final String group = key.replaceAll("\\.$", "");
+		return (a, b) -> {
+
+			// Matches labels belong to the given group
+			Predicate<TurboLabel> sameGroup = l ->
+				l.getGroup().isPresent() && l.getGroup().get().equals(group);
+
+			Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
+
+			List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
+			List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
+			Collections.sort(aLabels, labelComparator);
+			Collections.sort(bLabels, labelComparator);
+
+			// Put empty lists at the back
+			if (aLabels.size() == 0 && bLabels.size() == 0) {
+				return 0;
+			} else if (aLabels.size() == 0) {
+				// a is larger
+				return 1;
+			} else if (bLabels.size() == 0) {
+				// b is larger
+				return -1;
+			}
+
+			// Compare lengths
+			int result = !inverted
+				? aLabels.size() - bLabels.size()
+				: bLabels.size() - aLabels.size();
+
+			if (result != 0) {
+				return result;
+			}
+
+			// Lexicographic label comparison
+			assert aLabels.size() == bLabels.size();
+			for (int i=0; i<aLabels.size(); i++) {
+				result = !inverted
+					? labelComparator.compare(aLabels.get(i), bLabels.get(i))
+					: labelComparator.compare(bLabels.get(i), aLabels.get(i));
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		};
+	}
+
+	private boolean idSatisfies(TurboIssue issue) {
 	    return number.isPresent() && issue.getId() == number.get();
     }
 
@@ -418,10 +519,12 @@ public class Qualifier implements FilterExpression {
             return issue.getLabels().size() > 0;
         case "milestone":
         case "milestones":
-            return issue.getMilestone() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getMilestone().isPresent();
         case "assignee":
         case "assignees":
-            return issue.getAssignee() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getAssignee().isPresent();
         default:
             return false;
         }
@@ -500,14 +603,24 @@ public class Qualifier implements FilterExpression {
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
 	        if (label.getGroup().isPresent()) {
-		        // Check both
-		        if (label.getGroup().get().toLowerCase().contains(group)
-			        && label.getName().toLowerCase().contains(labelName)) {
-			        return true;
+		        if (labelName.isEmpty()) {
+			        // Check the group
+			        if (label.getGroup().get().toLowerCase().contains(group)) {
+				       return true;
+			        }
+		        } else {
+			        if (label.getGroup().get().toLowerCase().contains(group)
+				        && label.getName().toLowerCase().contains(labelName)) {
+				       return true;
+			        }
 		        }
 	        } else {
 		        // Check only the label name
-		        return label.getName().toLowerCase().contains(labelName);
+		        if (!group.isEmpty()) {
+			        return false;
+		        } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+			        return true;
+		        }
 	        }
         }
         return false;
@@ -533,6 +646,7 @@ public class Qualifier implements FilterExpression {
     	        return titleSatisfies(issue);
     		case "body":
     		case "desc":
+		    case "description":
     	        return bodySatisfies(issue);
     	    default:
     	    	return false;
