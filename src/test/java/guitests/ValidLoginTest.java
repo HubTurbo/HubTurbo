@@ -5,8 +5,11 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+import ui.RepositorySelector;
 
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
 
 public class ValidLoginTest extends UITest {
     @Before
@@ -33,6 +36,7 @@ public class ValidLoginTest extends UITest {
         type("test");
         click("Sign in");
         sleep(2000);
-//        assertNotNull(hasText("Failed to sign in. Please try again."));
+        RepositorySelector repositorySelector = find("#repositorySelector");
+        assertEquals(repositorySelector.getText(), "HubTurbo/HubTurbo");
     }
 }

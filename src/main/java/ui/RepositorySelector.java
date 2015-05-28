@@ -49,7 +49,7 @@ public class RepositorySelector extends HBox {
 		comboBox.getItems().addAll(ui.logic.getOpenRepositories());
 	}
 
-	private String getText() {
+	public String getText() {
 		return comboBox.getValue();
 	}
 
