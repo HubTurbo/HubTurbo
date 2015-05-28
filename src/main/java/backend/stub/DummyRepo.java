@@ -40,7 +40,8 @@ public class DummyRepo implements Repo {
 
 	@Override
 	public boolean login(UserCredentials credentials) {
-		return true;
+		if (credentials.username.equals("test") && credentials.password.equals("test")) return true;
+		return false;
 	}
 
 	@Override
