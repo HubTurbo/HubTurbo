@@ -25,9 +25,9 @@ public class Preferences {
 		this.columns = columns;
 
 		if (ui.isTestMode()) {
-			this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
-		} else {
 			this.fileHandler = new ConfigFileHandler(DIRECTORY, TEST_CONFIG_FILE);
+		} else {
+			this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
 		}
 
 		loadGlobalConfig();
