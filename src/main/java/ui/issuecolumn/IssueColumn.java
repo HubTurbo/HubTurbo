@@ -376,14 +376,7 @@ public abstract class IssueColumn extends Column {
 	public void refreshItems() {
 		applyCurrentFilterExpression();
 
-		transformedIssueList = new SortedList<>(
-			new FilteredList<>(issues, predicate), (a, b) -> {
-			int result = a.getRepoId().compareTo(b.getRepoId());
-			if (result != 0) {
-				return result;
-			}
-			return comparator.compare(a, b);
-		});
+		transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
 		if (!triggerMetadataUpdate) {
 			triggerMetadataUpdate = true;
