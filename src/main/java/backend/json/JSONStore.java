@@ -9,9 +9,9 @@ import java.util.concurrent.CompletableFuture;
 public class JSONStore extends RepoStore {
 
 	@Override
-	public CompletableFuture<Model> loadRepository(String repoName) {
+	public CompletableFuture<Model> loadRepository(String repoId) {
 		CompletableFuture<Model> response = new CompletableFuture<>();
-		addTask(new ReadTask(repoName, response));
+		addTask(new ReadTask(repoId, response));
 		return response;
 	}
 
