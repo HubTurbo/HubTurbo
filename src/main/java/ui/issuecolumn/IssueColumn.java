@@ -306,12 +306,12 @@ public abstract class IssueColumn extends Column {
 	 */
 	private void applyCurrentFilterExpression() {
 		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-		comparator = Qualifier.getSortComparator("id", true);
+		comparator = Qualifier.getSortComparator(model, "id", true);
 		Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
 			if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
 				ui.logic.openRepository(qualifier.getContent().get());
 			} else if (qualifier.getName().equals(Qualifier.SORT)) {
-				comparator = qualifier.getCompoundSortComparator();
+				comparator = qualifier.getCompoundSortComparator(model);
 			}
 		});
 	}

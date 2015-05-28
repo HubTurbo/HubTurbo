@@ -368,13 +368,13 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 
-	public Comparator<TurboIssue> getCompoundSortComparator() {
+	public Comparator<TurboIssue> getCompoundSortComparator(IModel model) {
 		if (sortKeys.isEmpty()) {
 			return (a, b) -> 0;
 		}
 		return (a, b) -> {
 			for (SortKey key : sortKeys) {
-				Comparator<TurboIssue> comparator = getSortComparator(key.key, key.inverted);
+				Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted);
 				int result = comparator.compare(a, b);
 				if (result != 0) {
 					return result;
@@ -384,7 +384,7 @@ public class Qualifier implements FilterExpression {
 		};
 	}
 
-	public static Comparator<TurboIssue> getSortComparator(String key, boolean inverted) {
+	public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
 		Comparator<TurboIssue> comparator;
 
 		switch (key) {
@@ -399,8 +399,27 @@ public class Qualifier implements FilterExpression {
 				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
 				break;
 			case "id":
-			default:
 				comparator = (a, b) -> a.getId() - b.getId();
+				break;
+			default:
+				// Assume it's a label group
+				// Strip trailing ., if any
+				final String group = key.replaceAll("\\.$", "");
+				comparator = (a, b) -> {
+
+					Predicate<TurboLabel> sameGroup = l ->
+						l.getGroup().isPresent() && l.getGroup().get().equals(group);
+
+					List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
+					List<TurboLabel> bLabels = model.getLabelsOfIssue(a, sameGroup);
+
+					if (aLabels.size() != 1 || bLabels.size() != 1) {
+						// We can't compare nonexclusive label groups, or if there aren't
+						// any labels of tht group
+						return 0;
+					}
+					return aLabels.get(0).getName().compareTo(bLabels.get(0).getName());
+				};
 				break;
 		}
 
