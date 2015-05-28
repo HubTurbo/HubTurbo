@@ -10,6 +10,8 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import ui.UI;
+import util.events.UpdateDummyRepoEventHandler;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +38,14 @@ public class DummyRepo implements Repo {
 			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
 			users.add(makeDummyUser(DUMMY_REPO_ID));
 		}
+
+		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
+			switch (e.updateType) {
+				case NEW_ISSUE:
+					issues.add(makeDummyIssue(DUMMY_REPO_ID));
+					break;
+			}
+		});
 	}
 
 	@Override
