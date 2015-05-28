@@ -13,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,8 +29,8 @@ import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -50,11 +51,12 @@ public abstract class IssueColumn extends Column {
 	// Filter-related
 
 	private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
-	public static final FilterExpression EMPTY = filter.expression.Qualifier.EMPTY;
-	private Predicate<TurboIssue> predicate = p -> true;
-	private FilterExpression currentFilterExpression = EMPTY;
 	protected FilterTextField filterTextField;
 	private UI ui;
+
+	private FilterExpression currentFilterExpression = Qualifier.EMPTY;
+	private Predicate<TurboIssue> predicate = p -> true;
+	private Comparator<TurboIssue> comparator = (a, b) -> 0;
 
 	// This controls whether a metadata update will be triggered on the next refresh.
 	// It's toggled to false by model updates that are not supposed to trigger updates.
@@ -279,13 +281,13 @@ public abstract class IssueColumn extends Column {
 			if (filter != null) {
 				this.applyFilterExpression(filter);
 			} else {
-				this.applyFilterExpression(EMPTY);
+				this.applyFilterExpression(Qualifier.EMPTY);
 			}
 
 			// Clear displayed message on successful filter
 			UI.status.clear();
 		} catch (ParseException ex) {
-			this.applyFilterExpression(EMPTY);
+			this.applyFilterExpression(Qualifier.EMPTY);
 			// Overrides message in status bar
 			UI.status.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
 		}
@@ -304,9 +306,20 @@ public abstract class IssueColumn extends Column {
 	 */
 	private void applyCurrentFilterExpression() {
 		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-		Qualifier.processMetaQualifierEffects(currentFilterExpression, qualifier -> {
-			if (qualifier.getName().equals("repo") && qualifier.getContent().isPresent()) {
+		comparator = Qualifier.getSortComparator("id", true);
+		Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
+			if (!qualifier.getContent().isPresent()) {
+				return;
+			}
+			if (qualifier.getName().equals(Qualifier.REPO)) {
 				ui.logic.openRepository(qualifier.getContent().get());
+			} else if (qualifier.getName().equals(Qualifier.SORT)) {
+				boolean ascending = metaQualifierInfo.isOrderAscending().isPresent()
+					? metaQualifierInfo.isOrderAscending().get()
+					: true;
+				assert qualifier.getContent().isPresent();
+
+				comparator = Qualifier.getSortComparator(qualifier.getContent().get(), ascending);
 			}
 		});
 	}
@@ -332,7 +345,7 @@ public abstract class IssueColumn extends Column {
 	}
 
 	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
-		if (currentFilterExpression != EMPTY) {
+		if (currentFilterExpression != Qualifier.EMPTY) {
 			try {
 				if (currentFilterExpression.canBeAppliedToIssue()) {
 					// TODO re-enable
@@ -370,7 +383,15 @@ public abstract class IssueColumn extends Column {
 	@Override
 	public void refreshItems() {
 		applyCurrentFilterExpression();
-		transformedIssueList = new FilteredList<>(issues, predicate);
+
+		transformedIssueList = new SortedList<>(
+			new FilteredList<>(issues, predicate), (a, b) -> {
+			int result = a.getRepoId().compareTo(b.getRepoId());
+			if (result != 0) {
+				return result;
+			}
+			return comparator.compare(a, b);
+		});
 
 		if (!triggerMetadataUpdate) {
 			triggerMetadataUpdate = true;
