@@ -390,7 +390,9 @@ public class Qualifier implements FilterExpression {
 	}
 
 	public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
-		Comparator<TurboIssue> comparator;
+		Comparator<TurboIssue> comparator = (a, b) -> 0;
+
+		boolean isLabelGroup = false;
 
 		switch (key) {
 			case "comments":
@@ -407,35 +409,76 @@ public class Qualifier implements FilterExpression {
 				comparator = (a, b) -> a.getId() - b.getId();
 				break;
 			default:
-				// Assume it's a label group
-				// Strip trailing ., if any
-				final String group = key.replaceAll("\\.$", "");
-				comparator = (a, b) -> {
-
-					Predicate<TurboLabel> sameGroup = l ->
-						l.getGroup().isPresent() && l.getGroup().get().equals(group);
-
-					List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
-					List<TurboLabel> bLabels = model.getLabelsOfIssue(a, sameGroup);
-
-					if (aLabels.size() != 1 || bLabels.size() != 1) {
-						// We can't compare nonexclusive label groups, or if there aren't
-						// any labels of tht group
-						return 0;
-					}
-					return aLabels.get(0).getName().compareTo(bLabels.get(0).getName());
-				};
+				// Doesn't match anything; assume it's a label group
+				isLabelGroup = true;
 				break;
 		}
 
-		if (!inverted) {
-			return comparator;
+		if (isLabelGroup) {
+			// Has a different notion of inversion
+			return getLabelGroupComparator(model, key, inverted);
 		} else {
-			return (a, b) -> -comparator.compare(a, b);
+			// Use default behaviour for inverting
+			if (!inverted) {
+				return comparator;
+			} else {
+				final Comparator<TurboIssue> finalComparator = comparator;
+				return (a, b) -> -finalComparator.compare(a, b);
+			}
 		}
 	}
 
-    private boolean idSatisfies(TurboIssue issue) {
+	private static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
+		// Strip trailing ., if any
+		final String group = key.replaceAll("\\.$", "");
+		return (a, b) -> {
+
+			// Matches labels belong to the given group
+			Predicate<TurboLabel> sameGroup = l ->
+				l.getGroup().isPresent() && l.getGroup().get().equals(group);
+
+			Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
+
+			List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
+			List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
+			Collections.sort(aLabels, labelComparator);
+			Collections.sort(bLabels, labelComparator);
+
+			// Put empty lists at the back
+			if (aLabels.size() == 0 && bLabels.size() == 0) {
+				return 0;
+			} else if (aLabels.size() == 0) {
+				// a is larger
+				return 1;
+			} else if (bLabels.size() == 0) {
+				// b is larger
+				return -1;
+			}
+
+			// Compare lengths
+			int result = !inverted
+				? aLabels.size() - bLabels.size()
+				: bLabels.size() - aLabels.size();
+
+			if (result != 0) {
+				return result;
+			}
+
+			// Lexicographic label comparison
+			assert aLabels.size() == bLabels.size();
+			for (int i=0; i<aLabels.size(); i++) {
+				result = !inverted
+					? labelComparator.compare(aLabels.get(i), bLabels.get(i))
+					: labelComparator.compare(bLabels.get(i), aLabels.get(i));
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		};
+	}
+
+	private boolean idSatisfies(TurboIssue issue) {
 	    return number.isPresent() && issue.getId() == number.get();
     }
 
