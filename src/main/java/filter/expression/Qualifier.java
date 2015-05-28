@@ -33,6 +33,7 @@ public class Qualifier implements FilterExpression {
 	private Optional<LocalDate> date = Optional.empty();
 	private Optional<NumberRange> numberRange = Optional.empty();
 	private Optional<Integer> number = Optional.empty();
+	private List<SortKey> sortKeys = new ArrayList<>();
 
 	// Copy constructor
 	public Qualifier(Qualifier other) {
@@ -47,6 +48,8 @@ public class Qualifier implements FilterExpression {
 			this.numberRange = other.getNumberRange();
 		} else if (other.getNumber().isPresent()) {
 			this.number = other.getNumber();
+		} else if (!other.sortKeys.isEmpty()) {
+			this.sortKeys = new ArrayList<>(other.sortKeys);
 		} else {
 			assert false : "Unrecognised content type! You may have forgotten to add it above";
 		}
@@ -75,6 +78,11 @@ public class Qualifier implements FilterExpression {
 	public Qualifier(String name, int number) {
 		this.name = name;
 		this.number = Optional.of(number);
+	}
+
+	public Qualifier(String name, List<SortKey> keys) {
+		this.name = name;
+		this.sortKeys = new ArrayList<>(keys);
 	}
 
 	/**
