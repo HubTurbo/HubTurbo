@@ -368,6 +368,22 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 
+	public Comparator<TurboIssue> getCompoundSortComparator() {
+		if (sortKeys.isEmpty()) {
+			return (a, b) -> 0;
+		}
+		return (a, b) -> {
+			for (SortKey key : sortKeys) {
+				Comparator<TurboIssue> comparator = getSortComparator(key.key, key.inverted);
+				int result = comparator.compare(a, b);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		};
+	}
+
 	public static Comparator<TurboIssue> getSortComparator(String key, boolean inverted) {
 		Comparator<TurboIssue> comparator;
 

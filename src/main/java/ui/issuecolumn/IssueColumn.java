@@ -308,18 +308,10 @@ public abstract class IssueColumn extends Column {
 		predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
 		comparator = Qualifier.getSortComparator("id", true);
 		Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
-			if (!qualifier.getContent().isPresent()) {
-				return;
-			}
-			if (qualifier.getName().equals(Qualifier.REPO)) {
+			if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
 				ui.logic.openRepository(qualifier.getContent().get());
 			} else if (qualifier.getName().equals(Qualifier.SORT)) {
-				boolean ascending = metaQualifierInfo.isOrderAscending().isPresent()
-					? metaQualifierInfo.isOrderAscending().get()
-					: true;
-				assert qualifier.getContent().isPresent();
-
-				comparator = Qualifier.getSortComparator(qualifier.getContent().get(), ascending);
+				comparator = qualifier.getCompoundSortComparator();
 			}
 		});
 	}
