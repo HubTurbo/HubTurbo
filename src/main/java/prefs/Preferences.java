@@ -12,6 +12,7 @@ public class Preferences {
 
 	public static final String DIRECTORY = "settings";
 	private static final String GLOBAL_CONFIG_FILE = "global.json";
+	private static final String TEST_CONFIG_FILE = "test.json";
 
 	private final ConfigFileHandler fileHandler;
 	private final UI ui;
@@ -22,7 +23,12 @@ public class Preferences {
 	public Preferences(UI ui, ColumnControl columns) {
 		this.ui = ui;
 		this.columns = columns;
-		this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
+
+		if (ui.isTestMode()) {
+			this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
+		} else {
+			this.fileHandler = new ConfigFileHandler(DIRECTORY, TEST_CONFIG_FILE);
+		}
 
 		loadGlobalConfig();
 	}
