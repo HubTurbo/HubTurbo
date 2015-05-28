@@ -342,7 +342,6 @@ public class Qualifier implements FilterExpression {
 	private static boolean shouldBeStripped(Qualifier q) {
 		switch (q.getName()) {
 			case "in":
-			case "order":
 			case "sort":
 				return true;
 			default:
@@ -353,7 +352,6 @@ public class Qualifier implements FilterExpression {
 	private static boolean isMetaQualifier(Qualifier q) {
 		switch (q.getName()) {
 		case "sort":
-		case "order":
 		case "in":
 		case "repo":
 			return true;
