@@ -45,6 +45,7 @@ public class RepoIO {
 
 	public CompletableFuture<Model> openRepository(String repoId) {
 		if (repoStore.isRepoStored(repoId)) {
+			System.out.println("lol");
 			return repoStore.loadRepository(repoId)
 				.thenCompose(this::updateModel)
 				.exceptionally(withResult(new Model(repoId)));
