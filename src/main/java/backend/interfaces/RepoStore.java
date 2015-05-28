@@ -12,7 +12,8 @@ import java.util.concurrent.Executors;
 
 public abstract class RepoStore {
 
-	public static final String DIRECTORY = "store";
+	private static String DIRECTORY = "store";
+	private static final String TEST_DIRECTORY = "store/test";
 	private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
 	public static String escapeRepoName(String repoName) {
@@ -50,5 +51,13 @@ public abstract class RepoStore {
 		if (!directory.exists() || !directory.isDirectory()) {
 			directory.mkdirs();
 		}
+	}
+
+	public static void enableTestDirectory() {
+		changeDirectory(RepoStore.TEST_DIRECTORY);
+	}
+
+	private static void changeDirectory(String newDir) {
+		RepoStore.DIRECTORY = newDir;
 	}
 }
