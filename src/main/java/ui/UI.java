@@ -110,8 +110,7 @@ public class UI extends Application implements EventDispatcher {
 
 		triggerEvent(new BoardSavedEvent());
 
-		// Use getOrDefault to avoid NullPointerException
-		if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) {
+		if (isTestMode()) {
 			browserComponent = new BrowserComponentStub(this);
 		} else {
 			browserComponent = new BrowserComponent(this);
