@@ -281,7 +281,9 @@ public class Qualifier implements FilterExpression {
         } else if (date.isPresent()) {
             return name + ":" + date.get().toString();
         } else if (dateRange.isPresent()) {
-            return name + ":" + dateRange.get().toString();
+	        return name + ":" + dateRange.get().toString();
+        } else if (!sortKeys.isEmpty()) {
+            return name + ":" + sortKeys.toString();
         } else if (numberRange.isPresent()) {
         	return name + ":" + numberRange.get().toString();
         } else if (number.isPresent()) {
@@ -299,6 +301,7 @@ public class Qualifier implements FilterExpression {
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
+	    result = prime * result + ((sortKeys == null) ? 0 : sortKeys.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
@@ -322,11 +325,16 @@ public class Qualifier implements FilterExpression {
                 return false;
         } else if (!date.equals(other.date))
             return false;
-        if (dateRange == null) {
-            if (other.dateRange != null)
-                return false;
+	    if (dateRange == null) {
+		    if (other.dateRange != null)
+			    return false;
         } else if (!dateRange.equals(other.dateRange))
             return false;
+	    if (sortKeys == null) {
+		    if (other.sortKeys != null)
+			    return false;
+	    } else if (!sortKeys.equals(other.sortKeys))
+		    return false;
         if (name == null) {
             if (other.name != null)
                 return false;
