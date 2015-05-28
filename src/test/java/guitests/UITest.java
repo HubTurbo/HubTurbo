@@ -11,6 +11,7 @@ import ui.UI;
 import java.util.concurrent.TimeUnit;
 
 public class UITest extends GuiTest{
+
     protected static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
     protected static class TestUI extends UI {
@@ -28,14 +29,18 @@ public class UITest extends GuiTest{
     @Before
     @Override
     public void setupStage() throws Throwable {
-        // add parameters as the second parameter onwards
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
+        launchApp();
         try {
             stage = targetWindow(stageFuture.get(25, TimeUnit.SECONDS));
             FXTestUtils.bringToFront(stage);
         } catch (Exception e) {
             throw new RuntimeException("Unable to show stage", e);
         }
+    }
+
+    // override this to change launch arguments
+    public void launchApp() {
+        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
     }
 
     @Override
