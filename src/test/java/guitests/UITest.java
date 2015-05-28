@@ -2,23 +2,16 @@ package guitests;
 
 import com.google.common.util.concurrent.SettableFuture;
 import javafx.scene.Parent;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.Before;
-import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertNotNull;
-import static org.loadui.testfx.controls.Commons.hasText;
-
-public class TestGuiTest2 extends GuiTest {
-
-    private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
+public class UITest extends GuiTest{
+    protected static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
     protected static class TestUI extends UI {
         public TestUI() {
@@ -35,7 +28,8 @@ public class TestGuiTest2 extends GuiTest {
     @Before
     @Override
     public void setupStage() throws Throwable {
-        FXTestUtils.launchApp(TestUI.class, "--test=true"); // You can add start parameters here
+        // add parameters as the second parameter onwards
+        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
         try {
             stage = targetWindow(stageFuture.get(25, TimeUnit.SECONDS));
             FXTestUtils.bringToFront(stage);
@@ -47,18 +41,5 @@ public class TestGuiTest2 extends GuiTest {
     @Override
     protected Parent getRootNode() {
         return stage.getScene().getRoot();
-    }
-
-    @Test
-    public void testBadLoginAgain() throws InterruptedException {
-//        TextField repoOwnerField = find("#repoOwnerField");
-//        doubleClick(repoOwnerField);
-//        type("HubTurbo").push(KeyCode.TAB);
-//        type("HubTurbo").push(KeyCode.TAB);
-//        type("test").push(KeyCode.TAB);
-//        type("test");
-//        click("Sign in");
-        sleep(2000);
-        assertNotNull(hasText("Failed to sign in. Please try again."));
     }
 }
