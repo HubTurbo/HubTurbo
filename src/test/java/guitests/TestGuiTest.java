@@ -9,6 +9,9 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
 import ui.RepositorySelector;
 import ui.UI;
+import util.events.DummyRepoUpdatedEvent;
+import util.events.ModelUpdatedEvent;
+import util.events.UpdateDummyRepoEvent;
 
 import java.util.concurrent.TimeUnit;
 
@@ -57,7 +60,11 @@ public class TestGuiTest extends GuiTest {
         for (int i = 0; i < 10; i++) {
             click("View");
             click("Refresh");
+            sleep(500);
+            UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE));
+            UI.events.triggerEvent(new DummyRepoUpdatedEvent());
+            sleep(500);
         }
-        sleep(5000);
+        sleep(1000);
     }
 }
