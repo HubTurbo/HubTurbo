@@ -25,8 +25,14 @@ public class RepoIO {
 	private final RepoStore repoStore;
 
 	public RepoIO(boolean isTestMode) {
-		repoSource = isTestMode ? new DummySource() : new GitHubSource();
 		repoStore = new JSONStore();
+
+		if (isTestMode) {
+			repoSource = new DummySource();
+			repoStore.enableTestDirectory();
+		} else {
+			repoSource = new GitHubSource();
+		}
 	}
 
 	public CompletableFuture<Boolean> login(UserCredentials credentials) {
