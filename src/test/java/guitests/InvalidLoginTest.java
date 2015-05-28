@@ -8,6 +8,9 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static org.loadui.testfx.controls.Commons.hasText;
+
 public class InvalidLoginTest extends UITest {
     @Before
     @Override
@@ -32,7 +35,6 @@ public class InvalidLoginTest extends UITest {
         type("HubTurbo").push(KeyCode.TAB);
         type("HubTurbo");
         click("Sign in");
-//        sleep(2000);
-//        assertNotNull(hasText("Failed to sign in. Please try again."));
+        assertNodeExists(hasText("Failed to sign in. Please try again."));
     }
 }
