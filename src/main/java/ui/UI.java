@@ -157,7 +157,7 @@ public class UI extends Application implements EventDispatcher {
 		applyCSS(css, scene);
 	}
 
-	private boolean isTestMode() {
+	public boolean isTestMode() {
 		if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
 		if (isBypassLogin()) return true;
 		return false;
