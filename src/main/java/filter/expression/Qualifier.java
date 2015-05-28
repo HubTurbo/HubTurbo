@@ -395,6 +395,7 @@ public class Qualifier implements FilterExpression {
 				comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
 				break;
 			case "updated":
+			case "date":
 				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
 				break;
 			case "id":
