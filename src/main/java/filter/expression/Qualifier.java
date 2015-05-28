@@ -391,6 +391,9 @@ public class Qualifier implements FilterExpression {
 			case "comments":
 				comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
 				break;
+			case "repo":
+				comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
+				break;
 			case "updated":
 				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
 				break;
