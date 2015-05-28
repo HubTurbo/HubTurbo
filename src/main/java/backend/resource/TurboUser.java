@@ -33,6 +33,13 @@ public class TurboUser {
 		this.repoId = repoId;
 	}
 
+	public TurboUser(String repoId, String loginName, String realName) {
+		this.loginName = loginName;
+		this.realName = realName;
+		this.avatarURL = "";
+		this.repoId = repoId;
+	}
+
 	public TurboUser(String repoId, User user) {
 		this.loginName = user.getLogin();
 		this.realName = user.getName();
@@ -76,5 +83,27 @@ public class TurboUser {
 	}
 	public String getAvatarURL() {
 		return avatarURL;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TurboUser that = (TurboUser) o;
+
+		if (!loginName.equals(that.loginName)) return false;
+		if (!realName.equals(that.realName)) return false;
+		if (!avatarURL.equals(that.avatarURL)) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = loginName.hashCode();
+		result = 31 * result + realName.hashCode();
+		result = 31 * result + avatarURL.hashCode();
+		return result;
 	}
 }

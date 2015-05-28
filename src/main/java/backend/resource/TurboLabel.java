@@ -36,10 +36,12 @@ public class TurboLabel {
 		this.repoId = repoId;
 	}
 
-	public TurboLabel(String repoId, String group, String name) {
-		this.actualName = join(group, name);
-		this.colour = "#ffffff";
-		this.repoId = repoId;
+	public static TurboLabel nonexclusive(String repoId, String group, String name) {
+		return new TurboLabel(repoId, joinWith(group, name, false));
+	}
+
+	public static TurboLabel exclusive(String repoId, String group, String name) {
+		return new TurboLabel(repoId, joinWith(group, name, true));
 	}
 
 	public TurboLabel(String repoId, Label label) {
@@ -74,8 +76,8 @@ public class TurboLabel {
 		}
 	}
 
-	private String join(String group, String name) {
-		return group + getDelimiter() + name;
+	private static String joinWith(String group, String name, boolean exclusive) {
+		return group + (exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER) + name;
 	}
 
 	public boolean isExclusive() {
@@ -88,18 +90,50 @@ public class TurboLabel {
 
 	public Optional<String> getGroup() {
 		if (getDelimiter().isPresent()) {
+			String delimiter = getDelimiter().get();
 			// Escaping due to constants not being valid regexes
-			return Optional.of(actualName.split("\\" + getDelimiter().get())[0]);
+			String[] segments = actualName.split("\\" + delimiter);
+			assert segments.length >= 1;
+			if (segments.length == 1) {
+				if (actualName.endsWith(delimiter)) {
+					// group.
+					return Optional.of(segments[0]);
+				} else {
+					// .name
+					return Optional.empty();
+				}
+			} else {
+				// group.name
+				assert segments.length == 2;
+				return Optional.of(segments[0]);
+			}
 		} else {
+			// name
 			return Optional.empty();
 		}
 	}
 
 	public String getName() {
 		if (getDelimiter().isPresent()) {
+			String delimiter = getDelimiter().get();
 			// Escaping due to constants not being valid regexes
-			return actualName.split("\\" + getDelimiter().get())[1];
+			String[] segments = actualName.split("\\" + delimiter);
+			assert segments.length >= 1;
+			if (segments.length == 1) {
+				if (actualName.endsWith(delimiter)) {
+					// group.
+					return "";
+				} else {
+					// .name
+					return segments[0];
+				}
+			} else {
+				// group.name
+				assert segments.length == 2;
+				return segments[1];
+			}
 		} else {
+			// name
 			return actualName;
 		}
 	}

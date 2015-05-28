@@ -152,12 +152,15 @@ public class Qualifier implements FilterExpression {
         case "title":
             return titleSatisfies(issue);
         case "body":
+        case "desc":
+        case "description":
             return bodySatisfies(issue);
         case "milestone":
             return milestoneSatisfies(model, issue);
         case "label":
             return labelsSatisfy(model, issue);
         case "author":
+        case "creator":
             return authorSatisfies(issue);
         case "assignee":
             return assigneeSatisfies(model, issue);
@@ -196,6 +199,7 @@ public class Qualifier implements FilterExpression {
         switch (name) {
         case "title":
         case "desc":
+        case "description":
         case "body":
         case "keyword":
             throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
@@ -217,6 +221,7 @@ public class Qualifier implements FilterExpression {
             applyAssignee(issue, model);
             break;
         case "author":
+        case "creator":
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
         case "involves":
         case "user":
@@ -471,10 +476,12 @@ public class Qualifier implements FilterExpression {
             return issue.getLabels().size() > 0;
         case "milestone":
         case "milestones":
-            return issue.getMilestone() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getMilestone().isPresent();
         case "assignee":
         case "assignees":
-            return issue.getAssignee() != null;
+	        assert issue.getMilestone() != null;
+            return issue.getAssignee().isPresent();
         default:
             return false;
         }
@@ -553,14 +560,24 @@ public class Qualifier implements FilterExpression {
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
 	        if (label.getGroup().isPresent()) {
-		        // Check both
-		        if (label.getGroup().get().toLowerCase().contains(group)
-			        && label.getName().toLowerCase().contains(labelName)) {
-			        return true;
+		        if (labelName.isEmpty()) {
+			        // Check the group
+			        if (label.getGroup().get().toLowerCase().contains(group)) {
+				       return true;
+			        }
+		        } else {
+			        if (label.getGroup().get().toLowerCase().contains(group)
+				        && label.getName().toLowerCase().contains(labelName)) {
+				       return true;
+			        }
 		        }
 	        } else {
 		        // Check only the label name
-		        return label.getName().toLowerCase().contains(labelName);
+		        if (!group.isEmpty()) {
+			        return false;
+		        } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+			        return true;
+		        }
 	        }
         }
         return false;
@@ -586,6 +603,7 @@ public class Qualifier implements FilterExpression {
     	        return titleSatisfies(issue);
     		case "body":
     		case "desc":
+		    case "description":
     	        return bodySatisfies(issue);
     	    default:
     	    	return false;

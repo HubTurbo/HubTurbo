@@ -19,12 +19,23 @@ public class DummyRepo implements Repo {
 
 	private static final String DUMMY_REPO_ID = "dummy/dummy";
 
-	private static int issueCounter = 10;
-	private static int labelCounter = 10;
-	private static int milestoneCounter = 10;
-	private static int userCounter = 10;
+	private static int issueCounter = 0;
+	private static int labelCounter = 0;
+	private static int milestoneCounter = 0;
+	private static int userCounter = 0;
+
+	private static List<TurboIssue> issues = new ArrayList<>();
+	private static List<TurboLabel> labels = new ArrayList<>();
+	private static List<TurboMilestone> milestones = new ArrayList<>();
+	private static List<TurboUser> users = new ArrayList<>();
 
 	public DummyRepo() {
+		for (int i=0; i<10; i++) {
+			issues.add(makeDummyIssue(DUMMY_REPO_ID));
+			labels.add(makeDummyLabel(DUMMY_REPO_ID));
+			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
+			users.add(makeDummyUser(DUMMY_REPO_ID));
+		}
 	}
 
 	@Override
@@ -67,43 +78,27 @@ public class DummyRepo implements Repo {
 
 	@Override
 	public List<TurboIssue> getIssues(String repoName) {
-		List<TurboIssue> issues = new ArrayList<>();
-		for (int i=0; i<10; i++) {
-			issues.add(makeDummyIssue(DUMMY_REPO_ID));
-		}
 		return issues;
 	}
 
 	@Override
 	public List<TurboLabel> getLabels(String repoId) {
-		List<TurboLabel> labels = new ArrayList<>();
-		for (int i=0; i<10; i++) {
-			labels.add(makeDummyLabel(DUMMY_REPO_ID));
-		}
 		return labels;
 	}
 
 	@Override
 	public List<TurboMilestone> getMilestones(String repoId) {
-		List<TurboMilestone> milestones = new ArrayList<>();
-		for (int i=0; i<10; i++) {
-			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
-		}
 		return milestones;
 	}
 
 	@Override
 	public List<TurboUser> getCollaborators(String repoId) {
-		List<TurboUser> users = new ArrayList<>();
-		for (int i=0; i<10; i++) {
-			users.add(makeDummyUser(DUMMY_REPO_ID));
-		}
 		return users;
 	}
 
 	private static TurboIssue updateRandomIssue(String repoId) {
 		int i = (int) (Math.random() * issueCounter);
-		return new TurboIssue(repoId, i, "Issue " + i + " " + Math.random());
+		return issues.set(i, new TurboIssue(repoId, i + 1, "Issue " + (i + 1) + " " + Math.random()));
 	}
 
 	private static TurboIssue makeDummyIssue(String repoId) {
@@ -113,8 +108,8 @@ public class DummyRepo implements Repo {
 	}
 
 	private static TurboLabel updateRandomLabel(String repoId) {
-		int i = (int) (Math.random() * issueCounter);
-		return new TurboLabel(repoId, "Label " + i + " " + Math.random());
+		int i = (int) (Math.random() * labelCounter);
+		return labels.set(i, new TurboLabel(repoId, "Label " + (i + 1) + " " + Math.random()));
 	}
 
 	private static TurboLabel makeDummyLabel(String repoId) {
@@ -125,7 +120,7 @@ public class DummyRepo implements Repo {
 
 	private static TurboMilestone updateRandomMilestone(String repoId) {
 		int i = (int) (Math.random() * milestoneCounter);
-		return new TurboMilestone(repoId, i, "Milestone " + i + " " + Math.random());
+		return milestones.set(i, new TurboMilestone(repoId, (i + 1), "Milestone " + (i + 1) + " " + Math.random()));
 	}
 
 	private static TurboMilestone makeDummyMilestone(String repoId) {
@@ -137,7 +132,7 @@ public class DummyRepo implements Repo {
 
 	private static TurboUser updateRandomUser(String repoId) {
 		int i = (int) (Math.random() * userCounter);
-		return new TurboUser(repoId, "User " + i + " " + Math.random());
+		return users.set(i, new TurboUser(repoId, "User " + (i + 1) + " " + Math.random()));
 	}
 
 	private static TurboUser makeDummyUser(String repoId) {
