@@ -4,6 +4,8 @@ import backend.IssueMetadata;
 import backend.interfaces.IModel;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Thread-safe. The only top-level state in the application.
@@ -110,6 +112,15 @@ public class MultiModel implements IModel {
 	public Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue) {
 		return getModelById(issue.getRepoId())
 			.flatMap(m -> m.getAssigneeOfIssue(issue));
+	}
+
+	@Override
+	public List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate) {
+		return getModelById(issue.getRepoId())
+			.flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
+			.get().stream()
+			.filter(predicate)
+			.collect(Collectors.toList());
 	}
 
 	@Override
