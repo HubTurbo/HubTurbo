@@ -112,6 +112,7 @@ public class UI extends Application implements EventDispatcher {
 
 		if (isTestMode()) {
 			browserComponent = new BrowserComponentStub(this);
+			registerTestEvents();
 		} else {
 			browserComponent = new BrowserComponent(this);
 			browserComponent.initialise();
@@ -120,6 +121,12 @@ public class UI extends Application implements EventDispatcher {
 		setExpandedWidth(false);
 		ensureSelectedPanelHasFocus();
 		columns.init();
+	}
+
+	private void registerTestEvents() {
+		registerEvent((DummyRepoUpdatedEventHandler) e -> {
+			Platform.runLater(logic::refresh);
+		});
 	}
 
 	private void initPreApplicationState() {
