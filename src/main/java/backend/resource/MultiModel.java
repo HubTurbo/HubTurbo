@@ -42,6 +42,7 @@ public class MultiModel implements IModel {
 
 	public synchronized MultiModel add(Model model) {
 		this.models.put(model.getRepoId(), model);
+		preprocessNewIssues(model);
 		return this;
 	}
 
@@ -54,6 +55,7 @@ public class MultiModel implements IModel {
 	}
 
 	public synchronized MultiModel replace(List<Model> newModels) {
+		preprocessUpdatedIssues(newModels);
 		this.models.clear();
 		newModels.forEach(this::add);
 		return this;
@@ -146,6 +148,42 @@ public class MultiModel implements IModel {
 
 	public void addPendingRepository(String repoId) {
 		pendingRepositories.add(repoId);
+	}
+
+	/**
+	 * Called on new models which come in.
+	 * Mutates TurboIssues with meta-information.
+	 * @param model
+	 */
+	private void preprocessNewIssues(Model model) {
+		// Updated 'marked as read' status
+		for (TurboIssue issue : model.getIssues()) {
+			issue.setMarkedReadAt(prefs.getMarkedReadAt(model.getRepoId(), issue.getId()));
+		}
+	}
+
+	/**
+	 * Called on existing models that are updated.
+	 * Mutates TurboIssues with meta-information.
+	 * @param newModels
+	 */
+	private void preprocessUpdatedIssues(List<Model> newModels) {
+		// Updates preferences with the results of issues that have been updated after a refresh.
+		// This makes read issues show up again.
+		for (Model model : newModels) {
+			Model existingModel = models.get(model.getRepoId());
+			assert models.containsKey(model.getRepoId());
+			if (!existingModel.getIssues().equals(model.getIssues())) {
+				// Find issues that have changed and update preferences with them
+				for (int i=1; i<=model.getIssues().size(); i++) {
+					// TODO O(n^2), optimise by preprocessing into a map or sorting
+					if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
+						// Update for this issue and model
+						prefs.setMarkedReadAt(model.getRepoId(), i, LocalDateTime.now());
+					}
+				}
+			}
+		}
 	}
 
 	private void ______BOILERPLATE______() {
