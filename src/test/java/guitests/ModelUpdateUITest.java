@@ -1,11 +1,12 @@
 package guitests;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
 import util.events.UILogicRefreshEvent;
 import util.events.UpdateDummyRepoEvent;
+
+import static org.junit.Assert.assertEquals;
 
 public class ModelUpdateUITest extends UITest {
 
@@ -18,7 +19,7 @@ public class ModelUpdateUITest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(500);
         IssuePanel issuePanel = find("#dummy/dummy_col0");
-        Assert.assertEquals(issuePanel.getIssueCount(), 11);
+        assertEquals(issuePanel.getIssueCount(), 11);
     }
 
     @Test
@@ -30,6 +31,6 @@ public class ModelUpdateUITest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(500);
         IssuePanel issuePanel = find("#dummy/dummy_col0");
-        Assert.assertEquals(issuePanel.getIssueCount(), 10);
+        assertEquals(issuePanel.getIssueCount(), 10);
     }
 }
