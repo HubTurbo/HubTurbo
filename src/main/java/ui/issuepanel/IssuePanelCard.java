@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class IssuePanelCard extends VBox {
@@ -55,7 +56,7 @@ public class IssuePanelCard extends VBox {
 		issueTitle.setWrapText(true);
 		issueTitle.getStyleClass().add("issue-panel-name");
 
-		if (issue.getMarkedReadAt().isPresent()) {
+		if (issue.isCurrentlyRead()) {
 			issueTitle.getStyleClass().add("issue-panel-name-read");
 		}
 
@@ -100,7 +101,7 @@ public class IssuePanelCard extends VBox {
 			})
 			.collect(Collectors.toList());
 
-		return layoutEvents(eventsWithinDuration, commentsWithinDuration);
+		return layoutEvents(issue.getMarkedReadAt(), eventsWithinDuration, commentsWithinDuration);
 	}
 
 	/**
@@ -109,14 +110,15 @@ public class IssuePanelCard extends VBox {
 	 * @param comments
 	 * @return
 	 */
-	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
+	private static Node layoutEvents(Optional<LocalDateTime> markedReadAt,
+	                                 List<TurboIssueEvent> events, List<Comment> comments) {
 		VBox result = new VBox();
 		result.setSpacing(3);
 		VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
 		// Events
 		events.stream()
-			.map(TurboIssueEvent::display)
+			.map(e -> e.display(markedReadAt))
 			.forEach(e -> result.getChildren().add(e));
 
 		// Comments

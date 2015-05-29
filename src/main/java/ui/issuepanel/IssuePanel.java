@@ -146,11 +146,13 @@ public class IssuePanel extends IssueColumn {
 					LocalDateTime time = LocalDateTime.now();
 					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), time);
 					issue.setMarkedReadAt(Optional.of(time));
+					issue.setIsCurrentlyRead(true);
 					parentColumnControl.refresh();
 				}
 				if (event.getCode() == KeyCode.U) {
 					ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
 					issue.setMarkedReadAt(Optional.empty());
+					issue.setIsCurrentlyRead(false);
 					parentColumnControl.refresh();
 				}
 				if (event.getCode() == KeyCode.F5) {

@@ -4,6 +4,7 @@ import backend.IssueMetadata;
 import backend.interfaces.IModel;
 import prefs.Preferences;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
@@ -156,9 +157,11 @@ public class MultiModel implements IModel {
 	 * @param model
 	 */
 	private void preprocessNewIssues(Model model) {
-		// Updated 'marked as read' status
+		// All new issues which come in are not read, unless they already were according to prefs.
 		for (TurboIssue issue : model.getIssues()) {
-			issue.setMarkedReadAt(prefs.getMarkedReadAt(model.getRepoId(), issue.getId()));
+			Optional<LocalDateTime> time = prefs.getMarkedReadAt(model.getRepoId(), issue.getId());
+			issue.setMarkedReadAt(time);
+			issue.setIsCurrentlyRead(time.isPresent());
 		}
 	}
 
@@ -171,15 +174,17 @@ public class MultiModel implements IModel {
 		// Updates preferences with the results of issues that have been updated after a refresh.
 		// This makes read issues show up again.
 		for (Model model : newModels) {
-			Model existingModel = models.get(model.getRepoId());
 			assert models.containsKey(model.getRepoId());
+			Model existingModel = models.get(model.getRepoId());
 			if (!existingModel.getIssues().equals(model.getIssues())) {
 				// Find issues that have changed and update preferences with them
 				for (int i=1; i<=model.getIssues().size(); i++) {
 					// TODO O(n^2), optimise by preprocessing into a map or sorting
 					if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
-						// Update for this issue and model
-						prefs.clearMarkedReadAt(model.getRepoId(), i);
+						assert model.getIssueById(i).isPresent();
+						// It's no longer currently read, but it retains its updated time.
+						// No changes to preferences.
+						model.getIssueById(i).get().setIsCurrentlyRead(false);
 					}
 				}
 			}
