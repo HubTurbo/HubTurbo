@@ -22,6 +22,17 @@ public class HTStatusBar extends StatusBar implements StatusUI {
 		setupProgressEvents();
 	}
 
+	@Override
+	public void updateTimeToRefresh(int time) {
+		Platform.runLater(() -> {
+			if (time == 10) {
+				setText("Refreshing in 10 seconds...");
+			} else if (time == 5) {
+				setText("Refreshing in 5 seconds...");
+			}
+		});
+	}
+
 	private void setupProgressEvents() {
 		ui.registerEvent((UpdateProgressEventHandler) e -> {
 			Platform.runLater(() -> {
