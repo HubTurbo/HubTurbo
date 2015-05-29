@@ -71,29 +71,29 @@ public class DummyRepo implements Repo {
 	@Override
 	public ImmutableTriple<List<TurboIssue>, String, Date>
 		getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
-		updateRandomIssue(DUMMY_REPO_ID);
-		issues.add(makeDummyIssue(DUMMY_REPO_ID));
+//		updateRandomIssue(DUMMY_REPO_ID);
+//		issues.add(makeDummyIssue(DUMMY_REPO_ID));
 		return new ImmutableTriple<>(issues, ETag, lastCheckTime);
 	}
 
 	@Override
 	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String ETag) {
-		updateRandomLabel(DUMMY_REPO_ID);
-		labels.add(makeDummyLabel(DUMMY_REPO_ID));
+//		updateRandomLabel(DUMMY_REPO_ID);
+//		labels.add(makeDummyLabel(DUMMY_REPO_ID));
 		return new ImmutablePair<>(labels, ETag);
 	}
 
 	@Override
 	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		updateRandomMilestone(DUMMY_REPO_ID);
-		milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
+//		updateRandomMilestone(DUMMY_REPO_ID);
+//		milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
 		return new ImmutablePair<>(milestones, ETag);
 	}
 
 	@Override
 	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String ETag) {
-		updateRandomUser(DUMMY_REPO_ID);
-		users.add(makeDummyUser(DUMMY_REPO_ID));
+//		updateRandomUser(DUMMY_REPO_ID);
+//		users.add(makeDummyUser(DUMMY_REPO_ID));
 		return new ImmutablePair<>(users, ETag);
 	}
 
