@@ -114,6 +114,8 @@ public abstract class IssueColumn extends Column {
 //	}
 
 	private final ModelUpdatedEventHandler onModelUpdate = e -> {
+
+		// Update keywords
 		List<String> all = new ArrayList<>(Arrays.asList(Qualifier.KEYWORDS));
 		all.addAll(e.model.getUsers().stream()
 			.map(TurboUser::getLoginName)
@@ -121,6 +123,7 @@ public abstract class IssueColumn extends Column {
 
 		filterTextField.setKeywords(all);
 
+		// Make metadata update state consistent
 		if (!e.triggerMetadataUpdate) {
 			this.triggerMetadataUpdate = false;
 		}
