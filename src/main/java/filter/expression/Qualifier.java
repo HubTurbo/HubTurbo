@@ -547,6 +547,10 @@ public class Qualifier implements FilterExpression {
         	return issue.isPullRequest() && !issue.isOpen();
         case "unmerged":
         	return issue.isPullRequest() && issue.isOpen();
+        case "read":
+	        return issue.isCurrentlyRead();
+        case "unread":
+	        return !issue.isCurrentlyRead();
         default:
             return false;
         }
