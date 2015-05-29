@@ -23,7 +23,7 @@ public class Logic {
 
 	private static final Logger logger = HTLog.get(Logic.class);
 
-	private final MultiModel models = new MultiModel();
+	private final MultiModel models;
 	private final UIManager uiManager;
 	private final Preferences prefs;
 
@@ -35,6 +35,7 @@ public class Logic {
 	public Logic(UIManager uiManager, Preferences prefs) {
 		this.uiManager = uiManager;
 		this.prefs = prefs;
+		this.models = new MultiModel(prefs);
 
 		// Pass the currently-empty model to the UI
 		updateUI();
@@ -64,17 +65,9 @@ public class Logic {
 		Futures.sequence(models.toModels().stream()
 			.map(repoIO::updateModel)
 			.collect(Collectors.toList()))
-			.thenApply(models::replace)
-			.thenRun(this::updateUI)
-			.exceptionally(Futures::log);
-	}
-
-	private void updateUI() {
-		uiManager.update(models, true);
-	}
-
-	private void updateUIWithoutMetadata() {
-		uiManager.update(models, false);
+				.thenApply(models::replace)
+				.thenRun(this::updateUI)
+				.exceptionally(Futures::log);
 	}
 
 	public CompletableFuture<Boolean> openRepository(String repoId) {
@@ -125,6 +118,14 @@ public class Logic {
 
 	public String getDefaultRepo() {
 		return models.getDefaultRepo();
+	}
+
+	private void updateUI() {
+		uiManager.update(models, true);
+	}
+
+	private void updateUIWithoutMetadata() {
+		uiManager.update(models, false);
 	}
 }
 

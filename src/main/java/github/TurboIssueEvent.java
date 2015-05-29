@@ -1,5 +1,6 @@
 package github;
 
+import backend.resource.TurboIssue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -7,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
+import util.Utility;
 
 import java.util.Date;
 
@@ -105,33 +107,46 @@ public class TurboIssueEvent {
 		return label;
 	}
 
-	public Node display() {
+	/**
+	 * Could be generalised to include other types of formatting in future
+	 * @param bold
+	 * @param text
+	 * @return
+	 */
+	private Text conditionallyBold(boolean bold, Text text) {
+		if (bold) {
+			text.getStyleClass().add("bold");
+		}
+		return text;
+	}
+
+	public Node display(TurboIssue issue) {
 		String actorName = getActor().getLogin();
 		String time = new PrettyTime().format(getDate());
+
+		boolean bold = issue.getMarkedReadAt().isPresent()
+			&& issue.getMarkedReadAt().get().isBefore(Utility.dateToLocalDateTime(getDate()));
 
 		switch (getType()) {
 			case Renamed: {
 				HBox display = new HBox();
-				display.getChildren().addAll(
-					octicon(OCTICON_MEGAPHONE),
-					new Text(String.format("%s renamed this issue %s.", actorName, time))
-				);
+				display.getChildren().addAll(octicon(OCTICON_MEGAPHONE),
+					conditionallyBold(bold,
+						new Text(String.format("%s renamed this issue %s.", actorName, time))));
 				return display;
 			}
 			case Milestoned: {
 				HBox display = new HBox();
-				display.getChildren().addAll(
-					octicon(OCTICON_MILESTONE),
-					new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time))
-				);
+				display.getChildren().addAll(octicon(OCTICON_MILESTONE),
+					conditionallyBold(bold,
+						new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
 				return display;
 			}
 			case Demilestoned: {
 				HBox display = new HBox();
-				display.getChildren().addAll(
-					octicon(OCTICON_MILESTONE),
-					new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))
-				);
+				display.getChildren().addAll(octicon(OCTICON_MILESTONE),
+					conditionallyBold(bold,
+						new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
 				return display;
 			}
 			case Labeled: {
@@ -140,10 +155,10 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
-					new Text(String.format("%s added label ", actorName)),
+					conditionallyBold(bold, new Text(String.format("%s added label ", actorName))),
 //					label.getNode(),
 					new Label(getLabelName()),
-					new Text(String.format(" %s.", time))
+					conditionallyBold(bold, new Text(String.format(" %s.", time)))
 				);
 				return display;
 			}
@@ -153,10 +168,10 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
-					new Text(String.format("%s removed label ", actorName)),
+					conditionallyBold(bold, new Text(String.format("%s removed label ", actorName))),
 //					label.getNode(),
 					new Label(getLabelName()),
-					new Text(String.format(" %s.", time))
+					conditionallyBold(bold, new Text(String.format(" %s.", time)))
 				);
 				return display;
 			}
@@ -164,7 +179,8 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_PERSON),
-					new Text(String.format("%s was assigned to this issue %s.", actorName, time))
+					conditionallyBold(bold,
+						new Text(String.format("%s was assigned to this issue %s.", actorName, time)))
 				);
 				return display;
 			}
@@ -172,7 +188,8 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_PERSON),
-					new Text(String.format("%s was unassigned from this issue %s.", actorName, time))
+					conditionallyBold(bold,
+						new Text(String.format("%s was unassigned from this issue %s.", actorName, time)))
 				);
 				return display;
 			}
@@ -180,7 +197,8 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_ISSUE_CLOSED),
-					new Text(String.format("%s closed this issue %s.", actorName, time))
+					conditionallyBold(bold,
+						new Text(String.format("%s closed this issue %s.", actorName, time)))
 				);
 				return display;
 			}
@@ -188,29 +206,30 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_ISSUE_OPENED),
-					new Text(String.format("%s reopened this issue %s.", actorName, time))
+					conditionallyBold(bold,
+						new Text(String.format("%s reopened this issue %s.", actorName, time)))
 				);
 				return display;
 			}
 			case Locked:
-				return new Text(String.format("%s locked issue %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s locked issue %s.", actorName, time)));
 			case Unlocked:
-				return new Text(String.format("%s unlocked this issue %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s unlocked this issue %s.", actorName, time)));
 			case Referenced:
-				return new Text(String.format("%s referenced this issue %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s referenced this issue %s.", actorName, time)));
 			case Subscribed:
-				return new Text(String.format("%s subscribed to receive notifications for this issue %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s subscribed to receive notifications for this issue %s.", actorName, time)));
 			case Mentioned:
-				return new Text(String.format("%s was mentioned %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s was mentioned %s.", actorName, time)));
 			case Merged:
-				return new Text(String.format("%s merged this issue %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s merged this issue %s.", actorName, time)));
 			case HeadRefDeleted:
-				return new Text(String.format("%s deleted the pull request's branch %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s deleted the pull request's branch %s.", actorName, time)));
 			case HeadRefRestored:
-				return new Text(String.format("%s restored the pull request's branch %s.", actorName, time));
+				return conditionallyBold(bold, new Text(String.format("%s restored the pull request's branch %s.", actorName, time)));
 			default:
 				// Not yet implemented, or no events triggered
-				return new Text(String.format("%s %s %s.", actorName, getType(), time));
+				return conditionallyBold(bold, new Text(String.format("%s %s %s.", actorName, getType(), time)));
 		}
 	}
 

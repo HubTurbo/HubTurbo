@@ -2,7 +2,10 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.interfaces.IModel;
+import prefs.Preferences;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 public class MultiModel implements IModel {
 
 	private final HashMap<String, Model> models;
+	private final Preferences prefs;
 
 	// A pending repository is one that has been requested to load but has
 	// not finished loading. We keep track of it because we don't want repeated
@@ -23,9 +27,10 @@ public class MultiModel implements IModel {
 	// Guaranteed to have a value throughout
 	private String defaultRepo = null;
 
-	public MultiModel() {
+	public MultiModel(Preferences prefs) {
 		this.models = new HashMap<>();
 		this.pendingRepositories = new HashSet<>();
+		this.prefs = prefs;
 	}
 
 	public synchronized MultiModel addPending(Model model) {
@@ -33,6 +38,7 @@ public class MultiModel implements IModel {
 		assert pendingRepositories.contains(repoId) : "No pending repository " + repoId + "!";
 		pendingRepositories.remove(repoId);
 		add(model);
+		preprocessNewIssues(model);
 		return this;
 	}
 
@@ -50,6 +56,7 @@ public class MultiModel implements IModel {
 	}
 
 	public synchronized MultiModel replace(List<Model> newModels) {
+		preprocessUpdatedIssues(newModels);
 		this.models.clear();
 		newModels.forEach(this::add);
 		return this;
@@ -142,6 +149,46 @@ public class MultiModel implements IModel {
 
 	public void addPendingRepository(String repoId) {
 		pendingRepositories.add(repoId);
+	}
+
+	/**
+	 * Called on new models which come in.
+	 * Mutates TurboIssues with meta-information.
+	 * @param model
+	 */
+	private void preprocessNewIssues(Model model) {
+		// All new issues which come in are not read, unless they already were according to prefs.
+		for (TurboIssue issue : model.getIssues()) {
+			Optional<LocalDateTime> time = prefs.getMarkedReadAt(model.getRepoId(), issue.getId());
+			issue.setMarkedReadAt(time);
+			issue.setIsCurrentlyRead(time.isPresent());
+		}
+	}
+
+	/**
+	 * Called on existing models that are updated.
+	 * Mutates TurboIssues with meta-information.
+	 * @param newModels
+	 */
+	private void preprocessUpdatedIssues(List<Model> newModels) {
+		// Updates preferences with the results of issues that have been updated after a refresh.
+		// This makes read issues show up again.
+		for (Model model : newModels) {
+			assert models.containsKey(model.getRepoId());
+			Model existingModel = models.get(model.getRepoId());
+			if (!existingModel.getIssues().equals(model.getIssues())) {
+				// Find issues that have changed and update preferences with them
+				for (int i=1; i<=model.getIssues().size(); i++) {
+					// TODO O(n^2), optimise by preprocessing into a map or sorting
+					if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
+						assert model.getIssueById(i).isPresent();
+						// It's no longer currently read, but it retains its updated time.
+						// No changes to preferences.
+						model.getIssueById(i).get().setIsCurrentlyRead(false);
+					}
+				}
+			}
+		}
 	}
 
 	private void ______BOILERPLATE______() {
