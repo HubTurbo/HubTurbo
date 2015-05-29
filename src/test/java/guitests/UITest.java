@@ -29,7 +29,9 @@ public class UITest extends GuiTest{
     @Before
     @Override
     public void setupStage() throws Throwable {
-        launchApp();
+        if (stage == null) {
+            launchApp();
+        }
         try {
             stage = targetWindow(stageFuture.get(25, TimeUnit.SECONDS));
             FXTestUtils.bringToFront(stage);
