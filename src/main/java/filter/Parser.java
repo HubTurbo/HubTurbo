@@ -7,6 +7,7 @@ import filter.lexer.TokenType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -185,7 +186,9 @@ public class Parser {
 	}
 
 	private FilterExpression parseQualifierContent(String qualifierName, boolean allowMultipleKeywords) {
-		if (isRangeOperatorToken(lookAhead())) {
+		if (isSortQualifier(qualifierName)) {
+			return parseSortKeys();
+		} else if (isRangeOperatorToken(lookAhead())) {
 			// < > <= >= [number range | date range]
 			return parseRangeOperator(qualifierName, lookAhead());
 		} else if (isDateToken(lookAhead())) {
@@ -194,7 +197,7 @@ public class Parser {
 		} else if (isNumberToken(lookAhead())) {
 			// [number] | [number] .. [number]
 			return parseNumberOrNumberRange(qualifierName);
-		} else if (isQuoteToken(lookAhead())) {//!allowMultipleKeywords &&
+		} else if (isQuoteToken(lookAhead())) {
 			// " [content] "
 			consume(TokenType.QUOTE);
 			FilterExpression result = parseQualifierContent(qualifierName, true);
@@ -210,6 +213,10 @@ public class Parser {
 		} else {
 			throw new ParseException(String.format("Invalid content for qualifier %s: %s", qualifierName, lookAhead()));
 		}
+	}
+
+	private boolean isSortQualifier(String qualifierName) {
+		return qualifierName.equals(Qualifier.SORT);
 	}
 
 	private boolean isKeywordToken(Token token) {
@@ -323,6 +330,28 @@ public class Parser {
 		}
 		assert false : "Should never reach here";
 		return null;
+	}
+
+	private FilterExpression parseSortKeys() {
+		List<SortKey> keys = new ArrayList<>();
+		keys.add(parseSortKey());
+
+		while (lookAhead().getType() == TokenType.COMMA) {
+			consume(TokenType.COMMA);
+			keys.add(parseSortKey());
+		}
+		return new Qualifier(Qualifier.SORT, keys);
+	}
+
+	private SortKey parseSortKey() {
+		if (lookAhead().getType() == TokenType.NOT) {
+			consume(TokenType.NOT);
+			Token key = consume(TokenType.SYMBOL);
+			return new SortKey(key.getValue(), true);
+		} else {
+			Token key = consume(TokenType.SYMBOL);
+			return new SortKey(key.getValue(), false);
+		}
 	}
 
 	private FilterExpression parseRangeOperator(String name, Token token) {
