@@ -38,12 +38,12 @@ public class MultiModel implements IModel {
 		assert pendingRepositories.contains(repoId) : "No pending repository " + repoId + "!";
 		pendingRepositories.remove(repoId);
 		add(model);
+		preprocessNewIssues(model);
 		return this;
 	}
 
 	public synchronized MultiModel add(Model model) {
 		this.models.put(model.getRepoId(), model);
-		preprocessNewIssues(model);
 		return this;
 	}
 
