@@ -10,7 +10,8 @@ public class UpdateDummyRepoEvent extends Event {
     public enum UpdateType {NEW_ISSUE, UPDATE_ISSUE, DELETE_ISSUE,
         NEW_LABEL, UPDATE_LABEL, DELETE_LABEL,
         NEW_MILESTONE, UPDATE_MILESTONE, DELETE_MILESTONE,
-        NEW_USER, UPDATE_USER, DELETE_USER
+        NEW_USER, UPDATE_USER, DELETE_USER,
+        RESET_REPO
     }
 
     /**

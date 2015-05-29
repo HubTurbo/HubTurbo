@@ -15,7 +15,7 @@ public class ModelUpdateUITest extends UITest {
             click("View");
             click("Refresh");
             sleep(500);
-            UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE));
+            UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
             UI.events.triggerEvent(new UILogicRefreshEvent());
             sleep(500);
         }

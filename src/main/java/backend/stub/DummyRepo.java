@@ -61,6 +61,10 @@ public class DummyRepo implements Repo {
 //				case DELETE_USER:
 //					getRepoState(e.repoId).deleteUser();
 //					break;
+				case RESET_REPO:
+					// Model reload is done by event handler registered in Logic
+					repoStates.put(e.repoId, new DummyRepoState(e.repoId));
+					break;
 			}
 		});
 	}

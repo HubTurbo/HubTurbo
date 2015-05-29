@@ -9,6 +9,8 @@ import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
+import util.events.UpdateDummyRepoEvent;
+import util.events.UpdateDummyRepoEventHandler;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,28 @@ public class Logic {
 		this.prefs = prefs;
 
 		repoIO = new RepoIO(isTestMode, enableTestJSON);
+
+		// Only relevant to testing
+		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
+			// RESET_REPO is handled jointly by Logic and DummyRepo
+			if (e.updateType == UpdateDummyRepoEvent.UpdateType.RESET_REPO) {
+				assert isTestMode;
+				assert e.repoId != null;
+
+				List<Model> toReplace = models.toModels();
+
+				logger.info("Attempting to reset " + e.repoId);
+				if (toReplace.remove(models.get(e.repoId))) {
+					logger.info("Clearing " + e.repoId + " successful.");
+				} else {
+					logger.info(e.repoId + " not currently in model.");
+				}
+				models.replace(toReplace);
+
+				// Re-"download" repo after clearing
+				openRepository(e.repoId);
+			}
+		});
 
 		// Pass the currently-empty model to the UI
 		uiManager.updateNow(models);
