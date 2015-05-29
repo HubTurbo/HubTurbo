@@ -55,6 +55,8 @@ public class TurboIssue {
 
 	private final String repoId;
 	private IssueMetadata metadata;
+	private Optional<LocalDateTime> markedReadAt;
+	private boolean isCurrentlyRead;
 
 	private void ______CONSTRUCTORS______() {
 	}
@@ -108,6 +110,8 @@ public class TurboIssue {
 
 		this.metadata = new IssueMetadata(issue.metadata);
 		this.repoId = issue.repoId;
+		this.markedReadAt = issue.markedReadAt;
+		this.isCurrentlyRead = issue.isCurrentlyRead;
 	}
 
 	public TurboIssue(String repoId, Issue issue) {
@@ -133,6 +137,8 @@ public class TurboIssue {
 
 		this.metadata = new IssueMetadata();
 		this.repoId = repoId;
+		this.markedReadAt = Optional.empty();
+		this.isCurrentlyRead = false;
 	}
 
 	public TurboIssue(String repoId, SerializableIssue issue) {
@@ -152,6 +158,8 @@ public class TurboIssue {
 
 		this.metadata = new IssueMetadata();
 		this.repoId = repoId;
+		this.markedReadAt = Optional.empty();
+		this.isCurrentlyRead = false;
 	}
 
 	private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
@@ -172,6 +180,8 @@ public class TurboIssue {
 		this.milestone = Optional.empty();
 
 		this.metadata = new IssueMetadata();
+		this.markedReadAt = Optional.empty();
+		this.isCurrentlyRead = false;
 	}
 
 	/**
@@ -300,6 +310,18 @@ public class TurboIssue {
 	public void setMetadata(IssueMetadata metadata) {
 		this.metadata = metadata;
 	}
+	public Optional<LocalDateTime> getMarkedReadAt() {
+		return markedReadAt;
+	}
+	public void setMarkedReadAt(Optional<LocalDateTime> markedReadAt) {
+		this.markedReadAt = markedReadAt;
+	}
+	public boolean isCurrentlyRead() {
+		return isCurrentlyRead;
+	}
+	public void setIsCurrentlyRead(boolean isCurrentlyRead) {
+		this.isCurrentlyRead = isCurrentlyRead;
+	}
 
 	/**
 	 * Metadata is not considered for equality.
@@ -324,6 +346,8 @@ public class TurboIssue {
 		if (milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) return false;
 		if (title != null ? !title.equals(issue.title) : issue.title != null) return false;
 		if (updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) return false;
+		if (markedReadAt != null ? !markedReadAt.equals(issue.markedReadAt) : issue.markedReadAt != null) return false;
+		if (isCurrentlyRead != issue.isCurrentlyRead) return false;
 
 		return true;
 	}
@@ -334,9 +358,11 @@ public class TurboIssue {
 		result = 31 * result + (creator != null ? creator.hashCode() : 0);
 		result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
 		result = 31 * result + (isPullRequest ? 1 : 0);
+		result = 31 * result + (isCurrentlyRead ? 1 : 0);
 		result = 31 * result + (title != null ? title.hashCode() : 0);
 		result = 31 * result + (description != null ? description.hashCode() : 0);
 		result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);
+		result = 31 * result + (markedReadAt != null ? markedReadAt.hashCode() : 0);
 		result = 31 * result + commentCount;
 		result = 31 * result + (isOpen ? 1 : 0);
 		result = 31 * result + (assignee != null ? assignee.hashCode() : 0);
