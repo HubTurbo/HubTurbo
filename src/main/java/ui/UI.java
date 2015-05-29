@@ -26,9 +26,9 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
-import util.HTLog;
 import util.PlatformEx;
 import util.PlatformSpecific;
+import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
@@ -37,6 +37,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static util.Futures.withResult;
 
@@ -53,6 +54,8 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
+	private static final int REFRESH_PERIOD = 60;
+
 	// Application-level state
 
 	public UIManager uiManager;
@@ -62,6 +65,7 @@ public class UI extends Application implements EventDispatcher {
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
+	private TickingTimer refreshTimer;
 
 	// Main UI elements
 
@@ -124,6 +128,9 @@ public class UI extends Application implements EventDispatcher {
 	private void initApplicationState() {
 		commandLineArgs = initialiseCommandLineArguments();
 		clearCacheIfNecessary();
+		refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
+			status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+		refreshTimer.start();
 	}
 
 	private void initUI(Stage stage) {
@@ -196,6 +203,7 @@ public class UI extends Application implements EventDispatcher {
 					if (shouldRefresh) {
 						logger.info("Browser view has changed; refreshing");
 						logic.refresh();
+						refreshTimer.restart();
 					}
 				});
 			}
