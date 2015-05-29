@@ -3,7 +3,6 @@ package ui.issuepanel;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -143,9 +142,9 @@ public class IssuePanel extends IssueColumn {
 				TurboIssue issue = listView.getSelectionModel().getSelectedItem();
 
 				if (event.getCode() == KeyCode.R) {
-					LocalDateTime time = LocalDateTime.now();
-					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), time);
-					issue.setMarkedReadAt(Optional.of(time));
+					LocalDateTime now = LocalDateTime.now();
+					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
+					issue.setMarkedReadAt(Optional.of(now));
 					issue.setIsCurrentlyRead(true);
 					parentColumnControl.refresh();
 				}

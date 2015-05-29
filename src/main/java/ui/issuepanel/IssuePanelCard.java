@@ -101,7 +101,7 @@ public class IssuePanelCard extends VBox {
 			})
 			.collect(Collectors.toList());
 
-		return layoutEvents(issue.getMarkedReadAt(), eventsWithinDuration, commentsWithinDuration);
+		return layoutEvents(issue, eventsWithinDuration, commentsWithinDuration);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class IssuePanelCard extends VBox {
 	 * @param comments
 	 * @return
 	 */
-	private static Node layoutEvents(Optional<LocalDateTime> markedReadAt,
+	private static Node layoutEvents(TurboIssue issue,
 	                                 List<TurboIssueEvent> events, List<Comment> comments) {
 		VBox result = new VBox();
 		result.setSpacing(3);
@@ -118,7 +118,7 @@ public class IssuePanelCard extends VBox {
 
 		// Events
 		events.stream()
-			.map(e -> e.display(markedReadAt))
+			.map(e -> e.display(issue))
 			.forEach(e -> result.getChildren().add(e));
 
 		// Comments
