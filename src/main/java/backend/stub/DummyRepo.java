@@ -32,13 +32,7 @@ public class DummyRepo implements Repo {
 	private static List<TurboUser> users = new ArrayList<>();
 
 	public DummyRepo() {
-		for (int i=0; i<10; i++) {
-			issues.add(makeDummyIssue(DUMMY_REPO_ID));
-			labels.add(makeDummyLabel(DUMMY_REPO_ID));
-			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
-			users.add(makeDummyUser(DUMMY_REPO_ID));
-		}
-
+		populateRepo();
 		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
 			switch (e.updateType) {
 				case NEW_ISSUE:
@@ -51,17 +45,21 @@ public class DummyRepo implements Repo {
 		});
 	}
 
-	public void resetRepo() {
-		issues = new ArrayList<>();
-		labels = new ArrayList<>();
-		milestones = new ArrayList<>();
-		users = new ArrayList<>();
+	public void populateRepo() {
 		for (int i=0; i<10; i++) {
 			issues.add(makeDummyIssue(DUMMY_REPO_ID));
 			labels.add(makeDummyLabel(DUMMY_REPO_ID));
 			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
 			users.add(makeDummyUser(DUMMY_REPO_ID));
 		}
+	}
+
+	public void resetRepo() {
+		issues = new ArrayList<>();
+		labels = new ArrayList<>();
+		milestones = new ArrayList<>();
+		users = new ArrayList<>();
+		populateRepo();
 	}
 
 	@Override
