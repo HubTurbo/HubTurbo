@@ -179,7 +179,7 @@ public class MultiModel implements IModel {
 					// TODO O(n^2), optimise by preprocessing into a map or sorting
 					if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
 						// Update for this issue and model
-						prefs.setMarkedReadAt(model.getRepoId(), i, LocalDateTime.now());
+						prefs.clearMarkedReadAt(model.getRepoId(), i);
 					}
 				}
 			}
