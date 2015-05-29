@@ -3,6 +3,7 @@ package ui.issuepanel;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import javafx.event.EventHandler;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -15,8 +16,10 @@ import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class IssuePanel extends IssueColumn {
 
@@ -136,6 +139,20 @@ public class IssuePanel extends IssueColumn {
 
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
+
+				TurboIssue issue = listView.getSelectionModel().getSelectedItem();
+
+				if (event.getCode() == KeyCode.R) {
+					LocalDateTime time = LocalDateTime.now();
+					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), time);
+					issue.setMarkedReadAt(Optional.of(time));
+					parentColumnControl.refresh();
+				}
+				if (event.getCode() == KeyCode.U) {
+					ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
+					issue.setMarkedReadAt(Optional.empty());
+					parentColumnControl.refresh();
+				}
 				if (event.getCode() == KeyCode.F5) {
 					ui.logic.refresh();
 				}
