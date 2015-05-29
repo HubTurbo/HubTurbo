@@ -13,7 +13,7 @@ import java.util.concurrent.FutureTask;
 
 public class ModelUpdateUITest extends UITest {
 
-    private final int EVENT_DELAY = 500;
+    private final int EVENT_DELAY = 750;
 
     @Test
     @SuppressWarnings("unchecked")
@@ -27,6 +27,26 @@ public class ModelUpdateUITest extends UITest {
         FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         Assert.assertEquals(11, countIssues.get());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void addMultipleIssuesTest() throws InterruptedException, ExecutionException {
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        sleep(EVENT_DELAY);
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        sleep(EVENT_DELAY);
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        sleep(EVENT_DELAY);
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        sleep(EVENT_DELAY);
+        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
+        PlatformEx.runAndWait(countIssues);
+        Assert.assertEquals(13, countIssues.get());
     }
 
     @Test
