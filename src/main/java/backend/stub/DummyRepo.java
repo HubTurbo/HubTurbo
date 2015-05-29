@@ -22,13 +22,47 @@ public class DummyRepo implements Repo {
 	private static final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
 
 	public DummyRepo() {
-//		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
-//			switch (e.updateType) {
-//				case NEW_ISSUE:
-//					issues.add(makeDummyIssue(DUMMY_REPO_ID));
+		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
+			assert e.repoId != null;
+			switch (e.updateType) {
+				case NEW_ISSUE:
+					getRepoState(e.repoId).makeNewIssue();
+					break;
+//				case NEW_LABEL:
+//					getRepoState(e.repoId).makeNewLabel();
 //					break;
-//			}
-//		});
+//				case NEW_MILESTONE:
+//					getRepoState(e.repoId).makeNewMilestone();
+//					break;
+//				case NEW_USER:
+//					getRepoState(e.repoId).makeNewUser();
+//					break;
+//				case UPDATE_ISSUE:
+//					getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
+//					break;
+//				case UPDATE_LABEL:
+//					getRepoState(e.repoId).updateLabel(e.itemId, e.updateText);
+//					break;
+//				case UPDATE_MILESTONE:
+//					getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
+//					break;
+//				case UPDATE_USER:
+//					getRepoState(e.repoId).updateUser(e.itemId, e.updateText);
+//					break;
+//				case DELETE_ISSUE:
+//					getRepoState(e.repoId).deleteIssue();
+//					break;
+//				case DELETE_LABEL:
+//					getRepoState(e.repoId).deleteLabel();
+//					break;
+//				case DELETE_MILESTONE:
+//					getRepoState(e.repoId).deleteMilestone();
+//					break;
+//				case DELETE_USER:
+//					getRepoState(e.repoId).deleteUser();
+//					break;
+			}
+		});
 	}
 
 	@Override
@@ -101,5 +135,4 @@ public class DummyRepo implements Repo {
 	public boolean isRepositoryValid(String repoId) {
 		return true;
 	}
-
 }
