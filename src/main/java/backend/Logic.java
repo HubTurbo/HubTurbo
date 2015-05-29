@@ -27,7 +27,7 @@ public class Logic {
 	private final UIManager uiManager;
 	private final Preferences prefs;
 
-	private RepoIO repoIO;// = new RepoIO();
+	private RepoIO repoIO;
 
 	// Assumed to be always present when app starts
 	public UserCredentials credentials = null;
