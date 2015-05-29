@@ -22,6 +22,7 @@ public class IssuePanel extends IssueColumn {
 
 	private final IModel model;
 	private final UI ui;
+	private int issueCount;
 
 	private NavigableListView<TurboIssue> listView;
 	private final KeyCombination keyCombBoxToList = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
@@ -90,6 +91,7 @@ public class IssuePanel extends IssueColumn {
 		// if it actually does on platforms other than Linux...
 		listView.setItems(null);
 		listView.setItems(getIssueList());
+		issueCount = getIssueList().size();
 
 		listView.restoreSelection();
 		this.setId(model.getDefaultRepo() + "_col" + columnIndex);
@@ -233,5 +235,9 @@ public class IssuePanel extends IssueColumn {
 				}
 			}
 		});
+	}
+
+	public int getIssueCount() {
+		return issueCount;
 	}
 }
