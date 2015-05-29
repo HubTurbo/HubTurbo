@@ -40,7 +40,6 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
 		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
 		registerDragEvents(issue);
-		this.setId(model.getDefaultRepo() + "_col" + parentColumnIndex + "_issue" + issue.getId());
 	}
 
 	private void registerDragEvents(TurboIssue issue) {
