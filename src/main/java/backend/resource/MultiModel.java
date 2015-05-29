@@ -2,7 +2,9 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.interfaces.IModel;
+import prefs.Preferences;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 public class MultiModel implements IModel {
 
 	private final HashMap<String, Model> models;
+	private final Preferences prefs;
 
 	// A pending repository is one that has been requested to load but has
 	// not finished loading. We keep track of it because we don't want repeated
@@ -23,9 +26,10 @@ public class MultiModel implements IModel {
 	// Guaranteed to have a value throughout
 	private String defaultRepo = null;
 
-	public MultiModel() {
+	public MultiModel(Preferences prefs) {
 		this.models = new HashMap<>();
 		this.pendingRepositories = new HashSet<>();
+		this.prefs = prefs;
 	}
 
 	public synchronized MultiModel addPending(Model model) {

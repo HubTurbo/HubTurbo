@@ -1,8 +1,6 @@
 package prefs;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import ui.UI;
-import ui.issuecolumn.ColumnControl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,14 +13,10 @@ public class Preferences {
 	private static final String GLOBAL_CONFIG_FILE = "global.json";
 
 	private final ConfigFileHandler fileHandler;
-	private final UI ui;
-	private final ColumnControl columns;
 
 	public GlobalConfig global;
 
-	public Preferences(UI ui, ColumnControl columns) {
-		this.ui = ui;
-		this.columns = columns;
+	public Preferences() {
 		this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
 
 		loadGlobalConfig();

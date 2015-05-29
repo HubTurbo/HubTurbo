@@ -7,6 +7,7 @@ import filter.Parser;
 import filter.expression.Qualifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import prefs.Preferences;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class FilterEvalTests {
 	private static final String REPO = "test/test";
 
 	public FilterEvalTests() {
-		empty = new MultiModel();
+		empty = new MultiModel(new Preferences());
 		empty.setDefaultRepo(REPO);
 	}
 
@@ -91,7 +92,7 @@ public class FilterEvalTests {
 	}
 
 	private IModel singletonModel(Model model) {
-		MultiModel models = new MultiModel();
+		MultiModel models = new MultiModel(new Preferences());
 		models.add(model);
 		models.setDefaultRepo(model.getRepoId());
 		return models;

@@ -115,7 +115,7 @@ public class UI extends Application implements EventDispatcher {
 		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
 			logger.error(throwable.getMessage(), throwable));
 
-		prefs = new Preferences(this, columns);
+		prefs = new Preferences();
 
 		eventBus = new EventBus();
 		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
