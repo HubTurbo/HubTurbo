@@ -90,16 +90,6 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		});
 	}
 
-	private boolean isTestMode() {
-		assert !isBypassLogin();
-		if (ui.getCommandLineArgs().getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
-		return false;
-	}
-
-	private boolean isBypassLogin() {
-		return ui.getCommandLineArgs().getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
-	}
-
 	private boolean attemptLogin() {
 		try {
 			if (Utility.isWellFormedRepoId(owner, repo)) {
@@ -191,7 +181,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
 
-		if (!isTestMode()) populateSavedFields();
+		if (!ui.isTestMode()) populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
