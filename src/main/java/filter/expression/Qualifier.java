@@ -25,6 +25,14 @@ public class Qualifier implements FilterExpression {
 
 	public static final Qualifier EMPTY = new Qualifier("", "");
 
+	public static final String[] KEYWORDS = new String[] {
+		"assignees", "author", "body", "closed", "comments", "created", "creator",
+		"date", "desc", "description", "has", "id", "in", "involves", "is", "issue",
+		"keyword", "label", "labels", "merged", "milestone", "milestones", "no",
+		"open", "pr", "pullrequest", "read", "repo", "sort", "state", "status", "title",
+		"type", "unmerged", "unread", "updated", "user"
+	};
+
 	private final String name;
 
 	// Only one of these will be present at a time
@@ -547,6 +555,10 @@ public class Qualifier implements FilterExpression {
         	return issue.isPullRequest() && !issue.isOpen();
         case "unmerged":
         	return issue.isPullRequest() && issue.isOpen();
+        case "read":
+	        return issue.isCurrentlyRead();
+        case "unread":
+	        return !issue.isCurrentlyRead();
         default:
             return false;
         }

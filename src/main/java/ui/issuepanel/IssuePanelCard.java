@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class IssuePanelCard extends VBox {
@@ -50,9 +51,14 @@ public class IssuePanelCard extends VBox {
 	}
 
 	private void setup() {
-		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueTitle.setWrappingWidth(CARD_WIDTH);
+		Label issueTitle = new Label("#" + issue.getId() + " " + issue.getTitle());
+		issueTitle.setMaxWidth(CARD_WIDTH);
+		issueTitle.setWrapText(true);
 		issueTitle.getStyleClass().add("issue-panel-name");
+
+		if (issue.isCurrentlyRead()) {
+			issueTitle.getStyleClass().add("issue-panel-name-read");
+		}
 
 		if (!issue.isOpen()) {
 			issueTitle.getStyleClass().add("issue-panel-closed");
@@ -95,7 +101,7 @@ public class IssuePanelCard extends VBox {
 			})
 			.collect(Collectors.toList());
 
-		return layoutEvents(eventsWithinDuration, commentsWithinDuration);
+		return layoutEvents(issue, eventsWithinDuration, commentsWithinDuration);
 	}
 
 	/**
@@ -104,14 +110,15 @@ public class IssuePanelCard extends VBox {
 	 * @param comments
 	 * @return
 	 */
-	private static Node layoutEvents(List<TurboIssueEvent> events, List<Comment> comments) {
+	private static Node layoutEvents(TurboIssue issue,
+	                                 List<TurboIssueEvent> events, List<Comment> comments) {
 		VBox result = new VBox();
 		result.setSpacing(3);
 		VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
 		// Events
 		events.stream()
-			.map(TurboIssueEvent::display)
+			.map(e -> e.display(issue))
 			.forEach(e -> result.getChildren().add(e));
 
 		// Comments

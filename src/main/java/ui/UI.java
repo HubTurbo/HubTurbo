@@ -29,6 +29,7 @@ import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
+import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
@@ -36,6 +37,7 @@ import util.events.Event;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -50,6 +52,8 @@ public class UI extends Application implements EventDispatcher {
 	private static final Logger logger = LogManager.getLogger(UI.class.getName());
 	private static HWND mainWindowHandle;
 
+	private static final int REFRESH_PERIOD = 60;
+
 	// Application-level state
 
 	public UIManager uiManager;
@@ -59,6 +63,7 @@ public class UI extends Application implements EventDispatcher {
 	public static EventDispatcher events;
 	public EventBus eventBus;
 	private HashMap<String, String> commandLineArgs;
+	private TickingTimer refreshTimer;
 
 	// Main UI elements
 
@@ -133,7 +138,7 @@ public class UI extends Application implements EventDispatcher {
 			logger.error(throwable.getMessage(), throwable));
 
 		commandLineArgs = initialiseCommandLineArguments();
-		prefs = new Preferences(this, columns);
+		prefs = new Preferences(isTestMode());
 
 		eventBus = new EventBus();
 		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
@@ -147,6 +152,9 @@ public class UI extends Application implements EventDispatcher {
 		// we can pass them in the form of an array.
 		logic = new Logic(uiManager, prefs, isTestMode(), isTestJSONEnabled());
 		clearCacheIfNecessary();
+		refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
+			status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+		refreshTimer.start();
 	}
 
 	private void initUI(Stage stage) {
@@ -235,6 +243,7 @@ public class UI extends Application implements EventDispatcher {
 					if (shouldRefresh) {
 						logger.info("Browser view has changed; refreshing");
 						logic.refresh();
+						refreshTimer.restart();
 					}
 				});
 			}
