@@ -10,7 +10,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
 import ui.UI;
-import ui.components.HTStatusBar;
 import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
