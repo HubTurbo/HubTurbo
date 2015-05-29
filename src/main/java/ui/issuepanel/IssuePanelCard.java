@@ -50,9 +50,14 @@ public class IssuePanelCard extends VBox {
 	}
 
 	private void setup() {
-		Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
-		issueTitle.setWrappingWidth(CARD_WIDTH);
+		Label issueTitle = new Label("#" + issue.getId() + " " + issue.getTitle());
+		issueTitle.setMaxWidth(CARD_WIDTH);
+		issueTitle.setWrapText(true);
 		issueTitle.getStyleClass().add("issue-panel-name");
+
+		if (issue.getMarkedReadAt().isPresent()) {
+			issueTitle.getStyleClass().add("issue-panel-name-read");
+		}
 
 		if (!issue.isOpen()) {
 			issueTitle.getStyleClass().add("issue-panel-closed");

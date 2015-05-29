@@ -53,6 +53,10 @@
 	-fx-font-size: 14px;
 }
 
+.issue-panel-name-read {
+	-fx-text-fill: #808080;
+}
+
 .issue-panel-closed {
 	-fx-strikethrough: true;
 }
