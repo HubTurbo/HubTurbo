@@ -185,6 +185,19 @@ public class TurboIssue {
 	}
 
 	/**
+	 * Transient state may not always be transferred between issues. For example,
+	 * when an issue is updated, the new issue is constructed from an external object,
+	 * not an existing issue, so transient state on the old one is lost if the old issue
+	 * is just replaced by the new. This method is required in such cases.
+	 * @param fromIssue
+	 */
+	private void transferTransientState(TurboIssue fromIssue) {
+		this.metadata = fromIssue.metadata;
+		this.markedReadAt = fromIssue.markedReadAt;
+		this.isCurrentlyRead = fromIssue.isCurrentlyRead;
+	}
+
+	/**
 	 * Conceptually, operations on issues. They should only modify non-serialized fields.
 	 */
 	private void ______METHODS______() {
@@ -207,7 +220,14 @@ public class TurboIssue {
 			// TODO O(n^2), fix by preprocessing and copying into a map
 			Optional<Integer> corresponding = findIssueWithId(existing, id);
 			if (corresponding.isPresent()) {
-				existing.set(corresponding.get(), new TurboIssue(issue));
+
+				// issue is constructed from an external Issue object.
+				// It won't have the transient state that its TurboIssue
+				// counterpart has, so we have to explicitly transfer it.
+				TurboIssue newIssue = new TurboIssue(issue);
+				newIssue.transferTransientState(existing.get(corresponding.get()));
+
+				existing.set(corresponding.get(), newIssue);
 			} else {
 				existing.add(new TurboIssue(issue));
 			}
