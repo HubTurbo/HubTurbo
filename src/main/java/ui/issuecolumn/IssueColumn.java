@@ -114,15 +114,7 @@ public abstract class IssueColumn extends Column {
 //	}
 
 	private final ModelUpdatedEventHandler onModelUpdate = e -> {
-		List<String> all = new ArrayList<>(Arrays.asList(
-			"label", "milestone",
-			"involves", "assignee", "author",
-			"title", "body",
-			"is", "issue", "pr", "merged", "unmerged",
-			"no", "type", "has",
-			"state", "open", "closed",
-			"created",
-			"updated"));
+		List<String> all = new ArrayList<>(Arrays.asList(Qualifier.KEYWORDS));
 		all.addAll(e.model.getUsers().stream()
 			.map(TurboUser::getLoginName)
 			.collect(Collectors.toList()));
