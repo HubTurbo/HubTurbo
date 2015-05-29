@@ -108,7 +108,7 @@ public class Logic {
 		if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
 			return Futures.unit(false);
 		}
-		models.addPendingRepository(repoId);
+		models.queuePendingRepository(repoId);
 		return isRepositoryValid(repoId).thenCompose(valid -> {
 			if (!valid) {
 				return Futures.unit(false);

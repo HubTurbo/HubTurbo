@@ -140,7 +140,7 @@ public class MultiModel implements IModel {
 		return pendingRepositories.contains(repoId);
 	}
 
-	public void addPendingRepository(String repoId) {
+	public void queuePendingRepository(String repoId) {
 		pendingRepositories.add(repoId);
 	}
 
