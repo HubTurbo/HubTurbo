@@ -4,6 +4,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import ui.UI;
 import ui.issuecolumn.ColumnControl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,10 +69,6 @@ public class Preferences {
 		global.addBoard(name, filterExprs);
 	}
 
-//	public List<String> getBoardPanels(String name) {
-//		return global.getBoardPanels(name);
-//	}
-
 	public Map<String, List<String>> getAllBoards() {
 		return global.getAllBoards();
 	}
@@ -90,7 +87,7 @@ public class Preferences {
 
 	/**
 	 * Helper method to get the most recently viewed repository,
-	 * allowing for failure if there are none (on first run)
+	 * allowing for failure if there are none (on first run).
 	 * @return
 	 */
 	public Optional<RepositoryId> getLastViewedRepository() {
@@ -98,7 +95,7 @@ public class Preferences {
 		if (lastViewed.isEmpty()) {
 			return Optional.empty();
 		} else {
-			String id = lastViewed.get(lastViewed.size()-1);
+			String id = lastViewed.get(lastViewed.size() - 1);
 			return Optional.of(RepositoryId.createFromId(id));
 		}
 	}
@@ -107,13 +104,15 @@ public class Preferences {
 		return global.getLastViewedRepositories();
 	}
 
-	/**
-	 * Testing
-	 */
+	public void clearMarkedReadAt(String repoId, int issue) {
+		global.clearMarkedReadAt(repoId, issue);
+	}
 
-//	public void setConfigFileHandler(ConfigFileHandler handler) {
-//		this.fileHandler = handler;
-//		init();
-//	}
-//
+	public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
+		global.setMarkedReadAt(repoId, issue, time);
+	}
+
+	public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
+		return global.getMarkedReadAt(repoId, issue);
+	}
 }

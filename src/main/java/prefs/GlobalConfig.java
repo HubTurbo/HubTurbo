@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,8 +28,33 @@ public class GlobalConfig {
 	private String lastLoginUsername = "";
 	private byte[] lastLoginPassword = new byte[0];
 	private Map<String, List<String>> boards = new HashMap<>();
+	private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
 
 	public GlobalConfig() {
+	}
+
+	public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
+		if (!markedReadTimes.containsKey(repoId)) {
+			markedReadTimes.put(repoId, new HashMap<>());
+		}
+		markedReadTimes.get(repoId).put(issue, time);
+	}
+
+	public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
+		if (!markedReadTimes.containsKey(repoId)) {
+			return Optional.empty();
+		}
+		return Optional.ofNullable(markedReadTimes.get(repoId).get(issue));
+	}
+
+	public void clearMarkedReadAt(String repoId, int issue) {
+		if (!markedReadTimes.containsKey(repoId)) {
+			// No need to do anything
+			return;
+		}
+		if (markedReadTimes.get(repoId).containsKey(issue)) {
+			markedReadTimes.get(repoId).remove(issue);
+		}
 	}
 
 	public void addBoard(String name, List<String> filterExprs) {
