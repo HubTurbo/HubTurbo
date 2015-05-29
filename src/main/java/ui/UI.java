@@ -143,7 +143,9 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void initApplicationState() {
-		logic = new Logic(uiManager, prefs, isTestMode());
+		// In the future, when more arguments are passed to logic,
+		// we can pass them in the form of an array.
+		logic = new Logic(uiManager, prefs, isTestMode(), isTestJSONEnabled());
 		clearCacheIfNecessary();
 	}
 
@@ -168,6 +170,10 @@ public class UI extends Application implements EventDispatcher {
 
 	private boolean isBypassLogin() {
 		return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
+	}
+
+	private boolean isTestJSONEnabled() {
+		return commandLineArgs.getOrDefault("testjson", "false").equalsIgnoreCase("true");
 	}
 
 	public void quit() {

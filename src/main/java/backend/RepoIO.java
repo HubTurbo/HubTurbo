@@ -4,6 +4,7 @@ import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
+import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
@@ -24,8 +25,12 @@ public class RepoIO {
 	private final RepoSource repoSource;
 	private final RepoStore repoStore;
 
-	public RepoIO(boolean isTestMode) {
-		repoStore = new JSONStore();
+	public RepoIO(boolean isTestMode, boolean enableTestJSON) {
+		if (isTestMode && !enableTestJSON) {
+			repoStore = new JSONStoreStub();
+		} else {
+			repoStore = new JSONStore();
+		}
 
 		if (isTestMode) {
 			repoSource = new DummySource();

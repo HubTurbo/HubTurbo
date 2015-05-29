@@ -32,11 +32,11 @@ public class Logic {
 	// Assumed to be always present when app starts
 	public UserCredentials credentials = null;
 
-	public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode) {
+	public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
 		this.uiManager = uiManager;
 		this.prefs = prefs;
 
-		repoIO = new RepoIO(isTestMode);
+		repoIO = new RepoIO(isTestMode, enableTestJSON);
 
 		// Pass the currently-empty model to the UI
 		uiManager.updateNow(models);
