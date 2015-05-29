@@ -92,7 +92,8 @@ public class FilterEvalTests {
 
 	private IModel singletonModel(Model model) {
 		MultiModel models = new MultiModel();
-		models.add(model);
+		models.queuePendingRepository(model.getRepoId());
+		models.addPending(model);
 		models.setDefaultRepo(model.getRepoId());
 		return models;
 	}

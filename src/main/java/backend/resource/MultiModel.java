@@ -36,7 +36,7 @@ public class MultiModel implements IModel {
 		return this;
 	}
 
-	public synchronized MultiModel add(Model model) {
+	private synchronized MultiModel add(Model model) {
 		this.models.put(model.getRepoId(), model);
 		return this;
 	}
