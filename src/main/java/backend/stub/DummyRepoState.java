@@ -91,7 +91,6 @@ public class DummyRepoState {
 	}
 
 	protected TurboIssue makeDummyIssue() {
-		System.out.println("The size is right " + (issues.size() + 1));
 		return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
 	}
 
