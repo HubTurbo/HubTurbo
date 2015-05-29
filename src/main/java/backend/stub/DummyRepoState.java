@@ -17,17 +17,17 @@ import java.util.List;
 
 public class DummyRepoState {
 
-	private static String dummyRepoId;
+	private String dummyRepoId;
 
-	private static int issueCounter = 0;
-	private static int labelCounter = 0;
-	private static int milestoneCounter = 0;
-	private static int userCounter = 0;
+	private List<TurboIssue> issues = new ArrayList<>();
+	private List<TurboLabel> labels = new ArrayList<>();
+	private List<TurboMilestone> milestones = new ArrayList<>();
+	private List<TurboUser> users = new ArrayList<>();
 
-	private static List<TurboIssue> issues = new ArrayList<>();
-	private static List<TurboLabel> labels = new ArrayList<>();
-	private static List<TurboMilestone> milestones = new ArrayList<>();
-	private static List<TurboUser> users = new ArrayList<>();
+	private List<TurboIssue> updatedIssues = new ArrayList<>();
+	private List<TurboLabel> updatedLabels = new ArrayList<>();
+	private List<TurboMilestone> updatedMilestones = new ArrayList<>();
+	private List<TurboUser> updatedUsers = new ArrayList<>();
 
 	public DummyRepoState(String repoId) {
 		this.dummyRepoId = repoId;
@@ -41,27 +41,37 @@ public class DummyRepoState {
 
 	protected ImmutableTriple<List<TurboIssue>, String, Date>
 	getUpdatedIssues(String ETag, Date lastCheckTime) {
-		updateRandomIssue();
-		issues.add(makeDummyIssue());
-		return new ImmutableTriple<>(issues, ETag, lastCheckTime);
+		ImmutableTriple<List<TurboIssue>, String, Date> toReturn
+				= new ImmutableTriple<>(updatedIssues, ETag, lastCheckTime);
+		updatedIssues = new ArrayList<>();
+		return toReturn;
+	}
+
+	protected void makeNewIssue() {
+		TurboIssue toAdd = makeDummyIssue();
+		issues.add(toAdd);
+		updatedIssues.add(toAdd);
 	}
 
 	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
-		updateRandomLabel();
-		labels.add(makeDummyLabel());
-		return new ImmutablePair<>(labels, ETag);
+		ImmutablePair<List<TurboLabel>, String> toReturn
+			= new ImmutablePair<>(updatedLabels, ETag);
+		updatedLabels = new ArrayList<>();
+		return toReturn;
 	}
 
 	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String ETag) {
-		updateRandomMilestone();
-		milestones.add(makeDummyMilestone());
-		return new ImmutablePair<>(milestones, ETag);
+		ImmutablePair<List<TurboMilestone>, String> toReturn
+			= new ImmutablePair<>(updatedMilestones, ETag);
+		updatedMilestones = new ArrayList<>();
+		return toReturn;
 	}
 
 	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String ETag) {
-		updateRandomUser();
-		users.add(makeDummyUser());
-		return new ImmutablePair<>(users, ETag);
+		ImmutablePair<List<TurboUser>, String> toReturn
+			= new ImmutablePair<>(updatedUsers, ETag);
+		updatedUsers = new ArrayList<>();
+		return toReturn;
 	}
 
 	protected List<TurboIssue> getIssues() {
@@ -80,49 +90,21 @@ public class DummyRepoState {
 		return users;
 	}
 
-	protected static TurboIssue updateRandomIssue() {
-		int i = (int) (Math.random() * issueCounter);
-		return issues.set(i, new TurboIssue(dummyRepoId, i + 1, "Issue " + (i + 1) + " " + Math.random()));
+	protected TurboIssue makeDummyIssue() {
+		System.out.println("The size is right " + (issues.size() + 1));
+		return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
 	}
 
-	protected static TurboIssue makeDummyIssue() {
-		TurboIssue issue = new TurboIssue(dummyRepoId, issueCounter + 1, "Issue " + (issueCounter + 1));
-		issueCounter++;
-		return issue;
+	protected TurboLabel makeDummyLabel() {
+		return new TurboLabel(dummyRepoId, "Label " + (labels.size() + 1));
 	}
 
-	protected static TurboLabel updateRandomLabel() {
-		int i = (int) (Math.random() * labelCounter);
-		return labels.set(i, new TurboLabel(dummyRepoId, "Label " + (i + 1) + " " + Math.random()));
+	protected TurboMilestone makeDummyMilestone() {
+		return new TurboMilestone(dummyRepoId, milestones.size() + 1, "Milestone " + (milestones.size() + 1));
 	}
 
-	protected static TurboLabel makeDummyLabel() {
-		TurboLabel label = new TurboLabel(dummyRepoId, "Label " + (labelCounter + 1));
-		labelCounter++;
-		return label;
-	}
-
-	protected static TurboMilestone updateRandomMilestone() {
-		int i = (int) (Math.random() * milestoneCounter);
-		return milestones.set(i, new TurboMilestone(dummyRepoId, (i + 1), "Milestone " + (i + 1) + " " + Math.random()));
-	}
-
-	protected static TurboMilestone makeDummyMilestone() {
-		TurboMilestone milestone = new TurboMilestone(dummyRepoId, milestoneCounter + 1,
-			"Milestone " + (milestoneCounter + 1));
-		milestoneCounter++;
-		return milestone;
-	}
-
-	protected static TurboUser updateRandomUser() {
-		int i = (int) (Math.random() * userCounter);
-		return users.set(i, new TurboUser(dummyRepoId, "User " + (i + 1) + " " + Math.random()));
-	}
-
-	protected static TurboUser makeDummyUser() {
-		TurboUser user = new TurboUser(dummyRepoId, "User " + (userCounter + 1));
-		userCounter++;
-		return user;
+	protected TurboUser makeDummyUser() {
+		return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
 	}
 
 	protected List<TurboIssueEvent> getEvents() {
