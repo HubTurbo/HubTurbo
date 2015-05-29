@@ -44,8 +44,24 @@ public class DummyRepo implements Repo {
 				case NEW_ISSUE:
 					issues.add(makeDummyIssue(DUMMY_REPO_ID));
 					break;
+				case RESET_REPO:
+					resetRepo();
+					break;
 			}
 		});
+	}
+
+	public void resetRepo() {
+		issues = new ArrayList<>();
+		labels = new ArrayList<>();
+		milestones = new ArrayList<>();
+		users = new ArrayList<>();
+		for (int i=0; i<10; i++) {
+			issues.add(makeDummyIssue(DUMMY_REPO_ID));
+			labels.add(makeDummyLabel(DUMMY_REPO_ID));
+			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
+			users.add(makeDummyUser(DUMMY_REPO_ID));
+		}
 	}
 
 	@Override
