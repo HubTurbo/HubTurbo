@@ -19,7 +19,7 @@ public class ModelUpdateUITest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(500);
         IssuePanel issuePanel = find("#dummy/dummy_col0");
-        assertEquals(issuePanel.getIssueCount(), 11);
+        assertEquals(11, issuePanel.getIssueCount());
     }
 
     @Test
@@ -31,6 +31,6 @@ public class ModelUpdateUITest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(500);
         IssuePanel issuePanel = find("#dummy/dummy_col0");
-        assertEquals(issuePanel.getIssueCount(), 10);
+        assertEquals(10, issuePanel.getIssueCount());
     }
 }
