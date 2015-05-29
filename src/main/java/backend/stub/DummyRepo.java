@@ -55,10 +55,14 @@ public class DummyRepo implements Repo {
 	}
 
 	public void resetRepo() {
-		issues = new ArrayList<>();
-		labels = new ArrayList<>();
-		milestones = new ArrayList<>();
-		users = new ArrayList<>();
+		issues.clear();
+		labels.clear();
+		milestones.clear();
+		users.clear();
+		issueCounter = 0;
+		labelCounter = 0;
+		milestoneCounter = 0;
+		userCounter = 0;
 		populateRepo();
 	}
 
