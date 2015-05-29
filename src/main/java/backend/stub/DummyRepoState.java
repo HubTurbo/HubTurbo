@@ -31,7 +31,7 @@ public class DummyRepoState {
 
 	public DummyRepoState(String repoId) {
 		this.dummyRepoId = repoId;
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			issues.add(makeDummyIssue());
 			labels.add(makeDummyLabel());
 			milestones.add(makeDummyMilestone());
@@ -45,12 +45,6 @@ public class DummyRepoState {
 				= new ImmutableTriple<>(updatedIssues, ETag, lastCheckTime);
 		updatedIssues = new ArrayList<>();
 		return toReturn;
-	}
-
-	protected void makeNewIssue() {
-		TurboIssue toAdd = makeDummyIssue();
-		issues.add(toAdd);
-		updatedIssues.add(toAdd);
 	}
 
 	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
@@ -90,19 +84,19 @@ public class DummyRepoState {
 		return users;
 	}
 
-	protected TurboIssue makeDummyIssue() {
+	private TurboIssue makeDummyIssue() {
 		return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
 	}
 
-	protected TurboLabel makeDummyLabel() {
+	private TurboLabel makeDummyLabel() {
 		return new TurboLabel(dummyRepoId, "Label " + (labels.size() + 1));
 	}
 
-	protected TurboMilestone makeDummyMilestone() {
+	private TurboMilestone makeDummyMilestone() {
 		return new TurboMilestone(dummyRepoId, milestones.size() + 1, "Milestone " + (milestones.size() + 1));
 	}
 
-	protected TurboUser makeDummyUser() {
+	private TurboUser makeDummyUser() {
 		return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
 	}
 
@@ -112,5 +106,119 @@ public class DummyRepoState {
 
 	protected List<Comment> getComments() {
 		return new ArrayList<>();
+	}
+
+	// UpdateEvent methods to directly mutate the repo state
+	protected void makeNewIssue() {
+		TurboIssue toAdd = makeDummyIssue();
+		issues.add(toAdd);
+		updatedIssues.add(toAdd);
+	}
+
+	protected void makeNewLabel() {
+		TurboLabel toAdd = makeDummyLabel();
+		labels.add(toAdd);
+		updatedLabels.add(toAdd);
+	}
+
+	protected void makeNewMilestone() {
+		TurboMilestone toAdd = makeDummyMilestone();
+		milestones.add(toAdd);
+		updatedMilestones.add(toAdd);
+	}
+
+	protected void makeNewUser() {
+		TurboUser toAdd = makeDummyUser();
+		users.add(toAdd);
+		updatedUsers.add(toAdd);
+	}
+
+	// Only updating of issues is possible. Labels, milestones and users are immutable.
+	protected TurboIssue updateIssue(int itemId, String updateText) {
+		int toUpdate = 0;
+		// Linear search
+		for (TurboIssue issue : issues) {
+			if (issue.getId() == itemId) break;
+			toUpdate++;
+		}
+		if (toUpdate < issues.size()) { // Found
+			TurboIssue issueToUpdate = issues.get(toUpdate);
+			issueToUpdate.setTitle(updateText);
+			updatedIssues.add(issueToUpdate);
+			return issueToUpdate;
+		}
+		return null;
+	}
+
+	protected TurboIssue deleteIssue(int itemId) {
+		int toDelete = 0;
+		for (TurboIssue issue : issues) {
+			if (issue.getId() == itemId) break;
+			toDelete++;
+		}
+		int toDeleteUpdated = 0;
+		for (TurboIssue updatedIssue : updatedIssues) {
+			if (updatedIssue.getId() == itemId) break;
+			toDeleteUpdated++;
+		}
+		if (toDeleteUpdated < updatedIssues.size()) updatedIssues.remove(toDeleteUpdated);
+		if (toDelete < issues.size()) { // Found
+			return issues.remove(toDelete);
+		}
+		return null;
+	}
+
+	protected TurboLabel deleteLabel(String idString) {
+		int toDelete = 0;
+		for (TurboLabel label : labels) {
+			if (label.getActualName().equalsIgnoreCase(idString)) break;
+			toDelete++;
+		}
+		int toDeleteUpdated = 0;
+		for (TurboLabel updatedLabel : updatedLabels) {
+			if (updatedLabel.getActualName().equalsIgnoreCase(idString)) break;
+			toDeleteUpdated++;
+		}
+		if (toDeleteUpdated < updatedLabels.size()) updatedLabels.remove(toDeleteUpdated);
+		if (toDelete < labels.size()) { // Found
+			return labels.remove(toDelete);
+		}
+		return null;
+	}
+
+	protected TurboMilestone deleteMilestone(int itemId) {
+		int toDelete = 0;
+		for (TurboMilestone milestone : milestones) {
+			if (milestone.getId() == itemId) break;
+			toDelete++;
+		}
+		int toDeleteUpdated = 0;
+		for (TurboMilestone updatedMilestone : updatedMilestones) {
+			if (updatedMilestone.getId() == itemId) break;
+			toDeleteUpdated++;
+		}
+		if (toDeleteUpdated < updatedMilestones.size()) updatedMilestones.remove(toDeleteUpdated);
+		if (toDelete < milestones.size()) { // Found
+			return milestones.remove(toDelete);
+		}
+		return null;
+	}
+
+	protected TurboUser deleteUser(String idString) {
+		int toDelete = 0;
+		for (TurboUser user : users) {
+			if (user.getLoginName().equalsIgnoreCase(idString)) break;
+			toDelete++;
+		}
+		int toDeleteUpdated = 0;
+		for (TurboUser updatedUser : updatedUsers) {
+			if (updatedUser.getLoginName().equalsIgnoreCase(idString)) break;
+			toDeleteUpdated++;
+		}
+		if (toDeleteUpdated < updatedUsers.size()) updatedUsers.remove(toDeleteUpdated);
+		if (toDelete < users.size()) { // Found
+			return users.remove(toDelete);
+		}
+		return null;
 	}
 }
