@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
 import ui.UI;
+import util.events.ClearLogicModelEvent;
 import util.events.UpdateDummyRepoEventHandler;
 
 import java.util.Date;
@@ -44,18 +45,23 @@ public class DummyRepo implements Repo {
 				// the following five:
 				case DELETE_ISSUE:
 					getRepoState(e.repoId).deleteIssue(e.itemId);
+					UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
 					break;
 				case DELETE_LABEL:
 					getRepoState(e.repoId).deleteLabel(e.idString);
+					UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
 					break;
 				case DELETE_MILESTONE:
 					getRepoState(e.repoId).deleteMilestone(e.itemId);
+					UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
 					break;
 				case DELETE_USER:
 					getRepoState(e.repoId).deleteUser(e.idString);
+					UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
 					break;
 				case RESET_REPO:
 					repoStates.put(e.repoId, new DummyRepoState(e.repoId));
+					UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
 					break;
 			}
 		});
