@@ -31,8 +31,9 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	// Tracks the index of the list which should be currently selected
 	private Optional<Integer> selectedIndex = Optional.empty();
 	
-	// Used for saving and restoring selection
-	private Optional<T> selectedItem = Optional.empty();
+	// Used for saving and restoring selection.
+	// selectedIndex should be used to get the currently-selected item, through the provided getter.
+	private Optional<T> lastSelectedItem = Optional.empty();
 	
 	// Indicates that saveSelection was called, in the event that saveSelection itself fails
 	// (when nothing is selected, both should be no-ops)
@@ -51,7 +52,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	 */
 	public void saveSelection() {
 		if (getSelectionModel().getSelectedItem() != null) {
-			selectedItem = Optional.of(getSelectionModel().getSelectedItem());
+			lastSelectedItem = Optional.of(getSelectionModel().getSelectedItem());
 		}
 		saveSelectionCalled = true;
 	}
@@ -62,7 +63,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	 * @throws IllegalStateException if called before saveSelection is
 	 */
 	public void restoreSelection() {
-		if (!selectedItem.isPresent()) {
+		if (!lastSelectedItem.isPresent()) {
 			if (!saveSelectionCalled) {
 				throw new IllegalStateException("saveSelection must be called before restoreSelection");
 			} else {
@@ -71,12 +72,12 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 			}
 		}
 		saveSelectionCalled = false;
-		
+
 		// Find index of previously-selected item
 		int index = -1;
 		int i = 0;
 		for (T item : getItems()) {
-			if (item.equals(selectedItem)) {
+			if (item.equals(lastSelectedItem)) {
 				index = i;
 				break;
 			}
@@ -113,30 +114,29 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		setOnKeyPressed(e -> {
 			if (e.isControlDown()){
 				return;
-			} else {
-				switch (e.getCode()) {
-				case UP:
-				case T:
-				case DOWN:
-				case V:
-					e.consume();
-					handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
-					assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
-					if (!e.isShiftDown()) {
-						logger.info("Arrow key navigation to issue " + selectedIndex.get());
-						onItemSelected.accept(selectedIndex.get());
-					}
-					break;
-				case ENTER:
-					e.consume();
-					if (selectedIndex.isPresent()) {
-						logger.info("Enter key selection on issue " + selectedIndex.get());
-						onItemSelected.accept(selectedIndex.get());	
-					}
-					break;
-				default:
-					break;
+			}
+			switch (e.getCode()) {
+			case UP:
+			case T:
+			case DOWN:
+			case V:
+				e.consume();
+				handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
+				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
+				if (!e.isShiftDown()) {
+					logger.info("Arrow key navigation to issue " + selectedIndex.get());
+					onItemSelected.accept(selectedIndex.get());
 				}
+				break;
+			case ENTER:
+				e.consume();
+				if (selectedIndex.isPresent()) {
+					logger.info("Enter key selection on issue " + selectedIndex.get());
+					onItemSelected.accept(selectedIndex.get());
+				}
+				break;
+			default:
+				break;
 			}
 		});
 	}
