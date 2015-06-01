@@ -170,6 +170,9 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		scrollAndShow(0);
 		selectedIndex = Optional.of(0);
 		onItemSelected.accept(selectedIndex.get());
-		
+	}
+
+	public Optional<T> getSelectedItem() {
+		return selectedIndex.map(getItems()::get);
 	}
 }
