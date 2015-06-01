@@ -139,9 +139,12 @@ public class IssuePanel extends IssueColumn {
 		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 
-				TurboIssue issue = listView.getSelectionModel().getSelectedItem();
-
 				if (event.getCode() == KeyCode.R) {
+					Optional<TurboIssue> item = listView.getSelectedItem();
+					if (!item.isPresent()) {
+						return;
+					}
+					TurboIssue issue = item.get();
 					LocalDateTime now = LocalDateTime.now();
 					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
 					issue.setMarkedReadAt(Optional.of(now));
@@ -149,6 +152,11 @@ public class IssuePanel extends IssueColumn {
 					parentColumnControl.refresh();
 				}
 				if (event.getCode() == KeyCode.U) {
+					Optional<TurboIssue> item = listView.getSelectedItem();
+					if (!item.isPresent()) {
+						return;
+					}
+					TurboIssue issue = item.get();
 					ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
 					issue.setMarkedReadAt(Optional.empty());
 					issue.setIsCurrentlyRead(false);
