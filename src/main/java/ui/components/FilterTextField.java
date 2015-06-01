@@ -18,11 +18,18 @@ import java.util.regex.Pattern;
 
 public class FilterTextField extends TextField {
 
+	// Callback functions
 	private Runnable cancel = () -> {};
 	private Function<String, String> confirm = (s) -> s;
-    private ValidationSupport validationSupport = new ValidationSupport();
+
+	// For reversion of edits
     private String previousText;
+
+	// The list of keywords which will be used in completion
 	private List<String> keywords = new ArrayList<>();
+
+	// For on-the-fly parsing and checking
+	private ValidationSupport validationSupport = new ValidationSupport();
 
 	public FilterTextField(String initialText, int position) {
 		super(initialText);
@@ -66,8 +73,11 @@ public class FilterTextField extends TextField {
 				// Can't find out the characters deleted...
 			} else if (Character.isAlphabetic(typed)) {
 				performCompletion(e);
-			} else if (typed == ' ' && (getText().isEmpty() || getText().endsWith(" "))){
-				e.consume();
+			} else if (typed == ' '){
+				// Prevent consecutive spaces
+				if (getText().isEmpty() || getText().endsWith(" ")) {
+					e.consume();
+				}
 			}
 		});
 		
@@ -82,7 +92,8 @@ public class FilterTextField extends TextField {
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
-				if(getText().equals(previousText)) {
+				// TODO move this out into a callback
+				if (getText().equals(previousText)) {
 					getParent().getParent().requestFocus();
 				} else {
 					revertEdit();
