@@ -72,7 +72,14 @@ public class FilterTextField extends TextField {
 			} else if (typed == '\b') {
 				// Can't find out the characters deleted...
 			} else if (Character.isAlphabetic(typed)) {
-				performCompletion(e);
+
+				// Only trigger completion when there's effectively nothing
+				// (only whitespace) after the caret
+				boolean shouldTriggerCompletion = getCharAfterCaret().trim().length() == 0;
+
+				if (shouldTriggerCompletion) {
+					performCompletion(e);
+				}
 			} else if (typed == ' '){
 				// Prevent consecutive spaces
 				if (getText().isEmpty() || getText().endsWith(" ")) {
