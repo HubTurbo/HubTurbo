@@ -83,18 +83,30 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 			}
 			i++;
 		}
-		
-		if (index == -1) {
-			// The item disappeared
-			if (getItems().size() == 0) {
-				selectedIndex = Optional.empty();
-			}
-			// Otherwis do nothing; selection will be resolved on its own
-		} else {
+		boolean itemFound = index > -1;
+
+		if (itemFound) {
 			// Select that item
 			getSelectionModel().clearAndSelect(index);
 			selectedIndex = Optional.of(index);
-			// Do not trigger event
+			// Do not trigger event; selection did not conceptually change
+		} else {
+			// The item disappeared
+			if (getItems().size() == 0) {
+				// No more items in the list
+				selectedIndex = Optional.empty();
+			} else {
+				// The list is non-empty, so we can be sure that we're selecting something
+				// The current index is the same as the next, due to the item disappearing
+				int lastIndex = getItems().size() - 1;
+				int nextIndex = Math.min(selectedIndex.get(), lastIndex);
+
+				getSelectionModel().clearAndSelect(nextIndex);
+				selectedIndex = Optional.of(nextIndex);
+
+				// The next item will be considered selected
+				onItemSelected.accept(nextIndex);
+			}
 		}
 	}
 
