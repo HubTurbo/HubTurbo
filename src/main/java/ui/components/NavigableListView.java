@@ -85,7 +85,11 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		}
 		
 		if (index == -1) {
-			// The item disappeared; do nothing, as selection will be resolved on its own
+			// The item disappeared
+			if (getItems().size() == 0) {
+				selectedIndex = Optional.empty();
+			}
+			// Otherwis do nothing; selection will be resolved on its own
 		} else {
 			// Select that item
 			getSelectionModel().clearAndSelect(index);
