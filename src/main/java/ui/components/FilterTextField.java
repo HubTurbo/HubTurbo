@@ -57,20 +57,9 @@ public class FilterTextField extends TextField {
 			
 			char typed = e.getCharacter().charAt(0);
 			
-			if (typed == ')') {
-				if (getCharAfterCaret().equals(")")) {
-					e.consume();
-					positionCaret(getCaretPosition()+1);
-				}
-			} else if (typed == '(') {
+			if (typed == '\t') {
 				e.consume();
-				insertMatchingBracket();
-			} else if (typed == '\t') {
-				e.consume();
-				if (getSelectedText().isEmpty()) {
-					movePastRemainingBrackets();
-				}
-				else {
+				if (!getSelectedText().isEmpty()) {
 					confirmCompletion();
 				}
 			} else if (typed == '\b') {
@@ -103,16 +92,6 @@ public class FilterTextField extends TextField {
 		});
 	}
 
-	private void insertMatchingBracket() {
-		if (getSelectedText().isEmpty()) {
-			int caret = getCaretPosition();
-			String before = getText().substring(0, caret);
-			String after = getText().substring(caret, getText().length());
-			setText(before + "()" + after);
-			Platform.runLater(() -> positionCaret(caret+1));
-		}
-	}
-
 	private void performCompletion(KeyEvent e) {
 		String word = getCurrentWord() + e.getCharacter();
 
@@ -137,11 +116,10 @@ public class FilterTextField extends TextField {
 			String addition = candidateWord.substring(word.length());
 
 			setText(before + insertion + addition + after);
-			Platform.runLater(() -> {
+			Platform.runLater(() ->
 				selectRange(
 					before.length() + insertion.length() + addition.length(),
-					before.length() + insertion.length());
-			});
+					before.length() + insertion.length()));
 		} else {
 			IndexRange sel = getSelection();
 //			boolean additionAfter = sel.getEnd() == caret;
@@ -168,20 +146,6 @@ public class FilterTextField extends TextField {
 		positionCaret(Math.max(getSelection().getStart(), getSelection().getEnd()));
 	}
 
-	private void movePastRemainingBrackets() {
-		// The default place to move to is the end of input field
-		int j = getText().length();
-		
-		for (int i=getCaretPosition(); i<getText().length(); i++) {
-			// Stop at the first non-) character
-			if (getText().charAt(i) != ')') {
-				j = i;
-				break;
-			}
-		}
-		positionCaret(j);
-	}
-	
 	private String getCurrentWord() {
 //		int caret = getCaretPosition();
 		int caret = Math.min(getSelection().getStart(), getSelection().getEnd());
@@ -192,14 +156,14 @@ public class FilterTextField extends TextField {
 		}
 		return getText().substring(pos > 0 ? pos+1 : pos, caret);
 	}
-	
+
 	// Caveat: algorithm only works for character-class regexes
 	private int regexLastIndexOf(String inString, String charClassRegex) {
 		inString = new StringBuilder(inString).reverse().toString();
-		
+
 		Pattern pattern = Pattern.compile(charClassRegex);
 	    Matcher m = pattern.matcher(inString);
-	    
+
 	    if (m.find()) {
 	    	return inString.length() - (m.start() + 1);
 	    } else {
