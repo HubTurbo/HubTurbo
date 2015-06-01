@@ -77,7 +77,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		int index = -1;
 		int i = 0;
 		for (T item : getItems()) {
-			if (item.equals(lastSelectedItem)) {
+			if (item.equals(lastSelectedItem.get())) {
 				index = i;
 				break;
 			}
