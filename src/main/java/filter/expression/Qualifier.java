@@ -487,7 +487,12 @@ public class Qualifier implements FilterExpression {
 	}
 
 	private boolean idSatisfies(TurboIssue issue) {
-	    return number.isPresent() && issue.getId() == number.get();
+		if (number.isPresent()) {
+			return issue.getId() == number.get();
+		} else if (numberRange.isPresent()) {
+			return numberRange.get().encloses(issue.getId());
+		}
+		return false;
     }
 
 	private boolean satisfiesUpdatedHours(TurboIssue issue) {
