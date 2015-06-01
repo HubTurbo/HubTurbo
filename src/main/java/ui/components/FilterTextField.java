@@ -92,9 +92,8 @@ public class FilterTextField extends TextField {
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
-				// TODO move this out into a callback
 				if (getText().equals(previousText)) {
-					getParent().getParent().requestFocus();
+					cancel.run();
 				} else {
 					revertEdit();
 					selectAll();
@@ -192,7 +191,6 @@ public class FilterTextField extends TextField {
 	private void revertEdit() {
 		setText(previousText);
 		positionCaret(getLength());
-		cancel.run();
 	}
 
 	private void confirmEdit() {

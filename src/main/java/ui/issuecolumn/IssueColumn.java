@@ -130,10 +130,12 @@ public abstract class IssueColumn extends Column {
 	};
 
 	private Node createFilterBox() {
-		filterTextField = new FilterTextField("", 0).setOnConfirm((text) -> {
-			applyStringFilter(text);
-			return text;
-		});
+		filterTextField = new FilterTextField("", 0)
+			.setOnConfirm((text) -> {
+				applyStringFilter(text);
+				return text;
+			})
+			.setOnCancel(this::requestFocus);
 
 		ui.registerEvent(onModelUpdate);
 
