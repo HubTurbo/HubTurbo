@@ -83,8 +83,14 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 			}
 			i++;
 		}
-		
-		if (index == -1) {
+		boolean itemFound = index > -1;
+
+		if (itemFound) {
+			// Select that item
+			getSelectionModel().clearAndSelect(index);
+			selectedIndex = Optional.of(index);
+			// Do not trigger event; selection did not conceptually change
+		} else {
 			// The item disappeared
 			if (getItems().size() == 0) {
 				// No more items in the list
@@ -101,11 +107,6 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 				// The next item will be considered selected
 				onItemSelected.accept(nextIndex);
 			}
-		} else {
-			// Select that item
-			getSelectionModel().clearAndSelect(index);
-			selectedIndex = Optional.of(index);
-			// Do not trigger event
 		}
 	}
 
