@@ -1,8 +1,6 @@
 package prefs;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import ui.UI;
-import ui.issuecolumn.ColumnControl;
 
 import java.time.LocalDateTime;
 import java.util.List;
