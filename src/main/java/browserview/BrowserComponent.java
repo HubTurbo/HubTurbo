@@ -451,7 +451,7 @@ public class BrowserComponent {
 	}
 
 	public void scrollPage(boolean isDownScroll) {
-		String script = "";
+		String script;
 		if (isDownScroll)
 			script = "window.scrollBy(0,100)";
 		else
@@ -460,7 +460,7 @@ public class BrowserComponent {
 	}
 
 	private void sendKeysToBrowser(String keyCode) {
-		WebElement body = null;
+		WebElement body;
 		try {
 			body = driver.findElementByTagName("body");
 			body.sendKeys(keyCode);
