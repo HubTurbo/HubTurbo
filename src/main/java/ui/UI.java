@@ -113,10 +113,14 @@ public class UI extends Application implements EventDispatcher {
 		triggerEvent(new BoardSavedEvent());
 
 		if (isTestMode()) {
-			browserComponent = new BrowserComponentStub(this);
+			if (isTestChromeDriver()) {
+				browserComponent = new BrowserComponent(this, true);
+			} else {
+				browserComponent = new BrowserComponentStub(this);
+			}
 			registerTestEvents();
 		} else {
-			browserComponent = new BrowserComponent(this);
+			browserComponent = new BrowserComponent(this, false);
 			browserComponent.initialise();
 		}
 
@@ -180,6 +184,10 @@ public class UI extends Application implements EventDispatcher {
 
 	private boolean isTestJSONEnabled() {
 		return commandLineArgs.getOrDefault("testjson", "false").equalsIgnoreCase("true");
+	}
+
+	private boolean isTestChromeDriver() {
+		return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
 	}
 
 	public void quit() {

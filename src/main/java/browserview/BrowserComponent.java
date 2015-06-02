@@ -69,7 +69,7 @@ public class BrowserComponent {
 	// at the moment.
 	private Executor executor;
 
-	public BrowserComponent(UI ui) {
+	public BrowserComponent(UI ui, boolean isTestChromeDriver) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
 	}
