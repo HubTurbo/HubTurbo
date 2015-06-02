@@ -38,13 +38,6 @@ public class UIBrowserBridge {
 		ui.registerEvent((IssueCreatedEventHandler) e ->
 			ui.getBrowserComponent().newIssue());
 
-		ui.registerEvent((LoginEventHandler) e -> {
-			ui.getBrowserComponent().login();
-			if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
-				ui.getBrowserComponent().showChangelog(ui.getCommandLineArgs().get(UI.ARG_UPDATED_TO));
-			}
-		});
-
 		ui.registerEvent((LabelCreatedEventHandler) e ->
 			ui.getBrowserComponent().newLabel());
 
