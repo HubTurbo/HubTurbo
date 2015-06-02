@@ -40,7 +40,7 @@ public class RepositoryServiceExtended extends RepositoryService{
 	public List<Repository> getOrganisationRepositories() throws IOException{
 		List<User> orgs = getOrganisations();
 		return orgs.stream()
-			.map(org -> getOrganisationRepos(org))
+			.map(this::getOrganisationRepos)
 			.reduce(new ArrayList<>(),
 							(l, item) -> {l.addAll(item); 
 										  return l;});
@@ -59,13 +59,13 @@ public class RepositoryServiceExtended extends RepositoryService{
 	
 	public List<String> getAllRepositoriesNames(String user) throws IOException{
 		return getAllRepositories(user).stream()
-									   .map(repo -> repo.getName())
+									   .map(Repository::getName)
 									   .collect(Collectors.toList());
 	}
 	
 	public List<String> getRepositoriesNames(String user) throws IOException{
 		return getRepositories(user).stream()
-								.map(repo -> repo.getName())
+								.map(Repository::getName)
 								.collect(Collectors.toList());
 	}
 	

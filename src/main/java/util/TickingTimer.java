@@ -126,7 +126,7 @@ public class TickingTimer {
                 onTimeout.run();
             }
             synchronized (this) {
-                latches.forEach(latch -> latch.countDown());
+                latches.forEach(CountDownLatch::countDown);
                 latches.clear();
             }
         }, 0, TICK_PERIOD, timeUnit);
