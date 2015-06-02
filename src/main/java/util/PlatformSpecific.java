@@ -18,24 +18,24 @@ public class PlatformSpecific {
 		return !isOnWindows() && !isOnMac();
 	}
 
-	public static PlatformSpecific ifWindows(Runnable code) {
-		if (isOnWindows()) {
-			code.run();
-		}
-		return instance;
-	}
+//	public static PlatformSpecific ifWindows(Runnable code) {
+//		if (isOnWindows()) {
+//			code.run();
+//		}
+//		return instance;
+//	}
 
-	public static PlatformSpecific ifMac(Runnable code) {
-		if (isOnMac()) {
-			code.run();
-		}
-		return instance;
-	}
+//	public static PlatformSpecific ifMac(Runnable code) {
+//		if (isOnMac()) {
+//			code.run();
+//		}
+//		return instance;
+//	}
 
-	public static PlatformSpecific ifLinux(Runnable code) {
-		if (isOnLinux()) {
-			code.run();
-		}
-		return instance;
-	}
+//	public static PlatformSpecific ifLinux(Runnable code) {
+//		if (isOnLinux()) {
+//			code.run();
+//		}
+//		return instance;
+//	}
 }
