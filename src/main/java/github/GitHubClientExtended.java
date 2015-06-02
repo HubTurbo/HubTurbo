@@ -1,12 +1,12 @@
 package github;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+//import com.google.common.reflect.TypeToken;
+//import com.google.gson.Gson;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 import util.IOUtilities;
-import util.Utility;
+//import util.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
+//import java.time.LocalDateTime;
+//import java.util.Map;
+//import java.util.Optional;
 
 public class GitHubClientExtended extends GitHubClient {
 	public static final int NO_UPDATE_RESPONSE_CODE = 304;
