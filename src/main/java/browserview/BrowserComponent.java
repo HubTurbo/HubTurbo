@@ -31,6 +31,7 @@ public class BrowserComponent {
 	private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
 	private static final boolean USE_MOBILE_USER_AGENT = false;
+	private static boolean isTestChromeDriver;
 
 	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
 			? "browserview/expanded/mobileHideUI.js"
@@ -72,6 +73,7 @@ public class BrowserComponent {
 	public BrowserComponent(UI ui, boolean isTestChromeDriver) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
+		this.isTestChromeDriver = isTestChromeDriver;
 	}
 
 	/**
@@ -123,7 +125,14 @@ public class BrowserComponent {
 		if (USE_MOBILE_USER_AGENT) {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 		}
-		ChromeDriver driver = new ChromeDriver(options);
+		ChromeDriver driver;
+		if (isTestChromeDriver) {
+			driver = new ChromeDriverStub(options);
+			logger.info("Creating ChromeDriverStub");
+		} else {
+			driver = new ChromeDriver(options);
+			logger.info("Creating ChromeDriver");
+		}
 		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
 		driver.manage().window().setSize(new Dimension(
