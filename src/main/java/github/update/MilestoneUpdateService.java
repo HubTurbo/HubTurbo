@@ -20,7 +20,7 @@ public class MilestoneUpdateService extends UpdateService<Milestone>{
 	}
 	
 	private Map<String, String> createUpdatedMilestonesParams(){
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		params.put("state", "all");
 		return params;
 	}

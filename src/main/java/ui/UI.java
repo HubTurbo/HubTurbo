@@ -113,10 +113,15 @@ public class UI extends Application implements EventDispatcher {
 		triggerEvent(new BoardSavedEvent());
 
 		if (isTestMode()) {
-			browserComponent = new BrowserComponentStub(this);
+			if (isTestChromeDriver()) {
+				browserComponent = new BrowserComponent(this, true);
+				browserComponent.initialise();
+			} else {
+				browserComponent = new BrowserComponentStub(this);
+			}
 			registerTestEvents();
 		} else {
-			browserComponent = new BrowserComponent(this);
+			browserComponent = new BrowserComponent(this, false);
 			browserComponent.initialise();
 		}
 
@@ -126,9 +131,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void registerTestEvents() {
-		registerEvent((UILogicRefreshEventHandler) e -> {
-			Platform.runLater(logic::refresh);
-		});
+		registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
 	}
 
 	private void initPreApplicationState() {
@@ -184,6 +187,10 @@ public class UI extends Application implements EventDispatcher {
 		return commandLineArgs.getOrDefault("testjson", "false").equalsIgnoreCase("true");
 	}
 
+	private boolean isTestChromeDriver() {
+		return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
+	}
+
 	public void quit() {
 		if (!isTestMode()) {
 			columns.saveSession();
@@ -229,25 +236,22 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
 		initialiseJNA(mainStage.getTitle());
-		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (!isFocused) {
-					return;
-				}
-				if (PlatformSpecific.isOnWindows()) {
-					browserComponent.focus(mainWindowHandle);
-				}
-				PlatformEx.runLaterDelayed(() -> {
-					boolean shouldRefresh = browserComponent.hasBviewChanged();
-					if (shouldRefresh) {
-						logger.info("Browser view has changed; refreshing");
-						logic.refresh();
-						refreshTimer.restart();
-					}
-				});
-			}
-		});
+		mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
+            if (!isFocused) {
+                return;
+            }
+            if (PlatformSpecific.isOnWindows()) {
+                browserComponent.focus(mainWindowHandle);
+            }
+            PlatformEx.runLaterDelayed(() -> {
+                boolean shouldRefresh = browserComponent.hasBviewChanged();
+                if (shouldRefresh) {
+                    logger.info("Browser view has changed; refreshing");
+                    logic.refresh();
+                    refreshTimer.restart();
+                }
+            });
+        });
 	}
 
 	private static void initialiseJNA(String windowTitle) {

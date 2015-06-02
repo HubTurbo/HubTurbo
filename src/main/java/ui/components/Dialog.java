@@ -38,7 +38,7 @@ public abstract class Dialog<T> {
 //		stage.setX(parentStage.getX() + x);
 //		stage.setY(parentStage.getY() + y);
 		stage.show();
-		Platform.runLater(() -> stage.requestFocus());
+		Platform.runLater(stage::requestFocus);
 		return response;
 	}
 

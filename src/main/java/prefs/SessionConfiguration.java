@@ -78,7 +78,7 @@ public class SessionConfiguration {
 	 */
 	public List<String> getLastViewedRepositories() {
 		return lastViewedRepositories.stream()
-				.map(repoViewRecord -> repoViewRecord.getRepository())
+				.map(RepoViewRecord::getRepository)
 				.collect(Collectors.toList());
 	}
 

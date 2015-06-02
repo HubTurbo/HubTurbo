@@ -23,9 +23,7 @@ public class TextAnimation {
 		
 		animation = new TimerTask() {
 		    public void run() {
-		         Platform.runLater(() -> {
-		        	 callback.apply(frames[(currentFrame++) % frames.length]);
-		         });
+		         Platform.runLater(() -> callback.apply(frames[(currentFrame++) % frames.length]));
 		    }
 		};
 	}

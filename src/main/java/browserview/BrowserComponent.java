@@ -15,12 +15,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
-import util.IOUtilities;
 import util.PlatformSpecific;
 
 import java.awt.*;
 import java.io.*;
-import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -33,6 +31,7 @@ public class BrowserComponent {
 	private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
 	private static final boolean USE_MOBILE_USER_AGENT = false;
+	private static boolean isTestChromeDriver;
 
 	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
 			? "browserview/expanded/mobileHideUI.js"
@@ -71,9 +70,10 @@ public class BrowserComponent {
 	// at the moment.
 	private Executor executor;
 
-	public BrowserComponent(UI ui) {
+	public BrowserComponent(UI ui, boolean isTestChromeDriver) {
 		this.ui = ui;
 		this.executor = Executors.newSingleThreadExecutor();
+		this.isTestChromeDriver = isTestChromeDriver;
 	}
 
 	/**
@@ -125,7 +125,14 @@ public class BrowserComponent {
 		if (USE_MOBILE_USER_AGENT) {
 			options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
 		}
-		ChromeDriver driver = new ChromeDriver(options);
+		ChromeDriver driver;
+		if (isTestChromeDriver) {
+			driver = new ChromeDriverStub(options);
+			logger.info("Creating ChromeDriverStub");
+		} else {
+			driver = new ChromeDriver(options);
+			logger.info("Creating ChromeDriver");
+		}
 		driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
 		Rectangle availableDimensions = ui.getAvailableDimensions();
 		driver.manage().window().setSize(new Dimension(
@@ -215,9 +222,7 @@ public class BrowserComponent {
 	 */
 	public void showDocs() {
 		logger.info("Showing documentation page");
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getPathForDocsPage());
-		});
+		runBrowserOperation(() -> driver.get(GitHubURL.getPathForDocsPage()));
 	}
 
 	/**
@@ -226,9 +231,7 @@ public class BrowserComponent {
 	 */
 	public void showChangelog(String version) {
 		logger.info("Showing changelog for version " + version);
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getChangelogForVersion(version));
-		});
+		runBrowserOperation(() -> driver.get(GitHubURL.getChangelogForVersion(version)));
 	}
 
 	/**

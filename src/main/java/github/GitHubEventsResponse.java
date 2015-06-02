@@ -31,7 +31,7 @@ public class GitHubEventsResponse {
 	
 	public GitHubEventsResponse(GitHubResponse response, InputStream jsonBody) {
 		this.response = response;
-		this.turboIssueEvents = new ArrayList<TurboIssueEvent>();
+		this.turboIssueEvents = new ArrayList<>();
 		parseEventParameters(jsonBody);
 	}
 

@@ -70,9 +70,7 @@ public class TickingTimerTests {
         // Timeouts every five seconds, tick every second
         final TickingTimer tickingTimer = new TickingTimer("test2",
                 5,
-                (i) -> {
-                    ticks.add(i); // Append the current remaining time every tick
-                },
+                ticks::add,
                 () -> {
                     ticks.add(10); // Append 10 every timeout
                 },

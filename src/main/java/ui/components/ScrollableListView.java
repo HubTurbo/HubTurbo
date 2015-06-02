@@ -122,7 +122,7 @@ public class ScrollableListView<T> extends ListView<T> {
 
 			while (continueRunning.getAsBoolean()) {
 
-				Platform.runLater(() -> scrollY());
+				Platform.runLater(this::scrollY);
 
 				try {
 					sleep(SCROLL_THREAD_SLEEP_INTERVAL);
