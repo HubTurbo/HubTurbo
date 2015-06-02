@@ -31,8 +31,9 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	// Tracks the index of the list which should be currently selected
 	private Optional<Integer> selectedIndex = Optional.empty();
 	
-	// Used for saving and restoring selection
-	private Optional<T> selectedItem = Optional.empty();
+	// Used for saving and restoring selection.
+	// selectedIndex should be used to get the currently-selected item, through the provided getter.
+	private Optional<T> lastSelectedItem = Optional.empty();
 	
 	// Indicates that saveSelection was called, in the event that saveSelection itself fails
 	// (when nothing is selected, both should be no-ops)
@@ -51,7 +52,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	 */
 	public void saveSelection() {
 		if (getSelectionModel().getSelectedItem() != null) {
-			selectedItem = Optional.of(getSelectionModel().getSelectedItem());
+			lastSelectedItem = Optional.of(getSelectionModel().getSelectedItem());
 		}
 		saveSelectionCalled = true;
 	}
@@ -62,7 +63,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 	 * @throws IllegalStateException if called before saveSelection is
 	 */
 	public void restoreSelection() {
-		if (!selectedItem.isPresent()) {
+		if (!lastSelectedItem.isPresent()) {
 			if (!saveSelectionCalled) {
 				throw new IllegalStateException("saveSelection must be called before restoreSelection");
 			} else {
@@ -71,25 +72,41 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 			}
 		}
 		saveSelectionCalled = false;
-		
+
 		// Find index of previously-selected item
 		int index = -1;
 		int i = 0;
 		for (T item : getItems()) {
-			if (item.equals(selectedItem)) {
+			if (item.equals(lastSelectedItem.get())) {
 				index = i;
 				break;
 			}
 			i++;
 		}
-		
-		if (index == -1) {
-			// The item disappeared; do nothing, as selection will be resolved on its own
-		} else {
+		boolean itemFound = index > -1;
+
+		if (itemFound) {
 			// Select that item
 			getSelectionModel().clearAndSelect(index);
 			selectedIndex = Optional.of(index);
-			// Do not trigger event
+			// Do not trigger event; selection did not conceptually change
+		} else {
+			// The item disappeared
+			if (getItems().size() == 0) {
+				// No more items in the list
+				selectedIndex = Optional.empty();
+			} else {
+				// The list is non-empty, so we can be sure that we're selecting something
+				// The current index is the same as the next, due to the item disappearing
+				int lastIndex = getItems().size() - 1;
+				int nextIndex = Math.min(selectedIndex.get(), lastIndex);
+
+				getSelectionModel().clearAndSelect(nextIndex);
+				selectedIndex = Optional.of(nextIndex);
+
+				// The next item will be considered selected
+				onItemSelected.accept(nextIndex);
+			}
 		}
 	}
 
@@ -113,30 +130,29 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		setOnKeyPressed(e -> {
 			if (e.isControlDown()){
 				return;
-			} else {
-				switch (e.getCode()) {
-				case UP:
-				case T:
-				case DOWN:
-				case V:
-					e.consume();
-					handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
-					assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
-					if (!e.isShiftDown()) {
-						logger.info("Arrow key navigation to issue " + selectedIndex.get());
-						onItemSelected.accept(selectedIndex.get());
-					}
-					break;
-				case ENTER:
-					e.consume();
-					if (selectedIndex.isPresent()) {
-						logger.info("Enter key selection on issue " + selectedIndex.get());
-						onItemSelected.accept(selectedIndex.get());	
-					}
-					break;
-				default:
-					break;
+			}
+			switch (e.getCode()) {
+			case UP:
+			case T:
+			case DOWN:
+			case V:
+				e.consume();
+				handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
+				assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
+				if (!e.isShiftDown()) {
+					logger.info("Arrow key navigation to issue " + selectedIndex.get());
+					onItemSelected.accept(selectedIndex.get());
 				}
+				break;
+			case ENTER:
+				e.consume();
+				if (selectedIndex.isPresent()) {
+					logger.info("Enter key selection on issue " + selectedIndex.get());
+					onItemSelected.accept(selectedIndex.get());
+				}
+				break;
+			default:
+				break;
 			}
 		});
 	}
@@ -170,6 +186,9 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		scrollAndShow(0);
 		selectedIndex = Optional.of(0);
 		onItemSelected.accept(selectedIndex.get());
-		
+	}
+
+	public Optional<T> getSelectedItem() {
+		return selectedIndex.map(getItems()::get);
 	}
 }
