@@ -281,22 +281,22 @@ public class MenuControl extends MenuBar {
 				return true;
 			}
 
-			private void handleSocketTimeoutException(Exception e) {
-				Platform.runLater(() -> {
-					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("Internet Connection is down",
-							"Timeout while loading items from github. Please check your internet connection.");
+//			private void handleSocketTimeoutException(Exception e) {
+//				Platform.runLater(() -> {
+//					logger.error(e.getMessage(), e);
+//					DialogMessage.showWarningDialog("Internet Connection is down",
+//							"Timeout while loading items from github. Please check your internet connection.");
+//
+//				});
+//			}
 
-				});
-			}
-
-			private void handleUnknownHostException(Exception e) {
-				Platform.runLater(() -> {
-					logger.error(e.getMessage(), e);
-					DialogMessage.showWarningDialog("No Internet Connection",
-							"Please check your internet connection and try again");
-				});
-			}
+//			private void handleUnknownHostException(Exception e) {
+//				Platform.runLater(() -> {
+//					logger.error(e.getMessage(), e);
+//					DialogMessage.showWarningDialog("No Internet Connection",
+//							"Please check your internet connection and try again");
+//				});
+//			}
 		};
 		DialogMessage.showProgressDialog(task, "Reloading repoistory...");
 		Thread thread = new Thread(task);
