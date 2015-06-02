@@ -2,7 +2,7 @@ package util;
 
 public class PlatformSpecific {
 	
-	private static final PlatformSpecific instance = new PlatformSpecific();
+//	private static final PlatformSpecific instance = new PlatformSpecific();
 	private PlatformSpecific() {}
 	private static final String osName = System.getProperty("os.name");
 	
