@@ -4,7 +4,6 @@ import backend.IssueMetadata;
 import backend.interfaces.IModel;
 import prefs.Preferences;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
