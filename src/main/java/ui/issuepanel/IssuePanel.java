@@ -114,140 +114,136 @@ public class IssuePanel extends IssueColumn {
 	}
 
 	private void setupKeyboardShortcuts() {
-		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				if (keyCombBoxToList.match(event)) {
-					event.consume();
-					listView.selectFirstItem();
-				}
-				if (event.getCode() == KeyCode.SPACE) {
-					event.consume();
-				}
-				if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
-					event.consume();
-					listView.selectFirstItem();
-				}
-				if (maximizeWindow.match(event)) {
-					ui.maximizeWindow();
-				}
-				if (minimizeWindow.match(event)) {
-					ui.minimizeWindow();
-				}
-				if (defaultSizeWindow.match(event)) {
-					ui.setDefaultWidth();
-				}
-			}
-		});
+		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            if (keyCombBoxToList.match(event)) {
+                event.consume();
+                listView.selectFirstItem();
+            }
+            if (event.getCode() == KeyCode.SPACE) {
+                event.consume();
+            }
+            if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+                event.consume();
+                listView.selectFirstItem();
+            }
+            if (maximizeWindow.match(event)) {
+                ui.maximizeWindow();
+            }
+            if (minimizeWindow.match(event)) {
+                ui.minimizeWindow();
+            }
+            if (defaultSizeWindow.match(event)) {
+                ui.setDefaultWidth();
+            }
+        });
 
-		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
+		addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
-				if (event.getCode() == KeyCode.R) {
-					Optional<TurboIssue> item = listView.getSelectedItem();
-					if (!item.isPresent()) {
-						return;
-					}
-					TurboIssue issue = item.get();
-					LocalDateTime now = LocalDateTime.now();
-					ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-					issue.setMarkedReadAt(Optional.of(now));
-					issue.setIsCurrentlyRead(true);
-					parentColumnControl.refresh();
-				}
-				if (event.getCode() == KeyCode.U) {
-					Optional<TurboIssue> item = listView.getSelectedItem();
-					if (!item.isPresent()) {
-						return;
-					}
-					TurboIssue issue = item.get();
-					ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-					issue.setMarkedReadAt(Optional.empty());
-					issue.setIsCurrentlyRead(false);
-					parentColumnControl.refresh();
-				}
-				if (event.getCode() == KeyCode.F5) {
-					ui.logic.refresh();
-				}
-				if (event.getCode() == KeyCode.F1) {
-					ui.getBrowserComponent().showDocs();
-				}
-				if (keyCombListToBox.match(event)) {
-					setFocusToFilterBox();
-				}
-				if (event.getCode() == KeyCode.SPACE
-					&& KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+            if (event.getCode() == KeyCode.R) {
+                Optional<TurboIssue> item = listView.getSelectedItem();
+                if (!item.isPresent()) {
+                    return;
+                }
+                TurboIssue issue = item.get();
+                LocalDateTime now = LocalDateTime.now();
+                ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
+                issue.setMarkedReadAt(Optional.of(now));
+                issue.setIsCurrentlyRead(true);
+                parentColumnControl.refresh();
+            }
+            if (event.getCode() == KeyCode.U) {
+                Optional<TurboIssue> item = listView.getSelectedItem();
+                if (!item.isPresent()) {
+                    return;
+                }
+                TurboIssue issue = item.get();
+                ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
+                issue.setMarkedReadAt(Optional.empty());
+                issue.setIsCurrentlyRead(false);
+                parentColumnControl.refresh();
+            }
+            if (event.getCode() == KeyCode.F5) {
+                ui.logic.refresh();
+            }
+            if (event.getCode() == KeyCode.F1) {
+                ui.getBrowserComponent().showDocs();
+            }
+            if (keyCombListToBox.match(event)) {
+                setFocusToFilterBox();
+            }
+            if (event.getCode() == KeyCode.SPACE
+                && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
 
-					setFocusToFilterBox();
-				}
-				if (event.getCode() == KeyCode.I) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showIssues();
-					}
-				}
-				if (event.getCode() == KeyCode.P) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showPullRequests();
-					}
-				}
-				if (event.getCode() == KeyCode.H) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showDocs();
-					}
-				}
-				if (event.getCode() == KeyCode.K) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showKeyboardShortcuts();
-					}
-				}
-				if (event.getCode() == KeyCode.D) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showContributors();
-						event.consume();
-					}
-				}
-				if (event.getCode() == KeyCode.U) {
-					ui.getBrowserComponent().scrollToTop();
-				}
-				if (event.getCode() == KeyCode.N) {
-					ui.getBrowserComponent().scrollToBottom();
-				}
-				if (event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
-					ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
-				}
-				if (event.getCode() == KeyCode.G) {
-					KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
-				}
-				if (event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
-					ui.getBrowserComponent().jumpToComment();
-				}
-				if (event.getCode() == KeyCode.L) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().newLabel();
-					} else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-						ui.getBrowserComponent().manageLabels(event.getCode().toString());
-					}
-				}
-				if (event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
-					ui.getBrowserComponent().manageAssignees(event.getCode().toString());
-				}
-				if (event.getCode() == KeyCode.M) {
-					if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
-						ui.getBrowserComponent().showMilestones();
-					} else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-						ui.getBrowserComponent().manageMilestones(event.getCode().toString());
-					}
-				}
-				if (maximizeWindow.match(event)) {
-					ui.maximizeWindow();
-				}
-				if (minimizeWindow.match(event)) {
-					ui.minimizeWindow();
-				}
-				if (defaultSizeWindow.match(event)) {
-					ui.setDefaultWidth();
-				}
-			}
-		});
+                setFocusToFilterBox();
+            }
+            if (event.getCode() == KeyCode.I) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showIssues();
+                }
+            }
+            if (event.getCode() == KeyCode.P) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showPullRequests();
+                }
+            }
+            if (event.getCode() == KeyCode.H) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showDocs();
+                }
+            }
+            if (event.getCode() == KeyCode.K) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showKeyboardShortcuts();
+                }
+            }
+            if (event.getCode() == KeyCode.D) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showContributors();
+                    event.consume();
+                }
+            }
+            if (event.getCode() == KeyCode.U) {
+                ui.getBrowserComponent().scrollToTop();
+            }
+            if (event.getCode() == KeyCode.N) {
+                ui.getBrowserComponent().scrollToBottom();
+            }
+            if (event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
+                ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
+            }
+            if (event.getCode() == KeyCode.G) {
+                KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
+            }
+            if (event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                ui.getBrowserComponent().jumpToComment();
+            }
+            if (event.getCode() == KeyCode.L) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().newLabel();
+                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    ui.getBrowserComponent().manageLabels(event.getCode().toString());
+                }
+            }
+            if (event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+            }
+            if (event.getCode() == KeyCode.M) {
+                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+                    ui.getBrowserComponent().showMilestones();
+                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+                }
+            }
+            if (maximizeWindow.match(event)) {
+                ui.maximizeWindow();
+            }
+            if (minimizeWindow.match(event)) {
+                ui.minimizeWindow();
+            }
+            if (defaultSizeWindow.match(event)) {
+                ui.setDefaultWidth();
+            }
+        });
 	}
 
 	private void setFocusToFilterBox() {
@@ -255,13 +251,11 @@ public class IssuePanel extends IssueColumn {
 		filterTextField.setText(filterTextField.getText().trim());
 		filterTextField.positionCaret(filterTextField.getLength());
 
-		addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
-					listView.selectFirstItem();
-				}
-			}
-		});
+		addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
+                listView.selectFirstItem();
+            }
+        });
 	}
 
 	public int getIssueCount() {

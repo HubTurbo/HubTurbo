@@ -239,16 +239,12 @@ public class ColumnControl extends HBox {
 		return 40 + Column.COLUMN_WIDTH;
 	}
 	private void setupKeyEvents() {
-		addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
-					handleKeys(event.getCode() == KeyCode.F);
-					assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
-				}
-			}
-			
-		});
+		addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+            if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
+                handleKeys(event.getCode() == KeyCode.F);
+                assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
+            }
+        });
 	}
 
 	private void handleKeys(boolean isForwardKey) {

@@ -72,16 +72,13 @@ public abstract class IssueColumn extends Column {
 			ui.triggerEvent(new ColumnClickedEvent(columnIndex));
 			requestFocus();
 		});
-		focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (isFocused) {
-				    getStyleClass().add("panel-focused");
-				} else {
-				    getStyleClass().remove("panel-focused");
-				}
-			}
-		});
+		focusedProperty().addListener((unused, wasFocused, isFocused) -> {
+            if (isFocused) {
+                getStyleClass().add("panel-focused");
+            } else {
+                getStyleClass().remove("panel-focused");
+            }
+        });
 	}
 
 //	private void setupIssueColumnDragEvents(Model model, int columnIndex) {

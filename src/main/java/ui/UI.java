@@ -229,25 +229,22 @@ public class UI extends Application implements EventDispatcher {
 		mainStage.show();
 		mainStage.setOnCloseRequest(e -> quit());
 		initialiseJNA(mainStage.getTitle());
-		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (!isFocused) {
-					return;
-				}
-				if (PlatformSpecific.isOnWindows()) {
-					browserComponent.focus(mainWindowHandle);
-				}
-				PlatformEx.runLaterDelayed(() -> {
-					boolean shouldRefresh = browserComponent.hasBviewChanged();
-					if (shouldRefresh) {
-						logger.info("Browser view has changed; refreshing");
-						logic.refresh();
-						refreshTimer.restart();
-					}
-				});
-			}
-		});
+		mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
+            if (!isFocused) {
+                return;
+            }
+            if (PlatformSpecific.isOnWindows()) {
+                browserComponent.focus(mainWindowHandle);
+            }
+            PlatformEx.runLaterDelayed(() -> {
+                boolean shouldRefresh = browserComponent.hasBviewChanged();
+                if (shouldRefresh) {
+                    logger.info("Browser view has changed; refreshing");
+                    logic.refresh();
+                    refreshTimer.restart();
+                }
+            });
+        });
 	}
 
 	private static void initialiseJNA(String windowTitle) {
