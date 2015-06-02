@@ -15,12 +15,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
-import util.IOUtilities;
 import util.PlatformSpecific;
 
 import java.awt.*;
 import java.io.*;
-import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
