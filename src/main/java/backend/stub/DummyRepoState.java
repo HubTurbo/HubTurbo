@@ -12,6 +12,7 @@ import org.eclipse.egit.github.core.Comment;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class DummyRepoState {
 
@@ -30,38 +31,54 @@ public class DummyRepoState {
 	public DummyRepoState(String repoId) {
 		this.dummyRepoId = repoId;
 		for (int i = 0; i < 10; i++) {
-			issues.add(makeDummyIssue());
-			labels.add(makeDummyLabel());
-			milestones.add(makeDummyMilestone());
-			users.add(makeDummyUser());
+			makeNewIssue();
+			makeNewLabel();
+			makeNewMilestone();
+			makeNewUser();
 		}
 	}
 
 	protected ImmutableTriple<List<TurboIssue>, String, Date>
 	getUpdatedIssues(String ETag, Date lastCheckTime) {
+		String currETag = ETag;
+		if (!updatedIssues.isEmpty()) currETag = UUID.randomUUID().toString();
+
 		ImmutableTriple<List<TurboIssue>, String, Date> toReturn
-				= new ImmutableTriple<>(updatedIssues, ETag, lastCheckTime);
+				= new ImmutableTriple<>(updatedIssues, currETag, lastCheckTime);
+
 		updatedIssues = new ArrayList<>();
 		return toReturn;
 	}
 
 	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
+		String currETag = ETag;
+		if (!updatedLabels.isEmpty()) currETag = UUID.randomUUID().toString();
+
 		ImmutablePair<List<TurboLabel>, String> toReturn
-			= new ImmutablePair<>(updatedLabels, ETag);
+			= new ImmutablePair<>(updatedLabels, currETag);
+
 		updatedLabels = new ArrayList<>();
 		return toReturn;
 	}
 
 	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String ETag) {
+		String currETag = ETag;
+		if (!updatedMilestones.isEmpty()) currETag = UUID.randomUUID().toString();
+
 		ImmutablePair<List<TurboMilestone>, String> toReturn
-			= new ImmutablePair<>(updatedMilestones, ETag);
+			= new ImmutablePair<>(updatedMilestones, currETag);
+
 		updatedMilestones = new ArrayList<>();
 		return toReturn;
 	}
 
 	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String ETag) {
+		String currETag = ETag;
+		if (!updatedUsers.isEmpty()) currETag = UUID.randomUUID().toString();
+
 		ImmutablePair<List<TurboUser>, String> toReturn
-			= new ImmutablePair<>(updatedUsers, ETag);
+			= new ImmutablePair<>(updatedUsers, currETag);
+
 		updatedUsers = new ArrayList<>();
 		return toReturn;
 	}

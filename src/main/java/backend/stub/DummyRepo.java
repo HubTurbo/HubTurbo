@@ -20,7 +20,7 @@ import java.util.List;
 
 public class DummyRepo implements Repo {
 
-	private static final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
+	private final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
 
 	public DummyRepo() {
 		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
