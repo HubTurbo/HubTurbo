@@ -169,21 +169,21 @@ public class GitHubClientExtended extends GitHubClient {
 		super.sendParams(request, params);
 	}
 
-	public Optional<LocalDateTime> getRateLimitResetTime() {
-		try {
-			HttpURLConnection httpRequest = createGet("/rate_limit");
-			if (isOk(httpRequest.getResponseCode())) {
-				String json = String.valueOf(IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
-				Map<String, Object> map =
-					new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
-				double unixSeconds = ((Map<String, Map<String, Double>>) map.get("resources"))
-					.get("core").get("reset");
-				return Optional.of(Utility.longToLocalDateTime((long) unixSeconds * 1000));
-			} else {
-				return Optional.empty();
-			}
-		} catch (IOException e) {
-			return Optional.empty();
-		}
-	}
+//	public Optional<LocalDateTime> getRateLimitResetTime() {
+//		try {
+//			HttpURLConnection httpRequest = createGet("/rate_limit");
+//			if (isOk(httpRequest.getResponseCode())) {
+//				String json = String.valueOf(IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
+//				Map<String, Object> map =
+//					new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+//				double unixSeconds = ((Map<String, Map<String, Double>>) map.get("resources"))
+//					.get("core").get("reset");
+//				return Optional.of(Utility.longToLocalDateTime((long) unixSeconds * 1000));
+//			} else {
+//				return Optional.empty();
+//			}
+//		} catch (IOException e) {
+//			return Optional.empty();
+//		}
+//	}
 }
