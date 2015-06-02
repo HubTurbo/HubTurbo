@@ -24,7 +24,7 @@ public class IssueServiceExtended extends IssueService{
 	}
 	
 	public HashMap<String, Object> getIssueData(IRepositoryIdProvider repository, int issueId) throws IOException{
-		HashMap<String, Object> result = new HashMap<String, Object>();
+		HashMap<String, Object> result = new HashMap<>();
 		GitHubResponse response = getIssueResponse(repository.generateId(), Integer.toString(issueId));
 		String dateModified = response.getHeader("Date");
 		result.put(ISSUE_DATE, dateModified);
@@ -83,21 +83,21 @@ public class IssueServiceExtended extends IssueService{
 	
 	public Issue editIssueTitle(IRepositoryIdProvider repository, int issueId, String title) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
-		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		HashMap<Object, Object> data = new HashMap<>();
 		data.put(FIELD_TITLE, title);
 		return ghClient.sendJson(connection, data, Issue.class);
 	}
 	
 	public Issue editIssueBody(IRepositoryIdProvider repository, int issueId, String body) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
-		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		HashMap<Object, Object> data = new HashMap<>();
 		data.put(FIELD_BODY, body);
 		return ghClient.sendJson(connection, data, Issue.class);
 	}
 	
 	public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean open) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
-		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		HashMap<Object, Object> data = new HashMap<>();
 		String state;
 		if(open){
 			state = STATE_OPEN;
@@ -110,7 +110,7 @@ public class IssueServiceExtended extends IssueService{
 	
 	public Issue setIssueMilestone(IRepositoryIdProvider repository, int issueId, Milestone milestone) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
-		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		HashMap<Object, Object> data = new HashMap<>();
 		if (milestone != null && milestone.getNumber() > 0) {
 			data.put(FILTER_MILESTONE, Integer.toString(milestone.getNumber()));
 		}else{
@@ -121,7 +121,7 @@ public class IssueServiceExtended extends IssueService{
 	
 	public Issue setIssueAssignee(IRepositoryIdProvider repository, int issueId, User user) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
-		HashMap<Object, Object> data = new HashMap<Object, Object>();
+		HashMap<Object, Object> data = new HashMap<>();
 		if(user != null && user.getLogin() != null){
 			data.put(FILTER_ASSIGNEE, user.getLogin());
 		}else{

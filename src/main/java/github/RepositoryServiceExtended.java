@@ -34,14 +34,14 @@ public class RepositoryServiceExtended extends RepositoryService{
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
 		}
-		return new ArrayList<Repository>();
+		return new ArrayList<>();
 	}
 	
 	public List<Repository> getOrganisationRepositories() throws IOException{
 		List<User> orgs = getOrganisations();
 		return orgs.stream()
 			.map(org -> getOrganisationRepos(org))
-			.reduce(new ArrayList<Repository>(), 
+			.reduce(new ArrayList<>(),
 							(l, item) -> {l.addAll(item); 
 										  return l;});
 	}
@@ -52,9 +52,9 @@ public class RepositoryServiceExtended extends RepositoryService{
 	 * */
 	
 	public List<Repository> getAllRepositories(String user) throws IOException{
-		HashSet<Repository> result = new HashSet<Repository>(getRepositories(user));
+		HashSet<Repository> result = new HashSet<>(getRepositories(user));
 		result.addAll(getOrganisationRepositories());
-		return new ArrayList<Repository>(result);
+		return new ArrayList<>(result);
 	}
 	
 	public List<String> getAllRepositoriesNames(String user) throws IOException{
