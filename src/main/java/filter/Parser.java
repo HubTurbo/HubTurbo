@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class Parser {
 
 	public static void main(String[] args) {
-		String input = "\"a b\"";
+		String input;
 		input = "id:1";
 		FilterExpression p = Parser.parse(input);
 //		ArrayList<Token> p = new Lexer(input).lex();
