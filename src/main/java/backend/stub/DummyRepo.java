@@ -41,6 +41,8 @@ public class DummyRepo implements Repo {
 				case UPDATE_ISSUE:
 					getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
 					break;
+				case UPDATE_MILESTONE:
+					getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
 				// Model reload is done by event handler registered in Logic in
 				// the following five:
 				case DELETE_ISSUE:

@@ -148,7 +148,7 @@ public class DummyRepoState {
 		updatedUsers.add(toAdd);
 	}
 
-	// Only updating of issues is possible. Labels, milestones and users are immutable.
+	// Only updating of issues and milestones is possible. Labels and users are immutable.
 	protected TurboIssue updateIssue(int itemId, String updateText) {
 		int toUpdate = 0;
 		// Linear search
@@ -161,6 +161,22 @@ public class DummyRepoState {
 			issueToUpdate.setTitle(updateText);
 			updatedIssues.add(issueToUpdate);
 			return issueToUpdate;
+		}
+		return null;
+	}
+
+	protected TurboMilestone updateMilestone(int itemId, String updateText) {
+		int toUpdate = 0;
+		// Linear search
+		for (TurboMilestone milestone : milestones) {
+			if (milestone.getId() == itemId) break;
+			toUpdate++;
+		}
+		if (toUpdate < milestones.size()) { // Found
+			TurboMilestone milestoneToUpdate = milestones.get(toUpdate);
+			milestoneToUpdate.setTitle(updateText);
+			updatedMilestones.add(milestoneToUpdate);
+			return milestoneToUpdate;
 		}
 		return null;
 	}
