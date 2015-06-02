@@ -117,6 +117,7 @@ public class UI extends Application implements EventDispatcher {
 				browserComponent = new BrowserComponent(this, true);
 			} else {
 				browserComponent = new BrowserComponentStub(this);
+				browserComponent.initialise();
 			}
 			registerTestEvents();
 		} else {
