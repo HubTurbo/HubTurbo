@@ -115,9 +115,9 @@ public class UI extends Application implements EventDispatcher {
 		if (isTestMode()) {
 			if (isTestChromeDriver()) {
 				browserComponent = new BrowserComponent(this, true);
+				browserComponent.initialise();
 			} else {
 				browserComponent = new BrowserComponentStub(this);
-				browserComponent.initialise();
 			}
 			registerTestEvents();
 		} else {

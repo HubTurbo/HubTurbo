@@ -2,6 +2,8 @@ package guitests;
 
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+import ui.UI;
+import util.events.IssueSelectedEvent;
 
 public class ChromeDriverTest extends UITest {
 
@@ -13,6 +15,6 @@ public class ChromeDriverTest extends UITest {
 
     @Test
     public void chromeDriverStubTest() {
-
+        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
     }
 }
