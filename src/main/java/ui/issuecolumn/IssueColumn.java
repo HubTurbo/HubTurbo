@@ -134,6 +134,7 @@ public abstract class IssueColumn extends Column {
 			applyStringFilter(text);
 			return text;
 		});
+		filterTextField.setId(model.getDefaultRepo() + "_col" + columnIndex + "_filterTextField");
 
 		ui.registerEvent(onModelUpdate);
 
