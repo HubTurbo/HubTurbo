@@ -137,11 +137,9 @@ public class FilterTextField extends TextField {
 			String addition = candidateWord.substring(word.length());
 
 			setText(before + insertion + addition + after);
-			Platform.runLater(() -> {
-				selectRange(
-					before.length() + insertion.length() + addition.length(),
-					before.length() + insertion.length());
-			});
+			Platform.runLater(() -> selectRange(
+                before.length() + insertion.length() + addition.length(),
+                before.length() + insertion.length()));
 		} else {
 			IndexRange sel = getSelection();
 //			boolean additionAfter = sel.getEnd() == caret;

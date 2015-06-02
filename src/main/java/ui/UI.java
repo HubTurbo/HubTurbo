@@ -126,9 +126,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void registerTestEvents() {
-		registerEvent((UILogicRefreshEventHandler) e -> {
-			Platform.runLater(logic::refresh);
-		});
+		registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
 	}
 
 	private void initPreApplicationState() {

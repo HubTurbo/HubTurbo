@@ -213,9 +213,7 @@ public class BrowserComponent {
 	 */
 	public void showDocs() {
 		logger.info("Showing documentation page");
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getPathForDocsPage());
-		});
+		runBrowserOperation(() -> driver.get(GitHubURL.getPathForDocsPage()));
 	}
 
 	/**
@@ -224,9 +222,7 @@ public class BrowserComponent {
 	 */
 	public void showChangelog(String version) {
 		logger.info("Showing changelog for version " + version);
-		runBrowserOperation(() -> {
-			driver.get(GitHubURL.getChangelogForVersion(version));
-		});
+		runBrowserOperation(() -> driver.get(GitHubURL.getChangelogForVersion(version)));
 	}
 
 	/**

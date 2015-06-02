@@ -23,9 +23,7 @@ public class UIEventTests extends UITest {
 
     @Test
     public void createIssueTest() {
-        UI.events.registerEvent((IssueCreatedEventHandler) e -> {
-            UIEventTests.increaseEventTestCount();
-        });
+        UI.events.registerEvent((IssueCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("New");
         click("Issue");
@@ -34,9 +32,7 @@ public class UIEventTests extends UITest {
 
     @Test
     public void createLabelTest() {
-        UI.events.registerEvent((LabelCreatedEventHandler) e -> {
-            UIEventTests.increaseEventTestCount();
-        });
+        UI.events.registerEvent((LabelCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("New");
         click("Label");
@@ -45,9 +41,7 @@ public class UIEventTests extends UITest {
 
     @Test
     public void createMilestoneTest() {
-        UI.events.registerEvent((MilestoneCreatedEventHandler) e -> {
-            UIEventTests.increaseEventTestCount();
-        });
+        UI.events.registerEvent((MilestoneCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("New");
         click("Milestone");
@@ -56,9 +50,7 @@ public class UIEventTests extends UITest {
 
     @Test
     public void columnClickedTest() {
-        UI.events.registerEvent((ColumnClickedEventHandler) e -> {
-            UIEventTests.increaseEventTestCount();
-        });
+        UI.events.registerEvent((ColumnClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, eventTestCount);

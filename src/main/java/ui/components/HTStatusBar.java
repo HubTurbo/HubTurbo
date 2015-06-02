@@ -34,21 +34,19 @@ public class HTStatusBar extends StatusBar implements StatusUI {
 	}
 
 	private void setupProgressEvents() {
-		ui.registerEvent((UpdateProgressEventHandler) e -> {
-			Platform.runLater(() -> {
-				if (progressBars.containsKey(e.repoId)) {
-					if (e.done) {
-						getRightItems().remove(progressBars.get(e.repoId));
-					} else {
-						progressBars.get(e.repoId).setProgress(e.progress);
-					}
-				} else {
-					TextProgressBar progressBar = new TextProgressBar(e.repoId);
-					progressBars.put(e.repoId, progressBar);
-					getRightItems().add(progressBar);
-				}
-			});
-		});
+		ui.registerEvent((UpdateProgressEventHandler) e -> Platform.runLater(() -> {
+            if (progressBars.containsKey(e.repoId)) {
+                if (e.done) {
+                    getRightItems().remove(progressBars.get(e.repoId));
+                } else {
+                    progressBars.get(e.repoId).setProgress(e.progress);
+                }
+            } else {
+                TextProgressBar progressBar = new TextProgressBar(e.repoId);
+                progressBars.put(e.repoId, progressBar);
+                getRightItems().add(progressBar);
+            }
+        }));
 	}
 
 	private void setup() {
@@ -56,9 +54,7 @@ public class HTStatusBar extends StatusBar implements StatusUI {
 	}
 
 	public void displayMessage(String text) {
-		Platform.runLater(() -> {
-			setText(text);
-		});
+		Platform.runLater(() -> setText(text));
 	}
 
 	@Override

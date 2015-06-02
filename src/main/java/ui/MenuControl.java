@@ -248,9 +248,7 @@ public class MenuControl extends MenuBar {
 
 	private MenuItem createForceRefreshMenuItem() {
 		MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
-		forceRefreshMenuItem.setOnAction((e) -> {
-			triggerForceRefreshProgressDialog();
-		});
+		forceRefreshMenuItem.setOnAction((e) -> triggerForceRefreshProgressDialog());
 
 		forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
 		return forceRefreshMenuItem;
