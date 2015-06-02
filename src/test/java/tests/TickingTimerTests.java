@@ -3,9 +3,13 @@ package tests;
 import org.junit.Test;
 import util.TickingTimer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.fail;
 
 public class TickingTimerTests {
 
@@ -32,7 +36,7 @@ public class TickingTimerTests {
 
     @Test
     public void threadingTest() {
-        final int attempts = 10;
+        final int attempts = 3;
 
         final TickingTimer tickingTimer = createTickingTimer();
         tickingTimer.start();
@@ -52,5 +56,37 @@ public class TickingTimerTests {
         es.execute(positive);
         delay(1);
         es.execute(negative);
+        delay(6.5); // Need 6 seconds to wait for the positive and negative runnables to complete the run.
+    }
+
+    @Test
+    public void triggerTest() {
+        final ArrayList<Integer> ticks = new ArrayList<>();
+        final ArrayList<Integer> ideal = new ArrayList<>(Arrays.asList(
+                4, 3, 2, 1, 5, 10, 4, 3, // After 6.5
+                5, 10, // Trigger
+                4, 3, 2)); // After 4.5
+
+        // Timeouts every five seconds, tick every second
+        final TickingTimer tickingTimer = new TickingTimer("test2",
+                5,
+                (i) -> {
+                    ticks.add(i); // Append the current remaining time every tick
+                },
+                () -> {
+                    ticks.add(10); // Append 10 every timeout
+                },
+                TimeUnit.SECONDS
+        );
+
+        tickingTimer.start();
+        delay(6.5);
+        tickingTimer.trigger();
+        delay(4.5);
+        tickingTimer.stop();
+
+        for (int i = 0; i < ideal.size(); i++) {
+            if (ticks.get(i) != ideal.get(i)) fail();
+        }
     }
 }
