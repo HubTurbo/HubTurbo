@@ -1,7 +1,5 @@
 package backend.stub;
 
-import backend.UserCredentials;
-import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
