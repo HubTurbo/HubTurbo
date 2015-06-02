@@ -143,7 +143,7 @@ public class FilterParserTests {
         		new Conjunction(
         				new Conjunction(
         						new Qualifier("keyword", "a"),
-        						new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 03, 15)))),
+        						new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15)))),
         				new Qualifier("keyword", "b"))
         );
     }
