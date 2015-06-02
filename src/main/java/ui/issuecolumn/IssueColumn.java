@@ -8,8 +8,6 @@ import filter.Parser;
 import filter.QualifierApplicationException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;

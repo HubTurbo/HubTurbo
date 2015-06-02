@@ -2,7 +2,6 @@ package ui.issuepanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;

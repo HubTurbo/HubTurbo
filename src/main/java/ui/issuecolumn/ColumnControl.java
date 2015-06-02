@@ -2,7 +2,6 @@ package ui.issuecolumn;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
