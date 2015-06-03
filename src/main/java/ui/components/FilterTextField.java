@@ -231,10 +231,10 @@ public class FilterTextField extends TextField {
 		confirmEdit();
 	}
 
-	public FilterTextField setOnCancel(Runnable cancel) {
-		this.cancel = cancel;
-		return this;
-	}
+//	public FilterTextField setOnCancel(Runnable cancel) {
+//		this.cancel = cancel;
+//		return this;
+//	}
 
 	public FilterTextField setOnConfirm(Function<String, String> confirm) {
 		this.confirm = confirm;
