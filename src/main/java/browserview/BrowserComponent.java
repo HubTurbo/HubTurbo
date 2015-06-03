@@ -33,9 +33,9 @@ public class BrowserComponent {
 	private static final boolean USE_MOBILE_USER_AGENT = false;
 	private static boolean isTestChromeDriver;
 
-	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
-			? "browserview/expanded/mobileHideUI.js"
-			: "browserview/expanded/hideUI.js";
+//	private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
+//			? "browserview/expanded/mobileHideUI.js"
+//			: "browserview/expanded/hideUI.js";
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
 	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
