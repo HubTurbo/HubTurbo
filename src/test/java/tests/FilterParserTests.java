@@ -6,6 +6,7 @@ import filter.expression.*;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -243,15 +244,30 @@ public class FilterParserTests {
         assertEquals(Parser.parse("e:f ~(a:b OR c:d)"),
                 new Conjunction(new Qualifier("e", "f"), new Negation(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")))));
     }
-    
+
+	@Test
+	public void colon() {
+		assertEquals(Parser.parse("assignee:darius"),
+			new Qualifier("assignee", "darius"));
+		assertEquals(Parser.parse("assignee    :    darius   "),
+			new Qualifier("assignee", "darius"));
+		assertEquals(Parser.parse("assignee:dar ius(one)"),
+			new Conjunction(new Conjunction(new Qualifier("assignee", "dar"), new Qualifier("keyword", "ius")), new Qualifier("keyword", "one")));
+	}
+
     @Test
-    public void colon() {
-        assertEquals(Parser.parse("assignee:darius"),
-                new Qualifier("assignee", "darius"));
-        assertEquals(Parser.parse("assignee    :    darius   "),
-                new Qualifier("assignee", "darius"));
-        assertEquals(Parser.parse("assignee:dar ius(one)"),
-                new Conjunction(new Conjunction(new Qualifier("assignee", "dar"), new Qualifier("keyword", "ius")), new Qualifier("keyword", "one")));
+    public void sortingKeys() {
+	    assertEquals(Parser.parse("sort:id"),
+		    new Qualifier("sort", Arrays.asList(new SortKey("id", false))));
+	    assertEquals(Parser.parse("sort: id , repo "),
+		    new Qualifier("sort", Arrays.asList(new SortKey("id", false), new SortKey("repo", false))));
+
+	    assertEquals(Parser.parse("sort:-id"),
+		    new Qualifier("sort", Arrays.asList(new SortKey("id", true))));
+	    assertEquals(Parser.parse("sort:id, ~repo"),
+		    new Qualifier("sort", Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
+	    assertEquals(Parser.parse("sort:~id, NOT repo"),
+		    new Qualifier("sort", Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }
 
     @Test

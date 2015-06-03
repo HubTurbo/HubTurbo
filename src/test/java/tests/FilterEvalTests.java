@@ -477,9 +477,11 @@ public class FilterEvalTests {
 
 	@Test
 	public void sort() {
-//		TurboIssue issue = new TurboIssue(REPO, 1, "");
-//
-//		assertEquals(true, Qualifier.process(empty, Parser.parse("repo:" + REPO), issue));
-//		assertEquals(false, Qualifier.process(empty, Parser.parse("repo:something/else"), issue));
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+
+		// Being a meta-qualifier, this doesn't have any effect
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id, ~repo"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:~id, NOT repo"), issue));
 	}
 }
