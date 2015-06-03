@@ -48,31 +48,31 @@ public class ModelUpdateUITest extends UITest {
         assertEquals(10, countIssues.get());
     }
 
-//    @Test
-//    @SuppressWarnings("unchecked")
-//    public void deleteIssueTest() throws InterruptedException, ExecutionException {
-//        resetRepo();
-//        addIssue();
-//        addIssue();
-//        deleteIssue();
-//        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
-//        PlatformEx.runAndWait(countIssues);
-//        Assert.assertEquals(11, countIssues.get());
-//    }
-//
-//    @Test
-//    @SuppressWarnings("unchecked")
-//    public void deleteMultipleIssuesTest() throws InterruptedException, ExecutionException {
-//        resetRepo();
-//        addIssue();
-//        addIssue();
-//        addIssue();
-//        deleteIssue();
-//        deleteIssue();
-//        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
-//        PlatformEx.runAndWait(countIssues);
-//        Assert.assertEquals(11, countIssues.get());
-//    }
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deleteIssueTest() throws InterruptedException, ExecutionException {
+        resetRepo();
+        addIssue();
+        addIssue();
+        deleteIssue(1);
+        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
+        PlatformEx.runAndWait(countIssues);
+        assertEquals(11, countIssues.get());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deleteMultipleIssuesTest() throws InterruptedException, ExecutionException {
+        resetRepo();
+        addIssue();
+        addIssue();
+        addIssue();
+        deleteIssue(1);
+        deleteIssue(2);
+        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
+        PlatformEx.runAndWait(countIssues);
+        assertEquals(11, countIssues.get());
+    }
 
     public void resetRepo() {
         UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy"));
@@ -86,8 +86,8 @@ public class ModelUpdateUITest extends UITest {
         sleep(EVENT_DELAY);
     }
 
-    public void deleteIssue() {
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy"));
+    public void deleteIssue(int itemId) {
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy", itemId));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
