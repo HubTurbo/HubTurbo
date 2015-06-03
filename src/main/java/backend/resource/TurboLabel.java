@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class TurboLabel {
 
-	private static final String EXCLUSIVE_DELIMITER = ".";
-	private static final String NONEXCLUSIVE_DELIMITER = "-";
+	public static final String EXCLUSIVE_DELIMITER = ".";
+	public static final String NONEXCLUSIVE_DELIMITER = "-";
 
 	private void ______SERIALIZED_FIELDS______() {
 	}
