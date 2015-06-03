@@ -62,9 +62,9 @@ public abstract class Dialog<T> {
 		return this;
 	}
 	
-	public void setModality(Modality modality){
-		this.modality = modality;
-	}
+//	public void setModality(Modality modality){
+//		this.modality = modality;
+//	}
 
 	// Dialog actions
 

@@ -68,6 +68,9 @@ allprojects {
 
     test {
         forkEvery = 1
+
+        // uncomment to disable gui tests
+//        exclude 'guitests'
     }
 
     jacoco {
@@ -103,6 +106,11 @@ task jacocoRootReport(type: JacocoReport) {
     sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)
     classDirectories =  files(allprojects.sourceSets.main.output)
     executionData = files(allprojects.jacocoTestReport.executionData)
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'github/**')
+        })
+    }
     reports {
         html.enabled = true
         xml.enabled = true

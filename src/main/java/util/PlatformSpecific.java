@@ -14,9 +14,9 @@ public class PlatformSpecific {
 		return osName.startsWith("Mac OS");
 	}
 
-	public static boolean isOnLinux() {
-		return !isOnWindows() && !isOnMac();
-	}
+//	public static boolean isOnLinux() {
+//		return !isOnWindows() && !isOnMac();
+//	}
 
 //	public static PlatformSpecific ifWindows(Runnable code) {
 //		if (isOnWindows()) {

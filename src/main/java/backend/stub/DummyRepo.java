@@ -23,6 +23,10 @@ public class DummyRepo implements Repo {
 	private final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
 
 	public DummyRepo() {
+		if (UI.events == null) {
+			// UI isn't initialised
+			return;
+		}
 		UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
 			assert e.repoId != null;
 			switch (e.updateType) {

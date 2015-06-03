@@ -192,15 +192,15 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	public void quit() {
-		if (!isTestMode()) {
-			columns.saveSession();
-			prefs.saveGlobalConfig();
-		}
 		if (browserComponent != null) {
 			browserComponent.onAppQuit();
 		}
-		Platform.exit();
-		System.exit(0);
+		if (!isTestMode()) {
+			columns.saveSession();
+			prefs.saveGlobalConfig();
+			Platform.exit();
+			System.exit(0);
+		}
 	}
 
 	public void onRepoOpened() {

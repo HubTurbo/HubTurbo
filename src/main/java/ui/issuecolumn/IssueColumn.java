@@ -329,27 +329,27 @@ public abstract class IssueColumn extends Column {
 		return filterTextField.getText();
 	}
 
-	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
-		if (currentFilterExpression != Qualifier.EMPTY) {
-			try {
-				if (currentFilterExpression.canBeAppliedToIssue()) {
-					// TODO re-enable
-//					TurboIssue clone = new TurboIssue(issue);
-					currentFilterExpression.applyTo(issue, model);
-					if (updateModel) {
-						// TODO re-enable
-//						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, models, clone, issue);
-					}
-					parentColumnControl.refresh();
-				} else {
-					throw new QualifierApplicationException(
-						"Could not apply predicate " + currentFilterExpression + ".");
-				}
-			} catch (QualifierApplicationException ex) {
-				UI.status.displayMessage(ex.getMessage());
-			}
-		}
-	}
+//	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
+//		if (currentFilterExpression != Qualifier.EMPTY) {
+//			try {
+//				if (currentFilterExpression.canBeAppliedToIssue()) {
+//					// TODO re-enable
+////					TurboIssue clone = new TurboIssue(issue);
+//					currentFilterExpression.applyTo(issue, model);
+//					if (updateModel) {
+//						// TODO re-enable
+////						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, models, clone, issue);
+//					}
+//					parentColumnControl.refresh();
+//				} else {
+//					throw new QualifierApplicationException(
+//						"Could not apply predicate " + currentFilterExpression + ".");
+//				}
+//			} catch (QualifierApplicationException ex) {
+//				UI.status.displayMessage(ex.getMessage());
+//			}
+//		}
+//	}
 
 	public TransformationList<TurboIssue, TurboIssue> getIssueList() {
 		return transformedIssueList;
