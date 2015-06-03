@@ -30,8 +30,8 @@ public class BrowserComponentStub extends BrowserComponent {
     @Override
     public void showDocs() {}
 
-    @Override
-    public void showChangelog(String version) {}
+//    @Override
+//    public void showChangelog(String version) {}
 
     @Override
     public void showIssue(String repoId, int id) {}
