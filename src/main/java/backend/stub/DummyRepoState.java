@@ -1,14 +1,19 @@
 package backend.stub;
 
+import backend.IssueMetadata;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import github.IssueEventType;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.User;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +23,7 @@ public class DummyRepoState {
 
 	private String dummyRepoId;
 
+	// TODO change to TreeMap
 	private List<TurboIssue> issues = new ArrayList<>();
 	private List<TurboLabel> labels = new ArrayList<>();
 	private List<TurboMilestone> milestones = new ArrayList<>();
@@ -31,17 +37,21 @@ public class DummyRepoState {
 	public DummyRepoState(String repoId) {
 		this.dummyRepoId = repoId;
 		for (int i = 0; i < 10; i++) {
-			makeNewIssue();
-			makeNewLabel();
-			makeNewMilestone();
-			makeNewUser();
+			issues.add(makeDummyIssue());
+			labels.add(makeDummyLabel());
+			milestones.add(makeDummyMilestone());
+			users.add(makeDummyUser());
+		}
+		// All default issues are treated as if created a long time ago
+		for (TurboIssue freshIssue : issues) {
+			freshIssue.setUpdatedAt(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)));
 		}
 	}
 
 	protected ImmutableTriple<List<TurboIssue>, String, Date>
 	getUpdatedIssues(String ETag, Date lastCheckTime) {
 		String currETag = ETag;
-		if (!updatedIssues.isEmpty()) currETag = UUID.randomUUID().toString();
+		if (!updatedIssues.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutableTriple<List<TurboIssue>, String, Date> toReturn
 				= new ImmutableTriple<>(updatedIssues, currETag, lastCheckTime);
@@ -52,7 +62,7 @@ public class DummyRepoState {
 
 	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
 		String currETag = ETag;
-		if (!updatedLabels.isEmpty()) currETag = UUID.randomUUID().toString();
+		if (!updatedLabels.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboLabel>, String> toReturn
 			= new ImmutablePair<>(updatedLabels, currETag);
@@ -63,7 +73,7 @@ public class DummyRepoState {
 
 	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String ETag) {
 		String currETag = ETag;
-		if (!updatedMilestones.isEmpty()) currETag = UUID.randomUUID().toString();
+		if (!updatedMilestones.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboMilestone>, String> toReturn
 			= new ImmutablePair<>(updatedMilestones, currETag);
@@ -74,7 +84,7 @@ public class DummyRepoState {
 
 	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String ETag) {
 		String currETag = ETag;
-		if (!updatedUsers.isEmpty()) currETag = UUID.randomUUID().toString();
+		if (!updatedUsers.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboUser>, String> toReturn
 			= new ImmutablePair<>(updatedUsers, currETag);
@@ -84,19 +94,19 @@ public class DummyRepoState {
 	}
 
 	protected List<TurboIssue> getIssues() {
-		return issues;
+		return new ArrayList<>(issues);
 	}
 
 	protected List<TurboLabel> getLabels() {
-		return labels;
+		return new ArrayList<>(labels);
 	}
 
 	protected List<TurboMilestone> getMilestones() {
-		return milestones;
+		return new ArrayList<>(milestones);
 	}
 
 	protected List<TurboUser> getCollaborators() {
-		return users;
+		return new ArrayList<>(users);
 	}
 
 	private TurboIssue makeDummyIssue() {
@@ -115,11 +125,18 @@ public class DummyRepoState {
 		return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
 	}
 
-	protected List<TurboIssueEvent> getEvents() {
+	protected List<TurboIssueEvent> getEvents(int issueId) {
+		// Linear search for issue with issueId
+		// Would be O(1) when implementation changed to TreeMap
+		for (TurboIssue issue : issues) {
+			if (issue.getId() == issueId) {
+				return issue.getMetadata().getEvents();
+			}
+		}
 		return new ArrayList<>();
 	}
 
-	protected List<Comment> getComments() {
+	protected List<Comment> getComments(int issueId) {
 		return new ArrayList<>();
 	}
 
@@ -159,6 +176,15 @@ public class DummyRepoState {
 		if (toUpdate < issues.size()) { // Found
 			TurboIssue issueToUpdate = issues.get(toUpdate);
 			issueToUpdate.setTitle(updateText);
+			// Add renamed event to events list of issue
+			List<TurboIssueEvent> eventsOfIssue = issueToUpdate.getMetadata().getEvents();
+			eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
+					IssueEventType.Renamed,
+					new Date()));
+			List<Comment> commentsOfIssue = issueToUpdate.getMetadata().getComments();
+			issueToUpdate.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+			issueToUpdate.setUpdatedAt(LocalDateTime.now());
+			// Add to list of updated issues
 			updatedIssues.add(issueToUpdate);
 			return issueToUpdate;
 		}

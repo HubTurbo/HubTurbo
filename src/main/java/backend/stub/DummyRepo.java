@@ -38,11 +38,13 @@ public class DummyRepo implements Repo {
 				case NEW_USER:
 					getRepoState(e.repoId).makeNewUser();
 					break;
+				// TODO implement update of issue and milestone (after switching to TreeMap implementation)
 				case UPDATE_ISSUE:
 					getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
 					break;
 				case UPDATE_MILESTONE:
 					getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
+					break;
 				// Model reload is done by event handler registered in Logic in
 				// the following five:
 				case DELETE_ISSUE:
@@ -127,12 +129,12 @@ public class DummyRepo implements Repo {
 
 	@Override
 	public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
-		return getRepoState(repoId).getEvents();
+		return getRepoState(repoId).getEvents(issueId);
 	}
 
 	@Override
 	public List<Comment> getComments(String repoId, int issueId) {
-		return getRepoState(repoId).getComments();
+		return getRepoState(repoId).getComments(issueId);
 	}
 
 	@Override
