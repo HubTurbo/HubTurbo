@@ -147,7 +147,7 @@ public class Qualifier implements FilterExpression {
 
 	@Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
-        assert name != null && content != null;
+        assert name != null;
 
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;

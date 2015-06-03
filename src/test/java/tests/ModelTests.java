@@ -19,7 +19,7 @@ public class ModelTests {
 
 	private static final String REPO = "test/test";
 
-    private static Model modelEmptySig, modelEmptySig2, modelUpdated, modelEmpty, modelCopyUpdated, modelCopyNotUpdated;
+    private static Model modelEmptySig, modelEmptySig2, modelUpdated, modelCopyUpdated, modelCopyNotUpdated;
 
     @BeforeClass
     public static void initialize() {
@@ -44,8 +44,6 @@ public class ModelTests {
                 dummy.getMilestones(REPO),
                 dummy.getCollaborators(REPO),
                 new UpdateSignature("issues", "labels", "milestones", "collaborators", new Date()));
-
-        modelEmpty = new Model(REPO);
 
         modelCopyUpdated = new Model(modelUpdated);
 	    modelCopyNotUpdated = new Model(modelEmptySig);

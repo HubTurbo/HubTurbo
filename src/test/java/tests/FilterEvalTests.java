@@ -12,6 +12,7 @@ import prefs.Preferences;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -375,9 +376,10 @@ public class FilterEvalTests {
 
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:sldkj"), issue));
+
 		assertEquals(false, Qualifier.process(empty, Parser.parse("is:issue"), issue));
 		assertEquals(true, Qualifier.process(empty, Parser.parse("is:pr"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:sldkj"), issue));
 
 		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
 		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
@@ -395,7 +397,6 @@ public class FilterEvalTests {
 
 		assertEquals(true, Qualifier.process(empty, Parser.parse("is:issue"), issue));
 		assertEquals(false, Qualifier.process(empty, Parser.parse("is:pr"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:lkjs"), issue));
 
 		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
 		assertEquals(false, Qualifier.process(empty, Parser.parse("is:closed"), issue));
@@ -412,6 +413,23 @@ public class FilterEvalTests {
 		// Not a PR
 		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
 		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+
+		// Read status
+
+		assertEquals(false, issue.isCurrentlyRead());
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unread"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:read"), issue));
+
+		issue.setMarkedReadAt(Optional.of(LocalDateTime.now()));
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unread"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:read"), issue));
+
+		issue.setIsCurrentlyRead(true);
+
+		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unread"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("is:read"), issue));
 	}
 
 	@Test
@@ -455,5 +473,15 @@ public class FilterEvalTests {
 
 		assertEquals(true, Qualifier.process(empty, Parser.parse("repo:" + REPO), issue));
 		assertEquals(false, Qualifier.process(empty, Parser.parse("repo:something/else"), issue));
+	}
+
+	@Test
+	public void sort() {
+		TurboIssue issue = new TurboIssue(REPO, 1, "");
+
+		// Being a meta-qualifier, this doesn't have any effect
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id, ~repo"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:~id, NOT repo"), issue));
 	}
 }
