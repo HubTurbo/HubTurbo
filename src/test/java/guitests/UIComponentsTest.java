@@ -20,4 +20,14 @@ public class UIComponentsTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.DIGIT0).release(KeyCode.DIGIT0).release(KeyCode.SHIFT);
         press(KeyCode.ENTER).release(KeyCode.ENTER);
     }
+
+    @Test
+    public void navigableListViewTest() {
+        click("#dummy/dummy_col0_1");
+        press(KeyCode.V).release(KeyCode.V);
+        press(KeyCode.T).release(KeyCode.T);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
+        press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+    }
 }
