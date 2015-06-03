@@ -229,10 +229,10 @@ public class BrowserComponent {
 	 * Navigates to the GitHub changelog page.
 	 * Run on a separate thread.
 	 */
-	public void showChangelog(String version) {
-		logger.info("Showing changelog for version " + version);
-		runBrowserOperation(() -> driver.get(GitHubURL.getChangelogForVersion(version)));
-	}
+//	public void showChangelog(String version) {
+//		logger.info("Showing changelog for version " + version);
+//		runBrowserOperation(() -> driver.get(GitHubURL.getChangelogForVersion(version)));
+//	}
 
 	/**
 	 * Navigates to the GitHub page for the given issue in the currently-active
