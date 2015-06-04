@@ -12,14 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * (explicit command line argument required for proper JSON Store to
  * activate during test mode)
  */
-public class JSONStoreStub extends RepoStore {
-
-	@Override
-	public CompletableFuture<Model> loadRepository(String repoId) {
-		CompletableFuture<Model> response = new CompletableFuture<>();
-		addTask(new ReadTask(repoId, response));
-		return response;
-	}
+public class JSONStoreStub extends JSONStore {
 
 	@Override
 	public void saveRepository(String repoId, SerializableModel model) {}
