@@ -15,6 +15,3 @@ after_success:
 branches:
   only:
     - master
-    - ci
-    - testfx
-    - tests
