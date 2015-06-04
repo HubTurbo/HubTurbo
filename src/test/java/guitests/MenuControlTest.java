@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.scene.input.KeyCode;
 import org.junit.Test;
 
 public class MenuControlTest extends UITest {
@@ -20,11 +21,16 @@ public class MenuControlTest extends UITest {
         type("Board 1");
         click("OK");
         click("Boards");
-        click("Open");
-        click("Board 1");
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.RIGHT).release(KeyCode.RIGHT);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
         click("Boards");
-        click("Delete");
-        click("Board 1");
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.RIGHT).release(KeyCode.RIGHT);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
         click("OK");
 
         click("View");
