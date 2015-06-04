@@ -17,6 +17,7 @@ public class ChromeDriverTest extends UITest {
                 TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
+    // TODO test that events have been triggered
     @Test
     public void chromeDriverStubTest() {
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
