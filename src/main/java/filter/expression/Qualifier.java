@@ -1,5 +1,13 @@
 package filter.expression;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -8,14 +16,6 @@ import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 import util.Utility;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 

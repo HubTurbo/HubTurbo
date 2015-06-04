@@ -1,15 +1,15 @@
 package filter.expression;
 
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
 
 public class Conjunction implements FilterExpression {
 	public FilterExpression left;
@@ -32,7 +32,9 @@ public class Conjunction implements FilterExpression {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
+		if (this == o) {
+			return true;
+		}
 		if (o == null || getClass() != o.getClass()) return false;
 
 		Conjunction that = (Conjunction) o;

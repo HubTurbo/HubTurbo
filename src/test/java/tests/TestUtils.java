@@ -1,11 +1,11 @@
 package tests;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import backend.interfaces.IModel;
 import backend.resource.*;
 import prefs.Preferences;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class TestUtils {
 

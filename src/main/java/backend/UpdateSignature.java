@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class UpdateSignature {
 
-	public static final UpdateSignature empty = new UpdateSignature();
+	public static final UpdateSignature EMPTY = new UpdateSignature();
 
 	public final String issuesETag;
 	public final String labelsETag;
@@ -37,11 +37,11 @@ public class UpdateSignature {
 	}
 
 	public boolean isEmpty() {
-		return this == empty;
+		return this == EMPTY;
 	}
 
 	/**
-	 * lastCheckTime does not contribute to equality of signatures
+	 * lastCheckTime does not contribute to equality of signatures.
 	 */
 	@Override
 	public boolean equals(Object o) {

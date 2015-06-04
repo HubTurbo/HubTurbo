@@ -1,14 +1,14 @@
 package backend.interfaces;
 
-import backend.IssueMetadata;
-import backend.UserCredentials;
-import backend.resource.Model;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import backend.IssueMetadata;
+import backend.UserCredentials;
+import backend.resource.Model;
 
 public abstract class RepoSource implements TaskRunner {
 

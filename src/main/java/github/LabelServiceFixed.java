@@ -1,15 +1,16 @@
 package github;
 
-import com.google.gson.reflect.TypeToken;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
+import com.google.gson.reflect.TypeToken;
 
 
 public class LabelServiceFixed extends LabelService {
@@ -64,8 +65,8 @@ public class LabelServiceFixed extends LabelService {
 	/**
 	 * 
 	 * @param repository
-	 * @param label: label with edited fields
-	 * @param name: name of label to edit
+	 * @param label label with edited fields
+	 * @param name name of label to edit
 	 * @return
 	 * @throws IOException
 	 */

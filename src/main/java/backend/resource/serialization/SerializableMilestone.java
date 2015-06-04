@@ -1,9 +1,9 @@
 package backend.resource.serialization;
 
-import backend.resource.TurboMilestone;
-
 import java.time.LocalDate;
 import java.util.Optional;
+
+import backend.resource.TurboMilestone;
 
 public class SerializableMilestone {
 	private int id;

@@ -1,15 +1,16 @@
 package backend.github;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.Logger;
+
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboLabel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.logging.log4j.Logger;
 import util.HTLog;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboLabel>> {
 

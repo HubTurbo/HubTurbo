@@ -1,16 +1,17 @@
 package tests;
 
-import backend.UpdateSignature;
-import backend.resource.*;
-import backend.resource.serialization.SerializableModel;
-import backend.stub.DummyRepo;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.util.*;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import backend.UpdateSignature;
+import backend.resource.*;
+import backend.resource.serialization.SerializableModel;
+import backend.stub.DummyRepo;
 
 public class ModelTests {
 
@@ -140,7 +141,7 @@ public class ModelTests {
         assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
 
         // Signature
-        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.empty);
+        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.EMPTY);
         assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
 
         // Resources

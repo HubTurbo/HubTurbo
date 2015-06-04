@@ -1,16 +1,18 @@
 package backend.json;
 
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.logging.log4j.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import backend.interfaces.RepoStore;
 import backend.interfaces.StoreTask;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.apache.logging.log4j.Logger;
 import util.HTLog;
-
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 class ReadTask extends StoreTask {
 

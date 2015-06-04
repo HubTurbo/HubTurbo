@@ -1,16 +1,17 @@
 package backend.resource;
 
-import backend.IssueMetadata;
-import backend.resource.serialization.SerializableIssue;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import util.Utility;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+
+import backend.IssueMetadata;
+import backend.resource.serialization.SerializableIssue;
+import util.Utility;
 
 /**
  * The guidelines in this class apply to all TurboResources.
@@ -62,7 +63,7 @@ public class TurboIssue {
 	}
 
 	/**
-	 * Default constructor: provides reasonable defaults for things
+	 * Default constructor: provides reasonable defaults for things.
 	 */
 	public TurboIssue(String repoId, int id, String title) {
 		this.id = id;
@@ -77,7 +78,7 @@ public class TurboIssue {
 	}
 
 	/**
-	 * Immutable-conscious constructor
+	 * Immutable-conscious constructor.
 	 */
 	public TurboIssue(String repoId, int id, String title,
 	                  String creator, LocalDateTime createdAt, boolean isPullRequest) {

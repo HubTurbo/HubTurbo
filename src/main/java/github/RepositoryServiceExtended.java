@@ -1,17 +1,17 @@
 package github;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.OrganizationService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class RepositoryServiceExtended extends RepositoryService{
 	private static final Logger logger = LogManager.getLogger(RepositoryServiceExtended.class.getName());
@@ -50,7 +50,7 @@ public class RepositoryServiceExtended extends RepositoryService{
 	
 	/**
 	 * Returns a list of all repositories the user owns/contributes 
-	 * and repositories belonging to organisations the user is a member of
+	 * and repositories belonging to organisations the user is a member of.
 	 * */
 	
 	public List<Repository> getAllRepositories(String user) throws IOException{

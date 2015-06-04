@@ -1,6 +1,7 @@
 package browserview;
 
 import com.sun.jna.platform.win32.WinDef;
+
 import ui.UI;
 
 public class BrowserComponentStub extends BrowserComponent {
@@ -16,7 +17,9 @@ public class BrowserComponentStub extends BrowserComponent {
     public void focus(WinDef.HWND mainWindowHandle) {}
 
     @Override
-    public boolean hasBviewChanged() { return false; }
+    public boolean hasBviewChanged() {
+	    return false;
+    }
 
     @Override
     public void newLabel() {}
@@ -76,5 +79,7 @@ public class BrowserComponentStub extends BrowserComponent {
 //    public void showContributors() {}
 
     @Override
-    public boolean isCurrentUrlIssue() { return true; }
+    public boolean isCurrentUrlIssue() {
+	    return true;
+    }
 }

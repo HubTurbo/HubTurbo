@@ -1,7 +1,8 @@
 package util;
 
-import javafx.concurrent.Task;
 import org.controlsfx.dialog.Dialogs;
+
+import javafx.concurrent.Task;
 
 public class DialogMessage {
 	public static void showWarningDialog(String title, String message){

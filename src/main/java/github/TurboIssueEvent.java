@@ -1,16 +1,17 @@
 package github;
 
+import java.util.Date;
+
+import org.eclipse.egit.github.core.User;
+import org.ocpsoft.prettytime.PrettyTime;
+
 import backend.resource.TurboIssue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import org.eclipse.egit.github.core.User;
-import org.ocpsoft.prettytime.PrettyTime;
 import util.Utility;
-
-import java.util.Date;
 
 /**
  * Models an event that could happen to an issue.
@@ -108,7 +109,7 @@ public class TurboIssueEvent {
 	}
 
 	/**
-	 * Could be generalised to include other types of formatting in future
+	 * Could be generalised to include other types of formatting in future.
 	 * @param bold
 	 * @param text
 	 * @return

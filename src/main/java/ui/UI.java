@@ -1,16 +1,23 @@
 package ui;
 
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.common.eventbus.EventBus;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+
 import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
-import com.google.common.eventbus.EventBus;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -21,8 +28,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.StatusUI;
@@ -33,11 +38,6 @@ import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -208,7 +208,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	/**
-	 * TODO Stop-gap measure pending a more robust updater
+	 * TODO Stop-gap measure pending a more robust updater.
 	 */
 	private void clearCacheIfNecessary() {
 		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
@@ -303,7 +303,7 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	/**
-	 * UI operations
+	 * UI operations.
 	 */
 
 	@Override

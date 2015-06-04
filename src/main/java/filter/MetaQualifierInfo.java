@@ -1,10 +1,10 @@
 package filter;
 
-import filter.expression.Qualifier;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import filter.expression.Qualifier;
 
 /**
  * Encapsulates information about the meta-qualifiers present in a filter expression,

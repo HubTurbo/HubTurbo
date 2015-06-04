@@ -1,12 +1,12 @@
 package ui;
 
+import java.util.function.Consumer;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import util.Utility;
-
-import java.util.function.Consumer;
 
 public class RepositorySelector extends HBox {
 

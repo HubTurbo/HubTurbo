@@ -1,15 +1,7 @@
 package github.update;
 
-import github.GitHubClientExtended;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.eclipse.egit.github.core.service.GitHubService;
-import util.Utility;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -18,16 +10,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.NoSuchPageException;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.service.GitHubService;
+
+import github.GitHubClientExtended;
+import util.Utility;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
  * Returns auxillary results in the form of an updated ETag and the time of response,
  * which may be retrieved via the provided getters.
  * Only provides the basic framework for fetching updates. Subclasses fill in the details.
+ *
+ * @param <T> The type of the entity that is updated
  * */
-public class UpdateService<T> extends GitHubService{
+public class UpdateService<T> extends GitHubService {
 	private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 
 	private final GitHubClientExtended client;

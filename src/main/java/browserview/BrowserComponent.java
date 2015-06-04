@@ -1,9 +1,10 @@
 package browserview;
 
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-import javafx.concurrent.Task;
+import java.awt.*;
+import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -13,14 +14,15 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
+
+import javafx.concurrent.Task;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
-
-import java.awt.*;
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -460,10 +462,11 @@ public class BrowserComponent {
 
 	public void scrollPage(boolean isDownScroll) {
 		String script;
-		if (isDownScroll)
+		if (isDownScroll) {
 			script = "window.scrollBy(0,100)";
-		else
+		} else {
 			script = "window.scrollBy(0, -100)";
+		}
 		executeJavaScript(script);
 	}
 

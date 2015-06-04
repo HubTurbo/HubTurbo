@@ -1,13 +1,14 @@
 package backend.github;
 
+import java.util.concurrent.ExecutionException;
+
+import org.apache.logging.log4j.Logger;
+
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.*;
-import org.apache.logging.log4j.Logger;
 import util.HTLog;
-
-import java.util.concurrent.ExecutionException;
 
 public class UpdateModelTask extends GitHubRepoTask<Model> {
 
@@ -39,8 +40,8 @@ public class UpdateModelTask extends GitHubRepoTask<Model> {
 			GitHubRepoTask.Result<TurboUser> usersResult = usersTask.response.get();
 
 			UpdateSignature newSignature =
-				new UpdateSignature(issuesResult.ETag, labelsResult.ETag,
-					milestonesResult.ETag, usersResult.ETag, issuesResult.lastCheckTime);
+				new UpdateSignature(issuesResult.eTag, labelsResult.eTag,
+					milestonesResult.eTag, usersResult.eTag, issuesResult.lastCheckTime);
 
 			Model result = new Model(model.getRepoId(), issuesResult.items,
 				labelsResult.items, milestonesResult.items, usersResult.items, newSignature);

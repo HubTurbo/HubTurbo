@@ -1,15 +1,6 @@
 package backend;
 
-import backend.resource.Model;
-import backend.resource.MultiModel;
-import org.apache.logging.log4j.Logger;
-import prefs.Preferences;
-import ui.UI;
-import util.Futures;
-import util.HTLog;
-import util.Utility;
-import util.events.ClearLogicModelEventHandler;
-import util.events.RepoOpenedEvent;
+import static util.Futures.withResult;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +9,17 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static util.Futures.withResult;
+import org.apache.logging.log4j.Logger;
+
+import backend.resource.Model;
+import backend.resource.MultiModel;
+import prefs.Preferences;
+import ui.UI;
+import util.Futures;
+import util.HTLog;
+import util.Utility;
+import util.events.ClearLogicModelEventHandler;
+import util.events.RepoOpenedEvent;
 
 public class Logic {
 

@@ -1,12 +1,15 @@
 package ui.issuecolumn;
 
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import javafx.application.Platform;
 import ui.UI;
 import util.TickingTimer;
-import util.events.*;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import util.events.IssueCreatedEventHandler;
+import util.events.IssueSelectedEventHandler;
+import util.events.LabelCreatedEventHandler;
+import util.events.MilestoneCreatedEventHandler;
 
 /**
  * A abstract component in charge of creating, displaying, and enabling edits of issues.
@@ -19,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class UIBrowserBridge {
 
-	private final int BROWSER_REQUEST_DELAY = 400; //milliseconds
+	private static final int BROWSER_REQUEST_DELAY = 400; //milliseconds
 	private TickingTimer timer;
 	private Optional<String> nextRepoId = Optional.empty();
 	private Optional<Integer> nextIssueId = Optional.empty();
@@ -32,7 +35,9 @@ public class UIBrowserBridge {
 			nextRepoId = Optional.of(e.repoId);
 			nextIssueId = Optional.of(e.id);
 			timer.restart();
-			if (timer.isPaused()) { timer.resume(); }
+			if (timer.isPaused()) {
+				timer.resume();
+			}
 		});
 
 		ui.registerEvent((IssueCreatedEventHandler) e ->

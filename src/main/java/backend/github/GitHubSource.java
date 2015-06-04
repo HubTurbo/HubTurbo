@@ -1,16 +1,17 @@
 package backend.github;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.logging.log4j.Logger;
+
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
-import org.apache.logging.log4j.Logger;
 import util.HTLog;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
 

@@ -1,5 +1,13 @@
 package backend.stub;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -7,16 +15,9 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
 import ui.UI;
 import util.events.ClearLogicModelEvent;
 import util.events.UpdateDummyRepoEventHandler;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 public class DummyRepo implements Repo {
 
@@ -93,23 +94,23 @@ public class DummyRepo implements Repo {
 
 	@Override
 	public ImmutableTriple<List<TurboIssue>, String, Date>
-		getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
-		return getRepoState(repoId).getUpdatedIssues(ETag, lastCheckTime);
+		getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
+		return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
 	}
 
 	@Override
-	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String ETag) {
-		return getRepoState(repoId).getUpdatedLabels(ETag);
+	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
+		return getRepoState(repoId).getUpdatedLabels(eTag);
 	}
 
 	@Override
-	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		return getRepoState(repoId).getUpdatedMilestones(ETag);
+	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag) {
+		return getRepoState(repoId).getUpdatedMilestones(eTag);
 	}
 
 	@Override
-	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String ETag) {
-		return getRepoState(repoId).getUpdatedCollaborators(ETag);
+	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag) {
+		return getRepoState(repoId).getUpdatedCollaborators(eTag);
 	}
 
 	@Override

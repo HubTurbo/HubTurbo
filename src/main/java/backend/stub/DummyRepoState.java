@@ -1,5 +1,14 @@
 package backend.stub;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.User;
+
 import backend.IssueMetadata;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -7,19 +16,6 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.IssueEventType;
 import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.User;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
-import java.util.UUID;
-import java.util.TreeMap;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
 
 public class DummyRepoState {
 
@@ -55,9 +51,10 @@ public class DummyRepoState {
 	}
 
 	protected ImmutableTriple<List<TurboIssue>, String, Date>
-	getUpdatedIssues(String ETag, Date lastCheckTime) {
-		String currETag = ETag;
-		if (!updatedIssues.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+		getUpdatedIssues(String eTag, Date lastCheckTime) {
+
+		String currETag = eTag;
+		if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
 			new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
@@ -66,9 +63,9 @@ public class DummyRepoState {
 		return toReturn;
 	}
 
-	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
-		String currETag = ETag;
-		if (!updatedLabels.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String eTag) {
+		String currETag = eTag;
+		if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboLabel>, String> toReturn
 			= new ImmutablePair<>(new ArrayList<>(updatedLabels.values()), currETag);
@@ -77,9 +74,9 @@ public class DummyRepoState {
 		return toReturn;
 	}
 
-	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String ETag) {
-		String currETag = ETag;
-		if (!updatedMilestones.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String eTag) {
+		String currETag = eTag;
+		if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboMilestone>, String> toReturn
 			= new ImmutablePair<>(new ArrayList<>(updatedMilestones.values()), currETag);
@@ -88,9 +85,9 @@ public class DummyRepoState {
 		return toReturn;
 	}
 
-	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String ETag) {
-		String currETag = ETag;
-		if (!updatedUsers.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String eTag) {
+		String currETag = eTag;
+		if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
 		ImmutablePair<List<TurboUser>, String> toReturn
 			= new ImmutablePair<>(new ArrayList<>(updatedUsers.values()), currETag);

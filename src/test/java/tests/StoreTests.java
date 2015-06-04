@@ -1,19 +1,21 @@
 package tests;
 
-import backend.RepoIO;
-import backend.resource.Model;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import ui.UI;
-import ui.components.StatusUIStub;
-import util.events.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import backend.RepoIO;
+import backend.resource.Model;
+import ui.UI;
+import ui.components.StatusUIStub;
+import util.events.EventDispatcherStub;
+import util.events.UpdateDummyRepoEvent;
 
 public class StoreTests {
 

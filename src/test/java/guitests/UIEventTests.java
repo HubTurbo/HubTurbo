@@ -1,14 +1,15 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
+
+import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
-
-import static org.junit.Assert.assertEquals;
 
 public class UIEventTests extends UITest {
 

@@ -1,11 +1,12 @@
 package ui.components;
 
-import javafx.scene.input.KeyCode;
+import java.util.Optional;
+import java.util.function.IntConsumer;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
-import java.util.function.IntConsumer;
+import javafx.scene.input.KeyCode;
 
 /**
  * A very specialized ListView subclass that:
@@ -23,6 +24,8 @@ import java.util.function.IntConsumer;
  * - it is highlighted with the arrow keys, but only when the Shift key is not down
  * - Enter is pressed when it is highlighted
  * - it is clicked
+ *
+ * @param <T> The type of the item in the list
  */
 public class NavigableListView<T> extends ScrollableListView<T> {
 

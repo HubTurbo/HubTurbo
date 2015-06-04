@@ -1,11 +1,11 @@
 package prefs;
 
-import org.eclipse.egit.github.core.RepositoryId;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.eclipse.egit.github.core.RepositoryId;
 
 public class Preferences {
 
@@ -60,7 +60,7 @@ public class Preferences {
 	 */
 
 	/**
-	 * Boards
+	 * Boards.
 	 */
 
 	public void addBoard(String name, List<String> filterExprs) {
@@ -77,7 +77,7 @@ public class Preferences {
 	}
 
 	/**
-	 * Session configuration
+	 * Session configuration.
 	 */
 
 	public void addToLastViewedRepositories(String repository) {

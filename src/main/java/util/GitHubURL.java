@@ -3,8 +3,6 @@ package util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
-
 public class GitHubURL {
 	private static final Logger logger = LogManager.getLogger(GitHubURL.class.getName());
 	

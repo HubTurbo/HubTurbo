@@ -1,14 +1,16 @@
 package github.update;
 
-import com.google.gson.reflect.TypeToken;
-import github.GitHubClientExtended;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
+
+import java.util.ArrayList;
+
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
-import java.util.ArrayList;
+import com.google.gson.reflect.TypeToken;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
+import github.GitHubClientExtended;
 
 public class LabelUpdateService extends UpdateService<Label> {
 	public LabelUpdateService(GitHubClientExtended client, String labelsETag){

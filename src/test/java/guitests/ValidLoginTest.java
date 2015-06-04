@@ -1,12 +1,13 @@
 package guitests;
 
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import ui.RepositorySelector;
 
-import static org.junit.Assert.assertEquals;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import ui.RepositorySelector;
 
 public class ValidLoginTest extends UITest {
 

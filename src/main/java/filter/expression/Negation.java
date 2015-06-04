@@ -1,13 +1,13 @@
 package filter.expression;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class Negation implements FilterExpression {
 	private FilterExpression expr;

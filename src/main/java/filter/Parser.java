@@ -1,16 +1,16 @@
 package filter;
 
-import filter.expression.*;
-import filter.lexer.Lexer;
-import filter.lexer.Token;
-import filter.lexer.TokenType;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import filter.expression.*;
+import filter.lexer.Lexer;
+import filter.lexer.Token;
+import filter.lexer.TokenType;
 
 public class Parser {
 
@@ -328,8 +328,7 @@ public class Parser {
 			} else {
 				throw new ParseException("Right operand of .. must be a date or *");
 			}
-		}
-		else {
+		} else {
 			// Just one date, not a range
 			return new Qualifier(qualifierName, leftDate.get());
 		}

@@ -1,13 +1,13 @@
 package backend.resource.serialization;
 
-import backend.UpdateSignature;
-import backend.resource.Model;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import backend.UpdateSignature;
+import backend.resource.Model;
+
 /**
- * 100% immutable
+ * 100% immutable.
  */
 public class SerializableModel {
 	public final String repoId;

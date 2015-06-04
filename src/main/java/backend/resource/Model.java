@@ -1,13 +1,13 @@
 package backend.resource;
 
-import backend.UpdateSignature;
-import backend.interfaces.IBaseModel;
-import backend.resource.serialization.SerializableModel;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import backend.UpdateSignature;
+import backend.interfaces.IBaseModel;
+import backend.resource.serialization.SerializableModel;
 
 @SuppressWarnings("unused")
 public class Model implements IBaseModel {
@@ -20,7 +20,7 @@ public class Model implements IBaseModel {
 	private final List<TurboUser> users;
 
 	/**
-	 * Standard constructor
+	 * Standard constructor.
 	 */
 	public Model(String repoId, List<TurboIssue> issues,
 		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
@@ -36,12 +36,12 @@ public class Model implements IBaseModel {
 
 	/**
 	 * Standard constructor with empty update signature -- for use when
-	 * a model is first downloaded
+	 * a model is first downloaded.
 	 */
 	public Model(String repoId, List<TurboIssue> issues,
 		List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
 
-		this.updateSignature = UpdateSignature.empty;
+		this.updateSignature = UpdateSignature.EMPTY;
 		this.repoId = repoId;
 		this.issues = issues;
 		this.labels = labels;
@@ -50,10 +50,10 @@ public class Model implements IBaseModel {
 	}
 
 	/**
-	 * Constructor for the empty model
+	 * Constructor for the empty model.
 	 */
 	public Model(String repoId) {
-		this.updateSignature = UpdateSignature.empty;
+		this.updateSignature = UpdateSignature.EMPTY;
 		this.repoId = repoId;
 		this.issues = new ArrayList<>();
 		this.labels = new ArrayList<>();
@@ -62,7 +62,7 @@ public class Model implements IBaseModel {
 	}
 
 	/**
-	 * Copy constructor
+	 * Copy constructor.
 	 */
 	public Model(Model model) {
 		this.updateSignature = model.updateSignature;

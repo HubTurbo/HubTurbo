@@ -1,6 +1,17 @@
 package ui;
 
 //import javafx.application.Platform;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -13,21 +24,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
 import util.PlatformEx;
 import util.events.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class MenuControl extends MenuBar {
@@ -129,7 +131,7 @@ public class MenuControl extends MenuBar {
 	}
 
 	/**
-	 * Called upon the Boards > Save being clicked
+	 * Called upon the Boards > Save being clicked.
 	 */
 	private void onBoardSave() {
 		logger.info("Menu: Boards > Save");
@@ -155,7 +157,7 @@ public class MenuControl extends MenuBar {
 	}
 
 	/**
-	 * Called upon the Boards > Open being clicked
+	 * Called upon the Boards > Open being clicked.
 	 */
 	private void onBoardOpen(String boardName, List<String> filters) {
 		logger.info("Menu: Boards > Open > " + boardName);
@@ -165,7 +167,7 @@ public class MenuControl extends MenuBar {
 	}
 
 	/**
-	 * Called upon the Boards > Delete being clicked
+	 * Called upon the Boards > Delete being clicked.
 	 */
 	private void onBoardDelete(String boardName) {
 		logger.info("Menu: Boards > Delete > " + boardName);
@@ -216,7 +218,7 @@ public class MenuControl extends MenuBar {
 	}
 
 	/**
-	 * Returns the list of filter strings currently showing the user interface
+	 * Returns the list of filter strings currently showing the user interface.
 	 * @return
 	 */
 	private List<String> getCurrentFilterExprs() {
@@ -313,8 +315,8 @@ public class MenuControl extends MenuBar {
 		return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
 	}
 	
-	public void scrollTo(int columnIndex, int NumOfColumns){
-		setHvalue(columnIndex * (columnsScrollPane.getHmax()) / (NumOfColumns - 1));
+	public void scrollTo(int columnIndex, int numOfColumns){
+		setHvalue(columnIndex * (columnsScrollPane.getHmax()) / (numOfColumns - 1));
 	}
 	private void setHvalue(double val) {
 		columnsScrollPane.setHvalue(val);

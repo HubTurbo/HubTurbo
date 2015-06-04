@@ -1,5 +1,14 @@
 package ui.components;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+
 import filter.ParseException;
 import filter.Parser;
 import javafx.application.Platform;
@@ -7,14 +16,6 @@ import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.ValidationSupport;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FilterTextField extends TextField {
 
@@ -69,8 +70,7 @@ public class FilterTextField extends TextField {
 				e.consume();
 				if (getSelectedText().isEmpty()) {
 					movePastRemainingBrackets();
-				}
-				else {
+				} else {
 					confirmCompletion();
 				}
 			} else if (typed == '\b') {

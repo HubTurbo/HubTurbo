@@ -1,14 +1,16 @@
 package guitests;
 
-import com.google.common.util.concurrent.SettableFuture;
-import javafx.scene.Parent;
-import javafx.stage.Stage;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
-import ui.UI;
 
-import java.util.concurrent.TimeUnit;
+import com.google.common.util.concurrent.SettableFuture;
+
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import ui.UI;
 
 public class UITest extends GuiTest{
 

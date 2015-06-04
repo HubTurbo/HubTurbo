@@ -1,10 +1,10 @@
 package backend.json;
 
+import java.util.concurrent.CompletableFuture;
+
 import backend.interfaces.RepoStore;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-
-import java.util.concurrent.CompletableFuture;
 
 public class JSONStore extends RepoStore {
 

@@ -1,11 +1,12 @@
 package tests;
 
-import backend.stub.DummyRepo;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import backend.stub.DummyRepo;
 
 public class DummyRepoTest {
 

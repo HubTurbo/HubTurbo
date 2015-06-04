@@ -1,5 +1,13 @@
 package backend;
 
+import static util.Futures.withResult;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.logging.log4j.Logger;
+
 import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
@@ -8,15 +16,8 @@ import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
-import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import static util.Futures.withResult;
 
 public class RepoIO {
 

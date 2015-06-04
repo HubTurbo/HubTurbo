@@ -1,14 +1,14 @@
 package backend.interfaces;
 
-import backend.resource.Model;
-import backend.resource.serialization.SerializableModel;
-import util.Utility;
-
 import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
+import util.Utility;
 
 public abstract class RepoStore {
 

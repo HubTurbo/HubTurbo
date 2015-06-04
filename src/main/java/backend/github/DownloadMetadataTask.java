@@ -1,17 +1,18 @@
 package backend.github;
 
-import backend.IssueMetadata;
-import backend.interfaces.Repo;
-import backend.interfaces.TaskRunner;
-import github.TurboIssueEvent;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import util.HTLog;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
+
+import backend.IssueMetadata;
+import backend.interfaces.Repo;
+import backend.interfaces.TaskRunner;
+import github.TurboIssueEvent;
+import util.HTLog;
 
 public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetadata>> {
 

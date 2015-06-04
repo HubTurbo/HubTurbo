@@ -1,13 +1,14 @@
 package backend.github;
 
+import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.*;
-import org.apache.logging.log4j.Logger;
 import util.HTLog;
-
-import java.util.List;
 
 public class DownloadRepoTask extends GitHubRepoTask<Model> {
 
@@ -26,7 +27,7 @@ public class DownloadRepoTask extends GitHubRepoTask<Model> {
 		List<TurboLabel> labels = repo.getLabels(repoId);
 		List<TurboMilestone> milestones = repo.getMilestones(repoId);
 		List<TurboUser> users = repo.getCollaborators(repoId);
-		Model result = new Model(repoId, issues, labels, milestones, users, UpdateSignature.empty);
+		Model result = new Model(repoId, issues, labels, milestones, users, UpdateSignature.EMPTY);
 		logger.info(HTLog.format(repoId, "Downloaded " + result.summarise()));
 		response.complete(result);
 	}

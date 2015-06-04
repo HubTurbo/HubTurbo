@@ -1,5 +1,24 @@
 package backend.github;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.service.CollaboratorService;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.MilestoneService;
+
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -11,27 +30,9 @@ import github.IssueServiceExtended;
 import github.LabelServiceFixed;
 import github.TurboIssueEvent;
 import github.update.*;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.*;
-import org.eclipse.egit.github.core.service.CollaboratorService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.MilestoneService;
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 public class GitHubRepo implements Repo {
 
 	private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -63,9 +64,9 @@ public class GitHubRepo implements Repo {
 
 	@Override
 	public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId,
-	                                                                        String ETag, Date lastCheckTime) {
+	                                                                        String eTag, Date lastCheckTime) {
 
-		IssueUpdateService issueUpdateService = new IssueUpdateService(client, ETag, lastCheckTime);
+		IssueUpdateService issueUpdateService = new IssueUpdateService(client, eTag, lastCheckTime);
 		List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 		List<TurboIssue> items = updatedItems.stream()
 			.map(i -> new TurboIssue(repoId, i))
@@ -75,25 +76,25 @@ public class GitHubRepo implements Repo {
 	}
 
 	@Override
-	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, LabelUpdateService::new, TurboLabel::new);
+	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
+		return getUpdatedResource(repoId, eTag, LabelUpdateService::new, TurboLabel::new);
 	}
 
 	@Override
-	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, MilestoneUpdateService::new, TurboMilestone::new);
+	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag) {
+		return getUpdatedResource(repoId, eTag, MilestoneUpdateService::new, TurboMilestone::new);
 	}
 
 	@Override
-	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String ETag) {
-		return getUpdatedResource(repoId, ETag, UserUpdateService::new, TurboUser::new);
+	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag) {
+		return getUpdatedResource(repoId, eTag, UserUpdateService::new, TurboUser::new);
 	}
 
 	private <TR, R, S extends UpdateService<R>> ImmutablePair<List<TR>, String> getUpdatedResource(
-		String repoId, String ETag, BiFunction<GitHubClientExtended, String, S> constructService,
+		String repoId, String eTag, BiFunction<GitHubClientExtended, String, S> constructService,
 		BiFunction<String, R, TR> resourceConstructor) {
 
-		S updateService = constructService.apply(client, ETag);
+		S updateService = constructService.apply(client, eTag);
 		List<R> updatedItems = updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 		List<TR> items = updatedItems.stream()
 			.map(i -> resourceConstructor.apply(repoId, i))
