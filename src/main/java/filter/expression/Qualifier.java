@@ -698,22 +698,40 @@ public class Qualifier implements FilterExpression {
 	}
 
 	private void applyMilestone(TurboIssue issue, IModel model) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Invalid milestone " + (date.isPresent() ? date.get() : dateRange.get()));
-    	}
+		if (!content.isPresent()) {
+			throw new QualifierApplicationException("Name of milestone to apply required");
+		}
 
-        // Find milestones containing the partial title
-        List<TurboMilestone> milestones = model.getMilestones().stream().filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase())).collect(Collectors.toList());
-        if (milestones.size() > 1) {
-            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
-        } else {
-            issue.setMilestone(milestones.get(0));
-        }
+		// Find milestones containing partial title
+		List<TurboMilestone> milestones = model.getMilestones().stream()
+			.filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
+			.collect(Collectors.toList());
+
+		if (milestones.isEmpty()) {
+			throw new QualifierApplicationException("Invalid milestone " + content.get());
+		} else if (milestones.size() == 1) {
+			issue.setMilestone(milestones.get(0));
+			return;
+		}
+
+		// Find milestones containing exact title
+		milestones = model.getMilestones().stream()
+			.filter(m -> m.getTitle().toLowerCase().equals(content.get().toLowerCase()))
+			.collect(Collectors.toList());
+
+		if (milestones.isEmpty()) {
+			throw new QualifierApplicationException("Invalid milestone " + content.get());
+		} else if (milestones.size() == 1) {
+			issue.setMilestone(milestones.get(0));
+			return;
+		}
+
+		throw new QualifierApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
     }
 
     private void applyLabel(TurboIssue issue, IModel model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Invalid label " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Name of label to apply required");
     	}
 
         // Find labels containing the label name
@@ -721,39 +739,71 @@ public class Qualifier implements FilterExpression {
            .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
 	        .collect(Collectors.toList());
 
-        if (labels.size() > 1) {
-            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
-        } else {
-            issue.addLabel(labels.get(0));
+	    if (labels.isEmpty()) {
+		    throw new QualifierApplicationException("Invalid label " + content.get());
+	    } else if (labels.size() == 1) {
+	        issue.addLabel(labels.get(0));
+		    return;
         }
+
+        // Find labels with the exact label name
+        labels = model.getLabels().stream()
+	        .filter(l -> l.getActualName().toLowerCase().equals(content.get().toLowerCase()))
+	        .collect(Collectors.toList());
+
+	    if (labels.isEmpty()) {
+		    throw new QualifierApplicationException("Invalid label " + content.get());
+	    } else if (labels.size() == 1) {
+	        issue.addLabel(labels.get(0));
+		    return;
+        }
+
+	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
     }
 
     private void applyAssignee(TurboIssue issue, IModel model) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Invalid assignee " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("Name of assignee to apply required");
     	}
 
-        // Find assignees containing the partial title
+        // Find assignees containing partial name
         List<TurboUser> assignees = model.getUsers().stream()
 	        .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
 	        .collect(Collectors.toList());
 
-        if (assignees.size() > 1) {
-            throw new QualifierApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
-        } else {
-            issue.setAssignee(assignees.get(0));
+	    if (assignees.isEmpty()) {
+		    throw new QualifierApplicationException("Invalid user " + content.get());
+	    } else if (assignees.size() == 1) {
+	        issue.setAssignee(assignees.get(0));
+		    return;
         }
+
+	    // Find assignees containing partial name
+	    assignees = model.getUsers().stream()
+		    .filter(c -> c.getLoginName().toLowerCase().equals(content.get().toLowerCase()))
+		    .collect(Collectors.toList());
+
+	    if (assignees.isEmpty()) {
+		    throw new QualifierApplicationException("Invalid user " + content.get());
+	    } else if (assignees.size() == 1) {
+		    issue.setAssignee(assignees.get(0));
+		    return;
+	    }
+
+	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
     }
 
     private void applyState(TurboIssue issue) throws QualifierApplicationException {
     	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Invalid state " + (date.isPresent() ? date.get() : dateRange.get()));
+    		throw new QualifierApplicationException("State to apply required");
     	}
 
         if (content.get().toLowerCase().contains("open")) {
             issue.setOpen(true);
         } else if (content.get().toLowerCase().contains("closed")) {
             issue.setOpen(false);
+        } else {
+	        throw new QualifierApplicationException("Invalid state " + content.get());
         }
     }
 
