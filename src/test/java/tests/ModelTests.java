@@ -136,46 +136,46 @@ public class ModelTests {
 		assertEquals(modelUpdated, deserializedModel);
 	}
 
-    @Test
-    public void getters() {
-        // ID
-        assertEquals(REPO, modelUpdated.getRepoId());
-        assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
-
-        // Signature
-        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.empty);
-        assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
-
-        // Resources
-        int issueCount = 1;
-        for (TurboIssue issue : modelUpdated.getIssues()) {
-	        assertEquals(issueCount, modelUpdated.getIssueById(issueCount).get().getId());
-            assertEquals(issueCount, issue.getId());
-            issueCount++;
-        }
-        int labelCount = 1;
-        for (TurboLabel label : modelUpdated.getLabels()) {
-            assertEquals("Label " + labelCount, label.getActualName());
-	        assertEquals("Label " + labelCount,
-		        modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
-            labelCount++;
-        }
-        int milestoneCount = 1;
-        for (TurboMilestone milestone : modelUpdated.getMilestones()) {
-            assertEquals(milestoneCount, milestone.getId());
-	        assertEquals(milestoneCount, modelUpdated.getMilestoneById(milestoneCount).get().getId());
-	        assertEquals("Milestone " + milestoneCount,
-		        modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
-            milestoneCount++;
-        }
-        int userCount = 1;
-        for (TurboUser user : modelUpdated.getUsers()) {
-            assertEquals("User " + userCount, user.getLoginName());
-	        assertEquals("User " + userCount,
-		        modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
-            userCount++;
-        }
-    }
+//    @Test
+//    public void getters() {
+//        // ID
+//        assertEquals(REPO, modelUpdated.getRepoId());
+//        assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
+//
+//        // Signature
+//        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.empty);
+//        assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
+//
+//        // Resources
+//        int issueCount = 1;
+//        for (TurboIssue issue : modelUpdated.getIssues()) {
+//	        assertEquals(issueCount, modelUpdated.getIssueById(issueCount).get().getId());
+//            assertEquals(issueCount, issue.getId());
+//            issueCount++;
+//        }
+//        int labelCount = 1;
+//        for (TurboLabel label : modelUpdated.getLabels()) {
+//            assertEquals("Label " + labelCount, label.getActualName());
+//	        assertEquals("Label " + labelCount,
+//		        modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
+//            labelCount++;
+//        }
+//        int milestoneCount = 1;
+//        for (TurboMilestone milestone : modelUpdated.getMilestones()) {
+//            assertEquals(milestoneCount, milestone.getId());
+//	        assertEquals(milestoneCount, modelUpdated.getMilestoneById(milestoneCount).get().getId());
+//	        assertEquals("Milestone " + milestoneCount,
+//		        modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
+//            milestoneCount++;
+//        }
+//        int userCount = 1;
+//        for (TurboUser user : modelUpdated.getUsers()) {
+//            assertEquals("User " + userCount, user.getLoginName());
+//	        assertEquals("User " + userCount,
+//		        modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
+//            userCount++;
+//        }
+//    }
 
     @Test
     public void operations() {
