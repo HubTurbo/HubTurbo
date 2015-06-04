@@ -8,6 +8,10 @@ public class MenuControlTest extends UITest {
     // TODO test that events have been triggered
     @Test
     public void menuControlTest() {
+        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).release(KeyCode.P).release(KeyCode.SHIFT).release(KeyCode.CONTROL);
+
         click("Panels");
         click("Create");
         click("Panels");
@@ -19,7 +23,7 @@ public class MenuControlTest extends UITest {
 
         click("Boards");
         click("Save");
-        type("Board 1");
+        type("1");
         click("OK");
         click("Boards");
         press(KeyCode.DOWN).release(KeyCode.DOWN);
@@ -36,7 +40,9 @@ public class MenuControlTest extends UITest {
 
         click("View");
         click("Refresh");
+        press(KeyCode.F5).release(KeyCode.F5);
         click("View");
         click("Force Refresh");
+        press(KeyCode.CONTROL).press(KeyCode.F5).release(KeyCode.F5).release(KeyCode.CONTROL);
     }
 }

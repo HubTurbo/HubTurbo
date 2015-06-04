@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import util.events.ColumnClickedEventHandler;
@@ -28,6 +29,9 @@ public class UIEventTests extends UITest {
         click("New");
         click("Issue");
         assertEquals(1, eventTestCount);
+        resetEventTestCount();
+        press(KeyCode.CONTROL).press(KeyCode.I).release(KeyCode.I).release(KeyCode.CONTROL);
+        assertEquals(1, eventTestCount);
     }
 
     @Test
@@ -37,6 +41,9 @@ public class UIEventTests extends UITest {
         click("New");
         click("Label");
         assertEquals(1, eventTestCount);
+        resetEventTestCount();
+        press(KeyCode.CONTROL).press(KeyCode.L).release(KeyCode.L).release(KeyCode.CONTROL);
+        assertEquals(1, eventTestCount);
     }
 
     @Test
@@ -45,6 +52,9 @@ public class UIEventTests extends UITest {
         resetEventTestCount();
         click("New");
         click("Milestone");
+        assertEquals(1, eventTestCount);
+        resetEventTestCount();
+        press(KeyCode.CONTROL).press(KeyCode.M).release(KeyCode.M).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
     }
 

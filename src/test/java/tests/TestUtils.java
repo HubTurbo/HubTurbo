@@ -11,7 +11,7 @@ public class TestUtils {
 
 	public static final String REPO = "test/test";
 
-	private static IModel singletonModel(Model model) {
+	public static IModel singletonModel(Model model) {
 		MultiModel models = new MultiModel(new Preferences(true));
 		models.queuePendingRepository(model.getRepoId());
 		models.addPending(model);

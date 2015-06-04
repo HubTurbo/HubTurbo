@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
+import util.PlatformEx;
 import util.events.IssueCreatedEvent;
 import util.events.IssueSelectedEvent;
 import util.events.LabelCreatedEvent;
@@ -20,18 +21,18 @@ public class ChromeDriverTest extends UITest {
     // TODO test that events have been triggered
     @Test
     public void chromeDriverStubTest() {
-        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
-        UI.events.triggerEvent(new IssueCreatedEvent());
-        UI.events.triggerEvent(new LabelCreatedEvent());
-        UI.events.triggerEvent(new MilestoneCreatedEvent());
+        PlatformEx.runAndWait(() -> {
+            UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
+            UI.events.triggerEvent(new IssueCreatedEvent());
+            UI.events.triggerEvent(new LabelCreatedEvent());
+            UI.events.triggerEvent(new MilestoneCreatedEvent());
+        });
 
-        // jump to comments
-        sleep(1000);
         click("#dummy/dummy_col0_1");
-        press(KeyCode.C).release(KeyCode.C);
 
         // show docs
         press(KeyCode.F1).release(KeyCode.F1);
+        press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
 
         // scroll to top
         press(KeyCode.U).release(KeyCode.U);
@@ -71,6 +72,9 @@ public class ChromeDriverTest extends UITest {
 
         // manage milestone
         press(KeyCode.M).release(KeyCode.M);
+
+        // jump to comments
+        press(KeyCode.C).release(KeyCode.C);
 
         click("View");
         click("Documentation");

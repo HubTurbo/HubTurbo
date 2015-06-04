@@ -5,11 +5,8 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
-import filter.QualifierApplicationException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -81,35 +78,6 @@ public abstract class IssueColumn extends Column {
         });
 	}
 
-//	private void setupIssueColumnDragEvents(Model model, int columnIndex) {
-//		setOnDragOver(e -> {
-//			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-//				DragData dd = DragData.deserialise(e.getDragboard().getString());
-//				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-//					e.acceptTransferModes(TransferMode.MOVE);
-//				}
-//			}
-//		});
-//
-//		setOnDragDropped(e -> {
-//			Dragboard db = e.getDragboard();
-//			boolean success = false;
-//
-//			if (db.hasString()) {
-//				success = true;
-//				DragData dd = DragData.deserialise(db.getString());
-//				if (dd.getColumnIndex() != columnIndex) {
-//					Optional<TurboIssue> rightIssue = model.getIssueById(dd.getIssueIndex());
-//					assert rightIssue.isPresent();
-//					applyCurrentFilterExpressionToIssue(rightIssue.get(), true);
-//				}
-//			}
-//			e.setDropCompleted(success);
-//
-//			e.consume();
-//		});
-//	}
-
 	private final ModelUpdatedEventHandler onModelUpdate = e -> {
 
 		// Update keywords
@@ -137,8 +105,6 @@ public abstract class IssueColumn extends Column {
 
 		filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
 
-//		setupIssueDragEvents(filterTextField);
-
 		HBox buttonsBox = new HBox();
 		buttonsBox.setSpacing(5);
 		buttonsBox.setAlignment(Pos.TOP_RIGHT);
@@ -149,16 +115,12 @@ public abstract class IssueColumn extends Column {
 		layout.getChildren().addAll(filterTextField, buttonsBox);
 		layout.setPadding(new Insets(0, 0, 3, 0));
 
+		setupPanelDragEvents(layout);
+
 		return layout;
 	}
 
 	private Label[] createButtons() {
-		// Label addIssue = new Label(ADD_ISSUE);
-		// addIssue.getStyleClass().add("label-button");
-		// addIssue.setOnMouseClicked((e) -> {
-		// ui.triggerEvent(new IssueCreatedEvent());
-		// });
-
 		Label closeList = new Label(CLOSE_COLUMN);
 		closeList.setId(model.getDefaultRepo() + "_col" + columnIndex + "_closeButton");
 		closeList.getStyleClass().add("label-button");
@@ -167,103 +129,29 @@ public abstract class IssueColumn extends Column {
 			parentColumnControl.closeColumn(columnIndex);
 		});
 
-		// Label toggleHierarchyMode = new Label(TOGGLE_HIERARCHY);
-		// toggleHierarchyMode.getStyleClass().add("label-button");
-		// toggleHierarchyMode.setOnMouseClicked((e) -> {
-		// parentColumnControl.toggleColumn(columnIndex);
-		// });
-
 		return new Label[] { closeList };
 	}
 
-//	private void setupIssueDragEvents(Node filterBox) {
-//		filterBox.setOnDragOver(e -> {
-//			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
-//				DragData dd = DragData.deserialise(e.getDragboard().getString());
-//				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-//					e.acceptTransferModes(TransferMode.MOVE);
-//				} else if (dd.getSource() == DragData.Source.LABEL_TAB
-//						|| dd.getSource() == DragData.Source.ASSIGNEE_TAB
-//						|| dd.getSource() == DragData.Source.MILESTONE_TAB) {
-//					e.acceptTransferModes(TransferMode.COPY);
-//				}
-//			}
-//		});
-//
-//		filterBox.setOnDragEntered(e -> {
-//			if (e.getDragboard().hasString()) {
-//				DragData dd = DragData.deserialise(e.getDragboard().getString());
-//				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-//					filterBox.getStyleClass().add("dragged-over");
-//				} else if (dd.getSource() == DragData.Source.COLUMN) {
-//					if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
-//						// Apparently the dragboard can't be updated while
-//						// the drag is in progress. This is why we use an
-//						// external source for updates.
-//						assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
-//						int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
-//						parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
-//						parentColumnControl.swapColumns(previous, columnIndex);
-//					}
-//				}
-//			}
-//			e.consume();
-//		});
-//
-//		filterBox.setOnDragExited(e -> {
-//			filterBox.getStyleClass().remove("dragged-over");
-//			e.consume();
-//		});
-//
-//		filterBox.setOnDragDropped(e -> {
-//			Dragboard db = e.getDragboard();
-//			boolean success = false;
-//			if (db.hasString()) {
-//				success = true;
-//				DragData dd = DragData.deserialise(db.getString());
-//				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
-//
-//					assert model.getIssueById(dd.getIssueIndex()).isPresent();
-//					TurboIssue rightIssue = model.getIssueById(dd.getIssueIndex()).get();
-//					if (rightIssue.getLabels().size() == 0) {
-//						// If the issue has no labels, show it by its title to inform
-//						// the user that there are no similar issues
-//						filter(new Qualifier("keyword", rightIssue.getTitle()));
-//					} else {
-//						// Otherwise, take the disjunction of its labels to show similar
-//						// issues.
-//						List<TurboLabel> labels = model.getLabelsOfIssue(rightIssue);
-//						FilterExpression result = new Qualifier("label", labels.get(0).getName());
-//						List<FilterExpression> rest = labels.stream()
-//							.skip(1)
-//							.map(label -> new Qualifier("label", label.getName()))
-//							.collect(Collectors.toList());
-//
-//						for (FilterExpression label : rest) {
-//							result = new Disjunction(label, result);
-//						}
-//
-//						filter(result);
-//					}
-//				} else if (dd.getSource() == DragData.Source.COLUMN) {
-//					// This event is never triggered when the drag is ended.
-//					// It's not a huge deal, as this is only used to
-//					// reinitialise the currently-dragged slot in ColumnControl.
-//					// The other main consequence of this is that we can't
-//					// assert to check if the slot has been cleared when starting a drag-swap.
-//				} else if (dd.getSource() == DragData.Source.LABEL_TAB) {
-//					filter(new Qualifier("label", dd.getEntityName()));
-//				} else if (dd.getSource() == DragData.Source.ASSIGNEE_TAB) {
-//					filter(new Qualifier("assignee", dd.getEntityName()));
-//				} else if (dd.getSource() == DragData.Source.MILESTONE_TAB) {
-//					filter(new Qualifier("milestone", dd.getEntityName()));
-//				}
-//
-//			}
-//			e.setDropCompleted(success);
-//			e.consume();
-//		});
-//	}
+	private void setupPanelDragEvents(Node dropNode) {
+		dropNode.setOnDragEntered(e -> {
+				if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+					// Apparently the dragboard can't be updated while
+					// the drag is in progress. This is why we use an
+					// external source for updates.
+					assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
+					int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
+					parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
+					parentColumnControl.swapColumns(previous, columnIndex);
+				}
+				e.consume();
+			}
+		);
+
+		dropNode.setOnDragExited(e -> {
+			dropNode.getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+	}
 
 	// These two methods are triggered by the contents of the input area
 	// changing. As such they should not be invoked manually, or the input
@@ -329,28 +217,6 @@ public abstract class IssueColumn extends Column {
 	public String getCurrentFilterString() {
 		return filterTextField.getText();
 	}
-
-//	private void applyCurrentFilterExpressionToIssue(TurboIssue issue, boolean updateModel) {
-//		if (currentFilterExpression != Qualifier.EMPTY) {
-//			try {
-//				if (currentFilterExpression.canBeAppliedToIssue()) {
-//					// TODO re-enable
-////					TurboIssue clone = new TurboIssue(issue);
-//					currentFilterExpression.applyTo(issue, model);
-//					if (updateModel) {
-//						// TODO re-enable
-////						dragAndDropExecutor.executeCommand(CommandType.EDIT_ISSUE, models, clone, issue);
-//					}
-//					parentColumnControl.refresh();
-//				} else {
-//					throw new QualifierApplicationException(
-//						"Could not apply predicate " + currentFilterExpression + ".");
-//				}
-//			} catch (QualifierApplicationException ex) {
-//				UI.status.displayMessage(ex.getMessage());
-//			}
-//		}
-//	}
 
 	public TransformationList<TurboIssue, TurboIssue> getIssueList() {
 		return transformedIssueList;

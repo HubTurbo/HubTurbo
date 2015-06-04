@@ -37,18 +37,18 @@ public class GitHubURL {
 		return DOCS_PAGE;
 	}
 
-	public static String getChangelogForVersion(String version) {
-		Optional<int[]> numbers = Utility.parseVersionNumber(version);
-		if (numbers.isPresent()) {
-			int major = numbers.get()[0];
-			int minor = numbers.get()[1];
-			int patch = numbers.get()[2];
-			return String.format(CHANGELOG_PAGE_FORMAT, major, minor, patch);
-		} else {
-			logger.error("Invalid version string format " + version + "; going to generic changelog page");
-			return CHANGELOG_PAGE;
-		}
-	}
+//	public static String getChangelogForVersion(String version) {
+//		Optional<int[]> numbers = Utility.parseVersionNumber(version);
+//		if (numbers.isPresent()) {
+//			int major = numbers.get()[0];
+//			int minor = numbers.get()[1];
+//			int patch = numbers.get()[2];
+//			return String.format(CHANGELOG_PAGE_FORMAT, major, minor, patch);
+//		} else {
+//			logger.error("Invalid version string format " + version + "; going to generic changelog page");
+//			return CHANGELOG_PAGE;
+//		}
+//	}
 
 	public static String getPathForPullRequests(String repoId) {
 		return String.format("https://github.com/%s/pulls", repoId);
