@@ -160,6 +160,7 @@ public abstract class IssueColumn extends Column {
 		// });
 
 		Label closeList = new Label(CLOSE_COLUMN);
+		closeList.setId(model.getDefaultRepo() + "_col" + columnIndex + "_closeButton");
 		closeList.getStyleClass().add("label-button");
 		closeList.setOnMouseClicked((e) -> {
 			e.consume();
