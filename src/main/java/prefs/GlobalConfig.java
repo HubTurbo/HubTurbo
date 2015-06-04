@@ -136,7 +136,9 @@ public class GlobalConfig {
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
 			result = cipher.doFinal(lastPassword.getBytes());
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+			| IllegalBlockSizeException | BadPaddingException e) {
+
 			logger.error("Cannot encrypt data " + e.getMessage(), e);
 		}
 		return result;
@@ -150,7 +152,9 @@ public class GlobalConfig {
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.DECRYPT_MODE, aesKey);
 			result = new String(cipher.doFinal(lastLoginEncrypted));
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+			| IllegalBlockSizeException | BadPaddingException e) {
+
 			logger.error("Cannot encrypt data " + e.getMessage(), e);
 		}
 		return result;

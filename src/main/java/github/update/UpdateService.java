@@ -103,11 +103,13 @@ public class UpdateService<T> extends GitHubService{
 
 			} else {
 				logger.info(String.format("%s: %d", resourceDesc, responseCode));
-				if(responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+				if (responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
 					logger.info("Nothing to update");
 				} else {
-					result = new ArrayList<>(getPagedItems(resourceDesc, new PageIterator<>(request, client)));
-					updatedETag = Optional.of(Utility.stripQuotes(connection.getHeaderField("ETag")));
+					result = new ArrayList<>(getPagedItems(resourceDesc,
+						new PageIterator<>(request, client)));
+					updatedETag = Optional.of(
+						Utility.stripQuotes(connection.getHeaderField("ETag")));
 					logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETag));
 				}
 			}

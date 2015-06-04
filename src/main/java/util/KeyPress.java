@@ -10,7 +10,10 @@ public class KeyPress {
 
 	public static boolean isDoublePress(KeyCode matchingKeyCode, KeyCode currentKeyCode) {
 		long keyEventTime = System.currentTimeMillis();
-		if ((keyEventTime - lastKeyEventTime) < keyPressSpeed && currentKeyCode.equals(lastKeyPressedCode) && currentKeyCode.equals(matchingKeyCode)) {
+		if ((keyEventTime - lastKeyEventTime) < keyPressSpeed
+			&& currentKeyCode.equals(lastKeyPressedCode)
+			&& currentKeyCode.equals(matchingKeyCode)) {
+
 			lastKeyEventTime = 0;
 			return true;
 	    } else {

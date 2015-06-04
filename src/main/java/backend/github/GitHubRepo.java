@@ -40,7 +40,7 @@ public class GitHubRepo implements Repo {
 	private final IssueServiceExtended issueService = new IssueServiceExtended(client);
 	private final CollaboratorService collaboratorService = new CollaboratorService(client);
 	private final LabelServiceFixed labelService = new LabelServiceFixed(client);
-	final private MilestoneService milestoneService = new MilestoneService(client);
+	private final MilestoneService milestoneService = new MilestoneService(client);
 
 	public GitHubRepo() {
 	}
@@ -62,13 +62,16 @@ public class GitHubRepo implements Repo {
 	}
 
 	@Override
-	public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
+	public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId,
+	                                                                        String ETag, Date lastCheckTime) {
+
 		IssueUpdateService issueUpdateService = new IssueUpdateService(client, ETag, lastCheckTime);
 		List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
 		List<TurboIssue> items = updatedItems.stream()
 			.map(i -> new TurboIssue(repoId, i))
 			.collect(Collectors.toList());
-		return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETag(), issueUpdateService.getUpdatedCheckTime());
+		return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETag(),
+			issueUpdateService.getUpdatedCheckTime());
 	}
 
 	@Override
@@ -131,7 +134,8 @@ public class GitHubRepo implements Repo {
 				.collect(Collectors.toList());
 		} catch (RequestException e) {
 			if (e.getStatus() == 403) {
-				logger.info(HTLog.format(repoId, "Unable to get collaborators: " + e.getLocalizedMessage()));
+				logger.info(HTLog.format(repoId, "Unable to get collaborators: "
+					+ e.getLocalizedMessage()));
 			} else {
 				HTLog.error(logger, e);
 			}
@@ -176,7 +180,8 @@ public class GitHubRepo implements Repo {
 
 				float progress = ((float) elements.size() / (float) totalIssueCount);
 				UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
-				logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)", elements.size(), progress * 100));
+				logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)",
+					elements.size(), progress * 100));
 			}
 			UI.events.triggerEvent(new UpdateProgressEvent(repoId));
 		} catch (NoSuchPageException pageException) {
@@ -191,7 +196,8 @@ public class GitHubRepo implements Repo {
 
 	public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
 		try {
-			return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId).getTurboIssueEvents();
+			return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId)
+				.getTurboIssueEvents();
 		} catch (IOException e) {
 			HTLog.error(logger, e);
 			return new ArrayList<>();

@@ -22,7 +22,9 @@ public class LabelServiceFixed extends LabelService {
 		super(client);
 	}
 	
-	public void deleteLabelFromIssue(IRepositoryIdProvider repository, String issueId, Label label) throws IOException{
+	public void deleteLabelFromIssue(IRepositoryIdProvider repository, String issueId,
+	                                 Label label) throws IOException{
+
 //		Github api format: DELETE /repos/:owner/:repo/issues/:number/labels/:name
 		String repoId = getId(repository);
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);

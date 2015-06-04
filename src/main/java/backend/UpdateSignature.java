@@ -50,7 +50,9 @@ public class UpdateSignature {
 
 		UpdateSignature that = (UpdateSignature) o;
 
-		if (collaboratorsETag != null ? !collaboratorsETag.equals(that.collaboratorsETag) : that.collaboratorsETag != null)
+		if (collaboratorsETag != null
+			? !collaboratorsETag.equals(that.collaboratorsETag)
+			: that.collaboratorsETag != null)
 			return false;
 		if (issuesETag != null ? !issuesETag.equals(that.issuesETag) : that.issuesETag != null) return false;
 		if (labelsETag != null ? !labelsETag.equals(that.labelsETag) : that.labelsETag != null) return false;

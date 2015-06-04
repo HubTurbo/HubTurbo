@@ -49,7 +49,9 @@ public class IssueServiceExtended extends IssueService{
 		return ghClient.get(request);
 	}
 	
-	private HttpURLConnection createIssuePostConnection(IRepositoryIdProvider repository, int issueId) throws IOException{
+	private HttpURLConnection createIssuePostConnection(IRepositoryIdProvider repository,
+	                                                    int issueId) throws IOException{
+
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(repository.generateId());
 		uri.append(SEGMENT_ISSUES);
@@ -61,9 +63,10 @@ public class IssueServiceExtended extends IssueService{
 	@Override
 	public Issue createIssue(IRepositoryIdProvider repository, Issue issue) throws IOException{
 		Issue returnedIssue = super.createIssue(repository, issue);
-		if(!returnedIssue.getState().equals(issue.getState())){
+		if (!returnedIssue.getState().equals(issue.getState())){
 			returnedIssue.setState(issue.getState());
-			editIssueState(repository, returnedIssue.getNumber(), returnedIssue.getState().equals(STATE_OPEN));
+			editIssueState(repository, returnedIssue.getNumber(),
+				returnedIssue.getState().equals(STATE_OPEN));
 		}
 		return returnedIssue;
 	}
@@ -99,21 +102,23 @@ public class IssueServiceExtended extends IssueService{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
 		HashMap<Object, Object> data = new HashMap<>();
 		String state;
-		if(open){
+		if (open) {
 			state = STATE_OPEN;
-		}else{
+		} else {
 			state = STATE_CLOSED;
 		}
 		data.put(FILTER_STATE, state);
 		return ghClient.sendJson(connection, data, Issue.class);
 	}
 	
-	public Issue setIssueMilestone(IRepositoryIdProvider repository, int issueId, Milestone milestone) throws IOException{
+	public Issue setIssueMilestone(IRepositoryIdProvider repository, int issueId,
+	                               Milestone milestone) throws IOException {
+
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
 		HashMap<Object, Object> data = new HashMap<>();
 		if (milestone != null && milestone.getNumber() > 0) {
 			data.put(FILTER_MILESTONE, Integer.toString(milestone.getNumber()));
-		}else{
+		} else {
 			data.put(FILTER_MILESTONE, ""); 
 		}
 		return ghClient.sendJson(connection, data, Issue.class);
@@ -122,9 +127,9 @@ public class IssueServiceExtended extends IssueService{
 	public Issue setIssueAssignee(IRepositoryIdProvider repository, int issueId, User user) throws IOException{
 		HttpURLConnection connection = createIssuePostConnection(repository, issueId);
 		HashMap<Object, Object> data = new HashMap<>();
-		if(user != null && user.getLogin() != null){
+		if (user != null && user.getLogin() != null) {
 			data.put(FILTER_ASSIGNEE, user.getLogin());
-		}else{
+		} else {
 			data.put(FILTER_ASSIGNEE, "");
 		}
 		return ghClient.sendJson(connection, data, Issue.class);

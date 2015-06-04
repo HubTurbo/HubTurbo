@@ -177,7 +177,7 @@ public class MultiModel implements IModel {
 			Model existingModel = models.get(model.getRepoId());
 			if (!existingModel.getIssues().equals(model.getIssues())) {
 				// Find issues that have changed and update preferences with them
-				for (int i=1; i<=model.getIssues().size(); i++) {
+				for (int i = 1; i <= model.getIssues().size(); i++) {
 					// TODO O(n^2), optimise by preprocessing into a map or sorting
 					if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
 						assert model.getIssueById(i).isPresent();

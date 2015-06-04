@@ -42,8 +42,10 @@ public class RepositoryServiceExtended extends RepositoryService{
 		return orgs.stream()
 			.map(this::getOrganisationRepos)
 			.reduce(new ArrayList<>(),
-							(l, item) -> {l.addAll(item); 
-										  return l;});
+				(l, item) -> {
+					l.addAll(item);
+					return l;
+				});
 	}
 	
 	/**

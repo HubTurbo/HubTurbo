@@ -220,7 +220,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 
 		// Change focus depending on what fields are present
 		Platform.runLater(() -> {
-			if(!lastLoginPassword.isEmpty()){
+			if (!lastLoginPassword.isEmpty()){
 				login(null);
 			} else if (!lastLoginName.isEmpty()) {
 				passwordField.requestFocus();

@@ -397,8 +397,9 @@ public class UI extends Application implements EventDispatcher {
 	}
 
 	private void ensureSelectedPanelHasFocus() {
-		if(columns.getCurrentlySelectedColumn().isPresent()) {
-			getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+		if (columns.getCurrentlySelectedColumn().isPresent()) {
+			getMenuControl().scrollTo(
+				columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
 			columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
 		}
 	}

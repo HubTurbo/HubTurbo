@@ -51,7 +51,7 @@ public class FilterTextField extends TextField {
 			boolean isModifierKeyPress = e.isAltDown() || e.isMetaDown() || e.isControlDown();
 			String key = e.getCharacter();
 			
-			if(key == null || key.isEmpty() || isModifierKeyPress){
+			if (key == null || key.isEmpty() || isModifierKeyPress){
 				return;
 			}
 			
@@ -60,7 +60,7 @@ public class FilterTextField extends TextField {
 			if (typed == ')') {
 				if (getCharAfterCaret().equals(")")) {
 					e.consume();
-					positionCaret(getCaretPosition()+1);
+					positionCaret(getCaretPosition() + 1);
 				}
 			} else if (typed == '(') {
 				e.consume();
@@ -93,7 +93,7 @@ public class FilterTextField extends TextField {
 			if (e.getCode() == KeyCode.ENTER) {
 				confirmEdit();
 			} else if (e.getCode() == KeyCode.ESCAPE) {
-				if(getText().equals(previousText)) {
+				if (getText().equals(previousText)) {
 					getParent().getParent().requestFocus();
 				} else {
 					revertEdit();
@@ -109,7 +109,7 @@ public class FilterTextField extends TextField {
 			String before = getText().substring(0, caret);
 			String after = getText().substring(caret, getText().length());
 			setText(before + "()" + after);
-			Platform.runLater(() -> positionCaret(caret+1));
+			Platform.runLater(() -> positionCaret(caret + 1));
 		}
 	}
 
@@ -170,7 +170,7 @@ public class FilterTextField extends TextField {
 		// The default place to move to is the end of input field
 		int j = getText().length();
 		
-		for (int i=getCaretPosition(); i<getText().length(); i++) {
+		for (int i = getCaretPosition(); i < getText().length(); i++) {
 			// Stop at the first non-) character
 			if (getText().charAt(i) != ')') {
 				j = i;
@@ -188,7 +188,7 @@ public class FilterTextField extends TextField {
 		if (pos == -1) {
 			pos = 0;
 		}
-		return getText().substring(pos > 0 ? pos+1 : pos, caret);
+		return getText().substring(pos > 0 ? pos + 1 : pos, caret);
 	}
 	
 	// Caveat: algorithm only works for character-class regexes
@@ -207,7 +207,7 @@ public class FilterTextField extends TextField {
 
 	private String getCharAfterCaret() {
 		if (getCaretPosition() < getText().length()) {
-			return getText().substring(getCaretPosition(), getCaretPosition()+1);
+			return getText().substring(getCaretPosition(), getCaretPosition() + 1);
 		}
 		return "";
 	}

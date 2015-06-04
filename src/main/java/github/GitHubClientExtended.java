@@ -57,7 +57,9 @@ public class GitHubClientExtended extends GitHubClient {
 	 * @return
 	 * @throws IOException
 	 */
-	public <V> V sendJson(final HttpURLConnection request, final Object params, final Type type) throws IOException {
+	public <V> V sendJson(final HttpURLConnection request, final Object params, final Type type)
+		throws IOException {
+
 		sendParams(request, params);
 		final int code = request.getResponseCode();
 		updateRateLimits(request);
@@ -169,11 +171,13 @@ public class GitHubClientExtended extends GitHubClient {
 		super.sendParams(request, params);
 	}
 
+	// TODO re-enable this
 //	public Optional<LocalDateTime> getRateLimitResetTime() {
 //		try {
 //			HttpURLConnection httpRequest = createGet("/rate_limit");
 //			if (isOk(httpRequest.getResponseCode())) {
-//				String json = String.valueOf(IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
+//				String json = String.valueOf(
+// IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
 //				Map<String, Object> map =
 //					new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
 //				double unixSeconds = ((Map<String, Map<String, Double>>) map.get("resources"))

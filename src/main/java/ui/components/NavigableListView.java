@@ -165,7 +165,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
 		
 		// Compute new index and clamp it within range
 		int newIndex = selectedIndex.get() + (isDownKey ? 1 : -1);
-		newIndex = Math.min(Math.max(0, newIndex), getItems().size()-1);
+		newIndex = Math.min(Math.max(0, newIndex), getItems().size() - 1);
 		
 		// Update selection state and our selection model
 		getSelectionModel().clearAndSelect(newIndex);

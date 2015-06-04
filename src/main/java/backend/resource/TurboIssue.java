@@ -361,12 +361,16 @@ public class TurboIssue {
 		if (assignee != null ? !assignee.equals(issue.assignee) : issue.assignee != null) return false;
 		if (createdAt != null ? !createdAt.equals(issue.createdAt) : issue.createdAt != null) return false;
 		if (creator != null ? !creator.equals(issue.creator) : issue.creator != null) return false;
-		if (description != null ? !description.equals(issue.description) : issue.description != null) return false;
+		if (description != null
+			? !description.equals(issue.description)
+			: issue.description != null) return false;
 		if (labels != null ? !labels.equals(issue.labels) : issue.labels != null) return false;
 		if (milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) return false;
 		if (title != null ? !title.equals(issue.title) : issue.title != null) return false;
 		if (updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) return false;
-		if (markedReadAt != null ? !markedReadAt.equals(issue.markedReadAt) : issue.markedReadAt != null) return false;
+		if (markedReadAt != null
+			? !markedReadAt.equals(issue.markedReadAt)
+			: issue.markedReadAt != null) return false;
 		if (isCurrentlyRead != issue.isCurrentlyRead) return false;
 
 		return true;

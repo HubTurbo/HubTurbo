@@ -59,8 +59,8 @@ public class DummyRepoState {
 		String currETag = ETag;
 		if (!updatedIssues.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
 
-		ImmutableTriple<List<TurboIssue>, String, Date> toReturn
-				= new ImmutableTriple<>(new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
+		ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
+			new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
 
 		updatedIssues = new TreeMap<>();
 		return toReturn;

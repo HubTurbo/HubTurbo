@@ -37,7 +37,7 @@ public class ColumnControl extends HBox {
 		new UIBrowserBridge(ui);
 
 		setSpacing(10);
-		setPadding(new Insets(0,10,0,10));
+		setPadding(new Insets(0, 10, 0, 10));
 
 		ui.registerEvent((ModelUpdatedEventHandler) e -> {
 			updateModel(e.model);
@@ -142,8 +142,8 @@ public class ColumnControl extends HBox {
 	}
 
 	private void updateCSSforColumns() {
-		if(currentlySelectedColumn.isPresent()) {
-			for(int index = 0; index < getChildren().size();index++) {
+		if (currentlySelectedColumn.isPresent()) {
+			for (int index = 0; index < getChildren().size(); index++) {
 				getColumn(index).getStyleClass().remove("panel-focused");
 			}
 			getColumn(currentlySelectedColumn.get()).getStyleClass().add("panel-focused");
@@ -251,8 +251,8 @@ public class ColumnControl extends HBox {
 		if (!currentlySelectedColumn.isPresent()) return;
 		if (getChildren().size() == 0) return;
 		Column selectedColumn = getColumn(currentlySelectedColumn.get());
-		if(selectedColumn instanceof IssueColumn){
-			if(((IssueColumn) selectedColumn).filterTextField.isFocused()){
+		if (selectedColumn instanceof IssueColumn){
+			if (((IssueColumn) selectedColumn).filterTextField.isFocused()){
 				return;
 			} else {
 				int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
