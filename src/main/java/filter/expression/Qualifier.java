@@ -436,7 +436,7 @@ public class Qualifier implements FilterExpression {
 		}
 	}
 
-	private static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
+	public static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
 		// Strip trailing ., if any
 		final String group = key.replaceAll("\\.$", "");
 		return (a, b) -> {
