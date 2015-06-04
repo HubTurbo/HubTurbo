@@ -115,15 +115,13 @@ public class FilterParserTests {
         		new Qualifier("updated", new NumberRange(24, null, true)));
 
         assertEquals(Parser.parse("updated:24"),
-        		new Qualifier("updated", new NumberRange(null, 24, true)));
-        assertEquals(Parser.parse("updated:<24"),
-        		Parser.parse("updated:24"));
+        		new Qualifier("updated", 24));
     }
 
     @Test
     public void numberRanges() {
     	assertEquals(Parser.parse("updated:1 .. 24"),
-    			new Qualifier("updated", new NumberRange(1, 24, true)));
+    			new Qualifier("updated", new NumberRange(1, 24, false)));
     	assertEquals(Parser.parse("updated:1 .. *"),
     			new Qualifier("updated", new NumberRange(1, null)));
 
