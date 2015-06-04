@@ -37,19 +37,17 @@ public class UpdateIssuesTest extends UITest {
     }
 
     public void resetRepo() {
-        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy")));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy"));
         sleep(EVENT_DELAY);
     }
 
     public void updateIssue(int issueId, String newIssueTitle) {
-        PlatformEx.runAndWait(() -> {
-            UI.events.triggerEvent(new UpdateDummyRepoEvent(
-                    UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE,
-                    "dummy/dummy",
-                    issueId,
-                    newIssueTitle));
-            UI.events.triggerEvent(new UILogicRefreshEvent());
-        });
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+                UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE,
+                "dummy/dummy",
+                issueId,
+                newIssueTitle));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
 }
