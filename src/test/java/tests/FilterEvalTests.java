@@ -39,12 +39,22 @@ public class FilterEvalTests {
 
 	@Test
 	public void id() {
-		TurboIssue issue = new TurboIssue(REPO, 1, "title");
+		TurboIssue issue1 = new TurboIssue(REPO, 1, "1");
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:1"), issue));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:1"), issue1));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>=1"), issue1));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<=1"), issue1));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("id:<1"), issue1));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("id:>1"), issue1));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("id:2"), issue1));
+
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<2"), issue1));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<=2"), issue1));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>0"), issue1));
+		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>=0"), issue1));
 
 		// Non-number
-		assertEquals(false, Qualifier.process(empty, Parser.parse("id:a"), issue));
+		assertEquals(false, Qualifier.process(empty, Parser.parse("id:a"), issue1));
 	}
 
 	private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
