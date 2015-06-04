@@ -533,7 +533,7 @@ public class BrowserComponent {
 	}
 
 	public boolean isCurrentUrlIssue() {
-		return GitHubURL.isUrlIssue(driver.getCurrentUrl());
+		return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
 	}
 
 }
