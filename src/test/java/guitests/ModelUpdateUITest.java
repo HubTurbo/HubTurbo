@@ -112,17 +112,17 @@ public class ModelUpdateUITest extends UITest {
 
     public void addIssue() {
         PlatformEx.runAndWait(() -> {
-                UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
-                UI.events.triggerEvent(new UILogicRefreshEvent());
-            });
+            UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
+            UI.events.triggerEvent(new UILogicRefreshEvent());
+        });
         sleep(EVENT_DELAY);
     }
 
     public void deleteIssue(int itemId) {
         PlatformEx.runAndWait(() -> {
-                UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy", itemId));
-                UI.events.triggerEvent(new UILogicRefreshEvent());
-            });
+            UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy", itemId));
+            UI.events.triggerEvent(new UILogicRefreshEvent());
+        });
         sleep(EVENT_DELAY);
     }
 }
