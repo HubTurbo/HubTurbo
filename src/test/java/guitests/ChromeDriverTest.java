@@ -25,9 +25,7 @@ public class ChromeDriverTest extends UITest {
         UI.events.triggerEvent(new LabelCreatedEvent());
         UI.events.triggerEvent(new MilestoneCreatedEvent());
 
-        // jump to comments
         click("#dummy/dummy_col0_1");
-        press(KeyCode.C).release(KeyCode.C);
 
         // show docs
         press(KeyCode.F1).release(KeyCode.F1);
@@ -70,6 +68,9 @@ public class ChromeDriverTest extends UITest {
 
         // manage milestone
         press(KeyCode.M).release(KeyCode.M);
+
+        // jump to comments
+        press(KeyCode.C).release(KeyCode.C);
 
         click("View");
         click("Documentation");
