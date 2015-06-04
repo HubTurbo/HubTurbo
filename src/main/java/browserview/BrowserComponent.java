@@ -38,7 +38,8 @@ public class BrowserComponent {
 //			: "browserview/expanded/hideUI.js";
 
 	// Chrome, Android 4.2.2, Samsung Galaxy S4
-	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
+	private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
+		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
 	private static final String CHROME_DRIVER_LOCATION = "browserview/";
 	private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
@@ -195,7 +196,9 @@ public class BrowserComponent {
 	public void newMilestone() {
 		logger.info("Navigating to New Milestone page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()))) {
+			if (!driver.getCurrentUrl().equals(
+				GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()))) {
+
 				driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()));
 			}
 		});
@@ -303,6 +306,7 @@ public class BrowserComponent {
 						case NoSuchWindow:
 							resetBrowser();
 							runBrowserOperation(operation); // Recurse and repeat
+							break;
 						case NoSuchElement:
 							logger.info("Warning: no such element! " + e.getMessage());
 							break;
@@ -373,9 +377,11 @@ public class BrowserComponent {
 	 */
 	private static void setupChromeDriverExecutable() {
 		File f = new File(CHROME_DRIVER_BINARY_NAME);
-		if(!f.exists()) {
-			InputStream in = BrowserComponent.class.getClassLoader().getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
-			assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at " + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
+		if (!f.exists()) {
+			InputStream in = BrowserComponent.class.getClassLoader()
+				.getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
+			assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at "
+				+ CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
 			OutputStream out;
 			try {
 				out = new FileOutputStream(CHROME_DRIVER_BINARY_NAME);
@@ -421,15 +427,14 @@ public class BrowserComponent {
 	public void focus(HWND mainWindowHandle){
 		if (PlatformSpecific.isOnWindows()) {
 			user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
-			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE);
+			user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 			user32.SetForegroundWindow(mainWindowHandle);
 		}
 	}
 
 	private String getCurrentPageSource() {
-		JavascriptExecutor executor = (JavascriptExecutor) driver;
-		String result = StringEscapeUtils.escapeHtml4((String) executor.executeScript("return document.documentElement.outerHTML"));
-		return result;
+		return StringEscapeUtils.escapeHtml4(
+			(String) driver.executeScript("return document.documentElement.outerHTML"));
 	}
 
 	public boolean hasBviewChanged() {
@@ -499,7 +504,9 @@ public class BrowserComponent {
 	public void showPullRequests() {
 		logger.info("Navigating to Pull requests page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()))) {
+			if (!driver.getCurrentUrl().equals(
+				GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()))) {
+
 				driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()));
 			}
 		});
@@ -508,7 +515,9 @@ public class BrowserComponent {
 	public void showKeyboardShortcuts() {
 		logger.info("Navigating to Keyboard Shortcuts");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForKeyboardShortcuts())) {
+			if (!driver.getCurrentUrl().equals(
+				GitHubURL.getPathForKeyboardShortcuts())) {
+
 				driver.get(GitHubURL.getPathForKeyboardShortcuts());
 			}
 		});
@@ -517,7 +526,9 @@ public class BrowserComponent {
 	public void showMilestones() {
 		logger.info("Navigating to Milestones page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()))) {
+			if (!driver.getCurrentUrl().equals(
+				GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()))) {
+
 				driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()));
 			}
 		});
@@ -526,7 +537,9 @@ public class BrowserComponent {
 	public void showContributors() {
 		logger.info("Navigating to Contributors page");
 		runBrowserOperation(() -> {
-			if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()))) {
+			if (!driver.getCurrentUrl().equals(
+				GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()))) {
+
 				driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()));
 			}
 		});

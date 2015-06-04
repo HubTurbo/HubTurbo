@@ -11,7 +11,8 @@ public class GitHubURL {
 	public static final String LOGIN_PAGE = "https://github.com/login";
 	public static final String DOCS_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Getting-Started";
 	public static final String CHANGELOG_PAGE = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog";
-	public static final String CHANGELOG_PAGE_FORMAT = "https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
+	public static final String CHANGELOG_PAGE_FORMAT =
+		"https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
 	
 	public static String getPathForAllIssues(String repoId) {
 		return String.format("https://github.com/%s/issues", repoId);

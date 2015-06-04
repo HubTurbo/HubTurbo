@@ -46,7 +46,7 @@ public class GitHubEventsResponse {
 			IssueEvent[] issueEvents = (IssueEvent[]) response.getBody();
 
 			Map<String, String> parameters;
-			for (int i=0; i<issueEvents.length; i++) {
+			for (int i = 0; i < issueEvents.length; i++) {
 				TurboIssueEvent event = new TurboIssueEvent(
 						issueEvents[i].getActor(),
 						IssueEventType.fromString(issueEvents[i].getEvent()),

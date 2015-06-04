@@ -27,11 +27,16 @@ public class IssuePanel extends IssueColumn {
 	private int issueCount;
 
 	private NavigableListView<TurboIssue> listView;
-	private final KeyCombination keyCombBoxToList = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination keyCombListToBox = new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination maximizeWindow = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination minimizeWindow = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination defaultSizeWindow = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination keyCombBoxToList =
+		new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination keyCombListToBox =
+		new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination maximizeWindow =
+		new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination minimizeWindow =
+		new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination defaultSizeWindow =
+		new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
 	public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {

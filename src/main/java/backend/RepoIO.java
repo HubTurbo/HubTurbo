@@ -67,7 +67,8 @@ public class RepoIO {
 				if (!model.equals(newModel)) {
 					repoStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
 				} else {
-					logger.info(HTLog.format(model.getRepoId(), "Nothing changed; not writing to store"));
+					logger.info(HTLog.format(model.getRepoId(),
+						"Nothing changed; not writing to store"));
 				}
 				return newModel;
 			}).exceptionally(withResult(new Model(model.getRepoId())));

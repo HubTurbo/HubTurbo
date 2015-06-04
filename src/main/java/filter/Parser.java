@@ -38,7 +38,8 @@ public class Parser {
 		if (input.get(position).getType() == type) {
 			return input.get(position++);
 		} else {
-			throw new ParseException("Invalid token " + input.get(position) + " where " + type + " expected");
+			throw new ParseException("Invalid token " + input.get(position)
+				+ " where " + type + " expected");
 		}
 	}
 	
@@ -49,13 +50,14 @@ public class Parser {
 	}
 
 	private Token lookAhead() {
-		return input.get(Math.min(position, input.size()-1));
+		return input.get(Math.min(position, input.size() - 1));
 	}
 		
 	private FilterExpression parseExpression(int precedence) {
 		Token token = consume();
 		if (token.getType() == TokenType.EOF) {
-			throw new ParseException("Unexpected EOF while parsing at " + sourcePosition + " (token " + position + ")");
+			throw new ParseException("Unexpected EOF while parsing at "
+				+ sourcePosition + " (token " + position + ")");
 		}
 		
 		// Prefix
@@ -180,7 +182,7 @@ public class Parser {
 		String qualifierName = token.getValue();
 
 		// Strip the : at the end, then trim
-		qualifierName = qualifierName.substring(0, qualifierName.length()-1).trim();
+		qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
 		return parseQualifierContent(qualifierName, false);
 	}
@@ -211,7 +213,8 @@ public class Parser {
 				return new Qualifier(qualifierName, consume().getValue());
 			}
 		} else {
-			throw new ParseException(String.format("Invalid content for qualifier %s: %s", qualifierName, lookAhead()));
+			throw new ParseException(String.format("Invalid content for qualifier %s: %s",
+				qualifierName, lookAhead()));
 		}
 	}
 
@@ -282,7 +285,8 @@ public class Parser {
 			if (isNumberToken(right)) {
 				Optional<Integer> rightNumber = parseNumber(right);
 				if (rightNumber.isPresent()) {
-					return new Qualifier(qualifierName, new NumberRange(leftDate.get(), rightNumber.get()));
+					return new Qualifier(qualifierName,
+						new NumberRange(leftDate.get(), rightNumber.get()));
 				} else {
 					assert false : "Possible problem with lexer processing number";
 				}
@@ -314,7 +318,8 @@ public class Parser {
 			if (isDateToken(right)) {
 				Optional<LocalDate> rightDate = parseDate(right);
 				if (rightDate.isPresent()) {
-					return new Qualifier(qualifierName, new DateRange(leftDate.get(), rightDate.get()));
+					return new Qualifier(qualifierName,
+						new DateRange(leftDate.get(), rightDate.get()));
 				} else {
 					assert false : "Possible problem with lexer processing date";
 				}
@@ -383,7 +388,8 @@ public class Parser {
 					Integer.parseInt(contentToken.getValue());
 				} catch (NumberFormatException e) {
 					// Exit with an exception if it's not a number
-					throw new ParseException(String.format("Operator %s can only be applied to number or date", operator));
+					throw new ParseException(String.format(
+						"Operator %s can only be applied to number or date", operator));
 				}
 				
 				// Must be a number
@@ -405,7 +411,8 @@ public class Parser {
 				return null;
 			}
 		} else {
-			throw new ParseException(String.format("Operator %s can only be applied to number or date, got %s", operator, lookAhead()));
+			throw new ParseException(String.format(
+				"Operator %s can only be applied to number or date, got %s", operator, lookAhead()));
 		}
 	}
 	

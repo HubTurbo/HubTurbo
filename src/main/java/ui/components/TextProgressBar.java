@@ -7,8 +7,8 @@ import javafx.scene.text.Text;
 
 public class TextProgressBar extends StackPane {
 
-	private final static int LABEL_WIDTH_PADDING = 10;
-	private final static int LABEL_HEIGHT_PADDING = 4;
+	private static final int LABEL_WIDTH_PADDING = 10;
+	private static final int LABEL_HEIGHT_PADDING = 4;
 
 	private final ProgressBar bar = new ProgressBar();
 	private final Text text = new Text();

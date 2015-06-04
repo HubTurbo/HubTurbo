@@ -57,7 +57,10 @@ public class MenuControl extends MenuBar {
 		boards.getItems().addAll(createBoardsMenu());
 
 		Menu view = new Menu("View");
-		view.getItems().addAll(createRefreshMenuItem(), createForceRefreshMenuItem(), createDocumentationMenuItem());
+		view.getItems().addAll(
+			createRefreshMenuItem(),
+			createForceRefreshMenuItem(),
+			createDocumentationMenuItem());
 		
 		Menu preferences = new Menu("Preferences");
 		preferences.getItems().add(createPreferencesMenu());
@@ -278,23 +281,6 @@ public class MenuControl extends MenuBar {
 				logger.info("Menu: View > Force Refresh completed");
 				return true;
 			}
-
-//			private void handleSocketTimeoutException(Exception e) {
-//				Platform.runLater(() -> {
-//					logger.error(e.getMessage(), e);
-//					DialogMessage.showWarningDialog("Internet Connection is down",
-//							"Timeout while loading items from github. Please check your internet connection.");
-//
-//				});
-//			}
-
-//			private void handleUnknownHostException(Exception e) {
-//				Platform.runLater(() -> {
-//					logger.error(e.getMessage(), e);
-//					DialogMessage.showWarningDialog("No Internet Connection",
-//							"Please check your internet connection and try again");
-//				});
-//			}
 		};
 		DialogMessage.showProgressDialog(task, "Reloading repoistory...");
 		Thread thread = new Thread(task);

@@ -35,9 +35,13 @@ public class IssuePanelCell extends ListCell<TurboIssue> {
 	@Override
 	public void updateItem(TurboIssue issue, boolean empty) {
 		super.updateItem(issue, empty);
-		if (issue == null) { return; }
+		if (issue == null) {
+			return;
+		}
+
 		Optional<Model> currentModel = model.getModelById(issue.getRepoId());
-		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId() + " for issue " + issue.getId();
+		assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId()
+			+ " for issue " + issue.getId();
 		setGraphic(new IssuePanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
 		this.setId(issue.getRepoId() + "_col" + parentColumnIndex + "_" + issue.getId());
 	}

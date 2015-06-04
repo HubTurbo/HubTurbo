@@ -118,7 +118,9 @@ public class Qualifier implements FilterExpression {
 		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
 	}
 
-	public static void processMetaQualifierEffects(FilterExpression expr, BiConsumer<Qualifier, MetaQualifierInfo> callback) {
+	public static void processMetaQualifierEffects(FilterExpression expr,
+	                                               BiConsumer<Qualifier, MetaQualifierInfo> callback) {
+
 		List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
 		MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
 		qualifiers.forEach(q -> callback.accept(q, info));
@@ -486,7 +488,7 @@ public class Qualifier implements FilterExpression {
 
 			// Lexicographic label comparison
 			assert aLabels.size() == bLabels.size();
-			for (int i=0; i<aLabels.size(); i++) {
+			for (int i = 0; i < aLabels.size(); i++) {
 				result = !inverted
 					? labelComparator.compare(aLabels.get(i), bLabels.get(i))
 					: labelComparator.compare(bLabels.get(i), aLabels.get(i));
@@ -738,7 +740,8 @@ public class Qualifier implements FilterExpression {
 			return;
 		}
 
-		throw new QualifierApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
+		throw new QualifierApplicationException(
+			"Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
     }
 
     private void applyLabel(TurboIssue issue, IModel model) throws QualifierApplicationException {
@@ -770,7 +773,8 @@ public class Qualifier implements FilterExpression {
 		    return;
         }
 
-	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
+	    throw new QualifierApplicationException(
+		    "Ambiguous filter: can apply any of the following labels: " + labels.toString());
     }
 
     private void applyAssignee(TurboIssue issue, IModel model) throws QualifierApplicationException {
@@ -802,7 +806,8 @@ public class Qualifier implements FilterExpression {
 		    return;
 	    }
 
-	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
+	    throw new QualifierApplicationException(
+		    "Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
     }
 
     private void applyState(TurboIssue issue) throws QualifierApplicationException {

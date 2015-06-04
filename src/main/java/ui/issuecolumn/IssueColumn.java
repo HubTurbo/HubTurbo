@@ -170,7 +170,8 @@ public abstract class IssueColumn extends Column {
 		} catch (ParseException ex) {
 			this.applyFilterExpression(Qualifier.EMPTY);
 			// Overrides message in status bar
-			UI.status.displayMessage("Panel " + (columnIndex + 1) + ": Parse error in filter: " + ex.getMessage());
+			UI.status.displayMessage("Panel " + (columnIndex + 1)
+				+ ": Parse error in filter: " + ex.getMessage());
 		}
 	}
 

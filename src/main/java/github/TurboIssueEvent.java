@@ -138,20 +138,21 @@ public class TurboIssueEvent {
 			case Milestoned: {
 				HBox display = new HBox();
 				display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-					conditionallyBold(bold,
-						new Text(String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
+					conditionallyBold(bold, new Text(String.format(
+						"%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
 				return display;
 			}
 			case Demilestoned: {
 				HBox display = new HBox();
 				display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-					conditionallyBold(bold,
-						new Text(String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
+					conditionallyBold(bold, new Text(String.format(
+						"%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
 				return display;
 			}
 			case Labeled: {
 				// TODO re-enable this
-//				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+//				TurboLabel label = ServiceManager.getInstance().getModel()
+//                  .getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
@@ -164,11 +165,13 @@ public class TurboIssueEvent {
 			}
 			case Unlabeled: {
 				// TODO re-enable this
-//				TurboLabel label = ServiceManager.getInstance().getModel().getLabelByGhName(getLabelName());
+//				TurboLabel label = ServiceManager.getInstance().getModel()
+//                  .getLabelByGhName(getLabelName());
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_TAG),
-					conditionallyBold(bold, new Text(String.format("%s removed label ", actorName))),
+					conditionallyBold(bold, new Text(
+						String.format("%s removed label ", actorName))),
 //					label.getNode(),
 					new Label(getLabelName()),
 					conditionallyBold(bold, new Text(String.format(" %s.", time)))
@@ -180,7 +183,8 @@ public class TurboIssueEvent {
 				display.getChildren().addAll(
 					octicon(OCTICON_PERSON),
 					conditionallyBold(bold,
-						new Text(String.format("%s was assigned to this issue %s.", actorName, time)))
+						new Text(String.format(
+							"%s was assigned to this issue %s.", actorName, time)))
 				);
 				return display;
 			}
@@ -188,8 +192,8 @@ public class TurboIssueEvent {
 				HBox display = new HBox();
 				display.getChildren().addAll(
 					octicon(OCTICON_PERSON),
-					conditionallyBold(bold,
-						new Text(String.format("%s was unassigned from this issue %s.", actorName, time)))
+					conditionallyBold(bold, new Text(String.format(
+						"%s was unassigned from this issue %s.", actorName, time)))
 				);
 				return display;
 			}
@@ -212,24 +216,34 @@ public class TurboIssueEvent {
 				return display;
 			}
 			case Locked:
-				return conditionallyBold(bold, new Text(String.format("%s locked issue %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s locked issue %s.", actorName, time)));
 			case Unlocked:
-				return conditionallyBold(bold, new Text(String.format("%s unlocked this issue %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s unlocked this issue %s.", actorName, time)));
 			case Referenced:
-				return conditionallyBold(bold, new Text(String.format("%s referenced this issue %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s referenced this issue %s.", actorName, time)));
 			case Subscribed:
-				return conditionallyBold(bold, new Text(String.format("%s subscribed to receive notifications for this issue %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s subscribed to receive notifications for this issue %s.",
+						actorName, time)));
 			case Mentioned:
-				return conditionallyBold(bold, new Text(String.format("%s was mentioned %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s was mentioned %s.", actorName, time)));
 			case Merged:
-				return conditionallyBold(bold, new Text(String.format("%s merged this issue %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s merged this issue %s.", actorName, time)));
 			case HeadRefDeleted:
-				return conditionallyBold(bold, new Text(String.format("%s deleted the pull request's branch %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s deleted the pull request's branch %s.", actorName, time)));
 			case HeadRefRestored:
-				return conditionallyBold(bold, new Text(String.format("%s restored the pull request's branch %s.", actorName, time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s restored the pull request's branch %s.", actorName, time)));
 			default:
 				// Not yet implemented, or no events triggered
-				return conditionallyBold(bold, new Text(String.format("%s %s %s.", actorName, getType(), time)));
+				return conditionallyBold(bold, new Text(
+					String.format("%s %s %s.", actorName, getType(), time)));
 		}
 	}
 
@@ -242,9 +256,11 @@ public class TurboIssueEvent {
 			case Renamed:
 				return String.format("%s renamed this issue %s.", actorName, time);
 			case Milestoned:
-				return String.format("%s added milestone %s %s.", actorName, getMilestoneTitle(), time);
+				return String.format("%s added milestone %s %s.", actorName,
+					getMilestoneTitle(), time);
 			case Demilestoned:
-				return String.format("%s removed milestone %s %s.", actorName, getMilestoneTitle(), time);
+				return String.format("%s removed milestone %s %s.", actorName,
+					getMilestoneTitle(), time);
 			case Labeled:
 				return String.format("%s added label %s %s.", actorName, getLabelName(), time);
 			case Unlabeled:
@@ -264,7 +280,8 @@ public class TurboIssueEvent {
 			case Referenced:
 				return String.format("%s referenced this issue %s.", actorName, time);
 			case Subscribed:
-				return String.format("%s subscribed to receive notifications for this issue %s.", actorName, time);
+				return String.format("%s subscribed to receive notifications for this issue %s.",
+					actorName, time);
 			case Mentioned:
 				return String.format("%s was mentioned %s.", actorName, time);
 			case Merged:

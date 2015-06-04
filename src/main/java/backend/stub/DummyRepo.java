@@ -42,7 +42,8 @@ public class DummyRepo implements Repo {
 				case NEW_USER:
 					getRepoState(e.repoId).makeNewUser();
 					break;
-				// TODO implement update of issue and milestone (after switching to TreeMap implementation)
+				// TODO implement update of issue and milestone
+				// (after switching to TreeMap implementation)
 				case UPDATE_ISSUE:
 					getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
 					break;

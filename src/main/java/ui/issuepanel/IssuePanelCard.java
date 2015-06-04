@@ -129,8 +129,8 @@ public class IssuePanelCard extends VBox {
 			HBox commentDisplay = new HBox();
 			commentDisplay.getChildren().addAll(
 				TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
-				new javafx.scene.control.Label(String.format("%d comments since, involving %s.", comments.size(),
-					names))
+				new javafx.scene.control.Label(
+					String.format("%d comments since, involving %s.", comments.size(), names))
 			);
 			result.getChildren().add(commentDisplay);
 		}
