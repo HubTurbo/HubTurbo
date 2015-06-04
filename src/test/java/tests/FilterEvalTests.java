@@ -10,8 +10,6 @@ import org.junit.Test;
 import prefs.Preferences;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +17,7 @@ import static org.junit.Assert.fail;
 
 public class FilterEvalTests {
 
-	private final MultiModel empty;
+	private final IModel empty;
 	private static final String REPO = "test/test";
 
 	public FilterEvalTests() {
@@ -110,54 +108,6 @@ public class FilterEvalTests {
 		assertEquals(false, matches("in:something a is", issue));
 	}
 
-	private IModel singletonModel(Model model) {
-		MultiModel models = new MultiModel(new Preferences(true));
-		models.queuePendingRepository(model.getRepoId());
-		models.addPending(model);
-		models.setDefaultRepo(model.getRepoId());
-		return models;
-	}
-
-	private IModel modelWith(TurboIssue issue, TurboMilestone milestone) {
-		return singletonModel(new Model(REPO,
-			new ArrayList<>(Arrays.asList(issue)),
-			new ArrayList<>(),
-			new ArrayList<>(Arrays.asList(milestone)),
-			new ArrayList<>()));
-	}
-
-	private IModel modelWith(TurboIssue issue, TurboLabel label) {
-		return singletonModel(new Model(new Model(REPO,
-			new ArrayList<>(Arrays.asList(issue)),
-			new ArrayList<>(Arrays.asList(label)),
-			new ArrayList<>(),
-			new ArrayList<>())));
-	}
-
-	private IModel modelWith(TurboIssue issue, TurboUser user) {
-		return singletonModel(new Model(new Model(REPO,
-			new ArrayList<>(Arrays.asList(issue)),
-			new ArrayList<>(),
-			new ArrayList<>(),
-			new ArrayList<>(Arrays.asList(user)))));
-	}
-
-	private IModel modelWith(TurboIssue issue, TurboLabel label, TurboMilestone milestone) {
-		return singletonModel(new Model(REPO,
-			new ArrayList<>(Arrays.asList(issue)),
-			new ArrayList<>(Arrays.asList(label)),
-			new ArrayList<>(Arrays.asList(milestone)),
-			new ArrayList<>()));
-	}
-
-	private IModel modelWith(TurboIssue issue, TurboLabel label, TurboMilestone milestone, TurboUser user) {
-		return singletonModel(new Model(REPO,
-			new ArrayList<>(Arrays.asList(issue)),
-			new ArrayList<>(Arrays.asList(label)),
-			new ArrayList<>(Arrays.asList(milestone)),
-			new ArrayList<>(Arrays.asList(user))));
-	}
-
 	@Test
 	public void milestone() {
 		TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
@@ -165,7 +115,7 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setMilestone(milestone);
 
-		IModel model = modelWith(issue, milestone);
+		IModel model = TestUtils.modelWith(issue, milestone);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
@@ -186,7 +136,7 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.addLabel(label);
 
-		IModel model = modelWith(issue, label);
+		IModel model = TestUtils.modelWith(issue, label);
 
 		assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("label:type."), issue));
@@ -210,7 +160,7 @@ public class FilterEvalTests {
 		issue = new TurboIssue(REPO, 1, "");
 		issue.addLabel(label);
 
-		model = modelWith(issue, label);
+		model = TestUtils.modelWith(issue, label);
 
 		assertEquals(false, Qualifier.process(model, Parser.parse("label:bug."), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
@@ -235,7 +185,7 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setAssignee(user);
 
-		IModel model = modelWith(issue, user);
+		IModel model = TestUtils.modelWith(issue, user);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue));
@@ -271,7 +221,7 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setAssignee(user);
 
-		IModel model = modelWith(issue, user);
+		IModel model = TestUtils.modelWith(issue, user);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue));
@@ -312,7 +262,7 @@ public class FilterEvalTests {
 		assertEquals(false, matches("has:something", issue));
 
 		issue.addLabel(label);
-		IModel model = modelWith(issue, label);
+		IModel model = TestUtils.modelWith(issue, label);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
@@ -320,7 +270,7 @@ public class FilterEvalTests {
 		assertEquals(false, matches("has:something", issue));
 
 		issue.setMilestone(milestone);
-		model = modelWith(issue, label, milestone);
+		model = TestUtils.modelWith(issue, label, milestone);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
@@ -328,7 +278,7 @@ public class FilterEvalTests {
 		assertEquals(false, matches("has:something", issue));
 
 		issue.setAssignee(user);
-		model = modelWith(issue, label, milestone, user);
+		model = TestUtils.modelWith(issue, label, milestone, user);
 
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
@@ -350,7 +300,7 @@ public class FilterEvalTests {
 		assertEquals(true, matches("no:something", issue));
 
 		issue.addLabel(label);
-		IModel model = modelWith(issue, label);
+		IModel model = TestUtils.modelWith(issue, label);
 
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
@@ -358,7 +308,7 @@ public class FilterEvalTests {
 		assertEquals(true, matches("no:something", issue));
 
 		issue.setMilestone(milestone);
-		model = modelWith(issue, label, milestone);
+		model = TestUtils.modelWith(issue, label, milestone);
 
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
@@ -366,7 +316,7 @@ public class FilterEvalTests {
 		assertEquals(true, matches("no:something", issue));
 
 		issue.setAssignee(user);
-		model = modelWith(issue, label, milestone, user);
+		model = TestUtils.modelWith(issue, label, milestone, user);
 
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
