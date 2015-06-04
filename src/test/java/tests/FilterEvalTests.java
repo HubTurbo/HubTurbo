@@ -31,45 +31,53 @@ public class FilterEvalTests {
 	public static void setup() {
 	}
 
+    /**
+     * Helper method for testing an issue against a filter string in the context
+     * of an empty model.
+     */
+    private boolean matches(String filterExpr, TurboIssue issue) {
+		return Qualifier.process(empty, Parser.parse(filterExpr), issue);
+    }
+
 	@Test
 	public void invalid() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "title");
-		assertEquals(false, Qualifier.process(empty, Parser.parse("something:a"), issue));
+		assertEquals(false, matches("something:a", issue));
 	}
 
 	@Test
 	public void id() {
 		TurboIssue issue1 = new TurboIssue(REPO, 1, "1");
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:1"), issue1));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>=1"), issue1));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<=1"), issue1));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("id:<1"), issue1));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("id:>1"), issue1));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("id:2"), issue1));
+		assertEquals(true, matches("id:1", issue1));
+		assertEquals(true, matches("id:>=1", issue1));
+		assertEquals(true, matches("id:<=1", issue1));
+		assertEquals(false, matches("id:<1", issue1));
+		assertEquals(false, matches("id:>1", issue1));
+		assertEquals(false, matches("id:2", issue1));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<2"), issue1));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:<=2"), issue1));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>0"), issue1));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("id:>=0"), issue1));
+		assertEquals(true, matches("id:<2", issue1));
+		assertEquals(true, matches("id:<=2", issue1));
+		assertEquals(true, matches("id:>0", issue1));
+		assertEquals(true, matches("id:>=0", issue1));
 
 		// Non-number
-		assertEquals(false, Qualifier.process(empty, Parser.parse("id:a"), issue1));
+		assertEquals(false, matches("id:a", issue1));
 	}
 
 	private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
 
 		// Exact match
-		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "test"), issue));
+		assertEquals(true, matches(prefix + "test", issue));
 
 		// Substring
-		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "te"), issue));
+		assertEquals(true, matches(prefix + "te", issue));
 
 		// Implicit conjunction
-		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "is a"), issue));
+		assertEquals(true, matches(prefix + "is a", issue));
 
 		// Like above but out of order
-		assertEquals(true, Qualifier.process(empty, Parser.parse(prefix + "a is"), issue));
+		assertEquals(true, matches(prefix + "a is", issue));
 	}
 
 	@Test
@@ -96,10 +104,10 @@ public class FilterEvalTests {
 		issue = new TurboIssue(REPO, 1, "this is a test");
 		testForPresenceOfKeywords("in:title ", issue);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("in:something test"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("in:something te"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("in:something is a"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("in:something a is"), issue));
+		assertEquals(false, matches("in:something test", issue));
+		assertEquals(false, matches("in:something te", issue));
+		assertEquals(false, matches("in:something is a", issue));
+		assertEquals(false, matches("in:something a is", issue));
 	}
 
 	private IModel singletonModel(Model model) {
@@ -168,7 +176,7 @@ public class FilterEvalTests {
 			fail(". is not a valid token on its own");
 		} catch (ParseException ignored) {
 		}
-		assertEquals(false, Qualifier.process(empty, Parser.parse("milestone:what"), issue));
+		assertEquals(false, matches("milestone:what", issue));
 	}
 
 	@Test
@@ -240,17 +248,17 @@ public class FilterEvalTests {
 	public void author() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("creator:BOB"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("creator:bob"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("creator:alice"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("creator:o"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("creator:lic"), issue));
+		assertEquals(true, matches("creator:BOB", issue));
+		assertEquals(true, matches("creator:bob", issue));
+		assertEquals(false, matches("creator:alice", issue));
+		assertEquals(true, matches("creator:o", issue));
+		assertEquals(false, matches("creator:lic", issue));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("author:BOB"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("author:bob"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("author:alice"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("author:o"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("author:lic"), issue));
+		assertEquals(true, matches("author:BOB", issue));
+		assertEquals(true, matches("author:bob", issue));
+		assertEquals(false, matches("author:alice", issue));
+		assertEquals(true, matches("author:o", issue));
+		assertEquals(false, matches("author:lic", issue));
 	}
 
 	@Test
@@ -285,9 +293,9 @@ public class FilterEvalTests {
 	public void state() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setOpen(false);
-		assertEquals(false, Qualifier.process(empty, Parser.parse("state:open"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("state:o"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("state:closed"), issue));
+		assertEquals(false, matches("state:open", issue));
+		assertEquals(false, matches("state:o", issue));
+		assertEquals(true, matches("state:closed", issue));
 	}
 
 	@Test
@@ -298,10 +306,10 @@ public class FilterEvalTests {
 
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:label"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:milestone"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:assignee"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:something"), issue));
+		assertEquals(false, matches("has:label", issue));
+		assertEquals(false, matches("has:milestone", issue));
+		assertEquals(false, matches("has:assignee", issue));
+		assertEquals(false, matches("has:something", issue));
 
 		issue.addLabel(label);
 		IModel model = modelWith(issue, label);
@@ -309,7 +317,7 @@ public class FilterEvalTests {
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:something"), issue));
+		assertEquals(false, matches("has:something", issue));
 
 		issue.setMilestone(milestone);
 		model = modelWith(issue, label, milestone);
@@ -317,7 +325,7 @@ public class FilterEvalTests {
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:something"), issue));
+		assertEquals(false, matches("has:something", issue));
 
 		issue.setAssignee(user);
 		model = modelWith(issue, label, milestone, user);
@@ -325,7 +333,7 @@ public class FilterEvalTests {
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("has:something"), issue));
+		assertEquals(false, matches("has:something", issue));
 	}
 
 	@Test
@@ -336,10 +344,10 @@ public class FilterEvalTests {
 
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:label"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:milestone"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:assignee"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:something"), issue));
+		assertEquals(true, matches("no:label", issue));
+		assertEquals(true, matches("no:milestone", issue));
+		assertEquals(true, matches("no:assignee", issue));
+		assertEquals(true, matches("no:something", issue));
 
 		issue.addLabel(label);
 		IModel model = modelWith(issue, label);
@@ -347,7 +355,7 @@ public class FilterEvalTests {
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:something"), issue));
+		assertEquals(true, matches("no:something", issue));
 
 		issue.setMilestone(milestone);
 		model = modelWith(issue, label, milestone);
@@ -355,7 +363,7 @@ public class FilterEvalTests {
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
 		assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:something"), issue));
+		assertEquals(true, matches("no:something", issue));
 
 		issue.setAssignee(user);
 		model = modelWith(issue, label, milestone, user);
@@ -363,22 +371,22 @@ public class FilterEvalTests {
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
 		assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("no:something"), issue));
+		assertEquals(true, matches("no:something", issue));
 	}
 
 	@Test
 	public void type() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("type:issue"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("type:pr"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("type:sldkj"), issue));
+		assertEquals(false, matches("type:issue", issue));
+		assertEquals(true, matches("type:pr", issue));
+		assertEquals(false, matches("type:sldkj", issue));
 
 		issue = new TurboIssue(REPO, 1, "", "", null, false);
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("type:issue"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("type:pr"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("type:lkjs"), issue));
+		assertEquals(true, matches("type:issue", issue));
+		assertEquals(false, matches("type:pr", issue));
+		assertEquals(false, matches("type:lkjs", issue));
 	}
 
 	@Test
@@ -386,71 +394,71 @@ public class FilterEvalTests {
 
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:sldkj"), issue));
+		assertEquals(false, matches("is:sldkj", issue));
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:issue"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:pr"), issue));
+		assertEquals(false, matches("is:issue", issue));
+		assertEquals(true, matches("is:pr", issue));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:closed"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+		assertEquals(true, matches("is:open", issue));
+		assertEquals(true, matches("is:unmerged", issue));
+		assertEquals(false, matches("is:closed", issue));
+		assertEquals(false, matches("is:merged", issue));
 
 		issue.setOpen(false);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:open"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:closed"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+		assertEquals(false, matches("is:open", issue));
+		assertEquals(false, matches("is:unmerged", issue));
+		assertEquals(true, matches("is:closed", issue));
+		assertEquals(true, matches("is:merged", issue));
 
 		issue = new TurboIssue(REPO, 1, "", "", null, false);
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:issue"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:pr"), issue));
+		assertEquals(true, matches("is:issue", issue));
+		assertEquals(false, matches("is:pr", issue));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:open"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+		assertEquals(true, matches("is:open", issue));
+		assertEquals(false, matches("is:closed", issue));
 
 		// Not a PR
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+		assertEquals(false, matches("is:unmerged", issue));
+		assertEquals(false, matches("is:merged", issue));
 
 		issue.setOpen(false);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:open"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:closed"), issue));
+		assertEquals(false, matches("is:open", issue));
+		assertEquals(true, matches("is:closed", issue));
 
 		// Not a PR
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unmerged"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:merged"), issue));
+		assertEquals(false, matches("is:unmerged", issue));
+		assertEquals(false, matches("is:merged", issue));
 
 		// Read status
 
 		assertEquals(false, issue.isCurrentlyRead());
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unread"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:read"), issue));
+		assertEquals(true, matches("is:unread", issue));
+		assertEquals(false, matches("is:read", issue));
 
 		issue.setMarkedReadAt(Optional.of(LocalDateTime.now()));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:unread"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:read"), issue));
+		assertEquals(true, matches("is:unread", issue));
+		assertEquals(false, matches("is:read", issue));
 
 		issue.setIsCurrentlyRead(true);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("is:unread"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("is:read"), issue));
+		assertEquals(false, matches("is:unread", issue));
+		assertEquals(true, matches("is:read", issue));
 	}
 
 	@Test
 	public void created() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "", "", LocalDateTime.of(2014, 12, 2, 12, 0), false);
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("created:<2014-12-1"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("created:<=2014-12-1"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("created:>2014-12-1"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("created:2014-12-2"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("created:nondate"), issue));
+		assertEquals(false, matches("created:<2014-12-1", issue));
+		assertEquals(false, matches("created:<=2014-12-1", issue));
+		assertEquals(true, matches("created:>2014-12-1", issue));
+		assertEquals(true, matches("created:2014-12-2", issue));
+		assertEquals(false, matches("created:nondate", issue));
 	}
 
 	@Test
@@ -461,28 +469,28 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		issue.setUpdatedAt(now.minusDays(2));
 
-		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:<24"), issue));
-		assertEquals(Qualifier.process(empty, Parser.parse("updated:<24"), issue),
-			Qualifier.process(empty, Parser.parse("updated:24"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("updated:>24"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:nondate"), issue));
+		assertEquals(false, matches("updated:<24", issue));
+		assertEquals(matches("updated:<24", issue),
+			matches("updated:24", issue));
+		assertEquals(true, matches("updated:>24", issue));
+		assertEquals(false, matches("updated:nondate", issue));
 
 		issue = new TurboIssue(REPO, 1, "");
 		issue.setUpdatedAt(now.minusDays(1));
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("updated:<26"), issue));
-		assertEquals(Qualifier.process(empty, Parser.parse("updated:<26"), issue),
-			Qualifier.process(empty, Parser.parse("updated:26"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:>26"), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("updated:nondate"), issue));
+		assertEquals(true, matches("updated:<26", issue));
+		assertEquals(matches("updated:<26", issue),
+			matches("updated:26", issue));
+		assertEquals(false, matches("updated:>26", issue));
+		assertEquals(false, matches("updated:nondate", issue));
 	}
 
 	@Test
 	public void repo() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-		assertEquals(true, Qualifier.process(empty, Parser.parse("repo:" + REPO), issue));
-		assertEquals(false, Qualifier.process(empty, Parser.parse("repo:something/else"), issue));
+		assertEquals(true, matches("repo:" + REPO, issue));
+		assertEquals(false, matches("repo:something/else", issue));
 	}
 
 	@Test
@@ -490,8 +498,8 @@ public class FilterEvalTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 
 		// Being a meta-qualifier, this doesn't have any effect
-		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:id, ~repo"), issue));
-		assertEquals(true, Qualifier.process(empty, Parser.parse("sort:~id, NOT repo"), issue));
+		assertEquals(true, matches("sort:id", issue));
+		assertEquals(true, matches("sort:id, ~repo", issue));
+		assertEquals(true, matches("sort:~id, NOT repo", issue));
 	}
 }
