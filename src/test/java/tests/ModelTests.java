@@ -10,10 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ModelTests {
 
@@ -136,46 +133,74 @@ public class ModelTests {
 		assertEquals(modelUpdated, deserializedModel);
 	}
 
-//    @Test
-//    public void getters() {
-//        // ID
-//        assertEquals(REPO, modelUpdated.getRepoId());
-//        assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
-//
-//        // Signature
-//        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.empty);
-//        assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
-//
-//        // Resources
-//        int issueCount = 1;
-//        for (TurboIssue issue : modelUpdated.getIssues()) {
-//	        assertEquals(issueCount, modelUpdated.getIssueById(issueCount).get().getId());
-//            assertEquals(issueCount, issue.getId());
-//            issueCount++;
-//        }
-//        int labelCount = 1;
-//        for (TurboLabel label : modelUpdated.getLabels()) {
-//            assertEquals("Label " + labelCount, label.getActualName());
-//	        assertEquals("Label " + labelCount,
-//		        modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
-//            labelCount++;
-//        }
-//        int milestoneCount = 1;
-//        for (TurboMilestone milestone : modelUpdated.getMilestones()) {
-//            assertEquals(milestoneCount, milestone.getId());
-//	        assertEquals(milestoneCount, modelUpdated.getMilestoneById(milestoneCount).get().getId());
-//	        assertEquals("Milestone " + milestoneCount,
-//		        modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
-//            milestoneCount++;
-//        }
-//        int userCount = 1;
-//        for (TurboUser user : modelUpdated.getUsers()) {
-//            assertEquals("User " + userCount, user.getLoginName());
-//	        assertEquals("User " + userCount,
-//		        modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
-//            userCount++;
-//        }
-//    }
+    @Test
+    public void getters() {
+        // ID
+        assertEquals(REPO, modelUpdated.getRepoId());
+        assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
+
+        // Signature
+        assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.empty);
+        assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
+
+        // Resources
+		// Issues
+        ArrayList<Integer> issueIds = new ArrayList<>();
+		for (int i = 1; i <= 10; i++) {
+			issueIds.add(i);
+		}
+		Collections.sort(issueIds); // 1, 2..10
+		int issueCount = 1;
+        for (TurboIssue issue : modelUpdated.getIssues()) {
+	        assertEquals(issueCount, modelUpdated.getIssueById(issueCount).get().getId());
+            assertEquals(issueIds.get(issueCount - 1).intValue(), issue.getId());
+			issueCount++;
+        }
+
+		// Labels
+		ArrayList<String> labelNames = new ArrayList<>();
+		for (int i = 1; i <= 10; i++) {
+			labelNames.add("Label " + i);
+		}
+		Collections.sort(labelNames); // Label 1, Label 10, Label 2..9
+        int labelCount = 1;
+        for (TurboLabel label : modelUpdated.getLabels()) {
+            assertEquals(labelNames.get(labelCount - 1), label.getActualName());
+	        assertEquals("Label " + labelCount,
+					modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
+            labelCount++;
+        }
+
+		// Milestones
+		ArrayList<Integer> milestoneIds = new ArrayList<>();
+		for (int i = 1; i <= 10; i++) {
+			milestoneIds.add(i);
+		}
+		Collections.sort(milestoneIds); // 1, 2..10
+        int milestoneCount = 1;
+        for (TurboMilestone milestone : modelUpdated.getMilestones()) {
+            assertEquals(milestoneCount, milestone.getId());
+	        assertEquals(milestoneIds.get(milestoneCount - 1).intValue(),
+					modelUpdated.getMilestoneById(milestoneCount).get().getId());
+	        assertEquals("Milestone " + milestoneCount,
+		        modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
+            milestoneCount++;
+        }
+
+		// Users
+		ArrayList<String> userLogins = new ArrayList<>();
+		for (int i = 1; i <= 10; i++) {
+			userLogins.add("User " + i);
+		}
+		Collections.sort(userLogins); // User 1, User 10, User 2..9
+        int userCount = 1;
+        for (TurboUser user : modelUpdated.getUsers()) {
+            assertEquals(userLogins.get(userCount - 1), user.getLoginName());
+	        assertEquals("User " + userCount,
+		        modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
+            userCount++;
+        }
+    }
 
     @Test
     public void operations() {

@@ -76,6 +76,7 @@ public class ModelUpdateUITest extends UITest {
         assertEquals(11, countIssues.get());
     }
 
+    // TODO no way to check correctness of these events as of yet as they are not reflected on the UI
     @Test
     public void otherTriggersTest() throws InterruptedException, ExecutionException {
         UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_LABEL, "dummy/dummy"));
