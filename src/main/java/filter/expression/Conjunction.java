@@ -12,8 +12,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Conjunction implements FilterExpression {
-	private FilterExpression left;
-	private FilterExpression right;
+	public FilterExpression left;
+	public FilterExpression right;
 
 	public Conjunction(FilterExpression left, FilterExpression right) {
 		this.left = left;
@@ -31,25 +31,23 @@ public class Conjunction implements FilterExpression {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Conjunction other = (Conjunction) obj;
-		if (left == null) {
-			if (other.left != null)
-				return false;
-		} else if (!left.equals(other.left))
-			return false;
-		if (right == null) {
-			if (other.right != null)
-				return false;
-		} else if (!right.equals(other.right))
-			return false;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Conjunction that = (Conjunction) o;
+
+		if (left != null ? !left.equals(that.left) : that.left != null) return false;
+		if (right != null ? !right.equals(that.right) : that.right != null) return false;
+
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = left != null ? left.hashCode() : 0;
+		result = 31 * result + (right != null ? right.hashCode() : 0);
+		return result;
 	}
 
 	@Override

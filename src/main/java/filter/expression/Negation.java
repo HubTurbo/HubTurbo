@@ -26,20 +26,20 @@ public class Negation implements FilterExpression {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Negation other = (Negation) obj;
-		if (expr == null) {
-			if (other.expr != null)
-				return false;
-		} else if (!expr.equals(other.expr))
-			return false;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Negation negation = (Negation) o;
+
+		if (expr != null ? !expr.equals(negation.expr) : negation.expr != null) return false;
+
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return expr != null ? expr.hashCode() : 0;
 	}
 
 	@Override

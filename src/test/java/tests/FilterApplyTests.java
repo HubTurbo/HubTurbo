@@ -11,6 +11,8 @@ import org.junit.Test;
 import prefs.Preferences;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -29,15 +31,60 @@ public class FilterApplyTests {
 	@Test
 	public void label() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
-		TurboLabel label = new TurboLabel(REPO, "bug");
-		assertEquals(0, issue.getLabels().size());
+		TurboLabel label = new TurboLabel(REPO, "aabb");
+		assertEquals(true, issue.getLabels().isEmpty());
+
+		// Simplest successful case
 		try {
-			new Qualifier("label", "bug").applyTo(issue, TestUtils.modelWith(issue, label));
-			assertEquals(1, issue.getLabels().size());
-			assertEquals("bug", issue.getLabels().get(0));
+			new Qualifier("label", "aabb").applyTo(issue, TestUtils.modelWith(issue, label));
+			assertEquals(false, issue.getLabels().isEmpty());
+			assertEquals("aabb", issue.getLabels().get(0));
 		} catch (QualifierApplicationException e) {
 			fail();
 		}
+
+		// Partial match
+		issue = new TurboIssue(REPO, 1, "");
+		TurboLabel label2 = new TurboLabel(REPO, "bbcc");
+		IModel model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(Arrays.asList(label, label2)),
+			new ArrayList<>(),
+			new ArrayList<>()));
+
+		try {
+			new Qualifier("label", "aa").applyTo(issue, model);
+			assertEquals(false, issue.getLabels().isEmpty());
+			assertEquals("aabb", issue.getLabels().get(0));
+		} catch (QualifierApplicationException e) {
+			fail();
+		}
+
+		// Ambigous label
+		issue = new TurboIssue(REPO, 1, "");
+		label2 = new TurboLabel(REPO, "bbcc");
+		model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(Arrays.asList(label, label2)),
+			new ArrayList<>(),
+			new ArrayList<>()));
+
+		try {
+			new Qualifier("label", "bb").applyTo(issue, model);
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-existent label
+		try {
+			new Qualifier("label", "dd").applyTo(issue, TestUtils.modelWith(issue, label));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-string
+		try {
+			new Qualifier("label", 1).applyTo(issue, TestUtils.modelWith(issue, label));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
     }
 
 	@Test
@@ -45,6 +92,8 @@ public class FilterApplyTests {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
 		TurboMilestone milestone = new TurboMilestone(REPO, 7, "v1");
 		assertEquals(false, issue.getMilestone().isPresent());
+
+		// Simplest successful case
 		try {
 			new Qualifier("milestone", "v1").applyTo(issue, TestUtils.modelWith(issue, milestone));
 			assertEquals(true, issue.getMilestone().isPresent());
@@ -52,20 +101,108 @@ public class FilterApplyTests {
 		} catch (QualifierApplicationException e) {
 			fail();
 		}
+
+		// Partial match
+		issue = new TurboIssue(REPO, 1, "");
+		TurboMilestone milestone2 = new TurboMilestone(REPO, 9, "v2");
+		IModel model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(milestone, milestone2)),
+			new ArrayList<>()));
+
+		try {
+			new Qualifier("milestone", "1").applyTo(issue, model);
+			assertEquals(true, issue.getMilestone().isPresent());
+			assertEquals(new Integer(7), issue.getMilestone().get());
+		} catch (QualifierApplicationException e) {
+			fail();
+		}
+
+		// Ambigous milestone
+		issue = new TurboIssue(REPO, 1, "");
+		milestone2 = new TurboMilestone(REPO, 9, "v2");
+		model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(milestone, milestone2)),
+			new ArrayList<>()));
+
+		try {
+			new Qualifier("milestone", "v").applyTo(issue, model);
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-existent milestone
+		try {
+			new Qualifier("milestone", "3").applyTo(issue, TestUtils.modelWith(issue, milestone));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-string
+		try {
+			new Qualifier("milestone", 1).applyTo(issue, TestUtils.modelWith(issue, milestone));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
     }
 
 	@Test
 	public void assignee() {
 		TurboIssue issue = new TurboIssue(REPO, 1, "");
-		TurboUser user = new TurboUser(REPO, "aaa");
+		TurboUser assignee = new TurboUser(REPO, "aabb");
 		assertEquals(false, issue.getAssignee().isPresent());
+
+		// Simplest successful case
 		try {
-			new Qualifier("assignee", "aaa").applyTo(issue, TestUtils.modelWith(issue, user));
+			new Qualifier("assignee", "aabb").applyTo(issue, TestUtils.modelWith(issue, assignee));
 			assertEquals(true, issue.getAssignee().isPresent());
-			assertEquals("aaa", issue.getAssignee().get());
+			assertEquals("aabb", issue.getAssignee().get());
 		} catch (QualifierApplicationException e) {
 			fail();
 		}
+
+		// Partial match
+		issue = new TurboIssue(REPO, 1, "");
+		TurboUser assignee2 = new TurboUser(REPO, "bbcc");
+		IModel model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(assignee, assignee2))));
+
+		try {
+			new Qualifier("assignee", "aa").applyTo(issue, model);
+			assertEquals(true, issue.getAssignee().isPresent());
+			assertEquals("aabb", issue.getAssignee().get());
+		} catch (QualifierApplicationException e) {
+			fail();
+		}
+
+		// Ambigous assignee
+		issue = new TurboIssue(REPO, 1, "");
+		assignee2 = new TurboUser(REPO, "bbcc");
+		model = TestUtils.singletonModel(new Model(REPO,
+			new ArrayList<>(Arrays.asList(issue)),
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>(Arrays.asList(assignee, assignee2))));
+
+		try {
+			new Qualifier("assignee", "bb").applyTo(issue, model);
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-existent assignee
+		try {
+			new Qualifier("assignee", "dd").applyTo(issue, TestUtils.modelWith(issue, assignee));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
+
+		// Non-string
+		try {
+			new Qualifier("assignee", 1).applyTo(issue, TestUtils.modelWith(issue, assignee));
+			fail();
+		} catch (QualifierApplicationException ignored) {}
     }
 
 	@Test
@@ -74,12 +211,19 @@ public class FilterApplyTests {
 		assertEquals(true, issue.isOpen());
 		try {
 			new Qualifier("state", "closed").applyTo(issue, empty);
-            assertEquals(false, issue.isOpen());
+			assertEquals(false, issue.isOpen());
 			new Qualifier("state", "open").applyTo(issue, empty);
-            assertEquals(true, issue.isOpen());
+			assertEquals(true, issue.isOpen());
 		} catch (QualifierApplicationException e) {
 			fail();
 		}
+
+		issue.setOpen(true);
+		assertEquals(true, issue.isOpen());
+		try {
+			new Qualifier("state", "something").applyTo(issue, empty);
+			fail();
+		} catch (QualifierApplicationException ignored) {}
     }
 
 	@Test
