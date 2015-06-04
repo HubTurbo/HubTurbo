@@ -36,7 +36,7 @@ public class TickingTimerTests {
 
     @Test
     public void threadingTest() {
-        final int attempts = 3;
+        final int attempts = 2;
 
         final TickingTimer tickingTimer = createTickingTimer();
         tickingTimer.start();
@@ -56,16 +56,16 @@ public class TickingTimerTests {
         es.execute(positive);
         delay(1);
         es.execute(negative);
-        delay(6.5); // Need 6 seconds to wait for the positive and negative runnables to complete the run.
+        delay(4.5); // Need 6 seconds to wait for the positive and negative runnables to complete the run.
     }
 
     @Test
     public void triggerTest() {
         final ArrayList<Integer> ticks = new ArrayList<>();
         final ArrayList<Integer> ideal = new ArrayList<>(Arrays.asList(
-                4, 3, 2, 1, 5, 10, 4, 3, // After 6.5
+                4, 3, // After 1.5
                 5, 10, // Trigger
-                4, 3, 2)); // After 4.5
+                4, 3)); // After 3.5
 
         // Timeouts every five seconds, tick every second
         final TickingTimer tickingTimer = new TickingTimer("test2",
@@ -78,9 +78,9 @@ public class TickingTimerTests {
         );
 
         tickingTimer.start();
-        delay(6.5);
+        delay(1.5);
         tickingTimer.trigger();
-        delay(4.5);
+        delay(3.5);
         tickingTimer.stop();
 
         for (int i = 0; i < ideal.size(); i++) {
