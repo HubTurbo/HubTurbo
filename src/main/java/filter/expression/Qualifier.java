@@ -311,11 +311,13 @@ public class Qualifier implements FilterExpression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+	    result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
+	    result = prime * result + ((number == null) ? 0 : number.hashCode());
+	    result = prime * result + ((numberRange == null) ? 0 : numberRange.hashCode());
 	    result = prime * result + ((sortKeys == null) ? 0 : sortKeys.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
@@ -343,6 +345,16 @@ public class Qualifier implements FilterExpression {
 			    return false;
         } else if (!dateRange.equals(other.dateRange))
             return false;
+	    if (number == null) {
+		    if (other.number != null)
+			    return false;
+	    } else if (!number.equals(other.number))
+		    return false;
+	    if (numberRange == null) {
+		    if (other.numberRange != null)
+			    return false;
+	    } else if (!numberRange.equals(other.numberRange))
+		    return false;
 	    if (sortKeys == null) {
 		    if (other.sortKeys != null)
 			    return false;
