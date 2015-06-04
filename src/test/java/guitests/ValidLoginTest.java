@@ -25,7 +25,7 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(2000);
+        sleep(1000);
         RepositorySelector repositorySelector = find("#repositorySelector");
         assertEquals(repositorySelector.getText(), "HubTurbo/HubTurbo");
     }
