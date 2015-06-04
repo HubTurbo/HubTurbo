@@ -12,7 +12,7 @@ import util.Utility;
 
 public abstract class RepoStore {
 
-	private static String DIRECTORY = "store";
+	private static String directory = "store";
 	private static final String TEST_DIRECTORY = "store/test";
 	private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
@@ -35,7 +35,7 @@ public abstract class RepoStore {
 	private static String getRepoPath(String repoId) {
 		ensureDirectoryExists();
 		String newRepoName = RepoStore.escapeRepoName(repoId);
-		return new File(RepoStore.DIRECTORY, newRepoName).getAbsolutePath();
+		return new File(RepoStore.directory, newRepoName).getAbsolutePath();
 	}
 
 	public static void write(String repoId, String output) {
@@ -47,7 +47,7 @@ public abstract class RepoStore {
 	}
 
 	private static void ensureDirectoryExists() {
-		File directory = new File(RepoStore.DIRECTORY);
+		File directory = new File(RepoStore.directory);
 		if (!directory.exists() || !directory.isDirectory()) {
 			directory.mkdirs();
 		}
@@ -58,6 +58,6 @@ public abstract class RepoStore {
 	}
 
 	private static void changeDirectory(String newDir) {
-		RepoStore.DIRECTORY = newDir;
+		RepoStore.directory = newDir;
 	}
 }
