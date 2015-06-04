@@ -2,7 +2,6 @@ package ui.issuecolumn;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
@@ -57,7 +56,7 @@ public class ColumnControl extends HBox {
 	}
 
 	/**
-	 * Called on login
+	 * Called on login.
 	 */
 	public void init() {
 		restoreColumns();
@@ -99,7 +98,7 @@ public class ColumnControl extends HBox {
 	}
 
 	/**
-	 * Returns a list of issues to download comments for
+	 * Returns a list of issues to download comments for.
 	 * @return
 	 */
 	public List<Integer> getUpdatedIssues() {
@@ -248,27 +247,32 @@ public class ColumnControl extends HBox {
 	}
 
 	private void handleKeys(boolean isForwardKey) {
-		if (!currentlySelectedColumn.isPresent()) return;
-		if (getChildren().size() == 0) return;
+		if (!currentlySelectedColumn.isPresent()) {
+			return;
+		}
+		if (getChildren().size() == 0) {
+			return;
+		}
 		Column selectedColumn = getColumn(currentlySelectedColumn.get());
 		if (selectedColumn instanceof IssueColumn){
 			if (((IssueColumn) selectedColumn).filterTextField.isFocused()){
 				return;
 			} else {
 				int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
-				if (newIndex < 0)
+				if (newIndex < 0) {
 					newIndex = getChildren().size() - 1;
-				else if (newIndex > getChildren().size() - 1)
+				} else if (newIndex > getChildren().size() - 1) {
 					newIndex = 0;
+				}
 				setCurrentlySelectedColumn(Optional.of(newIndex));
 				selectedColumn = getColumn(currentlySelectedColumn.get());
-				((IssueColumn) selectedColumn).requestFocus();
+				selectedColumn.requestFocus();
 			}
 		}
 		scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
 	}
 
-	private void scrollandShowColumn(int SelectedColumnIndex, int numOfColumns) {
-		ui.getMenuControl().scrollTo(SelectedColumnIndex, numOfColumns);
+	private void scrollandShowColumn(int selectedColumnIndex, int numOfColumns) {
+		ui.getMenuControl().scrollTo(selectedColumnIndex, numOfColumns);
 	}
 }

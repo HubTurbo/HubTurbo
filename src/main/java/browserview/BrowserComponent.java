@@ -21,7 +21,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 /**
  * An abstraction for the functions of the Selenium web driver.
  * It depends minimally on UI for width adjustments.
@@ -460,10 +459,11 @@ public class BrowserComponent {
 
 	public void scrollPage(boolean isDownScroll) {
 		String script;
-		if (isDownScroll)
+		if (isDownScroll) {
 			script = "window.scrollBy(0,100)";
-		else
+		} else {
 			script = "window.scrollBy(0, -100)";
+		}
 		executeJavaScript(script);
 	}
 
