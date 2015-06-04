@@ -137,8 +137,6 @@ public abstract class IssueColumn extends Column {
 
 		filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
 
-//		setupIssueDragEvents(filterTextField);
-
 		HBox buttonsBox = new HBox();
 		buttonsBox.setSpacing(5);
 		buttonsBox.setAlignment(Pos.TOP_RIGHT);
@@ -148,6 +146,8 @@ public abstract class IssueColumn extends Column {
 		HBox layout = new HBox();
 		layout.getChildren().addAll(filterTextField, buttonsBox);
 		layout.setPadding(new Insets(0, 0, 3, 0));
+
+		setupIssueDragEvents(layout);
 
 		return layout;
 	}
@@ -175,7 +175,7 @@ public abstract class IssueColumn extends Column {
 		return new Label[] { closeList };
 	}
 
-//	private void setupIssueDragEvents(Node filterBox) {
+	private void setupIssueDragEvents(Node filterBox) {
 //		filterBox.setOnDragOver(e -> {
 //			if (e.getGestureSource() != this && e.getDragboard().hasString()) {
 //				DragData dd = DragData.deserialise(e.getDragboard().getString());
@@ -188,32 +188,31 @@ public abstract class IssueColumn extends Column {
 //				}
 //			}
 //		});
-//
-//		filterBox.setOnDragEntered(e -> {
+
+		filterBox.setOnDragEntered(e -> {
 //			if (e.getDragboard().hasString()) {
 //				DragData dd = DragData.deserialise(e.getDragboard().getString());
 //				if (dd.getSource() == DragData.Source.ISSUE_CARD) {
 //					filterBox.getStyleClass().add("dragged-over");
 //				} else if (dd.getSource() == DragData.Source.COLUMN) {
-//					if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
-//						// Apparently the dragboard can't be updated while
-//						// the drag is in progress. This is why we use an
-//						// external source for updates.
-//						assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
-//						int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
-//						parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
-//						parentColumnControl.swapColumns(previous, columnIndex);
-//					}
-//				}
-//			}
-//			e.consume();
-//		});
-//
-//		filterBox.setOnDragExited(e -> {
-//			filterBox.getStyleClass().remove("dragged-over");
-//			e.consume();
-//		});
-//
+					if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+						// Apparently the dragboard can't be updated while
+						// the drag is in progress. This is why we use an
+						// external source for updates.
+						assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
+						int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
+						parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
+						parentColumnControl.swapColumns(previous, columnIndex);
+					}
+			e.consume();
+			}
+		);
+
+		filterBox.setOnDragExited(e -> {
+			filterBox.getStyleClass().remove("dragged-over");
+			e.consume();
+		});
+
 //		filterBox.setOnDragDropped(e -> {
 //			Dragboard db = e.getDragboard();
 //			boolean success = false;
@@ -262,7 +261,7 @@ public abstract class IssueColumn extends Column {
 //			e.setDropCompleted(success);
 //			e.consume();
 //		});
-//	}
+	}
 
 	// These two methods are triggered by the contents of the input area
 	// changing. As such they should not be invoked manually, or the input
