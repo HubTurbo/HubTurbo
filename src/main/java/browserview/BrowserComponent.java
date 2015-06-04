@@ -259,6 +259,7 @@ public class BrowserComponent {
 			logger.info("Initializing ChromeDriver");
 			return false;
 		}
+		if (isTestChromeDriver) { return true; }
 		try {
 			// Throws an exception if unable to switch to original HT tab
 			// which then triggers a browser reset when called from runBrowserOperation
