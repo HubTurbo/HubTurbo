@@ -5,6 +5,7 @@ import org.junit.Test;
 
 public class KeyboardShortcutsTest extends UITest {
 
+    // TODO test that events have been triggered
     @Test
     public void keyboardShortcutsTest() {
         // maximize
