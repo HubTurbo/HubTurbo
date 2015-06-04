@@ -5,6 +5,7 @@ import org.junit.Test;
 
 public class UIComponentsTest extends UITest {
 
+    // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void filterTextFieldTest() {
         click("#dummy/dummy_col0_filterTextField");
@@ -21,6 +22,7 @@ public class UIComponentsTest extends UITest {
         press(KeyCode.ENTER).release(KeyCode.ENTER);
     }
 
+    // TODO check that top issue is indeed highlighted
     @Test
     public void navigableListViewTest() {
         click("#dummy/dummy_col0_1");

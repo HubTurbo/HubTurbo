@@ -108,7 +108,7 @@ task jacocoRootReport(type: JacocoReport) {
     executionData = files(allprojects.jacocoTestReport.executionData)
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'github/**')
+            fileTree(dir: it, exclude: ['github/**', 'backend/github/**'])
         })
     }
     reports {
