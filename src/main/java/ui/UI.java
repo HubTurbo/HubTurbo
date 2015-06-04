@@ -173,10 +173,23 @@ public class UI extends Application implements EventDispatcher {
 		applyCSS(css, scene);
 	}
 
+	// Test mode should only be run as a test task (Gradle / JUnit), as quit()
+	// leaves the JVM alive during test mode (which is cleaned up by Gradle).
+	// Manually feeding --test=true into the command line arguments will leave the JVM
+	// running after the HT window has been closed, and thus will require the
+	// process to be closed manually afterwards (Force Quit / End Process).
 	public boolean isTestMode() {
 		if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
 		if (isBypassLogin()) return true;
+		if (isTestJSONEnabled()) return true;
+		if (isTestChromeDriver()) return true;
+		if (isTestGlobalConfig()) return true;
 		return false;
+	}
+
+	// Public for use in LoginDialog
+	public boolean isTestGlobalConfig() {
+		return commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
 	}
 
 	private boolean isBypassLogin() {
@@ -200,6 +213,10 @@ public class UI extends Application implements EventDispatcher {
 			prefs.saveGlobalConfig();
 			Platform.exit();
 			System.exit(0);
+		}
+		if (isTestGlobalConfig()) {
+			columns.saveSession();
+			prefs.saveGlobalConfig();
 		}
 	}
 

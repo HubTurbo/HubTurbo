@@ -181,7 +181,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
 		passwordField = new PasswordField();
 		grid.add(passwordField, 1, 2, 4, 1);
 
-		if (!ui.isTestMode()) populateSavedFields();
+		if ((!ui.isTestMode()) || ui.isTestGlobalConfig()) populateSavedFields();
 
 		repoOwnerField.setOnAction(this::login);
 		repoNameField.setOnAction(this::login);
