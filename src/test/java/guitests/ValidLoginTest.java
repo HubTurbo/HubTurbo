@@ -27,6 +27,6 @@ public class ValidLoginTest extends UITest {
         click("Sign in");
         sleep(1000);
         RepositorySelector repositorySelector = find("#repositorySelector");
-        assertEquals(repositorySelector.getText(), "HubTurbo/HubTurbo");
+        assertEquals(repositorySelector.getText(), "test/test");
     }
 }
