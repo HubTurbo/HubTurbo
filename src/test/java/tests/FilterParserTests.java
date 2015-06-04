@@ -274,6 +274,10 @@ public class FilterParserTests {
     public void serialisation() {
     	
     	String[] tests = {
+		    "", // Empty
+		    "aa", // Keywords
+		    "aa bb cc",
+		    "\"a b\"",
     		"abcdefg:hijkl",
     		"!abcdefg:hijkl", // NOT
     		"abcdefg:hijkl || zxc:aksljd", // OR
@@ -288,18 +292,27 @@ public class FilterParserTests {
 			"updated:>=24",
 			"updated:<24",
 			"updated:<=24",
+		    "updated:24",
 			"created:<=2014-12-4", // Date operators
 			"created:>=2014-12-4",
 			"created:<2014-12-4",
 			"created:>2014-12-4",
+		    "created:2014-12-4",
 			"created:2014-12-4 .. 2014-12-6", // Date ranges
+		    "sort:id", // Sorting keys
+		    "sort:id,repo",
+		    "sort:~id,repo",
+		    "sort:~id,!repo"
     	};
 
     	// We want to ensure that parsing some filter and parsing the serialised version
     	// of that filter result in the same data structure.
 	    for (String test : tests) {
 		    assert test != null;
-		    assertEquals(Parser.parse(Parser.parse(test).toString()), Parser.parse(test));
+		    FilterExpression a = Parser.parse(Parser.parse(test).toString());
+		    FilterExpression b = Parser.parse(test);
+		    assertEquals(a, b);
+		    assertEquals(a.hashCode(), b.hashCode());
 	    }
     }
 }
