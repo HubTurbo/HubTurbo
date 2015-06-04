@@ -20,10 +20,10 @@ public class InvalidLoginTest extends UITest {
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("HubTurbo");
+        type("abc").push(KeyCode.TAB);
+        type("abc").push(KeyCode.TAB);
+        type("abc").push(KeyCode.TAB);
+        type("abc");
         click("Sign in");
         assertNodeExists(hasText("Failed to sign in. Please try again."));
     }

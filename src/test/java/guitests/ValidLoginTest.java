@@ -20,8 +20,8 @@ public class ValidLoginTest extends UITest {
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
-        type("HubTurbo").push(KeyCode.TAB);
-        type("HubTurbo").push(KeyCode.TAB);
+        type("test").push(KeyCode.TAB);
+        type("test").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
