@@ -21,7 +21,6 @@ public class ModelUpdateUITest extends UITest {
     public void addIssueTest() throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
-        sleep(4 * EVENT_DELAY);
         FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(11, countIssues.get());
@@ -108,7 +107,6 @@ public class ModelUpdateUITest extends UITest {
 
     public void resetRepo() {
         UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy"));
-        UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
 
