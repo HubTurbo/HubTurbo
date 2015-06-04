@@ -282,13 +282,13 @@ public class Qualifier implements FilterExpression {
         if (this == EMPTY) {
             return "";
         } else if (content.isPresent()) {
+	        String quotedContent = content.get();
+	        if (quotedContent.contains(" ")) {
+		        quotedContent = "\"" + quotedContent + "\"";
+	        }
             if (name.equals("keyword")) {
-                return content.get();
+                return quotedContent;
             } else {
-            	String quotedContent = content.get();
-            	if (quotedContent.contains(" ")) {
-            		quotedContent = "\"" + quotedContent + "\"";
-            	}
                 return name + ":" + quotedContent;
             }
         } else if (date.isPresent()) {
@@ -296,7 +296,7 @@ public class Qualifier implements FilterExpression {
         } else if (dateRange.isPresent()) {
 	        return name + ":" + dateRange.get().toString();
         } else if (!sortKeys.isEmpty()) {
-            return name + ":" + sortKeys.toString();
+            return name + ":" + sortKeys.stream().map(SortKey::toString).collect(Collectors.joining(","));
         } else if (numberRange.isPresent()) {
         	return name + ":" + numberRange.get().toString();
         } else if (number.isPresent()) {
