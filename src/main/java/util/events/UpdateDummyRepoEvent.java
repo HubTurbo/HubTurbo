@@ -48,4 +48,12 @@ public class UpdateDummyRepoEvent extends Event {
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString) {
         this(updateType, repoId, -1, idString, null);
     }
+
+    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String updateText) {
+        this(updateType, repoId, itemId, null, updateText);
+    }
+
+    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString, String updateText) {
+        this(updateType, repoId, -1, idString, null);
+    }
 }

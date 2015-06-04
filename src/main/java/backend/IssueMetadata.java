@@ -10,16 +10,19 @@ public class IssueMetadata {
 	private final List<TurboIssueEvent> events;
 	private final List<Comment> comments;
 
+	// Constructor for default use when initializing TurboIssue
 	public IssueMetadata() {
 		events = new ArrayList<>();
 		comments = new ArrayList<>();
 	}
 
+	// Constructor used in DownloadMetadataTask
 	public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
 		this.events = events;
 		this.comments = comments;
 	}
 
+	// Constructor used in MultiModel
 	public IssueMetadata(IssueMetadata other) {
 		this.events = new ArrayList<>(other.events);
 		this.comments = new ArrayList<>(other.comments);
