@@ -111,20 +111,20 @@ public class Utility {
 	 * @param version version number string
 	 * @return an array of 3 elements, representing the major, minor, and patch versions respectively
 	 */
-	public static Optional<int[]> parseVersionNumber(String version) {
-		// Strip non-digits
-		version = version.replaceAll("[^0-9.]+", "");
-		
-		String[] temp = version.split("\\.");
-		try {
-            int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
-            int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
-            int patch = temp.length > 2 ? Integer.parseInt(temp[2]) : 0;
-            return Optional.of(new int[] {major, minor, patch});
-		} catch (NumberFormatException e) {
-			return Optional.empty();
-		}
-	}
+//	public static Optional<int[]> parseVersionNumber(String version) {
+//		// Strip non-digits
+//		version = version.replaceAll("[^0-9.]+", "");
+//
+//		String[] temp = version.split("\\.");
+//		try {
+//            int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
+//            int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
+//            int patch = temp.length > 2 ? Integer.parseInt(temp[2]) : 0;
+//            return Optional.of(new int[] {major, minor, patch});
+//		} catch (NumberFormatException e) {
+//			return Optional.empty();
+//		}
+//	}
 
 	public static String version(int major, int minor, int patch) {
 		return String.format("V%d.%d.%d", major, minor, patch);
