@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
@@ -36,6 +37,10 @@ public class FilterParserTests {
                     new Qualifier("keyword", "c"),
                     new Qualifier("keyword", "a")),
                 new Qualifier("keyword", "b")));
+        assertNotEquals(new Qualifier("", ""), null);
+        assertNotEquals(new Qualifier("", ""), "null");
+        assertNotEquals(new Qualifier("keyword", "a"), new Qualifier("keyword", "b"));
+        assertNotEquals(new Qualifier("", "a"), new Qualifier("keyword", "a"));
     }
 
     @Test
@@ -139,8 +144,12 @@ public class FilterParserTests {
                 new Qualifier("updated", new NumberRange(24, null)));
         assertEquals(Parser.parse("updated:>24"),
                 new Qualifier("updated", new NumberRange(24, null, true)));
+        assertNotEquals(Parser.parse("updated:<24"),
+                new Qualifier("updated", new NumberRange(24, null, true)));
 
         assertEquals(Parser.parse("updated:24"),
+                new Qualifier("updated", 24));
+        assertNotEquals(Parser.parse("updated:25"),
                 new Qualifier("updated", 24));
     }
 
@@ -233,6 +242,9 @@ public class FilterParserTests {
 
         assertEquals(Parser.parse("created : >= 2014-06-01"),
                 new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+
+        assertNotEquals(Parser.parse("created : <= 2014-06-01"),
+                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
     }
 
     @Test
@@ -249,6 +261,9 @@ public class FilterParserTests {
                                 new Qualifier("keyword", "a"),
                                 new Qualifier("created", LocalDate.of(2014, 6, 1))),
                         new Qualifier("keyword", "b")));
+
+        assertNotEquals(new Qualifier("created", LocalDate.of(2014, 6, 2)),
+                new Qualifier("created", LocalDate.of(2014, 6, 1)));
     }
 
     @Test
@@ -319,6 +334,8 @@ public class FilterParserTests {
             new Qualifier("sort", Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
         assertEquals(Parser.parse("sort:~id, NOT repo"),
             new Qualifier("sort", Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+        assertNotEquals(Parser.parse("sort:~repo, NOT id"),
+                new Qualifier("sort", Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }
 
     @Test
