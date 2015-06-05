@@ -37,7 +37,7 @@ public class DummyRepoState {
         for (int i = 0; i < 10; i++) {
             TurboIssue dummyIssue = makeDummyIssue();
             // All default issues are treated as if created a long time ago
-            dummyIssue.setUpdatedAt(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)));
+            dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
             TurboLabel dummyLabel = makeDummyLabel();
             TurboMilestone dummyMilestone = makeDummyMilestone();
             TurboUser dummyUser = makeDummyUser();
@@ -113,7 +113,12 @@ public class DummyRepoState {
     }
 
     private TurboIssue makeDummyIssue() {
-        return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
+        return new TurboIssue(dummyRepoId,
+                issues.size() + 1,
+                "Issue " + (issues.size() + 1),
+                "User " + (issues.size() + 1),
+                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                false);
     }
 
     private TurboLabel makeDummyLabel() {
