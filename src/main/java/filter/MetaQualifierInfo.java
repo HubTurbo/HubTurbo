@@ -12,28 +12,28 @@ import filter.expression.Qualifier;
  */
 public class MetaQualifierInfo {
 
-	private Optional<String> in = Optional.empty();
+    private Optional<String> in = Optional.empty();
 
-	public MetaQualifierInfo(List<Qualifier> qualifiers) {
+    public MetaQualifierInfo(List<Qualifier> qualifiers) {
 
-		this.in = processInQualifier(qualifiers);
-	}
+        this.in = processInQualifier(qualifiers);
+    }
 
-	private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
-		List<Qualifier> inQualifiers = qualifiers.stream()
-			.filter(q -> q.getName().equals("in"))
-			.collect(Collectors.toList());
-		
-		if (inQualifiers.isEmpty()) {
-			return Optional.empty();
-		} else if (inQualifiers.size() > 1) {
-			throw new ParseException("More than one meta-qualifier: in");
-		} else {
-			return inQualifiers.get(0).getContent();
-		}
-	}
+    private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
+        List<Qualifier> inQualifiers = qualifiers.stream()
+            .filter(q -> q.getName().equals("in"))
+            .collect(Collectors.toList());
 
-	public Optional<String> getIn() {
-		return in;
-	}
+        if (inQualifiers.isEmpty()) {
+            return Optional.empty();
+        } else if (inQualifiers.size() > 1) {
+            throw new ParseException("More than one meta-qualifier: in");
+        } else {
+            return inQualifiers.get(0).getContent();
+        }
+    }
+
+    public Optional<String> getIn() {
+        return in;
+    }
 }

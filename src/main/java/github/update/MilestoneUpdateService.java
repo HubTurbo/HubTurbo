@@ -15,24 +15,24 @@ import com.google.gson.reflect.TypeToken;
 import github.GitHubClientExtended;
 
 public class MilestoneUpdateService extends UpdateService<Milestone>{
-	
-	
-	public MilestoneUpdateService(GitHubClientExtended client, String milestonesETag){
-		super(client, SEGMENT_MILESTONES, milestonesETag);
-	}
-	
-	private Map<String, String> createUpdatedMilestonesParams(){
-		Map<String, String> params = new HashMap<>();
-		params.put("state", "all");
-		return params;
-	}
-	
-	@Override
-	protected PagedRequest<Milestone> createUpdatedRequest(IRepositoryIdProvider repoId){
-		PagedRequest<Milestone> request = super.createUpdatedRequest(repoId);
-		request.setParams(createUpdatedMilestonesParams());
-		request.setType(new TypeToken<Milestone>(){}.getType());
-		request.setArrayType(new TypeToken<ArrayList<Milestone>>(){}.getType());
-		return request;
-	}
+
+
+    public MilestoneUpdateService(GitHubClientExtended client, String milestonesETag){
+        super(client, SEGMENT_MILESTONES, milestonesETag);
+    }
+
+    private Map<String, String> createUpdatedMilestonesParams(){
+        Map<String, String> params = new HashMap<>();
+        params.put("state", "all");
+        return params;
+    }
+
+    @Override
+    protected PagedRequest<Milestone> createUpdatedRequest(IRepositoryIdProvider repoId){
+        PagedRequest<Milestone> request = super.createUpdatedRequest(repoId);
+        request.setParams(createUpdatedMilestonesParams());
+        request.setType(new TypeToken<Milestone>(){}.getType());
+        request.setArrayType(new TypeToken<ArrayList<Milestone>>(){}.getType());
+        return request;
+    }
 }

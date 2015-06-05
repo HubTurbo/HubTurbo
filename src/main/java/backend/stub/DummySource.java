@@ -12,37 +12,37 @@ import util.Futures;
 
 public class DummySource extends RepoSource {
 
-	private final DummyRepo dummy = new DummyRepo();
+    private final DummyRepo dummy = new DummyRepo();
 
-	@Override
-	public String getName() {
-		return "Dummy Source";
-	}
+    @Override
+    public String getName() {
+        return "Dummy Source";
+    }
 
-	@Override
-	public CompletableFuture<Boolean> login(UserCredentials credentials) {
-		CompletableFuture<Boolean> response = new CompletableFuture<>();
-		execute(() -> response.complete(dummy.login(credentials)));
-		return response;
-	}
+    @Override
+    public CompletableFuture<Boolean> login(UserCredentials credentials) {
+        CompletableFuture<Boolean> response = new CompletableFuture<>();
+        execute(() -> response.complete(dummy.login(credentials)));
+        return response;
+    }
 
-	@Override
-	public CompletableFuture<Model> downloadRepository(String repoId) {
-		return addTask(new DownloadRepoTask(this, dummy, repoId)).response;
-	}
+    @Override
+    public CompletableFuture<Model> downloadRepository(String repoId) {
+        return addTask(new DownloadRepoTask(this, dummy, repoId)).response;
+    }
 
-	@Override
-	public CompletableFuture<Model> updateModel(Model model) {
-		return addTask(new UpdateModelTask(this, dummy, model)).response;
-	}
+    @Override
+    public CompletableFuture<Model> updateModel(Model model) {
+        return addTask(new UpdateModelTask(this, dummy, model)).response;
+    }
 
-	@Override
-	public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
-		return addTask(new DownloadMetadataTask(this, dummy, repoId, issues)).response;
-	}
+    @Override
+    public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
+        return addTask(new DownloadMetadataTask(this, dummy, repoId, issues)).response;
+    }
 
-	@Override
-	public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
-		return Futures.unit(true);
-	}
+    @Override
+    public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+        return Futures.unit(true);
+    }
 }

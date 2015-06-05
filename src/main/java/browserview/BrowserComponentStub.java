@@ -18,7 +18,7 @@ public class BrowserComponentStub extends BrowserComponent {
 
     @Override
     public boolean hasBviewChanged() {
-	    return false;
+        return false;
     }
 
     @Override
@@ -80,6 +80,6 @@ public class BrowserComponentStub extends BrowserComponent {
 
     @Override
     public boolean isCurrentUrlIssue() {
-	    return true;
+        return true;
     }
 }

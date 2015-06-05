@@ -10,6 +10,6 @@ import backend.resource.serialization.SerializableModel;
  */
 public class JSONStoreStub extends JSONStore {
 
-	@Override
-	public void saveRepository(String repoId, SerializableModel model) {}
+    @Override
+    public void saveRepository(String repoId, SerializableModel model) {}
 }

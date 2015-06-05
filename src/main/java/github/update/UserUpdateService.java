@@ -15,15 +15,15 @@ import github.GitHubClientExtended;
 
 public class UserUpdateService extends UpdateService<User>{
 
-	public UserUpdateService(GitHubClientExtended client, String collabsETag){
-		super(client, SEGMENT_COLLABORATORS, collabsETag);
-	}
-	
-	@Override
-	protected PagedRequest<User> createUpdatedRequest(IRepositoryIdProvider repoId){
-		PagedRequest<User> request = super.createUpdatedRequest(repoId);
-		request.setType(new TypeToken<User>(){}.getType());
-		request.setArrayType(new TypeToken<ArrayList<User>>(){}.getType());
-		return request;
-	}
+    public UserUpdateService(GitHubClientExtended client, String collabsETag){
+        super(client, SEGMENT_COLLABORATORS, collabsETag);
+    }
+
+    @Override
+    protected PagedRequest<User> createUpdatedRequest(IRepositoryIdProvider repoId){
+        PagedRequest<User> request = super.createUpdatedRequest(repoId);
+        request.setType(new TypeToken<User>(){}.getType());
+        request.setArrayType(new TypeToken<ArrayList<User>>(){}.getType());
+        return request;
+    }
 }

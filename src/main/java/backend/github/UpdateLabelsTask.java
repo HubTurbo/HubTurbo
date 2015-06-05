@@ -14,29 +14,29 @@ import util.HTLog;
 
 public class UpdateLabelsTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboLabel>> {
 
-	private static final Logger logger = HTLog.get(UpdateLabelsTask.class);
+    private static final Logger logger = HTLog.get(UpdateLabelsTask.class);
 
-	private final Model model;
+    private final Model model;
 
-	public UpdateLabelsTask(TaskRunner taskRunner, Repo repo, Model model) {
-		super(taskRunner, repo);
-		this.model = model;
-	}
+    public UpdateLabelsTask(TaskRunner taskRunner, Repo repo, Model model) {
+        super(taskRunner, repo);
+        this.model = model;
+    }
 
-	@Override
-	public void run() {
-		ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId(),
-			model.getUpdateSignature().labelsETag);
+    @Override
+    public void run() {
+        ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId(),
+            model.getUpdateSignature().labelsETag);
 
-		List<TurboLabel> changed = changes.left;
+        List<TurboLabel> changed = changes.left;
 
-		logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
-			changed.size(), changed.isEmpty() ? "" : ": " + changed));
+        logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
+            changed.size(), changed.isEmpty() ? "" : ": " + changed));
 
-		List<TurboLabel> updated = changed.isEmpty()
-			? model.getLabels()
-			: new ArrayList<>(changed);
+        List<TurboLabel> updated = changed.isEmpty()
+            ? model.getLabels()
+            : new ArrayList<>(changed);
 
-		response.complete(new Result<>(updated, changes.right));
-	}
+        response.complete(new Result<>(updated, changes.right));
+    }
 }

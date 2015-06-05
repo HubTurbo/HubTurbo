@@ -7,22 +7,22 @@ import com.google.common.eventbus.EventBus;
  * Used for testing.
  */
 public class EventDispatcherStub implements EventDispatcher {
-	EventBus eventBus;
+    EventBus eventBus;
 
-	public EventDispatcherStub() {
-		this.eventBus = new EventBus();
-	}
+    public EventDispatcherStub() {
+        this.eventBus = new EventBus();
+    }
 
-	public void registerEvent(EventHandler handler) {
-		eventBus.register(handler);
-	}
+    public void registerEvent(EventHandler handler) {
+        eventBus.register(handler);
+    }
 
-	public void unregisterEvent(EventHandler handler) {
-		eventBus.unregister(handler);
-	}
+    public void unregisterEvent(EventHandler handler) {
+        eventBus.unregister(handler);
+    }
 
-	public <T extends Event> void triggerEvent(T event) {
-		eventBus.post(event);
-	}
+    public <T extends Event> void triggerEvent(T event) {
+        eventBus.post(event);
+    }
 
 }

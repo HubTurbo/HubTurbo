@@ -21,104 +21,104 @@ import util.events.IssueSelectedEvent;
 
 public class IssuePanel extends IssueColumn {
 
-	private final IModel model;
-	private final UI ui;
-	private int issueCount;
+    private final IModel model;
+    private final UI ui;
+    private int issueCount;
 
-	private NavigableListView<TurboIssue> listView;
-	private final KeyCombination keyCombBoxToList =
-		new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination keyCombListToBox =
-		new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination maximizeWindow =
-		new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination minimizeWindow =
-		new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination defaultSizeWindow =
-		new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-	private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
+    private NavigableListView<TurboIssue> listView;
+    private final KeyCombination keyCombBoxToList =
+        new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination keyCombListToBox =
+        new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination maximizeWindow =
+        new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination minimizeWindow =
+        new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination defaultSizeWindow =
+        new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
-	public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
-		super(ui, model, parentColumnControl, columnIndex);
-		this.model = model;
-		this.ui = ui;
+    public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
+        super(ui, model, parentColumnControl, columnIndex);
+        this.model = model;
+        this.ui = ui;
 
-		listView = new NavigableListView<>();
-		setupListView();
-		getChildren().add(listView);
+        listView = new NavigableListView<>();
+        setupListView();
+        getChildren().add(listView);
 
-		refreshItems();
-	}
+        refreshItems();
+    }
 
-	/**
-	 * Determines if an issue has had new comments added (or removed) based on
-	 * its last-known comment count in {@link #issueCommentCounts}.
-	 * @param issue
-	 * @return true if the issue has changed, false otherwise
-	 */
-	private boolean issueHasNewComments(TurboIssue issue) {
-		if (!issueCommentCounts.containsKey(issue.getId())) {
-			return false;
-		}
-		return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
-	}
+    /**
+     * Determines if an issue has had new comments added (or removed) based on
+     * its last-known comment count in {@link #issueCommentCounts}.
+     * @param issue
+     * @return true if the issue has changed, false otherwise
+     */
+    private boolean issueHasNewComments(TurboIssue issue) {
+        if (!issueCommentCounts.containsKey(issue.getId())) {
+            return false;
+        }
+        return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+    }
 
-	/**
-	 * Updates {@link #issueCommentCounts} with the latest counts.
-	 * Returns a list of issues which have new comments.
-	 * @return
-	 */
-	private HashSet<Integer> updateIssueCommentCounts() {
-		HashSet<Integer> result = new HashSet<>();
-		for (TurboIssue issue : getIssueList()) {
-			if (issueCommentCounts.containsKey(issue.getId())) {
-				// We know about this issue; check if it's been updated
-				if (issueHasNewComments(issue)) {
-					result.add(issue.getId());
-				}
-			} else {
-				// We don't know about this issue
-				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
-			}
-		}
-		return result;
-	}
+    /**
+     * Updates {@link #issueCommentCounts} with the latest counts.
+     * Returns a list of issues which have new comments.
+     * @return
+     */
+    private HashSet<Integer> updateIssueCommentCounts() {
+        HashSet<Integer> result = new HashSet<>();
+        for (TurboIssue issue : getIssueList()) {
+            if (issueCommentCounts.containsKey(issue.getId())) {
+                // We know about this issue; check if it's been updated
+                if (issueHasNewComments(issue)) {
+                    result.add(issue.getId());
+                }
+            } else {
+                // We don't know about this issue
+                issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+            }
+        }
+        return result;
+    }
 
-	@Override
-	public void refreshItems() {
-		super.refreshItems();
-		final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
-		
-		// Set the cell factory every time - this forces the list view to update
-		listView.setCellFactory(list ->
-			new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
-		listView.saveSelection();
+    @Override
+    public void refreshItems() {
+        super.refreshItems();
+        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
 
-		// Supposedly this also causes the list view to update - not sure
-		// if it actually does on platforms other than Linux...
-		listView.setItems(null);
-		listView.setItems(getIssueList());
-		issueCount = getIssueList().size();
+        // Set the cell factory every time - this forces the list view to update
+        listView.setCellFactory(list ->
+            new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
+        listView.saveSelection();
 
-		listView.restoreSelection();
-		this.setId(model.getDefaultRepo() + "_col" + columnIndex);
-	}
+        // Supposedly this also causes the list view to update - not sure
+        // if it actually does on platforms other than Linux...
+        listView.setItems(null);
+        listView.setItems(getIssueList());
+        issueCount = getIssueList().size();
 
-	private void setupListView() {
-		setVgrow(listView, Priority.ALWAYS);
-		setupKeyboardShortcuts();
-		listView.setOnItemSelected(i -> {
-			TurboIssue issue = listView.getItems().get(i);
-			ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
-			if (issueHasNewComments(issue)) {
-				issueCommentCounts.put(issue.getId(), issue.getCommentCount());
-				refreshItems();
-			}
-		});
-	}
+        listView.restoreSelection();
+        this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+    }
 
-	private void setupKeyboardShortcuts() {
-		filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+    private void setupListView() {
+        setVgrow(listView, Priority.ALWAYS);
+        setupKeyboardShortcuts();
+        listView.setOnItemSelected(i -> {
+            TurboIssue issue = listView.getItems().get(i);
+            ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
+            if (issueHasNewComments(issue)) {
+                issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+                refreshItems();
+            }
+        });
+    }
+
+    private void setupKeyboardShortcuts() {
+        filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (keyCombBoxToList.match(event)) {
                 event.consume();
                 listView.selectFirstItem();
@@ -141,7 +141,7 @@ public class IssuePanel extends IssueColumn {
             }
         });
 
-		addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
             if (event.getCode() == KeyCode.R) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
@@ -248,21 +248,21 @@ public class IssuePanel extends IssueColumn {
                 ui.setDefaultWidth();
             }
         });
-	}
+    }
 
-	private void setFocusToFilterBox() {
-		filterTextField.requestFocus();
-		filterTextField.setText(filterTextField.getText().trim());
-		filterTextField.positionCaret(filterTextField.getLength());
+    private void setFocusToFilterBox() {
+        filterTextField.requestFocus();
+        filterTextField.setText(filterTextField.getText().trim());
+        filterTextField.positionCaret(filterTextField.getLength());
 
-		addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
                 listView.selectFirstItem();
             }
         });
-	}
+    }
 
-	public int getIssueCount() {
-		return issueCount;
-	}
+    public int getIssueCount() {
+        return issueCount;
+    }
 }
