@@ -211,10 +211,10 @@ page at http://checkstyle.sourceforge.net/config.html -->
       <property name="severity" value="warning"/>
     </module>
 
-    <!-- Checks for braces around if and else blocks -->
+    <!-- Checks for braces around loop blocks -->
     <module name="NeedBraces">
       <property name="severity" value="warning"/>
-      <property name="tokens" value="LITERAL_IF, LITERAL_ELSE, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO"/>
+      <property name="tokens" value="LITERAL_FOR, LITERAL_WHILE, LITERAL_DO"/>
     </module>
 
     <module name="UpperEll">
