@@ -139,6 +139,7 @@ public class MenuControl extends MenuBar {
 	    }
 
 		TextInputDialog dlg = new TextInputDialog("");
+		dlg.getEditor().setId("boardnameinput");
 		dlg.setTitle("Board Name");
 		dlg.getDialogPane().setContentText("What should this board be called?");
 		dlg.getDialogPane().setHeaderText("Please name this board");
