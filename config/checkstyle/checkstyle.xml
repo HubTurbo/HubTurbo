@@ -3,9 +3,30 @@
     "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
-<!-- This is a checkstyle configuration file. For descriptions of
-what the following rules do, please see the checkstyle configuration
-page at http://checkstyle.sourceforge.net/config.html -->
+<!--
+
+    This configuration file enforces rules for a modified version of
+    Google's Java style guide.
+
+    Here are the main changes:
+
+    - Certain conventions are inapplicable: Google copyright notices,
+      named TODOs. These have been removed.
+    - Import order requirements have been changed to match Eclipse's default
+      (no priority given to Google-specific package names).
+    - Method names such as __METHOD_NAME__ are allowed, to serve as markers in
+      an IDE.
+    - Max line length is 120, instead of 100.
+    - `if` and `else` blocks do not need to have braces. This is useful for
+      guard clauses and automatically-generated `equals` methods.
+    - There are no javadoc checks. There doesn't seem to be a way to have
+      optional javadocs, yet have those which are present be checked. Hopefully
+      this can be rectified in future.
+
+    For explanations of what the rules do, see
+    http://checkstyle.sourceforge.net/config.html.
+
+-->
 
 <module name="Checker">
 
