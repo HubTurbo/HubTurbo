@@ -51,8 +51,9 @@ public class UseGlobalConfigsTest extends UITest {
         press(KeyCode.ENTER).release(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
+        sleep(2000);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        sleep(500);
+        sleep(2000);
         click("#dummy/dummy_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
