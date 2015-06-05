@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Optional;
 
@@ -53,5 +54,12 @@ public class TurboLabelTest {
         assertEquals(delimiter, label.getName());
         assertEquals(delimiter, label.getActualName());
         assertEquals(false, label.isExclusive());
+    }
+
+    @Test
+    public void styleTest() {
+        TurboLabel label1 = new TurboLabel(REPO, "name1");
+        TurboLabel label2 = new TurboLabel(REPO, "name2");
+        assertEquals(label1.getStyle(), label2.getStyle());
     }
 }
