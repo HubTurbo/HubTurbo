@@ -110,7 +110,7 @@ public class UI extends Application implements EventDispatcher {
 		logic.setDefaultRepo(repoId);
 		repoSelector.setText(repoId);
 
-		triggerEvent(new BoardSavedEvent());
+		triggerEvent(new BoardSavedEvent()); // Initializes boards
 
 		if (isTestMode()) {
 			if (isTestChromeDriver()) {
