@@ -48,7 +48,8 @@ public class UseGlobalConfigsTest extends UITest {
         click("Boards");
         click("Save");
         type("Empty Board");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        click("OK");
+        // press(KeyCode.ENTER).release(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
         sleep(2000);
