@@ -332,42 +332,13 @@ public class Qualifier implements FilterExpression {
         if (getClass() != obj.getClass())
             return false;
         Qualifier other = (Qualifier) obj;
-        if (content == null) {
-            if (other.content != null)
-                return false;
-        } else if (!content.equals(other.content))
-            return false;
-        if (date == null) {
-            if (other.date != null)
-                return false;
-        } else if (!date.equals(other.date))
-            return false;
-        if (dateRange == null) {
-            if (other.dateRange != null)
-                return false;
-        } else if (!dateRange.equals(other.dateRange))
-            return false;
-        if (number == null) {
-            if (other.number != null)
-                return false;
-        } else if (!number.equals(other.number))
-            return false;
-        if (numberRange == null) {
-            if (other.numberRange != null)
-                return false;
-        } else if (!numberRange.equals(other.numberRange))
-            return false;
-        if (sortKeys == null) {
-            if (other.sortKeys != null)
-                return false;
-        } else if (!sortKeys.equals(other.sortKeys))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
+        return content.equals(other.content) &&
+                date.equals(other.date) &&
+                dateRange.equals(other.dateRange) &&
+                number.equals(other.number) &&
+                numberRange.equals(other.numberRange) &&
+                sortKeys.equals(other.sortKeys) &&
+                name.equals(other.name);
     }
 
     private static boolean shouldNotBeStripped(Qualifier q) {
