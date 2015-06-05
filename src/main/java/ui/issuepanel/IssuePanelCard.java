@@ -101,7 +101,7 @@ public class IssuePanelCard extends VBox {
             })
             .collect(Collectors.toList());
 
-        return layoutEvents(issue, eventsWithinDuration, commentsWithinDuration);
+        return layoutEvents(model, issue, eventsWithinDuration, commentsWithinDuration);
     }
 
     /**
@@ -110,7 +110,7 @@ public class IssuePanelCard extends VBox {
      * @param comments
      * @return
      */
-    private static Node layoutEvents(TurboIssue issue,
+    private static Node layoutEvents(Model model, TurboIssue issue,
                                      List<TurboIssueEvent> events, List<Comment> comments) {
         VBox result = new VBox();
         result.setSpacing(3);
@@ -118,7 +118,7 @@ public class IssuePanelCard extends VBox {
 
         // Events
         events.stream()
-            .map(e -> e.display(issue))
+            .map(e -> e.display(model, issue))
             .forEach(e -> result.getChildren().add(e));
 
         // Comments
