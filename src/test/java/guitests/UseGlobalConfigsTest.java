@@ -50,9 +50,10 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save");
-        click("#boardnameinput");
-        type("Empty Board");
-        click("OK"); // Should not use ENTER here, Travis CI does not autofocus on "OK".
+        // Somehow the text field cannot be populated by typing on the CI, use setText instead.
+        // TODO find out why
+        ((TextField) find("#boardnameinput")).setText("Empty Board");
+        click("OK");
 
         // Load dummy2/dummy2 too
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
@@ -66,8 +67,7 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save");
-        click("#boardnameinput");
-        type("Dummy Board");
+        ((TextField) find("#boardnameinput")).setText("Dummy Board");
         click("OK");
 
         // Then exit program...
