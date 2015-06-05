@@ -48,13 +48,10 @@ public class UseGlobalConfigsTest extends UITest {
         click("Boards");
         click("Save");
         type("Empty Board");
-        click("OK");
-        // press(KeyCode.ENTER).release(KeyCode.ENTER);
+        click("OK"); // Should not use ENTER here, Travis CI does not autofocus on "OK".
 
         // Load dummy2/dummy2 too
-        sleep(2000);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        sleep(2000);
         click("#dummy/dummy_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
@@ -66,7 +63,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("Boards");
         click("Save");
         type("Dummy Board");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        click("OK");
 
         // Then exit program...
         click("Preferences");
