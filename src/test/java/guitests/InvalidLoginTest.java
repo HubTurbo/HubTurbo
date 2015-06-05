@@ -1,12 +1,13 @@
 package guitests;
 
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static org.loadui.testfx.controls.Commons.hasText;
+
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 
 public class InvalidLoginTest extends UITest {
 

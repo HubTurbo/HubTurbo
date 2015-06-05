@@ -1,22 +1,22 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
-import org.junit.Test;
-import ui.UI;
-import ui.issuepanel.IssuePanel;
-import ui.issuepanel.IssuePanelCard;
-import util.PlatformEx;
-import util.events.UILogicRefreshEvent;
-import util.events.UpdateDummyRepoEvent;
+import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import javafx.scene.input.KeyCode;
+import ui.UI;
+import ui.issuepanel.IssuePanel;
+import util.PlatformEx;
+import util.events.UILogicRefreshEvent;
+import util.events.UpdateDummyRepoEvent;
 
 public class UpdateIssuesTest extends UITest {
 
-    private final int EVENT_DELAY = 500;
+    private static final int EVENT_DELAY = 500;
 
     @Test
     @SuppressWarnings("unchecked")

@@ -1,7 +1,8 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
 import org.junit.Test;
+
+import javafx.scene.input.KeyCode;
 
 public class UIComponentsTest extends UITest {
 

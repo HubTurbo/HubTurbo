@@ -1,10 +1,6 @@
 package backend.json;
 
-import backend.interfaces.RepoStore;
-import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Same as JSONStore, but with the save function disabled.
@@ -14,6 +10,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public class JSONStoreStub extends JSONStore {
 
-	@Override
-	public void saveRepository(String repoId, SerializableModel model) {}
+    @Override
+    public void saveRepository(String repoId, SerializableModel model) {}
 }

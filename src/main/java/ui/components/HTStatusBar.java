@@ -1,40 +1,41 @@
 package ui.components;
 
-import javafx.application.Platform;
-import org.controlsfx.control.StatusBar;
-import ui.UI;
-import util.events.UpdateProgressEventHandler;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.controlsfx.control.StatusBar;
+
+import javafx.application.Platform;
+import ui.UI;
+import util.events.UpdateProgressEventHandler;
+
 public class HTStatusBar extends StatusBar implements StatusUI {
 
-	private final UI ui;
-	private final Map<String, TextProgressBar> progressBars;
+    private final UI ui;
+    private final Map<String, TextProgressBar> progressBars;
 
-	public HTStatusBar(UI ui) {
-		this.ui = ui;
-		progressBars = new HashMap<>();
+    public HTStatusBar(UI ui) {
+        this.ui = ui;
+        progressBars = new HashMap<>();
 
-		setup();
+        setup();
 
-		setupProgressEvents();
-	}
+        setupProgressEvents();
+    }
 
-	@Override
-	public void updateTimeToRefresh(int time) {
-		Platform.runLater(() -> {
-			if (time == 10) {
-				setText("Refreshing in 10 seconds...");
-			} else if (time == 5) {
-				setText("Refreshing in 5 seconds...");
-			}
-		});
-	}
+    @Override
+    public void updateTimeToRefresh(int time) {
+        Platform.runLater(() -> {
+            if (time == 10) {
+                setText("Refreshing in 10 seconds...");
+            } else if (time == 5) {
+                setText("Refreshing in 5 seconds...");
+            }
+        });
+    }
 
-	private void setupProgressEvents() {
-		ui.registerEvent((UpdateProgressEventHandler) e -> Platform.runLater(() -> {
+    private void setupProgressEvents() {
+        ui.registerEvent((UpdateProgressEventHandler) e -> Platform.runLater(() -> {
             if (progressBars.containsKey(e.repoId)) {
                 if (e.done) {
                     getRightItems().remove(progressBars.get(e.repoId));
@@ -47,18 +48,18 @@ public class HTStatusBar extends StatusBar implements StatusUI {
                 getRightItems().add(progressBar);
             }
         }));
-	}
+    }
 
-	private void setup() {
-		getStyleClass().add("top-borders");
-	}
+    private void setup() {
+        getStyleClass().add("top-borders");
+    }
 
-	public void displayMessage(String text) {
-		Platform.runLater(() -> setText(text));
-	}
+    public void displayMessage(String text) {
+        Platform.runLater(() -> setText(text));
+    }
 
-	@Override
-	public void clear() {
-		displayMessage("");
-	}
+    @Override
+    public void clear() {
+        displayMessage("");
+    }
 }

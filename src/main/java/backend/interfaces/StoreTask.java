@@ -1,12 +1,12 @@
 package backend.interfaces;
 
 public abstract class StoreTask implements Runnable {
-	public final String repoId;
+    public final String repoId;
 
-	protected StoreTask(String repoId) {
-		this.repoId = repoId;
-	}
+    protected StoreTask(String repoId) {
+        this.repoId = repoId;
+    }
 
-	public abstract void run();
+    public abstract void run();
 }
 

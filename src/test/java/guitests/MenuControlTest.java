@@ -1,7 +1,8 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
 import org.junit.Test;
+
+import javafx.scene.input.KeyCode;
 
 public class MenuControlTest extends UITest {
 
@@ -10,7 +11,8 @@ public class MenuControlTest extends UITest {
     public void menuControlTest() {
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).release(KeyCode.P).release(KeyCode.SHIFT).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).release(KeyCode.P)
+            .release(KeyCode.SHIFT).release(KeyCode.CONTROL);
 
         click("Panels");
         click("Create");

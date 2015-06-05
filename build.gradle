@@ -17,8 +17,12 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
-    // TODO: use a checkstyle configuration
-    // apply plugin: 'checkstyle'
+
+    apply plugin: 'checkstyle'
+    checkstyle {
+        toolVersion = "5.9"
+    }
+
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')

@@ -1,9 +1,10 @@
 package tests;
 
-import filter.expression.NumberRange;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import filter.expression.NumberRange;
 
 public class NumberRangeTest {
 

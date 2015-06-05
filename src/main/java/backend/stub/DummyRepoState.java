@@ -1,5 +1,14 @@
 package backend.stub;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.User;
+
 import backend.IssueMetadata;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -7,234 +16,222 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.IssueEventType;
 import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.User;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
-import java.util.UUID;
-import java.util.TreeMap;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
 
 public class DummyRepoState {
 
-	private String dummyRepoId;
+    private String dummyRepoId;
 
-	private TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
-	private TreeMap<String, TurboLabel> labels = new TreeMap<>();
-	private TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
-	private TreeMap<String, TurboUser> users = new TreeMap<>();
+    private TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
+    private TreeMap<String, TurboLabel> labels = new TreeMap<>();
+    private TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
+    private TreeMap<String, TurboUser> users = new TreeMap<>();
 
-	private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>();
-	private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>();
-	private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
-	private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
+    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>();
+    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>();
+    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
+    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
 
-	public DummyRepoState(String repoId) {
-		this.dummyRepoId = repoId;
+    public DummyRepoState(String repoId) {
+        this.dummyRepoId = repoId;
 
-		for (int i = 0; i < 10; i++) {
-			TurboIssue dummyIssue = makeDummyIssue();
-			// All default issues are treated as if created a long time ago
-			dummyIssue.setUpdatedAt(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)));
-			TurboLabel dummyLabel = makeDummyLabel();
-			TurboMilestone dummyMilestone = makeDummyMilestone();
-			TurboUser dummyUser = makeDummyUser();
+        for (int i = 0; i < 10; i++) {
+            TurboIssue dummyIssue = makeDummyIssue();
+            // All default issues are treated as if created a long time ago
+            dummyIssue.setUpdatedAt(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)));
+            TurboLabel dummyLabel = makeDummyLabel();
+            TurboMilestone dummyMilestone = makeDummyMilestone();
+            TurboUser dummyUser = makeDummyUser();
 
-			// Populate state with default objects
-			issues.put(dummyIssue.getId(), dummyIssue);
-			labels.put(dummyLabel.getActualName(), dummyLabel);
-			milestones.put(dummyMilestone.getId(), dummyMilestone);
-			users.put(dummyUser.getLoginName(), dummyUser);
-		}
-	}
+            // Populate state with default objects
+            issues.put(dummyIssue.getId(), dummyIssue);
+            labels.put(dummyLabel.getActualName(), dummyLabel);
+            milestones.put(dummyMilestone.getId(), dummyMilestone);
+            users.put(dummyUser.getLoginName(), dummyUser);
+        }
+    }
 
-	protected ImmutableTriple<List<TurboIssue>, String, Date>
-	getUpdatedIssues(String ETag, Date lastCheckTime) {
-		String currETag = ETag;
-		if (!updatedIssues.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+    protected ImmutableTriple<List<TurboIssue>, String, Date>
+        getUpdatedIssues(String eTag, Date lastCheckTime) {
 
-		ImmutableTriple<List<TurboIssue>, String, Date> toReturn
-				= new ImmutableTriple<>(new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
+        String currETag = eTag;
+        if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-		updatedIssues = new TreeMap<>();
-		return toReturn;
-	}
+        ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
+            new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
 
-	protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String ETag) {
-		String currETag = ETag;
-		if (!updatedLabels.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+        updatedIssues = new TreeMap<>();
+        return toReturn;
+    }
 
-		ImmutablePair<List<TurboLabel>, String> toReturn
-			= new ImmutablePair<>(new ArrayList<>(updatedLabels.values()), currETag);
+    protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String eTag) {
+        String currETag = eTag;
+        if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-		updatedLabels = new TreeMap<>();
-		return toReturn;
-	}
+        ImmutablePair<List<TurboLabel>, String> toReturn
+            = new ImmutablePair<>(new ArrayList<>(updatedLabels.values()), currETag);
 
-	protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String ETag) {
-		String currETag = ETag;
-		if (!updatedMilestones.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+        updatedLabels = new TreeMap<>();
+        return toReturn;
+    }
 
-		ImmutablePair<List<TurboMilestone>, String> toReturn
-			= new ImmutablePair<>(new ArrayList<>(updatedMilestones.values()), currETag);
+    protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String eTag) {
+        String currETag = eTag;
+        if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-		updatedMilestones = new TreeMap<>();
-		return toReturn;
-	}
+        ImmutablePair<List<TurboMilestone>, String> toReturn
+            = new ImmutablePair<>(new ArrayList<>(updatedMilestones.values()), currETag);
 
-	protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String ETag) {
-		String currETag = ETag;
-		if (!updatedUsers.isEmpty() || ETag == null) currETag = UUID.randomUUID().toString();
+        updatedMilestones = new TreeMap<>();
+        return toReturn;
+    }
 
-		ImmutablePair<List<TurboUser>, String> toReturn
-			= new ImmutablePair<>(new ArrayList<>(updatedUsers.values()), currETag);
+    protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String eTag) {
+        String currETag = eTag;
+        if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-		updatedUsers = new TreeMap<>();
-		return toReturn;
-	}
+        ImmutablePair<List<TurboUser>, String> toReturn
+            = new ImmutablePair<>(new ArrayList<>(updatedUsers.values()), currETag);
 
-	protected List<TurboIssue> getIssues() {
-		return new ArrayList<>(issues.values());
-	}
+        updatedUsers = new TreeMap<>();
+        return toReturn;
+    }
 
-	protected List<TurboLabel> getLabels() {
-		return new ArrayList<>(labels.values());
-	}
+    protected List<TurboIssue> getIssues() {
+        return new ArrayList<>(issues.values());
+    }
 
-	protected List<TurboMilestone> getMilestones() {
-		return new ArrayList<>(milestones.values());
-	}
+    protected List<TurboLabel> getLabels() {
+        return new ArrayList<>(labels.values());
+    }
 
-	protected List<TurboUser> getCollaborators() {
-		return new ArrayList<>(users.values());
-	}
+    protected List<TurboMilestone> getMilestones() {
+        return new ArrayList<>(milestones.values());
+    }
 
-	private TurboIssue makeDummyIssue() {
-		return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
-	}
+    protected List<TurboUser> getCollaborators() {
+        return new ArrayList<>(users.values());
+    }
 
-	private TurboLabel makeDummyLabel() {
-		return new TurboLabel(dummyRepoId, "Label " + (labels.size() + 1));
-	}
+    private TurboIssue makeDummyIssue() {
+        return new TurboIssue(dummyRepoId, issues.size() + 1, "Issue " + (issues.size() + 1));
+    }
 
-	private TurboMilestone makeDummyMilestone() {
-		return new TurboMilestone(dummyRepoId, milestones.size() + 1, "Milestone " + (milestones.size() + 1));
-	}
+    private TurboLabel makeDummyLabel() {
+        return new TurboLabel(dummyRepoId, "Label " + (labels.size() + 1));
+    }
 
-	private TurboUser makeDummyUser() {
-		return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
-	}
+    private TurboMilestone makeDummyMilestone() {
+        return new TurboMilestone(dummyRepoId, milestones.size() + 1, "Milestone " + (milestones.size() + 1));
+    }
 
-	protected List<TurboIssueEvent> getEvents(int issueId) {
-		TurboIssue issueToGet = issues.get(issueId);
-		if (issueToGet != null) {
-			return issueToGet.getMetadata().getEvents();
-		}
-		// Fail silently
-		return new ArrayList<>();
-	}
+    private TurboUser makeDummyUser() {
+        return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
+    }
 
-	protected List<Comment> getComments(int issueId) {
-		TurboIssue issueToGet = issues.get(issueId);
-		if (issueToGet != null) {
-			return issueToGet.getMetadata().getComments();
-		}
-		// Fail silently
-		return new ArrayList<>();
-	}
+    protected List<TurboIssueEvent> getEvents(int issueId) {
+        TurboIssue issueToGet = issues.get(issueId);
+        if (issueToGet != null) {
+            return issueToGet.getMetadata().getEvents();
+        }
+        // Fail silently
+        return new ArrayList<>();
+    }
 
-	// UpdateEvent methods to directly mutate the repo state
-	protected void makeNewIssue() {
-		TurboIssue toAdd = makeDummyIssue();
-		issues.put(toAdd.getId(), toAdd);
-		updatedIssues.put(toAdd.getId(), toAdd);
-	}
+    protected List<Comment> getComments(int issueId) {
+        TurboIssue issueToGet = issues.get(issueId);
+        if (issueToGet != null) {
+            return issueToGet.getMetadata().getComments();
+        }
+        // Fail silently
+        return new ArrayList<>();
+    }
 
-	protected void makeNewLabel() {
-		TurboLabel toAdd = makeDummyLabel();
-		labels.put(toAdd.getActualName(), toAdd);
-		updatedLabels.put(toAdd.getActualName(), toAdd);
-	}
+    // UpdateEvent methods to directly mutate the repo state
+    protected void makeNewIssue() {
+        TurboIssue toAdd = makeDummyIssue();
+        issues.put(toAdd.getId(), toAdd);
+        updatedIssues.put(toAdd.getId(), toAdd);
+    }
 
-	protected void makeNewMilestone() {
-		TurboMilestone toAdd = makeDummyMilestone();
-		milestones.put(toAdd.getId(), toAdd);
-		updatedMilestones.put(toAdd.getId(), toAdd);
-	}
+    protected void makeNewLabel() {
+        TurboLabel toAdd = makeDummyLabel();
+        labels.put(toAdd.getActualName(), toAdd);
+        updatedLabels.put(toAdd.getActualName(), toAdd);
+    }
 
-	protected void makeNewUser() {
-		TurboUser toAdd = makeDummyUser();
-		users.put(toAdd.getLoginName(), toAdd);
-		updatedUsers.put(toAdd.getLoginName(), toAdd);
-	}
+    protected void makeNewMilestone() {
+        TurboMilestone toAdd = makeDummyMilestone();
+        milestones.put(toAdd.getId(), toAdd);
+        updatedMilestones.put(toAdd.getId(), toAdd);
+    }
 
-	// Only updating of issues and milestones is possible. Labels and users are immutable.
-	protected TurboIssue updateIssue(int itemId, String updateText) {
-		TurboIssue issueToUpdate = issues.get(itemId);
+    protected void makeNewUser() {
+        TurboUser toAdd = makeDummyUser();
+        users.put(toAdd.getLoginName(), toAdd);
+        updatedUsers.put(toAdd.getLoginName(), toAdd);
+    }
 
-		if (issueToUpdate != null) {
-			return renameIssue(issueToUpdate, updateText);
-		}
-		return null;
-	}
+    // Only updating of issues and milestones is possible. Labels and users are immutable.
+    protected TurboIssue updateIssue(int itemId, String updateText) {
+        TurboIssue issueToUpdate = issues.get(itemId);
 
-	private TurboIssue renameIssue(TurboIssue issueToUpdate, String updateText) {
-		issueToUpdate.setTitle(updateText);
+        if (issueToUpdate != null) {
+            return renameIssue(issueToUpdate, updateText);
+        }
+        return null;
+    }
 
-		// Add renamed event to events list of issue
-		List<TurboIssueEvent> eventsOfIssue = issueToUpdate.getMetadata().getEvents();
-		eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
-				IssueEventType.Renamed,
-				new Date()));
-		List<Comment> commentsOfIssue = issueToUpdate.getMetadata().getComments();
-		issueToUpdate.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
-		issueToUpdate.setUpdatedAt(LocalDateTime.now());
+    private TurboIssue renameIssue(TurboIssue issueToUpdate, String updateText) {
+        issueToUpdate.setTitle(updateText);
 
-		// Add to list of updated issues
-		updatedIssues.put(issueToUpdate.getId(), issueToUpdate);
+        // Add renamed event to events list of issue
+        List<TurboIssueEvent> eventsOfIssue = issueToUpdate.getMetadata().getEvents();
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
+                IssueEventType.Renamed,
+                new Date()));
+        List<Comment> commentsOfIssue = issueToUpdate.getMetadata().getComments();
+        issueToUpdate.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        issueToUpdate.setUpdatedAt(LocalDateTime.now());
 
-		return issueToUpdate;
-	}
+        // Add to list of updated issues
+        updatedIssues.put(issueToUpdate.getId(), issueToUpdate);
 
-	protected TurboMilestone updateMilestone(int itemId, String updateText) {
-		TurboMilestone milestoneToUpdate = milestones.get(itemId);
+        return issueToUpdate;
+    }
 
-		if (milestoneToUpdate != null) {
-			return renameMilestone(milestoneToUpdate, updateText);
-		}
-		return null;
-	}
+    protected TurboMilestone updateMilestone(int itemId, String updateText) {
+        TurboMilestone milestoneToUpdate = milestones.get(itemId);
 
-	private TurboMilestone renameMilestone(TurboMilestone milestoneToUpdate, String updateText) {
-		milestoneToUpdate.setTitle(updateText);
-		updatedMilestones.put(milestoneToUpdate.getId(), milestoneToUpdate);
+        if (milestoneToUpdate != null) {
+            return renameMilestone(milestoneToUpdate, updateText);
+        }
+        return null;
+    }
 
-		return milestoneToUpdate;
-	}
+    private TurboMilestone renameMilestone(TurboMilestone milestoneToUpdate, String updateText) {
+        milestoneToUpdate.setTitle(updateText);
+        updatedMilestones.put(milestoneToUpdate.getId(), milestoneToUpdate);
 
-	protected TurboIssue deleteIssue(int itemId) {
-		updatedIssues.remove(itemId);
-		return issues.remove(itemId);
-	}
+        return milestoneToUpdate;
+    }
 
-	protected TurboLabel deleteLabel(String idString) {
-		updatedLabels.remove(idString);
-		return labels.remove(idString);
-	}
+    protected TurboIssue deleteIssue(int itemId) {
+        updatedIssues.remove(itemId);
+        return issues.remove(itemId);
+    }
 
-	protected TurboMilestone deleteMilestone(int itemId) {
-		updatedMilestones.remove(itemId);
-		return milestones.remove(itemId);
-	}
+    protected TurboLabel deleteLabel(String idString) {
+        updatedLabels.remove(idString);
+        return labels.remove(idString);
+    }
 
-	protected TurboUser deleteUser(String idString) {
-		updatedUsers.remove(idString);
-		return users.remove(idString);
-	}
+    protected TurboMilestone deleteMilestone(int itemId) {
+        updatedMilestones.remove(itemId);
+        return milestones.remove(itemId);
+    }
+
+    protected TurboUser deleteUser(String idString) {
+        updatedUsers.remove(idString);
+        return users.remove(idString);
+    }
 }

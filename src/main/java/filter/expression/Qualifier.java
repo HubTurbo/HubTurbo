@@ -1,5 +1,13 @@
 package filter.expression;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -9,143 +17,137 @@ import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 import util.Utility;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 public class Qualifier implements FilterExpression {
 
-	public static final String UPDATED = "updated";
-	public static final String REPO = "repo";
-	public static final String SORT = "sort";
+    public static final String UPDATED = "updated";
+    public static final String REPO = "repo";
+    public static final String SORT = "sort";
 
-	public static final Qualifier EMPTY = new Qualifier("", "");
+    public static final Qualifier EMPTY = new Qualifier("", "");
 
-	public static final String[] KEYWORDS = new String[] {
-		"assignees", "author", "body", "closed", "comments", "created", "creator",
-		"date", "desc", "description", "has", "id", "in", "involves", "is", "issue",
-		"keyword", "label", "labels", "merged", "milestone", "milestones", "no",
-		"open", "pr", "pullrequest", "read", "repo", "sort", "state", "status", "title",
-		"type", "unmerged", "unread", "updated", "user"
-	};
+    public static final String[] KEYWORDS = new String[] {
+        "assignees", "author", "body", "closed", "comments", "created", "creator",
+        "date", "desc", "description", "has", "id", "in", "involves", "is", "issue",
+        "keyword", "label", "labels", "merged", "milestone", "milestones", "no",
+        "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status", "title",
+        "type", "unmerged", "unread", "updated", "user"
+    };
 
-	private final String name;
+    private final String name;
 
-	// Only one of these will be present at a time
-	private Optional<DateRange> dateRange = Optional.empty();
-	private Optional<String> content = Optional.empty();
-	private Optional<LocalDate> date = Optional.empty();
-	private Optional<NumberRange> numberRange = Optional.empty();
-	private Optional<Integer> number = Optional.empty();
-	private List<SortKey> sortKeys = new ArrayList<>();
+    // Only one of these will be present at a time
+    private Optional<DateRange> dateRange = Optional.empty();
+    private Optional<String> content = Optional.empty();
+    private Optional<LocalDate> date = Optional.empty();
+    private Optional<NumberRange> numberRange = Optional.empty();
+    private Optional<Integer> number = Optional.empty();
+    private List<SortKey> sortKeys = new ArrayList<>();
 
-	// Copy constructor
-	public Qualifier(Qualifier other) {
-		this.name = other.getName();
-		if (other.getDateRange().isPresent()) {
-			this.dateRange = other.getDateRange();
-		} else if (other.getDate().isPresent()) {
-			this.date = other.getDate();
-		} else if (other.getContent().isPresent()) {
-			this.content = other.getContent();
-		} else if (other.getNumberRange().isPresent()) {
-			this.numberRange = other.getNumberRange();
-		} else if (other.getNumber().isPresent()) {
-			this.number = other.getNumber();
-		} else if (!other.sortKeys.isEmpty()) {
-			this.sortKeys = new ArrayList<>(other.sortKeys);
-		} else {
-			assert false : "Unrecognised content type! You may have forgotten to add it above";
-		}
-	}
+    // Copy constructor
+    public Qualifier(Qualifier other) {
+        this.name = other.getName();
+        if (other.getDateRange().isPresent()) {
+            this.dateRange = other.getDateRange();
+        } else if (other.getDate().isPresent()) {
+            this.date = other.getDate();
+        } else if (other.getContent().isPresent()) {
+            this.content = other.getContent();
+        } else if (other.getNumberRange().isPresent()) {
+            this.numberRange = other.getNumberRange();
+        } else if (other.getNumber().isPresent()) {
+            this.number = other.getNumber();
+        } else if (!other.sortKeys.isEmpty()) {
+            this.sortKeys = new ArrayList<>(other.sortKeys);
+        } else {
+            assert false : "Unrecognised content type! You may have forgotten to add it above";
+        }
+    }
 
-	public Qualifier(String name, String content) {
-		this.name = name;
-		this.content = Optional.of(content);
-	}
+    public Qualifier(String name, String content) {
+        this.name = name;
+        this.content = Optional.of(content);
+    }
 
-	public Qualifier(String name, NumberRange numberRange) {
-		this.name = name;
-		this.numberRange = Optional.of(numberRange);
-	}
+    public Qualifier(String name, NumberRange numberRange) {
+        this.name = name;
+        this.numberRange = Optional.of(numberRange);
+    }
 
-	public Qualifier(String name, DateRange dateRange) {
-		this.name = name;
-		this.dateRange = Optional.of(dateRange);
-	}
+    public Qualifier(String name, DateRange dateRange) {
+        this.name = name;
+        this.dateRange = Optional.of(dateRange);
+    }
 
-	public Qualifier(String name, LocalDate date) {
-		this.name = name;
-		this.date = Optional.of(date);
-	}
+    public Qualifier(String name, LocalDate date) {
+        this.name = name;
+        this.date = Optional.of(date);
+    }
 
-	public Qualifier(String name, int number) {
-		this.name = name;
-		this.number = Optional.of(number);
-	}
+    public Qualifier(String name, int number) {
+        this.name = name;
+        this.number = Optional.of(number);
+    }
 
-	public Qualifier(String name, List<SortKey> keys) {
-		this.name = name;
-		this.sortKeys = new ArrayList<>(keys);
-	}
+    public Qualifier(String name, List<SortKey> keys) {
+        this.name = name;
+        this.sortKeys = new ArrayList<>(keys);
+    }
 
-	/**
-	 * Helper function for testing a filter expression against an issue.
-	 * Ensures that meta-qualifiers are taken care of.
-	 * Should always be used over isSatisfiedBy.
-	 */
-	public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
+    /**
+     * Helper function for testing a filter expression against an issue.
+     * Ensures that meta-qualifiers are taken care of.
+     * Should always be used over isSatisfiedBy.
+     */
+    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
 
-		FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
-		List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
+        FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
+        List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
-		// Preprocessing for repo qualifier
-		boolean containsRepoQualifier = metaQualifiers.stream()
-				.map(Qualifier::getName)
-				.collect(Collectors.toList())
-			.contains("repo");
+        // Preprocessing for repo qualifier
+        boolean containsRepoQualifier = metaQualifiers.stream()
+                .map(Qualifier::getName)
+                .collect(Collectors.toList())
+            .contains("repo");
 
-		if (!containsRepoQualifier) {
-			exprWithNormalQualifiers = new Conjunction(
-				new Qualifier("repo", model.getDefaultRepo()),
-				exprWithNormalQualifiers);
-		}
+        if (!containsRepoQualifier) {
+            exprWithNormalQualifiers = new Conjunction(
+                new Qualifier("repo", model.getDefaultRepo()),
+                exprWithNormalQualifiers);
+        }
 
-		return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
-	}
+        return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
+    }
 
-	public static void processMetaQualifierEffects(FilterExpression expr, BiConsumer<Qualifier, MetaQualifierInfo> callback) {
-		List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
-		MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
-		qualifiers.forEach(q -> callback.accept(q, info));
-	}
+    public static void processMetaQualifierEffects(FilterExpression expr,
+                                                   BiConsumer<Qualifier, MetaQualifierInfo> callback) {
 
-	private static LocalDateTime currentTime = null;
+        List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
+        MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
+        qualifiers.forEach(q -> callback.accept(q, info));
+    }
 
-	private static LocalDateTime getCurrentTime() {
-		if (currentTime == null) {
-			return LocalDateTime.now();
-		} else {
-			return currentTime;
-		}
-	}
+    private static LocalDateTime currentTime = null;
 
-	/**
-	 * For testing. Stubs the current time so time-related qualifiers work properly.
-	 */
-	public static void setCurrentTime(LocalDateTime dateTime) {
-		currentTime = dateTime;
-	}
+    private static LocalDateTime getCurrentTime() {
+        if (currentTime == null) {
+            return LocalDateTime.now();
+        } else {
+            return currentTime;
+        }
+    }
 
-	public boolean isEmptyQualifier() {
-		return name.isEmpty() && content.isPresent() && content.get().isEmpty();
-	}
+    /**
+     * For testing. Stubs the current time so time-related qualifiers work properly.
+     */
+    public static void setCurrentTime(LocalDateTime dateTime) {
+        currentTime = dateTime;
+    }
 
-	@Override
+    public boolean isEmptyQualifier() {
+        return name.isEmpty() && content.isPresent() && content.get().isEmpty();
+    }
+
+    @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert name != null;
 
@@ -189,7 +191,7 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-	        return satisfiesUpdatedHours(issue);
+            return satisfiesUpdatedHours(issue);
         case "repo":
             return satisfiesRepo(issue);
         default:
@@ -197,7 +199,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-	@Override
+    @Override
     public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
         assert name != null && content != null;
 
@@ -253,27 +255,27 @@ public class Qualifier implements FilterExpression {
         return new ArrayList<>(Arrays.asList(name));
     }
 
-	@Override
-	public FilterExpression filter(Predicate<Qualifier> pred) {
-		if (pred.test(this)) {
-			return new Qualifier(this);
-		} else {
-			return EMPTY;
-		}
-	}
+    @Override
+    public FilterExpression filter(Predicate<Qualifier> pred) {
+        if (pred.test(this)) {
+            return new Qualifier(this);
+        } else {
+            return EMPTY;
+        }
+    }
 
-	@Override
-	public List<Qualifier> find(Predicate<Qualifier> pred) {
-		if (pred.test(this)) {
-			ArrayList<Qualifier> result = new ArrayList<>();
-			result.add(this);
-			return result;
-		} else {
-			return new ArrayList<>();
-		}
-	}
+    @Override
+    public List<Qualifier> find(Predicate<Qualifier> pred) {
+        if (pred.test(this)) {
+            ArrayList<Qualifier> result = new ArrayList<>();
+            result.add(this);
+            return result;
+        } else {
+            return new ArrayList<>();
+        }
+    }
 
-	/**
+    /**
      * This method is used to serialise qualifiers. Thus whatever form returned
      * should be syntactically valid.
      */
@@ -282,10 +284,10 @@ public class Qualifier implements FilterExpression {
         if (this == EMPTY) {
             return "";
         } else if (content.isPresent()) {
-	        String quotedContent = content.get();
-	        if (quotedContent.contains(" ")) {
-		        quotedContent = "\"" + quotedContent + "\"";
-	        }
+            String quotedContent = content.get();
+            if (quotedContent.contains(" ")) {
+                quotedContent = "\"" + quotedContent + "\"";
+            }
             if (name.equals("keyword")) {
                 return quotedContent;
             } else {
@@ -294,13 +296,13 @@ public class Qualifier implements FilterExpression {
         } else if (date.isPresent()) {
             return name + ":" + date.get().toString();
         } else if (dateRange.isPresent()) {
-	        return name + ":" + dateRange.get().toString();
+            return name + ":" + dateRange.get().toString();
         } else if (!sortKeys.isEmpty()) {
             return name + ":" + sortKeys.stream().map(SortKey::toString).collect(Collectors.joining(","));
         } else if (numberRange.isPresent()) {
-        	return name + ":" + numberRange.get().toString();
+            return name + ":" + numberRange.get().toString();
         } else if (number.isPresent()) {
-        	return name + ":" + number.get().toString();
+            return name + ":" + number.get().toString();
         } else {
             assert false : "Should not happen";
             return "";
@@ -311,13 +313,13 @@ public class Qualifier implements FilterExpression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-	    result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
-	    result = prime * result + ((number == null) ? 0 : number.hashCode());
-	    result = prime * result + ((numberRange == null) ? 0 : numberRange.hashCode());
-	    result = prime * result + ((sortKeys == null) ? 0 : sortKeys.hashCode());
+        result = prime * result + ((number == null) ? 0 : number.hashCode());
+        result = prime * result + ((numberRange == null) ? 0 : numberRange.hashCode());
+        result = prime * result + ((sortKeys == null) ? 0 : sortKeys.hashCode());
         return result;
     }
 
@@ -340,26 +342,26 @@ public class Qualifier implements FilterExpression {
                 return false;
         } else if (!date.equals(other.date))
             return false;
-	    if (dateRange == null) {
-		    if (other.dateRange != null)
-			    return false;
+        if (dateRange == null) {
+            if (other.dateRange != null)
+                return false;
         } else if (!dateRange.equals(other.dateRange))
             return false;
-	    if (number == null) {
-		    if (other.number != null)
-			    return false;
-	    } else if (!number.equals(other.number))
-		    return false;
-	    if (numberRange == null) {
-		    if (other.numberRange != null)
-			    return false;
-	    } else if (!numberRange.equals(other.numberRange))
-		    return false;
-	    if (sortKeys == null) {
-		    if (other.sortKeys != null)
-			    return false;
-	    } else if (!sortKeys.equals(other.sortKeys))
-		    return false;
+        if (number == null) {
+            if (other.number != null)
+                return false;
+        } else if (!number.equals(other.number))
+            return false;
+        if (numberRange == null) {
+            if (other.numberRange != null)
+                return false;
+        } else if (!numberRange.equals(other.numberRange))
+            return false;
+        if (sortKeys == null) {
+            if (other.sortKeys != null)
+                return false;
+        } else if (!sortKeys.equals(other.sortKeys))
+            return false;
         if (name == null) {
             if (other.name != null)
                 return false;
@@ -368,187 +370,187 @@ public class Qualifier implements FilterExpression {
         return true;
     }
 
-	private static boolean shouldNotBeStripped(Qualifier q) {
-		return !shouldBeStripped(q);
-	}
-
-	private static boolean shouldBeStripped(Qualifier q) {
-		switch (q.getName()) {
-			case "in":
-			case "sort":
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	private static boolean isMetaQualifier(Qualifier q) {
-		switch (q.getName()) {
-		case "sort":
-		case "in":
-		case "repo":
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	public Comparator<TurboIssue> getCompoundSortComparator(IModel model) {
-		if (sortKeys.isEmpty()) {
-			return (a, b) -> 0;
-		}
-		return (a, b) -> {
-			for (SortKey key : sortKeys) {
-				Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted);
-				int result = comparator.compare(a, b);
-				if (result != 0) {
-					return result;
-				}
-			}
-			return 0;
-		};
-	}
-
-	public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
-		Comparator<TurboIssue> comparator = (a, b) -> 0;
-
-		boolean isLabelGroup = false;
-
-		switch (key) {
-			case "comments":
-				comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
-				break;
-			case "repo":
-				comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
-				break;
-			case "updated":
-			case "date":
-				comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
-				break;
-			case "id":
-				comparator = (a, b) -> a.getId() - b.getId();
-				break;
-			default:
-				// Doesn't match anything; assume it's a label group
-				isLabelGroup = true;
-				break;
-		}
-
-		if (isLabelGroup) {
-			// Has a different notion of inversion
-			return getLabelGroupComparator(model, key, inverted);
-		} else {
-			// Use default behaviour for inverting
-			if (!inverted) {
-				return comparator;
-			} else {
-				final Comparator<TurboIssue> finalComparator = comparator;
-				return (a, b) -> -finalComparator.compare(a, b);
-			}
-		}
-	}
-
-	public static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
-		// Strip trailing ., if any
-		final String group = key.replaceAll("\\.$", "");
-		return (a, b) -> {
-
-			// Matches labels belong to the given group
-			Predicate<TurboLabel> sameGroup = l ->
-				l.getGroup().isPresent() && l.getGroup().get().equals(group);
-
-			Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
-
-			List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
-			List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
-			Collections.sort(aLabels, labelComparator);
-			Collections.sort(bLabels, labelComparator);
-
-			// Put empty lists at the back
-			if (aLabels.size() == 0 && bLabels.size() == 0) {
-				return 0;
-			} else if (aLabels.size() == 0) {
-				// a is larger
-				return 1;
-			} else if (bLabels.size() == 0) {
-				// b is larger
-				return -1;
-			}
-
-			// Compare lengths
-			int result = !inverted
-				? aLabels.size() - bLabels.size()
-				: bLabels.size() - aLabels.size();
-
-			if (result != 0) {
-				return result;
-			}
-
-			// Lexicographic label comparison
-			assert aLabels.size() == bLabels.size();
-			for (int i=0; i<aLabels.size(); i++) {
-				result = !inverted
-					? labelComparator.compare(aLabels.get(i), bLabels.get(i))
-					: labelComparator.compare(bLabels.get(i), aLabels.get(i));
-				if (result != 0) {
-					return result;
-				}
-			}
-			return 0;
-		};
-	}
-
-	private boolean idSatisfies(TurboIssue issue) {
-		if (number.isPresent()) {
-			return issue.getId() == number.get();
-		} else if (numberRange.isPresent()) {
-			return numberRange.get().encloses(issue.getId());
-		}
-		return false;
+    private static boolean shouldNotBeStripped(Qualifier q) {
+        return !shouldBeStripped(q);
     }
 
-	private boolean satisfiesUpdatedHours(TurboIssue issue) {
-		int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+    private static boolean shouldBeStripped(Qualifier q) {
+        switch (q.getName()) {
+            case "in":
+            case "sort":
+                return true;
+            default:
+                return false;
+        }
+    }
 
-		if (numberRange.isPresent()) {
-			return numberRange.get().encloses(hours);
-		} else if (number.isPresent()) {
-			// Treat it as <
-			return new NumberRange(null, number.get(), true).encloses(hours);
-		} else {
-			return false;
-		}
-	}
+    private static boolean isMetaQualifier(Qualifier q) {
+        switch (q.getName()) {
+        case "sort":
+        case "in":
+        case "repo":
+            return true;
+        default:
+            return false;
+        }
+    }
 
-	private boolean satisfiesRepo(TurboIssue issue) {
-		if (!content.isPresent()) return false;
-		return issue.getRepoId().equals(content.get());
-	}
+    public Comparator<TurboIssue> getCompoundSortComparator(IModel model) {
+        if (sortKeys.isEmpty()) {
+            return (a, b) -> 0;
+        }
+        return (a, b) -> {
+            for (SortKey key : sortKeys) {
+                Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted);
+                int result = comparator.compare(a, b);
+                if (result != 0) {
+                    return result;
+                }
+            }
+            return 0;
+        };
+    }
+
+    public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
+        Comparator<TurboIssue> comparator = (a, b) -> 0;
+
+        boolean isLabelGroup = false;
+
+        switch (key) {
+            case "comments":
+                comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
+                break;
+            case "repo":
+                comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
+                break;
+            case "updated":
+            case "date":
+                comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                break;
+            case "id":
+                comparator = (a, b) -> a.getId() - b.getId();
+                break;
+            default:
+                // Doesn't match anything; assume it's a label group
+                isLabelGroup = true;
+                break;
+        }
+
+        if (isLabelGroup) {
+            // Has a different notion of inversion
+            return getLabelGroupComparator(model, key, inverted);
+        } else {
+            // Use default behaviour for inverting
+            if (!inverted) {
+                return comparator;
+            } else {
+                final Comparator<TurboIssue> finalComparator = comparator;
+                return (a, b) -> -finalComparator.compare(a, b);
+            }
+        }
+    }
+
+    public static Comparator<TurboIssue> getLabelGroupComparator(IModel model, String key, boolean inverted) {
+        // Strip trailing ., if any
+        final String group = key.replaceAll("\\.$", "");
+        return (a, b) -> {
+
+            // Matches labels belong to the given group
+            Predicate<TurboLabel> sameGroup = l ->
+                l.getGroup().isPresent() && l.getGroup().get().equals(group);
+
+            Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
+
+            List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
+            List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
+            Collections.sort(aLabels, labelComparator);
+            Collections.sort(bLabels, labelComparator);
+
+            // Put empty lists at the back
+            if (aLabels.size() == 0 && bLabels.size() == 0) {
+                return 0;
+            } else if (aLabels.size() == 0) {
+                // a is larger
+                return 1;
+            } else if (bLabels.size() == 0) {
+                // b is larger
+                return -1;
+            }
+
+            // Compare lengths
+            int result = !inverted
+                ? aLabels.size() - bLabels.size()
+                : bLabels.size() - aLabels.size();
+
+            if (result != 0) {
+                return result;
+            }
+
+            // Lexicographic label comparison
+            assert aLabels.size() == bLabels.size();
+            for (int i = 0; i < aLabels.size(); i++) {
+                result = !inverted
+                    ? labelComparator.compare(aLabels.get(i), bLabels.get(i))
+                    : labelComparator.compare(bLabels.get(i), aLabels.get(i));
+                if (result != 0) {
+                    return result;
+                }
+            }
+            return 0;
+        };
+    }
+
+    private boolean idSatisfies(TurboIssue issue) {
+        if (number.isPresent()) {
+            return issue.getId() == number.get();
+        } else if (numberRange.isPresent()) {
+            return numberRange.get().encloses(issue.getId());
+        }
+        return false;
+    }
+
+    private boolean satisfiesUpdatedHours(TurboIssue issue) {
+        int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+
+        if (numberRange.isPresent()) {
+            return numberRange.get().encloses(hours);
+        } else if (number.isPresent()) {
+            // Treat it as <
+            return new NumberRange(null, number.get(), true).encloses(hours);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean satisfiesRepo(TurboIssue issue) {
+        if (!content.isPresent()) return false;
+        return issue.getRepoId().equals(content.get());
+    }
 
     private boolean satisfiesCreationDate(TurboIssue issue) {
-    	LocalDate creationDate = issue.getCreatedAt().toLocalDate();
-    	if (date.isPresent()) {
-    		return creationDate.isEqual(date.get());
-    	} else if (dateRange.isPresent()) {
-    		return dateRange.get().encloses(creationDate);
-    	} else {
-    		return false;
-    	}
-	}
+        LocalDate creationDate = issue.getCreatedAt().toLocalDate();
+        if (date.isPresent()) {
+            return creationDate.isEqual(date.get());
+        } else if (dateRange.isPresent()) {
+            return dateRange.get().encloses(creationDate);
+        } else {
+            return false;
+        }
+    }
 
-	private boolean satisfiesHasConditions(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+    private boolean satisfiesHasConditions(TurboIssue issue) {
+        if (!content.isPresent()) return false;
         switch (content.get()) {
         case "label":
         case "labels":
             return issue.getLabels().size() > 0;
         case "milestone":
         case "milestones":
-	        assert issue.getMilestone() != null;
+            assert issue.getMilestone() != null;
             return issue.getMilestone().isPresent();
         case "assignee":
         case "assignees":
-	        assert issue.getMilestone() != null;
+            assert issue.getMilestone() != null;
             return issue.getAssignee().isPresent();
         default:
             return false;
@@ -556,11 +558,11 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesNoConditions(TurboIssue issue) {
-	    return content.isPresent() && !satisfiesHasConditions(issue);
+        return content.isPresent() && !satisfiesHasConditions(issue);
     }
 
-	private boolean satisfiesIsConditions(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+    private boolean satisfiesIsConditions(TurboIssue issue) {
+        if (!content.isPresent()) return false;
         switch (content.get()) {
         case "open":
         case "closed":
@@ -569,21 +571,21 @@ public class Qualifier implements FilterExpression {
         case "issue":
             return typeSatisfies(issue);
         case "merged":
-        	return issue.isPullRequest() && !issue.isOpen();
+            return issue.isPullRequest() && !issue.isOpen();
         case "unmerged":
-        	return issue.isPullRequest() && issue.isOpen();
+            return issue.isPullRequest() && issue.isOpen();
         case "read":
-	        return issue.isCurrentlyRead();
+            return issue.isCurrentlyRead();
         case "unread":
-	        return !issue.isCurrentlyRead();
+            return !issue.isCurrentlyRead();
         default:
             return false;
         }
     }
 
-	private boolean stateSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
-    	String content = this.content.get().toLowerCase();
+    private boolean stateSatisfies(TurboIssue issue) {
+        if (!content.isPresent()) return false;
+        String content = this.content.get().toLowerCase();
         if (content.contains("open")) {
             return issue.isOpen();
         } else if (content.contains("closed")) {
@@ -594,20 +596,20 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean assigneeSatisfies(IModel model, TurboIssue issue) {
-	    if (!content.isPresent()) return false;
-	    Optional<TurboUser> assignee = model.getAssigneeOfIssue(issue);
+        if (!content.isPresent()) return false;
+        Optional<TurboUser> assignee = model.getAssigneeOfIssue(issue);
 
-	    if (!assignee.isPresent()) return false;
+        if (!assignee.isPresent()) return false;
 
-	    String content = this.content.get().toLowerCase();
-	    String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
-	    String name = assignee.get().getRealName() == null ? "" : assignee.get().getRealName().toLowerCase();
+        String content = this.content.get().toLowerCase();
+        String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
+        String name = assignee.get().getRealName() == null ? "" : assignee.get().getRealName().toLowerCase();
 
-	    return login.contains(content) || name.contains(content);
+        return login.contains(content) || name.contains(content);
     }
 
     private boolean authorSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+        if (!content.isPresent()) return false;
 
         String creator = issue.getCreator();
 
@@ -615,231 +617,234 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-    	return authorSatisfies(issue) || assigneeSatisfies(model, issue);
+        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
     }
 
     private boolean labelsSatisfy(IModel model, TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+        if (!content.isPresent()) return false;
 
-	    // Make use of TurboLabel constructor to parse the string, to avoid duplication
-	    TurboLabel tokens = new TurboLabel("", content.get().toLowerCase());
+        // Make use of TurboLabel constructor to parse the string, to avoid duplication
+        TurboLabel tokens = new TurboLabel("", content.get().toLowerCase());
 
-	    String group = "";
-		if (tokens.getGroup().isPresent()) {
-			group = tokens.getGroup().get().toLowerCase();
-		}
-	    String labelName = tokens.getName().toLowerCase();
+        String group = "";
+        if (tokens.getGroup().isPresent()) {
+            group = tokens.getGroup().get().toLowerCase();
+        }
+        String labelName = tokens.getName().toLowerCase();
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
-	        if (label.getGroup().isPresent()) {
-		        if (labelName.isEmpty()) {
-			        // Check the group
-			        if (label.getGroup().get().toLowerCase().contains(group)) {
-				       return true;
-			        }
-		        } else {
-			        if (label.getGroup().get().toLowerCase().contains(group)
-				        && label.getName().toLowerCase().contains(labelName)) {
-				       return true;
-			        }
-		        }
-	        } else {
-		        // Check only the label name
-		        if (!group.isEmpty()) {
-			        return false;
-		        } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
-			        return true;
-		        }
-	        }
+            if (label.getGroup().isPresent()) {
+                if (labelName.isEmpty()) {
+                    // Check the group
+                    if (label.getGroup().get().toLowerCase().contains(group)) {
+                       return true;
+                    }
+                } else {
+                    if (label.getGroup().get().toLowerCase().contains(group)
+                        && label.getName().toLowerCase().contains(labelName)) {
+                       return true;
+                    }
+                }
+            } else {
+                // Check only the label name
+                if (!group.isEmpty()) {
+                    return false;
+                } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
     private boolean milestoneSatisfies(IModel model, TurboIssue issue) {
-    	if (!content.isPresent()) return false;
-	    Optional<TurboMilestone> milestone = model.getMilestoneOfIssue(issue);
+        if (!content.isPresent()) return false;
+        Optional<TurboMilestone> milestone = model.getMilestoneOfIssue(issue);
 
-	    if (!milestone.isPresent()) return false;
+        if (!milestone.isPresent()) return false;
 
-	    String contents = content.get().toLowerCase();
-	    String title = milestone.get().getTitle().toLowerCase();
+        String contents = content.get().toLowerCase();
+        String title = milestone.get().getTitle().toLowerCase();
 
         return title.contains(contents);
     }
 
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
 
-    	if (info.getIn().isPresent()) {
-    		switch (info.getIn().get()) {
-    		case "title":
-    	        return titleSatisfies(issue);
-    		case "body":
-    		case "desc":
-		    case "description":
-    	        return bodySatisfies(issue);
-    	    default:
-    	    	return false;
-    		}
-    	} else {
-	        return titleSatisfies(issue) || bodySatisfies(issue);
-    	}
-	}
+        if (info.getIn().isPresent()) {
+            switch (info.getIn().get()) {
+            case "title":
+                return titleSatisfies(issue);
+            case "body":
+            case "desc":
+            case "description":
+                return bodySatisfies(issue);
+            default:
+                return false;
+            }
+        } else {
+            return titleSatisfies(issue) || bodySatisfies(issue);
+        }
+    }
 
-	private boolean bodySatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+    private boolean bodySatisfies(TurboIssue issue) {
+        if (!content.isPresent()) return false;
         return issue.getDescription().toLowerCase().contains(content.get().toLowerCase());
     }
 
-	private boolean titleSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
+    private boolean titleSatisfies(TurboIssue issue) {
+        if (!content.isPresent()) return false;
         return issue.getTitle().toLowerCase().contains(content.get().toLowerCase());
     }
 
     private boolean typeSatisfies(TurboIssue issue) {
-    	if (!content.isPresent()) return false;
-    	String content = this.content.get().toLowerCase();
-	    switch (content) {
-		    case "issue":
-			    return !issue.isPullRequest();
-		    case "pr":
-		    case "pullrequest":
-			    return issue.isPullRequest();
-		    default:
-			    return false;
-	    }
-	}
+        if (!content.isPresent()) return false;
+        String content = this.content.get().toLowerCase();
+        switch (content) {
+            case "issue":
+                return !issue.isPullRequest();
+            case "pr":
+            case "pullrequest":
+                return issue.isPullRequest();
+            default:
+                return false;
+        }
+    }
 
-	private void applyMilestone(TurboIssue issue, IModel model) throws QualifierApplicationException {
-		if (!content.isPresent()) {
-			throw new QualifierApplicationException("Name of milestone to apply required");
-		}
+    private void applyMilestone(TurboIssue issue, IModel model) throws QualifierApplicationException {
+        if (!content.isPresent()) {
+            throw new QualifierApplicationException("Name of milestone to apply required");
+        }
 
-		// Find milestones containing partial title
-		List<TurboMilestone> milestones = model.getMilestones().stream()
-			.filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
-			.collect(Collectors.toList());
+        // Find milestones containing partial title
+        List<TurboMilestone> milestones = model.getMilestones().stream()
+            .filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
+            .collect(Collectors.toList());
 
-		if (milestones.isEmpty()) {
-			throw new QualifierApplicationException("Invalid milestone " + content.get());
-		} else if (milestones.size() == 1) {
-			issue.setMilestone(milestones.get(0));
-			return;
-		}
+        if (milestones.isEmpty()) {
+            throw new QualifierApplicationException("Invalid milestone " + content.get());
+        } else if (milestones.size() == 1) {
+            issue.setMilestone(milestones.get(0));
+            return;
+        }
 
-		// Find milestones containing exact title
-		milestones = model.getMilestones().stream()
-			.filter(m -> m.getTitle().toLowerCase().equals(content.get().toLowerCase()))
-			.collect(Collectors.toList());
+        // Find milestones containing exact title
+        milestones = model.getMilestones().stream()
+            .filter(m -> m.getTitle().toLowerCase().equals(content.get().toLowerCase()))
+            .collect(Collectors.toList());
 
-		if (milestones.isEmpty()) {
-			throw new QualifierApplicationException("Invalid milestone " + content.get());
-		} else if (milestones.size() == 1) {
-			issue.setMilestone(milestones.get(0));
-			return;
-		}
+        if (milestones.isEmpty()) {
+            throw new QualifierApplicationException("Invalid milestone " + content.get());
+        } else if (milestones.size() == 1) {
+            issue.setMilestone(milestones.get(0));
+            return;
+        }
 
-		throw new QualifierApplicationException("Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
+        throw new QualifierApplicationException(
+            "Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
     }
 
     private void applyLabel(TurboIssue issue, IModel model) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Name of label to apply required");
-    	}
+        if (!content.isPresent()) {
+            throw new QualifierApplicationException("Name of label to apply required");
+        }
 
         // Find labels containing the label name
         List<TurboLabel> labels = model.getLabels().stream()
            .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
-	        .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
-	    if (labels.isEmpty()) {
-		    throw new QualifierApplicationException("Invalid label " + content.get());
-	    } else if (labels.size() == 1) {
-	        issue.addLabel(labels.get(0));
-		    return;
+        if (labels.isEmpty()) {
+            throw new QualifierApplicationException("Invalid label " + content.get());
+        } else if (labels.size() == 1) {
+            issue.addLabel(labels.get(0));
+            return;
         }
 
         // Find labels with the exact label name
         labels = model.getLabels().stream()
-	        .filter(l -> l.getActualName().toLowerCase().equals(content.get().toLowerCase()))
-	        .collect(Collectors.toList());
+            .filter(l -> l.getActualName().toLowerCase().equals(content.get().toLowerCase()))
+            .collect(Collectors.toList());
 
-	    if (labels.isEmpty()) {
-		    throw new QualifierApplicationException("Invalid label " + content.get());
-	    } else if (labels.size() == 1) {
-	        issue.addLabel(labels.get(0));
-		    return;
+        if (labels.isEmpty()) {
+            throw new QualifierApplicationException("Invalid label " + content.get());
+        } else if (labels.size() == 1) {
+            issue.addLabel(labels.get(0));
+            return;
         }
 
-	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following labels: " + labels.toString());
+        throw new QualifierApplicationException(
+            "Ambiguous filter: can apply any of the following labels: " + labels.toString());
     }
 
     private void applyAssignee(TurboIssue issue, IModel model) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("Name of assignee to apply required");
-    	}
+        if (!content.isPresent()) {
+            throw new QualifierApplicationException("Name of assignee to apply required");
+        }
 
         // Find assignees containing partial name
         List<TurboUser> assignees = model.getUsers().stream()
-	        .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
-	        .collect(Collectors.toList());
+            .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
+            .collect(Collectors.toList());
 
-	    if (assignees.isEmpty()) {
-		    throw new QualifierApplicationException("Invalid user " + content.get());
-	    } else if (assignees.size() == 1) {
-	        issue.setAssignee(assignees.get(0));
-		    return;
+        if (assignees.isEmpty()) {
+            throw new QualifierApplicationException("Invalid user " + content.get());
+        } else if (assignees.size() == 1) {
+            issue.setAssignee(assignees.get(0));
+            return;
         }
 
-	    // Find assignees containing partial name
-	    assignees = model.getUsers().stream()
-		    .filter(c -> c.getLoginName().toLowerCase().equals(content.get().toLowerCase()))
-		    .collect(Collectors.toList());
+        // Find assignees containing partial name
+        assignees = model.getUsers().stream()
+            .filter(c -> c.getLoginName().toLowerCase().equals(content.get().toLowerCase()))
+            .collect(Collectors.toList());
 
-	    if (assignees.isEmpty()) {
-		    throw new QualifierApplicationException("Invalid user " + content.get());
-	    } else if (assignees.size() == 1) {
-		    issue.setAssignee(assignees.get(0));
-		    return;
-	    }
+        if (assignees.isEmpty()) {
+            throw new QualifierApplicationException("Invalid user " + content.get());
+        } else if (assignees.size() == 1) {
+            issue.setAssignee(assignees.get(0));
+            return;
+        }
 
-	    throw new QualifierApplicationException("Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
+        throw new QualifierApplicationException(
+            "Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
     }
 
     private void applyState(TurboIssue issue) throws QualifierApplicationException {
-    	if (!content.isPresent()) {
-    		throw new QualifierApplicationException("State to apply required");
-    	}
+        if (!content.isPresent()) {
+            throw new QualifierApplicationException("State to apply required");
+        }
 
         if (content.get().toLowerCase().contains("open")) {
             issue.setOpen(true);
         } else if (content.get().toLowerCase().contains("closed")) {
             issue.setOpen(false);
         } else {
-	        throw new QualifierApplicationException("Invalid state " + content.get());
+            throw new QualifierApplicationException("Invalid state " + content.get());
         }
     }
 
-	public Optional<Integer> getNumber() {
-		return number;
-	}
+    public Optional<Integer> getNumber() {
+        return number;
+    }
 
-	public Optional<NumberRange> getNumberRange() {
-		return numberRange;
-	}
+    public Optional<NumberRange> getNumberRange() {
+        return numberRange;
+    }
 
-	public Optional<DateRange> getDateRange() {
-		return dateRange;
-	}
+    public Optional<DateRange> getDateRange() {
+        return dateRange;
+    }
 
-	public Optional<String> getContent() {
-		return content;
-	}
+    public Optional<String> getContent() {
+        return content;
+    }
 
-	public Optional<LocalDate> getDate() {
-		return date;
-	}
+    public Optional<LocalDate> getDate() {
+        return date;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 }

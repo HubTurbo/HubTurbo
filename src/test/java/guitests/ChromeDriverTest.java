@@ -1,8 +1,9 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+
+import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.IssueCreatedEvent;
 import util.events.IssueSelectedEvent;
