@@ -14,7 +14,7 @@ import java.util.concurrent.FutureTask;
 
 public class ModelUpdateUITest extends UITest {
 
-    private final int EVENT_DELAY = 500;
+    private final int EVENT_DELAY = 1000;
 
     @Test
     @SuppressWarnings("unchecked")

@@ -25,8 +25,8 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(1000);
+        sleep(2000);
         RepositorySelector repositorySelector = find("#repositorySelector");
-        assertEquals(repositorySelector.getText(), "test/test");
+        assertEquals("test/test", repositorySelector.getText());
     }
 }
