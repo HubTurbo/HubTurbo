@@ -47,6 +47,7 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save");
+        click("#boardnameinput");
         type("Empty Board");
         click("OK"); // Should not use ENTER here, Travis CI does not autofocus on "OK".
 
@@ -62,6 +63,7 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save");
+        click("#boardnameinput");
         type("Dummy Board");
         click("OK");
 
