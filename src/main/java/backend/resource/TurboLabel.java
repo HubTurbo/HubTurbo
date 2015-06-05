@@ -33,7 +33,7 @@ public class TurboLabel {
 
     public TurboLabel(String repoId, String name) {
         this.actualName = name;
-        this.colour = "#ffffff";
+        this.colour = "ffffff";
         this.repoId = repoId;
     }
 
@@ -139,7 +139,7 @@ public class TurboLabel {
         }
     }
 
-    private String getStyle() {
+    public String getStyle() {
         String colour = getColour();
         int r = Integer.parseInt(colour.substring(0, 2), 16);
         int g = Integer.parseInt(colour.substring(2, 4), 16);
