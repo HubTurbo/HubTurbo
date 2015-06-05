@@ -17,8 +17,12 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
-    // TODO: use a checkstyle configuration
-    // apply plugin: 'checkstyle'
+
+    apply plugin: 'checkstyle'
+    checkstyle {
+        toolVersion = "5.9"
+    }
+
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
@@ -45,6 +49,7 @@ allprojects {
         seleniumServerVersion = '2.45.0'
 
         junitVersion = '4.12'
+        testFxVersion = '3.1.0'
     }
 
     dependencies {
@@ -61,13 +66,19 @@ allprojects {
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
-        // TODO: move junit to test compile
-        // testCompile "junit:junit:$junitVersion"
-        compile "junit:junit:$junitVersion"
+        testCompile "junit:junit:$junitVersion"
+        testCompile "org.loadui:testFx:$testFxVersion"
+    }
+
+    test {
+        forkEvery = 1
+
+        // uncomment to disable gui tests
+//        exclude 'guitests'
     }
 
     jacoco {
-        toolVersion = "0.7.4.201502262128"
+        toolVersion = "0.7.5.201505241946"
     }
 
     jacocoTestReport {
@@ -94,11 +105,16 @@ allprojects {
     assemble.dependsOn shadowJar
 }
 
-task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+task jacocoRootReport(type: JacocoReport) {
     dependsOn = allprojects.test
     sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)
     classDirectories =  files(allprojects.sourceSets.main.output)
     executionData = files(allprojects.jacocoTestReport.executionData)
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['github/**', 'backend/github/**'])
+        })
+    }
     reports {
         html.enabled = true
         xml.enabled = true

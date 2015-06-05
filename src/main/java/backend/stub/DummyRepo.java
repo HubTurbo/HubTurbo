@@ -1,5 +1,13 @@
 package backend.stub;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -7,153 +15,136 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import ui.UI;
+import util.events.ClearLogicModelEvent;
+import util.events.UpdateDummyRepoEventHandler;
 
 public class DummyRepo implements Repo {
 
-	private static final String DUMMY_REPO_ID = "dummy/dummy";
+    private final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
 
-	private static int issueCounter = 0;
-	private static int labelCounter = 0;
-	private static int milestoneCounter = 0;
-	private static int userCounter = 0;
+    public DummyRepo() {
+        if (UI.events == null) {
+            // UI isn't initialised
+            return;
+        }
+        UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
+            assert e.repoId != null;
+            switch (e.updateType) {
+                case NEW_ISSUE:
+                    getRepoState(e.repoId).makeNewIssue();
+                    break;
+                case NEW_LABEL:
+                    getRepoState(e.repoId).makeNewLabel();
+                    break;
+                case NEW_MILESTONE:
+                    getRepoState(e.repoId).makeNewMilestone();
+                    break;
+                case NEW_USER:
+                    getRepoState(e.repoId).makeNewUser();
+                    break;
+                // TODO implement update of issue and milestone
+                // (after switching to TreeMap implementation)
+                case UPDATE_ISSUE:
+                    getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
+                    break;
+                case UPDATE_MILESTONE:
+                    getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
+                    break;
+                // Model reload is done by event handler registered in Logic in
+                // the following five:
+                case DELETE_ISSUE:
+                    getRepoState(e.repoId).deleteIssue(e.itemId);
+                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                    break;
+                case DELETE_LABEL:
+                    getRepoState(e.repoId).deleteLabel(e.idString);
+                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                    break;
+                case DELETE_MILESTONE:
+                    getRepoState(e.repoId).deleteMilestone(e.itemId);
+                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                    break;
+                case DELETE_USER:
+                    getRepoState(e.repoId).deleteUser(e.idString);
+                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                    break;
+                case RESET_REPO:
+                    repoStates.put(e.repoId, new DummyRepoState(e.repoId));
+                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                    break;
+            }
+        });
+    }
 
-	private static List<TurboIssue> issues = new ArrayList<>();
-	private static List<TurboLabel> labels = new ArrayList<>();
-	private static List<TurboMilestone> milestones = new ArrayList<>();
-	private static List<TurboUser> users = new ArrayList<>();
+    @Override
+    public boolean login(UserCredentials credentials) {
+        if (credentials.username.equals("test") && credentials.password.equals("test")) return true;
+        return false;
+    }
 
-	public DummyRepo() {
-		for (int i=0; i<10; i++) {
-			issues.add(makeDummyIssue(DUMMY_REPO_ID));
-			labels.add(makeDummyLabel(DUMMY_REPO_ID));
-			milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
-			users.add(makeDummyUser(DUMMY_REPO_ID));
-		}
-	}
+    private DummyRepoState getRepoState(String repoId) {
+        DummyRepoState repoToGet = repoStates.get(repoId);
+        if (repoToGet == null) {
+            repoToGet = new DummyRepoState(repoId);
+            repoStates.put(repoId, repoToGet);
+        }
+        return repoToGet;
+    }
 
-	@Override
-	public boolean login(UserCredentials credentials) {
-		return true;
-	}
+    @Override
+    public ImmutableTriple<List<TurboIssue>, String, Date>
+        getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
+        return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
+    }
 
-	@Override
-	public ImmutableTriple<List<TurboIssue>, String, Date>
-		getUpdatedIssues(String repoId, String ETag, Date lastCheckTime) {
-		List<TurboIssue> issues = new ArrayList<>();
-		issues.add(updateRandomIssue(DUMMY_REPO_ID));
-		issues.add(makeDummyIssue(DUMMY_REPO_ID));
-		return new ImmutableTriple<>(issues, ETag, lastCheckTime);
-	}
+    @Override
+    public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
+        return getRepoState(repoId).getUpdatedLabels(eTag);
+    }
 
-	@Override
-	public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String ETag) {
-		List<TurboLabel> labels = new ArrayList<>();
-		labels.add(updateRandomLabel(DUMMY_REPO_ID));
-		labels.add(makeDummyLabel(DUMMY_REPO_ID));
-		return new ImmutablePair<>(labels, ETag);
-	}
+    @Override
+    public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag) {
+        return getRepoState(repoId).getUpdatedMilestones(eTag);
+    }
 
-	@Override
-	public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String ETag) {
-		List<TurboMilestone> milestones = new ArrayList<>();
-		milestones.add(updateRandomMilestone(DUMMY_REPO_ID));
-		milestones.add(makeDummyMilestone(DUMMY_REPO_ID));
-		return new ImmutablePair<>(milestones, ETag);
-	}
+    @Override
+    public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag) {
+        return getRepoState(repoId).getUpdatedCollaborators(eTag);
+    }
 
-	@Override
-	public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String ETag) {
-		List<TurboUser> users = new ArrayList<>();
-		users.add(updateRandomUser(DUMMY_REPO_ID));
-		users.add(makeDummyUser(DUMMY_REPO_ID));
-		return new ImmutablePair<>(users, ETag);
-	}
+    @Override
+    public List<TurboIssue> getIssues(String repoId) {
+        return getRepoState(repoId).getIssues();
+    }
 
-	@Override
-	public List<TurboIssue> getIssues(String repoName) {
-		return issues;
-	}
+    @Override
+    public List<TurboLabel> getLabels(String repoId) {
+        return getRepoState(repoId).getLabels();
+    }
 
-	@Override
-	public List<TurboLabel> getLabels(String repoId) {
-		return labels;
-	}
+    @Override
+    public List<TurboMilestone> getMilestones(String repoId) {
+        return getRepoState(repoId).getMilestones();
+    }
 
-	@Override
-	public List<TurboMilestone> getMilestones(String repoId) {
-		return milestones;
-	}
+    @Override
+    public List<TurboUser> getCollaborators(String repoId) {
+        return getRepoState(repoId).getCollaborators();
+    }
 
-	@Override
-	public List<TurboUser> getCollaborators(String repoId) {
-		return users;
-	}
+    @Override
+    public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+        return getRepoState(repoId).getEvents(issueId);
+    }
 
-	private static TurboIssue updateRandomIssue(String repoId) {
-		int i = (int) (Math.random() * issueCounter);
-		return issues.set(i, new TurboIssue(repoId, i + 1, "Issue " + (i + 1) + " " + Math.random()));
-	}
+    @Override
+    public List<Comment> getComments(String repoId, int issueId) {
+        return getRepoState(repoId).getComments(issueId);
+    }
 
-	private static TurboIssue makeDummyIssue(String repoId) {
-		TurboIssue issue = new TurboIssue(repoId, issueCounter + 1, "Issue " + (issueCounter + 1));
-		issueCounter++;
-		return issue;
-	}
-
-	private static TurboLabel updateRandomLabel(String repoId) {
-		int i = (int) (Math.random() * labelCounter);
-		return labels.set(i, new TurboLabel(repoId, "Label " + (i + 1) + " " + Math.random()));
-	}
-
-	private static TurboLabel makeDummyLabel(String repoId) {
-		TurboLabel label = new TurboLabel(repoId, "Label " + (labelCounter + 1));
-		labelCounter++;
-		return label;
-	}
-
-	private static TurboMilestone updateRandomMilestone(String repoId) {
-		int i = (int) (Math.random() * milestoneCounter);
-		return milestones.set(i, new TurboMilestone(repoId, (i + 1), "Milestone " + (i + 1) + " " + Math.random()));
-	}
-
-	private static TurboMilestone makeDummyMilestone(String repoId) {
-		TurboMilestone milestone = new TurboMilestone(repoId, milestoneCounter + 1,
-			"Milestone " + (milestoneCounter + 1));
-		milestoneCounter++;
-		return milestone;
-	}
-
-	private static TurboUser updateRandomUser(String repoId) {
-		int i = (int) (Math.random() * userCounter);
-		return users.set(i, new TurboUser(repoId, "User " + (i + 1) + " " + Math.random()));
-	}
-
-	private static TurboUser makeDummyUser(String repoId) {
-		TurboUser user = new TurboUser(repoId, "User " + (userCounter + 1));
-		userCounter++;
-		return user;
-	}
-
-	@Override
-	public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
-		return new ArrayList<>();
-	}
-
-	@Override
-	public List<Comment> getComments(String repoId, int issueId) {
-		return new ArrayList<>();
-	}
-
-	@Override
-	public boolean isRepositoryValid(String repoId) {
-		return true;
-	}
-
+    @Override
+    public boolean isRepositoryValid(String repoId) {
+        return true;
+    }
 }

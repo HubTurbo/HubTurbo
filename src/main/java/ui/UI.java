@@ -1,15 +1,23 @@
 package ui;
 
-import backend.Logic;
-import backend.UIManager;
-import browserview.BrowserComponent;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+
+import backend.Logic;
+import backend.UIManager;
+import browserview.BrowserComponent;
+import browserview.BrowserComponentStub;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -20,8 +28,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.StatusUI;
@@ -33,369 +39,421 @@ import util.Utility;
 import util.events.*;
 import util.events.Event;
 
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import static util.Futures.withResult;
-
 public class UI extends Application implements EventDispatcher {
 
-	private static final int VERSION_MAJOR = 2;
-	private static final int VERSION_MINOR = 7;
-	private static final int VERSION_PATCH = 0;
+    private static final int VERSION_MAJOR = 2;
+    private static final int VERSION_MINOR = 7;
+    private static final int VERSION_PATCH = 0;
 
-	public static final String ARG_UPDATED_TO = "--updated-to";
+    public static final String ARG_UPDATED_TO = "--updated-to";
 
-	private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
+    private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
-	private static final Logger logger = LogManager.getLogger(UI.class.getName());
-	private static HWND mainWindowHandle;
+    private static final Logger logger = LogManager.getLogger(UI.class.getName());
+    private static HWND mainWindowHandle;
 
-	private static final int REFRESH_PERIOD = 60;
+    private static final int REFRESH_PERIOD = 60;
 
-	// Application-level state
+    // Application-level state
 
-	public UIManager uiManager;
-	public Logic logic;
-	public Preferences prefs;
-	public static StatusUI status;
-	public static EventDispatcher events;
-	public EventBus eventBus;
-	private HashMap<String, String> commandLineArgs;
-	private TickingTimer refreshTimer;
+    public UIManager uiManager;
+    public Logic logic;
+    public Preferences prefs;
+    public static StatusUI status;
+    public static EventDispatcher events;
+    public EventBus eventBus;
+    private HashMap<String, String> commandLineArgs;
+    private TickingTimer refreshTimer;
 
-	// Main UI elements
+    // Main UI elements
 
-	private Stage mainStage;
-	private ColumnControl columns;
-	private MenuControl menuBar;
-	private BrowserComponent browserComponent;
-	private RepositorySelector repoSelector;
+    private Stage mainStage;
+    private ColumnControl columns;
+    private MenuControl menuBar;
+    private BrowserComponent browserComponent;
+    private RepositorySelector repoSelector;
 
-	public static void main(String[] args) {
-		Application.launch(args);
-	}
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
 
-	@Override
-	public void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
 
-		initPreApplicationState();
-		initUI(stage);
-		initApplicationState();
+        initPreApplicationState();
+        initUI(stage);
+        initApplicationState();
 
-		getUserCredentials();
-	}
+        getUserCredentials();
+    }
 
-	private void getUserCredentials() {
-		new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
-			if (result.success) {
-				logic.openRepository(result.repoId);
-				logic.setDefaultRepo(result.repoId);
-				repoSelector.setText(result.repoId);
+    private void getUserCredentials() {
+        if (isBypassLogin()) {
+            showMainWindow("dummy/dummy");
+        } else {
+            new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
+                if (result.success) {
+                    showMainWindow(result.repoId);
+                } else {
+                    quit();
+                }
+                return true;
+            }).exceptionally(e -> {
+                logger.error(e.getLocalizedMessage(), e);
+                return false;
+            });
+        }
+    }
 
-				triggerEvent(new BoardSavedEvent());
-				browserComponent = new BrowserComponent(this);
-				browserComponent.initialise();
-				setExpandedWidth(false);
-				ensureSelectedPanelHasFocus();
-				columns.init();
-			} else {
-				quit();
-			}
-			return true;
-		}).exceptionally(withResult(false));
-	}
+    private void showMainWindow(String repoId) {
+        logic.openRepository(repoId);
+        logic.setDefaultRepo(repoId);
+        repoSelector.setText(repoId);
 
-	private void initPreApplicationState() {
-		UI.events = this;
+        triggerEvent(new BoardSavedEvent()); // Initializes boards
 
-		Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
-			logger.error(throwable.getMessage(), throwable));
+        if (isTestMode()) {
+            if (isTestChromeDriver()) {
+                browserComponent = new BrowserComponent(this, true);
+                browserComponent.initialise();
+            } else {
+                browserComponent = new BrowserComponentStub(this);
+            }
+            registerTestEvents();
+        } else {
+            browserComponent = new BrowserComponent(this, false);
+            browserComponent.initialise();
+        }
 
-		prefs = new Preferences();
+        setExpandedWidth(false);
+        ensureSelectedPanelHasFocus();
+        columns.init();
+    }
 
-		eventBus = new EventBus();
-		registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
+    private void registerTestEvents() {
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
+    }
 
-		uiManager = new UIManager(this);
-		logic = new Logic(uiManager, prefs);
-		status = new HTStatusBar(this);
-	}
+    private void initPreApplicationState() {
+        UI.events = this;
 
-	private void initApplicationState() {
-		commandLineArgs = initialiseCommandLineArguments();
-		clearCacheIfNecessary();
-		refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-			status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
-		refreshTimer.start();
-	}
+        Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
+            logger.error(throwable.getMessage(), throwable));
 
-	private void initUI(Stage stage) {
-		repoSelector = createRepoSelector();
-		mainStage = stage;
-		stage.setMaximized(false);
+        commandLineArgs = initialiseCommandLineArguments();
+        prefs = new Preferences(isTestMode());
 
-		Scene scene = new Scene(createRoot());
-		setupMainStage(scene);
+        eventBus = new EventBus();
+        registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
 
-		loadFonts();
-		String css = initCSS();
-		applyCSS(css, scene);
-	}
+        uiManager = new UIManager(this);
+        status = new HTStatusBar(this);
+    }
 
-	public void quit() {
-		columns.saveSession();
-		prefs.saveGlobalConfig();
-		if (browserComponent != null) {
-			browserComponent.onAppQuit();
-		}
-		Platform.exit();
-		System.exit(0);
-	}
+    private void initApplicationState() {
+        // In the future, when more arguments are passed to logic,
+        // we can pass them in the form of an array.
+        logic = new Logic(uiManager, prefs, isTestMode(), isTestJSONEnabled());
+        clearCacheIfNecessary();
+        refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
+            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+        refreshTimer.start();
+    }
 
-	public void onRepoOpened() {
-		repoSelector.refreshContents();
-	}
+    private void initUI(Stage stage) {
+        repoSelector = createRepoSelector();
+        mainStage = stage;
+        stage.setMaximized(false);
 
-	/**
-	 * TODO Stop-gap measure pending a more robust updater
-	 */
-	private void clearCacheIfNecessary() {
-		if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
-			// TODO
-//			CacheFileHandler.deleteCacheDirectory();
-		}
-	}
+        Scene scene = new Scene(createRoot());
+        setupMainStage(scene);
 
-	public String initCSS() {
-		return getClass().getResource("hubturbo.css").toString();
-	}
+        loadFonts();
+        String css = initCSS();
+        applyCSS(css, scene);
+    }
 
-	public static void applyCSS(String css, Scene scene) {
-		scene.getStylesheets().clear();
-		scene.getStylesheets().add(css);
-	}
+    // Test mode should only be run as a test task (Gradle / JUnit), as quit()
+    // leaves the JVM alive during test mode (which is cleaned up by Gradle).
+    // Manually feeding --test=true into the command line arguments will leave the JVM
+    // running after the HT window has been closed, and thus will require the
+    // process to be closed manually afterwards (Force Quit / End Process).
+    public boolean isTestMode() {
+        if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
+        if (isBypassLogin()) return true;
+        if (isTestJSONEnabled()) return true;
+        if (isTestChromeDriver()) return true;
+        if (isTestGlobalConfig()) return true;
+        return false;
+    }
 
-	public static void loadFonts(){
-		Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
-	}
+    // Public for use in LoginDialog
+    public boolean isTestGlobalConfig() {
+        return commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
+    }
 
-	private void setupMainStage(Scene scene) {
-		mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
-		mainStage.setScene(scene);
-		mainStage.show();
-		mainStage.setOnCloseRequest(e -> quit());
-		initialiseJNA(mainStage.getTitle());
-		mainStage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> unused, Boolean wasFocused, Boolean isFocused) {
-				if (!isFocused) {
-					return;
-				}
-				if (PlatformSpecific.isOnWindows()) {
-					browserComponent.focus(mainWindowHandle);
-				}
-				PlatformEx.runLaterDelayed(() -> {
-					boolean shouldRefresh = browserComponent.hasBviewChanged();
-					if (shouldRefresh) {
-						logger.info("Browser view has changed; refreshing");
-						logic.refresh();
-						refreshTimer.restart();
-					}
-				});
-			}
-		});
-	}
+    private boolean isBypassLogin() {
+        return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
+    }
 
-	private static void initialiseJNA(String windowTitle) {
-		if (PlatformSpecific.isOnWindows()) {
-			mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
-		}
-	}
+    private boolean isTestJSONEnabled() {
+        return commandLineArgs.getOrDefault("testjson", "false").equalsIgnoreCase("true");
+    }
 
-	private HashMap<String, String> initialiseCommandLineArguments() {
-		Parameters params = getParameters();
-		final List<String> parameters = params.getRaw();
-		assert parameters.size() % 2 == 0 : "Parameters should come in pairs";
-		HashMap<String, String> commandLineArgs = new HashMap<>();
-		for (int i=0; i<parameters.size(); i+=2) {
-			commandLineArgs.put(parameters.get(i), parameters.get(i+1));
-		}
-		return commandLineArgs;
-	}
+    private boolean isTestChromeDriver() {
+        return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
+    }
 
-	private Parent createRoot() {
+    public void quit() {
+        if (browserComponent != null) {
+            browserComponent.onAppQuit();
+        }
+        if (!isTestMode()) {
+            columns.saveSession();
+            prefs.saveGlobalConfig();
+            Platform.exit();
+            System.exit(0);
+        }
+        if (isTestGlobalConfig()) {
+            columns.saveSession();
+            prefs.saveGlobalConfig();
+        }
+    }
 
-		columns = new ColumnControl(this, prefs);
+    public void onRepoOpened() {
+        repoSelector.refreshContents();
+    }
 
-		VBox top = new VBox();
+    /**
+     * TODO Stop-gap measure pending a more robust updater
+     */
+    private void clearCacheIfNecessary() {
+        if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
+            // TODO
+//          CacheFileHandler.deleteCacheDirectory();
+        }
+    }
 
-		ScrollPane columnsScrollPane = new ScrollPane(columns);
-		columnsScrollPane.getStyleClass().add("transparent-bg");
-		columnsScrollPane.setFitToHeight(true);
-		columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-		HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
+    public String initCSS() {
+        return getClass().getResource("hubturbo.css").toString();
+    }
 
-		menuBar = new MenuControl(this, columns, columnsScrollPane, prefs);
-		top.getChildren().addAll(menuBar, repoSelector);
+    public static void applyCSS(String css, Scene scene) {
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(css);
+    }
 
-		BorderPane root = new BorderPane();
-		root.setTop(top);
-		root.setCenter(columnsScrollPane);
-		root.setBottom((HTStatusBar) status);
+    public static void loadFonts(){
+        Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
+    }
 
-		return root;
-	}
+    private void setupMainStage(Scene scene) {
+        mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
+        mainStage.setScene(scene);
+        mainStage.show();
+        mainStage.setOnCloseRequest(e -> quit());
+        initialiseJNA(mainStage.getTitle());
+        mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
+            if (!isFocused) {
+                return;
+            }
+            if (PlatformSpecific.isOnWindows()) {
+                browserComponent.focus(mainWindowHandle);
+            }
+            PlatformEx.runLaterDelayed(() -> {
+                boolean shouldRefresh = browserComponent.hasBviewChanged();
+                if (shouldRefresh) {
+                    logger.info("Browser view has changed; refreshing");
+                    logic.refresh();
+                    refreshTimer.restart();
+                }
+            });
+        });
+    }
 
-	/**
-	 * Sets the dimensions of the stage to the maximum usable size
-	 * of the desktop, or to the screen size if this fails.
-	 */
-	private Rectangle getDimensions() {
-		Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
-		if (dimensions.isPresent()) {
-			return dimensions.get();
-		} else {
-			return Utility.getScreenDimensions();
-		}
-	}
+    private static void initialiseJNA(String windowTitle) {
+        if (PlatformSpecific.isOnWindows()) {
+            mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
+        }
+    }
 
-	/**
-	 * UI operations
-	 */
+    private HashMap<String, String> initialiseCommandLineArguments() {
+        Parameters params = getParameters();
+        HashMap<String, String> commandLineArgs = new HashMap<>(params.getNamed());
+        return commandLineArgs;
+    }
 
-	@Override
-	public void registerEvent(EventHandler handler) {
-		eventBus.register(handler);
-		logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
-	}
+    private Parent createRoot() {
 
-	@Override
-	public void unregisterEvent(EventHandler handler) {
-		eventBus.unregister(handler);
-		logger.info("Unregistered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
-	}
+        columns = new ColumnControl(this, prefs);
 
-	@Override
-	public <T extends Event> void triggerEvent(T event) {
-		logger.info("About to trigger event " + event.getClass().getSimpleName());
-		eventBus.post(event);
-		logger.info("Triggered event " + event.getClass().getSimpleName());
-	}
+        VBox top = new VBox();
 
-	public BrowserComponent getBrowserComponent() {
-		return browserComponent;
-	}
+        ScrollPane columnsScrollPane = new ScrollPane(columns);
+        columnsScrollPane.getStyleClass().add("transparent-bg");
+        columnsScrollPane.setFitToHeight(true);
+        columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+        HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
 
-	/**
-	 * Returns the X position of the edge of the collapsed window.
-	 * This function may be called before the main stage is initialised, in
-	 * which case it simply returns a reasonable default.
-	 */
-	public double getCollapsedX() {
-		if (mainStage == null) {
-			return getDimensions().getWidth() * WINDOW_DEFAULT_PROPORTION;
-		}
-		return mainStage.getWidth();
-	}
+        menuBar = new MenuControl(this, columns, columnsScrollPane, prefs);
+        top.getChildren().addAll(menuBar, repoSelector);
 
-	/**
-	 * Returns the dimensions of the screen available for use when
-	 * the main window is in a collapsed state.
-	 * This function may be called before the main stage is initialised, in
-	 * which case it simply returns a reasonable default.
-	 */
-	public Rectangle getAvailableDimensions() {
-		Rectangle dimensions = getDimensions();
-		if (mainStage == null) {
-			return new Rectangle(
-					(int) (dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION),
-					(int) dimensions.getHeight());
-		}
-		return new Rectangle(
-				(int) (dimensions.getWidth() - mainStage.getWidth()),
-				(int) dimensions.getHeight());
-	}
+        BorderPane root = new BorderPane();
+        root.setTop(top);
+        root.setCenter(columnsScrollPane);
+        root.setBottom((HTStatusBar) status);
 
-	/**
-	 * Controls whether or not the main window is expanded (occupying the
-	 * whole screen) or not (occupying a percentage).
-	 * @param expanded
-	 */
-	private void setExpandedWidth(boolean expanded) {
-		Rectangle dimensions = getDimensions();
-		double width = expanded
-				? dimensions.getWidth()
-				: dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
+        return root;
+    }
 
-		mainStage.setMinWidth(columns.getPanelWidth());
-		mainStage.setMinHeight(dimensions.getHeight());
-		mainStage.setMaxWidth(width);
-		mainStage.setMaxHeight(dimensions.getHeight());
-		mainStage.setX(0);
-		mainStage.setY(0);
-		mainStage.setMaxWidth(dimensions.getWidth());
-	}
+    /**
+     * Sets the dimensions of the stage to the maximum usable size
+     * of the desktop, or to the screen size if this fails.
+     */
+    private Rectangle getDimensions() {
+        Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
+        if (dimensions.isPresent()) {
+            return dimensions.get();
+        } else {
+            return Utility.getScreenDimensions();
+        }
+    }
 
-	public HashMap<String, String> getCommandLineArgs() {
-		return commandLineArgs;
-	}
+    /**
+     * UI operations
+     */
 
-	private RepositorySelector createRepoSelector() {
-		RepositorySelector repoSelector = new RepositorySelector(this);
-		repoSelector.setOnValueChange(this::primaryRepoChanged);
-		return repoSelector;
-	}
+    @Override
+    public void registerEvent(EventHandler handler) {
+        eventBus.register(handler);
+        logger.info("Registered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
+    }
 
-	private void primaryRepoChanged(String repoId) {
-		logic.openRepository(repoId);
-		logic.setDefaultRepo(repoId);
-		repoSelector.setText(repoId);
-		columns.refresh();
-	}
+    @Override
+    public void unregisterEvent(EventHandler handler) {
+        eventBus.unregister(handler);
+        logger.info("Unregistered event handler " + handler.getClass().getInterfaces()[0].getSimpleName());
+    }
 
-	private void ensureSelectedPanelHasFocus() {
-		if(columns.getCurrentlySelectedColumn().isPresent()) {
-			getMenuControl().scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-			columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
-		}
-	}
+    @Override
+    public <T extends Event> void triggerEvent(T event) {
+        logger.info("About to trigger event " + event.getClass().getSimpleName());
+        eventBus.post(event);
+        logger.info("Triggered event " + event.getClass().getSimpleName());
+    }
 
-	public MenuControl getMenuControl() {
-		return menuBar;
-	}
+    public BrowserComponent getBrowserComponent() {
+        return browserComponent;
+    }
 
-	public void setDefaultWidth() {
-		mainStage.setMaximized(false);
-		Rectangle dimensions = getDimensions();
-		mainStage.setMinWidth(columns.getPanelWidth());
-		mainStage.setMinHeight(dimensions.getHeight());
-		mainStage.setMaxWidth(columns.getPanelWidth());
-		mainStage.setMaxHeight(dimensions.getHeight());
-		mainStage.setX(0);
-		mainStage.setY(0);
-	}
+    /**
+     * Returns the X position of the edge of the collapsed window.
+     * This function may be called before the main stage is initialised, in
+     * which case it simply returns a reasonable default.
+     */
+    public double getCollapsedX() {
+        if (mainStage == null) {
+            return getDimensions().getWidth() * WINDOW_DEFAULT_PROPORTION;
+        }
+        return mainStage.getWidth();
+    }
 
-	public void maximizeWindow() {
-		mainStage.setMaximized(true);
-		Rectangle dimensions = getDimensions();
-		mainStage.setMinWidth(dimensions.getWidth());
-		mainStage.setMinHeight(dimensions.getHeight());
-		mainStage.setMaxWidth(dimensions.getWidth());
-		mainStage.setMaxHeight(dimensions.getHeight());
-		mainStage.setX(0);
-		mainStage.setY(0);
-	}
+    /**
+     * Returns the dimensions of the screen available for use when
+     * the main window is in a collapsed state.
+     * This function may be called before the main stage is initialised, in
+     * which case it simply returns a reasonable default.
+     */
+    public Rectangle getAvailableDimensions() {
+        Rectangle dimensions = getDimensions();
+        if (mainStage == null) {
+            return new Rectangle(
+                    (int) (dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION),
+                    (int) dimensions.getHeight());
+        }
+        return new Rectangle(
+                (int) (dimensions.getWidth() - mainStage.getWidth()),
+                (int) dimensions.getHeight());
+    }
 
-	public void minimizeWindow() {
-		mainStage.setIconified(true);
-		menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
-	}
+    /**
+     * Controls whether or not the main window is expanded (occupying the
+     * whole screen) or not (occupying a percentage).
+     * @param expanded
+     */
+    private void setExpandedWidth(boolean expanded) {
+        Rectangle dimensions = getDimensions();
+        double width = expanded
+                ? dimensions.getWidth()
+                : dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-	public HWND getMainWindowHandle() {
-		return mainWindowHandle;
-	}
+        mainStage.setMinWidth(columns.getPanelWidth());
+        mainStage.setMinHeight(dimensions.getHeight());
+        mainStage.setMaxWidth(width);
+        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setX(0);
+        mainStage.setY(0);
+        mainStage.setMaxWidth(dimensions.getWidth());
+    }
+
+    public HashMap<String, String> getCommandLineArgs() {
+        return commandLineArgs;
+    }
+
+    private RepositorySelector createRepoSelector() {
+        RepositorySelector repoSelector = new RepositorySelector(this);
+        repoSelector.setOnValueChange(this::primaryRepoChanged);
+        return repoSelector;
+    }
+
+    private void primaryRepoChanged(String repoId) {
+        logic.openRepository(repoId);
+        logic.setDefaultRepo(repoId);
+        repoSelector.setText(repoId);
+        columns.refresh();
+    }
+
+    private void ensureSelectedPanelHasFocus() {
+        if (columns.getCurrentlySelectedColumn().isPresent()) {
+            getMenuControl().scrollTo(
+                columns.getCurrentlySelectedColumn().get(),
+                columns.getChildren().size());
+            columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
+        }
+    }
+
+    public MenuControl getMenuControl() {
+        return menuBar;
+    }
+
+    public void setDefaultWidth() {
+        mainStage.setMaximized(false);
+        Rectangle dimensions = getDimensions();
+        mainStage.setMinWidth(columns.getPanelWidth());
+        mainStage.setMinHeight(dimensions.getHeight());
+        mainStage.setMaxWidth(columns.getPanelWidth());
+        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setX(0);
+        mainStage.setY(0);
+    }
+
+    public void maximizeWindow() {
+        mainStage.setMaximized(true);
+        Rectangle dimensions = getDimensions();
+        mainStage.setMinWidth(dimensions.getWidth());
+        mainStage.setMinHeight(dimensions.getHeight());
+        mainStage.setMaxWidth(dimensions.getWidth());
+        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setX(0);
+        mainStage.setY(0);
+    }
+
+    public void minimizeWindow() {
+        mainStage.setIconified(true);
+        menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+    }
+
+    public HWND getMainWindowHandle() {
+        return mainWindowHandle;
+    }
 }
