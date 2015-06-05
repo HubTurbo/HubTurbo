@@ -15,7 +15,6 @@ after_success:
 branches:
   only:
     - master
-    - checkstyle
 
 before_install:
     - "export DISPLAY=:99.0"
