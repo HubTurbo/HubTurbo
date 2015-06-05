@@ -1,11 +1,14 @@
 package github;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -121,7 +124,7 @@ public class TurboIssueEvent {
         return text;
     }
 
-    public Node display(TurboIssue issue) {
+    public Node display(Model model, TurboIssue issue) {
         String actorName = getActor().getLogin();
         String time = new PrettyTime().format(getDate());
 
@@ -151,30 +154,27 @@ public class TurboIssueEvent {
                 return display;
             }
             case Labeled: {
-                // TODO re-enable this
-//                TurboLabel label = ServiceManager.getInstance().getModel()
-//                  .getLabelByGhName(getLabelName());
+                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
                     conditionallyBold(bold, new Text(String.format("%s added label ", actorName))),
-//                    label.getNode(),
-                    new Label(getLabelName()),
+                    label.isPresent()
+                        ? label.get().getNode()
+                        : new Label(getLabelName()),
                     conditionallyBold(bold, new Text(String.format(" %s.", time)))
                 );
                 return display;
             }
             case Unlabeled: {
-                // TODO re-enable this
-//                TurboLabel label = ServiceManager.getInstance().getModel()
-//                  .getLabelByGhName(getLabelName());
+                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
-                    conditionallyBold(bold, new Text(
-                        String.format("%s removed label ", actorName))),
-//                    label.getNode(),
-                    new Label(getLabelName()),
+                    conditionallyBold(bold, new Text(String.format("%s removed label ", actorName))),
+                    label.isPresent()
+                        ? label.get().getNode()
+                        : new Label(getLabelName()),
                     conditionallyBold(bold, new Text(String.format(" %s.", time)))
                 );
                 return display;
