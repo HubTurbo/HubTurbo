@@ -15,7 +15,7 @@ import util.events.UpdateDummyRepoEvent;
 
 public class ModelUpdateUITest extends UITest {
 
-    private final int EVENT_DELAY = 500;
+    private static final int EVENT_DELAY = 500;
 
     @Test
     @SuppressWarnings("unchecked")
@@ -88,20 +88,25 @@ public class ModelUpdateUITest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
 
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_LABEL, "dummy/dummy", "Label 1"));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.DELETE_LABEL, "dummy/dummy", "Label 1"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_MILESTONE, "dummy/dummy", "Milestone 1"));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.DELETE_MILESTONE, "dummy/dummy", "Milestone 1"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_USER, "dummy/dummy", "User 1"));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.DELETE_USER, "dummy/dummy", "User 1"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
 
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 1, null, "Issue 11"));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 1, null, "Issue 11"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.UPDATE_MILESTONE, "dummy/dummy", 1, null, "Milestone 11"));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.UPDATE_MILESTONE, "dummy/dummy", 1, null, "Milestone 11"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
@@ -118,7 +123,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     public void deleteIssue(int itemId) {
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy", itemId));
+        UI.events.triggerEvent(new UpdateDummyRepoEvent(
+            UpdateDummyRepoEvent.UpdateType.DELETE_ISSUE, "dummy/dummy", itemId));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }

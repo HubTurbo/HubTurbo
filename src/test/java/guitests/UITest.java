@@ -14,7 +14,7 @@ import ui.UI;
 
 public class UITest extends GuiTest{
 
-    protected static final SettableFuture<Stage> stageFuture = SettableFuture.create();
+    private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
     protected static class TestUI extends UI {
         public TestUI() {

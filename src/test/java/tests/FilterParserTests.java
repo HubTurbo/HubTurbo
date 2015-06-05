@@ -22,18 +22,30 @@ public class FilterParserTests {
 
     @Test
     public void keywords() {
-        assertEquals(Parser.parse("a(b)"), new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
-        assertEquals(Parser.parse("    a   (   b   )   "), new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
-        assertEquals(Parser.parse("a(b c)"), new Conjunction(new Qualifier("keyword", "a"), new Conjunction(new Qualifier("keyword", "b"), new Qualifier("keyword", "c"))));
-        assertEquals(Parser.parse("c a(b)"), new Conjunction(new Conjunction(new Qualifier("keyword", "c"), new Qualifier("keyword", "a")), new Qualifier("keyword", "b")));
+        assertEquals(Parser.parse("a(b)"),
+            new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+        assertEquals(Parser.parse("    a   (   b   )   "),
+            new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+        assertEquals(Parser.parse("a(b c)"),
+            new Conjunction(
+                new Qualifier("keyword", "a"),
+                new Conjunction(new Qualifier("keyword", "b"), new Qualifier("keyword", "c"))));
+        assertEquals(Parser.parse("c a(b)"),
+            new Conjunction(
+                new Conjunction(
+                    new Qualifier("keyword", "c"),
+                    new Qualifier("keyword", "a")),
+                new Qualifier("keyword", "b")));
     }
 
     @Test
     public void quotes() {
         // Quoted qualifier content
         assertEquals(Parser.parse("created:\"a b\""), new Qualifier("created", "a b"));
-        assertEquals(Parser.parse("created:\" > 2014-5-1 \""), new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
-        assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""), new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
+        assertEquals(Parser.parse("created:\" > 2014-5-1 \""),
+            new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
+        assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""),
+            new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
 
         // Prefix quotes
         assertEquals(Parser.parse("\"a b\""), new Qualifier("keyword", "a b"));
@@ -91,17 +103,30 @@ public class FilterParserTests {
         // Implicit conjunction
 
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
-                new Disjunction(new Conjunction(new Qualifier("milestone", "0.4"), new Qualifier("state", "open")), new Qualifier("label", "urgent")));
-        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"), Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
+                new Disjunction(
+                    new Conjunction(
+                        new Qualifier("milestone", "0.4"),
+                        new Qualifier("state", "open")),
+                    new Qualifier("label", "urgent")));
+        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
+            Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
 
     @Test
     public void associativity() {
         assertEquals(Parser.parse("a:b OR c:d OR e:f"),
-                new Disjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+                new Disjunction(
+                    new Disjunction(
+                        new Qualifier("a", "b"),
+                        new Qualifier("c", "d")),
+                    new Qualifier("e", "f")));
 
         assertEquals(Parser.parse("a:b AND c:d AND e:f"),
-                new Conjunction(new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+                new Conjunction(
+                    new Conjunction(
+                        new Qualifier("a", "b"),
+                        new Qualifier("c", "d")),
+                    new Qualifier("e", "f")));
     }
 
     @Test
@@ -143,7 +168,9 @@ public class FilterParserTests {
                 new Conjunction(
                         new Conjunction(
                                 new Qualifier("keyword", "a"),
-                                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15)))),
+                                new Qualifier("created",
+                                    new DateRange(LocalDate.of(2014, 6, 1),
+                                        LocalDate.of(2013, 3, 15)))),
                         new Qualifier("keyword", "b"))
         );
     }
@@ -227,21 +254,42 @@ public class FilterParserTests {
     @Test
     public void precedence() {
         assertEquals(Parser.parse("a:b OR c:d AND e:f"),
-                new Disjunction(new Qualifier("a", "b"), new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
+                new Disjunction(
+                    new Qualifier("a", "b"),
+                    new Conjunction(
+                        new Qualifier("c", "d"),
+                        new Qualifier("e", "f"))));
         assertEquals(Parser.parse("~a:b OR c:d AND e:f"),
-                new Disjunction(new Negation(new Qualifier("a", "b")), new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
+                new Disjunction(
+                    new Negation(
+                        new Qualifier("a", "b")),
+                    new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
 
-        assertEquals(Parser.parse("a:b ~c:d"), new Conjunction(new Qualifier("a", "b"), new Negation(new Qualifier("c", "d"))));
+        assertEquals(Parser.parse("a:b ~c:d"),
+            new Conjunction(new Qualifier("a", "b"), new Negation(new Qualifier("c", "d"))));
     }
 
     @Test
     public void grouping() {
         assertEquals(Parser.parse("(a:b OR c:d) AND e:f"),
-                new Conjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+                new Conjunction(
+                    new Disjunction(
+                        new Qualifier("a", "b"),
+                        new Qualifier("c", "d")),
+                    new Qualifier("e", "f")));
         assertEquals(Parser.parse("(a:b OR c:d) e:f"),
-                new Conjunction(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")), new Qualifier("e", "f")));
+                new Conjunction(
+                    new Disjunction(
+                        new Qualifier("a", "b"),
+                        new Qualifier("c", "d")),
+                    new Qualifier("e", "f")));
         assertEquals(Parser.parse("e:f ~(a:b OR c:d)"),
-                new Conjunction(new Qualifier("e", "f"), new Negation(new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")))));
+                new Conjunction(
+                    new Qualifier("e", "f"),
+                    new Negation(
+                        new Disjunction(
+                            new Qualifier("a", "b"),
+                            new Qualifier("c", "d")))));
     }
 
     @Test
@@ -251,7 +299,11 @@ public class FilterParserTests {
         assertEquals(Parser.parse("assignee    :    darius   "),
             new Qualifier("assignee", "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
-            new Conjunction(new Conjunction(new Qualifier("assignee", "dar"), new Qualifier("keyword", "ius")), new Qualifier("keyword", "one")));
+            new Conjunction(
+                new Conjunction(
+                    new Qualifier("assignee", "dar"),
+                    new Qualifier("keyword", "ius")),
+                new Qualifier("keyword", "one")));
     }
 
     @Test

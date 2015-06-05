@@ -16,7 +16,7 @@ import util.events.UpdateDummyRepoEvent;
 
 public class UpdateIssuesTest extends UITest {
 
-    private final int EVENT_DELAY = 500;
+    private static final int EVENT_DELAY = 500;
 
     @Test
     @SuppressWarnings("unchecked")

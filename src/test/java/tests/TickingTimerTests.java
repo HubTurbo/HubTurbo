@@ -43,13 +43,13 @@ public class TickingTimerTests {
         tickingTimer.start();
         ExecutorService es = Executors.newFixedThreadPool(2);
         Runnable positive = () -> {
-            for (int i=0; i<attempts; i++) {
+            for (int i = 0; i < attempts; i++) {
                 tickingTimer.pause();
                 delay(2);
             }
         };
         Runnable negative = () -> {
-            for (int i=0; i<attempts; i++) {
+            for (int i = 0; i < attempts; i++) {
                 tickingTimer.resume();
                 delay(2);
             }
