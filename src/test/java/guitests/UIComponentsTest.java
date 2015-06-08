@@ -42,8 +42,9 @@ public class UIComponentsTest extends UITest {
         sleep(1000);
         UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 0.5f));
         sleep(1000);
-        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 1));
+        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 0.9f));
         sleep(1000);
+        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy"));
     }
 
 }
