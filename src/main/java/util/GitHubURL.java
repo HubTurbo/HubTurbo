@@ -54,7 +54,7 @@ public class GitHubURL {
     }
 
     public static String getPathForKeyboardShortcuts() {
-        return String.format("https://github.com/HubTurbo/HubTurbo/wiki/Keyboard-Shortcuts");
+        return "https://github.com/HubTurbo/HubTurbo/wiki/Keyboard-Shortcuts";
     }
 
     public static String getPathForMilestones(String repoId) {
@@ -66,9 +66,6 @@ public class GitHubURL {
     }
 
     public static boolean isUrlIssue(String url) {
-        if (url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)")) {
-            return true;
-        }
-        return false;
+        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)");
     }
 }
