@@ -122,22 +122,18 @@ public class TurboMilestone {
     public void setClosedIssues(int closedIssues) {
         this.closedIssues = closedIssues;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TurboMilestone that = (TurboMilestone) o;
-
-        if (closedIssues != that.closedIssues) return false;
-        if (id != that.id) return false;
-        if (isOpen != that.isOpen) return false;
-        if (openIssues != that.openIssues) return false;
-        if (!description.equals(that.description)) return false;
-        if (!dueDate.equals(that.dueDate)) return false;
-        if (!title.equals(that.title)) return false;
-
-        return true;
+        return closedIssues == that.closedIssues &&
+                id == that.id && isOpen == that.isOpen &&
+                openIssues == that.openIssues &&
+                description.equals(that.description) &&
+                dueDate.equals(that.dueDate) &&
+                title.equals(that.title);
     }
 
     @Override
