@@ -33,11 +33,6 @@ public class TextProgressBar extends StackPane {
         syncProgress();
     }
 
-    public void addProgress(int increment) {
-        progress = Math.min(Math.max(0, progress + increment), 1);
-        syncProgress();
-    }
-
     private void syncProgress() {
         if (progress < 0.001) {
             bar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
