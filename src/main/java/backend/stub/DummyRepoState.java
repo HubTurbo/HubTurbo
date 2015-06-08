@@ -65,6 +65,19 @@ public class DummyRepoState {
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
         }
+        // Then put down three comments for issue 10
+        Comment dummyComment1 = new Comment();
+        Comment dummyComment2 = new Comment();
+        Comment dummyComment3 = new Comment();
+        dummyComment1.setCreatedAt(new Date()); // Recently posted
+        dummyComment2.setCreatedAt(new Date());
+        dummyComment3.setCreatedAt(new Date(0)); // Posted very long ago
+        Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
+        issues.get(10).setMetadata(new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(dummyComments))
+        ));
+        issues.get(10).setCommentCount(3);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
