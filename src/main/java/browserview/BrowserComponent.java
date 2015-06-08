@@ -51,7 +51,7 @@ public class BrowserComponent {
     private static User32 user32;
 
     private final UI ui;
-    private ChromeDriver driver = null;
+    private ChromeDriverEx driver = null;
 
     // We want browser commands to be run on a separate thread, but not to
     // interfere with each other. This executor is limited to a single instance,
@@ -63,7 +63,7 @@ public class BrowserComponent {
 
     // The first is not desirable and the second does not seem to be possible
     // at the moment.
-    private ExecutorService executor;
+    private Executor executor;
 
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
@@ -83,10 +83,6 @@ public class BrowserComponent {
             driver = createChromeDriver();
             logger.info("Successfully initialised browser component and ChromeDriver");
         });
-        if (isTestChromeDriver) {
-            executor.shutdownNow();
-            executor = Executors.newSingleThreadExecutor();
-        }
         login();
     }
 
@@ -121,25 +117,20 @@ public class BrowserComponent {
      * Creates, initialises, and returns a ChromeDriver.
      * @return
      */
-    private ChromeDriver createChromeDriver() {
+    private ChromeDriverEx createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
         if (USE_MOBILE_USER_AGENT) {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
-        ChromeDriver driver;
-        if (isTestChromeDriver) {
-            driver = new ChromeDriverStub(options);
-            logger.info("Creating ChromeDriverStub");
-        } else {
-            driver = new ChromeDriver(options);
-            logger.info("Creating ChromeDriver");
+        ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
+        if (!isTestChromeDriver) {
+            driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
+            Rectangle availableDimensions = ui.getAvailableDimensions();
+            driver.manage().window().setSize(new Dimension(
+                    (int) availableDimensions.getWidth(),
+                    (int) availableDimensions.getHeight()));
+            initialiseJNA();
         }
-        driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-        Rectangle availableDimensions = ui.getAvailableDimensions();
-        driver.manage().window().setSize(new Dimension(
-                (int) availableDimensions.getWidth(),
-                (int) availableDimensions.getHeight()));
-        initialiseJNA();
         return driver;
     }
 
@@ -244,9 +235,9 @@ public class BrowserComponent {
     }
 
     private boolean isBrowserActive(){
-        if (isTestChromeDriver) {
-            return true;
-        }
+//        if (isTestChromeDriver) {
+//            return true;
+//        }
         if (driver == null) {
             logger.info("Initializing ChromeDriver");
             return false;
