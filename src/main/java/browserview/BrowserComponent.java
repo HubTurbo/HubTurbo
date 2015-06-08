@@ -72,7 +72,7 @@ public class BrowserComponent {
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
         this.executor = Executors.newSingleThreadExecutor();
-        this.isTestChromeDriver = isTestChromeDriver;
+        BrowserComponent.isTestChromeDriver = isTestChromeDriver;
     }
 
     /**
@@ -281,32 +281,28 @@ public class BrowserComponent {
      */
 
     private void runBrowserOperation (Runnable operation) {
-        executor.execute(new Task<Void>() {
-            @Override
-            protected Void call() {
-                if (isBrowserActive()) {
-                    try {
-                        operation.run();
-                        pageContentOnLoad = getCurrentPageSource();
-                    } catch (WebDriverException e) {
-                        switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-                        case NoSuchWindow:
-                            resetBrowser();
-                            runBrowserOperation(operation); // Recurse and repeat
-                            break;
-                        case NoSuchElement:
-                            logger.info("Warning: no such element! " + e.getMessage());
-                            break;
-                        default:
-                            break;
-                        }
+        executor.execute(() -> {
+            if (isBrowserActive()) {
+                try {
+                    operation.run();
+                    pageContentOnLoad = getCurrentPageSource();
+                } catch (WebDriverException e) {
+                    switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+                    case NoSuchWindow:
+                        resetBrowser();
+                        runBrowserOperation(operation); // Recurse and repeat
+                        break;
+                    case NoSuchElement:
+                        logger.info("Warning: no such element! " + e.getMessage());
+                        break;
+                    default:
+                        break;
                     }
-                } else {
-                    logger.info("Chrome window not responding.");
-                    resetBrowser();
-                    runBrowserOperation(operation);
                 }
-                return null;
+            } else {
+                logger.info("Chrome window not responding.");
+                resetBrowser();
+                runBrowserOperation(operation);
             }
         });
     }
@@ -391,16 +387,10 @@ public class BrowserComponent {
      * Executed on another thread.
      */
   public void resize(double width) {
-      executor.execute(new Task<Void>() {
-          @Override
-          protected Void call() {
-              driver.manage().window().setPosition(new Point((int) width, 0));
-              Rectangle availableDimensions = ui.getAvailableDimensions();
-              driver.manage().window().setSize(new Dimension(
-                      (int) availableDimensions.getWidth(),
-                      (int) availableDimensions.getHeight()));
-              return null;
-          }
+      executor.execute(() -> {
+          driver.manage().window().setPosition(new Point((int) width, 0));
+          driver.manage().window().setSize(new Dimension(
+                  (int) ui.getAvailableDimensions().getWidth(), (int) ui.getAvailableDimensions().getHeight()));
       });
   }
 
