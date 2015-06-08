@@ -5,5 +5,5 @@ import com.google.common.eventbus.Subscribe;
 @FunctionalInterface
 public interface ClearLogicModelEventHandler extends EventHandler {
     @Subscribe
-    public void handle(ClearLogicModelEvent e);
+    void handle(ClearLogicModelEvent e);
 }
