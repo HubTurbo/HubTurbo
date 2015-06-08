@@ -101,18 +101,18 @@ public class ColumnControl extends HBox {
      * Returns a list of issues to download comments for.
      * @return
      */
-    public List<Integer> getUpdatedIssues() {
-        HashSet<Integer> result = new HashSet<>();
-        for (Node child : getChildren()) {
-            IssueColumn panel = (IssueColumn) child;
-            if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
-                panel.getIssueList().stream()
-                    .map(TurboIssue::getId)
-                    .forEach(result::add);
-            }
-        }
-        return new ArrayList<>(result);
-    }
+//    public List<Integer> getUpdatedIssues() {
+//        HashSet<Integer> result = new HashSet<>();
+//        for (Node child : getChildren()) {
+//            IssueColumn panel = (IssueColumn) child;
+//            if (panel.getCurrentFilterExpression().getQualifierNames().contains("updated")) {
+//                panel.getIssueList().stream()
+//                    .map(TurboIssue::getId)
+//                    .forEach(result::add);
+//            }
+//        }
+//        return new ArrayList<>(result);
+//    }
 
     public void forEach(Consumer<Column> callback) {
         getChildren().forEach(child -> callback.accept((Column) child));
