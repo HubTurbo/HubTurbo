@@ -33,7 +33,7 @@ public class UpdateIssuesTest extends UITest {
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(1, countIssues.get());
+        assertEquals(2, countIssues.get());
     }
 
     public void resetRepo() {
