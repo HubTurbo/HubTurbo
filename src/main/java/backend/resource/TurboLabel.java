@@ -37,6 +37,12 @@ public class TurboLabel {
         this.repoId = repoId;
     }
 
+    public TurboLabel(String repoId, String colour, String name) {
+        this.actualName = name;
+        this.colour = colour;
+        this.repoId = repoId;
+    }
+
     public static TurboLabel nonexclusive(String repoId, String group, String name) {
         return new TurboLabel(repoId, joinWith(group, name, false));
     }
