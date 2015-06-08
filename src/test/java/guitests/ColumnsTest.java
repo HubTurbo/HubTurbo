@@ -21,7 +21,7 @@ public class ColumnsTest extends UITest {
 
     // TODO check if interactions result in any effects
     @Test
-    public void dragClickAndCloseTest() {
+    public void columnsTest() {
         UI.events.registerEvent((ColumnClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
@@ -36,18 +36,27 @@ public class ColumnsTest extends UITest {
 
         // Click
         eventTriggered = false;
-        find("#dummy/dummy_col1_closeButton");
+        find("#dummy/dummy_col0_closeButton");
         moveBy(-15, 0);
         click(); // Click
         assertTrue(eventTriggered);
 
         // Close
-        click("#dummy/dummy_col1_closeButton");
+        click("#dummy/dummy_col0_closeButton");
         try {
-            find("#dummy/dummy_col1");
+            find("#dummy/dummy_col0");
             fail();
         } catch (NoNodesFoundException e) {
             // Expected behavior.
         }
+
+        // Switch primary repo
+        doubleClick("#repositorySelector");
+        doubleClick();
+        type("#dummy2/dummy2");
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
+        click("#dummy2/dummy2_col1");
     }
 }
