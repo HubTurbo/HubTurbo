@@ -20,26 +20,26 @@ public class DragData {
         this.issueIndex = issue;
     }
 
-    public DragData(Source source, String name) {
-        this.setSource(source);
-        this.entityName = name;
-    }
+//    public DragData(Source source, String name) {
+//        this.setSource(source);
+//        this.entityName = name;
+//    }
 
     public int getColumnIndex() {
         return columnIndex;
     }
 
-    public void setColumnIndex(int columnIndex) {
-        this.columnIndex = columnIndex;
-    }
+//    public void setColumnIndex(int columnIndex) {
+//        this.columnIndex = columnIndex;
+//    }
 
-    public int getIssueIndex() {
-        return issueIndex;
-    }
+//    public int getIssueIndex() {
+//        return issueIndex;
+//    }
 
-    public void setIssueIndex(int issueIndex) {
-        this.issueIndex = issueIndex;
-    }
+//    public void setIssueIndex(int issueIndex) {
+//        this.issueIndex = issueIndex;
+//    }
 
     public String serialise() {
         return (new Gson()).toJson(this);
@@ -49,15 +49,15 @@ public class DragData {
         return (new Gson()).fromJson(json, DragData.class);
     }
 
-    public Source getSource() {
-        return source;
-    }
+//    public Source getSource() {
+//        return source;
+//    }
 
     public void setSource(Source source) {
         this.source = source;
     }
 
-    public String getEntityName() {
-        return entityName;
-    }
+//    public String getEntityName() {
+//        return entityName;
+//    }
 }
