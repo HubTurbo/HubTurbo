@@ -359,18 +359,6 @@ public class BrowserComponent {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
     }
 
-    /**
-     * Resizes the browser window based on the given width.
-     * Executed on another thread.
-     */
-  public void resize(double width) {
-      executor.execute(() -> {
-          driver.manage().window().setPosition(new Point((int) width, 0));
-          driver.manage().window().setSize(new Dimension(
-                  (int) ui.getAvailableDimensions().getWidth(), (int) ui.getAvailableDimensions().getHeight()));
-      });
-  }
-
     private void bringToTop(){
         if (PlatformSpecific.isOnWindows()) {
             user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);

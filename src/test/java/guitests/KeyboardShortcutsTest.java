@@ -46,5 +46,8 @@ public class KeyboardShortcutsTest extends UITest {
         press(KeyCode.D).release(KeyCode.D);
         press(KeyCode.F).release(KeyCode.F);
         press(KeyCode.D).release(KeyCode.D);
+
+        // minimize window
+        press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL);
     }
 }
