@@ -1,8 +1,12 @@
 package guitests;
 
+import javafx.application.Platform;
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
+import ui.UI;
+import util.events.UpdateProgressEvent;
+import util.events.UpdateProgressEventHandler;
 
 public class UIComponentsTest extends UITest {
 
@@ -32,6 +36,17 @@ public class UIComponentsTest extends UITest {
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+    }
+
+    // TODO check that progress bar is updating
+    @Test
+    public void textProgressBarTest() {
+        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 0));
+        sleep(1000);
+        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 0.5f));
+        sleep(1000);
+        UI.events.triggerEvent(new UpdateProgressEvent("dummy/dummy", 1));
+        sleep(1000);
     }
 
 }
