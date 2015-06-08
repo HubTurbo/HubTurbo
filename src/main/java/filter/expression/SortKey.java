@@ -18,13 +18,9 @@ public class SortKey {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         SortKey sortKey = (SortKey) o;
-
-        if (inverted != sortKey.inverted) return false;
-        if (key != null ? !key.equals(sortKey.key) : sortKey.key != null) return false;
-
-        return true;
+        return inverted == sortKey.inverted &&
+                !(key != null ? !key.equals(sortKey.key) : sortKey.key != null);
     }
 
     @Override
