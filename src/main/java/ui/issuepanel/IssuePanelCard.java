@@ -208,10 +208,12 @@ public class IssuePanelCard extends VBox {
             Label assigneeNameLabel = new Label(issue.getAssignee().get());
             assigneeNameLabel.getStyleClass().add("display-box-padding");
 
-            Image image = assignee.getAvatar();
             ImageView avatar = new ImageView();
-            assert image != null;
-            avatar.setImage(image);
+            if (assignee.getAvatarURL().length() != 0) {
+                Image image = assignee.getAvatar();
+                assert image != null;
+                avatar.setImage(image);
+            }
 
             HBox assigneeBox = new HBox();
             assigneeBox.setAlignment(Pos.BASELINE_CENTER);
