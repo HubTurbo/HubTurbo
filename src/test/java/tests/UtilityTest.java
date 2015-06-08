@@ -29,7 +29,7 @@ public class UtilityTest {
 
         assertEquals(LocalDateTime.of(1994, 11, 15, 12, 45, 26), dateToLocalDateTime(new Date(94, 10, 15, 12, 45, 26)));
 
-        assertEquals(784874726000L, localDateTimeToLong(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
+        assertEquals(new Date(94, 10, 15, 12, 45, 26).getTime(), localDateTimeToLong(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
 
         assertEquals("HelloWorldThisIsATest", snakeCaseToCamelCase("hello_world_this_is_a_test"));
     }
