@@ -14,11 +14,6 @@ public class ColumnsTest extends UITest {
 
     private static boolean eventTriggered = false;
 
-    @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
-    }
-
     // TODO check if interactions result in any effects
     @Test
     public void columnsTest() {
