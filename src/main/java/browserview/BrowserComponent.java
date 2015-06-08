@@ -49,11 +49,6 @@ public class BrowserComponent {
     private static HWND browserWindowHandle;
     private static User32 user32;
 
-    static {
-        setupJNA();
-        setupChromeDriverExecutable();
-    }
-
     private final UI ui;
     private ChromeDriver driver = null;
 
@@ -73,6 +68,8 @@ public class BrowserComponent {
         this.ui = ui;
         this.executor = Executors.newSingleThreadExecutor();
         BrowserComponent.isTestChromeDriver = isTestChromeDriver;
+        setupJNA();
+        setupChromeDriverExecutable();
     }
 
     /**
@@ -360,7 +357,7 @@ public class BrowserComponent {
      */
     private static void setupChromeDriverExecutable() {
         File f = new File(CHROME_DRIVER_BINARY_NAME);
-        if (!f.exists()) {
+        if (!f.exists() && !isTestChromeDriver) {
             InputStream in = BrowserComponent.class.getClassLoader()
                 .getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
             assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at "
