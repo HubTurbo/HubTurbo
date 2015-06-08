@@ -20,7 +20,7 @@ public class ChromeDriverEx {
     }
 
     private void initialise(ChromeOptions options) {
-        if(!isTestChromeDriver) driver = new ChromeDriver(options);
+        if (!isTestChromeDriver) driver = new ChromeDriver(options);
     }
 
     public WebDriver.Options manage() {
@@ -28,7 +28,7 @@ public class ChromeDriverEx {
     }
 
     public void quit() {
-        if(!isTestChromeDriver) driver.quit();
+        if (!isTestChromeDriver) driver.quit();
     }
 
     public void get(String url) {
