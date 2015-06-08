@@ -35,7 +35,8 @@ public class DummyRepoState {
         this.dummyRepoId = repoId;
 
         for (int i = 0; i < 10; i++) {
-            TurboIssue dummyIssue = makeDummyIssue();
+            // Issue #6 is a PR
+            TurboIssue dummyIssue = (i != 6) ? makeDummyIssue() : makeDummyPR();
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
             TurboLabel dummyLabel = makeDummyLabel();
@@ -47,6 +48,22 @@ public class DummyRepoState {
             labels.put(dummyLabel.getActualName(), dummyLabel);
             milestones.put(dummyMilestone.getId(), dummyMilestone);
             users.put(dummyUser.getLoginName(), dummyUser);
+        }
+
+        // Issues #1-5 are assigned milestones 1-5 respectively
+        for (int i = 1; i <= 5; i++) {
+            issues.get(i).setMilestone(milestones.get(i));
+        }
+        // Odd issues are assigned label 1, even issues are assigned label 2
+        for (int i = 1; i <= 10; i++) {
+            issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
+        }
+        // We assign a colorful label to issue 10
+        labels.put("Colorful", new TurboLabel(dummyRepoId, "ffa500", "Colorful"));
+        issues.get(10).addLabel("Colorful");
+        // Each user is assigned to his corresponding issue
+        for (int i = 1; i <= 10; i++) {
+            issues.get(i).setAssignee("User " + i);
         }
     }
 
@@ -119,6 +136,15 @@ public class DummyRepoState {
                 "User " + (issues.size() + 1),
                 LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
                 false);
+    }
+
+    private TurboIssue makeDummyPR() {
+        return new TurboIssue(dummyRepoId,
+                issues.size() + 1,
+                "PR " + (issues.size() + 1),
+                "User " + (issues.size() + 1),
+                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                true);
     }
 
     private TurboLabel makeDummyLabel() {
