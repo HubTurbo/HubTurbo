@@ -3,6 +3,7 @@ package browserview;
 import java.awt.*;
 import java.io.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
@@ -62,11 +63,11 @@ public class BrowserComponent {
 
     // The first is not desirable and the second does not seem to be possible
     // at the moment.
-    private Executor executor;
+    private ExecutorService executor;
 
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
-        this.executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor();
         BrowserComponent.isTestChromeDriver = isTestChromeDriver;
         setupJNA();
         setupChromeDriverExecutable();
@@ -82,6 +83,10 @@ public class BrowserComponent {
             driver = createChromeDriver();
             logger.info("Successfully initialised browser component and ChromeDriver");
         });
+        if (isTestChromeDriver) {
+            executor.shutdownNow();
+            executor = Executors.newSingleThreadExecutor();
+        }
         login();
     }
 
@@ -239,12 +244,12 @@ public class BrowserComponent {
     }
 
     private boolean isBrowserActive(){
+        if (isTestChromeDriver) {
+            return true;
+        }
         if (driver == null) {
             logger.info("Initializing ChromeDriver");
             return false;
-        }
-        if (isTestChromeDriver) {
-            return true;
         }
         try {
             // Throws an exception if unable to switch to original HT tab
@@ -357,7 +362,7 @@ public class BrowserComponent {
      */
     private static void setupChromeDriverExecutable() {
         File f = new File(CHROME_DRIVER_BINARY_NAME);
-        if (!f.exists() && !isTestChromeDriver) {
+        if (!f.exists()) {
             InputStream in = BrowserComponent.class.getClassLoader()
                 .getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
             assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at "
