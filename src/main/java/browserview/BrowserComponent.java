@@ -390,19 +390,19 @@ public class BrowserComponent {
      * Resizes the browser window based on the given width.
      * Executed on another thread.
      */
-//  public void resize(double width) {
-//      executor.execute(new Task<Void>() {
-//          @Override
-//          protected Void call() {
-//              driver.manage().window().setPosition(new Point((int) width, 0));
-//              Rectangle availableDimensions = ui.getAvailableDimensions();
-//              driver.manage().window().setSize(new Dimension(
-//                      (int) availableDimensions.getWidth(),
-//                      (int) availableDimensions.getHeight()));
-//              return null;
-//          }
-//      });
-//  }
+  public void resize(double width) {
+      executor.execute(new Task<Void>() {
+          @Override
+          protected Void call() {
+              driver.manage().window().setPosition(new Point((int) width, 0));
+              Rectangle availableDimensions = ui.getAvailableDimensions();
+              driver.manage().window().setSize(new Dimension(
+                      (int) availableDimensions.getWidth(),
+                      (int) availableDimensions.getHeight()));
+              return null;
+          }
+      });
+  }
 
     private void bringToTop(){
         if (PlatformSpecific.isOnWindows()) {
