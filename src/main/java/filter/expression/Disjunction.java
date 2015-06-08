@@ -33,13 +33,9 @@ public class Disjunction implements FilterExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Disjunction that = (Disjunction) o;
-
-        if (left != null ? !left.equals(that.left) : that.left != null) return false;
-        if (right != null ? !right.equals(that.right) : that.right != null) return false;
-
-        return true;
+        return !(left != null ? !left.equals(that.left) : that.left != null) &&
+                !(right != null ? !right.equals(that.right) : that.right != null);
     }
 
     @Override
