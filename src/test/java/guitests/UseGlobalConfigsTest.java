@@ -26,7 +26,8 @@ public class UseGlobalConfigsTest extends UITest {
 
     @Override
     public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--testconfig=true");
+        // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
     }
 
     @Test
