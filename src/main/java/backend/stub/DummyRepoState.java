@@ -35,7 +35,7 @@ public class DummyRepoState {
         this.dummyRepoId = repoId;
 
         for (int i = 0; i < 10; i++) {
-            // Issue #6 is a PR
+            // Issue #7 is a PR
             TurboIssue dummyIssue = (i != 6) ? makeDummyIssue() : makeDummyPR();
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
@@ -72,12 +72,18 @@ public class DummyRepoState {
         dummyComment1.setCreatedAt(new Date()); // Recently posted
         dummyComment2.setCreatedAt(new Date());
         dummyComment3.setCreatedAt(new Date(0)); // Posted very long ago
+        dummyComment1.setUser(new User().setLogin("User 1"));
+        dummyComment2.setUser(new User().setLogin("User 2"));
+        dummyComment3.setUser(new User().setLogin("User 3"));
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
         issues.get(10).setMetadata(new IssueMetadata(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(dummyComments))
         ));
         issues.get(10).setCommentCount(3);
+        issues.get(10).setUpdatedAt(LocalDateTime.now());
+        // Close issue 6
+        issues.get(6).setOpen(false);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
