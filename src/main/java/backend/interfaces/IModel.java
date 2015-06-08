@@ -12,11 +12,11 @@ import backend.resource.*;
  * the UI.
   */
 public interface IModel extends IBaseModel {
-    public String getDefaultRepo();
-    public void setDefaultRepo(String repoId);
-    public Optional<Model> getModelById(String repoId);
-    public Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue);
-    public List<TurboLabel> getLabelsOfIssue(TurboIssue issue);
-    public List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate);
-    public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue);
+    String getDefaultRepo();
+    void setDefaultRepo(String repoId);
+    Optional<Model> getModelById(String repoId);
+    Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue);
+    List<TurboLabel> getLabelsOfIssue(TurboIssue issue);
+    List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate);
+    Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue);
 }
