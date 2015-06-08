@@ -3,7 +3,6 @@ package guitests;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
-import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 import util.events.ColumnClickedEventHandler;
 
