@@ -32,6 +32,10 @@ public class UtilityTest {
         assertEquals(new Date(94, 10, 15, 12, 45, 26).getTime(), localDateTimeToLong(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
 
         assertEquals("HelloWorldThisIsATest", snakeCaseToCamelCase("hello_world_this_is_a_test"));
+
+        assertEquals(1, parseVersionNumber("1.2.3a").get()[0]);
+        assertEquals(2, parseVersionNumber("1.2.3a").get()[1]);
+        assertEquals(3, parseVersionNumber("1.2.3a").get()[2]);
     }
 
 }
