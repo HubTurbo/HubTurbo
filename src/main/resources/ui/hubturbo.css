@@ -57,7 +57,7 @@
     -fx-text-fill: #808080;
 }
 
-.issue-panel-closed {
+.issue-panel-closed .text {
     -fx-strikethrough: true;
 }
 
