@@ -78,15 +78,6 @@ public class UseGlobalConfigsTest extends UITest {
         File testConfig = new File(configFileDirectory, testConfigFileName);
         if (!(testConfig.exists() && testConfig.isFile())) fail();
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(testConfig));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            fail();
-        }
         // ...then check that the JSON file contents are correct.
         Preferences testPref = new Preferences(true);
         // Credentials
