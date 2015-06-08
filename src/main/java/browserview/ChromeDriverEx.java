@@ -2,6 +2,7 @@ package browserview;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -49,7 +50,14 @@ public class ChromeDriverEx {
     }
 
     public WebDriver.TargetLocator switchTo() {
-        return !isTestChromeDriver ? driver.switchTo() : null;
+        if (!isTestChromeDriver) {
+            return driver.switchTo();
+        } else {
+            if (Math.random() < 0.5) {
+                throw new WebDriverException();
+            }
+        }
+        return null;
     }
 
     public String getWindowHandle() {

@@ -120,12 +120,11 @@ public class BrowserComponent {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
+        WebDriver.Options manage = driver.manage();
         if (!isTestChromeDriver) {
-            driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-            Rectangle availableDimensions = ui.getAvailableDimensions();
-            driver.manage().window().setSize(new Dimension(
-                    (int) availableDimensions.getWidth(),
-                    (int) availableDimensions.getHeight()));
+            manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
+            manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
+                    (int) ui.getAvailableDimensions().getHeight()));
             initialiseJNA();
         }
         return driver;
@@ -228,9 +227,6 @@ public class BrowserComponent {
     }
 
     private boolean isBrowserActive(){
-//        if (isTestChromeDriver) {
-//            return true;
-//        }
         if (driver == null) {
             logger.info("Initializing ChromeDriver");
             return false;
