@@ -59,8 +59,8 @@ public class DummyRepoState {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
         }
         // We assign a colorful label to issue 10
-        labels.put("Colorful", new TurboLabel(dummyRepoId, "ffa500", "Colorful"));
-        issues.get(10).addLabel("Colorful");
+        labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
+        issues.get(10).addLabel("Label 11");
         // Each user is assigned to his corresponding issue
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
