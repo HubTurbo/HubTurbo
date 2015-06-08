@@ -1,12 +1,9 @@
 package guitests;
 
-import javafx.application.Platform;
-import org.junit.Test;
-
 import javafx.scene.input.KeyCode;
+import org.junit.Test;
 import ui.UI;
 import util.events.UpdateProgressEvent;
-import util.events.UpdateProgressEventHandler;
 
 public class UIComponentsTest extends UITest {
 
