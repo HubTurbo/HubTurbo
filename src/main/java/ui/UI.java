@@ -278,8 +278,7 @@ public class UI extends Application implements EventDispatcher {
 
     private HashMap<String, String> initialiseCommandLineArguments() {
         Parameters params = getParameters();
-        HashMap<String, String> commandLineArgs = new HashMap<>(params.getNamed());
-        return commandLineArgs;
+        return new HashMap<>(params.getNamed());
     }
 
     private Parent createRoot() {
