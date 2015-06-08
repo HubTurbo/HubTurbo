@@ -57,10 +57,8 @@ public class IssuePanel extends IssueColumn {
      * @return true if the issue has changed, false otherwise
      */
     private boolean issueHasNewComments(TurboIssue issue) {
-        if (!issueCommentCounts.containsKey(issue.getId())) {
-            return false;
-        }
-        return Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+        return issueCommentCounts.containsKey(issue.getId()) &&
+                Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
     }
 
     /**
