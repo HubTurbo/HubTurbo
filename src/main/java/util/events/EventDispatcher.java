@@ -5,12 +5,12 @@ public interface EventDispatcher {
      * Publish/subscribe API making use of Guava's EventBus.
      * Takes an event handler to be called upon an event being fired.
      */
-    public void registerEvent(EventHandler handler);
+    void registerEvent(EventHandler handler);
 
     /**
      * Takes an event handler to be unregistered.
      */
-    public void unregisterEvent(EventHandler handler);
+    void unregisterEvent(EventHandler handler);
 
     /**
      * Publish/subscribe API making use of Guava's EventBus.
@@ -18,5 +18,5 @@ public interface EventDispatcher {
      * event is fired for all subscribers whose parameter is either the same
      * or a super type.
      */
-    public <T extends Event> void triggerEvent(T event);
+    <T extends Event> void triggerEvent(T event);
 }

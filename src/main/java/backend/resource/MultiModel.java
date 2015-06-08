@@ -197,12 +197,8 @@ public class MultiModel implements IModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         MultiModel that = (MultiModel) o;
-
-        if (!models.equals(that.models)) return false;
-
-        return true;
+        return models.equals(that.models);
     }
 
     @Override

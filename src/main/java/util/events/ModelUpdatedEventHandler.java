@@ -5,5 +5,5 @@ import com.google.common.eventbus.Subscribe;
 @FunctionalInterface
 public interface ModelUpdatedEventHandler extends EventHandler {
     @Subscribe
-    public void handle(ModelUpdatedEvent e);
+    void handle(ModelUpdatedEvent e);
 }

@@ -352,29 +352,20 @@ public class TurboIssue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TurboIssue issue = (TurboIssue) o;
-
-        if (commentCount != issue.commentCount) return false;
-        if (id != issue.id) return false;
-        if (isOpen != issue.isOpen) return false;
-        if (isPullRequest != issue.isPullRequest) return false;
-        if (assignee != null ? !assignee.equals(issue.assignee) : issue.assignee != null) return false;
-        if (createdAt != null ? !createdAt.equals(issue.createdAt) : issue.createdAt != null) return false;
-        if (creator != null ? !creator.equals(issue.creator) : issue.creator != null) return false;
-        if (description != null
-            ? !description.equals(issue.description)
-            : issue.description != null) return false;
-        if (labels != null ? !labels.equals(issue.labels) : issue.labels != null) return false;
-        if (milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) return false;
-        if (title != null ? !title.equals(issue.title) : issue.title != null) return false;
-        if (updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) return false;
-        if (markedReadAt != null
-            ? !markedReadAt.equals(issue.markedReadAt)
-            : issue.markedReadAt != null) return false;
-        if (isCurrentlyRead != issue.isCurrentlyRead) return false;
-
-        return true;
+        return commentCount == issue.commentCount &&
+                id == issue.id && isOpen == issue.isOpen &&
+                isPullRequest == issue.isPullRequest &&
+                !(assignee != null ? !assignee.equals(issue.assignee) : issue.assignee != null) &&
+                !(createdAt != null ? !createdAt.equals(issue.createdAt) : issue.createdAt != null) &&
+                !(creator != null ? !creator.equals(issue.creator) : issue.creator != null) &&
+                !(description != null ? !description.equals(issue.description) : issue.description != null) &&
+                !(labels != null ? !labels.equals(issue.labels) : issue.labels != null) &&
+                !(milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) &&
+                !(title != null ? !title.equals(issue.title) : issue.title != null) &&
+                !(updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) &&
+                !(markedReadAt != null ? !markedReadAt.equals(issue.markedReadAt) : issue.markedReadAt != null) &&
+                isCurrentlyRead == issue.isCurrentlyRead;
     }
 
     @Override

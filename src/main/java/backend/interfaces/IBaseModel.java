@@ -8,12 +8,12 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 
 public interface IBaseModel {
-    public List<TurboIssue> getIssues();
-    public List<TurboLabel> getLabels();
-    public List<TurboMilestone> getMilestones();
-    public List<TurboUser> getUsers();
+    List<TurboIssue> getIssues();
+    List<TurboLabel> getLabels();
+    List<TurboMilestone> getMilestones();
+    List<TurboUser> getUsers();
 
-    public default String summarise() {
+    default String summarise() {
         return String.format("%d issue(s), %d label(s), %d milestone(s), %d user(s)",
             getIssues().size(),
             getLabels().size(),

@@ -35,10 +35,6 @@ public class BrowserComponent {
     private static final boolean USE_MOBILE_USER_AGENT = false;
     private static boolean isTestChromeDriver;
 
-//  private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
-//          ? "browserview/expanded/mobileHideUI.js"
-//          : "browserview/expanded/hideUI.js";
-
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
@@ -165,18 +161,6 @@ public class BrowserComponent {
         }
         logger.info("Executed JavaScript " + script.substring(0, Math.min(script.length(), 10)));
     }
-
-    /**
-     * Runs a script in the currently-active driver window to hide GitHub UI elements.
-     */
-//  private void hidePageElements() {
-//      Optional<String> file = IOUtilities.readResource(HIDE_ELEMENTS_SCRIPT_PATH);
-//      if (file.isPresent()) {
-//          executeJavaScript(file.get());
-//      } else {
-//          logger.info("Failed to read script for hiding elements; did not execute");
-//      }
-//  }
 
     /**
      * Navigates to the New Label page on GitHub.
@@ -406,19 +390,19 @@ public class BrowserComponent {
      * Resizes the browser window based on the given width.
      * Executed on another thread.
      */
-//  public void resize(double width) {
-//      executor.execute(new Task<Void>() {
-//          @Override
-//          protected Void call() {
-//              driver.manage().window().setPosition(new Point((int) width, 0));
-//              Rectangle availableDimensions = ui.getAvailableDimensions();
-//              driver.manage().window().setSize(new Dimension(
-//                      (int) availableDimensions.getWidth(),
-//                      (int) availableDimensions.getHeight()));
-//              return null;
-//          }
-//      });
-//  }
+  public void resize(double width) {
+      executor.execute(new Task<Void>() {
+          @Override
+          protected Void call() {
+              driver.manage().window().setPosition(new Point((int) width, 0));
+              Rectangle availableDimensions = ui.getAvailableDimensions();
+              driver.manage().window().setSize(new Dimension(
+                      (int) availableDimensions.getWidth(),
+                      (int) availableDimensions.getHeight()));
+              return null;
+          }
+      });
+  }
 
     private void bringToTop(){
         if (PlatformSpecific.isOnWindows()) {

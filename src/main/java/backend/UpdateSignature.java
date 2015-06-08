@@ -47,19 +47,12 @@ public class UpdateSignature {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         UpdateSignature that = (UpdateSignature) o;
-
-        if (collaboratorsETag != null
-            ? !collaboratorsETag.equals(that.collaboratorsETag)
-            : that.collaboratorsETag != null)
-            return false;
-        if (issuesETag != null ? !issuesETag.equals(that.issuesETag) : that.issuesETag != null) return false;
-        if (labelsETag != null ? !labelsETag.equals(that.labelsETag) : that.labelsETag != null) return false;
-        if (milestonesETag != null ? !milestonesETag.equals(that.milestonesETag) : that.milestonesETag != null)
-            return false;
-
-        return true;
+        return !(collaboratorsETag != null ?
+                !collaboratorsETag.equals(that.collaboratorsETag) : that.collaboratorsETag != null) &&
+                !(issuesETag != null ? !issuesETag.equals(that.issuesETag) : that.issuesETag != null) &&
+                !(labelsETag != null ? !labelsETag.equals(that.labelsETag) : that.labelsETag != null) &&
+                !(milestonesETag != null ? !milestonesETag.equals(that.milestonesETag) : that.milestonesETag != null);
     }
 
     @Override

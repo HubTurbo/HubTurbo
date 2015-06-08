@@ -13,13 +13,9 @@ public class UserCredentials {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         UserCredentials that = (UserCredentials) o;
-
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (username != null ? !username.equals(that.username) : that.username != null) return false;
-
-        return true;
+        return !(password != null ? !password.equals(that.password) : that.password != null) &&
+                !(username != null ? !username.equals(that.username) : that.username != null);
     }
 
     @Override

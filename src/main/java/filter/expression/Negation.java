@@ -29,12 +29,8 @@ public class Negation implements FilterExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Negation negation = (Negation) o;
-
-        if (expr != null ? !expr.equals(negation.expr) : negation.expr != null) return false;
-
-        return true;
+        return !(expr != null ? !expr.equals(negation.expr) : negation.expr != null);
     }
 
     @Override

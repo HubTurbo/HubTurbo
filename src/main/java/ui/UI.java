@@ -179,12 +179,11 @@ public class UI extends Application implements EventDispatcher {
     // running after the HT window has been closed, and thus will require the
     // process to be closed manually afterwards (Force Quit / End Process).
     public boolean isTestMode() {
-        if (commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true")) return true;
-        if (isBypassLogin()) return true;
-        if (isTestJSONEnabled()) return true;
-        if (isTestChromeDriver()) return true;
-        if (isTestGlobalConfig()) return true;
-        return false;
+        return commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true") ||
+                isBypassLogin() ||
+                isTestJSONEnabled() ||
+                isTestChromeDriver() ||
+                isTestGlobalConfig();
     }
 
     // Public for use in LoginDialog
@@ -279,8 +278,7 @@ public class UI extends Application implements EventDispatcher {
 
     private HashMap<String, String> initialiseCommandLineArguments() {
         Parameters params = getParameters();
-        HashMap<String, String> commandLineArgs = new HashMap<>(params.getNamed());
-        return commandLineArgs;
+        return new HashMap<>(params.getNamed());
     }
 
     private Parent createRoot() {
