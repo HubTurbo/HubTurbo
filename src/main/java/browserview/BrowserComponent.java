@@ -1,29 +1,21 @@
 package browserview;
 
-import java.awt.*;
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-
-import javafx.concurrent.Task;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+
+import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -221,20 +213,23 @@ public class BrowserComponent {
     }
 
     public void jumpToComment(){
-        WebElement comment = driver.findElementById("new_comment_field");
-        comment.click();
-        bringToTop();
+        try {
+            WebElement comment = driver.findElementById("new_comment_field");
+            comment.click();
+            bringToTop();
+        } catch (NoSuchElementException e) {
+            logger.warn("Unable to reach jump to comments. ");
+        }
     }
 
     private boolean isBrowserActive(){
-        if (driver == null) {
-            logger.info("Initializing ChromeDriver");
-            return false;
-        }
+        if (driver == null) return false;
         try {
             // Throws an exception if unable to switch to original HT tab
             // which then triggers a browser reset when called from runBrowserOperation
-            driver.switchTo().window(driver.getWindowHandle());
+            WebDriver.TargetLocator switchTo = driver.switchTo();
+            String windowHandle = driver.getWindowHandle();
+            if (!isTestChromeDriver) switchTo.window(windowHandle);
             // When the HT tab is closed (but the window is still alive),
             // a lot of the operations on the driver (such as getCurrentURL)
             // will hang (without throwing an exception, the thread will just freeze the UI forever),

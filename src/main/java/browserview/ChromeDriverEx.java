@@ -7,6 +7,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.util.NoSuchElementException;
+
 // acts as a middleman for ChromeDriver when not in testing mode,
 // and as a stub when testing
 
@@ -41,19 +43,21 @@ public class ChromeDriverEx {
                 "https://github.com/HubTurbo/HubTurbo/issues/1";
     }
 
-    public WebElement findElementById(String id) {
-        return !isTestChromeDriver ? driver.findElementById(id) : null;
+    public WebElement findElementById(String id) throws NoSuchElementException {
+        if (!isTestChromeDriver) return driver.findElementById(id);
+        throw new NoSuchElementException();
     }
 
-    public WebElement findElementByTagName(String tag) {
-        return !isTestChromeDriver ? driver.findElementByTagName(tag) : null;
+    public WebElement findElementByTagName(String tag) throws NoSuchElementException {
+        if (!isTestChromeDriver) return driver.findElementByTagName(tag);
+        throw new NoSuchElementException();
     }
 
-    public WebDriver.TargetLocator switchTo() {
+    public WebDriver.TargetLocator switchTo() throws WebDriverException {
         if (!isTestChromeDriver) {
             return driver.switchTo();
         } else {
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.1) {
                 throw new WebDriverException();
             }
         }
@@ -64,11 +68,12 @@ public class ChromeDriverEx {
         return !isTestChromeDriver ? driver.getWindowHandle() : "";
     }
 
-    public WebElement findElement(By by) {
-        return !isTestChromeDriver ? driver.findElement(by) : null;
+    public WebElement findElement(By by) throws NoSuchElementException {
+        if (!isTestChromeDriver) return driver.findElement(by);
+        throw new NoSuchElementException();
     }
 
     public Object executeScript(String script) {
-        return !isTestChromeDriver ? driver.executeScript(script) : null;
+        return !isTestChromeDriver ? driver.executeScript(script) : "";
     }
 }
