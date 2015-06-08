@@ -99,17 +99,14 @@ public class BrowserComponent {
      */
     private void quit() {
         logger.info("Quitting browser component");
-
         // The application may quit before the browser is initialised.
         // In that case, do nothing.
-        if (driver == null) {
-            return;
-        }
-
-        try {
-            driver.quit();
-        } catch (WebDriverException e) {
-            // Chrome was closed; do nothing
+        if (driver != null) {
+            try {
+                driver.quit();
+            } catch (WebDriverException e) {
+                // Chrome was closed; do nothing
+            }
         }
     }
 
@@ -147,11 +144,7 @@ public class BrowserComponent {
      * @param script
      */
     private void executeJavaScript(String script) {
-        if (driver instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) driver).executeScript(script);
-        } else {
-            assert false : "Driver cannot execute JS";
-        }
+        driver.executeScript(script);
         logger.info("Executed JavaScript " + script.substring(0, Math.min(script.length(), 10)));
     }
 
