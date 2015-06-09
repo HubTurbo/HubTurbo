@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.Optional;
 
+import org.eclipse.egit.github.core.Label;
 import org.junit.Test;
 
 import backend.resource.TurboLabel;
@@ -62,4 +63,15 @@ public class TurboLabelTest {
         TurboLabel label2 = new TurboLabel(REPO, "name2");
         assertEquals(label1.getStyle(), label2.getStyle());
     }
+
+    @Test
+    public void turboLabelTest() {
+        Label label = new Label();
+        label.setName("test label");
+        label.setColor("ffffff");
+        TurboLabel turboLabel = new TurboLabel("dummy/dummy", label);
+        assertEquals("dummy/dummy", turboLabel.getRepoId());
+
+    }
+
 }
