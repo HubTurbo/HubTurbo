@@ -208,7 +208,9 @@ public class IssuePanel extends IssueColumn {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (event.getCode() == KeyCode.N) {
-                ui.getBrowserComponent().scrollToBottom();
+                if (!minimizeWindow.match(event)) {
+                    ui.getBrowserComponent().scrollToBottom();
+                }
             }
             if (event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
                 ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
