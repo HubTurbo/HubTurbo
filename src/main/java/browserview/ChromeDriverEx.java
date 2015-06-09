@@ -34,8 +34,23 @@ public class ChromeDriverEx {
         if (!isTestChromeDriver) driver.quit();
     }
 
-    public void get(String url) {
-        if (!isTestChromeDriver) driver.get(url);
+    public void get(String url) throws WebDriverException {
+        if(isTestChromeDriver) {
+            testGet();
+        } else {
+            driver.get(url);
+        }
+    }
+
+    public void testGet() throws WebDriverException {
+        double chance = Math.random();
+        if (chance < 0.25) {
+            throw new WebDriverException("no such window");
+        } else if (chance < 0.5) {
+            throw new WebDriverException("no such element");
+        } else if (chance < 0.75) {
+            throw new WebDriverException("unexpected alert open");
+        }
     }
 
     public String getCurrentUrl() {

@@ -311,9 +311,7 @@ public class BrowserComponent {
      * One-time JNA setup.
      */
     private static void setupJNA() {
-        if (PlatformSpecific.isOnWindows()) {
-            user32 = User32.INSTANCE;
-        }
+        if (PlatformSpecific.isOnWindows()) user32 = User32.INSTANCE;
     }
 
     /**
@@ -383,9 +381,7 @@ public class BrowserComponent {
     public boolean hasBviewChanged() {
         if (isTestChromeDriver) return true;
         if (isBrowserActive()) {
-            if (getCurrentPageSource().equals(pageContentOnLoad)){
-                return false;
-            }
+            if (getCurrentPageSource().equals(pageContentOnLoad)) return false;
             pageContentOnLoad = getCurrentPageSource();
             return true;
         }
