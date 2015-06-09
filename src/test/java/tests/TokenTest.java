@@ -31,6 +31,8 @@ public class TokenTest {
         assertEquals(false, token.equals(token1));
         token.setValue(":");
         assertEquals(true, token.equals(token1));
+        token.setValue("..");
+        assertEquals(false, token.equals(token1));
     }
 
 }
