@@ -193,17 +193,13 @@ public class Model implements IBaseModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Model model = (Model) o;
-
-        if (!issues.equals(model.issues)) return false;
-        if (!labels.equals(model.labels)) return false;
-        if (!milestones.equals(model.milestones)) return false;
-        if (!repoId.equals(model.repoId)) return false;
-        if (!updateSignature.equals(model.updateSignature)) return false;
-        if (!users.equals(model.users)) return false;
-
-        return true;
+        return issues.equals(model.issues) &&
+                labels.equals(model.labels) &&
+                milestones.equals(model.milestones) &&
+                repoId.equals(model.repoId) &&
+                updateSignature.equals(model.updateSignature) &&
+                users.equals(model.users);
     }
 
     @Override
