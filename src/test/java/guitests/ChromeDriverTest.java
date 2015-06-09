@@ -32,8 +32,6 @@ public class ChromeDriverTest extends UITest {
         UI.events.triggerEvent(new MilestoneCreatedEvent());
         sleep(EVENT_DELAY);
 
-        click("#dummy/dummy_col0_1");
-
         // show docs
         press(KeyCode.F1).release(KeyCode.F1);
         press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
