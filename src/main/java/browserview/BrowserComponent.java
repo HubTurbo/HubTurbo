@@ -381,6 +381,7 @@ public class BrowserComponent {
     }
 
     public boolean hasBviewChanged() {
+        if (isTestChromeDriver) return true;
         if (isBrowserActive()) {
             if (getCurrentPageSource().equals(pageContentOnLoad)){
                 return false;
