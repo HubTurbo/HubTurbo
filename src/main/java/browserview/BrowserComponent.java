@@ -217,7 +217,7 @@ public class BrowserComponent {
             WebElement comment = driver.findElementById("new_comment_field");
             comment.click();
             bringToTop();
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             logger.warn("Unable to reach jump to comments. ");
         }
     }
@@ -300,8 +300,9 @@ public class BrowserComponent {
                 searchBox = driver.findElement(By.name("password"));
                 searchBox.sendKeys(ui.logic.credentials.password);
                 searchBox.submit();
-            } catch (NoSuchElementException e) {
+            } catch (Exception e) {
                 // Already logged in; do nothing
+                logger.info("Unable to login, may already be logged in. ");
             }
         });
     }
@@ -415,7 +416,7 @@ public class BrowserComponent {
             body = driver.findElementByTagName("body");
             body.sendKeys(keyCode);
         } catch (Exception e) {
-            logger.error("No such element" + e.getLocalizedMessage(), e);
+            logger.error("No such element");
         }
     }
 
