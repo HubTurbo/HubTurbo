@@ -141,6 +141,7 @@ public class ModelTests {
         assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
 
         // Signature
+        assertEquals(true, modelEmptySig.getUpdateSignature().isEmpty());
         assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.EMPTY);
         assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
 
