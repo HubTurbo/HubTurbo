@@ -66,9 +66,19 @@ public class DateRange {
         if (getClass() != obj.getClass())
             return false;
         DateRange other = (DateRange) obj;
-        return end.equals(other.end) &&
-                start.equals(other.start) &&
-                strictly == other.strictly;
+        if (end == null) {
+            if (other.end != null)
+                return false;
+        } else if (!end.equals(other.end))
+            return false;
+        if (start == null) {
+            if (other.start != null)
+                return false;
+        } else if (!start.equals(other.start))
+            return false;
+        if (strictly != other.strictly)
+            return false;
+        return true;
     }
 
     @Override
