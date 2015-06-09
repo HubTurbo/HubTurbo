@@ -35,7 +35,7 @@ public class ChromeDriverEx {
     }
 
     public void get(String url) throws WebDriverException {
-        if(isTestChromeDriver) {
+        if (isTestChromeDriver) {
             testGet();
         } else {
             driver.get(url);
