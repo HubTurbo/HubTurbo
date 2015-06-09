@@ -57,7 +57,8 @@ public class ChromeDriverEx {
         if (!isTestChromeDriver) {
             return driver.switchTo();
         } else {
-            if (Math.random() < 0.1) {
+            // ~50% chance to throw an exception which is used to test resetBrowser
+            if (Math.random() < 0.5) {
                 throw new WebDriverException();
             }
         }
