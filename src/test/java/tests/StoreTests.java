@@ -26,6 +26,7 @@ public class StoreTests {
      * @param seconds The number of seconds for the thread to sleep.
      */
     private static void delay(double seconds) {
+        UI.status.updateTimeToRefresh((int) seconds);
         int time = (int) (seconds * 1000);
         try {
             Thread.sleep(time);
@@ -94,6 +95,7 @@ public class StoreTests {
      */
     @After
     public void cleanup() {
+        UI.status.clear();
         File toClear = new File("store/test/dummy1-dummy1.json");
         if (toClear.isFile()) toClear.delete();
     }
