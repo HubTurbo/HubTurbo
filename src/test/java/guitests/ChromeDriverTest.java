@@ -12,6 +12,8 @@ import util.events.MilestoneCreatedEvent;
 
 public class ChromeDriverTest extends UITest {
 
+    private final int EVENT_DELAY = 100;
+
     @Override
     public void launchApp() {
         FXTestUtils.launchApp(
@@ -22,9 +24,13 @@ public class ChromeDriverTest extends UITest {
     @Test
     public void chromeDriverStubTest() {
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
+        sleep(EVENT_DELAY);
         UI.events.triggerEvent(new IssueCreatedEvent());
+        sleep(EVENT_DELAY);
         UI.events.triggerEvent(new LabelCreatedEvent());
+        sleep(EVENT_DELAY);
         UI.events.triggerEvent(new MilestoneCreatedEvent());
+        sleep(EVENT_DELAY);
 
         click("#dummy/dummy_col0_1");
 
