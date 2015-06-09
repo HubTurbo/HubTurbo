@@ -33,27 +33,33 @@ public class UpdateDummyRepoEvent extends Event {
 
     // Overloaded constructors
 
+    // Hardly used, maybe to clean up entire model
     public UpdateDummyRepoEvent(UpdateType updateType) {
         this(updateType, null, -1, null, null);
     }
 
+    // e.g. Clean repo, new issue
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId) {
         this(updateType, repoId, -1, null, null);
     }
 
+    // e.g. Delete issue
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId) {
         this(updateType, repoId, itemId, null, null);
     }
 
+    // e.g. Delete label
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString) {
         this(updateType, repoId, -1, idString, null);
     }
 
+    // e.g. Update issue
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String updateText) {
         this(updateType, repoId, itemId, null, updateText);
     }
 
+    // e.g. Update label
     public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString, String updateText) {
-        this(updateType, repoId, -1, idString, null);
+        this(updateType, repoId, -1, idString, updateText);
     }
 }
