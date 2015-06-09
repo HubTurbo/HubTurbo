@@ -26,11 +26,6 @@ public class RangeTest extends UITest {
 
     private static final int EVENT_DELAY = 1000;
 
-    @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
-    }
-
     @Test
     public void numberRangeTest() {
         ((TextField) find("#dummy/dummy_col0_filterTextField")).setText("id:>5");
