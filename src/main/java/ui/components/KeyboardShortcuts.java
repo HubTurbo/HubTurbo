@@ -11,6 +11,7 @@ import javafx.scene.input.KeyCombination;
  * ui.components.NavigableListView
  * ui.issuecolumn.ColumnControl
  * ui.issuepanel.IssuePanel
+ * ui.MenuControl
  *
  * Utility Class:
  * util.KeyPress
@@ -55,8 +56,28 @@ public class KeyboardShortcuts {
     public static final KeyCode MANAGE_ASSIGNEES = KeyCode.A;
     public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
 
-    public static final KeyCode PREVIOUS_ISSUE = KeyCode.T;
-    public static final KeyCode NEXT_ISSUE = KeyCode.V;
-
     public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
+
+    //ui.issuecolumn.ColumnControl
+    public static final KeyCode LEFT_PANEL = KeyCode.D;
+    public static final KeyCode RIGHT_PANEL = KeyCode.F;
+
+    // ui.components.NavigableListView && ui.issuepanel.IssuePanel
+    public static final KeyCode UP_ISSUE = KeyCode.T;
+    public static final KeyCode DOWN_ISSUE = KeyCode.V;
+
+    // ui.MenuControl
+    public static final KeyCombination NEW_ISSUE =
+            new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination NEW_LABEL =
+            new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination NEW_MILESTONE =
+            new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);
+
+    public static final KeyCombination CREATE_LEFT_PANEL =
+            new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination CREATE_RIGHT_PANEL =
+            new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination CLOSE_PANEL =
+            new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
 }
