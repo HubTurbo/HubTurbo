@@ -244,8 +244,8 @@ public class IssuePanel extends IssueColumn {
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyboardShortcuts.NEXT_ISSUE ||
-                    event.getCode() == KeyboardShortcuts.PREVIOUS_ISSUE) {
+            if (event.getCode() == KeyboardShortcuts.DOWN_ISSUE ||
+                    event.getCode() == KeyboardShortcuts.UP_ISSUE) {
                 listView.selectFirstItem();
             }
         });
