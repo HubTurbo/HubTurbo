@@ -1,15 +1,5 @@
 package ui;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -18,16 +8,25 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.components.KeyboardShortcuts;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.DialogMessage;
 import util.PlatformEx;
 import util.events.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class MenuControl extends MenuBar {
@@ -88,8 +87,7 @@ public class MenuControl extends MenuBar {
             columns.createNewPanelAtStart();
             setHvalue(columnsScrollPane.getHmin());
         });
-        createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
-                KeyCombination.SHIFT_DOWN));
+        createLeft.setAccelerator(KeyboardShortcuts.CREATE_LEFT_PANEL);
 
         MenuItem createRight = new MenuItem("Create");
         createRight.setOnAction(e -> {
@@ -115,14 +113,14 @@ public class MenuControl extends MenuBar {
             };
             columns.widthProperty().addListener(listener);
         });
-        createRight.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
+        createRight.setAccelerator(KeyboardShortcuts.CREATE_RIGHT_PANEL);
 
         MenuItem closeColumn = new MenuItem("Close");
         closeColumn.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
             columns.closeCurrentColumn();
         });
-        closeColumn.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
+        closeColumn.setAccelerator(KeyboardShortcuts.CLOSE_PANEL);
 
         cols.getItems().addAll(createRight, createLeft, closeColumn);
         return cols;
@@ -236,7 +234,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Documentation");
             ui.getBrowserComponent().showDocs();
         });
-        documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
+        documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyboardShortcuts.SHOW_DOCS));
         return documentationMenuItem;
     }
 
@@ -246,7 +244,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Refresh");
             ui.logic.refresh();
         });
-        refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
+        refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyboardShortcuts.REFRESH));
         return refreshMenuItem;
     }
 
@@ -254,7 +252,8 @@ public class MenuControl extends MenuBar {
         MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
         forceRefreshMenuItem.setOnAction((e) -> triggerForceRefreshProgressDialog());
 
-        forceRefreshMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F5, KeyCombination.CONTROL_DOWN));
+        forceRefreshMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyboardShortcuts.REFRESH, KeyCombination.CONTROL_DOWN));
         return forceRefreshMenuItem;
     }
 
@@ -295,21 +294,21 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: New > Issue");
             ui.triggerEvent(new IssueCreatedEvent());
         });
-        newIssueMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN));
+        newIssueMenuItem.setAccelerator(KeyboardShortcuts.NEW_ISSUE);
 
         MenuItem newLabelMenuItem = new MenuItem("Label");
         newLabelMenuItem.setOnAction(e -> {
             logger.info("Menu: New > Label");
             ui.triggerEvent(new LabelCreatedEvent());
         });
-        newLabelMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
+        newLabelMenuItem.setAccelerator(KeyboardShortcuts.NEW_LABEL);
 
         MenuItem newMilestoneMenuItem = new MenuItem("Milestone");
         newMilestoneMenuItem.setOnAction(e -> {
             logger.info("Menu: New > Milestone");
             ui.triggerEvent(new MilestoneCreatedEvent());
         });
-        newMilestoneMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
+        newMilestoneMenuItem.setAccelerator(KeyboardShortcuts.NEW_MILESTONE);
 
         return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
     }
