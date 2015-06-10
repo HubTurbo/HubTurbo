@@ -1,12 +1,11 @@
 package ui.components;
 
-import java.util.Optional;
-import java.util.function.IntConsumer;
-
+import javafx.scene.input.KeyCode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javafx.scene.input.KeyCode;
+import java.util.Optional;
+import java.util.function.IntConsumer;
 
 /**
  * A very specialized ListView subclass that:
@@ -134,34 +133,27 @@ public class NavigableListView<T> extends ScrollableListView<T> {
             if (e.isControlDown()){
                 return;
             }
-            switch (e.getCode()) {
-            case UP:
-            case T:
-            case DOWN:
-            case V:
-                e.consume();
-                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
-                assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
-                if (!e.isShiftDown()) {
-                    logger.info("Arrow key navigation to issue " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get());
-                }
-                break;
-            case ENTER:
+            if (e.getCode() == KeyCode.ENTER) {
                 e.consume();
                 if (selectedIndex.isPresent()) {
                     logger.info("Enter key selection on issue " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
-                break;
-            default:
-                break;
+            }
+            if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
+                    e.getCode() == KeyboardShortcuts.UP_ISSUE || e.getCode() == KeyboardShortcuts.DOWN_ISSUE) {
+                e.consume();
+                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyboardShortcuts.DOWN_ISSUE);
+                assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
+                if (!e.isShiftDown()) {
+                    logger.info("Arrow key navigation to issue " + selectedIndex.get());
+                    onItemSelected.accept(selectedIndex.get());
+                }
             }
         });
     }
 
     private void handleUpDownKeys(boolean isDownKey) {
-
         // Nothing is selected or the list is empty; do nothing
         if (!selectedIndex.isPresent()) return;
         if (getItems().size() == 0) return;
