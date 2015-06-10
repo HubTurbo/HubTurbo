@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
+import ui.components.KeyboardShortcuts;
 import ui.components.NavigableListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
@@ -26,16 +27,6 @@ public class IssuePanel extends IssueColumn {
     private int issueCount;
 
     private NavigableListView<TurboIssue> listView;
-    private final KeyCombination keyCombBoxToList =
-        new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination keyCombListToBox =
-        new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination maximizeWindow =
-        new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination minimizeWindow =
-        new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination defaultSizeWindow =
-        new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
     public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
@@ -117,7 +108,7 @@ public class IssuePanel extends IssueColumn {
 
     private void setupKeyboardShortcuts() {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (keyCombBoxToList.match(event)) {
+            if (KeyboardShortcuts.BOX_TO_LIST.match(event)) {
                 event.consume();
                 listView.selectFirstItem();
             }
@@ -128,13 +119,13 @@ public class IssuePanel extends IssueColumn {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (maximizeWindow.match(event)) {
+            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (minimizeWindow.match(event)) {
+            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (defaultSizeWindow.match(event)) {
+            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
         });
@@ -170,7 +161,7 @@ public class IssuePanel extends IssueColumn {
             if (event.getCode() == KeyCode.F1) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (keyCombListToBox.match(event)) {
+            if (KeyboardShortcuts.LIST_TO_BOX.match(event)) {
                 setFocusToFilterBox();
             }
             if (event.getCode() == KeyCode.SPACE
@@ -208,7 +199,7 @@ public class IssuePanel extends IssueColumn {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (event.getCode() == KeyCode.N) {
-                if (!minimizeWindow.match(event)) {
+                if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
@@ -238,13 +229,13 @@ public class IssuePanel extends IssueColumn {
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
-            if (maximizeWindow.match(event)) {
+            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (minimizeWindow.match(event)) {
+            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (defaultSizeWindow.match(event)) {
+            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
         });
