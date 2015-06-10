@@ -1,15 +1,7 @@
 package ui.issuepanel;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -19,6 +11,11 @@ import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
 
 public class IssuePanel extends IssueColumn {
 
@@ -112,10 +109,10 @@ public class IssuePanel extends IssueColumn {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (event.getCode() == KeyCode.SPACE) {
+            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS) {
                 event.consume();
             }
-            if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+            if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
                 event.consume();
                 listView.selectFirstItem();
             }
@@ -132,7 +129,7 @@ public class IssuePanel extends IssueColumn {
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
-            if (event.getCode() == KeyCode.R) {
+            if (event.getCode() == KeyboardShortcuts.MARK_AS_READ) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -144,7 +141,7 @@ public class IssuePanel extends IssueColumn {
                 issue.setIsCurrentlyRead(true);
                 parentColumnControl.refresh();
             }
-            if (event.getCode() == KeyCode.U) {
+            if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -155,75 +152,75 @@ public class IssuePanel extends IssueColumn {
                 issue.setIsCurrentlyRead(false);
                 parentColumnControl.refresh();
             }
-            if (event.getCode() == KeyCode.F5) {
+            if (event.getCode() == KeyboardShortcuts.REFRESH) {
                 ui.logic.refresh();
             }
-            if (event.getCode() == KeyCode.F1) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_DOCS) {
                 ui.getBrowserComponent().showDocs();
             }
             if (KeyboardShortcuts.LIST_TO_BOX.match(event)) {
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyCode.SPACE
-                && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS
+                && KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
 
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyCode.I) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_ISSUES) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showIssues();
                 }
             }
-            if (event.getCode() == KeyCode.P) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_PULL_REQUESTS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showPullRequests();
                 }
             }
-            if (event.getCode() == KeyCode.H) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_HELP) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showDocs();
                 }
             }
-            if (event.getCode() == KeyCode.K) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showKeyboardShortcuts();
                 }
             }
-            if (event.getCode() == KeyCode.D) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_CONTRIBUTORS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showContributors();
                     event.consume();
                 }
             }
-            if (event.getCode() == KeyCode.U) {
+            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_TOP) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (event.getCode() == KeyCode.N) {
+            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_BOTTOM) {
                 if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
-            if (event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
-                ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
+            if (event.getCode() == KeyboardShortcuts.SCROLL_UP || event.getCode() == KeyboardShortcuts.SCROLL_DOWN) {
+                ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.SCROLL_DOWN);
             }
-            if (event.getCode() == KeyCode.G) {
+            if (event.getCode() == KeyboardShortcuts.GOTO_MODIFIER) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().jumpToComment();
             }
-            if (event.getCode() == KeyCode.L) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().manageLabels(event.getCode().toString());
                 }
             }
-            if (event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
-            if (event.getCode() == KeyCode.M) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_MILESTONES) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
@@ -247,7 +244,8 @@ public class IssuePanel extends IssueColumn {
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
+            if (event.getCode() == KeyboardShortcuts.NEXT_ISSUE ||
+                    event.getCode() == KeyboardShortcuts.PREVIOUS_ISSUE) {
                 listView.selectFirstItem();
             }
         });
