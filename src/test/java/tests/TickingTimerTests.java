@@ -1,16 +1,11 @@
 package tests;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
+import util.TickingTimer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-
-import util.TickingTimer;
 
 public class TickingTimerTests {
 
@@ -37,19 +32,19 @@ public class TickingTimerTests {
 
     @Test
     public void threadingTest() {
-        final int attempts = 2;
+        final int attempts = 10;
 
         final TickingTimer tickingTimer = createTickingTimer();
         tickingTimer.start();
         ExecutorService es = Executors.newFixedThreadPool(2);
         Runnable positive = () -> {
-            for (int i = 0; i < attempts; i++) {
+            for (int i=0; i<attempts; i++) {
                 tickingTimer.pause();
                 delay(2);
             }
         };
         Runnable negative = () -> {
-            for (int i = 0; i < attempts; i++) {
+            for (int i=0; i<attempts; i++) {
                 tickingTimer.resume();
                 delay(2);
             }
@@ -57,35 +52,5 @@ public class TickingTimerTests {
         es.execute(positive);
         delay(1);
         es.execute(negative);
-        delay(4.5); // Need 6 seconds to wait for the positive and negative runnables to complete the run.
-    }
-
-    @Test
-    public void triggerTest() {
-        final ArrayList<Integer> ticks = new ArrayList<>();
-        final ArrayList<Integer> ideal = new ArrayList<>(Arrays.asList(
-                4, 3, // After 1.5
-                5, 10, // Trigger
-                4, 3)); // After 3.5
-
-        // Timeouts every five seconds, tick every second
-        final TickingTimer tickingTimer = new TickingTimer("test2",
-                5,
-                ticks::add,
-                () -> {
-                    ticks.add(10); // Append 10 every timeout
-                },
-                TimeUnit.SECONDS
-        );
-
-        tickingTimer.start();
-        delay(1.5);
-        tickingTimer.trigger();
-        delay(3.5);
-        tickingTimer.stop();
-
-        for (int i = 0; i < ideal.size(); i++) {
-            if (ticks.get(i) != ideal.get(i)) fail();
-        }
     }
 }

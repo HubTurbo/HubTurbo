@@ -4,6 +4,6 @@ import com.google.common.eventbus.Subscribe;
 
 @FunctionalInterface
 public interface MilestoneCreatedEventHandler extends EventHandler {
-    @Subscribe
-    void handle(MilestoneCreatedEvent e);
+	@Subscribe
+	public void handle(MilestoneCreatedEvent e);
 }

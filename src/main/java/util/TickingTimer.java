@@ -1,5 +1,8 @@
 package util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,9 +11,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * A abstract timer that counts down ('ticks') on a specified period. Repeats
@@ -126,7 +126,7 @@ public class TickingTimer {
                 onTimeout.run();
             }
             synchronized (this) {
-                latches.forEach(CountDownLatch::countDown);
+                latches.forEach(latch -> latch.countDown());
                 latches.clear();
             }
         }, 0, TICK_PERIOD, timeUnit);
