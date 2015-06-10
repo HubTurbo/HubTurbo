@@ -4,6 +4,6 @@ import com.google.common.eventbus.Subscribe;
 
 @FunctionalInterface
 public interface RepoOpenedEventHandler extends EventHandler {
-    @Subscribe
-    void handle(RepoOpenedEvent e);
+	@Subscribe
+	public void handle(RepoOpenedEvent e);
 }

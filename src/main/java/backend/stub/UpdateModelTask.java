@@ -6,7 +6,7 @@ import backend.resource.Model;
 
 public class UpdateModelTask extends backend.github.UpdateModelTask {
 
-    public UpdateModelTask(TaskRunner taskRunner, Repo repo, Model model) {
-        super(taskRunner, repo, model);
-    }
+	public UpdateModelTask(TaskRunner taskRunner, Repo repo, Model model) {
+		super(taskRunner, repo, model);
+	}
 }

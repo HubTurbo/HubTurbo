@@ -1,7 +1,7 @@
 package ui.components;
 
 public interface StatusUI {
-    void updateTimeToRefresh(int time);
-    void displayMessage(String text);
-    void clear();
+	public void updateTimeToRefresh(int time);
+	public void displayMessage(String text);
+	public void clear();
 }
