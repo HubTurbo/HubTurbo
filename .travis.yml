@@ -7,7 +7,7 @@ env:
     - TERM=dumb
 
 script:
-    - "./gradlew clean check -i"
+    - "./gradlew clean check -i --continue"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"
@@ -15,6 +15,7 @@ after_success:
 branches:
   only:
     - master
-    - ci
-    - testfx
-    - tests
+
+before_install:
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
