@@ -141,6 +141,7 @@ public class ModelTests {
         assertEquals(modelUpdated.getRepoId(), modelUpdated.getRepoId());
 
         // Signature
+        assertEquals(true, modelEmptySig.getUpdateSignature().isEmpty());
         assertEquals(modelEmptySig.getUpdateSignature(), UpdateSignature.EMPTY);
         assertEquals(modelEmptySig.getUpdateSignature(), modelEmptySig2.getUpdateSignature());
 
@@ -160,7 +161,7 @@ public class ModelTests {
 
         // Labels
         ArrayList<String> labelNames = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 11; i++) {
             labelNames.add("Label " + i);
         }
         Collections.sort(labelNames); // Label 1, Label 10, Label 2..9
@@ -227,7 +228,7 @@ public class ModelTests {
             modelUpdated.getLabelByActualName("");
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboLabel>empty(), modelUpdated.getLabelByActualName("Label 11"));
+        assertEquals(Optional.<TurboLabel>empty(), modelUpdated.getLabelByActualName("Label 12"));
         assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getActualName());
 
         // Milestones

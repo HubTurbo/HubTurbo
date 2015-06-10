@@ -26,18 +26,9 @@ public class RangeTest extends UITest {
 
     private static final int EVENT_DELAY = 1000;
 
-    @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--bypasslogin=true");
-    }
-
     @Test
     public void numberRangeTest() {
         ((TextField) find("#dummy/dummy_col0_filterTextField")).setText("id:>5");
-//        type("id");
-//        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-//        press(KeyCode.SHIFT).press(KeyCode.PERIOD).release(KeyCode.PERIOD).release(KeyCode.SHIFT);
-//        type("5");
         click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         assertEquals(5, ((IssuePanel) find("#dummy/dummy_col0")).getIssueCount());

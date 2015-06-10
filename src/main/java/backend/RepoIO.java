@@ -35,7 +35,7 @@ public class RepoIO {
 
         if (isTestMode) {
             repoSource = new DummySource();
-            repoStore.enableTestDirectory();
+            RepoStore.enableTestDirectory();
         } else {
             repoSource = new GitHubSource();
         }

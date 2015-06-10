@@ -9,8 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 public class IOUtilities {
 
-    private static final Logger logger = LogManager.getLogger(IOUtilities.class.getName());
-
     public static ByteArrayOutputStream inputStreamToByteArrayOutputStream(InputStream is) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int nRead;
@@ -22,23 +20,4 @@ public class IOUtilities {
         return buffer;
     }
 
-//    public static Optional<String> readResource(String packagePath) {
-//        ClassLoader classLoader = UI.class.getClassLoader();
-//        BufferedReader reader;
-//        InputStream inputStream = classLoader.getResourceAsStream(packagePath);
-//        StringBuilder sb = new StringBuilder();
-//        try {
-//            reader = new BufferedReader(new InputStreamReader(inputStream));
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                sb.append(line);
-//                sb.append("\n");
-//            }
-//            reader.close();
-//            return Optional.of(sb.toString());
-//        } catch (Exception e) {
-//            logger.error(e.getLocalizedMessage(), e);
-//        }
-//        return Optional.empty();
-//    }
 }

@@ -1,28 +1,21 @@
 package browserview;
 
-import java.awt.*;
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-
-import javafx.concurrent.Task;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+
+import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -34,10 +27,6 @@ public class BrowserComponent {
 
     private static final boolean USE_MOBILE_USER_AGENT = false;
     private static boolean isTestChromeDriver;
-
-//  private static String HIDE_ELEMENTS_SCRIPT_PATH = USE_MOBILE_USER_AGENT
-//          ? "browserview/expanded/mobileHideUI.js"
-//          : "browserview/expanded/hideUI.js";
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
@@ -53,13 +42,8 @@ public class BrowserComponent {
     private static HWND browserWindowHandle;
     private static User32 user32;
 
-    static {
-        setupJNA();
-        setupChromeDriverExecutable();
-    }
-
     private final UI ui;
-    private ChromeDriver driver = null;
+    private ChromeDriverEx driver = null;
 
     // We want browser commands to be run on a separate thread, but not to
     // interfere with each other. This executor is limited to a single instance,
@@ -75,8 +59,10 @@ public class BrowserComponent {
 
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
-        this.executor = Executors.newSingleThreadExecutor();
-        this.isTestChromeDriver = isTestChromeDriver;
+        executor = Executors.newSingleThreadExecutor();
+        BrowserComponent.isTestChromeDriver = isTestChromeDriver;
+        setupJNA();
+        setupChromeDriverExecutable();
     }
 
     /**
@@ -105,17 +91,14 @@ public class BrowserComponent {
      */
     private void quit() {
         logger.info("Quitting browser component");
-
         // The application may quit before the browser is initialised.
         // In that case, do nothing.
-        if (driver == null) {
-            return;
-        }
-
-        try {
-            driver.quit();
-        } catch (WebDriverException e) {
-            // Chrome was closed; do nothing
+        if (driver != null) {
+            try {
+                driver.quit();
+            } catch (WebDriverException e) {
+                // Chrome was closed; do nothing
+            }
         }
     }
 
@@ -123,25 +106,19 @@ public class BrowserComponent {
      * Creates, initialises, and returns a ChromeDriver.
      * @return
      */
-    private ChromeDriver createChromeDriver() {
+    private ChromeDriverEx createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
         if (USE_MOBILE_USER_AGENT) {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
-        ChromeDriver driver;
-        if (isTestChromeDriver) {
-            driver = new ChromeDriverStub(options);
-            logger.info("Creating ChromeDriverStub");
-        } else {
-            driver = new ChromeDriver(options);
-            logger.info("Creating ChromeDriver");
+        ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
+        WebDriver.Options manage = driver.manage();
+        if (!isTestChromeDriver) {
+            manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
+            manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
+                    (int) ui.getAvailableDimensions().getHeight()));
+            initialiseJNA();
         }
-        driver.manage().window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-        Rectangle availableDimensions = ui.getAvailableDimensions();
-        driver.manage().window().setSize(new Dimension(
-                (int) availableDimensions.getWidth(),
-                (int) availableDimensions.getHeight()));
-        initialiseJNA();
         return driver;
     }
 
@@ -158,25 +135,9 @@ public class BrowserComponent {
      * @param script
      */
     private void executeJavaScript(String script) {
-        if (driver instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) driver).executeScript(script);
-        } else {
-            assert false : "Driver cannot execute JS";
-        }
+        driver.executeScript(script);
         logger.info("Executed JavaScript " + script.substring(0, Math.min(script.length(), 10)));
     }
-
-    /**
-     * Runs a script in the currently-active driver window to hide GitHub UI elements.
-     */
-//  private void hidePageElements() {
-//      Optional<String> file = IOUtilities.readResource(HIDE_ELEMENTS_SCRIPT_PATH);
-//      if (file.isPresent()) {
-//          executeJavaScript(file.get());
-//      } else {
-//          logger.info("Failed to read script for hiding elements; did not execute");
-//      }
-//  }
 
     /**
      * Navigates to the New Label page on GitHub.
@@ -252,23 +213,23 @@ public class BrowserComponent {
     }
 
     public void jumpToComment(){
-        WebElement comment = driver.findElementById("new_comment_field");
-        comment.click();
-        bringToTop();
+        try {
+            WebElement comment = driver.findElementById("new_comment_field");
+            comment.click();
+            bringToTop();
+        } catch (Exception e) {
+            logger.warn("Unable to reach jump to comments. ");
+        }
     }
 
     private boolean isBrowserActive(){
-        if (driver == null) {
-            logger.info("Initializing ChromeDriver");
-            return false;
-        }
-        if (isTestChromeDriver) {
-            return true;
-        }
+        if (driver == null) return false;
         try {
             // Throws an exception if unable to switch to original HT tab
             // which then triggers a browser reset when called from runBrowserOperation
-            driver.switchTo().window(driver.getWindowHandle());
+            WebDriver.TargetLocator switchTo = driver.switchTo();
+            String windowHandle = driver.getWindowHandle();
+            if (!isTestChromeDriver) switchTo.window(windowHandle);
             // When the HT tab is closed (but the window is still alive),
             // a lot of the operations on the driver (such as getCurrentURL)
             // will hang (without throwing an exception, the thread will just freeze the UI forever),
@@ -297,32 +258,28 @@ public class BrowserComponent {
      */
 
     private void runBrowserOperation (Runnable operation) {
-        executor.execute(new Task<Void>() {
-            @Override
-            protected Void call() {
-                if (isBrowserActive()) {
-                    try {
-                        operation.run();
-                        pageContentOnLoad = getCurrentPageSource();
-                    } catch (WebDriverException e) {
-                        switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-                        case NoSuchWindow:
-                            resetBrowser();
-                            runBrowserOperation(operation); // Recurse and repeat
-                            break;
-                        case NoSuchElement:
-                            logger.info("Warning: no such element! " + e.getMessage());
-                            break;
-                        default:
-                            break;
-                        }
+        executor.execute(() -> {
+            if (isBrowserActive()) {
+                try {
+                    operation.run();
+                    pageContentOnLoad = getCurrentPageSource();
+                } catch (WebDriverException e) {
+                    switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
+                    case NoSuchWindow:
+                        resetBrowser();
+                        runBrowserOperation(operation); // Recurse and repeat
+                        break;
+                    case NoSuchElement:
+                        logger.info("Warning: no such element! " + e.getMessage());
+                        break;
+                    default:
+                        break;
                     }
-                } else {
-                    logger.info("Chrome window not responding.");
-                    resetBrowser();
-                    runBrowserOperation(operation);
                 }
-                return null;
+            } else {
+                logger.info("Chrome window not responding.");
+                resetBrowser();
+                runBrowserOperation(operation);
             }
         });
     }
@@ -343,8 +300,9 @@ public class BrowserComponent {
                 searchBox = driver.findElement(By.name("password"));
                 searchBox.sendKeys(ui.logic.credentials.password);
                 searchBox.submit();
-            } catch (NoSuchElementException e) {
+            } catch (Exception e) {
                 // Already logged in; do nothing
+                logger.info("Unable to login, may already be logged in. ");
             }
         });
     }
@@ -353,9 +311,7 @@ public class BrowserComponent {
      * One-time JNA setup.
      */
     private static void setupJNA() {
-        if (PlatformSpecific.isOnWindows()) {
-            user32 = User32.INSTANCE;
-        }
+        if (PlatformSpecific.isOnWindows()) user32 = User32.INSTANCE;
     }
 
     /**
@@ -402,24 +358,6 @@ public class BrowserComponent {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
     }
 
-    /**
-     * Resizes the browser window based on the given width.
-     * Executed on another thread.
-     */
-//  public void resize(double width) {
-//      executor.execute(new Task<Void>() {
-//          @Override
-//          protected Void call() {
-//              driver.manage().window().setPosition(new Point((int) width, 0));
-//              Rectangle availableDimensions = ui.getAvailableDimensions();
-//              driver.manage().window().setSize(new Dimension(
-//                      (int) availableDimensions.getWidth(),
-//                      (int) availableDimensions.getHeight()));
-//              return null;
-//          }
-//      });
-//  }
-
     private void bringToTop(){
         if (PlatformSpecific.isOnWindows()) {
             user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
@@ -441,10 +379,9 @@ public class BrowserComponent {
     }
 
     public boolean hasBviewChanged() {
+        if (isTestChromeDriver) return true;
         if (isBrowserActive()) {
-            if (getCurrentPageSource().equals(pageContentOnLoad)){
-                return false;
-            }
+            if (getCurrentPageSource().equals(pageContentOnLoad)) return false;
             pageContentOnLoad = getCurrentPageSource();
             return true;
         }
@@ -476,7 +413,7 @@ public class BrowserComponent {
             body = driver.findElementByTagName("body");
             body.sendKeys(keyCode);
         } catch (Exception e) {
-            logger.error("No such element" + e.getLocalizedMessage(), e);
+            logger.error("No such element");
         }
     }
 

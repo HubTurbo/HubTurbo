@@ -90,14 +90,10 @@ public class TurboUser {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TurboUser that = (TurboUser) o;
-
-        if (!loginName.equals(that.loginName)) return false;
-        if (!realName.equals(that.realName)) return false;
-        if (!avatarURL.equals(that.avatarURL)) return false;
-
-        return true;
+        return loginName.equals(that.loginName) &&
+                realName.equals(that.realName) &&
+                avatarURL.equals(that.avatarURL);
     }
 
     @Override

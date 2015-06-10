@@ -37,6 +37,12 @@ public class TurboLabel {
         this.repoId = repoId;
     }
 
+    public TurboLabel(String repoId, String colour, String name) {
+        this.actualName = name;
+        this.colour = colour;
+        this.repoId = repoId;
+    }
+
     public static TurboLabel nonexclusive(String repoId, String group, String name) {
         return new TurboLabel(repoId, joinWith(group, name, false));
     }
@@ -82,11 +88,7 @@ public class TurboLabel {
     }
 
     public boolean isExclusive() {
-        if (getDelimiter().isPresent()) {
-            return getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
-        } else {
-            return false;
-        }
+        return getDelimiter().isPresent() && getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
     }
 
     public Optional<String> getGroup() {
@@ -182,13 +184,8 @@ public class TurboLabel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TurboLabel that = (TurboLabel) o;
-
-        if (!actualName.equals(that.actualName)) return false;
-        if (!colour.equals(that.colour)) return false;
-
-        return true;
+        return actualName.equals(that.actualName) && colour.equals(that.colour);
     }
 
     @Override

@@ -13,7 +13,7 @@ public class KeyPress {
         if ((keyEventTime - lastKeyEventTime) < keyPressSpeed
             && currentKeyCode.equals(lastKeyPressedCode)
             && currentKeyCode.equals(matchingKeyCode)) {
-
+            lastKeyPressedCode = null;
             lastKeyEventTime = 0;
             return true;
         } else {
@@ -26,6 +26,7 @@ public class KeyPress {
     public static boolean isValidKeyCombination(KeyCode firstKeyPressed, KeyCode keyPressed) {
         long keyEventTime = System.currentTimeMillis();
         if ((keyEventTime - lastKeyEventTime) < keyPressSpeed && firstKeyPressed.equals(lastKeyPressedCode)) {
+            lastKeyPressedCode = null;
             lastKeyEventTime = 0;
             return true;
         } else {

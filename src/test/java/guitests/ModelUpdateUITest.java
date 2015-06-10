@@ -15,7 +15,7 @@ import util.events.UpdateDummyRepoEvent;
 
 public class ModelUpdateUITest extends UITest {
 
-    private static final int EVENT_DELAY = 1000;
+    private static final int EVENT_DELAY = 1500;
 
     @Test
     @SuppressWarnings("unchecked")

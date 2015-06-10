@@ -30,6 +30,7 @@ public class IssuePanelCard extends VBox {
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
     private static final String OCTICON_COMMENT = "\uf02b";
+
     /**
      * A card that is constructed with an issue as argument. Its components
      * are bound to the issue's fields and will update automatically.
@@ -139,24 +140,6 @@ public class IssuePanelCard extends VBox {
         return result;
     }
 
-    /**
-     * Given a list of issue events, returns a textual representation of them,
-     * concatenated together with newlines.
-     * @param events
-     * @param width
-     * @return
-     */
-    private static Node formatEventsText(List<TurboIssueEvent> events, int width) {
-        String text = events.stream()
-            .map(TurboIssueEvent::toString)
-            .collect(Collectors.joining("\n"));
-
-        Text display = new Text(text);
-        display.setWrappingWidth(width);
-        display.getStyleClass().add("issue-panel-feed");
-        return display;
-    }
-
     private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
         List<Qualifier> filters = currentFilterExpression.find(q -> q.getName().equals("updated"));
         assert filters.size() > 0 : "Problem with isUpdateFilter";
@@ -225,10 +208,12 @@ public class IssuePanelCard extends VBox {
             Label assigneeNameLabel = new Label(issue.getAssignee().get());
             assigneeNameLabel.getStyleClass().add("display-box-padding");
 
-            Image image = assignee.getAvatar();
             ImageView avatar = new ImageView();
-            assert image != null;
-            avatar.setImage(image);
+            if (assignee.getAvatarURL().length() != 0) {
+                Image image = assignee.getAvatar();
+                assert image != null;
+                avatar.setImage(image);
+            }
 
             HBox assigneeBox = new HBox();
             assigneeBox.setAlignment(Pos.BASELINE_CENTER);

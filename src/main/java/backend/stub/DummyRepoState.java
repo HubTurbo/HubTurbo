@@ -35,7 +35,8 @@ public class DummyRepoState {
         this.dummyRepoId = repoId;
 
         for (int i = 0; i < 10; i++) {
-            TurboIssue dummyIssue = makeDummyIssue();
+            // Issue #7 is a PR
+            TurboIssue dummyIssue = (i != 6) ? makeDummyIssue() : makeDummyPR();
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
             TurboLabel dummyLabel = makeDummyLabel();
@@ -48,6 +49,41 @@ public class DummyRepoState {
             milestones.put(dummyMilestone.getId(), dummyMilestone);
             users.put(dummyUser.getLoginName(), dummyUser);
         }
+
+        // Issues #1-5 are assigned milestones 1-5 respectively
+        for (int i = 1; i <= 5; i++) {
+            issues.get(i).setMilestone(milestones.get(i));
+        }
+        // Odd issues are assigned label 1, even issues are assigned label 2
+        for (int i = 1; i <= 10; i++) {
+            issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
+        }
+        // We assign a colorful label to issue 10
+        labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
+        issues.get(10).addLabel("Label 11");
+        // Each user is assigned to his corresponding issue
+        for (int i = 1; i <= 10; i++) {
+            issues.get(i).setAssignee("User " + i);
+        }
+        // Then put down three comments for issue 10
+        Comment dummyComment1 = new Comment();
+        Comment dummyComment2 = new Comment();
+        Comment dummyComment3 = new Comment();
+        dummyComment1.setCreatedAt(new Date()); // Recently posted
+        dummyComment2.setCreatedAt(new Date());
+        dummyComment3.setCreatedAt(new Date(0)); // Posted very long ago
+        dummyComment1.setUser(new User().setLogin("User 1"));
+        dummyComment2.setUser(new User().setLogin("User 2"));
+        dummyComment3.setUser(new User().setLogin("User 3"));
+        Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
+        issues.get(10).setMetadata(new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(dummyComments))
+        ));
+        issues.get(10).setCommentCount(3);
+        issues.get(10).setUpdatedAt(LocalDateTime.now());
+        // Close issue 6
+        issues.get(6).setOpen(false);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -119,6 +155,15 @@ public class DummyRepoState {
                 "User " + (issues.size() + 1),
                 LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
                 false);
+    }
+
+    private TurboIssue makeDummyPR() {
+        return new TurboIssue(dummyRepoId,
+                issues.size() + 1,
+                "PR " + (issues.size() + 1),
+                "User " + (issues.size() + 1),
+                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                true);
     }
 
     private TurboLabel makeDummyLabel() {

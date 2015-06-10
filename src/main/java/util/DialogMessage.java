@@ -12,15 +12,6 @@ public class DialogMessage {
                .showWarning();
     }
 
-//    public static Action showConfirmDialog(String title, String message){
-//        Action response = Dialogs.create()
-//                .title(title)
-//                .message(message)
-//                .actions(Dialog.Actions.OK, Dialog.Actions.CANCEL)
-//                .showConfirm();
-//        return response;
-//    }
-
     public static void showProgressDialog(Task<?> task, String progressTitle){
         Dialogs.create()
                .title(progressTitle)

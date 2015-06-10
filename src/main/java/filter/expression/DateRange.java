@@ -76,9 +76,7 @@ public class DateRange {
                 return false;
         } else if (!start.equals(other.start))
             return false;
-        if (strictly != other.strictly)
-            return false;
-        return true;
+        return strictly == other.strictly;
     }
 
     @Override

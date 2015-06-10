@@ -14,14 +14,6 @@ import filter.lexer.TokenType;
 
 public class Parser {
 
-    public static void main(String[] args) {
-        String input;
-        input = "id:1";
-        FilterExpression p = Parser.parse(input);
-//        ArrayList<Token> p = new Lexer(input).lex();
-        System.out.println(p);
-    }
-
     private Parser(ArrayList<Token> input) {
         this.input = input;
     }
