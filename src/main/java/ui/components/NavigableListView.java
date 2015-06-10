@@ -13,7 +13,8 @@ import javafx.scene.input.KeyCode;
  *
  * - can be navigated with the arrow keys and Enter
  * - supports an event for item selection
- * - provides methods for retaining selection after its contents are changed
+ * - provides methods for retaining selection of an item (not by index)
+ *   after its contents are changed
  *
  * It depends on the functionality of ScrollableListView to ensure that
  * navigation scrolls the list properly. The Up, Down, and Enter key events
@@ -27,14 +28,14 @@ import javafx.scene.input.KeyCode;
  *
  * @param <T> The type of the item in the list
  */
-public class NavigableListView<T> extends ScrollableListView<T> {
+public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     private static final Logger logger = LogManager.getLogger(NavigableListView.class.getName());
 
-    // Tracks the index of the list which should be currently selected
+    // Tracks the index of the item in the list which should be currently selected
     private Optional<Integer> selectedIndex = Optional.empty();
 
-    // Used for saving and restoring selection.
+    // Used for saving and restoring selection by item.
     // selectedIndex should be used to get the currently-selected item, through the provided getter.
     private Optional<T> lastSelectedItem = Optional.empty();
 
@@ -80,7 +81,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
         int index = -1;
         int i = 0;
         for (T item : getItems()) {
-            if (item.equals(lastSelectedItem.get())) {
+            if (areItemsEqual(item, lastSelectedItem.get())) {
                 index = i;
                 break;
             }
@@ -113,6 +114,15 @@ public class NavigableListView<T> extends ScrollableListView<T> {
         }
     }
 
+    // sample generic findIndex, most of the time using the equals method
+    // will not give the desired behaviour because an item's properties might
+    // change but the item is still considered to be the same
+//    boolean areItemsEqual(T item1, T item2) {
+//        return item1.equals(item2);
+//    }
+
+    abstract boolean areItemsEqual(T item1, T item2);
+
     private void setupMouseEvents() {
         setOnMouseClicked(e -> {
             int currentlySelected = getSelectionModel().getSelectedIndex();
@@ -123,7 +133,7 @@ public class NavigableListView<T> extends ScrollableListView<T> {
             if (currentlySelected != -1) {
                 selectedIndex = Optional.of(currentlySelected);
 
-                logger.info("Mouse click on issue " + selectedIndex.get());
+                logger.info("Mouse click on item index " + selectedIndex.get());
                 onItemSelected.accept(selectedIndex.get());
             }
         });
@@ -143,14 +153,14 @@ public class NavigableListView<T> extends ScrollableListView<T> {
                 handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
-                    logger.info("Arrow key navigation to issue " + selectedIndex.get());
+                    logger.info("Arrow key navigation to item index " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
                 break;
             case ENTER:
                 e.consume();
                 if (selectedIndex.isPresent()) {
-                    logger.info("Enter key selection on issue " + selectedIndex.get());
+                    logger.info("Enter key selection on item index " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
                 break;
