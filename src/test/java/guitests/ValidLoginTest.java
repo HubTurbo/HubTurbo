@@ -1,13 +1,12 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import ui.RepositorySelector;
+import static org.junit.Assert.assertEquals;
 
 public class ValidLoginTest extends UITest {
 
@@ -27,7 +26,7 @@ public class ValidLoginTest extends UITest {
         type("test");
         click("Sign in");
         sleep(2000);
-        RepositorySelector repositorySelector = find("#repositorySelector");
-        assertEquals("test/test", repositorySelector.getText());
+        ComboBox<String> repositorySelector = find("#repositorySelector");
+        assertEquals("test/test", repositorySelector.getValue());
     }
 }
