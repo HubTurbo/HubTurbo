@@ -265,4 +265,8 @@ public class IssuePanel extends IssueColumn {
     public int getIssueCount() {
         return issueCount;
     }
+
+    public TurboIssue getSelectedIssue() {
+        return listView.getSelectedItem().get();
+    }
 }
