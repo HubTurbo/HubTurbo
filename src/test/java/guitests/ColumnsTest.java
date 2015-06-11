@@ -1,7 +1,6 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import ui.UI;
@@ -31,12 +30,11 @@ public class ColumnsTest extends UITest {
         // Drag
         // TODO check whether columns are actually reordered
         drag("#dummy/dummy_col1_closeButton").to("#dummy/dummy_col0_closeButton");
-        release(MouseButton.PRIMARY);
 
         // Click
         eventTriggered = false;
         find("#dummy/dummy_col0_closeButton");
-        moveBy(-15, 0);
+        moveBy(-50, 0);
         click(); // Click
         assertTrue(eventTriggered);
 
