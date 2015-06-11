@@ -114,13 +114,6 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         }
     }
 
-    // sample generic findIndex, most of the time using the equals method
-    // will not give the desired behaviour because an item's properties might
-    // change but the item is still considered to be the same
-//    boolean areItemsEqual(T item1, T item2) {
-//        return item1.equals(item2);
-//    }
-
     abstract boolean areItemsEqual(T item1, T item2);
 
     private void setupMouseEvents() {
