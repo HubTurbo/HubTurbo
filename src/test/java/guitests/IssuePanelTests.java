@@ -1,6 +1,5 @@
 package guitests;
 
-import backend.resource.TurboIssue;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
@@ -12,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 public class IssuePanelTests extends UITest {
 
-    private static final int EVENT_DELAY = 1500;
+    private static final int EVENT_DELAY = 1000;
 
     @Test
     public void keepSelectionTest() {
@@ -28,15 +27,12 @@ public class IssuePanelTests extends UITest {
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
         assertEquals(3, issuePanel.getSelectedIssue().getId());
-        TurboIssue turboIssue1 = issuePanel.getSelectedIssue();
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(new UpdateDummyRepoEvent(
                 UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        TurboIssue turboIssue2 = issuePanel.getSelectedIssue();
-        assertEquals(true, turboIssue1.equals(turboIssue2));
-        sleep(5000);
+        assertEquals(4, issuePanel.getSelectedIssue().getId());
     }
 
 }
