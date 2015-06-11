@@ -18,6 +18,9 @@ public class ColumnsTest extends UITest {
     public void columnsTest() {
         UI.events.registerEvent((ColumnClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
+        // maximize
+        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
