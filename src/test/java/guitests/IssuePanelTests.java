@@ -32,7 +32,7 @@ public class IssuePanelTests extends UITest {
                 UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        assertEquals(4, issuePanel.getSelectedIssue().getId());
+        assertEquals(3, issuePanel.getSelectedIssue().getId());
     }
 
 }
