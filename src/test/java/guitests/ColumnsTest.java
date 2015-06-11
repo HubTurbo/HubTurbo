@@ -50,7 +50,7 @@ public class ColumnsTest extends UITest {
         // Switch primary repo
         doubleClick("#repositorySelector");
         doubleClick();
-        type("#dummy2/dummy2");
+        type("dummy2/dummy2");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
