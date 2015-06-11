@@ -232,19 +232,28 @@ public class DummyRepoState {
     }
 
     private TurboIssue renameIssue(TurboIssue issueToUpdate, String updateText) {
-        issueToUpdate.setTitle(updateText);
+        // Not allowed to mutate issueToUpdate itself as it introduces immediate changes in the GUI.
+        TurboIssue updatedIssue = new TurboIssue(issueToUpdate);
+
+        updatedIssue.setTitle(updateText);
 
         // Add renamed event to events list of issue
-        List<TurboIssueEvent> eventsOfIssue = issueToUpdate.getMetadata().getEvents();
+        List<TurboIssueEvent> eventsOfIssue = updatedIssue.getMetadata().getEvents();
+        // Not deep copy as the same TurboIssueEvent objects of issueToUpdate are the TurboIssueEvents
+        // of updatedIssue. Might create problems later if eventsOfIssue are to be mutable after downloading
+        // from repo (which should not be the case).
+        // (but this approach works if the metadata of the issue is not modified)
+        // TODO make TurboIssueEvent immutable
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
                 IssueEventType.Renamed,
                 new Date()));
-        List<Comment> commentsOfIssue = issueToUpdate.getMetadata().getComments();
-        issueToUpdate.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
-        issueToUpdate.setUpdatedAt(LocalDateTime.now());
+        List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
+        updatedIssue.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        updatedIssue.setUpdatedAt(LocalDateTime.now());
 
-        // Add to list of updated issues
-        updatedIssues.put(issueToUpdate.getId(), issueToUpdate);
+        // Add to list of updated issues, and replace issueToUpdate in main issues store.
+        updatedIssues.put(updatedIssue.getId(), updatedIssue);
+        issues.put(updatedIssue.getId(), updatedIssue);
 
         return issueToUpdate;
     }
@@ -259,8 +268,13 @@ public class DummyRepoState {
     }
 
     private TurboMilestone renameMilestone(TurboMilestone milestoneToUpdate, String updateText) {
-        milestoneToUpdate.setTitle(updateText);
-        updatedMilestones.put(milestoneToUpdate.getId(), milestoneToUpdate);
+        // Similarly to renameIssue, to avoid immediate update of the GUI when we update
+        // the milestone, milestoneToUpdate is not to be mutated.
+        TurboMilestone updatedMilestone = new TurboMilestone(milestoneToUpdate);
+        updatedMilestone.setTitle(updateText);
+
+        updatedMilestones.put(updatedMilestone.getId(), updatedMilestone);
+        milestones.put(updatedMilestone.getId(), updatedMilestone);
 
         return milestoneToUpdate;
     }

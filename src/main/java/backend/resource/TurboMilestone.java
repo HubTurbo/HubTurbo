@@ -69,6 +69,18 @@ public class TurboMilestone {
         this.repoId = repoId;
     }
 
+    // Copy constructor, for now only used to ensure DummyRepo updates work properly.
+    public TurboMilestone(TurboMilestone milestone) {
+        this.id = milestone.getId();
+        this.title = milestone.getTitle();
+        this.dueDate = milestone.getDueDate();
+        this.description = milestone.getDescription();
+        this.isOpen = milestone.isOpen();
+        this.openIssues = milestone.getOpenIssues();
+        this.closedIssues = milestone.getClosedIssues();
+        this.repoId = milestone.getRepoId();
+    }
+
     private void ______METHODS______() {
     }
 

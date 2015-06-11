@@ -1,10 +1,5 @@
 package ui.issuepanel;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import javafx.scene.input.KeyCode;
@@ -13,11 +8,16 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
-import ui.components.NavigableListView;
+import ui.components.IssueListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
 
 public class IssuePanel extends IssueColumn {
 
@@ -25,7 +25,7 @@ public class IssuePanel extends IssueColumn {
     private final UI ui;
     private int issueCount;
 
-    private NavigableListView<TurboIssue> listView;
+    private IssueListView listView;
     private final KeyCombination keyCombBoxToList =
         new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
     private final KeyCombination keyCombListToBox =
@@ -43,7 +43,7 @@ public class IssuePanel extends IssueColumn {
         this.model = model;
         this.ui = ui;
 
-        listView = new NavigableListView<>();
+        listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
 
@@ -264,5 +264,9 @@ public class IssuePanel extends IssueColumn {
 
     public int getIssueCount() {
         return issueCount;
+    }
+
+    public TurboIssue getSelectedIssue() {
+        return listView.getSelectedItem().get();
     }
 }
