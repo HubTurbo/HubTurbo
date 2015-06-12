@@ -13,7 +13,7 @@ public class IssueMetadata {
     private final List<TurboIssueEvent> events;
     private final List<Comment> comments;
     private final LocalDateTime nonSelfUpdatedAt;
-    private int nonSelfCommentCount;
+    private final int nonSelfCommentCount;
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
