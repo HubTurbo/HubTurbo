@@ -186,12 +186,15 @@ public abstract class IssueColumn extends Column {
     private void applyCurrentFilterExpression(boolean hasMetadata) {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
         comparator = Qualifier.getSortComparator(model, "id", true, false);
+
+        // BiConsumer is used here as we need to update the comparator, and at the same time call
+        // openRepository() if necessary.
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
                 ui.logic.openRepository(qualifier.getContent().get());
             } else if (qualifier.getName().equals(Qualifier.UPDATED)
                     && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
-                // no sort order specified, implicitly assumed to sort by non-self-update
+                // no sort order specified, implicitly assumed to sort by last-non-self-update
                 comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
                 comparator = qualifier.getCompoundSortComparator(model, hasMetadata);
