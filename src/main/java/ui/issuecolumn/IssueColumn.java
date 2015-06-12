@@ -52,14 +52,14 @@ public abstract class IssueColumn extends Column {
     protected FilterTextField filterTextField;
     private UI ui;
 
-    private FilterExpression currentFilterExpression = Qualifier.EMPTY;
+    protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
     private Predicate<TurboIssue> predicate = p -> true;
     private Comparator<TurboIssue> comparator = (a, b) -> 0;
 
     // This controls whether a metadata update will be triggered on the next refresh.
     // It's toggled to false by model updates that are not supposed to trigger updates.
     // It's toggled to true each time a refresh DOES NOT trigger an update.
-    private boolean triggerMetadataUpdate = true;
+    protected boolean hasMetadata = false;
 
     public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(model, parentColumnControl, columnIndex);
@@ -88,11 +88,6 @@ public abstract class IssueColumn extends Column {
             .collect(Collectors.toList()));
 
         filterTextField.setKeywords(all);
-
-        // Make metadata update state consistent
-        if (!e.triggerMetadataUpdate) {
-            this.triggerMetadataUpdate = false;
-        }
     };
 
     private Node createFilterBox() {
@@ -190,12 +185,12 @@ public abstract class IssueColumn extends Column {
      */
     private void applyCurrentFilterExpression() {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-        comparator = Qualifier.getSortComparator(model, "id", true);
+        comparator = Qualifier.getSortComparator(model, "id", true, false);
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
                 ui.logic.openRepository(qualifier.getContent().get());
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
-                comparator = qualifier.getCompoundSortComparator(model);
+                comparator = qualifier.getCompoundSortComparator(model, hasMetadata);
             }
         });
     }
@@ -224,8 +219,9 @@ public abstract class IssueColumn extends Column {
         return transformedIssueList;
     }
 
-    public void setItems(List<TurboIssue> items) {
+    public void setItems(List<TurboIssue> items, boolean hasMetadata) {
         this.issues = FXCollections.observableArrayList(items);
+        this.hasMetadata = hasMetadata;
         refreshItems();
     }
 
@@ -240,15 +236,13 @@ public abstract class IssueColumn extends Column {
 
         transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
-        if (!triggerMetadataUpdate) {
-            triggerMetadataUpdate = true;
-        } else if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
+        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && !hasMetadata) {
             // Group all filtered issues by repo, then trigger updates for each group
             transformedIssueList.stream()
                 .collect(Collectors.groupingBy(TurboIssue::getRepoId))
-                .entrySet().forEach(e ->
-                ui.logic.getIssueMetadata(e.getKey(),
-                    e.getValue().stream()
+                .entrySet().forEach(repoSetEntry ->
+                ui.logic.getIssueMetadata(repoSetEntry.getKey(),
+                    repoSetEntry.getValue().stream()
                         .map(TurboIssue::getId)
                         .collect(Collectors.toList())));
         }
