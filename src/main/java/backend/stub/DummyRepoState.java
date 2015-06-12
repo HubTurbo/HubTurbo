@@ -242,9 +242,9 @@ public class DummyRepoState {
         // Not deep copy as the same TurboIssueEvent objects of issueToUpdate are the TurboIssueEvents
         // of updatedIssue. Might create problems later if eventsOfIssue are to be mutable after downloading
         // from repo (which should not be the case).
-        // (but this approach works if the metadata of the issue is not modified)
+        // (but this approach works if the metadata of the issue is not modified, which is the current case)
         // TODO make TurboIssueEvent immutable
-        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
                 IssueEventType.Renamed,
                 new Date()));
         List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
