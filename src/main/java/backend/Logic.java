@@ -132,6 +132,8 @@ public class Logic {
     private Map<Integer, IssueMetadata> processNonSelfUpdate(Map<Integer, IssueMetadata> metadata) {
         String currentUser = prefs.getLastLoginUsername();
 
+        // Iterates through each entry in the metadata set, and looks for the comment/event with
+        // the latest time created.
         for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
             IssueMetadata currentMetadata = entry.getValue();
             if (!currentMetadata.isEmpty()) {
@@ -150,11 +152,22 @@ public class Logic {
                 }
 
                 entry.setValue(new IssueMetadata(currentMetadata,
-                        LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault())
+                        LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
+                        calculateNonSelfCommentCount(currentMetadata.getComments(), currentUser)
                 ));
             }
         }
         return metadata;
+    }
+
+    private int calculateNonSelfCommentCount(List<Comment> comments, String currentUser) {
+        int result = 0;
+        for (Comment comment : comments) {
+            if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
+                result++;
+            }
+        }
+        return result;
     }
 
     public Set<String> getOpenRepositories() {
