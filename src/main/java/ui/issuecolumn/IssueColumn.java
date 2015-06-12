@@ -56,11 +56,6 @@ public abstract class IssueColumn extends Column {
     private Predicate<TurboIssue> predicate = p -> true;
     private Comparator<TurboIssue> comparator = (a, b) -> 0;
 
-    // This controls whether a metadata update will be triggered on the next refresh.
-    // It's toggled to false by model updates that are not supposed to trigger updates.
-    // It's toggled to true each time a refresh DOES NOT trigger an update.
-    protected boolean hasMetadata = false;
-
     public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(model, parentColumnControl, columnIndex);
         this.ui = ui;
@@ -172,10 +167,15 @@ public abstract class IssueColumn extends Column {
         }
     }
 
+    /**
+     * Triggered by pressing ENTER in the filter box. Therefore, the hasMetadata call
+     * is false.
+     *
+     * @param filter
+     */
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
-        applyCurrentFilterExpression();
-        refreshItems();
+        refreshItems(false);
     }
 
     /**
@@ -183,12 +183,16 @@ public abstract class IssueColumn extends Column {
      * current filter. Meant to be called from refreshItems() so as not to go into
      * infinite mutual recursion.
      */
-    private void applyCurrentFilterExpression() {
+    private void applyCurrentFilterExpression(boolean hasMetadata) {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
         comparator = Qualifier.getSortComparator(model, "id", true, false);
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
                 ui.logic.openRepository(qualifier.getContent().get());
+            } else if (qualifier.getName().equals(Qualifier.UPDATED)
+                    && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
+                // no sort order specified, implicitly assumed to sort by non-self-update
+                comparator = Qualifier.getSortComparator(model, "nonselfupdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
                 comparator = qualifier.getCompoundSortComparator(model, hasMetadata);
             }
@@ -221,8 +225,7 @@ public abstract class IssueColumn extends Column {
 
     public void setItems(List<TurboIssue> items, boolean hasMetadata) {
         this.issues = FXCollections.observableArrayList(items);
-        this.hasMetadata = hasMetadata;
-        refreshItems();
+        refreshItems(hasMetadata);
     }
 
     @Override
@@ -231,8 +234,8 @@ public abstract class IssueColumn extends Column {
     }
 
     @Override
-    public void refreshItems() {
-        applyCurrentFilterExpression();
+    public void refreshItems(boolean hasMetadata) {
+        applyCurrentFilterExpression(hasMetadata);
 
         transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
