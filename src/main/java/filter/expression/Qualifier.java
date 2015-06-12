@@ -397,17 +397,15 @@ public class Qualifier implements FilterExpression {
                 break;
             case "updated":
             case "date":
+                comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                break;
+            case "nonselfupdate":
+                // Purposefully inverted a and b to make latest issues show up first.
                 if (metadataRefresh) {
-                    comparator = (a, b) -> {
-                        if (a.getRepoId().equalsIgnoreCase("teammates/repo")) {
-                            System.out.println("ding!");
-                            System.out.println(a.getMetadata().getNonSelfUpdatedAt().toString());
-                            System.out.println(b.getMetadata().getNonSelfUpdatedAt().toString());
-                        }
-                        return a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
-                    };
+                    comparator = (a, b) ->
+                        b.getMetadata().getNonSelfUpdatedAt().compareTo(a.getMetadata().getNonSelfUpdatedAt());
                 } else {
-                    comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                    comparator = (a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt());
                 }
                 break;
             case "id":
