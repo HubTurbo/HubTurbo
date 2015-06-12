@@ -2,17 +2,18 @@ package backend;
 
 import static util.Futures.withResult;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import github.TurboIssueEvent;
 import org.apache.logging.log4j.Logger;
 
 import backend.resource.Model;
 import backend.resource.MultiModel;
+import org.eclipse.egit.github.core.Comment;
 import prefs.Preferences;
 import ui.UI;
 import util.Futures;
@@ -119,11 +120,41 @@ public class Logic {
 
     public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
         logger.info("Getting metadata for issues " + issues);
-        return repoIO.getIssueMetadata(repoId, issues).thenApply(metadata -> {
-            models.insertMetadata(repoId, metadata);
-            return metadata;
-        }).thenApply(Futures.tap(this::updateUIWithoutMetadata))
-        .exceptionally(withResult(new HashMap<>()));
+        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processNonSelfUpdate)
+            .thenApply(metadata -> {
+                models.insertMetadata(repoId, metadata);
+                return metadata;
+            }).thenApply(Futures.tap(this::updateUIWithMetadata))
+            .exceptionally(withResult(new HashMap<>()));
+    }
+
+    // Adds update times to the metadata map
+    private Map<Integer, IssueMetadata> processNonSelfUpdate(Map<Integer, IssueMetadata> metadata) {
+        String currentUser = prefs.getLastLoginUsername();
+
+        for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
+            IssueMetadata currentMetadata = entry.getValue();
+            if (!currentMetadata.isEmpty()) {
+                Date lastNonSelfUpdate = new Date(0);
+                for (TurboIssueEvent event : currentMetadata.getEvents()) {
+                    if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                            && event.getDate().after(lastNonSelfUpdate)) {
+                        lastNonSelfUpdate = event.getDate();
+                    }
+                }
+                for (Comment comment : currentMetadata.getComments()) {
+                    if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                            && comment.getCreatedAt().after(lastNonSelfUpdate)) {
+                        lastNonSelfUpdate = comment.getCreatedAt();
+                    }
+                }
+
+                entry.setValue(new IssueMetadata(currentMetadata,
+                        LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault())
+                ));
+            }
+        }
+        return metadata;
     }
 
     public Set<String> getOpenRepositories() {
@@ -145,11 +176,11 @@ public class Logic {
     }
 
     private void updateUI() {
-        uiManager.update(models, true);
+        uiManager.update(models, false);
     }
 
-    private void updateUIWithoutMetadata() {
-        uiManager.update(models, false);
+    private void updateUIWithMetadata() {
+        uiManager.update(models, true);
     }
 }
 
