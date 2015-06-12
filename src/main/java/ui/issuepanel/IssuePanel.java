@@ -2,6 +2,7 @@ package ui.issuepanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
+import filter.expression.Qualifier;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -85,21 +86,25 @@ public class IssuePanel extends IssueColumn {
     @Override
     public void refreshItems() {
         super.refreshItems();
-        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
+        // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
+        // or if hasMetadata is true (metadata has arrived)
+        if (!currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) || hasMetadata) {
+            final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
 
-        // Set the cell factory every time - this forces the list view to update
-        listView.setCellFactory(list ->
-            new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
-        listView.saveSelection();
+            // Set the cell factory every time - this forces the list view to update
+            listView.setCellFactory(list ->
+                    new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
+            listView.saveSelection();
 
-        // Supposedly this also causes the list view to update - not sure
-        // if it actually does on platforms other than Linux...
-        listView.setItems(null);
-        listView.setItems(getIssueList());
-        issueCount = getIssueList().size();
+            // Supposedly this also causes the list view to update - not sure
+            // if it actually does on platforms other than Linux...
+            listView.setItems(null);
+            listView.setItems(getIssueList());
+            issueCount = getIssueList().size();
 
-        listView.restoreSelection();
-        this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+            listView.restoreSelection();
+            this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+        }
     }
 
     private void setupListView() {
