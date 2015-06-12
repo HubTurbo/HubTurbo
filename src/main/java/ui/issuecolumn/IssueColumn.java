@@ -192,7 +192,7 @@ public abstract class IssueColumn extends Column {
             } else if (qualifier.getName().equals(Qualifier.UPDATED)
                     && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
                 // no sort order specified, implicitly assumed to sort by non-self-update
-                comparator = Qualifier.getSortComparator(model, "nonselfupdate", true, true);
+                comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
                 comparator = qualifier.getCompoundSortComparator(model, hasMetadata);
             }

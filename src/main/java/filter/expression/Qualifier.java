@@ -27,10 +27,10 @@ public class Qualifier implements FilterExpression {
 
     public static final String[] KEYWORDS = new String[] {
         "assignees", "author", "body", "closed", "comments", "created", "creator",
-        "date", "desc", "description", "has", "id", "in", "involves", "is", "issue",
-        "keyword", "label", "labels", "merged", "milestone", "milestones", "no",
-        "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status", "title",
-        "type", "unmerged", "unread", "updated", "user"
+        "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
+        "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
+        "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
+        "title", "type", "unmerged", "unread", "updated", "user"
     };
 
     private final String name;
@@ -399,7 +399,7 @@ public class Qualifier implements FilterExpression {
             case "date":
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 break;
-            case "nonselfupdate":
+            case "nonSelfUpdate":
                 // Purposefully inverted a and b to make latest issues show up first.
                 if (metadataRefresh) {
                     comparator = (a, b) ->
