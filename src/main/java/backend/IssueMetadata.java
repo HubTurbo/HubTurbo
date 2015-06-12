@@ -14,6 +14,7 @@ public class IssueMetadata {
     private final List<Comment> comments;
     private final LocalDateTime nonSelfUpdatedAt;
     private final int nonSelfCommentCount;
+    private final boolean isUpdated;
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
@@ -21,6 +22,7 @@ public class IssueMetadata {
         comments = new ArrayList<>();
         nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         nonSelfCommentCount = 0;
+        isUpdated = false;
     }
 
     // Constructor used in DownloadMetadataTask
@@ -29,6 +31,7 @@ public class IssueMetadata {
         this.comments = comments;
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
+        this.isUpdated = false;
     }
 
     // Constructor used in Logic
@@ -37,6 +40,7 @@ public class IssueMetadata {
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
         this.nonSelfCommentCount = nonSelfCommentCount; // Calculated just prior to calling
+        this.isUpdated = true;
     }
 
     // Constructor used in MultiModel
@@ -45,6 +49,7 @@ public class IssueMetadata {
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.isUpdated = other.isUpdated;
     }
 
     public boolean isEmpty() {
@@ -68,6 +73,8 @@ public class IssueMetadata {
     }
 
     public int getNonSelfCommentCount() { return nonSelfCommentCount; }
+
+    public boolean isUpdated() { return isUpdated; }
 
     @Override
     public String toString() {
