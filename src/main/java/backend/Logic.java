@@ -136,26 +136,24 @@ public class Logic {
         // the latest time created.
         for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
             IssueMetadata currentMetadata = entry.getValue();
-            if (!currentMetadata.isEmpty()) {
-                Date lastNonSelfUpdate = new Date(0);
-                for (TurboIssueEvent event : currentMetadata.getEvents()) {
-                    if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                            && event.getDate().after(lastNonSelfUpdate)) {
-                        lastNonSelfUpdate = event.getDate();
-                    }
+            Date lastNonSelfUpdate = new Date(0);
+            for (TurboIssueEvent event : currentMetadata.getEvents()) {
+                if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                        && event.getDate().after(lastNonSelfUpdate)) {
+                    lastNonSelfUpdate = event.getDate();
                 }
-                for (Comment comment : currentMetadata.getComments()) {
-                    if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                            && comment.getCreatedAt().after(lastNonSelfUpdate)) {
-                        lastNonSelfUpdate = comment.getCreatedAt();
-                    }
-                }
-
-                entry.setValue(new IssueMetadata(currentMetadata,
-                        LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
-                        calculateNonSelfCommentCount(currentMetadata.getComments(), currentUser)
-                ));
             }
+            for (Comment comment : currentMetadata.getComments()) {
+                if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                        && comment.getCreatedAt().after(lastNonSelfUpdate)) {
+                    lastNonSelfUpdate = comment.getCreatedAt();
+                }
+            }
+
+            entry.setValue(new IssueMetadata(currentMetadata,
+                    LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
+                    calculateNonSelfCommentCount(currentMetadata.getComments(), currentUser)
+            ));
         }
         return metadata;
     }
