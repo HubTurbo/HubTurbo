@@ -1,5 +1,7 @@
 package browserview;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -13,6 +15,8 @@ import java.util.NoSuchElementException;
 // and as a stub when testing
 
 public class ChromeDriverEx {
+
+    private static final Logger logger = LogManager.getLogger(ChromeDriverEx.class.getName());
 
     private boolean isTestChromeDriver;
     private ChromeDriver driver;
@@ -36,9 +40,15 @@ public class ChromeDriverEx {
 
     public void get(String url) throws WebDriverException {
         if (isTestChromeDriver) {
+            logger.info("Test loading page: " + url);
             testGet();
         } else {
-            driver.get(url);
+            if (driver.getCurrentUrl().equals(url)) {
+                logger.info("Already on page: " + url + " will not load it again. ");
+            } else {
+                logger.info("Loading page: " + url);
+                driver.get(url);
+            }
         }
     }
 
