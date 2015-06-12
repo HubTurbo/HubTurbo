@@ -37,7 +37,11 @@ public class IssuePanel extends IssueColumn {
         new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
     private final KeyCombination defaultSizeWindow =
         new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+
+    // At the moment, apparently, whenever the screen refreshes, all previously lit up comments will
+    // lose the highlight.
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
+    private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
     public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(ui, model, parentColumnControl, columnIndex);
@@ -48,7 +52,7 @@ public class IssuePanel extends IssueColumn {
         setupListView();
         getChildren().add(listView);
 
-        refreshItems();
+        refreshItems(false);
     }
 
     /**
@@ -57,9 +61,16 @@ public class IssuePanel extends IssueColumn {
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
-    private boolean issueHasNewComments(TurboIssue issue) {
-        return issueCommentCounts.containsKey(issue.getId()) &&
-                Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+    private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
+        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+            return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
+                    Math.abs(
+                            issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
+                    ) > 0;
+        } else {
+            return issueCommentCounts.containsKey(issue.getId()) &&
+                    Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+        }
     }
 
     /**
@@ -67,16 +78,17 @@ public class IssuePanel extends IssueColumn {
      * Returns a list of issues which have new comments.
      * @return
      */
-    private HashSet<Integer> updateIssueCommentCounts() {
+    private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
         HashSet<Integer> result = new HashSet<>();
         for (TurboIssue issue : getIssueList()) {
             if (issueCommentCounts.containsKey(issue.getId())) {
                 // We know about this issue; check if it's been updated
-                if (issueHasNewComments(issue)) {
+                if (issueHasNewComments(issue, hasMetadata)) {
                     result.add(issue.getId());
                 }
             } else {
-                // We don't know about this issue
+                // We don't know about this issue, just put the current comment count.
+                issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
                 issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             }
         }
@@ -84,12 +96,12 @@ public class IssuePanel extends IssueColumn {
     }
 
     @Override
-    public void refreshItems() {
-        super.refreshItems();
+    public void refreshItems(boolean hasMetadata) {
+        super.refreshItems(hasMetadata);
         // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
         // or if hasMetadata is true (metadata has arrived)
         if (!currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) || hasMetadata) {
-            final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
+            final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
 
             // Set the cell factory every time - this forces the list view to update
             listView.setCellFactory(list ->
@@ -110,13 +122,18 @@ public class IssuePanel extends IssueColumn {
     private void setupListView() {
         setVgrow(listView, Priority.ALWAYS);
         setupKeyboardShortcuts();
+
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
             ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
-            if (issueHasNewComments(issue)) {
-                issueCommentCounts.put(issue.getId(), issue.getCommentCount());
-                refreshItems();
-            }
+
+            // Save the stored comment count as its own comment count.
+            // The refreshItems(false) call that follows will remove the Litt-up effect of the comment bubble.
+            // (if it was there before)
+            issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+            issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
+            // We don't need to get metadata here, so we pass false.
+            refreshItems(false);
         });
     }
 
