@@ -141,7 +141,7 @@ public class IssuePanel extends IssueColumn {
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
-            if (event.getCode() == KeyCode.R) {
+            if (event.getCode() == KeyCode.E) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
