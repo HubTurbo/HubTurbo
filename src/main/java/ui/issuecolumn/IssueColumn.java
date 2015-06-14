@@ -184,7 +184,8 @@ public abstract class IssueColumn extends Column {
      * infinite mutual recursion.
      */
     private void applyCurrentFilterExpression(boolean hasMetadata) {
-        predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
+        predicate = issue -> Qualifier.process(model, currentFilterExpression, issue,
+                                            ui.prefs.getLastLoginUsername());
         comparator = Qualifier.getSortComparator(model, "id", true, false);
 
         // BiConsumer is used here as we need to update the comparator, and at the same time call
