@@ -36,7 +36,7 @@ public class FilterEvalTests {
      * of an empty model.
      */
     private boolean matches(String filterExpr, TurboIssue issue) {
-        return Qualifier.process(empty, Parser.parse(filterExpr), issue);
+        return Qualifier.process(empty, Parser.parse(filterExpr), issue, "");
     }
 
     @Test
@@ -119,12 +119,12 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue, ""));
         try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue));
+            assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue, ""));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -140,17 +140,17 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:type."), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("label:type."), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("label:type.bug"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue, ""));
         try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue, ""));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue));
+            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue, ""));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -164,17 +164,17 @@ public class FilterEvalTests {
 
         model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:bug."), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("label:bug."), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("label:type.bug"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue, ""));
         try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue, ""));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue));
+            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue, ""));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -189,11 +189,11 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:alice"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:o"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:lic"), issue, ""));
     }
 
     @Test
@@ -225,20 +225,20 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:alice"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:lic"), issue, ""));
 
         // author
         issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("involves:alice"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("involves:lic"), issue, ""));
     }
 
     @Test
@@ -266,25 +266,25 @@ public class FilterEvalTests {
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue, ""));
         assertEquals(false, matches("has:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue, ""));
         assertEquals(false, matches("has:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue, ""));
         assertEquals(false, matches("has:something", issue));
     }
 
@@ -304,25 +304,25 @@ public class FilterEvalTests {
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue, ""));
         assertEquals(true, matches("no:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue, ""));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue, ""));
         assertEquals(true, matches("no:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue, ""));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue, ""));
         assertEquals(true, matches("no:something", issue));
     }
 
