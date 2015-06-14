@@ -98,7 +98,7 @@ public class Qualifier implements FilterExpression {
      * Ensures that meta-qualifiers are taken care of.
      * Should always be used over isSatisfiedBy.
      */
-    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
+    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue, String currentUser) {
 
         FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
         List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
@@ -115,7 +115,8 @@ public class Qualifier implements FilterExpression {
                 exprWithNormalQualifiers);
         }
 
-        return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
+        return exprWithNormalQualifiers.isSatisfiedBy(model, issue,
+                                                    new MetaQualifierInfo(metaQualifiers), currentUser);
     }
 
     public static void processMetaQualifierEffects(FilterExpression expr,
@@ -148,7 +149,7 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info, String currentUser) {
         assert name != null;
 
         // The empty qualifier is satisfied by anything
@@ -191,7 +192,7 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-            return satisfiesUpdatedHours(issue);
+            return satisfiesUpdatedHours(issue, currentUser);
         case "repo":
             return satisfiesRepo(issue);
         default:
@@ -490,17 +491,50 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue) {
-        int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+    private boolean satisfiesUpdatedHours(TurboIssue issue, String currentUser) {
+        NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
-            return numberRange.get().encloses(hours);
+            updatedRange = numberRange.get();
         } else if (number.isPresent()) {
-            // Treat it as <
-            return new NumberRange(null, number.get(), true).encloses(hours);
+            updatedRange = new NumberRange(null, number.get(), true);
         } else {
             return false;
         }
+
+        int hoursSinceUpdate;
+
+        if (issue.getMetadata().isUpdated()) {
+            // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
+            hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
+                    .until(getCurrentTime(), ChronoUnit.HOURS));
+        } else {
+            // First time being filtered (haven't gotten metadata from source yet).
+            hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        }
+
+        if (updatedRange.encloses(hoursSinceUpdate)) return true;
+
+        // If it doesn't enclose, we also consider creation as an update event.
+        int hoursSinceCreation = Utility.safeLongToInt(issue.getCreatedAt()
+                .until(getCurrentTime(), ChronoUnit.HOURS));
+
+        if (!issue.getCreator().equalsIgnoreCase(currentUser)) {
+            // But on the second time being filtered, we consider only if creator is different
+            if (updatedRange.encloses(hoursSinceCreation)) return true;
+        }
+
+        // Creation time is also outside of range, we do not need to show this issue at all.
+        return false;
+
+//        if (numberRange.isPresent()) {
+//            return numberRange.get().encloses(hours);
+//        } else if (number.isPresent()) {
+//            // Treat it as <
+//            return new NumberRange(null, number.get(), true).encloses(hours);
+//        } else {
+//            return false;
+//        }
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
