@@ -30,7 +30,7 @@ public class KeyboardShortcuts {
     public static final KeyCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 
-    public static final KeyCode MARK_AS_READ = KeyCode.R;
+    public static final KeyCode MARK_AS_READ = KeyCode.E;
     public static final KeyCode MARK_AS_UNREAD = KeyCode.U;
 
     public static final KeyCode REFRESH = KeyCode.F5;
