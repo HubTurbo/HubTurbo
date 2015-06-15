@@ -72,7 +72,7 @@ public class MenuControl extends MenuBar {
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
-//          DataManager.getInstance().setLastLoginPassword("");
+            prefs.setLastLoginCredentials("", "");
             ui.quit();
             // Need to do: clear the login credentials and return to login window
         });
