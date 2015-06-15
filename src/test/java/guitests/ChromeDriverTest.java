@@ -23,7 +23,7 @@ public class ChromeDriverTest extends UITest {
     // TODO test that events have been triggered
     @Test
     public void chromeDriverStubTest() {
-        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
+        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(new IssueCreatedEvent());
         sleep(EVENT_DELAY);
