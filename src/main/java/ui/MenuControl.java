@@ -74,7 +74,6 @@ public class MenuControl extends MenuBar {
             logger.info("Logging out of HT");
             prefs.setLastLoginCredentials("", "");
             ui.quit();
-            ui.main(null);
         });
         return logout;
 
