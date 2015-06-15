@@ -13,23 +13,23 @@ public class GitHubURL {
         "https://github.com/HubTurbo/HubTurbo/wiki/Changelog#v%d%d%d";
 
     public static String getPathForAllIssues(String repoId) {
-        return String.format("https://github.com/%s/issues", repoId);
+        return String.format("https://github.com/%s/issues", repoId.toLowerCase());
     }
 
     public static String getPathForIssue(String repoId, int id) {
-        return String.format("https://github.com/%s/issues/%d", repoId, id);
+        return String.format("https://github.com/%s/issues/%d", repoId.toLowerCase(), id);
     }
 
     public static String getPathForNewIssue(String repoId) {
-        return String.format("https://github.com/%s/issues/new", repoId);
+        return String.format("https://github.com/%s/issues/new", repoId.toLowerCase());
     }
 
     public static String getPathForNewLabel(String repoId) {
-        return String.format("https://github.com/%s/labels", repoId);
+        return String.format("https://github.com/%s/labels", repoId.toLowerCase());
     }
 
     public static String getPathForNewMilestone(String repoId) {
-        return String.format("https://github.com/%s/milestones/new", repoId);
+        return String.format("https://github.com/%s/milestones/new", repoId.toLowerCase());
     }
 
     public static String getPathForDocsPage() {
@@ -50,7 +50,7 @@ public class GitHubURL {
 //    }
 
     public static String getPathForPullRequests(String repoId) {
-        return String.format("https://github.com/%s/pulls", repoId);
+        return String.format("https://github.com/%s/pulls", repoId.toLowerCase());
     }
 
     public static String getPathForKeyboardShortcuts() {
@@ -58,11 +58,11 @@ public class GitHubURL {
     }
 
     public static String getPathForMilestones(String repoId) {
-        return String.format("https://github.com/%s/milestones", repoId);
+        return String.format("https://github.com/%s/milestones", repoId.toLowerCase());
     }
 
     public static String getPathForContributors(String repoId) {
-        return String.format("https://github.com/%s/graphs/contributors", repoId);
+        return String.format("https://github.com/%s/graphs/contributors", repoId.toLowerCase());
     }
 
     public static boolean isUrlIssue(String url) {
