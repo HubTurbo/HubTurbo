@@ -43,7 +43,7 @@ public class ChromeDriverEx {
             logger.info("Test loading page: " + url);
             testGet();
         } else {
-            if (driver.getCurrentUrl().equals(url)) {
+            if (driver.getCurrentUrl().toLowerCase().equals(url)) {
                 logger.info("Already on page: " + url + " will not load it again. ");
             } else {
                 logger.info("Previous page was: " + driver.getCurrentUrl());
