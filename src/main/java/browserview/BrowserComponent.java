@@ -191,9 +191,14 @@ public class BrowserComponent {
      * driver window.
      * Run on a separate thread.
      */
-    public void showIssue(String repoId, int id) {
-        logger.info("Showing issue #" + id);
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id)));
+    public void showIssue(String repoId, int id, boolean isPullRequest) {
+        if (isPullRequest) {
+            logger.info("Showing pull request #" + id);
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id)));
+        } else {
+            logger.info("Showing issue #" + id);
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id)));
+        }
     }
 
     public void jumpToComment(){
