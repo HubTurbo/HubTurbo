@@ -72,7 +72,7 @@ public class MenuControl extends MenuBar {
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
-//          DataManager.getInstance().setLastLoginPassword("");
+            prefs.setLastLoginCredentials("", "");
             ui.quit();
         });
         return logout;
@@ -88,7 +88,7 @@ public class MenuControl extends MenuBar {
             columns.createNewPanelAtStart();
             setHvalue(columnsScrollPane.getHmin());
         });
-        createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
+        createLeft.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN,
                 KeyCombination.SHIFT_DOWN));
 
         MenuItem createRight = new MenuItem("Create");
