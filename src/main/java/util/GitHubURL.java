@@ -20,6 +20,10 @@ public class GitHubURL {
         return String.format("https://github.com/%s/issues/%d", repoId, id);
     }
 
+    public static String getPathForPullRequest(String repoId, int id) {
+        return String.format("https://github.com/%s/pull/%d", repoId, id);
+    }
+
     public static String getPathForNewIssue(String repoId) {
         return String.format("https://github.com/%s/issues/new", repoId);
     }
