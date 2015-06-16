@@ -125,7 +125,9 @@ public class IssuePanel extends IssueColumn {
 
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
-            ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
+            ui.triggerEvent(
+                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex, issue.isPullRequest())
+            );
 
             // Save the stored comment count as its own comment count.
             // The refreshItems(false) call that follows will remove the highlighted effect of the comment bubble.
@@ -163,7 +165,7 @@ public class IssuePanel extends IssueColumn {
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
-            if (event.getCode() == KeyCode.R) {
+            if (event.getCode() == KeyCode.E) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
