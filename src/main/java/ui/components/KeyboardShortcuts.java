@@ -98,9 +98,8 @@ public class KeyboardShortcuts {
             KeyboardShortcuts.keyboardShortcuts = getDefaultKeyboardShortcuts();
         } else {
             KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
-            MARK_AS_READ = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_READ"));
-            MARK_AS_UNREAD = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_UNREAD"));
         }
+        getKeyboardShortcutsFromHashMap();
     }
 
     public static Map<String, String> getDefaultKeyboardShortcuts() {
@@ -108,5 +107,10 @@ public class KeyboardShortcuts {
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
         defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
         return defaultKeyboardShortcuts;
+    }
+
+    private static void getKeyboardShortcutsFromHashMap() {
+        MARK_AS_READ = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_READ"));
+        MARK_AS_UNREAD = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_UNREAD"));
     }
 }
