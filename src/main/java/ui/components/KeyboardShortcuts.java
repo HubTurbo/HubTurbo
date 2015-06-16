@@ -75,7 +75,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);
 
     public static final KeyCombination CREATE_LEFT_PANEL =
-            new KeyCodeCombination(KeyCode.N, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCombination CREATE_RIGHT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination CLOSE_PANEL =
