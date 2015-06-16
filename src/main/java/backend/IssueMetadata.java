@@ -61,10 +61,6 @@ public class IssueMetadata {
         this.isUpdated = other.isUpdated;
     }
 
-    public boolean isEmpty() {
-        return events.isEmpty() && comments.isEmpty();
-    }
-
     public String summarise() {
         return String.format("%d events, %d comments", events.size(), comments.size());
     }
