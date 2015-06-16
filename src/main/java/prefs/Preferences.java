@@ -114,4 +114,12 @@ public class Preferences {
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return global.getMarkedReadAt(repoId, issue);
     }
+
+    public Map<String, String> getKeyboardShortcuts() {
+        return global.getKeyboardShortcuts();
+    }
+
+    public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
+        global.setKeyboardShortcuts(keyboardShortcuts);
+    }
 }
