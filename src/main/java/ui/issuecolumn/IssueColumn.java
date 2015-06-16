@@ -156,9 +156,6 @@ public abstract class IssueColumn extends Column {
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
-
-            // Clear displayed message on successful filter
-            UI.status.clear();
         } catch (ParseException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
             // Overrides message in status bar
