@@ -25,6 +25,15 @@ public class IssueMetadata {
         isUpdated = false;
     }
 
+    // Copy constructor used in TurboIssue
+    public IssueMetadata(IssueMetadata other) {
+        this.events = new ArrayList<>(other.events);
+        this.comments = new ArrayList<>(other.comments);
+        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.isUpdated = other.isUpdated;
+    }
+
     // Constructor used in DownloadMetadataTask
     public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
         this.events = events;
@@ -44,10 +53,10 @@ public class IssueMetadata {
     }
 
     // Constructor used in MultiModel
-    public IssueMetadata(IssueMetadata other) {
+    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
-        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.isUpdated = other.isUpdated;
     }

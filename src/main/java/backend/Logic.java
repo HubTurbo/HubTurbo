@@ -123,11 +123,13 @@ public class Logic {
         logger.info("Getting metadata for issues " + issues);
         UI.status.displayMessage(message);
 
+        String currentUser = prefs.getLastLoginUsername();
+
         return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processNonSelfUpdate)
             .thenApply(metadata -> {
                 String updatedMessage = "Received metadata from " + repoId + "!";
                 UI.status.displayMessage(updatedMessage);
-                models.insertMetadata(repoId, metadata);
+                models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
             }).thenApply(Futures.tap(this::updateUIWithMetadata))
             .exceptionally(withResult(new HashMap<>()));
