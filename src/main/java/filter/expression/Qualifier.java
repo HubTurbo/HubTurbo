@@ -361,6 +361,7 @@ public class Qualifier implements FilterExpression {
         case "sort":
         case "in":
         case "repo":
+        case "updated":
             return true;
         default:
             return false;
