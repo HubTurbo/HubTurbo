@@ -527,14 +527,6 @@ public class Qualifier implements FilterExpression {
         // Creation time is also outside of range, we do not need to show this issue at all.
         return false;
 
-//        if (numberRange.isPresent()) {
-//            return numberRange.get().encloses(hours);
-//        } else if (number.isPresent()) {
-//            // Treat it as <
-//            return new NumberRange(null, number.get(), true).encloses(hours);
-//        } else {
-//            return false;
-//        }
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
