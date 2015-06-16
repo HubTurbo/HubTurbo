@@ -401,12 +401,11 @@ public class Qualifier implements FilterExpression {
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 break;
             case "nonSelfUpdate":
-                // Purposefully inverted a and b to make latest issues show up first.
                 if (metadataRefresh) {
                     comparator = (a, b) ->
-                        b.getMetadata().getNonSelfUpdatedAt().compareTo(a.getMetadata().getNonSelfUpdatedAt());
+                        a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
                 } else {
-                    comparator = (a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt());
+                    comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 }
                 break;
             case "id":
