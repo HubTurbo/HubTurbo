@@ -68,8 +68,8 @@ public class MenuControl extends MenuBar {
     }
 
     private Menu createPreferencesMenu() {
-    	Menu preferences = new Menu("Preferences");
-    	
+        Menu preferences = new Menu("Preferences");
+        
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
@@ -79,8 +79,8 @@ public class MenuControl extends MenuBar {
         
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(e -> {
-        	logger.info("Quitting HT");
-        	ui.quit();
+            logger.info("Quitting HT");
+            ui.quit();
         });
         
         preferences.getItems().addAll(logout, quit);
