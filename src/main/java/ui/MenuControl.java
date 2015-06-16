@@ -88,7 +88,7 @@ public class MenuControl extends MenuBar {
             columns.createNewPanelAtStart();
             setHvalue(columnsScrollPane.getHmin());
         });
-        createLeft.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN,
+        createLeft.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN,
                 KeyCombination.SHIFT_DOWN));
 
         MenuItem createRight = new MenuItem("Create");
