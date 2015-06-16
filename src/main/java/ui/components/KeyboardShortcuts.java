@@ -3,6 +3,10 @@ package ui.components;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import prefs.Preferences;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * a central place to specify keyboard shortcuts
@@ -18,6 +22,15 @@ import javafx.scene.input.KeyCombination;
  */
 public class KeyboardShortcuts {
 
+    private static Map<String, String> keyboardShortcuts = null;
+    private static Preferences prefs;
+
+    // customizable keyboard shortcuts
+    // ui.issuepanel.IssuePanel
+    public static KeyCode MARK_AS_READ;
+    public static KeyCode MARK_AS_UNREAD;
+
+    // non-customizable keyboard shortcuts
     // ui.issuepanel.IssuePanel
     public static final KeyCombination BOX_TO_LIST =
             new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
@@ -29,9 +42,6 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-
-    public static final KeyCode MARK_AS_READ = KeyCode.E;
-    public static final KeyCode MARK_AS_UNREAD = KeyCode.U;
 
     public static final KeyCode REFRESH = KeyCode.F5;
     public static final KeyCode SHOW_DOCS = KeyCode.F1;
@@ -80,4 +90,22 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
+
+    public static void loadKeyboardShortcuts(Preferences prefs) {
+        KeyboardShortcuts.prefs = prefs;
+        if (prefs.getKeyboardShortcuts().size() < getDefaultKeyboardShortcuts().size()) {
+            prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
+        } else {
+            KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
+            MARK_AS_READ = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_READ"));
+            MARK_AS_UNREAD = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_UNREAD"));
+        }
+    }
+
+    public static Map<String, String> getDefaultKeyboardShortcuts() {
+        Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
+        defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
+        defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
+        return defaultKeyboardShortcuts;
+    }
 }
