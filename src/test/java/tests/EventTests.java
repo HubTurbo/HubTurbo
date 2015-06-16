@@ -21,7 +21,7 @@ public class EventTests {
         events.register(succeed1);
         
         BoardSavedEvent te = new BoardSavedEvent();
-        IssueSelectedEvent te2 = new IssueSelectedEvent("", 1, 2);
+        IssueSelectedEvent te2 = new IssueSelectedEvent("", 1, 2, false);
 
         events.post(te);
 

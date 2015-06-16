@@ -6,7 +6,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import ui.components.NavigableListView;
+import ui.components.IssueListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
@@ -23,7 +23,7 @@ public class IssuePanel extends IssueColumn {
     private final UI ui;
     private int issueCount;
 
-    private NavigableListView<TurboIssue> listView;
+    private IssueListView listView;
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
 
     public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
@@ -31,7 +31,7 @@ public class IssuePanel extends IssueColumn {
         this.model = model;
         this.ui = ui;
 
-        listView = new NavigableListView<>();
+        listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
 
@@ -95,7 +95,8 @@ public class IssuePanel extends IssueColumn {
         setupKeyboardShortcuts();
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
-            ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
+            ui.triggerEvent(
+                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex, issue.isPullRequest()));
             if (issueHasNewComments(issue)) {
                 issueCommentCounts.put(issue.getId(), issue.getCommentCount());
                 refreshItems();
@@ -253,5 +254,9 @@ public class IssuePanel extends IssueColumn {
 
     public int getIssueCount() {
         return issueCount;
+    }
+
+    public TurboIssue getSelectedIssue() {
+        return listView.getSelectedItem().get();
     }
 }

@@ -18,6 +18,9 @@ public class ColumnsTest extends UITest {
     public void columnsTest() {
         UI.events.registerEvent((ColumnClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
+        // maximize
+        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
@@ -31,7 +34,7 @@ public class ColumnsTest extends UITest {
         // Click
         eventTriggered = false;
         find("#dummy/dummy_col0_closeButton");
-        moveBy(-15, 0);
+        moveBy(-50, 0);
         click(); // Click
         assertTrue(eventTriggered);
 
@@ -47,7 +50,7 @@ public class ColumnsTest extends UITest {
         // Switch primary repo
         doubleClick("#repositorySelector");
         doubleClick();
-        type("#dummy2/dummy2");
+        type("dummy2/dummy2");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
