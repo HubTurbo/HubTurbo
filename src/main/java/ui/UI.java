@@ -193,6 +193,8 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
     }
 
+    // When --bypasslogin=true is passed as an argument, the username and password
+    // are empty strings.
     private boolean isBypassLogin() {
         return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
     }
