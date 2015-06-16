@@ -39,8 +39,8 @@ public class Negation implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info, String currentUser) {
-        return !expr.isSatisfiedBy(model, issue, info, currentUser);
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+        return !expr.isSatisfiedBy(model, issue, info);
     }
 
     @Override

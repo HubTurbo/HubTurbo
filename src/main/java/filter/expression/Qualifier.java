@@ -98,8 +98,7 @@ public class Qualifier implements FilterExpression {
      * Ensures that meta-qualifiers are taken care of.
      * Should always be used over isSatisfiedBy.
      */
-    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue, String currentUser) {
-
+    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
         FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
         List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
@@ -115,8 +114,7 @@ public class Qualifier implements FilterExpression {
                 exprWithNormalQualifiers);
         }
 
-        return exprWithNormalQualifiers.isSatisfiedBy(model, issue,
-                                                    new MetaQualifierInfo(metaQualifiers), currentUser);
+        return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
     }
 
     public static void processMetaQualifierEffects(FilterExpression expr,
@@ -149,7 +147,7 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info, String currentUser) {
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert name != null;
 
         // The empty qualifier is satisfied by anything
@@ -192,7 +190,7 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-            return satisfiesUpdatedHours(issue, currentUser);
+            return satisfiesUpdatedHours(issue);
         case "repo":
             return satisfiesRepo(issue);
         default:
@@ -491,7 +489,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue, String currentUser) {
+    private boolean satisfiesUpdatedHours(TurboIssue issue) {
         NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
@@ -513,20 +511,7 @@ public class Qualifier implements FilterExpression {
             hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
         }
 
-        if (updatedRange.encloses(hoursSinceUpdate)) return true;
-
-        // If it doesn't enclose, we also consider creation as an update event.
-        int hoursSinceCreation = Utility.safeLongToInt(issue.getCreatedAt()
-                .until(getCurrentTime(), ChronoUnit.HOURS));
-
-        if (!issue.getCreator().equalsIgnoreCase(currentUser)) {
-            // But on the second time being filtered, we consider only if creator is different
-            if (updatedRange.encloses(hoursSinceCreation)) return true;
-        }
-
-        // Creation time is also outside of range, we do not need to show this issue at all.
-        return false;
-
+        return updatedRange.encloses(hoursSinceUpdate);
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {

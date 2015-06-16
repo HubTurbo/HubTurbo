@@ -128,7 +128,7 @@ public class IssuePanel extends IssueColumn {
             ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
 
             // Save the stored comment count as its own comment count.
-            // The refreshItems(false) call that follows will remove the Litt-up effect of the comment bubble.
+            // The refreshItems(false) call that follows will remove the highlighted effect of the comment bubble.
             // (if it was there before)
             issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());

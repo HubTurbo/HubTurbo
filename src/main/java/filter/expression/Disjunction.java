@@ -46,9 +46,9 @@ public class Disjunction implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info, String currentUser) {
-        return left.isSatisfiedBy(model, issue, info, currentUser)
-                || right.isSatisfiedBy(model, issue, info, currentUser);
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+        return left.isSatisfiedBy(model, issue, info)
+                || right.isSatisfiedBy(model, issue, info);
     }
 
     @Override

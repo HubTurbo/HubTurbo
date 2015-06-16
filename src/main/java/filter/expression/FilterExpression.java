@@ -13,7 +13,7 @@ public interface FilterExpression {
     // Determines if an issue satisfies this filter expression.
     // If so, it is shown in the issue panel.
 
-    boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info, String currentUser);
+    boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info);
 
     // Filter expressions may only be applied if they contain no ambiguity
     // => they must contain only qualifiers or conjunctions thereof. Disjunctions
