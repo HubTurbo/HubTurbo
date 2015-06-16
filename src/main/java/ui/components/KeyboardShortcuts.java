@@ -95,6 +95,7 @@ public class KeyboardShortcuts {
         KeyboardShortcuts.prefs = prefs;
         if (prefs.getKeyboardShortcuts().size() < getDefaultKeyboardShortcuts().size()) {
             prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
+            KeyboardShortcuts.keyboardShortcuts = getDefaultKeyboardShortcuts();
         } else {
             KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
             MARK_AS_READ = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_READ"));
