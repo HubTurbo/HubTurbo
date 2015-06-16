@@ -30,6 +30,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
+import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
@@ -144,6 +145,7 @@ public class UI extends Application implements EventDispatcher {
 
         commandLineArgs = initialiseCommandLineArguments();
         prefs = new Preferences(isTestMode());
+        KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
         registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
