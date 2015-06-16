@@ -38,8 +38,9 @@ public class IssuePanel extends IssueColumn {
     private final KeyCombination defaultSizeWindow =
         new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 
-    // At the moment, apparently, whenever the screen refreshes, all previously lit up comments will
-    // lose the highlight.
+    // IssueCommentCounts and issueNonSelfCommentCounts are accessed whenever the view is updated
+    // via listView.setItems in refreshItems. However, an overwrite of the count only happens upon
+    // an IssueSelectedEvent.
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
