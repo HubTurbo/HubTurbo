@@ -26,6 +26,7 @@ public class UIBrowserBridge {
     private TickingTimer timer;
     private Optional<String> nextRepoId = Optional.empty();
     private Optional<Integer> nextIssueId = Optional.empty();
+    private Optional<Boolean> isPullRequest = Optional.empty();
 
     public UIBrowserBridge(UI ui) {
         timer = createTickingTimer(ui);
@@ -34,20 +35,18 @@ public class UIBrowserBridge {
         ui.registerEvent((IssueSelectedEventHandler) e -> {
             nextRepoId = Optional.of(e.repoId);
             nextIssueId = Optional.of(e.id);
+            isPullRequest = Optional.of(e.isPullRequest);
             timer.restart();
             if (timer.isPaused()) {
                 timer.resume();
             }
         });
 
-        ui.registerEvent((IssueCreatedEventHandler) e ->
-            ui.getBrowserComponent().newIssue());
+        ui.registerEvent((IssueCreatedEventHandler) e -> ui.getBrowserComponent().newIssue());
 
-        ui.registerEvent((LabelCreatedEventHandler) e ->
-            ui.getBrowserComponent().newLabel());
+        ui.registerEvent((LabelCreatedEventHandler) e -> ui.getBrowserComponent().newLabel());
 
-        ui.registerEvent((MilestoneCreatedEventHandler) e ->
-            ui.getBrowserComponent().newMilestone());
+        ui.registerEvent((MilestoneCreatedEventHandler) e -> ui.getBrowserComponent().newMilestone());
     }
 
     private TickingTimer createTickingTimer(UI ui) {
@@ -55,8 +54,8 @@ public class UIBrowserBridge {
             // do nothing for each tick
         }, () -> {
             Platform.runLater(() -> {
-                if (nextRepoId.isPresent() && nextIssueId.isPresent()) {
-                    ui.getBrowserComponent().showIssue(nextRepoId.get(), nextIssueId.get());
+                if (nextRepoId.isPresent() && nextIssueId.isPresent() && isPullRequest.isPresent()) {
+                    ui.getBrowserComponent().showIssue(nextRepoId.get(), nextIssueId.get(), isPullRequest.get());
                 }
             });
             timer.pause();

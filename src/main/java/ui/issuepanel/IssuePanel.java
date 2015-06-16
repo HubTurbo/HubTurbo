@@ -107,7 +107,8 @@ public class IssuePanel extends IssueColumn {
         setupKeyboardShortcuts();
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
-            ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
+            ui.triggerEvent(
+                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex, issue.isPullRequest()));
             if (issueHasNewComments(issue)) {
                 issueCommentCounts.put(issue.getId(), issue.getCommentCount());
                 refreshItems();
