@@ -43,7 +43,7 @@ public class DummyRepoState {
             TurboMilestone dummyMilestone = makeDummyMilestone();
             TurboUser dummyUser = makeDummyUser();
 
-            // Populate state with default objects
+            // Populate state with defaults
             issues.put(dummyIssue.getId(), dummyIssue);
             labels.put(dummyLabel.getActualName(), dummyLabel);
             milestones.put(dummyMilestone.getId(), dummyMilestone);
@@ -82,7 +82,7 @@ public class DummyRepoState {
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
-        // Close issue 6
+        // Issue 6 is closed
         issues.get(6).setOpen(false);
     }
 
