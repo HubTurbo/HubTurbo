@@ -21,7 +21,7 @@ public class LogoutTest extends UITest {
 
     @Override
     public void launchApp() {
-    FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+    	FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
     }
 
     @Test
@@ -53,5 +53,4 @@ public class LogoutTest extends UITest {
         File testConfig = new File(configFileDirectory, testConfigFileName);
         if (testConfig.exists() && testConfig.isFile()) testConfig.delete();
     }
-
 }
