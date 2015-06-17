@@ -165,10 +165,10 @@ public abstract class IssueColumn extends Column {
     }
 
     /**
-     * Triggered by pressing ENTER in the filter box. Therefore, the hasMetadata call
+     * Triggered after pressing ENTER in the filter box. Therefore, the hasMetadata call
      * is false.
      *
-     * @param filter
+     * @param filter The current filter text in the filter box
      */
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
