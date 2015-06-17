@@ -50,7 +50,8 @@ public class Conjunction implements FilterExpression {
 
     @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
-        return left.isSatisfiedBy(model, issue, info) && right.isSatisfiedBy(model, issue, info);
+        return left.isSatisfiedBy(model, issue, info)
+                && right.isSatisfiedBy(model, issue, info);
     }
 
     private boolean containsDuplicateQualifierNames() {

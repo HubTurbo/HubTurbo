@@ -35,6 +35,9 @@ public class Preferences {
         global = fileHandler.loadGlobalConfig();
     }
 
+    // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
+    // credentials are guaranteed to be the current user's credentials thanks to setLastLoginCredentials
+    // being called immediately after a successful login in LoginDialog.
     public String getLastLoginPassword() {
         return global.getLastLoginPassword();
     }

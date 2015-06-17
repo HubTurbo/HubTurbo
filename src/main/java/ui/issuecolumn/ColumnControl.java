@@ -42,7 +42,7 @@ public class ColumnControl extends HBox {
             updateModel(e.model);
             forEach(child -> {
                 if (child instanceof IssueColumn) {
-                    ((IssueColumn) child).setItems(e.model.getIssues());
+                    ((IssueColumn) child).setItems(e.model.getIssues(), e.hasMetadata);
                 }
             });
         });
@@ -101,8 +101,11 @@ public class ColumnControl extends HBox {
         getChildren().forEach(child -> callback.accept((Column) child));
     }
 
+    /**
+     * For a quick refresh (without requesting updates)
+     */
     public void refresh() {
-        forEach(child -> child.refreshItems());
+        forEach(child -> child.refreshItems(false));
     }
 
     private IssueColumn addColumn() {
@@ -112,7 +115,7 @@ public class ColumnControl extends HBox {
     public IssueColumn addColumnAt(int index) {
         IssueColumn panel = new IssuePanel(ui, model, this, index);
         getChildren().add(index, panel);
-        panel.setItems(model.getIssues());
+        panel.setItems(model.getIssues(), false);
         updateColumnIndices();
         setCurrentlySelectedColumn(Optional.of(index));
         return panel;
