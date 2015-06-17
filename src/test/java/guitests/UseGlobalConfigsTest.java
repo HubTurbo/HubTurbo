@@ -99,17 +99,6 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("", dummyBoard.get(0));
         assertEquals("repo:dummy2/dummy2", dummyBoard.get(1));
     }
-    
-    @Test
-    public void testLogout() {
-        launchApp();
-        click("Preferences");
-        click("Logout");
-        
-        Preferences testPref = new Preferences(true);
-        assertEquals("", testPref.getLastLoginUsername());
-        assertEquals("", testPref.getLastLoginPassword());
-    }
 
     @After
     public void teardown() {
