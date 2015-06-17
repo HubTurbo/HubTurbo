@@ -21,7 +21,7 @@ public class LogoutTest extends UITest {
 
     @Override
     public void launchApp() {
-    	FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
     }
 
     @Test
