@@ -144,8 +144,9 @@ public class IssuePanel extends IssueColumn {
             // (if it was there before)
             issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
-            // We don't need to get metadata here, so we pass false.
-            refreshItems(false);
+            // We assume we already have metadata, so we pass true to avoid refreshItems from trying to get
+            // metadata after clicking.
+            refreshItems(true);
         });
     }
 

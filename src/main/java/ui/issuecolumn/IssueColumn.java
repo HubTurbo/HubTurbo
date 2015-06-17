@@ -180,7 +180,7 @@ public abstract class IssueColumn extends Column {
      * current filter. Meant to be called from refreshItems() so as not to go into
      * infinite mutual recursion.
      */
-    private void applyCurrentFilterExpression(boolean hasMetadata) {
+    private void applyCurrentFilterExpression(boolean nonSelfSortable) {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
         comparator = Qualifier.getSortComparator(model, "id", true, false);
 
@@ -194,7 +194,7 @@ public abstract class IssueColumn extends Column {
                 // no sort order specified, implicitly assumed to sort by last-non-self-update
                 comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
-                comparator = qualifier.getCompoundSortComparator(model, hasMetadata);
+                comparator = qualifier.getCompoundSortComparator(model, nonSelfSortable);
             }
         });
     }
@@ -235,11 +235,22 @@ public abstract class IssueColumn extends Column {
 
     @Override
     public void refreshItems(boolean hasMetadata) {
-        applyCurrentFilterExpression(hasMetadata);
+        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
 
+        // Transforms predicate and comparator to the desired values
+        // If hasUpdatedQualifier && hasMetadata, we allow sorting by non-self update times (if the user
+        // specifies the updated and/or sort qualifiers)
+        applyCurrentFilterExpression(hasUpdatedQualifier && hasMetadata);
+
+        // Then use them to filter & sort.
         transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
-        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && !hasMetadata) {
+        // If the updated qualifier is specified, after initiallly filtering with hasMetadata as false
+        // (which, since we don't have metadata, filters by getUpdatedAt) we trigger getIssueMetadata,
+        // which will eventually return a model with metadata and trigger this method again with
+        // hasMetadata as true. However, since we already have metadata this time, we don't trigger
+        // getIssueMetadata here again.
+        if (hasUpdatedQualifier && !hasMetadata) {
             // Group all filtered issues by repo, then trigger updates for each group
             transformedIssueList.stream()
                 .collect(Collectors.groupingBy(TurboIssue::getRepoId))
