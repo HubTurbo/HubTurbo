@@ -69,7 +69,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Then exit program...
         click("Preferences");
-        click("Logout");
+        click("Quit");
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(configFileDirectory, testConfigFileName);
