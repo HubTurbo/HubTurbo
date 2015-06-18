@@ -39,7 +39,7 @@ public class ChromeDriverTest extends UITest {
         press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
 
         // scroll to top
-        press(KeyCode.U).release(KeyCode.U);
+        press(KeyCode.I).release(KeyCode.I);
 
         // scroll to bottom
         press(KeyCode.N).release(KeyCode.N);
