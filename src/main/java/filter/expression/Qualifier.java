@@ -366,13 +366,13 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    public Comparator<TurboIssue> getCompoundSortComparator(IModel model, boolean nonSelfSortable) {
+    public Comparator<TurboIssue> getCompoundSortComparator(IModel model, boolean isNotSelfSortable) {
         if (sortKeys.isEmpty()) {
             return (a, b) -> 0;
         }
         return (a, b) -> {
             for (SortKey key : sortKeys) {
-                Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted, nonSelfSortable);
+                Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted, isNotSelfSortable);
                 int result = comparator.compare(a, b);
                 if (result != 0) {
                     return result;
@@ -385,7 +385,7 @@ public class Qualifier implements FilterExpression {
     public static Comparator<TurboIssue> getSortComparator(IModel model,
                                                            String key,
                                                            boolean inverted,
-                                                           boolean nonSelfSortable) {
+                                                           boolean isNotSelfSortable) {
         Comparator<TurboIssue> comparator = (a, b) -> 0;
 
         boolean isLabelGroup = false;
@@ -402,7 +402,7 @@ public class Qualifier implements FilterExpression {
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 break;
             case "nonSelfUpdate":
-                if (nonSelfSortable) {
+                if (isNotSelfSortable) {
                     comparator = (a, b) ->
                         a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
                 } else {
