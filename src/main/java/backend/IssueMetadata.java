@@ -77,9 +77,13 @@ public class IssueMetadata {
         return nonSelfUpdatedAt;
     }
 
-    public int getNonSelfCommentCount() { return nonSelfCommentCount; }
+    public int getNonSelfCommentCount() {
+        return nonSelfCommentCount;
+    }
 
-    public boolean isUpdated() { return isUpdated; }
+    public boolean isUpdated() {
+        return isUpdated;
+    }
 
     @Override
     public String toString() {

@@ -180,7 +180,7 @@ public abstract class IssueColumn extends Column {
      * current filter. Meant to be called from refreshItems() so as not to go into
      * infinite mutual recursion.
      */
-    private void applyCurrentFilterExpression(boolean nonSelfSortable) {
+    private void applyCurrentFilterExpression(boolean isSortableByNonSelfUpdates) {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
         comparator = Qualifier.getSortComparator(model, "id", true, false);
 
@@ -194,7 +194,7 @@ public abstract class IssueColumn extends Column {
                 // no sort order specified, implicitly assumed to sort by last-non-self-update
                 comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
-                comparator = qualifier.getCompoundSortComparator(model, nonSelfSortable);
+                comparator = qualifier.getCompoundSortComparator(model, isSortableByNonSelfUpdates);
             }
         });
     }
