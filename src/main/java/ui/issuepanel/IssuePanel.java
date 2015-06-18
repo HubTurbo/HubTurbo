@@ -2,6 +2,7 @@ package ui.issuepanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
+import filter.expression.Qualifier;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
