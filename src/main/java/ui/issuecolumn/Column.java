@@ -89,8 +89,11 @@ public abstract class Column extends VBox {
     /**
      * This method is called when the item list is to be refreshed. This mainly happens
      * when the user selects Refresh from the menu. Subclasses may also require it.
+     *
+     * hasMetadata implies the issues to be filtered have metadata inside, and thus should
+     * be displayed and sorted accordingly.
      */
-    public abstract void refreshItems();
+    public abstract void refreshItems(boolean hasMetadata);
 
     /**
      * This method is called when the column control is deselected. It used to happen when

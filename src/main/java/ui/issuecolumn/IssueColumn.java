@@ -50,14 +50,9 @@ public abstract class IssueColumn extends Column {
     protected FilterTextField filterTextField;
     private UI ui;
 
-    private FilterExpression currentFilterExpression = Qualifier.EMPTY;
+    protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
     private Predicate<TurboIssue> predicate = p -> true;
     private Comparator<TurboIssue> comparator = (a, b) -> 0;
-
-    // This controls whether a metadata update will be triggered on the next refresh.
-    // It's toggled to false by model updates that are not supposed to trigger updates.
-    // It's toggled to true each time a refresh DOES NOT trigger an update.
-    private boolean triggerMetadataUpdate = true;
 
     public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(model, parentColumnControl, columnIndex);
@@ -85,11 +80,6 @@ public abstract class IssueColumn extends Column {
             .collect(Collectors.toList()));
 
         filterTextField.setKeywords(all);
-
-        // Make metadata update state consistent
-        if (!e.triggerMetadataUpdate) {
-            this.triggerMetadataUpdate = false;
-        }
     };
 
     private Node createFilterBox() {
@@ -163,9 +153,6 @@ public abstract class IssueColumn extends Column {
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
-
-            // Clear displayed message on successful filter
-            UI.status.clear();
         } catch (ParseException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
             // Overrides message in status bar
@@ -174,10 +161,15 @@ public abstract class IssueColumn extends Column {
         }
     }
 
+    /**
+     * Triggered after pressing ENTER in the filter box. Therefore, the hasMetadata call
+     * is false.
+     *
+     * @param filter The current filter text in the filter box
+     */
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
-        applyCurrentFilterExpression();
-        refreshItems();
+        refreshItems(false);
     }
 
     /**
@@ -185,14 +177,21 @@ public abstract class IssueColumn extends Column {
      * current filter. Meant to be called from refreshItems() so as not to go into
      * infinite mutual recursion.
      */
-    private void applyCurrentFilterExpression() {
+    private void applyCurrentFilterExpression(boolean isSortableByNonSelfUpdates) {
         predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-        comparator = Qualifier.getSortComparator(model, "id", true);
+        comparator = Qualifier.getSortComparator(model, "id", true, false);
+
+        // BiConsumer is used here as we need to update the comparator, and at the same time call
+        // openRepository() if necessary.
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
                 ui.logic.openRepository(qualifier.getContent().get());
+            } else if (qualifier.getName().equals(Qualifier.UPDATED)
+                    && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
+                // no sort order specified, implicitly assumed to sort by last-non-self-update
+                comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
             } else if (qualifier.getName().equals(Qualifier.SORT)) {
-                comparator = qualifier.getCompoundSortComparator(model);
+                comparator = qualifier.getCompoundSortComparator(model, isSortableByNonSelfUpdates);
             }
         });
     }
@@ -221,9 +220,9 @@ public abstract class IssueColumn extends Column {
         return transformedIssueList;
     }
 
-    public void setItems(List<TurboIssue> items) {
+    public void setItems(List<TurboIssue> items, boolean hasMetadata) {
         this.issues = FXCollections.observableArrayList(items);
-        refreshItems();
+        refreshItems(hasMetadata);
     }
 
     @Override
@@ -232,20 +231,29 @@ public abstract class IssueColumn extends Column {
     }
 
     @Override
-    public void refreshItems() {
-        applyCurrentFilterExpression();
+    public void refreshItems(boolean hasMetadata) {
+        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
 
+        // Transforms predicate and comparator to the desired values
+        // If hasUpdatedQualifier && hasMetadata, we allow sorting by non-self update times (if the user
+        // specifies the updated and/or sort qualifiers)
+        applyCurrentFilterExpression(hasUpdatedQualifier && hasMetadata);
+
+        // Then use them to filter & sort.
         transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
 
-        if (!triggerMetadataUpdate) {
-            triggerMetadataUpdate = true;
-        } else if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED)) {
+        // If the updated qualifier is specified, after initiallly filtering with hasMetadata as false
+        // (which, since we don't have metadata, filters by getUpdatedAt) we trigger getIssueMetadata,
+        // which will eventually return a model with metadata and trigger this method again with
+        // hasMetadata as true. However, since we already have metadata this time, we don't trigger
+        // getIssueMetadata here again.
+        if (hasUpdatedQualifier && !hasMetadata) {
             // Group all filtered issues by repo, then trigger updates for each group
             transformedIssueList.stream()
                 .collect(Collectors.groupingBy(TurboIssue::getRepoId))
-                .entrySet().forEach(e ->
-                ui.logic.getIssueMetadata(e.getKey(),
-                    e.getValue().stream()
+                .entrySet().forEach(repoSetEntry ->
+                ui.logic.getIssueMetadata(repoSetEntry.getKey(),
+                    repoSetEntry.getValue().stream()
                         .map(TurboIssue::getId)
                         .collect(Collectors.toList())));
         }

@@ -43,7 +43,7 @@ public class DummyRepoState {
             TurboMilestone dummyMilestone = makeDummyMilestone();
             TurboUser dummyUser = makeDummyUser();
 
-            // Populate state with default objects
+            // Populate state with defaults
             issues.put(dummyIssue.getId(), dummyIssue);
             labels.put(dummyLabel.getActualName(), dummyLabel);
             milestones.put(dummyMilestone.getId(), dummyMilestone);
@@ -82,7 +82,7 @@ public class DummyRepoState {
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
-        // Close issue 6
+        // Issue 6 is closed
         issues.get(6).setOpen(false);
     }
 
@@ -242,9 +242,9 @@ public class DummyRepoState {
         // Not deep copy as the same TurboIssueEvent objects of issueToUpdate are the TurboIssueEvents
         // of updatedIssue. Might create problems later if eventsOfIssue are to be mutable after downloading
         // from repo (which should not be the case).
-        // (but this approach works if the metadata of the issue is not modified)
+        // (but this approach works if the metadata of the issue is not modified, which is the current case)
         // TODO make TurboIssueEvent immutable
-        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("dummyUser"),
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
                 IssueEventType.Renamed,
                 new Date()));
         List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
