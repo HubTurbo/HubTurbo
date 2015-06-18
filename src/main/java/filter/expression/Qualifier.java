@@ -372,7 +372,8 @@ public class Qualifier implements FilterExpression {
         }
         return (a, b) -> {
             for (SortKey key : sortKeys) {
-                Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted, isSortableByNonSelfUpdates);
+                Comparator<TurboIssue> comparator =
+                        getSortComparator(model, key.key, key.inverted, isSortableByNonSelfUpdates);
                 int result = comparator.compare(a, b);
                 if (result != 0) {
                     return result;
