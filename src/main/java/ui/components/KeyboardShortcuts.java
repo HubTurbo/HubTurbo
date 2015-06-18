@@ -37,6 +37,19 @@ public class KeyboardShortcuts {
     public static KeyCode MARK_AS_READ;
     public static KeyCode MARK_AS_UNREAD;
 
+    public static KeyCode SCROLL_TO_TOP;
+    public static KeyCode SCROLL_TO_BOTTOM;
+    public static KeyCode SCROLL_UP;
+    public static KeyCode SCROLL_DOWN;
+
+    //ui.issuecolumn.ColumnControl
+    public static KeyCode LEFT_PANEL;
+    public static KeyCode RIGHT_PANEL;
+
+    // ui.components.NavigableListView && ui.issuepanel.IssuePanel
+    public static KeyCode UP_ISSUE;
+    public static KeyCode DOWN_ISSUE;
+
     // non-customizable keyboard shortcuts
     // ui.issuepanel.IssuePanel
     public static final KeyCombination BOX_TO_LIST =
@@ -62,11 +75,6 @@ public class KeyboardShortcuts {
     public static final KeyCode SHOW_KEYBOARD_SHORTCUTS = KeyCode.K;
     public static final KeyCode SHOW_CONTRIBUTORS = KeyCode.D;
 
-    public static final KeyCode SCROLL_TO_TOP = KeyCode.U;
-    public static final KeyCode SCROLL_TO_BOTTOM = KeyCode.N;
-    public static final KeyCode SCROLL_UP = KeyCode.J;
-    public static final KeyCode SCROLL_DOWN = KeyCode.K;
-
     // TODO decouple manage/show labels/milestones?
     public static final KeyCode NEW_COMMENT = KeyCode.C;
     public static final KeyCode MANAGE_LABELS = KeyCode.L;
@@ -74,14 +82,6 @@ public class KeyboardShortcuts {
     public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
 
     public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
-
-    //ui.issuecolumn.ColumnControl
-    public static final KeyCode LEFT_PANEL = KeyCode.D;
-    public static final KeyCode RIGHT_PANEL = KeyCode.F;
-
-    // ui.components.NavigableListView && ui.issuepanel.IssuePanel
-    public static final KeyCode UP_ISSUE = KeyCode.T;
-    public static final KeyCode DOWN_ISSUE = KeyCode.V;
 
     // ui.MenuControl
     public static final KeyCombination NEW_ISSUE =
@@ -101,14 +101,15 @@ public class KeyboardShortcuts {
     public static void loadKeyboardShortcuts(Preferences prefs) {
         KeyboardShortcuts.prefs = prefs;
         KeyboardShortcuts.assignedKeys = new HashSet<>();
-        if (prefs.getKeyboardShortcuts().size() < getDefaultKeyboardShortcuts().size()) {
-            logger.warn("One or more user specified keyboard shortcuts are missing, resetting to defaults. ");
+        if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
+            logger.warn("Invalid number of user specified keyboard shortcuts, resetting to defaults. ");
             prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
             KeyboardShortcuts.keyboardShortcuts = getDefaultKeyboardShortcuts();
         } else {
             logger.info("Loading user specified keyboard shortcuts. ");
             KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
         }
+        addNonCustomizableShortcutKeys();
         getKeyboardShortcutsFromHashMap();
     }
 
@@ -116,12 +117,28 @@ public class KeyboardShortcuts {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
         defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
+        defaultKeyboardShortcuts.put("SCROLL_TO_TOP", "U");
+        defaultKeyboardShortcuts.put("SCROLL_TO_BOTTOM", "N");
+        defaultKeyboardShortcuts.put("SCROLL_UP", "J");
+        defaultKeyboardShortcuts.put("SCROLL_DOWN", "K");
+        defaultKeyboardShortcuts.put("LEFT_PANEL", "D");
+        defaultKeyboardShortcuts.put("RIGHT_PANEL", "F");
+        defaultKeyboardShortcuts.put("UP_ISSUE", "T");
+        defaultKeyboardShortcuts.put("DOWN_ISSUE", "V");
         return defaultKeyboardShortcuts;
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
         MARK_AS_READ = getKeyCode("MARK_AS_READ");
         MARK_AS_UNREAD = getKeyCode("MARK_AS_UNREAD");
+        SCROLL_TO_TOP = getKeyCode("SCROLL_TO_TOP");
+        SCROLL_TO_BOTTOM = getKeyCode("SCROLL_TO_BOTTOM");
+        SCROLL_UP = getKeyCode("SCROLL_UP");
+        SCROLL_DOWN = getKeyCode("SCROLL_DOWN");
+        LEFT_PANEL = getKeyCode("LEFT_PANEL");
+        RIGHT_PANEL = getKeyCode("RIGHT_PANEL");
+        UP_ISSUE = getKeyCode("UP_ISSUE");
+        DOWN_ISSUE = getKeyCode("DOWN_ISSUE");
     }
 
     private static KeyCode getKeyCode(String keyboardShortcut) {
@@ -141,5 +158,14 @@ public class KeyboardShortcuts {
         logger.info("Assigning <" + keyCode + "> to " + keyboardShortcut);
         assignedKeys.add(keyCode);
         return keyCode;
+    }
+
+    private static void addNonCustomizableShortcutKeys() {
+        assignedKeys.add(KeyCode.F5); //REFRESH
+        assignedKeys.add(KeyCode.F1); //SHOW_DOCS
+        assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
+        assignedKeys.add(KeyCode.C); //NEW_COMMENT
+        assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
+        assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
     }
 }
