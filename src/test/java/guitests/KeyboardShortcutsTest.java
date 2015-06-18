@@ -49,7 +49,9 @@ public class KeyboardShortcutsTest extends UITest {
 
         click("#dummy/dummy_col1_1");
 
+        // mark as read/unread
         press(KeyCode.R).release(KeyCode.R);
+        press(KeyCode.U).release(KeyCode.U);
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
