@@ -53,7 +53,7 @@ public class IssuePanel extends IssueColumn {
         setupListView();
         getChildren().add(listView);
 
-        refreshItems(false);
+        refreshItems(true);
     }
 
     /**
