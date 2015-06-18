@@ -3,10 +3,14 @@ package ui.components;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * a central place to specify keyboard shortcuts
@@ -22,8 +26,11 @@ import java.util.Map;
  */
 public class KeyboardShortcuts {
 
+    private static final Logger logger = LogManager.getLogger(KeyboardShortcuts.class.getName());
+
     private static Map<String, String> keyboardShortcuts = null;
     private static Preferences prefs;
+    private static Set<KeyCode> assignedKeys = null;
 
     // customizable keyboard shortcuts
     // ui.issuepanel.IssuePanel
@@ -93,10 +100,13 @@ public class KeyboardShortcuts {
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
         KeyboardShortcuts.prefs = prefs;
+        KeyboardShortcuts.assignedKeys = new HashSet<>();
         if (prefs.getKeyboardShortcuts().size() < getDefaultKeyboardShortcuts().size()) {
+            logger.warn("One or more user specified keyboard shortcuts are missing, resetting to defaults. ");
             prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
             KeyboardShortcuts.keyboardShortcuts = getDefaultKeyboardShortcuts();
         } else {
+            logger.info("Loading user specified keyboard shortcuts. ");
             KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
         }
         getKeyboardShortcutsFromHashMap();
@@ -110,7 +120,26 @@ public class KeyboardShortcuts {
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
-        MARK_AS_READ = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_READ"));
-        MARK_AS_UNREAD = KeyCode.getKeyCode(keyboardShortcuts.get("MARK_AS_UNREAD"));
+        MARK_AS_READ = getKeyCode("MARK_AS_READ");
+        MARK_AS_UNREAD = getKeyCode("MARK_AS_UNREAD");
+    }
+
+    private static KeyCode getKeyCode(String keyboardShortcut) {
+        KeyCode keyCode = KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut));
+        if (keyboardShortcuts.containsKey(keyboardShortcut)) {
+            KeyCode userDefinedKeyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
+            if (userDefinedKeyCode != null && !assignedKeys.contains(userDefinedKeyCode)) {
+                keyCode = userDefinedKeyCode;
+            } else {
+                logger.warn("Invalid key specified for " + keyboardShortcut +
+                        " or key has already been used for some other shortcut. ");
+            }
+        } else {
+            logger.warn("Could not find user defined keyboard shortcut for " + keyboardShortcut +
+                    ", using the default key. ");
+        }
+        logger.info("Assigning <" + keyCode + "> to " + keyboardShortcut);
+        assignedKeys.add(keyCode);
+        return keyCode;
     }
 }
