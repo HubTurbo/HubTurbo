@@ -105,7 +105,7 @@ public class ColumnControl extends HBox {
      * For a quick refresh (without requesting updates)
      */
     public void refresh() {
-        forEach(child -> child.refreshItems(false));
+        forEach(child -> child.refreshItems(true));
     }
 
     private IssueColumn addColumn() {
