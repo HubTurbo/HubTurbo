@@ -100,17 +100,17 @@ public class KeyboardShortcuts {
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
         KeyboardShortcuts.prefs = prefs;
-        KeyboardShortcuts.assignedKeys = new HashSet<>();
+        assignedKeys = new HashSet<>();
         if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
             logger.warn("Invalid number of user specified keyboard shortcuts, resetting to defaults. ");
-            prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
-            KeyboardShortcuts.keyboardShortcuts = getDefaultKeyboardShortcuts();
+            keyboardShortcuts = getDefaultKeyboardShortcuts();
         } else {
             logger.info("Loading user specified keyboard shortcuts. ");
-            KeyboardShortcuts.keyboardShortcuts = prefs.getKeyboardShortcuts();
+            keyboardShortcuts = prefs.getKeyboardShortcuts();
         }
         addNonCustomizableShortcutKeys();
         getKeyboardShortcutsFromHashMap();
+        prefs.setKeyboardShortcuts(keyboardShortcuts);
     }
 
     public static Map<String, String> getDefaultKeyboardShortcuts() {
