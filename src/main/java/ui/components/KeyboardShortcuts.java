@@ -1,11 +1,14 @@
 package ui.components;
 
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.UI;
+import util.DialogMessage;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,8 +105,18 @@ public class KeyboardShortcuts {
         KeyboardShortcuts.prefs = prefs;
         assignedKeys = new HashSet<>();
         if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
-            logger.warn("Invalid number of user specified keyboard shortcuts, resetting to defaults. ");
-            keyboardShortcuts = getDefaultKeyboardShortcuts();
+            logger.warn("Invalid number of user specified keyboard shortcuts detected. ");
+            if (DialogMessage.showYesNoWarningDialog(
+                    "Error",
+                    "Invalid number of shortcut keys specified",
+                    "Do you want to reset the shortcut keys to their defaults or quit?",
+                    "Reset to default",
+                    "Quit")) {
+                keyboardShortcuts = getDefaultKeyboardShortcuts();
+            } else {
+                Platform.exit();
+                System.exit(0);
+            }
         } else {
             logger.info("Loading user specified keyboard shortcuts. ");
             keyboardShortcuts = prefs.getKeyboardShortcuts();
@@ -149,11 +162,35 @@ public class KeyboardShortcuts {
                 keyCode = userDefinedKeyCode;
             } else {
                 logger.warn("Invalid key specified for " + keyboardShortcut +
-                        " or key has already been used for some other shortcut. ");
+                        " or it has already been used for some other shortcut. ");
+                if (DialogMessage.showYesNoWarningDialog(
+                        "Error",
+                        "Invalid key specified for " + keyboardShortcut +
+                                " or it has already been used for some other shortcut. ",
+                        "Do you want to use the default key <" +
+                                getDefaultKeyboardShortcuts().get(keyboardShortcut) + "> or quit?",
+                        "Use default key",
+                        "Quit")) {
+                    keyboardShortcuts.put(keyboardShortcut, getDefaultKeyboardShortcuts().get(keyboardShortcut));
+                } else {
+                    Platform.exit();
+                    System.exit(0);
+                }
             }
         } else {
-            logger.warn("Could not find user defined keyboard shortcut for " + keyboardShortcut +
-                    ", using the default key. ");
+            logger.warn("Could not find user defined keyboard shortcut for " + keyboardShortcut);
+            if (DialogMessage.showYesNoWarningDialog(
+                    "Error",
+                    "Could not find user defined keyboard shortcut for " + keyboardShortcut,
+                    "Do you want to use the default key <" +
+                            getDefaultKeyboardShortcuts().get(keyboardShortcut) + "> or quit?",
+                    "Use default key",
+                    "Quit")) {
+                keyboardShortcuts.put(keyboardShortcut, getDefaultKeyboardShortcuts().get(keyboardShortcut));
+            } else {
+                Platform.exit();
+                System.exit(0);
+            }
         }
         logger.info("Assigning <" + keyCode + "> to " + keyboardShortcut);
         assignedKeys.add(keyCode);
