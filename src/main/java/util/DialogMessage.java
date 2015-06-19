@@ -12,10 +12,4 @@ public class DialogMessage {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    public static void showProgressDialog(Task<?> task, String progressTitle){
-        Dialogs.create()
-               .title(progressTitle)
-               .showWorkerProgress(task);
-    }
 }

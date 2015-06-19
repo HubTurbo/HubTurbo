@@ -58,7 +58,6 @@ public class MenuControl extends MenuBar {
         Menu view = new Menu("View");
         view.getItems().addAll(
             createRefreshMenuItem(),
-            createForceRefreshMenuItem(),
             createDocumentationMenuItem());
 
         Menu preferences = createPreferencesMenu();
@@ -256,46 +255,6 @@ public class MenuControl extends MenuBar {
         });
         refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyboardShortcuts.REFRESH));
         return refreshMenuItem;
-    }
-
-    private MenuItem createForceRefreshMenuItem() {
-        MenuItem forceRefreshMenuItem = new MenuItem("Force Refresh");
-        forceRefreshMenuItem.setOnAction((e) -> triggerForceRefreshProgressDialog());
-
-        forceRefreshMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyboardShortcuts.REFRESH, KeyCombination.CONTROL_DOWN));
-        return forceRefreshMenuItem;
-    }
-
-    private void triggerForceRefreshProgressDialog() {
-        Task<Boolean> task = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws IOException {
-                try {
-                    logger.info("Menu: View > Force Refresh");
-
-                    updateProgress(0, 1);
-//                  updateMessage(String.format("Reloading %s...",
-//                      ServiceManager.getInstance().getRepoId().generateId()));
-
-                    // TODO
-//                  ServiceManager.getInstance().forceRefresh((message, progress) -> {
-//                      updateProgress(progress * 100, 100);
-//                      updateMessage(message);
-//                  });
-                    PlatformEx.runAndWait(columns::recreateColumns);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    return false;
-                }
-                logger.info("Menu: View > Force Refresh completed");
-                return true;
-            }
-        };
-        DialogMessage.showProgressDialog(task, "Reloading repoistory...");
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
     }
 
     private MenuItem[] createNewMenuItems() {
