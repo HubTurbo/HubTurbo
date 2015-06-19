@@ -64,6 +64,7 @@ public class UI extends Application implements EventDispatcher {
     public EventBus eventBus;
     private HashMap<String, String> commandLineArgs;
     private TickingTimer refreshTimer;
+    public GUIController guiController;
 
     // Main UI elements
 
@@ -166,6 +167,9 @@ public class UI extends Application implements EventDispatcher {
         repoSelector = createRepoSelector();
         mainStage = stage;
         stage.setMaximized(false);
+
+        columns = new ColumnControl(this, prefs);
+        guiController = new GUIController(this, columns);
 
         Scene scene = new Scene(createRoot());
         setupMainStage(scene);
@@ -286,8 +290,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private Parent createRoot() {
-
-        columns = new ColumnControl(this, prefs);
 
         VBox top = new VBox();
 
