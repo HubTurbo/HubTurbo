@@ -29,5 +29,5 @@ public class DialogMessage {
 
         return result.get().equals(yesButton);
     }
-    
+
 }

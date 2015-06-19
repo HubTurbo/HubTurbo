@@ -104,6 +104,10 @@ public class KeyboardShortcuts {
     public static void loadKeyboardShortcuts(Preferences prefs) {
         KeyboardShortcuts.prefs = prefs;
         assignedKeys = new HashSet<>();
+        if (prefs.getKeyboardShortcuts().size() == 0) {
+            logger.info("No user specified keyboard shortcuts found, using defaults. ");
+            prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
+        }
         if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
             logger.warn("Invalid number of user specified keyboard shortcuts detected. ");
             if (DialogMessage.showYesNoWarningDialog(
