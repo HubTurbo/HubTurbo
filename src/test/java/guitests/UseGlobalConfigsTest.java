@@ -58,7 +58,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         sleep(2000);
 
         // Make a new board

@@ -1,14 +1,5 @@
 package backend.stub;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.*;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.User;
-
 import backend.IssueMetadata;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -16,6 +7,13 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.IssueEventType;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.User;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class DummyRepoState {
 
