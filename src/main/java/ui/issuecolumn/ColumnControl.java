@@ -32,20 +32,8 @@ public class ColumnControl extends HBox {
         this.ui = ui;
         this.prefs = prefs;
 
-        // Set up the connection to the browser
-        new UIBrowserBridge(ui);
-
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
-
-        ui.registerEvent((ModelUpdatedEventHandler) e -> {
-            updateModel(e.model);
-            forEach(child -> {
-                if (child instanceof IssueColumn) {
-                    ((IssueColumn) child).setItems(e.model.getIssues(), e.hasMetadata);
-                }
-            });
-        });
 
         ui.registerEvent((IssueSelectedEventHandler) e ->
             setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
@@ -62,7 +50,7 @@ public class ColumnControl extends HBox {
         restoreColumns();
     }
 
-    private void updateModel(IModel newModel) {
+    public void updateModel(IModel newModel) {
         model = newModel;
     }
 
