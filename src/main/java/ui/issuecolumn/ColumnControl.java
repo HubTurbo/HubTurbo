@@ -1,13 +1,6 @@
 package ui.issuecolumn;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
@@ -19,6 +12,11 @@ import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelUpdatedEventHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 
 public class ColumnControl extends HBox {

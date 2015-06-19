@@ -28,21 +28,18 @@ public class MenuControlTest extends UITest {
         type("1");
         click("OK");
         click("Boards");
-        press(KeyCode.DOWN).release(KeyCode.DOWN);
-        press(KeyCode.DOWN).release(KeyCode.DOWN);
-        press(KeyCode.RIGHT).release(KeyCode.RIGHT);
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.ENTER);
         click("Boards");
-        press(KeyCode.DOWN).release(KeyCode.DOWN);
-        press(KeyCode.DOWN).release(KeyCode.DOWN);
-        press(KeyCode.DOWN).release(KeyCode.DOWN);
-        press(KeyCode.RIGHT).release(KeyCode.RIGHT);
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.ENTER);
         click("OK");
 
         click("View");
         click("Refresh");
-        press(KeyCode.F5).release(KeyCode.F5);
+        push(KeyCode.F5);
         click("View");
         click("Force Refresh");
         press(KeyCode.CONTROL).press(KeyCode.F5).release(KeyCode.F5).release(KeyCode.CONTROL);
