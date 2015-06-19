@@ -12,7 +12,7 @@ import javafx.scene.Parent;
 import javafx.stage.Stage;
 import ui.UI;
 
-public class UITest extends GuiTest{
+public class UITest extends GuiTest {
 
     private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
