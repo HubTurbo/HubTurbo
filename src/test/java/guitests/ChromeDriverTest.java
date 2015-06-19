@@ -35,20 +35,20 @@ public class ChromeDriverTest extends UITest {
         click("#dummy/dummy_col0_1");
 
         // show docs
-        press(KeyCode.F1).release(KeyCode.F1);
+        push(KeyCode.F1);
         press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
 
         // scroll to top
-        press(KeyCode.U).release(KeyCode.U);
+        push(KeyCode.U);
 
         // scroll to bottom
-        press(KeyCode.N).release(KeyCode.N);
+        push(KeyCode.N);
 
         // scroll up
-        press(KeyCode.J).release(KeyCode.J);
+        push(KeyCode.J);
 
         // scroll down
-        press(KeyCode.K).release(KeyCode.K);
+        push(KeyCode.K);
 
         // go to labels page
         press(KeyCode.G).press(KeyCode.L).release(KeyCode.L).release(KeyCode.G);
@@ -69,16 +69,16 @@ public class ChromeDriverTest extends UITest {
         press(KeyCode.G).press(KeyCode.K).release(KeyCode.K).release(KeyCode.G);
 
         // manage labels
-        press(KeyCode.L).release(KeyCode.L);
+        push(KeyCode.L);
 
         // manage assignee
-        press(KeyCode.A).release(KeyCode.A);
+        push(KeyCode.A);
 
         // manage milestone
-        press(KeyCode.M).release(KeyCode.M);
+        push(KeyCode.M);
 
         // jump to comments
-        press(KeyCode.C).release(KeyCode.C);
+        push(KeyCode.C);
 
         click("View");
         click("Documentation");

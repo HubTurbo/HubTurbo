@@ -30,7 +30,7 @@ public class UpdateIssuesTest extends UITest {
         type("updated");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("24");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(2, countIssues.get());
