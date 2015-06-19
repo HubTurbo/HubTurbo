@@ -22,36 +22,36 @@ public class KeyboardShortcutsTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.UP).release(KeyCode.UP).release(KeyCode.CONTROL);
 
         // jump from filter box to first issue
-        press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+        push(KeyCode.SPACE).push(KeyCode.SPACE);
 
         // jump from issue list to filter box
-        press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+        push(KeyCode.SPACE).push(KeyCode.SPACE);
 
-        press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+        push(KeyCode.SPACE).push(KeyCode.SPACE);
 
         // jump to last issue
-        press(KeyCode.END).release(KeyCode.END);
+        push(KeyCode.END);
 
         // jump to first issue
-        press(KeyCode.HOME).release(KeyCode.HOME);
+        push(KeyCode.HOME);
 
-        press(KeyCode.V).release(KeyCode.V);
-        press(KeyCode.V).release(KeyCode.V);
-        press(KeyCode.T).release(KeyCode.T);
+        push(KeyCode.V);
+        push(KeyCode.V);
+        push(KeyCode.T);
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        press(KeyCode.SPACE).release(KeyCode.SPACE).press(KeyCode.SPACE).release(KeyCode.SPACE);
+        push(KeyCode.SPACE).push(KeyCode.SPACE);
 
-        press(KeyCode.F).release(KeyCode.F);
-        press(KeyCode.D).release(KeyCode.D);
-        press(KeyCode.F).release(KeyCode.F);
-        press(KeyCode.D).release(KeyCode.D);
+        push(KeyCode.F);
+        push(KeyCode.D);
+        push(KeyCode.F);
+        push(KeyCode.D);
 
         click("#dummy/dummy_col1_1");
 
         // mark as read/unread
-        press(KeyCode.R).release(KeyCode.R);
-        press(KeyCode.U).release(KeyCode.U);
+        push(KeyCode.E);
+        push(KeyCode.U);
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
