@@ -111,7 +111,7 @@ public class KeyboardShortcuts {
         if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
             logger.warn("Invalid number of user specified keyboard shortcuts detected. ");
             if (DialogMessage.showYesNoWarningDialog(
-                    "Error",
+                    "Warning",
                     "Invalid number of shortcut keys specified",
                     "Do you want to reset the shortcut keys to their defaults or quit?",
                     "Reset to default",
@@ -168,7 +168,7 @@ public class KeyboardShortcuts {
                 logger.warn("Invalid key specified for " + keyboardShortcut +
                         " or it has already been used for some other shortcut. ");
                 if (DialogMessage.showYesNoWarningDialog(
-                        "Error",
+                        "Warning",
                         "Invalid key specified for " + keyboardShortcut +
                                 " or it has already been used for some other shortcut. ",
                         "Do you want to use the default key <" +
@@ -184,7 +184,7 @@ public class KeyboardShortcuts {
         } else {
             logger.warn("Could not find user defined keyboard shortcut for " + keyboardShortcut);
             if (DialogMessage.showYesNoWarningDialog(
-                    "Error",
+                    "Warning",
                     "Could not find user defined keyboard shortcut for " + keyboardShortcut,
                     "Do you want to use the default key <" +
                             getDefaultKeyboardShortcuts().get(keyboardShortcut) + "> or quit?",
