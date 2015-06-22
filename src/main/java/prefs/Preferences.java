@@ -1,11 +1,12 @@
 package prefs;
 
+import org.eclipse.egit.github.core.RepositoryId;
+import ui.components.KeyboardShortcuts;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.eclipse.egit.github.core.RepositoryId;
 
 public class Preferences {
 
@@ -25,6 +26,7 @@ public class Preferences {
         }
 
         loadGlobalConfig();
+        KeyboardShortcuts.loadKeyboardShortcuts(this);
     }
 
     public void saveGlobalConfig() {
