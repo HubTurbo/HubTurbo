@@ -31,7 +31,6 @@ public class KeyboardShortcuts {
     private static final Logger logger = LogManager.getLogger(KeyboardShortcuts.class.getName());
 
     private static Map<String, String> keyboardShortcuts = null;
-    private static Preferences prefs;
     private static Set<KeyCode> assignedKeys = null;
 
     // customizable keyboard shortcuts
@@ -138,7 +137,6 @@ public class KeyboardShortcuts {
     }
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
-        KeyboardShortcuts.prefs = prefs;
         assignedKeys = new HashSet<>();
         if (prefs.getKeyboardShortcuts().size() == 0) {
             logger.info("No user specified keyboard shortcuts found, using defaults. ");
