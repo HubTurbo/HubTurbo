@@ -81,7 +81,7 @@ public class IssuePanelCard extends VBox {
      * @param withinHours the number of hours to bound the returned events by
      * @return the node
      */
-    public Node getEventDisplay(TurboIssue issue, final int withinHours) {
+    private Node getEventDisplay(TurboIssue issue, final int withinHours) {
         final LocalDateTime now = LocalDateTime.now();
 
         List<TurboIssueEvent> eventsWithinDuration = issue.getMetadata().getEvents().stream()
