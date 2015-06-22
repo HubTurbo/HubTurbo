@@ -10,6 +10,7 @@ import util.events.IssueSelectedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
 import util.events.testevents.ExecuteScriptEventHandler;
+import util.events.testevents.JumpToCommentEventHandler;
 import util.events.testevents.NavigateToPageEventHandler;
 import util.events.testevents.SendKeysToBrowserEventHandler;
 
@@ -21,6 +22,7 @@ public class ChromeDriverTest extends UITest {
     private String url;
     private String script;
     private String keyCode;
+    private boolean jumpToComment;
 
     @Override
     public void launchApp() {
@@ -31,9 +33,13 @@ public class ChromeDriverTest extends UITest {
     @Test
     public void chromeDriverStubTest() {
         clearUrl();
+        clearScript();
+        clearKeyCode();
+        jumpToComment = false;
         UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
         UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
         UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
+        UI.events.registerEvent((JumpToCommentEventHandler) e -> jumpToComment = true);
 
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
         sleep(EVENT_DELAY);
@@ -146,9 +152,9 @@ public class ChromeDriverTest extends UITest {
 
         // jump to comments
         push(KeyCode.C);
-//        sleep(EVENT_DELAY);
-//        assertEquals("c", keyCode);
-//        clearKeyCode();
+        sleep(EVENT_DELAY);
+        assertEquals(true, jumpToComment);
+        jumpToComment = false;
 
         click("View");
         click("Documentation");
