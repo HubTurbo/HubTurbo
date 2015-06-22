@@ -12,7 +12,7 @@ import util.events.MilestoneCreatedEvent;
 
 public class ChromeDriverTest extends UITest {
 
-    private final int EVENT_DELAY = 100;
+    private static final int EVENT_DELAY = 100;
 
     @Override
     public void launchApp() {
@@ -39,7 +39,7 @@ public class ChromeDriverTest extends UITest {
         press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
 
         // scroll to top
-        push(KeyCode.U);
+        push(KeyCode.I);
 
         // scroll to bottom
         push(KeyCode.N);

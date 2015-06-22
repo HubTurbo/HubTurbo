@@ -40,8 +40,6 @@ import util.events.ModelUpdatedEventHandler;
  */
 public abstract class IssueColumn extends Column {
 
-    private static final Logger logger = LogManager.getLogger(IssueColumn.class.getName());
-
     // Collection-related
 
     private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
@@ -60,7 +58,6 @@ public abstract class IssueColumn extends Column {
         super(model, parentColumnControl, columnIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
-//      setupIssueColumnDragEvents(model, columnIndex);
         this.setOnMouseClicked(e-> {
             ui.triggerEvent(new ColumnClickedEvent(columnIndex));
             requestFocus();
