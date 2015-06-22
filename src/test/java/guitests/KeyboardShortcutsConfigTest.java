@@ -9,6 +9,7 @@ import ui.components.KeyboardShortcuts;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
 
@@ -35,6 +36,9 @@ public class KeyboardShortcutsConfigTest extends UITest {
         sleep(1000);
         assertNodeExists(hasText("Invalid number of shortcut keys specified"));
         click("Reset to default");
+        testPref.saveGlobalConfig();
+        testPref.loadGlobalConfig();
+        assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
 
         testPref = new Preferences(true);
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
@@ -46,6 +50,9 @@ public class KeyboardShortcutsConfigTest extends UITest {
         sleep(1000);
         assertNodeExists(hasText("Invalid number of shortcut keys specified"));
         click("Reset to default");
+        testPref.saveGlobalConfig();
+        testPref.loadGlobalConfig();
+        assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
     }
 
     @Test
@@ -62,6 +69,10 @@ public class KeyboardShortcutsConfigTest extends UITest {
         assertNodeExists(hasText("Invalid key specified for MARK_AS_READ" +
                 " or it has already been used for some other shortcut. "));
         click("Use default key");
+        testPref.saveGlobalConfig();
+        testPref.loadGlobalConfig();
+        assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -77,6 +88,10 @@ public class KeyboardShortcutsConfigTest extends UITest {
         sleep(1000);
         assertNodeExists(hasText("Could not find user defined keyboard shortcut for MARK_AS_READ"));
         click("Use default key");
+        testPref.saveGlobalConfig();
+        testPref.loadGlobalConfig();
+        assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -93,6 +108,10 @@ public class KeyboardShortcutsConfigTest extends UITest {
         assertNodeExists(hasText("Invalid key specified for MARK_AS_UNREAD" +
                 " or it has already been used for some other shortcut. "));
         click("Use default key");
+        testPref.saveGlobalConfig();
+        testPref.loadGlobalConfig();
+        assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_UNREAD"),
+                testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
     }
 
 }
