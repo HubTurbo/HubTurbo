@@ -3,11 +3,11 @@ package ui.issuecolumn;
 import backend.interfaces.IModel;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
 import ui.UI;
+import ui.components.KeyboardShortcuts;
 import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
@@ -223,8 +223,8 @@ public class ColumnControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
-                handleKeys(event.getCode() == KeyCode.F);
+            if (event.getCode() == KeyboardShortcuts.RIGHT_PANEL || event.getCode() == KeyboardShortcuts.LEFT_PANEL) {
+                handleKeys(event.getCode() == KeyboardShortcuts.RIGHT_PANEL);
                 assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });

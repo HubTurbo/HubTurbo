@@ -40,8 +40,5 @@ public class MenuControlTest extends UITest {
         click("View");
         click("Refresh");
         push(KeyCode.F5);
-        click("View");
-        click("Force Refresh");
-        press(KeyCode.CONTROL).press(KeyCode.F5).release(KeyCode.F5).release(KeyCode.CONTROL);
     }
 }
