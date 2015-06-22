@@ -128,7 +128,7 @@ public class UI extends Application implements EventDispatcher {
 
         setExpandedWidth(false);
 
-        columns.init();
+        columns.init(guiController);
         // Should only be called after columns have been initialized
         ensureSelectedPanelHasFocus();
     }

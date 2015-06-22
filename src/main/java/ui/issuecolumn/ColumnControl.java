@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
+import ui.GUIController;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
@@ -24,6 +25,7 @@ public class ColumnControl extends HBox {
     private final UI ui;
     private final Preferences prefs;
     private IModel model;
+    private GUIController guiController;
     private Optional<Integer> currentlySelectedColumn = Optional.empty();
 
     public ColumnControl(UI ui, Preferences prefs) {
@@ -44,7 +46,8 @@ public class ColumnControl extends HBox {
     /**
      * Called on login.
      */
-    public void init() {
+    public void init(GUIController guiController) {
+        this.guiController = guiController;
         restoreColumns();
     }
 
@@ -177,6 +180,7 @@ public class ColumnControl extends HBox {
         return currentlySelectedColumn;
     }
 
+    // For dragging purposes
     private int currentlyDraggedColumnIndex = -1;
     public int getCurrentlyDraggedColumnIndex() {
         return currentlyDraggedColumnIndex;
