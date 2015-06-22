@@ -40,6 +40,15 @@ public class IssuePanelCard extends VBox {
     private IssueColumn parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
+    /**
+     * The constructor is the only method called from IssuePanelCard. The rest of the methods in this class
+     * are auxiliary methods called from the constructor so that the code is easier to understand.
+     *
+     * @param model
+     * @param issue
+     * @param parentPanel
+     * @param issuesWithNewComments
+     */
     public IssuePanelCard(Model model, TurboIssue issue, IssueColumn parentPanel, HashSet<Integer>
         issuesWithNewComments) {
         this.model = model;
