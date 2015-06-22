@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
+import util.events.testevents.ExecuteScriptEvent;
 import util.events.testevents.NavigateToPageEvent;
 
 import java.util.NoSuchElementException;
@@ -107,6 +108,9 @@ public class ChromeDriverEx {
     }
 
     public Object executeScript(String script) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new ExecuteScriptEvent(script));
+        }
         return !isTestChromeDriver ? driver.executeScript(script) : "";
     }
 }
