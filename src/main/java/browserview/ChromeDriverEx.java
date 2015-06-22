@@ -8,6 +8,9 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import ui.UI;
+import util.GitHubURL;
+import util.events.testevents.NavigateToPageEvent;
 
 import java.util.NoSuchElementException;
 
@@ -39,6 +42,9 @@ public class ChromeDriverEx {
     }
 
     public void get(String url) throws WebDriverException {
+        if (!url.equals(GitHubURL.LOGIN_PAGE)) {
+            UI.events.triggerEvent(new NavigateToPageEvent(url));
+        }
         if (isTestChromeDriver) {
             logger.info("Test loading page: " + url);
             testGet();
