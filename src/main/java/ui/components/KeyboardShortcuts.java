@@ -7,7 +7,6 @@ import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
-import ui.UI;
 import util.DialogMessage;
 
 import java.util.HashMap;
@@ -101,6 +100,43 @@ public class KeyboardShortcuts {
     public static final KeyCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
 
+    public static Map<String, String> getDefaultKeyboardShortcuts() {
+        Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
+        defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
+        defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
+        defaultKeyboardShortcuts.put("SCROLL_TO_TOP", "I");
+        defaultKeyboardShortcuts.put("SCROLL_TO_BOTTOM", "N");
+        defaultKeyboardShortcuts.put("SCROLL_UP", "J");
+        defaultKeyboardShortcuts.put("SCROLL_DOWN", "K");
+        defaultKeyboardShortcuts.put("LEFT_PANEL", "D");
+        defaultKeyboardShortcuts.put("RIGHT_PANEL", "F");
+        defaultKeyboardShortcuts.put("UP_ISSUE", "T");
+        defaultKeyboardShortcuts.put("DOWN_ISSUE", "V");
+        return defaultKeyboardShortcuts;
+    }
+
+    private static void addNonCustomizableShortcutKeys() {
+        assignedKeys.add(KeyCode.F5); //REFRESH
+        assignedKeys.add(KeyCode.F1); //SHOW_DOCS
+        assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
+        assignedKeys.add(KeyCode.C); //NEW_COMMENT
+        assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
+        assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
+    }
+
+    private static void getKeyboardShortcutsFromHashMap() {
+        MARK_AS_READ = getKeyCode("MARK_AS_READ");
+        MARK_AS_UNREAD = getKeyCode("MARK_AS_UNREAD");
+        SCROLL_TO_TOP = getKeyCode("SCROLL_TO_TOP");
+        SCROLL_TO_BOTTOM = getKeyCode("SCROLL_TO_BOTTOM");
+        SCROLL_UP = getKeyCode("SCROLL_UP");
+        SCROLL_DOWN = getKeyCode("SCROLL_DOWN");
+        LEFT_PANEL = getKeyCode("LEFT_PANEL");
+        RIGHT_PANEL = getKeyCode("RIGHT_PANEL");
+        UP_ISSUE = getKeyCode("UP_ISSUE");
+        DOWN_ISSUE = getKeyCode("DOWN_ISSUE");
+    }
+
     public static void loadKeyboardShortcuts(Preferences prefs) {
         KeyboardShortcuts.prefs = prefs;
         assignedKeys = new HashSet<>();
@@ -128,34 +164,6 @@ public class KeyboardShortcuts {
         addNonCustomizableShortcutKeys();
         getKeyboardShortcutsFromHashMap();
         prefs.setKeyboardShortcuts(keyboardShortcuts);
-    }
-
-    public static Map<String, String> getDefaultKeyboardShortcuts() {
-        Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
-        defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
-        defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
-        defaultKeyboardShortcuts.put("SCROLL_TO_TOP", "I");
-        defaultKeyboardShortcuts.put("SCROLL_TO_BOTTOM", "N");
-        defaultKeyboardShortcuts.put("SCROLL_UP", "J");
-        defaultKeyboardShortcuts.put("SCROLL_DOWN", "K");
-        defaultKeyboardShortcuts.put("LEFT_PANEL", "D");
-        defaultKeyboardShortcuts.put("RIGHT_PANEL", "F");
-        defaultKeyboardShortcuts.put("UP_ISSUE", "T");
-        defaultKeyboardShortcuts.put("DOWN_ISSUE", "V");
-        return defaultKeyboardShortcuts;
-    }
-
-    private static void getKeyboardShortcutsFromHashMap() {
-        MARK_AS_READ = getKeyCode("MARK_AS_READ");
-        MARK_AS_UNREAD = getKeyCode("MARK_AS_UNREAD");
-        SCROLL_TO_TOP = getKeyCode("SCROLL_TO_TOP");
-        SCROLL_TO_BOTTOM = getKeyCode("SCROLL_TO_BOTTOM");
-        SCROLL_UP = getKeyCode("SCROLL_UP");
-        SCROLL_DOWN = getKeyCode("SCROLL_DOWN");
-        LEFT_PANEL = getKeyCode("LEFT_PANEL");
-        RIGHT_PANEL = getKeyCode("RIGHT_PANEL");
-        UP_ISSUE = getKeyCode("UP_ISSUE");
-        DOWN_ISSUE = getKeyCode("DOWN_ISSUE");
     }
 
     private static KeyCode getKeyCode(String keyboardShortcut) {
@@ -201,12 +209,4 @@ public class KeyboardShortcuts {
         return keyCode;
     }
 
-    private static void addNonCustomizableShortcutKeys() {
-        assignedKeys.add(KeyCode.F5); //REFRESH
-        assignedKeys.add(KeyCode.F1); //SHOW_DOCS
-        assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
-        assignedKeys.add(KeyCode.C); //NEW_COMMENT
-        assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
-        assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
-    }
 }
