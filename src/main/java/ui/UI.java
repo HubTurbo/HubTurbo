@@ -137,6 +137,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initPreApplicationState() {
+        logger.info(Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
