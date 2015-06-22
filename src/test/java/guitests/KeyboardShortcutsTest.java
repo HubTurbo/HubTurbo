@@ -1,8 +1,10 @@
 package guitests;
 
-import org.junit.Test;
-
 import javafx.scene.input.KeyCode;
+import org.junit.Test;
+import ui.components.KeyboardShortcuts;
+
+import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
 public class KeyboardShortcutsTest extends UITest {
 
@@ -22,12 +24,12 @@ public class KeyboardShortcutsTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.UP).release(KeyCode.UP).release(KeyCode.CONTROL);
 
         // jump from filter box to first issue
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         // jump from issue list to filter box
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         // jump to last issue
         push(KeyCode.END);
@@ -35,25 +37,29 @@ public class KeyboardShortcutsTest extends UITest {
         // jump to first issue
         push(KeyCode.HOME);
 
-        push(KeyCode.V);
-        push(KeyCode.V);
-        push(KeyCode.T);
+        push(getKeyCode("DOWN_ISSUE"));
+        push(getKeyCode("DOWN_ISSUE"));
+        push(getKeyCode("UP_ISSUE"));
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
-        push(KeyCode.F);
-        push(KeyCode.D);
-        push(KeyCode.F);
-        push(KeyCode.D);
+        push(getKeyCode("RIGHT_PANEL"));
+        push(getKeyCode("LEFT_PANEL"));
+        push(getKeyCode("RIGHT_PANEL"));
+        push(getKeyCode("LEFT_PANEL"));
 
         click("#dummy/dummy_col1_1");
 
         // mark as read/unread
-        push(KeyCode.E);
-        push(KeyCode.U);
+        push(getKeyCode("MARK_AS_READ"));
+        push(getKeyCode("MARK_AS_UNREAD"));
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
+    }
+
+    public KeyCode getKeyCode(String shortcut) {
+        return KeyCode.getKeyCode(KeyboardShortcuts.getDefaultKeyboardShortcuts().get(shortcut));
     }
 }
