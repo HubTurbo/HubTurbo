@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -397,6 +398,9 @@ public class BrowserComponent {
     }
 
     private void sendKeysToBrowser(String keyCode) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new SendKeysToBrowserEvent(keyCode));
+        }
         WebElement body;
         try {
             body = driver.findElementByTagName("body");
