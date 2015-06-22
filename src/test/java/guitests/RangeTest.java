@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 
 public class RangeTest extends UITest {
 
-    private static final int EVENT_DELAY = 500;
+    private static final int EVENT_DELAY = 1000;
 
     @Test
     public void numberRangeTest() {
