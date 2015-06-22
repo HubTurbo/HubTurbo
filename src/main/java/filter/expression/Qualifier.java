@@ -519,7 +519,7 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesRepo(TurboIssue issue) {
         if (!content.isPresent()) return false;
-        return issue.getRepoId().equals(content.get());
+        return issue.getRepoId().toLowerCase().equals(content.get().toLowerCase());
     }
 
     private boolean satisfiesCreationDate(TurboIssue issue) {
