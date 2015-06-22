@@ -16,8 +16,8 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
 import ui.UI;
-import util.events.ClearLogicModelEvent;
-import util.events.UpdateDummyRepoEventHandler;
+import util.events.testevents.ClearLogicModelEvent;
+import util.events.testevents.UpdateDummyRepoEventHandler;
 
 public class DummyRepo implements Repo {
 

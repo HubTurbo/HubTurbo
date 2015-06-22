@@ -32,6 +32,7 @@ import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
+import util.events.testevents.UILogicRefreshEventHandler;
 
 import java.awt.*;
 import java.util.HashMap;

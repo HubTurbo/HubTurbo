@@ -11,8 +11,8 @@ import javafx.scene.input.KeyCode;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
 import util.PlatformEx;
-import util.events.UILogicRefreshEvent;
-import util.events.UpdateDummyRepoEvent;
+import util.events.testevents.UILogicRefreshEvent;
+import util.events.testevents.UpdateDummyRepoEvent;
 
 public class UpdateIssuesTest extends UITest {
 
