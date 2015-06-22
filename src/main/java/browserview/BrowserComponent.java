@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
@@ -203,6 +204,9 @@ public class BrowserComponent {
     }
 
     public void jumpToComment(){
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new JumpToCommentEvent());
+        }
         try {
             WebElement comment = driver.findElementById("new_comment_field");
             comment.click();
