@@ -1,15 +1,5 @@
 package ui.issuecolumn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -31,6 +21,13 @@ import ui.UI;
 import ui.components.FilterTextField;
 import util.events.ColumnClickedEvent;
 import util.events.ModelUpdatedEventHandler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * An IssueColumn is a Column meant for containing issues. The main additions to
@@ -83,10 +80,12 @@ public abstract class IssueColumn extends Column {
     };
 
     private Node createFilterBox() {
-        filterTextField = new FilterTextField("", 0).setOnConfirm((text) -> {
-            applyStringFilter(text);
-            return text;
-        });
+        filterTextField = new FilterTextField("", 0)
+                .setOnConfirm((text) -> {
+                    applyStringFilter(text);
+                    return text;
+                })
+                .setOnCancel(this::requestFocus);
         filterTextField.setId(model.getDefaultRepo() + "_col" + columnIndex + "_filterTextField");
 
         ui.registerEvent(onModelUpdate);
