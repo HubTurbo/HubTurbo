@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
+import ui.issuepanel.IssuePanel;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
@@ -21,7 +22,6 @@ public class KeyboardShortcutsTest extends UITest {
     private int selectedIssueId;
     private int columnIndex;
 
-    // TODO test that events have been triggered
     @Test
     public void keyboardShortcutsTest() {
         UI.events.registerEvent((WindowResizeEventHandler) e -> windowResizeEventType = e.eventType);
@@ -105,9 +105,11 @@ public class KeyboardShortcutsTest extends UITest {
         click("#dummy/dummy_col1_1");
 
         // mark as read/unread
+        IssuePanel issuePanel = find("#dummy/dummy_col1");
         push(getKeyCode("MARK_AS_READ"));
-
+        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
         push(getKeyCode("MARK_AS_UNREAD"));
+        assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
