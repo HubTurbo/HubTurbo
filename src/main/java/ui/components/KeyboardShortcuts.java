@@ -64,6 +64,9 @@ public class KeyboardShortcuts {
     public static final KeyCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 
+    public static final KeyCode FIRST_ISSUE = KeyCode.HOME;
+    public static final KeyCode LAST_ISSUE = KeyCode.END;
+
     public static final KeyCode REFRESH = KeyCode.F5;
     public static final KeyCode SHOW_DOCS = KeyCode.F1;
 

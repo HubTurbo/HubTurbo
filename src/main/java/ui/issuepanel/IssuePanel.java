@@ -160,7 +160,6 @@ public class IssuePanel extends IssueColumn {
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-
             if (event.getCode() == KeyboardShortcuts.MARK_AS_READ) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
