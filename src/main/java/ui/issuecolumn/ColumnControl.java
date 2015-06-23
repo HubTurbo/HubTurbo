@@ -9,6 +9,7 @@ import prefs.Preferences;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.IssuePanel;
+import util.events.ColumnClickedEvent;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelUpdatedEventHandler;
@@ -253,6 +254,7 @@ public class ColumnControl extends HBox {
                 selectedColumn.requestFocus();
             }
         }
+        ui.triggerEvent(new ColumnClickedEvent(currentlySelectedColumn.get()));
         scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
     }
 
