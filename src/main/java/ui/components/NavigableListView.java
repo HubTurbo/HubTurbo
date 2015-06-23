@@ -133,7 +133,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     private void setupKeyEvents() {
         setOnKeyPressed(e -> {
-            if (e.isControlDown()){
+            if (e.isControlDown()) {
                 return;
             }
             if (e.getCode() == KeyCode.ENTER) {
@@ -152,6 +152,14 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                     logger.info("Enter key selection on item index " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
+            }
+            if (e.getCode() == KeyboardShortcuts.FIRST_ISSUE) {
+                e.consume();
+                selectFirstItem();
+            }
+            if (e.getCode() == KeyboardShortcuts.LAST_ISSUE) {
+                e.consume();
+                selectLastItem();
             }
         });
     }
@@ -183,6 +191,15 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         getSelectionModel().clearAndSelect(0);
         scrollAndShow(0);
         selectedIndex = Optional.of(0);
+        onItemSelected.accept(selectedIndex.get());
+    }
+
+    public void selectLastItem(){
+        requestFocus();
+        if (getItems().size() == 0) return;
+        getSelectionModel().clearAndSelect(getItems().size() - 1);
+        scrollAndShow(getItems().size() - 1);
+        selectedIndex = Optional.of(getItems().size() - 1);
         onItemSelected.accept(selectedIndex.get());
     }
 

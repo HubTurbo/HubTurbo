@@ -12,6 +12,7 @@ import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.testevents.UIComponentFocusEvent;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -159,7 +160,6 @@ public class IssuePanel extends IssueColumn {
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-
             if (event.getCode() == KeyboardShortcuts.MARK_AS_READ) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
@@ -270,6 +270,9 @@ public class IssuePanel extends IssueColumn {
     }
 
     private void setFocusToFilterBox() {
+        if (ui.isTestMode()) {
+            ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
+        }
         filterTextField.requestFocus();
         filterTextField.setText(filterTextField.getText().trim());
         filterTextField.positionCaret(filterTextField.getLength());
