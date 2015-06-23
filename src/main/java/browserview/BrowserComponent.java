@@ -146,6 +146,7 @@ public class BrowserComponent {
     public void newLabel() {
         logger.info("Navigating to New Label page");
         runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo())));
+        bringToTop();
     }
 
     /**
