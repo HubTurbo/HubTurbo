@@ -265,4 +265,8 @@ public class ColumnControl extends HBox {
     public int getNumberOfColumns() {
         return getChildren().size();
     }
+
+    public int getNumberOfSavedBoards() {
+        return prefs.getAllBoards().size();
+    }
 }
