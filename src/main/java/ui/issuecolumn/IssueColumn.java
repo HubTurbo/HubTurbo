@@ -188,6 +188,8 @@ public abstract class IssueColumn extends Column {
         // openRepository() if necessary.
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
+                // Even when the qualifier is wrapped by a negation ("-repo:HubTurbo/HubTurbo"),
+                // repo is still opened.
                 ui.logic.openRepository(qualifier.getContent().get());
             } else if (qualifier.getName().equals(Qualifier.UPDATED)
                     && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
