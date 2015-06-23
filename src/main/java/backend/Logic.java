@@ -19,7 +19,7 @@ import ui.UI;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
-import util.events.ClearLogicModelEventHandler;
+import util.events.testevents.ClearLogicModelEventHandler;
 import util.events.RepoOpenedEvent;
 
 public class Logic {

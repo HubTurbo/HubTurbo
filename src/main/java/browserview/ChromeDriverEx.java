@@ -8,6 +8,10 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import ui.UI;
+import util.GitHubURL;
+import util.events.testevents.ExecuteScriptEvent;
+import util.events.testevents.NavigateToPageEvent;
 
 import java.util.NoSuchElementException;
 
@@ -40,6 +44,9 @@ public class ChromeDriverEx {
 
     public void get(String url) throws WebDriverException {
         if (isTestChromeDriver) {
+            if (!url.equalsIgnoreCase(GitHubURL.LOGIN_PAGE)) {
+                UI.events.triggerEvent(new NavigateToPageEvent(url));
+            }
             logger.info("Test loading page: " + url);
             testGet();
         } else {
@@ -101,6 +108,9 @@ public class ChromeDriverEx {
     }
 
     public Object executeScript(String script) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new ExecuteScriptEvent(script));
+        }
         return !isTestChromeDriver ? driver.executeScript(script) : "";
     }
 }

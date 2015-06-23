@@ -15,7 +15,7 @@ import backend.resource.Model;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
-import util.events.UpdateDummyRepoEvent;
+import util.events.testevents.UpdateDummyRepoEvent;
 
 public class StoreTests {
 
