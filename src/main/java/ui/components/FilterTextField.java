@@ -43,7 +43,6 @@ public class FilterTextField extends TextField {
 
     private void setup() {
         setPrefColumnCount(30);
-
         validationSupport.registerValidator(this, (c, newValue) -> {
             boolean wasError = false;
             try {
@@ -53,17 +52,13 @@ public class FilterTextField extends TextField {
             }
             return ValidationResult.fromErrorIf(this, "Parse error", wasError);
         });
-
         setOnKeyTyped(e -> {
             boolean isModifierKeyPress = e.isAltDown() || e.isMetaDown() || e.isControlDown();
             String key = e.getCharacter();
-
             if (key == null || key.isEmpty() || isModifierKeyPress){
                 return;
             }
-
             char typed = e.getCharacter().charAt(0);
-
             if (typed == '\t') {
                 e.consume();
                 if (!getSelectedText().isEmpty()) {
@@ -85,13 +80,11 @@ public class FilterTextField extends TextField {
                 }
             }
         });
-
         setOnKeyPressed(e -> {
              if (e.getCode() == KeyCode.TAB) {
                  e.consume();
              }
         });
-
         setOnKeyReleased(e -> {
             e.consume();
             if (e.getCode() == KeyCode.ENTER) {
@@ -109,7 +102,6 @@ public class FilterTextField extends TextField {
 
     private void performCompletion(KeyEvent e) {
         String word = getCurrentWord() + e.getCharacter();
-
         for (String candidateWord : keywords) {
             if (candidateWord.startsWith(word)) {
                 performCompletionOfWord(e, word, candidateWord);
@@ -119,36 +111,26 @@ public class FilterTextField extends TextField {
     }
 
     private void performCompletionOfWord(KeyEvent e, String word, String candidateWord) {
-
         e.consume();
         int caret = getCaretPosition();
-
         if (getSelectedText().isEmpty()) {
             String before = getText().substring(0, caret);
             String insertion = e.getCharacter();
             String after = getText().substring(caret, getText().length());
-
             String addition = candidateWord.substring(word.length());
-
             setText(before + insertion + addition + after);
             Platform.runLater(() -> selectRange(
                 before.length() + insertion.length() + addition.length(),
                 before.length() + insertion.length()));
         } else {
             IndexRange sel = getSelection();
-//            boolean additionAfter = sel.getEnd() == caret;
             int start = Math.min(sel.getStart(), sel.getEnd());
             int end = Math.max(sel.getStart(), sel.getEnd());
-
             String before = getText().substring(0, start);
             String after = getText().substring(end, getText().length());
-//            String selection = getText().substring(start, end);
             String insertion = e.getCharacter();
-
             String addition = candidateWord.substring(word.length());
-
             setText(before + insertion + addition + after);
-
             Platform.runLater(() -> selectRange(
                 before.length() + insertion.length() + addition.length(),
                 before.length() + insertion.length()));
@@ -161,9 +143,7 @@ public class FilterTextField extends TextField {
     }
 
     private String getCurrentWord() {
-//        int caret = getCaretPosition();
         int caret = Math.min(getSelection().getStart(), getSelection().getEnd());
-//        int pos = getText().substring(0, caret).lastIndexOf(" ");
         int pos = regexLastIndexOf(getText().substring(0, caret), "[ (:)]");
         if (pos == -1) {
             pos = 0;
@@ -174,10 +154,8 @@ public class FilterTextField extends TextField {
     // Caveat: algorithm only works for character-class regexes
     private int regexLastIndexOf(String inString, String charClassRegex) {
         inString = new StringBuilder(inString).reverse().toString();
-
         Pattern pattern = Pattern.compile(charClassRegex);
         Matcher m = pattern.matcher(inString);
-
         if (m.find()) {
             return inString.length() - (m.start() + 1);
         } else {
