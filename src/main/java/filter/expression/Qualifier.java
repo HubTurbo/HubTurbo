@@ -354,7 +354,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private static boolean isMetaQualifier(Qualifier q) {
+    public static boolean isMetaQualifier(Qualifier q) {
         switch (q.getName()) {
         case "sort":
         case "in":
