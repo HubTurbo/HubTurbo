@@ -43,10 +43,10 @@ public class ChromeDriverEx {
     }
 
     public void get(String url) throws WebDriverException {
-        if (!url.equals(GitHubURL.LOGIN_PAGE)) {
-            UI.events.triggerEvent(new NavigateToPageEvent(url));
-        }
         if (isTestChromeDriver) {
+            if (!url.equalsIgnoreCase(GitHubURL.LOGIN_PAGE)) {
+                UI.events.triggerEvent(new NavigateToPageEvent(url));
+            }
             logger.info("Test loading page: " + url);
             testGet();
         } else {
