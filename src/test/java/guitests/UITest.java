@@ -1,18 +1,18 @@
 package guitests;
 
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.util.concurrent.SettableFuture;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
 import org.junit.Before;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.utils.FXTestUtils;
-
-import com.google.common.util.concurrent.SettableFuture;
-
-import javafx.scene.Parent;
-import javafx.stage.Stage;
+import prefs.Preferences;
 import ui.UI;
 
-public class UITest extends GuiTest{
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+public class UITest extends GuiTest {
 
     private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
@@ -28,9 +28,21 @@ public class UITest extends GuiTest{
         }
     }
 
+    public void setupMethod() {
+        // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
+    }
+
     @Before
     @Override
     public void setupStage() throws Throwable {
+        // delete test.json if it exists
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        if (testConfig.exists()) {
+            testConfig.delete();
+        }
+
+        setupMethod();
+
         if (stage == null) {
             launchApp();
         }

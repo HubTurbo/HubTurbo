@@ -3,13 +3,14 @@ package ui.issuecolumn;
 import backend.interfaces.IModel;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
 import ui.GUIController;
 import ui.UI;
+import ui.components.KeyboardShortcuts;
 import ui.issuepanel.IssuePanel;
+import util.events.ColumnClickedEvent;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelUpdatedEventHandler;
@@ -216,8 +217,8 @@ public class ColumnControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
-                handleKeys(event.getCode() == KeyCode.F);
+            if (event.getCode() == KeyboardShortcuts.RIGHT_PANEL || event.getCode() == KeyboardShortcuts.LEFT_PANEL) {
+                handleKeys(event.getCode() == KeyboardShortcuts.RIGHT_PANEL);
                 assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });
@@ -246,6 +247,7 @@ public class ColumnControl extends HBox {
                 selectedColumn.requestFocus();
             }
         }
+        ui.triggerEvent(new ColumnClickedEvent(currentlySelectedColumn.get()));
         scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
     }
 
@@ -255,5 +257,13 @@ public class ColumnControl extends HBox {
 
     public GUIController getGUIController() {
         return guiController;
+    }
+
+    public int getNumberOfColumns() {
+        return getChildren().size();
+    }
+
+    public int getNumberOfSavedBoards() {
+        return prefs.getAllBoards().size();
     }
 }

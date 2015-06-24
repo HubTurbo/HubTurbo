@@ -12,6 +12,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+import util.events.testevents.JumpToCommentEvent;
+import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -146,6 +148,7 @@ public class BrowserComponent {
     public void newLabel() {
         logger.info("Navigating to New Label page");
         runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo())));
+        bringToTop();
     }
 
     /**
@@ -202,6 +205,9 @@ public class BrowserComponent {
     }
 
     public void jumpToComment(){
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new JumpToCommentEvent());
+        }
         try {
             WebElement comment = driver.findElementById("new_comment_field");
             comment.click();
@@ -397,6 +403,9 @@ public class BrowserComponent {
     }
 
     private void sendKeysToBrowser(String keyCode) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new SendKeysToBrowserEvent(keyCode));
+        }
         WebElement body;
         try {
             body = driver.findElementByTagName("body");

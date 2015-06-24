@@ -133,7 +133,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
         Platform.runLater(()->{
             enableUI(true);
             UI.status.displayMessage(message);
-            DialogMessage.showWarningDialog("Error", message);
+            DialogMessage.showErrorDialog("Login Error", message);
         });
     }
 

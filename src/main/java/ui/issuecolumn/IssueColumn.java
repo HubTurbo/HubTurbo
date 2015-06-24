@@ -1,15 +1,5 @@
 package ui.issuecolumn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -32,6 +22,13 @@ import ui.components.FilterTextField;
 import util.events.ColumnClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 /**
  * An IssueColumn is a Column meant for containing issues. The main additions to
  * Column are filtering functionality and a list of issues to be maintained.
@@ -39,8 +36,6 @@ import util.events.ModelUpdatedEventHandler;
  * override methods which determine that.
  */
 public abstract class IssueColumn extends Column {
-
-    private static final Logger logger = LogManager.getLogger(IssueColumn.class.getName());
 
     // Collection-related
 
@@ -60,7 +55,6 @@ public abstract class IssueColumn extends Column {
         super(model, parentColumnControl, columnIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
-//      setupIssueColumnDragEvents(model, columnIndex);
         this.setOnMouseClicked(e-> {
             ui.triggerEvent(new ColumnClickedEvent(columnIndex));
             requestFocus();
@@ -86,10 +80,12 @@ public abstract class IssueColumn extends Column {
     };
 
     private Node createFilterBox() {
-        filterTextField = new FilterTextField("", 0).setOnConfirm((text) -> {
-            applyStringFilter(text);
-            return text;
-        });
+        filterTextField = new FilterTextField("", 0)
+                .setOnConfirm((text) -> {
+                    applyStringFilter(text);
+                    return text;
+                })
+                .setOnCancel(this::requestFocus);
         filterTextField.setId(model.getDefaultRepo() + "_col" + columnIndex + "_filterTextField");
 
         ui.registerEvent(onModelUpdate);
