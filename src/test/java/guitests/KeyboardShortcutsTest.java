@@ -29,14 +29,18 @@ public class KeyboardShortcutsTest extends UITest {
         clearColumnIndex();
 
         // maximize
+        System.out.println("maximizing stage");
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
-        sleep(1000);
-        assertEquals(true, stage.isMaximized());
+//        sleep(1000);
+        System.out.println("is stage maximized: " + stage.isMaximized());
+//        assertEquals(true, stage.isMaximized());
 
         // mid-sized window
+        System.out.println("resizing to default size");
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
-        sleep(1000);
-        assertEquals(false, stage.isMaximized());
+//        sleep(1000);
+        System.out.println("is stage maximized: " + stage.isMaximized());
+//        assertEquals(false, stage.isMaximized());
 
         // jump from filter box to first issue
         press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
@@ -107,9 +111,11 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
 
         // minimize window
+        System.out.println("minimizing stage");
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
-        sleep(1000);
-        assertEquals(true, stage.isIconified());
+//        sleep(1000);
+        System.out.println("is stage iconified: " + stage.isIconified());
+//        assertEquals(true, stage.isIconified());
     }
 
     public KeyCode getKeyCode(String shortcut) {
