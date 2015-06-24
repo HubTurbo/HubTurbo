@@ -53,7 +53,7 @@ public class IssuePanel extends IssueColumn {
         setupListView();
         getChildren().add(listView);
 
-        refreshItems(true);
+//        refreshItems(true);
     }
 
     /**
@@ -126,7 +126,7 @@ public class IssuePanel extends IssueColumn {
 
             listView.restoreSelection();
             this.setId(model.getDefaultRepo() + "_col" + columnIndex);
-        }
+//        }
     }
 
     private void setupListView() {
