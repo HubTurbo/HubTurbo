@@ -15,7 +15,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ui.components.KeyboardShortcuts;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -31,17 +30,8 @@ public class GlobalConfig {
     private byte[] lastLoginPassword = new byte[0];
     private Map<String, List<String>> boards = new HashMap<>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
-    private Map<String, String> keyboardShortcuts = new HashMap<>();
 
     public GlobalConfig() {
-    }
-
-    public Map<String, String> getKeyboardShortcuts() {
-        return new HashMap<>(keyboardShortcuts);
-    }
-
-    public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
-        this.keyboardShortcuts = new HashMap<>(keyboardShortcuts);
     }
 
     public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {

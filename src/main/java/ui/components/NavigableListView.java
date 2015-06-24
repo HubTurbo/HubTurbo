@@ -1,11 +1,12 @@
 package ui.components;
 
-import javafx.scene.input.KeyCode;
+import java.util.Optional;
+import java.util.function.IntConsumer;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
-import java.util.function.IntConsumer;
+import javafx.scene.input.KeyCode;
 
 /**
  * A very specialized ListView subclass that:
@@ -133,38 +134,37 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     private void setupKeyEvents() {
         setOnKeyPressed(e -> {
-            if (e.isControlDown()) {
+            if (e.isControlDown()){
                 return;
             }
-            if (e.getCode() == KeyCode.ENTER) {
+            switch (e.getCode()) {
+            case UP:
+            case T:
+            case DOWN:
+            case V:
                 e.consume();
-                if (selectedIndex.isPresent()) {
-                    logger.info("Enter key selection on issue " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get());
-                }
-            }
-            if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
-                    e.getCode() == KeyboardShortcuts.UP_ISSUE || e.getCode() == KeyboardShortcuts.DOWN_ISSUE) {
-                e.consume();
-                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyboardShortcuts.DOWN_ISSUE);
+                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.V);
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
+                    logger.info("Arrow key navigation to item index " + selectedIndex.get());
+                    onItemSelected.accept(selectedIndex.get());
+                }
+                break;
+            case ENTER:
+                e.consume();
+                if (selectedIndex.isPresent()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
-            }
-            if (e.getCode() == KeyboardShortcuts.FIRST_ISSUE) {
-                e.consume();
-                selectFirstItem();
-            }
-            if (e.getCode() == KeyboardShortcuts.LAST_ISSUE) {
-                e.consume();
-                selectLastItem();
+                break;
+            default:
+                break;
             }
         });
     }
 
     private void handleUpDownKeys(boolean isDownKey) {
+
         // Nothing is selected or the list is empty; do nothing
         if (!selectedIndex.isPresent()) return;
         if (getItems().size() == 0) return;
@@ -191,15 +191,6 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         getSelectionModel().clearAndSelect(0);
         scrollAndShow(0);
         selectedIndex = Optional.of(0);
-        onItemSelected.accept(selectedIndex.get());
-    }
-
-    public void selectLastItem(){
-        requestFocus();
-        if (getItems().size() == 0) return;
-        getSelectionModel().clearAndSelect(getItems().size() - 1);
-        scrollAndShow(getItems().size() - 1);
-        selectedIndex = Optional.of(getItems().size() - 1);
         onItemSelected.accept(selectedIndex.get());
     }
 

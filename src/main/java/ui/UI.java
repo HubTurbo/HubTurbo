@@ -1,12 +1,21 @@
 package ui;
 
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.common.eventbus.EventBus;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+
 import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
-import com.google.common.eventbus.EventBus;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -19,11 +28,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
-import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.issuecolumn.ColumnControl;
 import util.PlatformEx;
@@ -32,18 +38,11 @@ import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
-import util.events.testevents.UILogicRefreshEventHandler;
-import util.events.testevents.WindowResizeEvent;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 2;
-    private static final int VERSION_MINOR = 9;
+    private static final int VERSION_MINOR = 8;
     private static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -138,7 +137,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initPreApplicationState() {
-        logger.info(Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
@@ -146,7 +144,6 @@ public class UI extends Application implements EventDispatcher {
 
         commandLineArgs = initialiseCommandLineArguments();
         prefs = new Preferences(isTestMode());
-        KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
         registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
@@ -196,8 +193,6 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
     }
 
-    // When --bypasslogin=true is passed as an argument, the username and password
-    // are empty strings.
     private boolean isBypassLogin() {
         return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
     }
@@ -432,9 +427,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void setDefaultWidth() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.DEFAULT_SIZE_WINDOW));
-        }
         mainStage.setMaximized(false);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(columns.getPanelWidth());
@@ -446,9 +438,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void maximizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MAXIMIZE_WINDOW));
-        }
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(dimensions.getWidth());
@@ -460,9 +449,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void minimizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MINIMIZE_WINDOW));
-        }
         mainStage.setIconified(true);
         menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
     }

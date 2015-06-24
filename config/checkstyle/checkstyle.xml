@@ -58,15 +58,15 @@
       <property name="severity" value="error"/>
     </module>
 
-    <!--<module name="ImportOrder">-->
+    <module name="ImportOrder">
       <!-- Checks for out of order import statements. -->
 
-      <!--<property name="severity" value="warning"/>
-      <property name="groups" value="junit,net,java,javax,org,com"/>-->
+      <property name="severity" value="warning"/>
+      <property name="groups" value="junit,net,java,javax,org,com"/>
       <!-- This ensures that static imports go first. -->
-      <!--<property name="option" value="top"/>
+      <property name="option" value="top"/>
       <property name="tokens" value="STATIC_IMPORT, IMPORT"/>
-    </module>-->
+    </module>
 
     <!--
 

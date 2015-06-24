@@ -1,17 +1,11 @@
 package browserview;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import ui.UI;
-import util.GitHubURL;
-import util.events.testevents.ExecuteScriptEvent;
-import util.events.testevents.NavigateToPageEvent;
 
 import java.util.NoSuchElementException;
 
@@ -19,8 +13,6 @@ import java.util.NoSuchElementException;
 // and as a stub when testing
 
 public class ChromeDriverEx {
-
-    private static final Logger logger = LogManager.getLogger(ChromeDriverEx.class.getName());
 
     private boolean isTestChromeDriver;
     private ChromeDriver driver;
@@ -44,19 +36,9 @@ public class ChromeDriverEx {
 
     public void get(String url) throws WebDriverException {
         if (isTestChromeDriver) {
-            if (!url.equalsIgnoreCase(GitHubURL.LOGIN_PAGE)) {
-                UI.events.triggerEvent(new NavigateToPageEvent(url));
-            }
-            logger.info("Test loading page: " + url);
             testGet();
         } else {
-            if (driver.getCurrentUrl().equalsIgnoreCase(url)) {
-                logger.info("Already on page: " + url + " will not load it again. ");
-            } else {
-                logger.info("Previous page was: " + driver.getCurrentUrl());
-                logger.info("Loading page: " + url);
-                driver.get(url);
-            }
+            driver.get(url);
         }
     }
 
@@ -108,9 +90,6 @@ public class ChromeDriverEx {
     }
 
     public Object executeScript(String script) {
-        if (isTestChromeDriver) {
-            UI.events.triggerEvent(new ExecuteScriptEvent(script));
-        }
         return !isTestChromeDriver ? driver.executeScript(script) : "";
     }
 }

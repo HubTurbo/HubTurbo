@@ -1,12 +1,14 @@
 package tests;
 
-import backend.resource.TurboLabel;
-import org.eclipse.egit.github.core.Label;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import org.eclipse.egit.github.core.Label;
+import org.junit.Test;
+
+import backend.resource.TurboLabel;
 
 public class TurboLabelTest {
 

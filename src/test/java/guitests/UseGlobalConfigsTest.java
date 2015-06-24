@@ -58,7 +58,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
-        push(KeyCode.ENTER);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(2000);
 
         // Make a new board
@@ -69,7 +69,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Then exit program...
         click("Preferences");
-        click("Quit");
+        click("Logout");
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(configFileDirectory, testConfigFileName);

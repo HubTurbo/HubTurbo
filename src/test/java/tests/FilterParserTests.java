@@ -1,14 +1,18 @@
 package tests;
 
-import filter.ParseException;
-import filter.Parser;
-import filter.expression.*;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import net.sf.cglib.core.Local;
+import org.junit.Test;
+
+import filter.ParseException;
+import filter.Parser;
+import filter.expression.*;
 
 public class FilterParserTests {
 

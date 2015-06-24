@@ -10,8 +10,8 @@ import org.junit.Test;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
 import util.PlatformEx;
-import util.events.testevents.UILogicRefreshEvent;
-import util.events.testevents.UpdateDummyRepoEvent;
+import util.events.UILogicRefreshEvent;
+import util.events.UpdateDummyRepoEvent;
 
 public class ModelUpdateUITest extends UITest {
 
