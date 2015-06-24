@@ -22,7 +22,6 @@ public class SortTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("-id");
         push(KeyCode.ENTER);
-        click("#dummy/dummy_col0_2");
         doubleClick("#dummy/dummy_col0_filterTextField");
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Comment count
