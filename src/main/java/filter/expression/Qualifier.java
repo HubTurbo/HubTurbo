@@ -27,10 +27,10 @@ public class Qualifier implements FilterExpression {
 
     public static final String[] KEYWORDS = new String[] {
         "assignees", "author", "body", "closed", "comments", "created", "creator",
-        "date", "desc", "description", "has", "id", "in", "involves", "is", "issue",
-        "keyword", "label", "labels", "merged", "milestone", "milestones", "no",
-        "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status", "title",
-        "type", "unmerged", "unread", "updated", "user"
+        "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
+        "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
+        "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
+        "title", "type", "unmerged", "unread", "updated", "user"
     };
 
     private final String name;
@@ -99,7 +99,6 @@ public class Qualifier implements FilterExpression {
      * Should always be used over isSatisfiedBy.
      */
     public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
-
         FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
         List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
@@ -360,19 +359,21 @@ public class Qualifier implements FilterExpression {
         case "sort":
         case "in":
         case "repo":
+        case "updated":
             return true;
         default:
             return false;
         }
     }
 
-    public Comparator<TurboIssue> getCompoundSortComparator(IModel model) {
+    public Comparator<TurboIssue> getCompoundSortComparator(IModel model, boolean isSortableByNonSelfUpdates) {
         if (sortKeys.isEmpty()) {
             return (a, b) -> 0;
         }
         return (a, b) -> {
             for (SortKey key : sortKeys) {
-                Comparator<TurboIssue> comparator = getSortComparator(model, key.key, key.inverted);
+                Comparator<TurboIssue> comparator =
+                        getSortComparator(model, key.key, key.inverted, isSortableByNonSelfUpdates);
                 int result = comparator.compare(a, b);
                 if (result != 0) {
                     return result;
@@ -382,7 +383,10 @@ public class Qualifier implements FilterExpression {
         };
     }
 
-    public static Comparator<TurboIssue> getSortComparator(IModel model, String key, boolean inverted) {
+    public static Comparator<TurboIssue> getSortComparator(IModel model,
+                                                           String key,
+                                                           boolean inverted,
+                                                           boolean isSortableByNonSelfUpdates) {
         Comparator<TurboIssue> comparator = (a, b) -> 0;
 
         boolean isLabelGroup = false;
@@ -397,6 +401,14 @@ public class Qualifier implements FilterExpression {
             case "updated":
             case "date":
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                break;
+            case "nonSelfUpdate":
+                if (isSortableByNonSelfUpdates) {
+                    comparator = (a, b) ->
+                        a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
+                } else {
+                    comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                }
                 break;
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
@@ -481,21 +493,33 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
-        int hours = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
-            return numberRange.get().encloses(hours);
+            updatedRange = numberRange.get();
         } else if (number.isPresent()) {
-            // Treat it as <
-            return new NumberRange(null, number.get(), true).encloses(hours);
+            updatedRange = new NumberRange(null, number.get(), true);
         } else {
             return false;
         }
+
+        int hoursSinceUpdate;
+
+        if (issue.getMetadata().isUpdated()) {
+            // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
+            hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
+                    .until(getCurrentTime(), ChronoUnit.HOURS));
+        } else {
+            // First time being filtered (haven't gotten metadata from source yet).
+            hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        }
+
+        return updatedRange.encloses(hoursSinceUpdate);
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
         if (!content.isPresent()) return false;
-        return issue.getRepoId().equals(content.get());
+        return issue.getRepoId().equalsIgnoreCase(content.get());
     }
 
     private boolean satisfiesCreationDate(TurboIssue issue) {

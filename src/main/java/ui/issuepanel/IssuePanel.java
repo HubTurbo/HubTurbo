@@ -2,17 +2,17 @@ package ui.issuepanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
+import filter.expression.Qualifier;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
+import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
 import ui.issuecolumn.ColumnControl;
 import ui.issuecolumn.IssueColumn;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.testevents.UIComponentFocusEvent;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -26,17 +26,8 @@ public class IssuePanel extends IssueColumn {
     private int issueCount;
 
     private IssueListView listView;
-    private final KeyCombination keyCombBoxToList =
-        new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination keyCombListToBox =
-        new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination maximizeWindow =
-        new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination minimizeWindow =
-        new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination defaultSizeWindow =
-        new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
+    private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
     public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(ui, model, parentColumnControl, columnIndex);
@@ -47,7 +38,7 @@ public class IssuePanel extends IssueColumn {
         setupListView();
         getChildren().add(listView);
 
-        refreshItems();
+        refreshItems(true);
     }
 
     /**
@@ -56,9 +47,16 @@ public class IssuePanel extends IssueColumn {
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
-    private boolean issueHasNewComments(TurboIssue issue) {
-        return issueCommentCounts.containsKey(issue.getId()) &&
-                Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+    private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
+        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+            return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
+                    Math.abs(
+                            issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
+                    ) > 0;
+        } else {
+            return issueCommentCounts.containsKey(issue.getId()) &&
+                    Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
+        }
     }
 
     /**
@@ -66,16 +64,17 @@ public class IssuePanel extends IssueColumn {
      * Returns a list of issues which have new comments.
      * @return
      */
-    private HashSet<Integer> updateIssueCommentCounts() {
+    private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
         HashSet<Integer> result = new HashSet<>();
         for (TurboIssue issue : getIssueList()) {
             if (issueCommentCounts.containsKey(issue.getId())) {
                 // We know about this issue; check if it's been updated
-                if (issueHasNewComments(issue)) {
+                if (issueHasNewComments(issue, hasMetadata)) {
                     result.add(issue.getId());
                 }
             } else {
-                // We don't know about this issue
+                // We don't know about this issue, just put the current comment count.
+                issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
                 issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             }
         }
@@ -83,65 +82,85 @@ public class IssuePanel extends IssueColumn {
     }
 
     @Override
-    public void refreshItems() {
-        super.refreshItems();
-        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts();
+    public void refreshItems(boolean hasMetadata) {
+        super.refreshItems(hasMetadata);
 
-        // Set the cell factory every time - this forces the list view to update
-        listView.setCellFactory(list ->
-            new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
-        listView.saveSelection();
+        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
 
-        // Supposedly this also causes the list view to update - not sure
-        // if it actually does on platforms other than Linux...
-        listView.setItems(null);
-        listView.setItems(getIssueList());
-        issueCount = getIssueList().size();
+        // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
+        // or if hasMetadata is true (metadata has arrived), or if getIssueList is empty (if filter does
+        // have UPDATED, but there are no issues whose metadata require retrieval causing hasMetadata to
+        // never be true)
 
-        listView.restoreSelection();
-        this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+        if (!hasUpdatedQualifier // not waiting for metadata, just update
+                || hasMetadata // metadata has arrived, update
+                || getIssueList().size() == 0 // checked only when above two not satisfied
+                ) {
+            final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
+
+            // Set the cell factory every time - this forces the list view to update
+            listView.setCellFactory(list ->
+                    new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
+            listView.saveSelection();
+
+            // Supposedly this also causes the list view to update - not sure
+            // if it actually does on platforms other than Linux...
+            listView.setItems(null);
+            listView.setItems(getIssueList());
+            issueCount = getIssueList().size();
+
+            listView.restoreSelection();
+            this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+        }
     }
 
     private void setupListView() {
         setVgrow(listView, Priority.ALWAYS);
         setupKeyboardShortcuts();
+
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
-            ui.triggerEvent(new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex));
-            if (issueHasNewComments(issue)) {
-                issueCommentCounts.put(issue.getId(), issue.getCommentCount());
-                refreshItems();
-            }
+            ui.triggerEvent(
+                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex, issue.isPullRequest())
+            );
+
+            // Save the stored comment count as its own comment count.
+            // The refreshItems(false) call that follows will remove the highlighted effect of the comment bubble.
+            // (if it was there before)
+            issueCommentCounts.put(issue.getId(), issue.getCommentCount());
+            issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
+            // We assume we already have metadata, so we pass true to avoid refreshItems from trying to get
+            // metadata after clicking.
+            refreshItems(true);
         });
     }
 
     private void setupKeyboardShortcuts() {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (keyCombBoxToList.match(event)) {
+            if (KeyboardShortcuts.BOX_TO_LIST.match(event)) {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (event.getCode() == KeyCode.SPACE) {
+            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS) {
                 event.consume();
             }
-            if (KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+            if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (maximizeWindow.match(event)) {
+            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (minimizeWindow.match(event)) {
+            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (defaultSizeWindow.match(event)) {
+            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-
-            if (event.getCode() == KeyCode.R) {
+            if (event.getCode() == KeyboardShortcuts.MARK_AS_READ) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -153,7 +172,7 @@ public class IssuePanel extends IssueColumn {
                 issue.setIsCurrentlyRead(true);
                 parentColumnControl.refresh();
             }
-            if (event.getCode() == KeyCode.U) {
+            if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -164,99 +183,103 @@ public class IssuePanel extends IssueColumn {
                 issue.setIsCurrentlyRead(false);
                 parentColumnControl.refresh();
             }
-            if (event.getCode() == KeyCode.F5) {
+            if (event.getCode() == KeyboardShortcuts.REFRESH) {
                 ui.logic.refresh();
             }
-            if (event.getCode() == KeyCode.F1) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_DOCS) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (keyCombListToBox.match(event)) {
+            if (KeyboardShortcuts.LIST_TO_BOX.match(event)) {
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyCode.SPACE
-                && KeyPress.isDoublePress(KeyCode.SPACE, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS
+                && KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
 
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyCode.I) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_ISSUES) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showIssues();
                 }
             }
-            if (event.getCode() == KeyCode.P) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_PULL_REQUESTS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showPullRequests();
                 }
             }
-            if (event.getCode() == KeyCode.H) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_HELP) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showDocs();
                 }
             }
-            if (event.getCode() == KeyCode.K) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showKeyboardShortcuts();
                 }
             }
-            if (event.getCode() == KeyCode.D) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_CONTRIBUTORS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showContributors();
                     event.consume();
                 }
             }
-            if (event.getCode() == KeyCode.U) {
+            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_TOP) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (event.getCode() == KeyCode.N) {
-                if (!minimizeWindow.match(event)) {
+            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_BOTTOM) {
+                if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
-            if (event.getCode() == KeyCode.J || event.getCode() == KeyCode.K) {
-                ui.getBrowserComponent().scrollPage(event.getCode() == KeyCode.K);
+            if (event.getCode() == KeyboardShortcuts.SCROLL_UP || event.getCode() == KeyboardShortcuts.SCROLL_DOWN) {
+                ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.SCROLL_DOWN);
             }
-            if (event.getCode() == KeyCode.G) {
+            if (event.getCode() == KeyboardShortcuts.GOTO_MODIFIER) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (event.getCode() == KeyCode.C && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().jumpToComment();
             }
-            if (event.getCode() == KeyCode.L) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().manageLabels(event.getCode().toString());
                 }
             }
-            if (event.getCode() == KeyCode.A && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
-            if (event.getCode() == KeyCode.M) {
-                if (KeyPress.isValidKeyCombination(KeyCode.G, event.getCode())) {
+            if (event.getCode() == KeyboardShortcuts.SHOW_MILESTONES) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
-            if (maximizeWindow.match(event)) {
+            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (minimizeWindow.match(event)) {
+            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (defaultSizeWindow.match(event)) {
+            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
         });
     }
 
     private void setFocusToFilterBox() {
+        if (ui.isTestMode()) {
+            ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
+        }
         filterTextField.requestFocus();
         filterTextField.setText(filterTextField.getText().trim());
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.V || event.getCode() == KeyCode.T) {
+            if (event.getCode() == KeyboardShortcuts.DOWN_ISSUE ||
+                    event.getCode() == KeyboardShortcuts.UP_ISSUE) {
                 listView.selectFirstItem();
             }
         });

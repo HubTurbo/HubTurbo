@@ -12,6 +12,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+import util.events.testevents.JumpToCommentEvent;
+import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -145,11 +147,8 @@ public class BrowserComponent {
      */
     public void newLabel() {
         logger.info("Navigating to New Label page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo())));
+        bringToTop();
     }
 
     /**
@@ -158,11 +157,7 @@ public class BrowserComponent {
      */
     public void newMilestone() {
         logger.info("Navigating to New Milestone page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo())));
         bringToTop();
     }
 
@@ -172,11 +167,7 @@ public class BrowserComponent {
      */
     public void newIssue() {
         logger.info("Navigating to New Issue page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo())));
         bringToTop();
     }
 
@@ -203,16 +194,20 @@ public class BrowserComponent {
      * driver window.
      * Run on a separate thread.
      */
-    public void showIssue(String repoId, int id) {
-        logger.info("Showing issue #" + id);
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForIssue(repoId, id))) {
-                driver.get(GitHubURL.getPathForIssue(repoId, id));
-            }
-        });
+    public void showIssue(String repoId, int id, boolean isPullRequest) {
+        if (isPullRequest) {
+            logger.info("Showing pull request #" + id);
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id)));
+        } else {
+            logger.info("Showing issue #" + id);
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id)));
+        }
     }
 
     public void jumpToComment(){
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new JumpToCommentEvent());
+        }
         try {
             WebElement comment = driver.findElementById("new_comment_field");
             comment.click();
@@ -408,6 +403,9 @@ public class BrowserComponent {
     }
 
     private void sendKeysToBrowser(String keyCode) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new SendKeysToBrowserEvent(keyCode));
+        }
         WebElement body;
         try {
             body = driver.findElementByTagName("body");
@@ -434,47 +432,27 @@ public class BrowserComponent {
 
     public void showIssues() {
         logger.info("Navigating to Issues page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo())));
     }
 
     public void showPullRequests() {
         logger.info("Navigating to Pull requests page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo())));
     }
 
     public void showKeyboardShortcuts() {
         logger.info("Navigating to Keyboard Shortcuts");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForKeyboardShortcuts())) {
-                driver.get(GitHubURL.getPathForKeyboardShortcuts());
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForKeyboardShortcuts()));
     }
 
     public void showMilestones() {
         logger.info("Navigating to Milestones page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo())));
     }
 
     public void showContributors() {
         logger.info("Navigating to Contributors page");
-        runBrowserOperation(() -> {
-            if (!driver.getCurrentUrl().equals(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()))) {
-                driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()));
-            }
-        });
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo())));
     }
 
     public boolean isCurrentUrlIssue() {

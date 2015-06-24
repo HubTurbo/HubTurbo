@@ -25,7 +25,7 @@ public class ColumnsTest extends UITest {
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.ENTER);
 
         // Drag
         // TODO check whether columns are actually reordered
@@ -51,7 +51,7 @@ public class ColumnsTest extends UITest {
         doubleClick("#repositorySelector");
         doubleClick();
         type("dummy2/dummy2");
-        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
         click("#dummy2/dummy2_col1");

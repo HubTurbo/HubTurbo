@@ -2,12 +2,15 @@ package tests;
 
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static util.Utility.*;
 
 public class UtilityTest {
@@ -25,12 +28,19 @@ public class UtilityTest {
 
         assertEquals("1994-11-15T12:45Z", formatDateISO8601(testDate.getTime()));
 
-        assertEquals(new Date(94, 10, 15, 12, 45, 26), localDateTimeToDate(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
+        Date date = null;
 
-        assertEquals(LocalDateTime.of(1994, 11, 15, 12, 45, 26), dateToLocalDateTime(new Date(94, 10, 15, 12, 45, 26)));
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd-k-m-s").parse("1994-11-15-12-45-26");
+        } catch (ParseException e) {
+            fail();
+        }
 
-        assertEquals(new Date(94, 10, 15, 12, 45, 26).getTime(),
-                localDateTimeToLong(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
+        assertEquals(date, localDateTimeToDate(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
+
+        assertEquals(LocalDateTime.of(1994, 11, 15, 12, 45, 26), dateToLocalDateTime(date));
+
+        assertEquals(date.getTime(), localDateTimeToLong(LocalDateTime.of(1994, 11, 15, 12, 45, 26)));
 
         assertEquals("HelloWorldThisIsATest", snakeCaseToCamelCase("hello_world_this_is_a_test"));
 

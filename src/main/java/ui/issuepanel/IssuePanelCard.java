@@ -1,13 +1,5 @@
 package ui.issuepanel;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.eclipse.egit.github.core.Comment;
-
 import backend.resource.*;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
@@ -21,9 +13,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import org.eclipse.egit.github.core.Comment;
 import ui.issuecolumn.IssueColumn;
 import util.Utility;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IssuePanelCard extends VBox {
 
