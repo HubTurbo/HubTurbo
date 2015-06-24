@@ -1,5 +1,10 @@
 package util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -15,12 +20,6 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
 public class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
@@ -31,8 +30,9 @@ public class Utility {
     }
 
     public static boolean isWellFormedRepoId(String repoId) {
-        return repoId != null && !repoId.isEmpty()
-            && RepositoryId.createFromId(repoId).generateId().equals(repoId);
+        RepositoryId repositoryId = RepositoryId.createFromId(repoId);
+        return repoId != null && !repoId.isEmpty() && repositoryId != null
+            && repositoryId.generateId().equals(repoId);
     }
 
     public static Optional<String> readFile(String filename) {
