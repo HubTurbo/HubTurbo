@@ -104,7 +104,8 @@ public class ColumnControl extends HBox {
     public IssueColumn addColumnAt(int index) {
         IssueColumn panel = new IssuePanel(ui, model, this, index);
         getChildren().add(index, panel);
-        panel.setItems(model.getIssues(), false);
+        guiController.columnFilterExpressionChanged(panel);
+//        panel.setItems(model.getIssues(), false);
         updateColumnIndices();
         setCurrentlySelectedColumn(Optional.of(index));
         return panel;
