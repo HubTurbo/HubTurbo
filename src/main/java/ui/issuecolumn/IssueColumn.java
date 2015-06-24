@@ -184,7 +184,8 @@ public abstract class IssueColumn extends Column {
         // openRepository() if necessary.
         Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
             if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
-                ui.logic.openRepoFromFilter(qualifier.getContent().get());
+                ui.logic.openRepository(qualifier.getContent().get());
+                ui.logic.setDefaultRepo(qualifier.getContent().get());
             } else if (qualifier.getName().equals(Qualifier.UPDATED)
                     && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
                 // no sort order specified, implicitly assumed to sort by last-non-self-update
