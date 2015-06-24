@@ -1,17 +1,5 @@
 package ui;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -28,11 +16,22 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 import prefs.Preferences;
 import ui.components.Dialog;
 import util.DialogMessage;
 import util.HTLog;
 import util.Utility;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginDialog extends Dialog<LoginDialog.Result> {
 
@@ -73,10 +72,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
     }
 
     private void login(Event unused) {
-
         resolveCredentials();
-        enableUI(false);
-
         CompletableFuture.supplyAsync(this::attemptLogin, executor).thenAccept(success -> {
             if (success) {
                 // Save login details only on successful login
@@ -103,12 +99,8 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
         return false;
     }
 
-    private void resolveCredentials() {
-        owner = repoOwnerField.getText();
-        repo = repoNameField.getText();
-        username = usernameField.getText();
-        password = passwordField.getText();
-
+    private void loadCredentialsFromFile() {
+        resolveCredentials();
         // If either field is empty, try to load credentials.txt
         if (username.isEmpty() || password.isEmpty()) {
             BufferedReader reader;
@@ -118,8 +110,10 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
                 while ((line = reader.readLine()) != null) {
                     if (username.isEmpty()) {
                         username = line;
+                        usernameField.setText(line);
                     } else {
                         password = line;
+                        passwordField.setText(line);
                     }
                 }
                 logger.info("Logged in using credentials.txt");
@@ -129,12 +123,24 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
         }
     }
 
+    private void resolveCredentials() {
+        owner = repoOwnerField.getText();
+        repo = repoNameField.getText();
+        username = usernameField.getText();
+        password = passwordField.getText();
+    }
+
     private void handleError(String message) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             enableUI(true);
             UI.status.displayMessage(message);
             DialogMessage.showErrorDialog("Login Error", message);
         });
+    }
+
+    @Override
+    protected boolean showOnSetup() {
+        return !Utility.isWellFormedRepoId(owner, repo) || username.isEmpty() || password.isEmpty();
     }
 
     @Override
@@ -218,6 +224,9 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
         if (!lastLoginPassword.isEmpty()) {
             passwordField.setText(lastLoginPassword);
         }
+
+        loadCredentialsFromFile();
+        resolveCredentials();
 
         // Change focus depending on what fields are present
         Platform.runLater(() -> {
