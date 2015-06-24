@@ -30,10 +30,12 @@ public class KeyboardShortcutsTest extends UITest {
 
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+        sleep(1000);
         assertEquals(true, stage.isMaximized());
 
         // mid-sized window
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
+        sleep(1000);
         assertEquals(false, stage.isMaximized());
 
         // jump from filter box to first issue
@@ -106,6 +108,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
+        sleep(1000);
         assertEquals(true, stage.isIconified());
     }
 
