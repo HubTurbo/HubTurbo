@@ -36,7 +36,7 @@ public class KeyboardShortcutsTest extends UITest {
         // mid-sized window
         System.out.println("resizing to default size");
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
-//        sleep(1000);
+        sleep(5000);
         System.out.println("is stage maximized: " + stage.isMaximized());
 //        assertEquals(false, stage.isMaximized());
 
