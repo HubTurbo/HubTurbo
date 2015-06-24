@@ -251,4 +251,8 @@ public class ColumnControl extends HBox {
     private void scrollandShowColumn(int selectedColumnIndex, int numOfColumns) {
         ui.getMenuControl().scrollTo(selectedColumnIndex, numOfColumns);
     }
+
+    public GUIController getGUIController() {
+        return guiController;
+    }
 }
