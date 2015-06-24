@@ -11,8 +11,8 @@ import javafx.scene.input.KeyCode;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
 import util.PlatformEx;
-import util.events.testevents.UILogicRefreshEvent;
-import util.events.testevents.UpdateDummyRepoEvent;
+import util.events.UILogicRefreshEvent;
+import util.events.UpdateDummyRepoEvent;
 
 public class UpdateIssuesTest extends UITest {
 
@@ -30,7 +30,7 @@ public class UpdateIssuesTest extends UITest {
         type("updated");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("24");
-        push(KeyCode.ENTER);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
         FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(2, countIssues.get());

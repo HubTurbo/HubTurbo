@@ -1,23 +1,24 @@
 package ui.issuecolumn;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
 import ui.UI;
-import ui.components.KeyboardShortcuts;
 import ui.issuepanel.IssuePanel;
-import util.events.ColumnClickedEvent;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.ModelUpdatedEventHandler;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 
 public class ColumnControl extends HBox {
@@ -41,7 +42,7 @@ public class ColumnControl extends HBox {
             updateModel(e.model);
             forEach(child -> {
                 if (child instanceof IssueColumn) {
-                    ((IssueColumn) child).setItems(e.model.getIssues(), e.hasMetadata);
+                    ((IssueColumn) child).setItems(e.model.getIssues());
                 }
             });
         });
@@ -100,11 +101,8 @@ public class ColumnControl extends HBox {
         getChildren().forEach(child -> callback.accept((Column) child));
     }
 
-    /**
-     * For a quick refresh (without requesting updates)
-     */
     public void refresh() {
-        forEach(child -> child.refreshItems(true));
+        forEach(child -> child.refreshItems());
     }
 
     private IssueColumn addColumn() {
@@ -114,7 +112,7 @@ public class ColumnControl extends HBox {
     public IssueColumn addColumnAt(int index) {
         IssueColumn panel = new IssuePanel(ui, model, this, index);
         getChildren().add(index, panel);
-        panel.setItems(model.getIssues(), false);
+        panel.setItems(model.getIssues());
         updateColumnIndices();
         setCurrentlySelectedColumn(Optional.of(index));
         return panel;
@@ -224,8 +222,8 @@ public class ColumnControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyboardShortcuts.RIGHT_PANEL || event.getCode() == KeyboardShortcuts.LEFT_PANEL) {
-                handleKeys(event.getCode() == KeyboardShortcuts.RIGHT_PANEL);
+            if (event.getCode() == KeyCode.F || event.getCode() == KeyCode.D) {
+                handleKeys(event.getCode() == KeyCode.F);
                 assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });
@@ -254,19 +252,10 @@ public class ColumnControl extends HBox {
                 selectedColumn.requestFocus();
             }
         }
-        ui.triggerEvent(new ColumnClickedEvent(currentlySelectedColumn.get()));
         scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
     }
 
     private void scrollandShowColumn(int selectedColumnIndex, int numOfColumns) {
         ui.getMenuControl().scrollTo(selectedColumnIndex, numOfColumns);
-    }
-
-    public int getNumberOfColumns() {
-        return getChildren().size();
-    }
-
-    public int getNumberOfSavedBoards() {
-        return prefs.getAllBoards().size();
     }
 }

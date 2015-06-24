@@ -4,8 +4,8 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.issuepanel.IssuePanel;
-import util.events.testevents.UILogicRefreshEvent;
-import util.events.testevents.UpdateDummyRepoEvent;
+import util.events.UILogicRefreshEvent;
+import util.events.UpdateDummyRepoEvent;
 
 import static org.junit.Assert.assertEquals;
 

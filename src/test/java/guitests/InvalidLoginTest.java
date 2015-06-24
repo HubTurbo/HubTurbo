@@ -26,7 +26,6 @@ public class InvalidLoginTest extends UITest {
         type("abc").push(KeyCode.TAB);
         type("abc");
         click("Sign in");
-        sleep(1000);
         assertNodeExists(hasText("Failed to sign in. Please try again."));
     }
 }

@@ -1,6 +1,4 @@
-package util.events.testevents;
-
-import util.events.Event;
+package util.events;
 
 public class ClearLogicModelEvent extends Event {
 

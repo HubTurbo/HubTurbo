@@ -13,13 +13,13 @@ public class UIManager {
         this.ui = ui;
     }
 
-    public void update(MultiModel models, boolean hasMetadata) {
+    public void update(MultiModel models, boolean triggerMetadataUpdate) {
         Platform.runLater(() ->
-            ui.triggerEvent(new ModelUpdatedEvent(models, hasMetadata)));
+            ui.triggerEvent(new ModelUpdatedEvent(models, triggerMetadataUpdate)));
     }
 
     public void updateNow(MultiModel models) {
-        ui.triggerEvent(new ModelUpdatedEvent(models, false));
+        ui.triggerEvent(new ModelUpdatedEvent(models, true));
     }
 }
 

@@ -471,14 +471,14 @@ public class FilterEvalTests {
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", false, false));
+            Qualifier.getSortComparator(model, "repo", false));
 
         assertEquals(Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", true, false));
+            Qualifier.getSortComparator(model, "repo", true));
 
         assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), renderedIssues.stream()
             .map(TurboIssue::getId)
@@ -500,14 +500,14 @@ public class FilterEvalTests {
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", false, false));
+            Qualifier.getSortComparator(model, "updated", false));
 
         assertEquals(Arrays.asList(0, 1, 2, 3, 4), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", true, false));
+            Qualifier.getSortComparator(model, "updated", true));
 
         assertEquals(Arrays.asList(4, 3, 2, 1, 0), renderedIssues.stream()
             .map(TurboIssue::getId)
@@ -527,14 +527,14 @@ public class FilterEvalTests {
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", false, false));
+            Qualifier.getSortComparator(model, "id", false));
 
         assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", true, false));
+            Qualifier.getSortComparator(model, "id", true));
 
         assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
             .map(TurboIssue::getId)
@@ -556,14 +556,14 @@ public class FilterEvalTests {
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", false, false));
+            Qualifier.getSortComparator(model, "comments", false));
 
         assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
 
         Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", true, false));
+            Qualifier.getSortComparator(model, "comments", true));
 
         assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
             .map(TurboIssue::getId)

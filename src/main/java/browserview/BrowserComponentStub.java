@@ -31,7 +31,7 @@ public class BrowserComponentStub extends BrowserComponent {
     public void newIssue() {}
 
     @Override
-    public void showIssue(String repoId, int id, boolean isPullRequest) {}
+    public void showIssue(String repoId, int id) {}
 
     @Override
     public boolean isCurrentUrlIssue() {
