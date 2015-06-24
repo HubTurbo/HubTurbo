@@ -29,16 +29,13 @@ public class KeyboardShortcutsTest extends UITest {
         clearColumnIndex();
 
         // maximize
-        assertEquals(false, stage.isMaximized());
+        assertEquals(false, stage.getMinWidth() > 500);
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
-        assertEquals(true, stage.isMaximized());
+        assertEquals(true, stage.getMinWidth() > 500);
 
         // mid-sized window
-        System.out.println("resizing to default size");
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
-        sleep(5000);
-        System.out.println("is stage maximized: " + stage.isMaximized());
-//        assertEquals(false, stage.isMaximized());
+        assertEquals(false, stage.getMinWidth() > 500);
 
         // jump from filter box to first issue
         press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
