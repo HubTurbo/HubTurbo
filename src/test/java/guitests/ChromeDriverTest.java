@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ChromeDriverTest extends UITest {
 
-    private static final int EVENT_DELAY = 1000;
+    private static final int EVENT_DELAY = 750;
     private String url;
     private String script;
     private String keyCode;
