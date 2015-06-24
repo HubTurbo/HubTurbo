@@ -118,7 +118,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
                 }
                 logger.info("Logged in using credentials.txt");
             } catch (Exception ex) {
-                logger.info("Failed to find or open credentials.txt");
+                logger.info("Unable to find or open credentials.txt");
             }
         }
     }
