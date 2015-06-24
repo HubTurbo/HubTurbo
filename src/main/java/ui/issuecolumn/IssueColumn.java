@@ -44,7 +44,7 @@ public abstract class IssueColumn extends Column {
 
     // Collection-related
 
-    private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
+//    private ObservableList<TurboIssue> issues = FXCollections.observableArrayList();
 
     // Filter-related
 
@@ -53,8 +53,8 @@ public abstract class IssueColumn extends Column {
     private UI ui;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
-    private Predicate<TurboIssue> predicate = p -> true;
-    private Comparator<TurboIssue> comparator = (a, b) -> 0;
+//    private Predicate<TurboIssue> predicate = p -> true;
+//    private Comparator<TurboIssue> comparator = (a, b) -> 0;
 
     public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(model, parentColumnControl, columnIndex);
@@ -172,7 +172,10 @@ public abstract class IssueColumn extends Column {
      */
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
-        refreshItems(false);
+//        refreshItems(false);
+
+        // NEW
+        parentColumnControl.getGUIController().columnFilterExpressionChanged(this);
     }
 
     /**
@@ -180,34 +183,34 @@ public abstract class IssueColumn extends Column {
      * current filter. Meant to be called from refreshItems() so as not to go into
      * infinite mutual recursion.
      */
-    private void applyCurrentFilterExpression(boolean isSortableByNonSelfUpdates) {
-        predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
-        comparator = Qualifier.getSortComparator(model, "id", true, false);
-
-        // BiConsumer is used here as we need to update the comparator, and at the same time call
-        // openRepository() if necessary.
-        Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
-            if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
-                // Even when the qualifier is wrapped by a negation ("-repo:HubTurbo/HubTurbo"),
-                // repo is still opened.
-                ui.logic.openRepository(qualifier.getContent().get());
-            } else if (qualifier.getName().equals(Qualifier.UPDATED)
-                    && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
-                // no sort order specified, implicitly assumed to sort by last-non-self-update
-                comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
-            } else if (qualifier.getName().equals(Qualifier.SORT)) {
-                comparator = qualifier.getCompoundSortComparator(model, isSortableByNonSelfUpdates);
-            }
-        });
-    }
+//    private void applyCurrentFilterExpression(boolean isSortableByNonSelfUpdates) {
+//        predicate = issue -> Qualifier.process(model, currentFilterExpression, issue);
+//        comparator = Qualifier.getSortComparator(model, "id", true, false);
+//
+//        // BiConsumer is used here as we need to update the comparator, and at the same time call
+//        // openRepository() if necessary.
+//        Qualifier.processMetaQualifierEffects(currentFilterExpression, (qualifier, metaQualifierInfo) -> {
+//            if (qualifier.getContent().isPresent() && qualifier.getName().equals(Qualifier.REPO)) {
+//                // Even when the qualifier is wrapped by a negation ("-repo:HubTurbo/HubTurbo"),
+//                // repo is still opened.
+//                ui.logic.openRepository(qualifier.getContent().get());
+//            } else if (qualifier.getName().equals(Qualifier.UPDATED)
+//                    && !currentFilterExpression.getQualifierNames().contains(Qualifier.SORT)) {
+//                // no sort order specified, implicitly assumed to sort by last-non-self-update
+//                comparator = Qualifier.getSortComparator(model, "nonSelfUpdate", true, true);
+//            } else if (qualifier.getName().equals(Qualifier.SORT)) {
+//                comparator = qualifier.getCompoundSortComparator(model, isSortableByNonSelfUpdates);
+//            }
+//        });
+//    }
 
     // An odd workaround for the above problem: serialising, then
     // immediately parsing a filter expression, just so the update can be
     // triggered through the text contents of the input area changing.
 
-    public void filter(FilterExpression filterExpr) {
-        filterByString(filterExpr.toString());
-    }
+//    public void filter(FilterExpression filterExpr) {
+//        filterByString(filterExpr.toString());
+//    }
 
     public void filterByString(String filterString) {
         filterTextField.setFilterText(filterString);
@@ -225,9 +228,14 @@ public abstract class IssueColumn extends Column {
         return transformedIssueList;
     }
 
-    public void setItems(List<TurboIssue> items, boolean hasMetadata) {
-        this.issues = FXCollections.observableArrayList(items);
-        refreshItems(hasMetadata);
+//    public void setItems(List<TurboIssue> items, boolean hasMetadata) {
+//        this.issues = FXCollections.observableArrayList(items);
+//        refreshItems(hasMetadata);
+//    }
+
+    // RELEVANT
+    public void setIssueList(TransformationList<TurboIssue, TurboIssue> transformedIssueList) {
+        this.transformedIssueList = transformedIssueList;
     }
 
     @Override
@@ -237,30 +245,30 @@ public abstract class IssueColumn extends Column {
 
     @Override
     public void refreshItems(boolean hasMetadata) {
-        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
-
-        // Transforms predicate and comparator to the desired values
-        // If hasUpdatedQualifier && hasMetadata, we allow sorting by non-self update times (if the user
-        // specifies the updated and/or sort qualifiers)
-        applyCurrentFilterExpression(hasUpdatedQualifier && hasMetadata);
-
-        // Then use them to filter & sort.
-        transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
-
-        // If the updated qualifier is specified, after initiallly filtering with hasMetadata as false
-        // (which, since we don't have metadata, filters by getUpdatedAt) we trigger getIssueMetadata,
-        // which will eventually return a model with metadata and trigger this method again with
-        // hasMetadata as true. However, since we already have metadata this time, we don't trigger
-        // getIssueMetadata here again.
-        if (hasUpdatedQualifier && !hasMetadata) {
-            // Group all filtered issues by repo, then trigger updates for each group
-            transformedIssueList.stream()
-                .collect(Collectors.groupingBy(TurboIssue::getRepoId))
-                .entrySet().forEach(repoSetEntry ->
-                ui.logic.getIssueMetadata(repoSetEntry.getKey(),
-                    repoSetEntry.getValue().stream()
-                        .map(TurboIssue::getId)
-                        .collect(Collectors.toList())));
-        }
+//        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
+//
+//        // Transforms predicate and comparator to the desired values
+//        // If hasUpdatedQualifier && hasMetadata, we allow sorting by non-self update times (if the user
+//        // specifies the updated and/or sort qualifiers)
+//        applyCurrentFilterExpression(hasUpdatedQualifier && hasMetadata);
+//
+//        // Then use them to filter & sort.
+//        transformedIssueList = new SortedList<>(new FilteredList<>(issues, predicate), comparator);
+//
+//        // If the updated qualifier is specified, after initiallly filtering with hasMetadata as false
+//        // (which, since we don't have metadata, filters by getUpdatedAt) we trigger getIssueMetadata,
+//        // which will eventually return a model with metadata and trigger this method again with
+//        // hasMetadata as true. However, since we already have metadata this time, we don't trigger
+//        // getIssueMetadata here again.
+//        if (hasUpdatedQualifier && !hasMetadata) {
+//            // Group all filtered issues by repo, then trigger updates for each group
+//            transformedIssueList.stream()
+//                .collect(Collectors.groupingBy(TurboIssue::getRepoId))
+//                .entrySet().forEach(repoSetEntry ->
+//                ui.logic.getIssueMetadata(repoSetEntry.getKey(),
+//                    repoSetEntry.getValue().stream()
+//                        .map(TurboIssue::getId)
+//                        .collect(Collectors.toList())));
+//        }
     }
 }
