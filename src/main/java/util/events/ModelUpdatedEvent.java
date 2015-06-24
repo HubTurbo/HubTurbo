@@ -5,10 +5,10 @@ import backend.resource.MultiModel;
 
 public class ModelUpdatedEvent extends Event {
     public final IModel model;
-    public final boolean triggerMetadataUpdate;
+    public final boolean hasMetadata;
 
-    public ModelUpdatedEvent(MultiModel model, boolean triggerMetadataUpdate) {
+    public ModelUpdatedEvent(MultiModel model, boolean hasMetadata) {
         this.model = model;
-        this.triggerMetadataUpdate = triggerMetadataUpdate;
+        this.hasMetadata = hasMetadata;
     }
 }

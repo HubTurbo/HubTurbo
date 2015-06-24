@@ -1,11 +1,11 @@
 package prefs;
 
+import org.eclipse.egit.github.core.RepositoryId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.eclipse.egit.github.core.RepositoryId;
 
 public class Preferences {
 
@@ -35,6 +35,9 @@ public class Preferences {
         global = fileHandler.loadGlobalConfig();
     }
 
+    // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
+    // credentials are guaranteed to be the current user's credentials thanks to setLastLoginCredentials
+    // being called immediately after a successful login in LoginDialog.
     public String getLastLoginPassword() {
         return global.getLastLoginPassword();
     }
@@ -113,5 +116,13 @@ public class Preferences {
 
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return global.getMarkedReadAt(repoId, issue);
+    }
+
+    public Map<String, String> getKeyboardShortcuts() {
+        return global.getKeyboardShortcuts();
+    }
+
+    public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
+        global.setKeyboardShortcuts(keyboardShortcuts);
     }
 }

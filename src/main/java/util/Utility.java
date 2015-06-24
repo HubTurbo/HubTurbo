@@ -26,10 +26,8 @@ public class Utility {
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
     public static boolean isWellFormedRepoId(String owner, String repo) {
-        if (owner == null || owner.isEmpty() || repo == null || repo.isEmpty()) {
-            return false;
-        }
-        return isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
+        return !(owner == null || owner.isEmpty() || repo == null || repo.isEmpty())
+                && isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
     }
 
     public static boolean isWellFormedRepoId(String repoId) {
