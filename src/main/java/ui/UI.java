@@ -80,7 +80,6 @@ public class UI extends Application implements EventDispatcher {
 
     @Override
     public void start(Stage stage) {
-
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
@@ -267,11 +266,13 @@ public class UI extends Application implements EventDispatcher {
                 browserComponent.focus(mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {
-                boolean shouldRefresh = browserComponent.hasBviewChanged();
-                if (shouldRefresh) {
-                    logger.info("Browser view has changed; refreshing");
-                    logic.refresh();
-                    refreshTimer.restart();
+                if (browserComponent != null) {
+                    boolean shouldRefresh = browserComponent.hasBviewChanged();
+                    if (shouldRefresh) {
+                        logger.info("Browser view has changed; refreshing");
+                        logic.refresh();
+                        refreshTimer.restart();
+                    }
                 }
             });
         });
