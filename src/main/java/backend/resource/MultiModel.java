@@ -61,12 +61,35 @@ public class MultiModel implements IModel {
         return this;
     }
 
-    public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata) {
+    public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
-                issue.setMetadata(new IssueMetadata(metadata.get(issue.getId())));
+                IssueMetadata toBeInserted = metadata.get(issue.getId());
+                LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
+                        issue.getCreatedAt(), currentUser, issue.getCreator());
+                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
             }
         });
+    }
+
+    private static LocalDateTime reconcileCreationDate(LocalDateTime lastNonSelfUpdate,
+                                                       LocalDateTime creationTime,
+                                                       String currentUser,
+                                                       String issueCreator) {
+        // If current user is same as issue creator, we do not consider creation of issue
+        // as an issue update.
+        if (currentUser.equalsIgnoreCase(issueCreator)) return lastNonSelfUpdate;
+
+        // Current user is not the issue creator.
+        // lastNonSelfUpdate cannot be before creationTime unless it is the default value (epoch 0),
+        // which means the issue has no events or comments.
+        // However, since the current user is not the issue creator, creation of the issue itself
+        // counts as an update.
+        if (lastNonSelfUpdate.compareTo(creationTime) < 0) return creationTime;
+
+        // Otherwise, the issue actually possesses non-self updates, so we do nothing with the
+        // value.
+        return lastNonSelfUpdate;
     }
 
     @Override

@@ -1,18 +1,28 @@
 package guitests;
 
+import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-
-import javafx.scene.input.KeyCode;
 import ui.UI;
+import util.GitHubURL;
 import util.events.IssueCreatedEvent;
 import util.events.IssueSelectedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
+import util.events.testevents.ExecuteScriptEventHandler;
+import util.events.testevents.JumpToCommentEventHandler;
+import util.events.testevents.NavigateToPageEventHandler;
+import util.events.testevents.SendKeysToBrowserEventHandler;
+
+import static org.junit.Assert.assertEquals;
 
 public class ChromeDriverTest extends UITest {
 
-    private final int EVENT_DELAY = 100;
+    private static final int EVENT_DELAY = 1000;
+    private String url;
+    private String script;
+    private String keyCode;
+    private boolean jumpToComment;
 
     @Override
     public void launchApp() {
@@ -20,69 +30,151 @@ public class ChromeDriverTest extends UITest {
                 TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
-    // TODO test that events have been triggered
     @Test
     public void chromeDriverStubTest() {
-        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0));
+        clearUrl();
+        clearScript();
+        clearKeyCode();
+        jumpToComment = false;
+        UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
+        UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
+        UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
+        UI.events.registerEvent((JumpToCommentEventHandler) e -> jumpToComment = true);
+
+        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
         sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForIssue("dummy/dummy", 1), url);
+        clearUrl();
         UI.events.triggerEvent(new IssueCreatedEvent());
         sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForNewIssue("dummy/dummy"), url);
+        clearUrl();
         UI.events.triggerEvent(new LabelCreatedEvent());
         sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForNewLabel("dummy/dummy"), url);
+        clearUrl();
         UI.events.triggerEvent(new MilestoneCreatedEvent());
         sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForNewMilestone("dummy/dummy"), url);
+        clearUrl();
 
         click("#dummy/dummy_col0_1");
+        sleep(EVENT_DELAY);
+        clearUrl();
 
         // show docs
-        press(KeyCode.F1).release(KeyCode.F1);
-        press(KeyCode.G).press(KeyCode.H).release(KeyCode.H).release(KeyCode.G);
+        push(KeyCode.F1);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.DOCS_PAGE, url);
+        clearUrl();
+        push(KeyCode.G).push(KeyCode.H);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.DOCS_PAGE, url);
+        clearUrl();
 
         // scroll to top
-        press(KeyCode.U).release(KeyCode.U);
+        push(KeyCode.I);
+        sleep(EVENT_DELAY);
+        assertEquals("window.scrollTo(0, 0)", script);
+        clearScript();
 
         // scroll to bottom
-        press(KeyCode.N).release(KeyCode.N);
+        push(KeyCode.N);
+        sleep(EVENT_DELAY);
+        assertEquals("window.scrollTo(0, document.body.scrollHeight)", script);
+        clearScript();
 
         // scroll up
-        press(KeyCode.J).release(KeyCode.J);
+        push(KeyCode.J);
+        sleep(EVENT_DELAY);
+        assertEquals("window.scrollBy(0, -100)", script);
+        clearScript();
 
         // scroll down
-        press(KeyCode.K).release(KeyCode.K);
+        push(KeyCode.K);
+        sleep(EVENT_DELAY);
+        assertEquals("window.scrollBy(0,100)", script);
+        clearScript();
 
         // go to labels page
-        press(KeyCode.G).press(KeyCode.L).release(KeyCode.L).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.L);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForNewLabel("dummy/dummy"), url);
+        clearUrl();
 
         // go to issues page
-        press(KeyCode.G).press(KeyCode.I).release(KeyCode.I).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.I);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForAllIssues("dummy/dummy"), url);
+        clearUrl();
 
         // go to milestones page
-        press(KeyCode.G).press(KeyCode.M).release(KeyCode.M).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.M);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForMilestones("dummy/dummy"), url);
+        clearUrl();
 
         // go to pull requests page
-        press(KeyCode.G).press(KeyCode.P).release(KeyCode.P).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.P);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForPullRequests("dummy/dummy"), url);
+        clearUrl();
 
         // go to developers page
-        press(KeyCode.G).press(KeyCode.D).release(KeyCode.D).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.D);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForContributors("dummy/dummy"), url);
+        clearUrl();
 
         // go to keyboard shortcuts page
-        press(KeyCode.G).press(KeyCode.K).release(KeyCode.K).release(KeyCode.G);
+        push(KeyCode.G).push(KeyCode.K);
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.getPathForKeyboardShortcuts(), url);
+        clearUrl();
 
         // manage labels
-        press(KeyCode.L).release(KeyCode.L);
+        push(KeyCode.L);
+        sleep(EVENT_DELAY);
+        assertEquals("l", keyCode);
+        clearKeyCode();
 
         // manage assignee
-        press(KeyCode.A).release(KeyCode.A);
+        push(KeyCode.A);
+        sleep(EVENT_DELAY);
+        assertEquals("a", keyCode);
+        clearKeyCode();
 
         // manage milestone
-        press(KeyCode.M).release(KeyCode.M);
+        push(KeyCode.M);
+        sleep(EVENT_DELAY);
+        assertEquals("m", keyCode);
+        clearKeyCode();
 
         // jump to comments
-        press(KeyCode.C).release(KeyCode.C);
+        push(KeyCode.C);
+        sleep(EVENT_DELAY);
+        assertEquals(true, jumpToComment);
+        jumpToComment = false;
 
         click("View");
         click("Documentation");
+        sleep(EVENT_DELAY);
+        assertEquals(GitHubURL.DOCS_PAGE, url);
+        clearUrl();
+
         click("Preferences");
         click("Logout");
+    }
+
+    public void clearUrl() {
+        url = "";
+    }
+
+    public void clearScript() {
+        script = "";
+    }
+
+    public void clearKeyCode() {
+        keyCode = "";
     }
 }
