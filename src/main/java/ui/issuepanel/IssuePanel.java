@@ -98,19 +98,19 @@ public class IssuePanel extends IssueColumn {
 
     @Override
     public void refreshItems(boolean hasMetadata) {
-        super.refreshItems(hasMetadata);
-
-        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
-
-        // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
-        // or if hasMetadata is true (metadata has arrived), or if getIssueList is empty (if filter does
-        // have UPDATED, but there are no issues whose metadata require retrieval causing hasMetadata to
-        // never be true)
-
-        if (!hasUpdatedQualifier // not waiting for metadata, just update
-                || hasMetadata // metadata has arrived, update
-                || getIssueList().size() == 0 // checked only when above two not satisfied
-                ) {
+//        super.refreshItems(hasMetadata);
+//
+//        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
+//
+//        // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
+//        // or if hasMetadata is true (metadata has arrived), or if getIssueList is empty (if filter does
+//        // have UPDATED, but there are no issues whose metadata require retrieval causing hasMetadata to
+//        // never be true)
+//
+//        if (!hasUpdatedQualifier // not waiting for metadata, just update
+//                || hasMetadata // metadata has arrived, update
+//                || getIssueList().size() == 0 // checked only when above two not satisfied
+//                ) {
             final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
 
             // Set the cell factory every time - this forces the list view to update
