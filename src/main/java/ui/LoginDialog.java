@@ -88,6 +88,7 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
     }
 
     private boolean attemptLogin() {
+        Platform.runLater(() -> enableUI(false));
         try {
             if (Utility.isWellFormedRepoId(owner, repo)) {
                 return ui.logic.login(username, password).get();
