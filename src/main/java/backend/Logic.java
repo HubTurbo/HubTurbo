@@ -140,26 +140,6 @@ public class Logic {
             }
         });
     }
-    
-    // Dummy method for refactoring above two methods. Currently not used yet.
-    public CompletableFuture<Boolean> openRepo(String repoId) {
-        models.queuePendingRepository(repoId);
-        return isRepositoryValid(repoId).thenCompose(valid -> {
-            if (!valid) {
-                return Futures.unit(false);
-            } else {
-                prefs.addToLastViewedRepositories(repoId);
-                logger.info("Opening " + repoId);
-                UI.status.displayMessage("Opening " + repoId);
-                return repoIO.openRepository(repoId)
-                    .thenApply(models::addPending)
-                    .thenRun(this::updateUI)
-                    .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                    .thenApply(n -> true)
-                    .exceptionally(withResult(false));
-            }
-        });
-    }
 
     public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
         String message = "Getting metadata for " + repoId + "...";
