@@ -97,6 +97,29 @@ public class Logic {
 
     public CompletableFuture<Boolean> openRepository(String repoId) {
         assert Utility.isWellFormedRepoId(repoId);
+        if ((isAlreadyOpen(repoId) && repoId.equals(getDefaultRepo())) || models.isRepositoryPending(repoId)) {
+            return Futures.unit(false);
+        }
+        models.queuePendingRepository(repoId);
+        return isRepositoryValid(repoId).thenCompose(valid -> {
+            if (!valid) {
+                return Futures.unit(false);
+            } else {
+                prefs.addToLastViewedRepositories(repoId);
+                logger.info("Opening " + repoId);
+                UI.status.displayMessage("Opening " + repoId);
+                return repoIO.openRepository(repoId)
+                    .thenApply(models::addPending)
+                    .thenRun(this::updateUI)
+                    .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
+                    .thenApply(n -> true)
+                    .exceptionally(withResult(false));
+            }
+        });
+    }
+    
+    public CompletableFuture<Boolean> openRepoFromFilter(String repoId) {
+        assert Utility.isWellFormedRepoId(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             return Futures.unit(false);
         }

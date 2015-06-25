@@ -3,6 +3,7 @@ package guitests;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.application.Platform;
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -41,6 +42,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("test");
         click("Sign in");
         sleep(2000);
+        
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals(repositorySelector.getValue(), "dummy/dummy");
 
@@ -51,15 +53,31 @@ public class UseGlobalConfigsTest extends UITest {
         // TODO find out why
         ((TextField) find("#boardnameinput")).setText("Empty Board");
         click("OK");
+        
+        // Testing combo box edit
+        doubleClick("#repositorySelector");
+        doubleClick();
+        type("dummy1/dummy1");
+        push(KeyCode.ENTER);
 
-        // Load dummy2/dummy2 too
+        // Testing adding repo from filter
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        click("#dummy/dummy_col1_filterTextField");
+        click("#dummy1/dummy1_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
         sleep(2000);
+        
+        // Testing combo box select
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                repositorySelector.show();
+            }
+        });
+        sleep(200);
+        click("dummy/dummy");
 
         // Make a new board
         click("Boards");
@@ -87,8 +105,10 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(1));
         // Last viewed repositories
         List<String> lastViewedRepositories = testPref.getLastViewedRepositories();
-        assertEquals("dummy/dummy", lastViewedRepositories.get(0));
+        assertEquals(3, lastViewedRepositories.size());
+        assertEquals("dummy1/dummy1", lastViewedRepositories.get(0));
         assertEquals("dummy2/dummy2", lastViewedRepositories.get(1));
+        assertEquals("dummy/dummy", lastViewedRepositories.get(2));
         // Boards
         Map<String, List<String>> boards = testPref.getAllBoards();
         List<String> emptyBoard = boards.get("Empty Board");
