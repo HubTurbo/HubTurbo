@@ -5,6 +5,8 @@ import org.junit.Test;
 
 public class SortTest extends UITest {
 
+    // TODO check that issue list is sorted correctly
+
     @Test
     public void sortTest () {
         click("#dummy/dummy_col0_filterTextField");
@@ -20,7 +22,6 @@ public class SortTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("-id");
         push(KeyCode.ENTER);
-        click("#dummy/dummy_col0_1");
         doubleClick("#dummy/dummy_col0_filterTextField");
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Comment count
