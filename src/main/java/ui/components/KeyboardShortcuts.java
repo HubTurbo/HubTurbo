@@ -63,6 +63,8 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination SWITCH_DEFAULT_REPO =
+            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
 
     public static final KeyCode REFRESH = KeyCode.F5;
     public static final KeyCode SHOW_DOCS = KeyCode.F1;
