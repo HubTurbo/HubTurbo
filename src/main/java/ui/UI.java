@@ -33,7 +33,6 @@ import util.Utility;
 import util.events.*;
 import util.events.Event;
 import util.events.testevents.UILogicRefreshEventHandler;
-import util.events.testevents.WindowResizeEvent;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -432,9 +431,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void setDefaultWidth() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.DEFAULT_SIZE_WINDOW));
-        }
         mainStage.setMaximized(false);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(columns.getPanelWidth());
@@ -446,9 +442,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void maximizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MAXIMIZE_WINDOW));
-        }
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(dimensions.getWidth());
@@ -460,9 +453,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void minimizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MINIMIZE_WINDOW));
-        }
         mainStage.setIconified(true);
         menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
     }
