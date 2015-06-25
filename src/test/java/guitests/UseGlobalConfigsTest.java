@@ -3,6 +3,7 @@ package guitests;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.application.Platform;
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -69,11 +70,14 @@ public class UseGlobalConfigsTest extends UITest {
         sleep(2000);
         
         // Testing combo box select
-        click("#repositorySelector");
-        moveBy(120, 0);
-        click();
-        moveBy(-120, 20);
-        click();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                repositorySelector.show();
+            }
+        });
+        sleep(200);
+        click("dummy/dummy");
 
         // Make a new board
         click("Boards");
