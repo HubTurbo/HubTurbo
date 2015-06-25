@@ -226,7 +226,6 @@ public class LoginDialog extends Dialog<LoginDialog.Result> {
         }
 
         loadCredentialsFromFile();
-        resolveCredentials();
 
         // Change focus depending on what fields are present
         Platform.runLater(() -> {
