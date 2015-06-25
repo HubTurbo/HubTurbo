@@ -59,7 +59,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("dummy1/dummy1");
         push(KeyCode.ENTER);
 
-        // Load dummy2/dummy2 too
+        // Testing adding repo from filter
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         click("#dummy1/dummy1_col1_filterTextField");
         type("repo");
