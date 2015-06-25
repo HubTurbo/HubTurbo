@@ -9,39 +9,33 @@ import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
-import util.events.testevents.WindowResizeEvent;
-import util.events.testevents.WindowResizeEventHandler;
 
 import static org.junit.Assert.assertEquals;
 import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
 public class KeyboardShortcutsTest extends UITest {
 
-    private WindowResizeEvent.EventType windowResizeEventType;
     private UIComponentFocusEvent.EventType uiComponentFocusEventType;
     private int selectedIssueId;
     private int columnIndex;
 
     @Test
     public void keyboardShortcutsTest() {
-        UI.events.registerEvent((WindowResizeEventHandler) e -> windowResizeEventType = e.eventType);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> selectedIssueId = e.id);
         UI.events.registerEvent((UIComponentFocusEventHandler) e -> uiComponentFocusEventType = e.eventType);
         UI.events.registerEvent((ColumnClickedEventHandler) e -> columnIndex = e.columnIndex);
-        clearEventType();
         clearSelectedIssueId();
         clearUiComponentFocusEventType();
         clearColumnIndex();
 
         // maximize
+        assertEquals(false, stage.getMinWidth() > 500);
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
-        assertEquals(WindowResizeEvent.EventType.MAXIMIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(true, stage.getMinWidth() > 500);
 
         // mid-sized window
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
-        assertEquals(WindowResizeEvent.EventType.DEFAULT_SIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(false, stage.getMinWidth() > 500);
 
         // jump from filter box to first issue
         press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
@@ -113,16 +107,11 @@ public class KeyboardShortcutsTest extends UITest {
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
-        assertEquals(WindowResizeEvent.EventType.MINIMIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(true, stage.isIconified());
     }
 
     public KeyCode getKeyCode(String shortcut) {
         return KeyCode.getKeyCode(KeyboardShortcuts.getDefaultKeyboardShortcuts().get(shortcut));
-    }
-
-    public void clearEventType() {
-        windowResizeEventType = WindowResizeEvent.EventType.NONE;
     }
 
     public void clearSelectedIssueId() {
