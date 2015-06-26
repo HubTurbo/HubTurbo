@@ -56,11 +56,6 @@ public class ColumnControl extends HBox {
         model = newModel;
     }
 
-    public void recreateColumns() {
-        saveSession();
-        restoreColumns();
-    }
-
     public void saveSession() {
         List<String> sessionFilters = new ArrayList<>();
         getChildren().forEach(child -> {
