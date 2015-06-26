@@ -422,23 +422,22 @@ public class UI extends Application implements EventDispatcher {
     }
     
     public void switchDefaultRepo(){
-    	logger.info("Triggered switch default repo");
-    	String[] openRepos = logic.getOpenRepositories().toArray(new String[0]);
-    	String currentRepo = logic.getDefaultRepo();
+        logger.info("Triggered switch default repo");
+        String[] openRepos = logic.getOpenRepositories().toArray(new String[0]);
+        String currentRepo = logic.getDefaultRepo();
     	
-    	// Cycle to the next open repository
-    	for(int i = 0; i < openRepos.length; i++){
-    		if(openRepos[i].equals(currentRepo)){
-    			if(i == openRepos.length-1){
-    				primaryRepoChanged(openRepos[0]);
-    			}
-    			else {
-    				primaryRepoChanged(openRepos[i+1]);
-    			}
+        // Cycle to the next open repository
+        for (int i = 0; i < openRepos.length; i++) {
+    	    if (openRepos[i].equals(currentRepo)) {
+    		    if (i == openRepos.length - 1) {
+    			    primaryRepoChanged(openRepos[0]);
+    		    } else {
+    			    primaryRepoChanged(openRepos[i + 1]);
+    		    }
     			
-    			break;
-    		}
-    	}
+    		    break;
+    	    }
+        }
     }
 
     private void ensureSelectedPanelHasFocus() {
