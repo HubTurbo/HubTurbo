@@ -29,7 +29,7 @@ public class Logic {
     private final UIManager uiManager;
     protected final Preferences prefs;
 
-    protected RepoIO repoIO;
+    private RepoIO repoIO;
     public LoginController loginController;
 
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
@@ -188,6 +188,10 @@ public class Logic {
 
     private void updateUIWithMetadata() {
         uiManager.update(models, true);
+    }
+
+    protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
+        return repoIO.login(credentials);
     }
 }
 

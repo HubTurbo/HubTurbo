@@ -32,7 +32,7 @@ public class LoginController {
         UI.status.displayMessage(message);
         credentials = new UserCredentials(username, password);
         try {
-            return logic.repoIO.login(credentials).get();
+            return logic.repoIOLogin(credentials).get();
         } catch (InterruptedException | ExecutionException e1) {
             HTLog.error(logger, e1);
             return false;
