@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class Dialog<T> {
 
-    private final Stage parentStage;
     private Stage stage = null;
     private CompletableFuture<T> response;
 
@@ -22,11 +21,7 @@ public abstract class Dialog<T> {
     private Modality modality = Modality.APPLICATION_MODAL;
 
     public Dialog(Stage parentStage) {
-        this.parentStage = parentStage;
         this.response = new CompletableFuture<>();
-    }
-
-    public CompletableFuture<T> setup() {
         Scene scene = new Scene(content(), width, height);
         stage = new Stage();
         stage.setScene(scene);
@@ -35,16 +30,16 @@ public abstract class Dialog<T> {
         stage.initOwner(parentStage);
         stage.initModality(modality);
         stage.initStyle(stageStyle);
-//        stage.setX(parentStage.getX() + x);
-//        stage.setY(parentStage.getY() + y);
-        if (showOnSetup()) {
-            show();
-        }
+    }
+
+    public CompletableFuture<T> show() {
+        stage.show();
+        Platform.runLater(stage::requestFocus);
         return response;
     }
 
     // Getters and setters for stage properties
-    // (Some only work before setup() is called)
+    // (Some only work before show() is called)
 
     public Dialog<T> setTitle(String title) {
         this.title = title;
@@ -73,11 +68,6 @@ public abstract class Dialog<T> {
         stage.close();
     }
 
-    public void show() {
-        stage.show();
-        Platform.runLater(stage::requestFocus);
-    }
-
     protected void completeResponse(T value) {
         response.complete(value);
     }
@@ -93,8 +83,4 @@ public abstract class Dialog<T> {
         return null;
     }
 
-    protected boolean showOnSetup() {
-        // To be implemented by extending classes
-        return false;
-    }
 }
