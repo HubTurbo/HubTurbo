@@ -291,9 +291,9 @@ public class BrowserComponent {
             driver.get(GitHubURL.LOGIN_PAGE);
             try {
                 WebElement searchBox = driver.findElement(By.name("login"));
-                searchBox.sendKeys(ui.logic.credentials.username);
+                searchBox.sendKeys(ui.logic.loginController.credentials.username);
                 searchBox = driver.findElement(By.name("password"));
-                searchBox.sendKeys(ui.logic.credentials.password);
+                searchBox.sendKeys(ui.logic.loginController.credentials.password);
                 searchBox.submit();
             } catch (Exception e) {
                 // Already logged in; do nothing
