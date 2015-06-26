@@ -1,13 +1,12 @@
 package guitests;
 
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
-
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static org.loadui.testfx.controls.Commons.hasText;
 
 public class InvalidLoginTest extends UITest {
 
@@ -21,12 +20,58 @@ public class InvalidLoginTest extends UITest {
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
-        type("abc").push(KeyCode.TAB);
-        type("abc").push(KeyCode.TAB);
-        type("abc").push(KeyCode.TAB);
-        type("abc");
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc");
         click("Sign in");
         sleep(1000);
         assertNodeExists(hasText("Failed to sign in. Please try again."));
+        click("OK");
     }
+
+    @Test
+    public void emptyLoginTest() throws InterruptedException {
+        TextField repoOwnerField = find("#repoOwnerField");
+        doubleClick(repoOwnerField);
+        doubleClick(repoOwnerField);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).push(KeyCode.TAB).push(KeyCode.BACK_SPACE);
+        click("Sign in");
+        sleep(1000);
+        assertNodeExists(hasText("Failed to sign in. Please try again."));
+        click("OK");
+    }
+
+    @Test
+    public void emptyUsernameTest() throws InterruptedException {
+        TextField repoOwnerField = find("#repoOwnerField");
+        doubleClick(repoOwnerField);
+        doubleClick(repoOwnerField);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc");
+        click("Sign in");
+        sleep(1000);
+        assertNodeExists(hasText("Failed to sign in. Please try again."));
+        click("OK");
+    }
+
+    @Test
+    public void emptyPasswordTest() throws InterruptedException {
+        TextField repoOwnerField = find("#repoOwnerField");
+        doubleClick(repoOwnerField);
+        doubleClick(repoOwnerField);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
+        push(KeyCode.BACK_SPACE);
+        click("Sign in");
+        sleep(1000);
+        assertNodeExists(hasText("Failed to sign in. Please try again."));
+        click("OK");
+    }
+
 }
