@@ -27,9 +27,9 @@ public class Logic {
 
     private final MultiModel models;
     private final UIManager uiManager;
-    private final Preferences prefs;
+    protected final Preferences prefs;
 
-    private RepoIO repoIO;
+    protected RepoIO repoIO;
     public LoginController loginController;
 
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
@@ -38,7 +38,7 @@ public class Logic {
         this.models = new MultiModel(prefs);
 
         repoIO = new RepoIO(isTestMode, enableTestJSON);
-        loginController = new LoginController(repoIO);
+        loginController = new LoginController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) e -> {
