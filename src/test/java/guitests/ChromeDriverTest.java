@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ChromeDriverTest extends UITest {
 
-    private static final int EVENT_DELAY = 1000;
+    private static final int EVENT_DELAY = 750;
     private String url;
     private String script;
     private String keyCode;
@@ -58,7 +58,7 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.getPathForNewMilestone("dummy/dummy"), url);
         clearUrl();
 
-        click("#dummy/dummy_col0_1");
+        click("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
         clearUrl();
 

@@ -1,7 +1,5 @@
 package ui.components;
 
-import java.util.concurrent.CompletableFuture;
-
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,6 +7,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Dialog<T> {
 
@@ -26,7 +26,7 @@ public abstract class Dialog<T> {
         this.response = new CompletableFuture<>();
     }
 
-    public CompletableFuture<T> show() {
+    public CompletableFuture<T> setup() {
         Scene scene = new Scene(content(), width, height);
         stage = new Stage();
         stage.setScene(scene);
@@ -37,13 +37,14 @@ public abstract class Dialog<T> {
         stage.initStyle(stageStyle);
 //        stage.setX(parentStage.getX() + x);
 //        stage.setY(parentStage.getY() + y);
-        stage.show();
-        Platform.runLater(stage::requestFocus);
+        if (showOnSetup()) {
+            show();
+        }
         return response;
     }
 
     // Getters and setters for stage properties
-    // (Some only work before show() is called)
+    // (Some only work before setup() is called)
 
     public Dialog<T> setTitle(String title) {
         this.title = title;
@@ -72,6 +73,11 @@ public abstract class Dialog<T> {
         stage.close();
     }
 
+    public void show() {
+        stage.show();
+        Platform.runLater(stage::requestFocus);
+    }
+
     protected void completeResponse(T value) {
         response.complete(value);
     }
@@ -85,5 +91,10 @@ public abstract class Dialog<T> {
     protected Parent content() {
         // To be implemented by extending classes
         return null;
+    }
+
+    protected boolean showOnSetup() {
+        // To be implemented by extending classes
+        return false;
     }
 }

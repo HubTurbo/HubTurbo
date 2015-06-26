@@ -33,7 +33,6 @@ import util.Utility;
 import util.events.*;
 import util.events.Event;
 import util.events.testevents.UILogicRefreshEventHandler;
-import util.events.testevents.WindowResizeEvent;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -81,21 +80,23 @@ public class UI extends Application implements EventDispatcher {
 
     @Override
     public void start(Stage stage) {
-
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
-
         getUserCredentials();
     }
 
     private void getUserCredentials() {
         if (isBypassLogin()) {
             showMainWindow("dummy/dummy");
+            mainStage.show();
         } else {
-            new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
+            disableUI(true);
+            mainStage.show();
+            new LoginDialog(this, prefs, mainStage).setup().thenApply(result -> {
                 if (result.success) {
                     showMainWindow(result.repoId);
+                    disableUI(false);
                 } else {
                     quit();
                 }
@@ -105,6 +106,12 @@ public class UI extends Application implements EventDispatcher {
                 return false;
             });
         }
+    }
+
+    private void disableUI(boolean disable) {
+        mainStage.setResizable(!disable);
+        menuBar.setDisable(disable);
+        repoSelector.setDisable(disable);
     }
 
     private void showMainWindow(String repoId) {
@@ -271,14 +278,17 @@ public class UI extends Application implements EventDispatcher {
                 browserComponent.focus(mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {
-                boolean shouldRefresh = browserComponent.hasBviewChanged();
-                if (shouldRefresh) {
-                    logger.info("Browser view has changed; refreshing");
-                    logic.refresh();
-                    refreshTimer.restart();
+                if (browserComponent != null) {
+                    boolean shouldRefresh = browserComponent.hasBviewChanged();
+                    if (shouldRefresh) {
+                        logger.info("Browser view has changed; refreshing");
+                        logic.refresh();
+                        refreshTimer.restart();
+                    }
                 }
             });
         });
+        mainStage.hide();
     }
 
     private static void initialiseJNA(String windowTitle) {
@@ -434,9 +444,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void setDefaultWidth() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.DEFAULT_SIZE_WINDOW));
-        }
         mainStage.setMaximized(false);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(columns.getPanelWidth());
@@ -448,9 +455,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void maximizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MAXIMIZE_WINDOW));
-        }
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(dimensions.getWidth());
@@ -462,9 +466,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void minimizeWindow() {
-        if (isTestMode()) {
-            triggerEvent(new WindowResizeEvent(WindowResizeEvent.EventType.MINIMIZE_WINDOW));
-        }
         mainStage.setIconified(true);
         menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
     }
