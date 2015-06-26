@@ -428,15 +428,15 @@ public class UI extends Application implements EventDispatcher {
     	
         // Cycle to the next open repository
         for (int i = 0; i < openRepos.length; i++) {
-    	    if (openRepos[i].equals(currentRepo)) {
-    		    if (i == openRepos.length - 1) {
-    			    primaryRepoChanged(openRepos[0]);
-    		    } else {
-    			    primaryRepoChanged(openRepos[i + 1]);
-    		    }
-    			
-    		    break;
-    	    }
+            if (openRepos[i].equals(currentRepo)) {
+                if (i == openRepos.length - 1) {
+                    primaryRepoChanged(openRepos[0]);
+                } else {
+                    primaryRepoChanged(openRepos[i + 1]);
+                }
+                
+                break;
+            }
         }
     }
 
