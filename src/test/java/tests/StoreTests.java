@@ -10,12 +10,14 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import backend.RepoIO;
-import backend.resource.Model;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 import util.events.testevents.UpdateDummyRepoEvent;
+import backend.RepoIO;
+import backend.interfaces.RepoStore;
+import backend.json.JSONStore;
+import backend.resource.Model;
 
 public class StoreTests {
 
@@ -88,6 +90,17 @@ public class StoreTests {
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
         assertEquals(11, dummy2.getIssues().size());
+    }
+
+    @Test(expected=ExecutionException.class)
+    public void testCorruptedJSON() throws InterruptedException, ExecutionException {
+        RepoStore.write("testrepo/testrepo", "abcde");
+
+        JSONStore jsonStore = new JSONStore();
+        jsonStore.loadRepository("testrepo/testrepo").get();
+
+        File f = new File("store/test/testrepo/testrepo");
+        f.delete();
     }
 
     /**
