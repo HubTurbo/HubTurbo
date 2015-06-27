@@ -104,6 +104,12 @@ public class StoreTests {
         f.delete();
     }
 
+    @Test(expected = ExecutionException.class)
+    public void testNonExistedJSON() throws InterruptedException, ExecutionException {
+        JSONStore jsonStore = new JSONStore();
+        jsonStore.loadRepository("nonexist/nonexist").get();
+    }
+
     @Test
     public void testLoadCorruptedRepository() throws InterruptedException, ExecutionException {
         RepoStore.write("testrepo/testrepo", "abcde");
@@ -115,6 +121,14 @@ public class StoreTests {
 
         File f = new File("store/test/testrepo/testrepo");
         f.delete();
+    }
+
+    @Test
+    public void testLoadNonExistRepo() throws InterruptedException, ExecutionException {
+        RepoIO repoIO = new RepoIO(false, false);
+        Model model = repoIO.openRepository("nonexist/nonexist").get();
+
+        assertTrue(model.getIssues().isEmpty());
     }
 
     /**
