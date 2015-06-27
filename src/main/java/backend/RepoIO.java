@@ -64,7 +64,7 @@ public class RepoIO {
                 .exceptionally(ex -> {
                     try {
                         return downloadRepositoryFromSource(repoId).get();
-                    } catch (ExecutionException|InterruptedException e) {
+                    } catch (ExecutionException | InterruptedException e) {
                         logger.info("Error while downloading " + repoId);
                         logger.error(e.getLocalizedMessage());
 

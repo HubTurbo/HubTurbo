@@ -92,7 +92,7 @@ public class StoreTests {
         assertEquals(11, dummy2.getIssues().size());
     }
 
-    @Test(expected=ExecutionException.class)
+    @Test(expected = ExecutionException.class)
     public void testCorruptedJSON() throws InterruptedException, ExecutionException {
         RepoStore.write("testrepo/testrepo", "abcde");
 
