@@ -5,14 +5,17 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
+import util.HTLog;
+import util.exceptions.JSONLoadException;
+import util.exceptions.RepoStoreException;
 import backend.interfaces.RepoStore;
 import backend.interfaces.StoreTask;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-import util.HTLog;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 class ReadTask extends StoreTask {
 
@@ -27,21 +30,39 @@ class ReadTask extends StoreTask {
 
     @Override
     public void run() {
-        Model model = load(repoId);
-        response.complete(model);
+        try {
+            Model model = load(repoId);
+            response.complete(model);
+        } catch (RepoStoreException e) {
+            logger.error(HTLog.format(repoId, "Failed to load from store"));
+            response.completeExceptionally(e);
+        }
     }
 
-    private Model load(String repoId) {
+    /**
+     * Load repository data from RepoStore into a new Model.
+     * @param repoId the string id of the repository to be loaded
+     * @return a new Model containing data for the requested repository.
+     * @throws JSONLoadException
+     */
+    private Model load(String repoId) throws RepoStoreException {
         Optional<String> input = RepoStore.read(repoId);
 
         if (!input.isPresent()) {
             logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
-            return new Model(repoId);
+            throw new JSONLoadException();
         } else {
             logger.info(HTLog.format(repoId, "Loaded from JSON cache"));
-            SerializableModel sModel = new Gson().fromJson(input.get(),
-                new TypeToken<SerializableModel>(){}.getType());
-            return new Model(sModel);
+
+            try {
+                SerializableModel sModel = new Gson().fromJson(input.get(),
+                        new TypeToken<SerializableModel>(){}.getType());
+
+                return new Model(sModel);
+            } catch (JsonParseException e) {
+                logger.error(HTLog.format(repoId, "JSON data is corrupted"));
+                throw new JSONLoadException();
+            }
         }
     }
 }
