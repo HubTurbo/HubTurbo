@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -98,6 +99,19 @@ public class StoreTests {
 
         JSONStore jsonStore = new JSONStore();
         jsonStore.loadRepository("testrepo/testrepo").get();
+
+        File f = new File("store/test/testrepo/testrepo");
+        f.delete();
+    }
+
+    @Test
+    public void testLoadCorruptedRepository() throws InterruptedException, ExecutionException {
+        RepoStore.write("testrepo/testrepo", "abcde");
+
+        RepoIO repoIO = new RepoIO(false, false);
+        Model model = repoIO.openRepository("testrepo/testrepo").get();
+
+        assertTrue(model.getIssues().isEmpty());
 
         File f = new File("store/test/testrepo/testrepo");
         f.delete();
