@@ -40,16 +40,17 @@ class ReadTask extends StoreTask {
     }
 
     /**
-     * Load repository data from RepoStore into a new Model.
+     * Loads repository data from RepoStore into a new Model.
      * @param repoId the string id of the repository to be loaded
      * @return a new Model containing data for the requested repository.
-     * @throws JSONLoadException
+     * @throws JSONLoadException when the repository's JSON data cannot be
+     *         retrieved from the local store or is corrupted
      */
     private Model load(String repoId) throws RepoStoreException {
         Optional<String> input = RepoStore.read(repoId);
 
         if (!input.isPresent()) {
-            logger.error("Unable to load " + repoId + " from JSON cache; defaulting to an empty Model");
+            logger.error("Unable to load " + repoId + " from JSON cache");
             throw new JSONLoadException();
         } else {
             logger.info(HTLog.format(repoId, "Loaded from JSON cache"));
