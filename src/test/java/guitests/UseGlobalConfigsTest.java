@@ -1,22 +1,20 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.junit.After;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+import prefs.Preferences;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import org.junit.After;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
-import prefs.Preferences;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UseGlobalConfigsTest extends UITest {
 
@@ -31,10 +29,7 @@ public class UseGlobalConfigsTest extends UITest {
 
     @Test
     public void globalConfigTest() {
-        // Cleaning up with @Before creates race condition.
-        // Neither can we ensure test config file does not exist before starting test,
-        // as the program automatically generates an empty config file if it does not
-        // exist.
+        // Override setupMethod() if you want to do stuff to the JSON beforehand
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
