@@ -1,18 +1,18 @@
 package backend.interfaces;
 
+import backend.resource.Model;
+import backend.resource.serialization.SerializableModel;
+import util.Utility;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import backend.resource.Model;
-import backend.resource.serialization.SerializableModel;
-import util.Utility;
-
 public abstract class RepoStore {
 
-    private static String directory = "store";
+    protected static String directory = "store";
     private static final String TEST_DIRECTORY = "store/test";
     private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
@@ -26,11 +26,6 @@ public abstract class RepoStore {
 
     public abstract CompletableFuture<Model> loadRepository(String repoId);
     public abstract void saveRepository(String repoId, SerializableModel model);
-
-    public boolean isRepoStored(String repoId) {
-        File file = new File(getRepoPath(repoId));
-        return file.exists() && file.isFile();
-    }
 
     private static String getRepoPath(String repoId) {
         ensureDirectoryExists();
@@ -46,7 +41,7 @@ public abstract class RepoStore {
         return Utility.readFile(getRepoPath(repoId));
     }
 
-    private static void ensureDirectoryExists() {
+    protected static void ensureDirectoryExists() {
         File directory = new File(RepoStore.directory);
         if (!directory.exists() || !directory.isDirectory()) {
             directory.mkdirs();
@@ -60,4 +55,5 @@ public abstract class RepoStore {
     private static void changeDirectory(String newDir) {
         RepoStore.directory = newDir;
     }
+
 }
