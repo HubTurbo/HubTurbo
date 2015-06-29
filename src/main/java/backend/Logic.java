@@ -1,6 +1,17 @@
 package backend;
 
-import static util.Futures.withResult;
+import backend.resource.Model;
+import backend.resource.MultiModel;
+import github.TurboIssueEvent;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
+import prefs.Preferences;
+import ui.UI;
+import util.Futures;
+import util.HTLog;
+import util.Utility;
+import util.events.RepoOpenedEvent;
+import util.events.testevents.ClearLogicModelEventHandler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,19 +19,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import github.TurboIssueEvent;
-import org.apache.logging.log4j.Logger;
-
-import backend.resource.Model;
-import backend.resource.MultiModel;
-import org.eclipse.egit.github.core.Comment;
-import prefs.Preferences;
-import ui.UI;
-import util.Futures;
-import util.HTLog;
-import util.Utility;
-import util.events.testevents.ClearLogicModelEventHandler;
-import util.events.RepoOpenedEvent;
+import static util.Futures.withResult;
 
 public class Logic {
 
@@ -105,7 +104,7 @@ public class Logic {
             if (!valid) {
                 return Futures.unit(false);
             } else {
-                prefs.addToLastViewedRepositories(repoId);
+                prefs.setLastViewedRepository(repoId);
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
