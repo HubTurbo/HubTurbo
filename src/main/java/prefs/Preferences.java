@@ -91,7 +91,12 @@ public class Preferences {
         if (global.getLastViewedRepository().isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(RepositoryId.createFromId(global.getLastViewedRepository()));
+            RepositoryId repositoryId = RepositoryId.createFromId(global.getLastViewedRepository());
+            if (repositoryId == null) {
+                return Optional.empty();
+            } else {
+                return Optional.of(repositoryId);
+            }
         }
     }
 
