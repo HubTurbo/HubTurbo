@@ -1,21 +1,18 @@
 package prefs;
 
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import ui.components.KeyboardShortcuts;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -26,7 +23,7 @@ public class GlobalConfig {
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
     private List<String> lastOpenFilters = new ArrayList<>();
-    private List<RepoViewRecord> lastViewedRepositories = new ArrayList<>();
+    private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
     private Map<String, List<String>> boards = new HashMap<>();
@@ -92,38 +89,12 @@ public class GlobalConfig {
         return new ArrayList<>(lastOpenFilters);
     }
 
-    /**
-     * Adds a repository to the list of last-viewed repositories.
-     * The list will always have 10 or fewer items.
-     */
-    public void addToLastViewedRepositories(String repository) {
-        repository = repository.toLowerCase();
-
-        // Create record for this repository
-        RepoViewRecord latestRepoView = new RepoViewRecord(repository);
-        int index = lastViewedRepositories.indexOf(latestRepoView);
-        if (index < 0) {
-            lastViewedRepositories.add(latestRepoView);
-        } else {
-            lastViewedRepositories.get(index).setTimestamp(latestRepoView.getTimestamp());
-        }
-
-        // Keep only the 10 latest records
-        Collections.sort(lastViewedRepositories);
-        while (lastViewedRepositories.size() > 10) {
-            lastViewedRepositories.remove(lastViewedRepositories.size() - 1);
-        }
-        assert lastViewedRepositories.size() <= 10;
+    public void setLastViewedRepository(String repository) {
+        lastViewedRepository = repository;
     }
 
-    /**
-     * Returns last-viewed repositories in owner/name format.
-     * They are sorted by access date, latest first.
-     */
-    public List<String> getLastViewedRepositories() {
-        return lastViewedRepositories.stream()
-                .map(RepoViewRecord::getRepository)
-                .collect(Collectors.toList());
+    public String getLastViewedRepository() {
+        return lastViewedRepository;
     }
 
     public String getLastLoginUsername() {
