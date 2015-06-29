@@ -7,6 +7,7 @@ import org.junit.Test;
 import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.ColumnClickedEventHandler;
+import util.events.DefaultRepoSwitchedEventHandler;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
@@ -64,6 +65,14 @@ public class UIEventTests extends UITest {
         UI.events.registerEvent((ColumnClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("#dummy/dummy_col0_filterTextField");
+        assertEquals(1, eventTestCount);
+    }
+    
+    @Test
+    public void defaultRepoSwitchedTest() {
+        UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.increaseEventTestCount());
+        resetEventTestCount();
+        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
     }
 }
