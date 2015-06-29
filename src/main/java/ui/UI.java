@@ -427,7 +427,7 @@ public class UI extends Application implements EventDispatcher {
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
-        columns.refresh();
+        logic.refresh();
     }
 
     private void ensureSelectedPanelHasFocus() {
