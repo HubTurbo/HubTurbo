@@ -1,20 +1,22 @@
 package guitests;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.junit.After;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-import prefs.Preferences;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import org.junit.After;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+
+import prefs.Preferences;
 
 public class UseGlobalConfigsTest extends UITest {
 

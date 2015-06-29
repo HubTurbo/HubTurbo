@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -10,12 +11,14 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import backend.RepoIO;
-import backend.resource.Model;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 import util.events.testevents.UpdateDummyRepoEvent;
+import backend.RepoIO;
+import backend.interfaces.RepoStore;
+import backend.json.JSONStore;
+import backend.resource.Model;
 
 public class StoreTests {
 
@@ -88,6 +91,44 @@ public class StoreTests {
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
         assertEquals(11, dummy2.getIssues().size());
+    }
+
+    @Test(expected = ExecutionException.class)
+    public void testCorruptedJSON() throws InterruptedException, ExecutionException {
+        RepoStore.write("testrepo/testrepo", "abcde");
+
+        JSONStore jsonStore = new JSONStore();
+        jsonStore.loadRepository("testrepo/testrepo").get();
+
+        File f = new File("store/test/testrepo/testrepo");
+        f.delete();
+    }
+
+    @Test(expected = ExecutionException.class)
+    public void testNonExistedJSON() throws InterruptedException, ExecutionException {
+        JSONStore jsonStore = new JSONStore();
+        jsonStore.loadRepository("nonexist/nonexist").get();
+    }
+
+    @Test
+    public void testLoadCorruptedRepository() throws InterruptedException, ExecutionException {
+        RepoStore.write("testrepo/testrepo", "abcde");
+
+        RepoIO repoIO = new RepoIO(false, false);
+        Model model = repoIO.openRepository("testrepo/testrepo").get();
+
+        assertTrue(model.getIssues().isEmpty());
+
+        File f = new File("store/test/testrepo/testrepo");
+        f.delete();
+    }
+
+    @Test
+    public void testLoadNonExistRepo() throws InterruptedException, ExecutionException {
+        RepoIO repoIO = new RepoIO(false, false);
+        Model model = repoIO.openRepository("nonexist/nonexist").get();
+
+        assertTrue(model.getIssues().isEmpty());
     }
 
     /**
