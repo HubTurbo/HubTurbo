@@ -3,6 +3,7 @@ package guitests;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -85,10 +86,9 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals(2, lastOpenFilters.size());
         assertEquals("", lastOpenFilters.get(0));
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(1));
-        // Last viewed repositories
-        List<String> lastViewedRepositories = testPref.getLastViewedRepositories();
-        assertEquals("dummy/dummy", lastViewedRepositories.get(0));
-        assertEquals("dummy2/dummy2", lastViewedRepositories.get(1));
+        // Last viewed repository
+        RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
+        assertEquals("dummy2/dummy2", lastViewedRepository.generateId());
         // Boards
         Map<String, List<String>> boards = testPref.getAllBoards();
         List<String> emptyBoard = boards.get("Empty Board");
