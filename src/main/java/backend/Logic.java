@@ -185,9 +185,11 @@ public class Logic {
     }
 
     public Set<String> getOpenRepositories() {
-        return models.toModels().stream()
-            .map(Model::getRepoId)
-            .collect(Collectors.toSet());
+        return models.toModels().stream().map(Model::getRepoId).collect(Collectors.toSet());
+    }
+
+    public Set<String> getStoredRepos() {
+        return repoIO.getStoredRepos().stream().collect(Collectors.toSet());
     }
 
     public boolean isAlreadyOpen(String repoId) {
