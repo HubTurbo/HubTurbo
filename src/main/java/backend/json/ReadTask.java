@@ -58,7 +58,7 @@ class ReadTask extends StoreTask {
                         new TypeToken<SerializableModel>(){}.getType());
 
                 return new Model(sModel);
-            } catch (JsonParseException e) {
+            } catch (NullPointerException | JsonParseException e) {
                 logger.error(HTLog.format(repoId, "JSON data is corrupted"));
                 throw new JSONLoadException();
             }
