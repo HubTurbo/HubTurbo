@@ -88,7 +88,7 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(1));
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
-        assertEquals("dummy2/dummy2", lastViewedRepository.generateId());
+        assertEquals("dummy/dummy", lastViewedRepository.generateId());
         // Boards
         Map<String, List<String>> boards = testPref.getAllBoards();
         List<String> emptyBoard = boards.get("Empty Board");
