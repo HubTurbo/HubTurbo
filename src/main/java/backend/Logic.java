@@ -58,7 +58,7 @@ public class Logic {
             models.replace(toReplace);
 
             // Re-"download" repo after clearing
-            openRepository(e.repoId);
+            openPrimaryRepository(e.repoId);
         });
 
         // Pass the currently-empty model to the UI
@@ -94,7 +94,15 @@ public class Logic {
                 .exceptionally(Futures::log);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId) {
+    public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
+        return openRepository(repoId, true);
+    }
+
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
+        return openRepository(repoId, false);
+    }
+
+    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             return Futures.unit(false);
@@ -104,15 +112,17 @@ public class Logic {
             if (!valid) {
                 return Futures.unit(false);
             } else {
-                prefs.setLastViewedRepository(repoId);
+                if (isPrimaryRepository) {
+                    prefs.setLastViewedRepository(repoId);
+                }
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
-                    .thenApply(models::addPending)
-                    .thenRun(this::updateUI)
-                    .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                    .thenApply(n -> true)
-                    .exceptionally(withResult(false));
+                        .thenApply(models::addPending)
+                        .thenRun(this::updateUI)
+                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
+                        .thenApply(n -> true)
+                        .exceptionally(withResult(false));
             }
         });
     }
