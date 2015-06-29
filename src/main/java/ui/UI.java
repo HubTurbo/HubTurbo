@@ -115,7 +115,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        logic.openRepository(repoId);
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
 
@@ -424,7 +424,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void primaryRepoChanged(String repoId) {
-        logic.openRepository(repoId);
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
         columns.refresh();
