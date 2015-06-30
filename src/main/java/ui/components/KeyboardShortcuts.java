@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * Classes that currently have keyboard shortcut code:
  * ui.components.NavigableListView
- * ui.issuecolumn.PanelControl
+ * ui.issuepanel.PanelControl
  * ui.listpanel.ListPanel
  * ui.MenuControl
  *
@@ -43,7 +43,7 @@ public class KeyboardShortcuts {
     public static KeyCode SCROLL_UP;
     public static KeyCode SCROLL_DOWN;
 
-    //ui.issuecolumn.PanelControl
+    //ui.issuepanel.PanelControl
     public static KeyCode LEFT_PANEL;
     public static KeyCode RIGHT_PANEL;
 

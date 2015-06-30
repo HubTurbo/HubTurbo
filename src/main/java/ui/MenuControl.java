@@ -13,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
-import ui.issuecolumn.PanelControl;
-import ui.issuecolumn.FilterPanel;
+import ui.issuepanel.PanelControl;
+import ui.issuepanel.FilterPanel;
 import util.events.*;
 
 import java.util.List;

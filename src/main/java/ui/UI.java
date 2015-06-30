@@ -25,7 +25,7 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
-import ui.issuecolumn.PanelControl;
+import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.TickingTimer;
