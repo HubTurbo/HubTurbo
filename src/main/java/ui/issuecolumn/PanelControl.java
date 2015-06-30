@@ -36,7 +36,7 @@ public class PanelControl extends HBox {
         setPadding(new Insets(0, 10, 0, 10));
 
         ui.registerEvent((IssueSelectedEventHandler) e ->
-            setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
+                setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
 

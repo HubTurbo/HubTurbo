@@ -106,7 +106,7 @@ public class GUIController {
      *
      * The multiModel to use here is stored from the last time a ModelUpdatedEvent was triggered.
      *
-     * @param changedPanel The column whose filter expression had been changed by the user.
+     * @param changedPanel The panel whose filter expression had been changed by the user.
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
         Platform.runLater(() -> {
@@ -121,7 +121,7 @@ public class GUIController {
     }
 
     /**
-     * Manages the flow of execution in filtering and updating a column.
+     * Manages the flow of execution in filtering and updating a panel.
      *
      * It opens all necessary repos, then filters issues. Then, it determines whether to refresh the items
      * on the issue panel, thus presenting the new data to the user, or to hold off this data and instead fire
@@ -130,7 +130,7 @@ public class GUIController {
      * updatedModel and allModelIssues are specified as separate arguments as the extraction of allModelIssues
      * is O(n).
      *
-     * @param panelToProcess The column whose filter expression will be used to filter issues.
+     * @param panelToProcess The panel whose filter expression will be used to filter issues.
      * @param updatedModel The model whose data will be used to display issue details.
      * @param allModelIssues The list of issues extracted from the model.
      * @param toUpdate The tally for metadata requests. Ignored if the issues already have metadata, or don't need it.
@@ -174,24 +174,24 @@ public class GUIController {
      * Produces a list of issues, filtered and sorted from all issues from the given multimodel, based on
      * the given filter expression.
      *
-     * Like updatedModel and allModelIssues, panelExpression and columnMetaQualifiers are passed separately
+     * Like updatedModel and allModelIssues, panelExpression and panelMetaQualifiers are passed separately
      * as extraction of the meta qualifiers is O(n).
      *
-     * @param panelExpression The filter expression belonging to the column.
-     * @param columnMetaQualifiers The meta qualifiers in the column's filter expression.
+     * @param panelExpression The filter expression belonging to the panel.
+     * @param panelMetaQualifiers The meta qualifiers in the panel's filter expression.
      * @param updatedModel The model to be used to display issue details such as assignee and labels.
      * @param allModelIssues The list of issues extracted from the model.
      * @param isSortableByNonSelfUpdates Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The list of filtered and sorted issues for the panel.
      */
     private TransformationList<TurboIssue, TurboIssue> filterAndSortPanel(FilterExpression panelExpression,
-                                                                          List<Qualifier> columnMetaQualifiers,
+                                                                          List<Qualifier> panelMetaQualifiers,
                                                                           IModel updatedModel,
                                                                           ObservableList<TurboIssue> allModelIssues,
                                                                           boolean isSortableByNonSelfUpdates) {
 
         Predicate<TurboIssue> predicate = issue -> Qualifier.process(updatedModel, panelExpression, issue);
-        Comparator<TurboIssue> comparator = determineComparator(columnMetaQualifiers, isSortableByNonSelfUpdates);
+        Comparator<TurboIssue> comparator = determineComparator(panelMetaQualifiers, isSortableByNonSelfUpdates);
 
         return new SortedList<>(new FilteredList<>(allModelIssues, predicate), comparator);
     }
