@@ -21,33 +21,33 @@ public abstract class AbstractPanel extends VBox {
 
     public static final int PANEL_WIDTH = 400;
 
-    public static final String CLOSE_COLUMN = "\u2716";
+    public static final String CLOSE_PANEL = "\u2716";
 
     protected final IModel model;
     protected final PanelControl parentPanelControl;
-    protected int columnIndex;
+    protected int panelIndex;
 
-    public AbstractPanel(IModel model, PanelControl parentPanelControl, int columnIndex) {
+    public AbstractPanel(IModel model, PanelControl parentPanelControl, int panelIndex) {
         this.model = model;
         this.parentPanelControl = parentPanelControl;
-        this.columnIndex = columnIndex;
+        this.panelIndex = panelIndex;
 
-        setupColumn();
-        setupColumnDragEvents();
+        setupPanel();
+        setupPanelDragEvents();
     }
 
-    private void setupColumn() {
+    private void setupPanel() {
         setPrefWidth(PANEL_WIDTH);
         setMinWidth(PANEL_WIDTH);
         setPadding(new Insets(5));
         getStyleClass().addAll("borders", "rounded-borders");
     }
 
-    private void setupColumnDragEvents() {
+    private void setupPanelDragEvents() {
         setOnDragEntered(e -> {
             if (e.getDragboard().hasString()) {
                 DragData dd = DragData.deserialise(e.getDragboard().getString());
-                if (dd.getColumnIndex() != columnIndex) {
+                if (dd.getPanelIndex() != panelIndex) {
                     getStyleClass().add("dragged-over");
                 }
             }
@@ -62,12 +62,12 @@ public abstract class AbstractPanel extends VBox {
         setOnDragDetected((event) -> {
             Dragboard db = startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            DragData dd = new DragData(DragData.Source.COLUMN, -1, -1);
+            DragData dd = new DragData(DragData.Source.PANEL, -1, -1);
             content.putString(dd.serialise());
             db.setContent(content);
             // We're using this because the content of a dragboard can't be changed
             // while the drag is in progress; this seemed like the simplest workaround
-            parentPanelControl.setCurrentlyDraggedColumnIndex(columnIndex);
+            parentPanelControl.setCurrentlyDraggedPanelIndex(panelIndex);
             event.consume();
         });
 
@@ -79,7 +79,7 @@ public abstract class AbstractPanel extends VBox {
      * Should not be called externally.
      */
     void updateIndex(int updated) {
-        columnIndex = updated;
+        panelIndex = updated;
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class AbstractPanel extends VBox {
     public abstract void refreshItems(boolean hasMetadata);
 
     /**
-     * This method is called when the column control is deselected. It used to happen when
+     * This method is called when the panel control is deselected. It used to happen when
      * the issue panel was closed.
      */
     public abstract void close();

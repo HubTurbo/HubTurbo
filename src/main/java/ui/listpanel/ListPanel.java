@@ -29,8 +29,8 @@ public class ListPanel extends FilterPanel {
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
-    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
-        super(ui, model, parentPanelControl, columnIndex);
+    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
+        super(ui, model, parentPanelControl, panelIndex);
         this.model = model;
         this.ui = ui;
 
@@ -90,7 +90,7 @@ public class ListPanel extends FilterPanel {
 
         // Set the cell factory every time - this forces the list view to update
         listView.setCellFactory(list ->
-                new ListPanelCell(model, ListPanel.this, columnIndex, issuesWithNewComments));
+                new ListPanelCell(model, ListPanel.this, panelIndex, issuesWithNewComments));
         listView.saveSelection();
 
         // Supposedly this also causes the list view to update - not sure
@@ -100,7 +100,7 @@ public class ListPanel extends FilterPanel {
         issueCount = getIssueList().size();
 
         listView.restoreSelection();
-        this.setId(model.getDefaultRepo() + "_col" + columnIndex);
+        this.setId(model.getDefaultRepo() + "_col" + panelIndex);
     }
 
     private void setupListView() {
@@ -110,7 +110,7 @@ public class ListPanel extends FilterPanel {
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
             ui.triggerEvent(
-                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), columnIndex, issue.isPullRequest())
+                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
             );
 
             // Save the stored comment count as its own comment count.
