@@ -30,6 +30,7 @@ public class RepoIO {
     public RepoIO(boolean isTestMode, boolean enableTestJSON) {
         if (isTestMode && !enableTestJSON) {
             jsonStore = new JSONStoreStub();
+            storedRepos = new ArrayList<>();
         } else {
             jsonStore = new JSONStore();
             storedRepos = new ArrayList<>(jsonStore.getStoredRepos());
