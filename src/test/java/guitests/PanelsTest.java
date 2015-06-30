@@ -28,7 +28,7 @@ public class PanelsTest extends UITest {
         push(KeyCode.ENTER);
 
         // Drag
-        // TODO check whether columns are actually reordered
+        // TODO check whether panels are actually reordered
         drag("#dummy/dummy_col1_closeButton").to("#dummy/dummy_col0_closeButton");
 
         // Click
