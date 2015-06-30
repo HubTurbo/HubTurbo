@@ -102,7 +102,8 @@ public class UI extends Application implements EventDispatcher {
                                 mainStage,
                                 logic.loginController.getOwner(),
                                 logic.loginController.getRepo(),
-                                logic.loginController.getUsername())
+                                logic.loginController.getUsername(),
+                                logic.loginController.getPassword())
                                 .show().thenApply(isLoggedIn -> {
                     if (isLoggedIn) {
                         showMainWindow(logic.loginController.getRepoId());
