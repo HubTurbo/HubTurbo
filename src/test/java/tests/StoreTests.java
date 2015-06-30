@@ -121,7 +121,7 @@ public class StoreTests {
     }
 
     @Test
-    public void testLoadNonExistRepo() throws InterruptedException, ExecutionException {
+    public void testLoadNonExistedRepo() throws InterruptedException, ExecutionException {
         RepoIO repoIO = new RepoIO(false, false);
         Model model = repoIO.openRepository("nonexist/nonexist").get();
 
