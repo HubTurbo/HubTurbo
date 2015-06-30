@@ -9,13 +9,13 @@ import util.events.PanelClickedEventHandler;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ColumnsTest extends UITest {
+public class PanelsTest extends UITest {
 
     private static boolean eventTriggered = false;
 
     // TODO check if interactions result in any effects
     @Test
-    public void columnsTest() {
+    public void panelsTest() {
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
         // maximize
