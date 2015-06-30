@@ -83,28 +83,39 @@ public class UI extends Application implements EventDispatcher {
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
-        getUserCredentials();
+        login(isBypassLogin());
     }
 
-    private void getUserCredentials() {
-        if (isBypassLogin()) {
+    private void login(boolean isBypassLogin) {
+        if (isBypassLogin) {
             showMainWindow("dummy/dummy");
             mainStage.show();
         } else {
-            disableUI(true);
-            mainStage.show();
-            new LoginDialog(this, prefs, mainStage).setup().thenApply(result -> {
-                if (result.success) {
-                    showMainWindow(result.repoId);
-                    disableUI(false);
-                } else {
-                    quit();
-                }
-                return true;
-            }).exceptionally(e -> {
-                logger.error(e.getLocalizedMessage(), e);
-                return false;
-            });
+            if (logic.loginController.attemptLogin()) {
+                showMainWindow(logic.loginController.getRepoId());
+                mainStage.show();
+            } else {
+                disableUI(true);
+                status.displayMessage("Waiting for login...");
+                mainStage.show();
+                new LoginDialog(this,
+                                mainStage,
+                                logic.loginController.getOwner(),
+                                logic.loginController.getRepo(),
+                                logic.loginController.getUsername())
+                                .show().thenApply(isLoggedIn -> {
+                    if (isLoggedIn) {
+                        showMainWindow(logic.loginController.getRepoId());
+                        disableUI(false);
+                    } else {
+                        quit();
+                    }
+                    return true;
+                }).exceptionally(e -> {
+                    logger.error(e.getLocalizedMessage(), e);
+                    return false;
+                });
+            }
         }
     }
 

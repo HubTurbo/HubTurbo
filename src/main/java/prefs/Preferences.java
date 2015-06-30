@@ -98,7 +98,12 @@ public class Preferences {
             return Optional.empty();
         } else {
             String id = lastViewed.get(lastViewed.size() - 1);
-            return Optional.of(RepositoryId.createFromId(id));
+            RepositoryId repositoryId = RepositoryId.createFromId(id);
+            if (repositoryId == null) {
+                return Optional.empty();
+            } else {
+                return Optional.of(repositoryId);
+            }
         }
     }
 
