@@ -2,26 +2,21 @@ package ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
-import ui.issuecolumn.ColumnControl;
-import ui.issuecolumn.IssueColumn;
-import util.DialogMessage;
-import util.PlatformEx;
+import ui.issuecolumn.PanelControl;
+import ui.issuecolumn.FilterPanel;
 import util.events.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,12 +28,12 @@ public class MenuControl extends MenuBar {
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
-    private final ColumnControl columns;
+    private final PanelControl columns;
     private final ScrollPane columnsScrollPane;
     private final UI ui;
     private final Preferences prefs;
 
-    public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
+    public MenuControl(UI ui, PanelControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
         this.columns = columns;
         this.prefs = prefs;
         this.columnsScrollPane = columnsScrollPane;
@@ -229,8 +224,8 @@ public class MenuControl extends MenuBar {
      */
     private List<String> getCurrentFilterExprs() {
         return columns.getChildren().stream().flatMap(c -> {
-            if (c instanceof IssueColumn) {
-                return Stream.of(((IssueColumn) c).getCurrentFilterString());
+            if (c instanceof FilterPanel) {
+                return Stream.of(((FilterPanel) c).getCurrentFilterString());
             } else {
                 return Stream.of();
             }

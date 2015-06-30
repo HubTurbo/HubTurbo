@@ -1,4 +1,4 @@
-package ui.issuepanel;
+package ui.listpanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
@@ -8,8 +8,8 @@ import javafx.scene.layout.Priority;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
-import ui.issuecolumn.ColumnControl;
-import ui.issuecolumn.IssueColumn;
+import ui.issuecolumn.PanelControl;
+import ui.issuecolumn.FilterPanel;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.testevents.UIComponentFocusEvent;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class IssuePanel extends IssueColumn {
+public class ListPanel extends FilterPanel {
 
     private final IModel model;
     private final UI ui;
@@ -29,16 +29,14 @@ public class IssuePanel extends IssueColumn {
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
-    public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
-        super(ui, model, parentColumnControl, columnIndex);
+    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
+        super(ui, model, parentPanelControl, columnIndex);
         this.model = model;
         this.ui = ui;
 
         listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
-
-//        refreshItems(true);
     }
 
     /**
@@ -81,37 +79,28 @@ public class IssuePanel extends IssueColumn {
         return result;
     }
 
+    /**
+     * Refreshes the list of issue cards shown to the user.
+     *
+     * @param hasMetadata Indicates the commnet count hashmap to be used.
+     */
     @Override
     public void refreshItems(boolean hasMetadata) {
-//        super.refreshItems(hasMetadata);
-//
-//        boolean hasUpdatedQualifier = currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED);
-//
-//        // Only update filter if filter does not contain UPDATED (does not need to wait for metadata)
-//        // or if hasMetadata is true (metadata has arrived), or if getIssueList is empty (if filter does
-//        // have UPDATED, but there are no issues whose metadata require retrieval causing hasMetadata to
-//        // never be true)
-//
-//        if (!hasUpdatedQualifier // not waiting for metadata, just update
-//                || hasMetadata // metadata has arrived, update
-//                || getIssueList().size() == 0 // checked only when above two not satisfied
-//                ) {
-            final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
+        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
 
-            // Set the cell factory every time - this forces the list view to update
-            listView.setCellFactory(list ->
-                    new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
-            listView.saveSelection();
+        // Set the cell factory every time - this forces the list view to update
+        listView.setCellFactory(list ->
+                new ListPanelCell(model, ListPanel.this, columnIndex, issuesWithNewComments));
+        listView.saveSelection();
 
-            // Supposedly this also causes the list view to update - not sure
-            // if it actually does on platforms other than Linux...
-            listView.setItems(null);
-            listView.setItems(getIssueList());
-            issueCount = getIssueList().size();
+        // Supposedly this also causes the list view to update - not sure
+        // if it actually does on platforms other than Linux...
+        listView.setItems(null);
+        listView.setItems(getIssueList());
+        issueCount = getIssueList().size();
 
-            listView.restoreSelection();
-            this.setId(model.getDefaultRepo() + "_col" + columnIndex);
-//        }
+        listView.restoreSelection();
+        this.setId(model.getDefaultRepo() + "_col" + columnIndex);
     }
 
     private void setupListView() {
@@ -170,7 +159,7 @@ public class IssuePanel extends IssueColumn {
                 ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
                 issue.setMarkedReadAt(Optional.of(now));
                 issue.setIsCurrentlyRead(true);
-                parentColumnControl.refresh();
+                parentPanelControl.refresh();
             }
             if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
@@ -181,7 +170,7 @@ public class IssuePanel extends IssueColumn {
                 ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
                 issue.setMarkedReadAt(Optional.empty());
                 issue.setIsCurrentlyRead(false);
-                parentColumnControl.refresh();
+                parentPanelControl.refresh();
             }
             if (event.getCode() == KeyboardShortcuts.REFRESH) {
                 ui.logic.refresh();

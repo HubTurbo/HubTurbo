@@ -25,7 +25,7 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
-import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.TickingTimer;
@@ -69,7 +69,7 @@ public class UI extends Application implements EventDispatcher {
     // Main UI elements
 
     private Stage mainStage;
-    private ColumnControl columns;
+    private PanelControl columns;
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
@@ -190,7 +190,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage = stage;
         stage.setMaximized(false);
 
-        columns = new ColumnControl(this, prefs);
+        columns = new PanelControl(this, prefs);
         guiController = new GUIController(this, columns);
 
         Scene scene = new Scene(createRoot());

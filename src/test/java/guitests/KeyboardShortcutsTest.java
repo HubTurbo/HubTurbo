@@ -4,8 +4,8 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import ui.issuepanel.IssuePanel;
-import util.events.ColumnClickedEventHandler;
+import ui.listpanel.ListPanel;
+import util.events.PanelClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
@@ -23,7 +23,7 @@ public class KeyboardShortcutsTest extends UITest {
     public void keyboardShortcutsTest() {
         UI.events.registerEvent((IssueSelectedEventHandler) e -> selectedIssueId = e.id);
         UI.events.registerEvent((UIComponentFocusEventHandler) e -> uiComponentFocusEventType = e.eventType);
-        UI.events.registerEvent((ColumnClickedEventHandler) e -> columnIndex = e.columnIndex);
+        UI.events.registerEvent((PanelClickedEventHandler) e -> columnIndex = e.columnIndex);
         clearSelectedIssueId();
         clearUiComponentFocusEventType();
         clearColumnIndex();
@@ -99,7 +99,7 @@ public class KeyboardShortcutsTest extends UITest {
         click("#dummy/dummy_col1_1");
 
         // mark as read/unread
-        IssuePanel issuePanel = find("#dummy/dummy_col1");
+        ListPanel issuePanel = find("#dummy/dummy_col1");
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
         push(getKeyCode("MARK_AS_UNREAD"));

@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import ui.UI;
 import ui.components.FilterTextField;
-import util.events.ColumnClickedEvent;
+import util.events.PanelClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An IssueColumn is a Column meant for containing issues and an accompanying filter text field,
+ * An FilterPanel is a AbstractPanel meant for containing issues and an accompanying filter text field,
  * which specifies the issues to be contained within as well as their order.
  *
- * The IssueColumn does not perform the filtering itself - it merely specifies how filtering is to be done.
+ * The FilterPanel does not perform the filtering itself - it merely specifies how filtering is to be done.
  *
- * The IssueColumn also does not specify how the list is to be displayed -- subclasses override methods
+ * The FilterPanel also does not specify how the list is to be displayed -- subclasses override methods
  * which determine that.
  */
-public abstract class IssueColumn extends Column {
+public abstract class FilterPanel extends AbstractPanel {
 
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
@@ -40,12 +40,12 @@ public abstract class IssueColumn extends Column {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
-        super(model, parentColumnControl, columnIndex);
+    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
+        super(model, parentPanelControl, columnIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
         this.setOnMouseClicked(e-> {
-            ui.triggerEvent(new ColumnClickedEvent(columnIndex));
+            ui.triggerEvent(new PanelClickedEvent(columnIndex));
             requestFocus();
         });
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
@@ -79,7 +79,7 @@ public abstract class IssueColumn extends Column {
 
         ui.registerEvent(onModelUpdate);
 
-        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
+        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(columnIndex)));
 
         HBox buttonsBox = new HBox();
         buttonsBox.setSpacing(5);
@@ -102,7 +102,7 @@ public abstract class IssueColumn extends Column {
         closeList.getStyleClass().add("label-button");
         closeList.setOnMouseClicked((e) -> {
             e.consume();
-            parentColumnControl.closeColumn(columnIndex);
+            parentPanelControl.closeColumn(columnIndex);
         });
 
         return new Label[] { closeList };
@@ -110,14 +110,14 @@ public abstract class IssueColumn extends Column {
 
     private void setupPanelDragEvents(Node dropNode) {
         dropNode.setOnDragEntered(e -> {
-                if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+                if (parentPanelControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
                     // Apparently the dragboard can't be updated while
                     // the drag is in progress. This is why we use an
                     // external source for updates.
-                    assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
-                    int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
-                    parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
-                    parentColumnControl.swapColumns(previous, columnIndex);
+                    assert parentPanelControl.getCurrentlyDraggedColumnIndex() != -1;
+                    int previous = parentPanelControl.getCurrentlyDraggedColumnIndex();
+                    parentPanelControl.setCurrentlyDraggedColumnIndex(columnIndex);
+                    parentPanelControl.swapColumns(previous, columnIndex);
                 }
                 e.consume();
             }
@@ -157,7 +157,7 @@ public abstract class IssueColumn extends Column {
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
 
-        parentColumnControl.getGUIController().columnFilterExpressionChanged(this);
+        parentPanelControl.getGUIController().columnFilterExpressionChanged(this);
     }
 
     public void filterByString(String filterString) {
@@ -186,7 +186,7 @@ public abstract class IssueColumn extends Column {
     }
 
     /**
-     * Additional logic to be implemented by child classes. Currently implemented by IssuePanel
+     * Additional logic to be implemented by child classes. Currently implemented by ListPanel
      * to re-render the list of IssuePanelCards.
      *
      * @param hasMetadata Indicates whether the IssuePanelCards will show metadata details.

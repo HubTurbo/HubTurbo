@@ -4,13 +4,14 @@ import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
-import ui.issuecolumn.ColumnControl;
-import ui.issuecolumn.IssueColumn;
+import ui.issuecolumn.PanelControl;
+import ui.issuecolumn.FilterPanel;
 import ui.issuecolumn.UIBrowserBridge;
 import util.events.ModelUpdatedEvent;
 import util.events.ModelUpdatedEventHandler;
@@ -23,21 +24,21 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 /**
- * This class manages the state of UI components and acts as a gateway between back-end components and
+ * Manages the state of UI components and acts as a gateway between back-end components and
  * GUI components. Any mutation of GUI components should be carried out here.
  */
 
 public class GUIController {
-    private ColumnControl columnControl;
+    private PanelControl panelControl;
     private UI ui;
 
     // Synchronised with Logic's latest updated multimodel.
     // Not to be modified from this point or any further in the GUI.
     private IModel multiModel;
 
-    public GUIController(UI ui, ColumnControl columnControl) {
+    public GUIController(UI ui, PanelControl panelControl) {
         this.ui = ui;
-        this.columnControl = columnControl;
+        this.panelControl = panelControl;
 
         // Set up the connection to the browser
         new UIBrowserBridge(ui);
@@ -52,7 +53,7 @@ public class GUIController {
 
     /**
      * The handler method for a ModelUpdatedEvent. It extracts the issues of the multimodel carried by the event,
-     * and then filters and sorts the issues to place each panel in ColumnControl based on these issues.
+     * and then filters and sorts the issues to place each panel in PanelControl based on these issues.
      *
      * The filtering process also produces a list of issues to request metadata for, if e.hasMetadata is false
      * and their respective panels specify the display of metadata (through the UPDATED filter).
@@ -61,58 +62,66 @@ public class GUIController {
      * on their respective panels, or held back until their metadata requests have been fired and the downloaded
      * metadata come back as a subsequent ModelUpdatedEvent (with e.hasMetadata being true).
      *
+     * Platform.runLater ensures that all of this is done on the UI thread.
+     *
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        multiModel = e.model;
+        Platform.runLater(() -> {
 
-        // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
-        IModel updatedModel = e.model;
+            multiModel = e.model;
 
-        // Set the new model to columnControl. This is in turn passed from ColumnControl to IssuePanel,
-        // down to each IssuePanelCard in order to display details about each issue such as labels and assignees.
-        columnControl.updateModel(updatedModel);
+            // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
+            IModel updatedModel = e.model;
 
-        // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
-        // to produce the appropriate list of issues to be displayed.
-        ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
+            // Set the new model to panelControl. This is in turn passed from PanelControl to ListPanel,
+            // down to each ListPanelCard in order to display details about each issue such as labels and assignees.
+            panelControl.updateModel(updatedModel);
 
-        // Populated in processColumn calls.
-        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+            // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
+            // to produce the appropriate list of issues to be displayed.
+            ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
 
-        columnControl.getChildren().forEach(child -> {
-            if (child instanceof IssueColumn) {
-                processColumn((IssueColumn) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
-            }
+            // Populated in processColumn calls.
+            HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+
+            panelControl.getChildren().forEach(child -> {
+                if (child instanceof FilterPanel) {
+                    processColumn((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
+                }
+            });
+
+            // If toUpdate is empty, no metadata is requested.
+            dispatchMetadataRequests(toUpdate);
+
         });
-
-        // If toUpdate is empty, no metadata is requested.
-        dispatchMetadataRequests(toUpdate);
     }
 
     /**
-     * Handler method for an applyFilterExpression call from an IssueColumn, which is in turn triggered by
-     * the user pressing ENTER while the cursor is on the IssueColumn's filterTextField.
+     * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
+     * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
      *
-     * The logic in this method is similar to that of modelUpdated, but only the IssueColumn whose
+     * The logic in this method is similar to that of modelUpdated, but only the FilterPanel whose
      * filterTextField was changed will be processed.
      *
      * The multiModel to use here is stored from the last time a ModelUpdatedEvent was triggered.
      *
      * @param changedColumn The column whose filter expression had been changed by the user.
      */
-    public void columnFilterExpressionChanged(IssueColumn changedColumn) {
-        ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
-        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+    public void columnFilterExpressionChanged(FilterPanel changedColumn) {
+        Platform.runLater(() -> {
+            ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
+            HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
-        // This is not triggered by a (metadata) update, so we pass false into the call.
-        processColumn(changedColumn, multiModel, allModelIssues, toUpdate, false);
+            // This is not triggered by a (metadata) update, so we pass false into the call.
+            processColumn(changedColumn, multiModel, allModelIssues, toUpdate, false);
 
-        dispatchMetadataRequests(toUpdate);
+            dispatchMetadataRequests(toUpdate);
+        });
     }
 
     /**
-     * This method manages the flow of execution in filtering and updating a column.
+     * Manages the flow of execution in filtering and updating a column.
      *
      * It opens all necessary repos, then filters issues. Then, it determines whether to refresh the items
      * on the issue panel, thus presenting the new data to the user, or to hold off this data and instead fire
@@ -127,7 +136,7 @@ public class GUIController {
      * @param toUpdate The tally for metadata requests. Ignored if the issues already have metadata, or don't need it.
      * @param isMetadataUpdate Determines whether issues have the necessary metadata to be displayed to the user.
      */
-    public void processColumn(IssueColumn columnToProcess,
+    public void processColumn(FilterPanel columnToProcess,
                               IModel updatedModel,
                               ObservableList<TurboIssue> allModelIssues,
                               HashMap<String, HashSet<Integer>> toUpdate,
@@ -235,7 +244,7 @@ public class GUIController {
      * @param filteredAndSortedIssues The issues to be displayed.
      * @param isMetadataUpdate Determines whether comment bubbles will be highlighted based on non-self update times.
      */
-    private static void updateColumn(IssueColumn columnToUpdate,
+    private static void updateColumn(FilterPanel columnToUpdate,
                                      TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
                                      boolean isMetadataUpdate) {
         columnToUpdate.setIssueList(filteredAndSortedIssues);

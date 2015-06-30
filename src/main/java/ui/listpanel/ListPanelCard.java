@@ -1,4 +1,4 @@
-package ui.issuepanel;
+package ui.listpanel;
 
 import backend.resource.*;
 import filter.expression.FilterExpression;
@@ -14,7 +14,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.Comment;
-import ui.issuecolumn.IssueColumn;
+import ui.issuecolumn.FilterPanel;
 import util.Utility;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class IssuePanelCard extends VBox {
+public class ListPanelCard extends VBox {
 
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
@@ -37,11 +37,11 @@ public class IssuePanelCard extends VBox {
     private final TurboIssue issue;
     private final Model model;
     private FlowPane issueDetails = new FlowPane();
-    private IssueColumn parentPanel;
+    private FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
     /**
-     * The constructor is the only method called from IssuePanelCard. The rest of the methods in this class
+     * The constructor is the only method called from ListPanelCard. The rest of the methods in this class
      * are auxiliary methods called from the constructor so that the code is easier to understand.
      *
      * @param model
@@ -49,8 +49,8 @@ public class IssuePanelCard extends VBox {
      * @param parentPanel
      * @param issuesWithNewComments
      */
-    public IssuePanelCard(Model model, TurboIssue issue, IssueColumn parentPanel, HashSet<Integer>
-        issuesWithNewComments) {
+    public ListPanelCard(Model model, TurboIssue issue, FilterPanel parentPanel, HashSet<Integer>
+            issuesWithNewComments) {
         this.model = model;
         this.issue = issue;
         this.parentPanel = parentPanel;
