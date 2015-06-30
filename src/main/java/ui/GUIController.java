@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 /**
- * This class manages the state of UI components and acts as a gateway between back-end components and
+ * Manages the state of UI components and acts as a gateway between back-end components and
  * GUI components. Any mutation of GUI components should be carried out here.
  */
 
@@ -112,7 +112,7 @@ public class GUIController {
     }
 
     /**
-     * This method manages the flow of execution in filtering and updating a column.
+     * Manages the flow of execution in filtering and updating a column.
      *
      * It opens all necessary repos, then filters issues. Then, it determines whether to refresh the items
      * on the issue panel, thus presenting the new data to the user, or to hold off this data and instead fire
