@@ -10,14 +10,14 @@ import javafx.scene.layout.VBox;
 import ui.DragData;
 
 /**
- * A Column is a JavaFX node that is contained by a ColumnControl.
+ * A AbstractPanel is a JavaFX node that is contained by a ColumnControl.
  * It is in charge of displaying arbitrary content and provides
  * functionality for being added, removed, and reordered (via dragging).
  *
  * Since objects of this class are JavaFX nodes, content can be displayed
  * simply by adding child nodes to them.
  */
-public abstract class Column extends VBox {
+public abstract class AbstractPanel extends VBox {
 
     public static final int COLUMN_WIDTH = 400;
 
@@ -27,7 +27,7 @@ public abstract class Column extends VBox {
     protected final ColumnControl parentColumnControl;
     protected int columnIndex;
 
-    public Column(IModel model, ColumnControl parentColumnControl, int columnIndex) {
+    public AbstractPanel(IModel model, ColumnControl parentColumnControl, int columnIndex) {
         this.model = model;
         this.parentColumnControl = parentColumnControl;
         this.columnIndex = columnIndex;
