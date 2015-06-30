@@ -19,25 +19,25 @@ public class MenuControlTest extends UITest {
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         PanelControl panelControl = (PanelControl) find("#dummy/dummy_col0").getParent();
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
-        assertEquals(0, panelControl.getNumberOfColumns());
+        assertEquals(0, panelControl.getNumberOfPanels());
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        assertEquals(1, panelControl.getNumberOfColumns());
+        assertEquals(1, panelControl.getNumberOfPanels());
         press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).release(KeyCode.P)
             .release(KeyCode.SHIFT).release(KeyCode.CONTROL);
-        assertEquals(2, panelControl.getNumberOfColumns());
+        assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Panels");
         click("Create");
-        assertEquals(3, panelControl.getNumberOfColumns());
+        assertEquals(3, panelControl.getNumberOfPanels());
         click("Panels");
         click("Create (Left)");
-        assertEquals(4, panelControl.getNumberOfColumns());
+        assertEquals(4, panelControl.getNumberOfPanels());
         click("Panels");
         click("Close");
-        assertEquals(3, panelControl.getNumberOfColumns());
+        assertEquals(3, panelControl.getNumberOfPanels());
         click("Panels");
         click("Close");
-        assertEquals(2, panelControl.getNumberOfColumns());
+        assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Boards");
         click("Save");
@@ -47,13 +47,13 @@ public class MenuControlTest extends UITest {
 
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
-        assertEquals(0, panelControl.getNumberOfColumns());
+        assertEquals(0, panelControl.getNumberOfPanels());
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
         push(KeyCode.ENTER);
-        assertEquals(2, panelControl.getNumberOfColumns());
+        assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);

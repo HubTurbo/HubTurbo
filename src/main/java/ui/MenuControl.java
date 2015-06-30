@@ -163,7 +163,7 @@ public class MenuControl extends MenuBar {
     private void onBoardOpen(String boardName, List<String> filters) {
         logger.info("Menu: Boards > Open > " + boardName);
 
-        columns.closeAllColumns();
+        columns.closeAllPanels();
         columns.openColumnsWithFilters(filters);
     }
 

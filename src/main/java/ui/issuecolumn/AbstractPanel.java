@@ -19,7 +19,7 @@ import ui.DragData;
  */
 public abstract class AbstractPanel extends VBox {
 
-    public static final int COLUMN_WIDTH = 400;
+    public static final int PANEL_WIDTH = 400;
 
     public static final String CLOSE_COLUMN = "\u2716";
 
@@ -37,8 +37,8 @@ public abstract class AbstractPanel extends VBox {
     }
 
     private void setupColumn() {
-        setPrefWidth(COLUMN_WIDTH);
-        setMinWidth(COLUMN_WIDTH);
+        setPrefWidth(PANEL_WIDTH);
+        setMinWidth(PANEL_WIDTH);
         setPadding(new Insets(5));
         getStyleClass().addAll("borders", "rounded-borders");
     }
