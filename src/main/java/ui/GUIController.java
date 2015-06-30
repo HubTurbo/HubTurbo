@@ -109,13 +109,15 @@ public class GUIController {
      * @param changedColumn The column whose filter expression had been changed by the user.
      */
     public void columnFilterExpressionChanged(IssueColumn changedColumn) {
-        ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
-        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+        Platform.runLater(() -> {
+            ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
+            HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
-        // This is not triggered by a (metadata) update, so we pass false into the call.
-        processColumn(changedColumn, multiModel, allModelIssues, toUpdate, false);
+            // This is not triggered by a (metadata) update, so we pass false into the call.
+            processColumn(changedColumn, multiModel, allModelIssues, toUpdate, false);
 
-        dispatchMetadataRequests(toUpdate);
+            dispatchMetadataRequests(toUpdate);
+        });
     }
 
     /**
