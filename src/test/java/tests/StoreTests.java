@@ -1,24 +1,21 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import ui.UI;
-import ui.components.StatusUIStub;
-import util.events.EventDispatcherStub;
-import util.events.testevents.UpdateDummyRepoEvent;
 import backend.RepoIO;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import ui.UI;
+import ui.components.StatusUIStub;
+import util.events.EventDispatcherStub;
+import util.events.testevents.UpdateDummyRepoEvent;
+
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.*;
 
 public class StoreTests {
 
@@ -86,7 +83,7 @@ public class StoreTests {
         // Now we create a new RepoIO object. If we didn't load from the test JSON file, we would have to
         // re-"download" the whole repository from the DummySource. This means that we would end up with
         // only 10 issues.
-        RepoIO alternateIO = new RepoIO(true, false);
+        RepoIO alternateIO = new RepoIO(true, true);
 
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
