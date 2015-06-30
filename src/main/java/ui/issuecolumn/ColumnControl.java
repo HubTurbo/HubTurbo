@@ -9,11 +9,10 @@ import prefs.Preferences;
 import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import ui.issuepanel.IssuePanel;
+import ui.listpanel.ListPanel;
 import util.events.ColumnClickedEvent;
 import util.events.ColumnClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
-import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +58,8 @@ public class ColumnControl extends HBox {
     public void saveSession() {
         List<String> sessionFilters = new ArrayList<>();
         getChildren().forEach(child -> {
-            if (child instanceof IssueColumn) {
-                String filter = ((IssueColumn) child).getCurrentFilterString();
+            if (child instanceof FilterPanel) {
+                String filter = ((FilterPanel) child).getCurrentFilterString();
                 sessionFilters.add(filter);
             }
         });
@@ -82,8 +81,8 @@ public class ColumnControl extends HBox {
         }
     }
 
-    public void forEach(Consumer<Column> callback) {
-        getChildren().forEach(child -> callback.accept((Column) child));
+    public void forEach(Consumer<AbstractPanel> callback) {
+        getChildren().forEach(child -> callback.accept((AbstractPanel) child));
     }
 
     /**
@@ -93,12 +92,12 @@ public class ColumnControl extends HBox {
         forEach(child -> child.refreshItems(true));
     }
 
-    private IssueColumn addColumn() {
+    private FilterPanel addColumn() {
         return addColumnAt(getChildren().size());
     }
 
-    public IssueColumn addColumnAt(int index) {
-        IssueColumn panel = new IssuePanel(ui, model, this, index);
+    public FilterPanel addColumnAt(int index) {
+        FilterPanel panel = new ListPanel(ui, model, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.
@@ -123,8 +122,8 @@ public class ColumnControl extends HBox {
         }
     }
 
-    public Column getColumn(int index) {
-        return (Column) getChildren().get(index);
+    public AbstractPanel getColumn(int index) {
+        return (AbstractPanel) getChildren().get(index);
     }
 
     public void closeAllColumns() {
@@ -134,7 +133,7 @@ public class ColumnControl extends HBox {
 
     public void openColumnsWithFilters(List<String> filters) {
         for (String filter : filters) {
-            IssueColumn column = addColumn();
+            FilterPanel column = addColumn();
             column.filterByString(filter);
         }
     }
@@ -142,13 +141,13 @@ public class ColumnControl extends HBox {
     public void closeColumn(int index) {
         Node child = getChildren().remove(index);
         updateColumnIndices();
-        ((Column) child).close();
+        ((AbstractPanel) child).close();
     }
 
     private void updateColumnIndices() {
         int i = 0;
         for (Node c : getChildren()) {
-            ((Column) c).updateIndex(i++);
+            ((AbstractPanel) c).updateIndex(i++);
         }
     }
 
@@ -161,8 +160,8 @@ public class ColumnControl extends HBox {
     }
 
     public void swapColumns(int columnIndex, int columnIndex2) {
-        Column one = getColumn(columnIndex);
-        Column two = getColumn(columnIndex2);
+        AbstractPanel one = getColumn(columnIndex);
+        AbstractPanel two = getColumn(columnIndex2);
         one.updateIndex(columnIndex2);
         two.updateIndex(columnIndex);
         // This method of swapping is used because Collections.swap
@@ -206,11 +205,11 @@ public class ColumnControl extends HBox {
 
     public double getPanelWidth() {
         // COLUMN_WIDTH is used instead of
-        // ((Column) getChildren().get(0)).getWidth();
+        // ((AbstractPanel) getChildren().get(0)).getWidth();
         // because when this function is called, columns may not have been sized yet.
         // In any case actual column width is COLUMN_WIDTH at minimum, so we can assume
         // that they are that large.
-        return 40 + Column.COLUMN_WIDTH;
+        return 40 + AbstractPanel.COLUMN_WIDTH;
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -228,9 +227,9 @@ public class ColumnControl extends HBox {
         if (getChildren().size() == 0) {
             return;
         }
-        Column selectedColumn = getColumn(currentlySelectedColumn.get());
-        if (selectedColumn instanceof IssueColumn){
-            if (((IssueColumn) selectedColumn).filterTextField.isFocused()){
+        AbstractPanel selectedPanel = getColumn(currentlySelectedColumn.get());
+        if (selectedPanel instanceof FilterPanel){
+            if (((FilterPanel) selectedPanel).filterTextField.isFocused()){
                 return;
             } else {
                 int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
@@ -240,8 +239,8 @@ public class ColumnControl extends HBox {
                     newIndex = 0;
                 }
                 setCurrentlySelectedColumn(Optional.of(newIndex));
-                selectedColumn = getColumn(currentlySelectedColumn.get());
-                selectedColumn.requestFocus();
+                selectedPanel = getColumn(currentlySelectedColumn.get());
+                selectedPanel.requestFocus();
             }
         }
         ui.triggerEvent(new ColumnClickedEvent(currentlySelectedColumn.get()));

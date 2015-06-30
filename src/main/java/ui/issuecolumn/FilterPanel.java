@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An IssueColumn is a Column meant for containing issues and an accompanying filter text field,
+ * An FilterPanel is a AbstractPanel meant for containing issues and an accompanying filter text field,
  * which specifies the issues to be contained within as well as their order.
  *
- * The IssueColumn does not perform the filtering itself - it merely specifies how filtering is to be done.
+ * The FilterPanel does not perform the filtering itself - it merely specifies how filtering is to be done.
  *
- * The IssueColumn also does not specify how the list is to be displayed -- subclasses override methods
+ * The FilterPanel also does not specify how the list is to be displayed -- subclasses override methods
  * which determine that.
  */
-public abstract class IssueColumn extends Column {
+public abstract class FilterPanel extends AbstractPanel {
 
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
@@ -40,7 +40,7 @@ public abstract class IssueColumn extends Column {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public IssueColumn(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
+    public FilterPanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(model, parentColumnControl, columnIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
@@ -186,7 +186,7 @@ public abstract class IssueColumn extends Column {
     }
 
     /**
-     * Additional logic to be implemented by child classes. Currently implemented by IssuePanel
+     * Additional logic to be implemented by child classes. Currently implemented by ListPanel
      * to re-render the list of IssuePanelCards.
      *
      * @param hasMetadata Indicates whether the IssuePanelCards will show metadata details.

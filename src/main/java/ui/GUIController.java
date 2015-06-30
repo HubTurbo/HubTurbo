@@ -11,7 +11,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
 import ui.issuecolumn.ColumnControl;
-import ui.issuecolumn.IssueColumn;
+import ui.issuecolumn.FilterPanel;
 import ui.issuecolumn.UIBrowserBridge;
 import util.events.ModelUpdatedEvent;
 import util.events.ModelUpdatedEventHandler;
@@ -74,8 +74,8 @@ public class GUIController {
             // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
             IModel updatedModel = e.model;
 
-            // Set the new model to columnControl. This is in turn passed from ColumnControl to IssuePanel,
-            // down to each IssuePanelCard in order to display details about each issue such as labels and assignees.
+            // Set the new model to columnControl. This is in turn passed from ColumnControl to ListPanel,
+            // down to each ListPanelCard in order to display details about each issue such as labels and assignees.
             columnControl.updateModel(updatedModel);
 
             // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
@@ -86,8 +86,8 @@ public class GUIController {
             HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
             columnControl.getChildren().forEach(child -> {
-                if (child instanceof IssueColumn) {
-                    processColumn((IssueColumn) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
+                if (child instanceof FilterPanel) {
+                    processColumn((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
                 }
             });
 
@@ -98,17 +98,17 @@ public class GUIController {
     }
 
     /**
-     * Handler method for an applyFilterExpression call from an IssueColumn, which is in turn triggered by
-     * the user pressing ENTER while the cursor is on the IssueColumn's filterTextField.
+     * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
+     * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
      *
-     * The logic in this method is similar to that of modelUpdated, but only the IssueColumn whose
+     * The logic in this method is similar to that of modelUpdated, but only the FilterPanel whose
      * filterTextField was changed will be processed.
      *
      * The multiModel to use here is stored from the last time a ModelUpdatedEvent was triggered.
      *
      * @param changedColumn The column whose filter expression had been changed by the user.
      */
-    public void columnFilterExpressionChanged(IssueColumn changedColumn) {
+    public void columnFilterExpressionChanged(FilterPanel changedColumn) {
         Platform.runLater(() -> {
             ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
             HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
@@ -136,7 +136,7 @@ public class GUIController {
      * @param toUpdate The tally for metadata requests. Ignored if the issues already have metadata, or don't need it.
      * @param isMetadataUpdate Determines whether issues have the necessary metadata to be displayed to the user.
      */
-    public void processColumn(IssueColumn columnToProcess,
+    public void processColumn(FilterPanel columnToProcess,
                               IModel updatedModel,
                               ObservableList<TurboIssue> allModelIssues,
                               HashMap<String, HashSet<Integer>> toUpdate,
@@ -244,7 +244,7 @@ public class GUIController {
      * @param filteredAndSortedIssues The issues to be displayed.
      * @param isMetadataUpdate Determines whether comment bubbles will be highlighted based on non-self update times.
      */
-    private static void updateColumn(IssueColumn columnToUpdate,
+    private static void updateColumn(FilterPanel columnToUpdate,
                                      TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
                                      boolean isMetadataUpdate) {
         columnToUpdate.setIssueList(filteredAndSortedIssues);
