@@ -40,12 +40,12 @@ public abstract class FilterPanel extends AbstractPanel {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
-        super(model, parentPanelControl, columnIndex);
+    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
+        super(model, parentPanelControl, panelIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
         this.setOnMouseClicked(e-> {
-            ui.triggerEvent(new PanelClickedEvent(columnIndex));
+            ui.triggerEvent(new PanelClickedEvent(panelIndex));
             requestFocus();
         });
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
@@ -75,11 +75,11 @@ public abstract class FilterPanel extends AbstractPanel {
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
-        filterTextField.setId(model.getDefaultRepo() + "_col" + columnIndex + "_filterTextField");
+        filterTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
 
         ui.registerEvent(onModelUpdate);
 
-        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(columnIndex)));
+        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(panelIndex)));
 
         HBox buttonsBox = new HBox();
         buttonsBox.setSpacing(5);
@@ -97,12 +97,12 @@ public abstract class FilterPanel extends AbstractPanel {
     }
 
     private Label[] createButtons() {
-        Label closeList = new Label(CLOSE_COLUMN);
-        closeList.setId(model.getDefaultRepo() + "_col" + columnIndex + "_closeButton");
+        Label closeList = new Label(CLOSE_PANEL);
+        closeList.setId(model.getDefaultRepo() + "_col" + panelIndex + "_closeButton");
         closeList.getStyleClass().add("label-button");
         closeList.setOnMouseClicked((e) -> {
             e.consume();
-            parentPanelControl.closeColumn(columnIndex);
+            parentPanelControl.closePanel(panelIndex);
         });
 
         return new Label[] { closeList };
@@ -110,14 +110,14 @@ public abstract class FilterPanel extends AbstractPanel {
 
     private void setupPanelDragEvents(Node dropNode) {
         dropNode.setOnDragEntered(e -> {
-                if (parentPanelControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+                if (parentPanelControl.getCurrentlyDraggedPanelIndex() != panelIndex) {
                     // Apparently the dragboard can't be updated while
                     // the drag is in progress. This is why we use an
                     // external source for updates.
-                    assert parentPanelControl.getCurrentlyDraggedColumnIndex() != -1;
-                    int previous = parentPanelControl.getCurrentlyDraggedColumnIndex();
-                    parentPanelControl.setCurrentlyDraggedColumnIndex(columnIndex);
-                    parentPanelControl.swapColumns(previous, columnIndex);
+                    assert parentPanelControl.getCurrentlyDraggedPanelIndex() != -1;
+                    int previous = parentPanelControl.getCurrentlyDraggedPanelIndex();
+                    parentPanelControl.setCurrentlyDraggedPanelIndex(panelIndex);
+                    parentPanelControl.swapPanels(previous, panelIndex);
                 }
                 e.consume();
             }
@@ -144,7 +144,7 @@ public abstract class FilterPanel extends AbstractPanel {
         } catch (ParseException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
             // Overrides message in status bar
-            UI.status.displayMessage("Panel " + (columnIndex + 1)
+            UI.status.displayMessage("Panel " + (panelIndex + 1)
                 + ": Parse error in filter: " + ex.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
 
-        parentPanelControl.getGUIController().columnFilterExpressionChanged(this);
+        parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
     public void filterByString(String filterString) {

@@ -28,15 +28,15 @@ public class MenuControl extends MenuBar {
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
-    private final PanelControl columns;
-    private final ScrollPane columnsScrollPane;
+    private final PanelControl panels;
+    private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
 
-    public MenuControl(UI ui, PanelControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
-        this.columns = columns;
+    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
+        this.panels = panels;
         this.prefs = prefs;
-        this.columnsScrollPane = columnsScrollPane;
+        this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
         createMenuItems();
     }
@@ -88,41 +88,41 @@ public class MenuControl extends MenuBar {
         MenuItem createLeft = new MenuItem("Create (Left)");
         createLeft.setOnAction(e -> {
             logger.info("Menu: Panels > Create (Left)");
-            columns.createNewPanelAtStart();
-            setHvalue(columnsScrollPane.getHmin());
+            panels.createNewPanelAtStart();
+            setHvalue(panelsScrollPane.getHmin());
         });
         createLeft.setAccelerator(KeyboardShortcuts.CREATE_LEFT_PANEL);
 
         MenuItem createRight = new MenuItem("Create");
         createRight.setOnAction(e -> {
             logger.info("Menu: Panels > Create");
-            columns.createNewPanelAtEnd();
+            panels.createNewPanelAtEnd();
             // listener is used as columnsScroll's Hmax property doesn't update
             // synchronously
             ChangeListener<Number> listener = new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                    for (Node child : columnsScrollPane.getChildrenUnmodifiable()) {
+                    for (Node child : panelsScrollPane.getChildrenUnmodifiable()) {
                         if (child instanceof ScrollBar) {
                             ScrollBar scrollBar = (ScrollBar) child;
                             if (scrollBar.getOrientation() == Orientation.HORIZONTAL
                                     && scrollBar.visibleProperty().get()) {
-                                setHvalue(columnsScrollPane.getHmax());
+                                setHvalue(panelsScrollPane.getHmax());
                                 break;
                             }
                         }
                     }
-                    columns.widthProperty().removeListener(this);
+                    panels.widthProperty().removeListener(this);
                 }
             };
-            columns.widthProperty().addListener(listener);
+            panels.widthProperty().addListener(listener);
         });
         createRight.setAccelerator(KeyboardShortcuts.CREATE_RIGHT_PANEL);
 
         MenuItem closeColumn = new MenuItem("Close");
         closeColumn.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
-            columns.closeCurrentColumn();
+            panels.closeCurrentPanel();
         });
         closeColumn.setAccelerator(KeyboardShortcuts.CLOSE_PANEL);
 
@@ -163,8 +163,8 @@ public class MenuControl extends MenuBar {
     private void onBoardOpen(String boardName, List<String> filters) {
         logger.info("Menu: Boards > Open > " + boardName);
 
-        columns.closeAllColumns();
-        columns.openColumnsWithFilters(filters);
+        panels.closeAllPanels();
+        panels.openPanelsWithFilters(filters);
     }
 
     /**
@@ -223,7 +223,7 @@ public class MenuControl extends MenuBar {
      * @return
      */
     private List<String> getCurrentFilterExprs() {
-        return columns.getChildren().stream().flatMap(c -> {
+        return panels.getChildren().stream().flatMap(c -> {
             if (c instanceof FilterPanel) {
                 return Stream.of(((FilterPanel) c).getCurrentFilterString());
             } else {
@@ -278,10 +278,10 @@ public class MenuControl extends MenuBar {
     }
 
     public void scrollTo(int columnIndex, int numOfColumns){
-        setHvalue(columnIndex * (columnsScrollPane.getHmax()) / (numOfColumns - 1));
+        setHvalue(columnIndex * (panelsScrollPane.getHmax()) / (numOfColumns - 1));
     }
     private void setHvalue(double val) {
-        columnsScrollPane.setHvalue(val);
+        panelsScrollPane.setHvalue(val);
     }
 
 }

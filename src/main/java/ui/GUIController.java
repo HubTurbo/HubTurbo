@@ -82,12 +82,12 @@ public class GUIController {
             // to produce the appropriate list of issues to be displayed.
             ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
 
-            // Populated in processColumn calls.
+            // Populated in processPanel calls.
             HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
             panelControl.getChildren().forEach(child -> {
                 if (child instanceof FilterPanel) {
-                    processColumn((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
+                    processPanel((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
                 }
             });
 
@@ -106,22 +106,22 @@ public class GUIController {
      *
      * The multiModel to use here is stored from the last time a ModelUpdatedEvent was triggered.
      *
-     * @param changedColumn The column whose filter expression had been changed by the user.
+     * @param changedPanel The panel whose filter expression had been changed by the user.
      */
-    public void columnFilterExpressionChanged(FilterPanel changedColumn) {
+    public void panelFilterExpressionChanged(FilterPanel changedPanel) {
         Platform.runLater(() -> {
             ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
             HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
             // This is not triggered by a (metadata) update, so we pass false into the call.
-            processColumn(changedColumn, multiModel, allModelIssues, toUpdate, false);
+            processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
 
             dispatchMetadataRequests(toUpdate);
         });
     }
 
     /**
-     * Manages the flow of execution in filtering and updating a column.
+     * Manages the flow of execution in filtering and updating a panel.
      *
      * It opens all necessary repos, then filters issues. Then, it determines whether to refresh the items
      * on the issue panel, thus presenting the new data to the user, or to hold off this data and instead fire
@@ -130,33 +130,33 @@ public class GUIController {
      * updatedModel and allModelIssues are specified as separate arguments as the extraction of allModelIssues
      * is O(n).
      *
-     * @param columnToProcess The column whose filter expression will be used to filter issues.
+     * @param panelToProcess The panel whose filter expression will be used to filter issues.
      * @param updatedModel The model whose data will be used to display issue details.
      * @param allModelIssues The list of issues extracted from the model.
      * @param toUpdate The tally for metadata requests. Ignored if the issues already have metadata, or don't need it.
      * @param isMetadataUpdate Determines whether issues have the necessary metadata to be displayed to the user.
      */
-    public void processColumn(FilterPanel columnToProcess,
-                              IModel updatedModel,
-                              ObservableList<TurboIssue> allModelIssues,
-                              HashMap<String, HashSet<Integer>> toUpdate,
-                              boolean isMetadataUpdate) {
+    public void processPanel(FilterPanel panelToProcess,
+                             IModel updatedModel,
+                             ObservableList<TurboIssue> allModelIssues,
+                             HashMap<String, HashSet<Integer>> toUpdate,
+                             boolean isMetadataUpdate) {
 
         // Extract the filter expression and the meta qualifiers within it. The expression is used for
         // filtering the issues, whereas the meta qualifiers are used for a special issue sorting order,
         // as well as to determine whether to tally issues for metadata updates.
-        FilterExpression columnExpression = columnToProcess.getCurrentFilterExpression();
-        List<Qualifier> columnMetaQualifiers = columnExpression.find(Qualifier::isMetaQualifier);
+        FilterExpression panelExpression = panelToProcess.getCurrentFilterExpression();
+        List<Qualifier> panelMetaQualifiers = panelExpression.find(Qualifier::isMetaQualifier);
 
         // First we request all necessary repos. The opened repos will come in subsequent ModelUpdatedEvents.
-        openAllReposInExpression(columnMetaQualifiers);
+        openAllReposInExpression(panelMetaQualifiers);
 
-        boolean hasUpdatedQualifier = updatedQualifierExists(columnMetaQualifiers);
+        boolean hasUpdatedQualifier = updatedQualifierExists(panelMetaQualifiers);
 
         // Issues are filtered and sorted here. isMetadataUpdate and hasUpdatedQualifier are used to determine
         // whether to use an implicit non-self-update sorting order.
         TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues =
-                filterAndSortColumn(columnExpression, columnMetaQualifiers,
+                filterAndSortPanel(panelExpression, panelMetaQualifiers,
                         updatedModel, allModelIssues, isMetadataUpdate && hasUpdatedQualifier);
 
         // If the filter expression has an UPDATED qualifier, we must ensure that the issues have the relevant
@@ -164,7 +164,7 @@ public class GUIController {
         // However, even if this is not a metadata update, but there are no issues to display or retrieve metadata
         // for, we also display the empty panel to the user.
         if (!hasUpdatedQualifier || isMetadataUpdate || filteredAndSortedIssues.isEmpty()) {
-            updateColumn(columnToProcess, filteredAndSortedIssues, isMetadataUpdate);
+            updatePanel(panelToProcess, filteredAndSortedIssues, isMetadataUpdate);
         } else {
             populateUpdateList(filteredAndSortedIssues, toUpdate);
         }
@@ -174,24 +174,24 @@ public class GUIController {
      * Produces a list of issues, filtered and sorted from all issues from the given multimodel, based on
      * the given filter expression.
      *
-     * Like updatedModel and allModelIssues, columnExpression and columnMetaQualifiers are passed separately
+     * Like updatedModel and allModelIssues, panelExpression and panelMetaQualifiers are passed separately
      * as extraction of the meta qualifiers is O(n).
      *
-     * @param columnExpression The filter expression belonging to the column.
-     * @param columnMetaQualifiers The meta qualifiers in the column's filter expression.
+     * @param panelExpression The filter expression belonging to the panel.
+     * @param panelMetaQualifiers The meta qualifiers in the panel's filter expression.
      * @param updatedModel The model to be used to display issue details such as assignee and labels.
      * @param allModelIssues The list of issues extracted from the model.
      * @param isSortableByNonSelfUpdates Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The list of filtered and sorted issues for the panel.
      */
-    private TransformationList<TurboIssue, TurboIssue> filterAndSortColumn(FilterExpression columnExpression,
-                                                                           List<Qualifier> columnMetaQualifiers,
-                                                                           IModel updatedModel,
-                                                                           ObservableList<TurboIssue> allModelIssues,
-                                                                           boolean isSortableByNonSelfUpdates) {
+    private TransformationList<TurboIssue, TurboIssue> filterAndSortPanel(FilterExpression panelExpression,
+                                                                          List<Qualifier> panelMetaQualifiers,
+                                                                          IModel updatedModel,
+                                                                          ObservableList<TurboIssue> allModelIssues,
+                                                                          boolean isSortableByNonSelfUpdates) {
 
-        Predicate<TurboIssue> predicate = issue -> Qualifier.process(updatedModel, columnExpression, issue);
-        Comparator<TurboIssue> comparator = determineComparator(columnMetaQualifiers, isSortableByNonSelfUpdates);
+        Predicate<TurboIssue> predicate = issue -> Qualifier.process(updatedModel, panelExpression, issue);
+        Comparator<TurboIssue> comparator = determineComparator(panelMetaQualifiers, isSortableByNonSelfUpdates);
 
         return new SortedList<>(new FilteredList<>(allModelIssues, predicate), comparator);
     }
@@ -240,15 +240,15 @@ public class GUIController {
      * Presents the given list of issues to the user by placing them on the given panel and refreshing the panel,
      * resulting in actual GUI elements being created from the given issues.
      *
-     * @param columnToUpdate The panel to display the issues on.
+     * @param panelToUpdate The panel to display the issues on.
      * @param filteredAndSortedIssues The issues to be displayed.
      * @param isMetadataUpdate Determines whether comment bubbles will be highlighted based on non-self update times.
      */
-    private static void updateColumn(FilterPanel columnToUpdate,
-                                     TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
-                                     boolean isMetadataUpdate) {
-        columnToUpdate.setIssueList(filteredAndSortedIssues);
-        columnToUpdate.refreshItems(isMetadataUpdate);
+    private static void updatePanel(FilterPanel panelToUpdate,
+                                    TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
+                                    boolean isMetadataUpdate) {
+        panelToUpdate.setIssueList(filteredAndSortedIssues);
+        panelToUpdate.refreshItems(isMetadataUpdate);
     }
 
     /**

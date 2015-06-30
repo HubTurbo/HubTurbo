@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 public class DragData {
 
     public enum Source {
-        ISSUE_CARD, COLUMN, LABEL_TAB, MILESTONE_TAB, ASSIGNEE_TAB, FEED_TAB
+        ISSUE_CARD, PANEL, LABEL_TAB, MILESTONE_TAB, ASSIGNEE_TAB, FEED_TAB
     }
 
     private Source source;
@@ -25,12 +25,12 @@ public class DragData {
 //        this.entityName = name;
 //    }
 
-    public int getColumnIndex() {
+    public int getPanelIndex() {
         return columnIndex;
     }
 
-//    public void setColumnIndex(int columnIndex) {
-//        this.columnIndex = columnIndex;
+//    public void setColumnIndex(int panelIndex) {
+//        this.panelIndex = panelIndex;
 //    }
 
 //    public int getIssueIndex() {

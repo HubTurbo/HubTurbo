@@ -26,7 +26,7 @@ public class PanelControl extends HBox {
     private final Preferences prefs;
     private IModel model;
     private GUIController guiController;
-    private Optional<Integer> currentlySelectedColumn = Optional.empty();
+    private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
     public PanelControl(UI ui, Preferences prefs) {
         this.ui = ui;
@@ -36,9 +36,9 @@ public class PanelControl extends HBox {
         setPadding(new Insets(0, 10, 0, 10));
 
         ui.registerEvent((IssueSelectedEventHandler) e ->
-            setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+                setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
-                setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+                setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
 
         setupKeyEvents();
     }
@@ -48,7 +48,7 @@ public class PanelControl extends HBox {
      */
     public void init(GUIController guiController) {
         this.guiController = guiController;
-        restoreColumns();
+        restorePanels();
     }
 
     public void updateModel(IModel newModel) {
@@ -66,18 +66,18 @@ public class PanelControl extends HBox {
         prefs.setLastOpenFilters(sessionFilters);
     }
 
-    public void restoreColumns() {
+    public void restorePanels() {
         getChildren().clear();
 
         List<String> filters = prefs.getLastOpenFilters();
 
         if (filters.isEmpty()) {
-            addColumn();
+            addPanel();
             return;
         }
 
         for (String filter : filters) {
-            addColumn().filterByString(filter);
+            addPanel().filterByString(filter);
         }
     }
 
@@ -92,59 +92,59 @@ public class PanelControl extends HBox {
         forEach(child -> child.refreshItems(true));
     }
 
-    private FilterPanel addColumn() {
-        return addColumnAt(getChildren().size());
+    private FilterPanel addPanel() {
+        return addPanelAt(getChildren().size());
     }
 
-    public FilterPanel addColumnAt(int index) {
+    public FilterPanel addPanelAt(int index) {
         FilterPanel panel = new ListPanel(ui, model, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.
-        guiController.columnFilterExpressionChanged(panel);
+        guiController.panelFilterExpressionChanged(panel);
 
-        updateColumnIndices();
-        setCurrentlySelectedColumn(Optional.of(index));
+        updatePanelIndices();
+        setCurrentlySelectedPanel(Optional.of(index));
         return panel;
     }
 
-    private void setCurrentlySelectedColumn(Optional<Integer> selectedColumn) {
-        currentlySelectedColumn = selectedColumn;
-        updateCSSforColumns();
+    private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
+        currentlySelectedPanel = selectedPanel;
+        updateCSSforPanels();
     }
 
-    private void updateCSSforColumns() {
-        if (currentlySelectedColumn.isPresent()) {
+    private void updateCSSforPanels() {
+        if (currentlySelectedPanel.isPresent()) {
             for (int index = 0; index < getChildren().size(); index++) {
-                getColumn(index).getStyleClass().remove("panel-focused");
+                getPanel(index).getStyleClass().remove("panel-focused");
             }
-            getColumn(currentlySelectedColumn.get()).getStyleClass().add("panel-focused");
+            getPanel(currentlySelectedPanel.get()).getStyleClass().add("panel-focused");
         }
     }
 
-    public AbstractPanel getColumn(int index) {
+    public AbstractPanel getPanel(int index) {
         return (AbstractPanel) getChildren().get(index);
     }
 
-    public void closeAllColumns() {
+    public void closeAllPanels() {
         getChildren().clear();
         // There aren't any children left, so we don't need to update indices
     }
 
-    public void openColumnsWithFilters(List<String> filters) {
+    public void openPanelsWithFilters(List<String> filters) {
         for (String filter : filters) {
-            FilterPanel column = addColumn();
-            column.filterByString(filter);
+            FilterPanel panel = addPanel();
+            panel.filterByString(filter);
         }
     }
 
-    public void closeColumn(int index) {
+    public void closePanel(int index) {
         Node child = getChildren().remove(index);
-        updateColumnIndices();
+        updatePanelIndices();
         ((AbstractPanel) child).close();
     }
 
-    private void updateColumnIndices() {
+    private void updatePanelIndices() {
         int i = 0;
         for (Node c : getChildren()) {
             ((AbstractPanel) c).updateIndex(i++);
@@ -152,110 +152,110 @@ public class PanelControl extends HBox {
     }
 
     public void createNewPanelAtStart() {
-        addColumnAt(0);
+        addPanelAt(0);
     }
 
     public void createNewPanelAtEnd() {
-        addColumn();
+        addPanel();
     }
 
-    public void swapColumns(int columnIndex, int columnIndex2) {
-        AbstractPanel one = getColumn(columnIndex);
-        AbstractPanel two = getColumn(columnIndex2);
-        one.updateIndex(columnIndex2);
-        two.updateIndex(columnIndex);
+    public void swapPanels(int panelIndex, int panelIndex2) {
+        AbstractPanel one = getPanel(panelIndex);
+        AbstractPanel two = getPanel(panelIndex2);
+        one.updateIndex(panelIndex2);
+        two.updateIndex(panelIndex);
         // This method of swapping is used because Collections.swap
         // will assign one child without removing the other, causing
         // a duplicate child exception. HBoxes are constructed because
         // null also causes an exception.
-        getChildren().set(columnIndex, new HBox());
-        getChildren().set(columnIndex2, new HBox());
-        getChildren().set(columnIndex, two);
-        getChildren().set(columnIndex2, one);
+        getChildren().set(panelIndex, new HBox());
+        getChildren().set(panelIndex2, new HBox());
+        getChildren().set(panelIndex, two);
+        getChildren().set(panelIndex2, one);
     }
 
-    public Optional<Integer> getCurrentlySelectedColumn() {
-        return currentlySelectedColumn;
+    public Optional<Integer> getCurrentlySelectedPanel() {
+        return currentlySelectedPanel;
     }
 
     // For dragging purposes
-    private int currentlyDraggedColumnIndex = -1;
-    public int getCurrentlyDraggedColumnIndex() {
-        return currentlyDraggedColumnIndex;
+    private int currentlyDraggedPanelIndex = -1;
+    public int getCurrentlyDraggedPanelIndex() {
+        return currentlyDraggedPanelIndex;
     }
-    public void setCurrentlyDraggedColumnIndex(int i) {
-        currentlyDraggedColumnIndex = i;
+    public void setCurrentlyDraggedPanelIndex(int i) {
+        currentlyDraggedPanelIndex = i;
     }
 
-    public void closeCurrentColumn() {
-        if (currentlySelectedColumn.isPresent()) {
-            int columnIndex = currentlySelectedColumn.get();
-            closeColumn(columnIndex);
+    public void closeCurrentPanel() {
+        if (currentlySelectedPanel.isPresent()) {
+            int panelIndex = currentlySelectedPanel.get();
+            closePanel(panelIndex);
             if (getChildren().size() == 0) {
-                setCurrentlySelectedColumn(Optional.empty());
+                setCurrentlySelectedPanel(Optional.empty());
             } else {
-                int newColumnIndex = (columnIndex > getChildren().size() - 1)
-                                     ? columnIndex - 1
-                                     : columnIndex;
-                setCurrentlySelectedColumn(Optional.of(newColumnIndex));
-                getColumn(currentlySelectedColumn.get()).requestFocus();
+                int newPanelIndex = (panelIndex > getChildren().size() - 1)
+                                     ? panelIndex - 1
+                                     : panelIndex;
+                setCurrentlySelectedPanel(Optional.of(newPanelIndex));
+                getPanel(currentlySelectedPanel.get()).requestFocus();
             }
         }
     }
 
     public double getPanelWidth() {
-        // COLUMN_WIDTH is used instead of
+        // PANEL_WIDTH is used instead of
         // ((AbstractPanel) getChildren().get(0)).getWidth();
-        // because when this function is called, columns may not have been sized yet.
-        // In any case actual column width is COLUMN_WIDTH at minimum, so we can assume
+        // because when this function is called, panels may not have been sized yet.
+        // In any case actual panel width is PANEL_WIDTH at minimum, so we can assume
         // that they are that large.
-        return 40 + AbstractPanel.COLUMN_WIDTH;
+        return 40 + AbstractPanel.PANEL_WIDTH;
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyboardShortcuts.RIGHT_PANEL || event.getCode() == KeyboardShortcuts.LEFT_PANEL) {
                 handleKeys(event.getCode() == KeyboardShortcuts.RIGHT_PANEL);
-                assert currentlySelectedColumn.isPresent() : "handleKeys doesn't set selectedIndex!";
+                assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });
     }
 
     private void handleKeys(boolean isForwardKey) {
-        if (!currentlySelectedColumn.isPresent()) {
+        if (!currentlySelectedPanel.isPresent()) {
             return;
         }
         if (getChildren().size() == 0) {
             return;
         }
-        AbstractPanel selectedPanel = getColumn(currentlySelectedColumn.get());
+        AbstractPanel selectedPanel = getPanel(currentlySelectedPanel.get());
         if (selectedPanel instanceof FilterPanel){
             if (((FilterPanel) selectedPanel).filterTextField.isFocused()){
                 return;
             } else {
-                int newIndex = currentlySelectedColumn.get() + (isForwardKey ? 1 : -1);
+                int newIndex = currentlySelectedPanel.get() + (isForwardKey ? 1 : -1);
                 if (newIndex < 0) {
                     newIndex = getChildren().size() - 1;
                 } else if (newIndex > getChildren().size() - 1) {
                     newIndex = 0;
                 }
-                setCurrentlySelectedColumn(Optional.of(newIndex));
-                selectedPanel = getColumn(currentlySelectedColumn.get());
+                setCurrentlySelectedPanel(Optional.of(newIndex));
+                selectedPanel = getPanel(currentlySelectedPanel.get());
                 selectedPanel.requestFocus();
             }
         }
-        ui.triggerEvent(new PanelClickedEvent(currentlySelectedColumn.get()));
-        scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
+        ui.triggerEvent(new PanelClickedEvent(currentlySelectedPanel.get()));
+        scrollandShowPanel(currentlySelectedPanel.get(), getChildren().size());
     }
 
-    private void scrollandShowColumn(int selectedColumnIndex, int numOfColumns) {
-        ui.getMenuControl().scrollTo(selectedColumnIndex, numOfColumns);
+    private void scrollandShowPanel(int selectedPanelIndex, int numOfPanels) {
+        ui.getMenuControl().scrollTo(selectedPanelIndex, numOfPanels);
     }
 
     public GUIController getGUIController() {
         return guiController;
     }
 
-    public int getNumberOfColumns() {
+    public int getNumberOfPanels() {
         return getChildren().size();
     }
 
