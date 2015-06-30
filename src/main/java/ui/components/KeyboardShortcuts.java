@@ -19,8 +19,8 @@ import java.util.Set;
  *
  * Classes that currently have keyboard shortcut code:
  * ui.components.NavigableListView
- * ui.issuecolumn.ColumnControl
- * ui.issuepanel.IssuePanel
+ * ui.issuepanel.PanelControl
+ * ui.listpanel.ListPanel
  * ui.MenuControl
  *
  * Utility Class:
@@ -34,7 +34,7 @@ public class KeyboardShortcuts {
     private static Set<KeyCode> assignedKeys = null;
 
     // customizable keyboard shortcuts
-    // ui.issuepanel.IssuePanel
+    // ui.listpanel.ListPanel
     public static KeyCode MARK_AS_READ;
     public static KeyCode MARK_AS_UNREAD;
 
@@ -43,16 +43,16 @@ public class KeyboardShortcuts {
     public static KeyCode SCROLL_UP;
     public static KeyCode SCROLL_DOWN;
 
-    //ui.issuecolumn.ColumnControl
+    //ui.issuepanel.PanelControl
     public static KeyCode LEFT_PANEL;
     public static KeyCode RIGHT_PANEL;
 
-    // ui.components.NavigableListView && ui.issuepanel.IssuePanel
+    // ui.components.NavigableListView && ui.listpanel.ListPanel
     public static KeyCode UP_ISSUE;
     public static KeyCode DOWN_ISSUE;
 
     // non-customizable keyboard shortcuts
-    // ui.issuepanel.IssuePanel
+    // ui.listpanel.ListPanel
     public static final KeyCombination BOX_TO_LIST =
             new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination LIST_TO_BOX =
