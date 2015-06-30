@@ -4,7 +4,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import ui.UI;
-import util.events.ColumnClickedEventHandler;
+import util.events.PanelClickedEventHandler;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -16,7 +16,7 @@ public class ColumnsTest extends UITest {
     // TODO check if interactions result in any effects
     @Test
     public void columnsTest() {
-        UI.events.registerEvent((ColumnClickedEventHandler) e -> eventTriggered = !eventTriggered);
+        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);

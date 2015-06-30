@@ -10,8 +10,8 @@ import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
-import util.events.ColumnClickedEvent;
-import util.events.ColumnClickedEventHandler;
+import util.events.PanelClickedEvent;
+import util.events.PanelClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 
 import java.util.ArrayList;
@@ -37,8 +37,8 @@ public class PanelControl extends HBox {
 
         ui.registerEvent((IssueSelectedEventHandler) e ->
             setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
-        ui.registerEvent((ColumnClickedEventHandler) e ->
-            setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
+        ui.registerEvent((PanelClickedEventHandler) e ->
+                setCurrentlySelectedColumn(Optional.of(e.columnIndex)));
 
         setupKeyEvents();
     }
@@ -243,7 +243,7 @@ public class PanelControl extends HBox {
                 selectedPanel.requestFocus();
             }
         }
-        ui.triggerEvent(new ColumnClickedEvent(currentlySelectedColumn.get()));
+        ui.triggerEvent(new PanelClickedEvent(currentlySelectedColumn.get()));
         scrollandShowColumn(currentlySelectedColumn.get(), getChildren().size());
     }
 

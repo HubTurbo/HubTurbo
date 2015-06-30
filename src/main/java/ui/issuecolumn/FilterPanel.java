@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import ui.UI;
 import ui.components.FilterTextField;
-import util.events.ColumnClickedEvent;
+import util.events.PanelClickedEvent;
 import util.events.ModelUpdatedEventHandler;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public abstract class FilterPanel extends AbstractPanel {
         this.ui = ui;
         getChildren().add(createFilterBox());
         this.setOnMouseClicked(e-> {
-            ui.triggerEvent(new ColumnClickedEvent(columnIndex));
+            ui.triggerEvent(new PanelClickedEvent(columnIndex));
             requestFocus();
         });
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
@@ -79,7 +79,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
         ui.registerEvent(onModelUpdate);
 
-        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new ColumnClickedEvent(columnIndex)));
+        filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(columnIndex)));
 
         HBox buttonsBox = new HBox();
         buttonsBox.setSpacing(5);

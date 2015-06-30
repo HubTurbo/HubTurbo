@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
 import ui.UI;
-import util.events.ColumnClickedEventHandler;
+import util.events.PanelClickedEventHandler;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
@@ -61,7 +61,7 @@ public class UIEventTests extends UITest {
 
     @Test
     public void columnClickedTest() {
-        UI.events.registerEvent((ColumnClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
+        UI.events.registerEvent((PanelClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, eventTestCount);
