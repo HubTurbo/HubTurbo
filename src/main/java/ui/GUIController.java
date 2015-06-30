@@ -62,39 +62,33 @@ public class GUIController {
      * on their respective panels, or held back until their metadata requests have been fired and the downloaded
      * metadata come back as a subsequent ModelUpdatedEvent (with e.hasMetadata being true).
      *
-     * Platform.runLater ensures that all of this is done on the UI thread.
-     *
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        Platform.runLater(() -> {
+        multiModel = e.model;
 
-            multiModel = e.model;
+        // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
+        IModel updatedModel = e.model;
 
-            // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
-            IModel updatedModel = e.model;
+        // Set the new model to panelControl. This is in turn passed from PanelControl to ListPanel,
+        // down to each ListPanelCard in order to display details about each issue such as labels and assignees.
+        panelControl.updateModel(updatedModel);
 
-            // Set the new model to panelControl. This is in turn passed from PanelControl to ListPanel,
-            // down to each ListPanelCard in order to display details about each issue such as labels and assignees.
-            panelControl.updateModel(updatedModel);
+        // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
+        // to produce the appropriate list of issues to be displayed.
+        ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
 
-            // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
-            // to produce the appropriate list of issues to be displayed.
-            ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
+        // Populated in processPanel calls.
+        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
-            // Populated in processPanel calls.
-            HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
-
-            panelControl.getChildren().forEach(child -> {
-                if (child instanceof FilterPanel) {
-                    processPanel((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
-                }
-            });
-
-            // If toUpdate is empty, no metadata is requested.
-            dispatchMetadataRequests(toUpdate);
-
+        panelControl.getChildren().forEach(child -> {
+            if (child instanceof FilterPanel) {
+                processPanel((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
+            }
         });
+
+        // If toUpdate is empty, no metadata is requested.
+        dispatchMetadataRequests(toUpdate);
     }
 
     /**
@@ -109,15 +103,13 @@ public class GUIController {
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
-        Platform.runLater(() -> {
-            ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
-            HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+        ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
+        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
-            // This is not triggered by a (metadata) update, so we pass false into the call.
-            processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
+        // This is not triggered by a (metadata) update, so we pass false into the call.
+        processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
 
-            dispatchMetadataRequests(toUpdate);
-        });
+        dispatchMetadataRequests(toUpdate);
     }
 
     /**
