@@ -8,7 +8,7 @@ import javafx.scene.layout.Priority;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
-import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.PanelControl;
 import ui.issuecolumn.FilterPanel;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
@@ -29,8 +29,8 @@ public class ListPanel extends FilterPanel {
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
-    public ListPanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
-        super(ui, model, parentColumnControl, columnIndex);
+    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
+        super(ui, model, parentPanelControl, columnIndex);
         this.model = model;
         this.ui = ui;
 
@@ -159,7 +159,7 @@ public class ListPanel extends FilterPanel {
                 ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
                 issue.setMarkedReadAt(Optional.of(now));
                 issue.setIsCurrentlyRead(true);
-                parentColumnControl.refresh();
+                parentPanelControl.refresh();
             }
             if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
@@ -170,7 +170,7 @@ public class ListPanel extends FilterPanel {
                 ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
                 issue.setMarkedReadAt(Optional.empty());
                 issue.setIsCurrentlyRead(false);
-                parentColumnControl.refresh();
+                parentPanelControl.refresh();
             }
             if (event.getCode() == KeyboardShortcuts.REFRESH) {
                 ui.logic.refresh();

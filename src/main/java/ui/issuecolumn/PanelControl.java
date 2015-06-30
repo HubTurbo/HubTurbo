@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 
-public class ColumnControl extends HBox {
+public class PanelControl extends HBox {
 
     private final UI ui;
     private final Preferences prefs;
@@ -28,7 +28,7 @@ public class ColumnControl extends HBox {
     private GUIController guiController;
     private Optional<Integer> currentlySelectedColumn = Optional.empty();
 
-    public ColumnControl(UI ui, Preferences prefs) {
+    public PanelControl(UI ui, Preferences prefs) {
         this.ui = ui;
         this.prefs = prefs;
 

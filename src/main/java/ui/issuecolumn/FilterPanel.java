@@ -40,8 +40,8 @@ public abstract class FilterPanel extends AbstractPanel {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public FilterPanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
-        super(model, parentColumnControl, columnIndex);
+    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int columnIndex) {
+        super(model, parentPanelControl, columnIndex);
         this.ui = ui;
         getChildren().add(createFilterBox());
         this.setOnMouseClicked(e-> {
@@ -102,7 +102,7 @@ public abstract class FilterPanel extends AbstractPanel {
         closeList.getStyleClass().add("label-button");
         closeList.setOnMouseClicked((e) -> {
             e.consume();
-            parentColumnControl.closeColumn(columnIndex);
+            parentPanelControl.closeColumn(columnIndex);
         });
 
         return new Label[] { closeList };
@@ -110,14 +110,14 @@ public abstract class FilterPanel extends AbstractPanel {
 
     private void setupPanelDragEvents(Node dropNode) {
         dropNode.setOnDragEntered(e -> {
-                if (parentColumnControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
+                if (parentPanelControl.getCurrentlyDraggedColumnIndex() != columnIndex) {
                     // Apparently the dragboard can't be updated while
                     // the drag is in progress. This is why we use an
                     // external source for updates.
-                    assert parentColumnControl.getCurrentlyDraggedColumnIndex() != -1;
-                    int previous = parentColumnControl.getCurrentlyDraggedColumnIndex();
-                    parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
-                    parentColumnControl.swapColumns(previous, columnIndex);
+                    assert parentPanelControl.getCurrentlyDraggedColumnIndex() != -1;
+                    int previous = parentPanelControl.getCurrentlyDraggedColumnIndex();
+                    parentPanelControl.setCurrentlyDraggedColumnIndex(columnIndex);
+                    parentPanelControl.swapColumns(previous, columnIndex);
                 }
                 e.consume();
             }
@@ -157,7 +157,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private void applyFilterExpression(FilterExpression filter) {
         currentFilterExpression = filter;
 
-        parentColumnControl.getGUIController().columnFilterExpressionChanged(this);
+        parentPanelControl.getGUIController().columnFilterExpressionChanged(this);
     }
 
     public void filterByString(String filterString) {

@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
-import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.PanelControl;
 import ui.issuecolumn.FilterPanel;
 import util.events.*;
 
@@ -28,12 +28,12 @@ public class MenuControl extends MenuBar {
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
-    private final ColumnControl columns;
+    private final PanelControl columns;
     private final ScrollPane columnsScrollPane;
     private final UI ui;
     private final Preferences prefs;
 
-    public MenuControl(UI ui, ColumnControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
+    public MenuControl(UI ui, PanelControl columns, ScrollPane columnsScrollPane, Preferences prefs) {
         this.columns = columns;
         this.prefs = prefs;
         this.columnsScrollPane = columnsScrollPane;

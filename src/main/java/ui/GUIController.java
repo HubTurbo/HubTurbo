@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
-import ui.issuecolumn.ColumnControl;
+import ui.issuecolumn.PanelControl;
 import ui.issuecolumn.FilterPanel;
 import ui.issuecolumn.UIBrowserBridge;
 import util.events.ModelUpdatedEvent;
@@ -29,16 +29,16 @@ import java.util.function.Predicate;
  */
 
 public class GUIController {
-    private ColumnControl columnControl;
+    private PanelControl panelControl;
     private UI ui;
 
     // Synchronised with Logic's latest updated multimodel.
     // Not to be modified from this point or any further in the GUI.
     private IModel multiModel;
 
-    public GUIController(UI ui, ColumnControl columnControl) {
+    public GUIController(UI ui, PanelControl panelControl) {
         this.ui = ui;
-        this.columnControl = columnControl;
+        this.panelControl = panelControl;
 
         // Set up the connection to the browser
         new UIBrowserBridge(ui);
@@ -53,7 +53,7 @@ public class GUIController {
 
     /**
      * The handler method for a ModelUpdatedEvent. It extracts the issues of the multimodel carried by the event,
-     * and then filters and sorts the issues to place each panel in ColumnControl based on these issues.
+     * and then filters and sorts the issues to place each panel in PanelControl based on these issues.
      *
      * The filtering process also produces a list of issues to request metadata for, if e.hasMetadata is false
      * and their respective panels specify the display of metadata (through the UPDATED filter).
@@ -74,9 +74,9 @@ public class GUIController {
             // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
             IModel updatedModel = e.model;
 
-            // Set the new model to columnControl. This is in turn passed from ColumnControl to ListPanel,
+            // Set the new model to panelControl. This is in turn passed from PanelControl to ListPanel,
             // down to each ListPanelCard in order to display details about each issue such as labels and assignees.
-            columnControl.updateModel(updatedModel);
+            panelControl.updateModel(updatedModel);
 
             // Extracts all issues from the multimodel. This is then filtered through each of the panels' filters
             // to produce the appropriate list of issues to be displayed.
@@ -85,7 +85,7 @@ public class GUIController {
             // Populated in processColumn calls.
             HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
 
-            columnControl.getChildren().forEach(child -> {
+            panelControl.getChildren().forEach(child -> {
                 if (child instanceof FilterPanel) {
                     processColumn((FilterPanel) child, updatedModel, allModelIssues, toUpdate, e.hasMetadata);
                 }

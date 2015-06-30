@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import ui.DragData;
 
 /**
- * A AbstractPanel is a JavaFX node that is contained by a ColumnControl.
+ * A AbstractPanel is a JavaFX node that is contained by a PanelControl.
  * It is in charge of displaying arbitrary content and provides
  * functionality for being added, removed, and reordered (via dragging).
  *
@@ -24,12 +24,12 @@ public abstract class AbstractPanel extends VBox {
     public static final String CLOSE_COLUMN = "\u2716";
 
     protected final IModel model;
-    protected final ColumnControl parentColumnControl;
+    protected final PanelControl parentPanelControl;
     protected int columnIndex;
 
-    public AbstractPanel(IModel model, ColumnControl parentColumnControl, int columnIndex) {
+    public AbstractPanel(IModel model, PanelControl parentPanelControl, int columnIndex) {
         this.model = model;
-        this.parentColumnControl = parentColumnControl;
+        this.parentPanelControl = parentPanelControl;
         this.columnIndex = columnIndex;
 
         setupColumn();
@@ -67,7 +67,7 @@ public abstract class AbstractPanel extends VBox {
             db.setContent(content);
             // We're using this because the content of a dragboard can't be changed
             // while the drag is in progress; this seemed like the simplest workaround
-            parentColumnControl.setCurrentlyDraggedColumnIndex(columnIndex);
+            parentPanelControl.setCurrentlyDraggedColumnIndex(columnIndex);
             event.consume();
         });
 
@@ -75,7 +75,7 @@ public abstract class AbstractPanel extends VBox {
     }
 
     /**
-     * To be called by ColumnControl in order to have indices updated.
+     * To be called by PanelControl in order to have indices updated.
      * Should not be called externally.
      */
     void updateIndex(int updated) {

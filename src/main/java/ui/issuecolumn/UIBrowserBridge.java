@@ -16,7 +16,7 @@ import util.events.MilestoneCreatedEventHandler;
  * Its function is to decouple the UI logic and events from the BrowserComponent.
  * In this sense it is similar in function to ui.listpanel.expanded.IssueCommentsDisplay.
  *
- * Unlike the aforementioned component is owned by the ColumnControl, which is not recreated
+ * Unlike the aforementioned component is owned by the PanelControl, which is not recreated
  * on issue selection. Thus its constructor does not contain a reference to a particular issue.
  * Instead it takes ownership of issues via events.
  */
