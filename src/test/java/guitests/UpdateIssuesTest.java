@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
 import ui.UI;
-import ui.issuepanel.IssuePanel;
+import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -31,7 +31,7 @@ public class UpdateIssuesTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("24");
         push(KeyCode.ENTER);
-        FutureTask countIssues = new FutureTask(((IssuePanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(2, countIssues.get());
     }

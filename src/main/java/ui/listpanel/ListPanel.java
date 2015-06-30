@@ -1,4 +1,4 @@
-package ui.issuepanel;
+package ui.listpanel;
 
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
@@ -9,7 +9,7 @@ import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
 import ui.issuecolumn.ColumnControl;
-import ui.issuecolumn.IssueColumn;
+import ui.issuecolumn.FilterPanel;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.testevents.UIComponentFocusEvent;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class IssuePanel extends IssueColumn {
+public class ListPanel extends FilterPanel {
 
     private final IModel model;
     private final UI ui;
@@ -29,7 +29,7 @@ public class IssuePanel extends IssueColumn {
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
-    public IssuePanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
+    public ListPanel(UI ui, IModel model, ColumnControl parentColumnControl, int columnIndex) {
         super(ui, model, parentColumnControl, columnIndex);
         this.model = model;
         this.ui = ui;
@@ -90,7 +90,7 @@ public class IssuePanel extends IssueColumn {
 
         // Set the cell factory every time - this forces the list view to update
         listView.setCellFactory(list ->
-                new IssuePanelCell(model, IssuePanel.this, columnIndex, issuesWithNewComments));
+                new ListPanelCell(model, ListPanel.this, columnIndex, issuesWithNewComments));
         listView.saveSelection();
 
         // Supposedly this also causes the list view to update - not sure

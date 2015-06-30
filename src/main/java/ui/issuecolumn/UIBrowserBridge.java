@@ -14,7 +14,7 @@ import util.events.MilestoneCreatedEventHandler;
 /**
  * A abstract component in charge of creating, displaying, and enabling edits of issues.
  * Its function is to decouple the UI logic and events from the BrowserComponent.
- * In this sense it is similar in function to ui.issuepanel.expanded.IssueCommentsDisplay.
+ * In this sense it is similar in function to ui.listpanel.expanded.IssueCommentsDisplay.
  *
  * Unlike the aforementioned component is owned by the ColumnControl, which is not recreated
  * on issue selection. Thus its constructor does not contain a reference to a particular issue.
