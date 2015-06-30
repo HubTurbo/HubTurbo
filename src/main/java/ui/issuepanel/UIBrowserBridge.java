@@ -1,4 +1,4 @@
-package ui.issuecolumn;
+package ui.issuepanel;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

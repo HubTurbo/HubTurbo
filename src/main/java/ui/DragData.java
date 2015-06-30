@@ -9,14 +9,14 @@ public class DragData {
     }
 
     private Source source;
-    private int columnIndex;
+    private int panelIndex;
     private int issueIndex;
 
     private String entityName;
 
-    public DragData(Source source, int col, int issue) {
+    public DragData(Source source, int panelIndex, int issue) {
         this.setSource(source);
-        this.columnIndex = col;
+        this.panelIndex = panelIndex;
         this.issueIndex = issue;
     }
 
@@ -26,10 +26,10 @@ public class DragData {
 //    }
 
     public int getPanelIndex() {
-        return columnIndex;
+        return panelIndex;
     }
 
-//    public void setColumnIndex(int panelIndex) {
+//    public void setPanelIndex(int panelIndex) {
 //        this.panelIndex = panelIndex;
 //    }
 

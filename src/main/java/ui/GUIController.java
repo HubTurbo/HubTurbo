@@ -10,9 +10,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
-import ui.issuecolumn.PanelControl;
-import ui.issuecolumn.FilterPanel;
-import ui.issuecolumn.UIBrowserBridge;
+import ui.issuepanel.PanelControl;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.UIBrowserBridge;
 import util.events.ModelUpdatedEvent;
 import util.events.ModelUpdatedEventHandler;
 

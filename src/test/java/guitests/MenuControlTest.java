@@ -4,7 +4,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import ui.issuecolumn.PanelControl;
+import ui.issuepanel.PanelControl;
 import util.events.ModelUpdatedEventHandler;
 
 import static org.junit.Assert.assertEquals;

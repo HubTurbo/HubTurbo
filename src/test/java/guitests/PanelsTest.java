@@ -9,13 +9,13 @@ import util.events.PanelClickedEventHandler;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ColumnsTest extends UITest {
+public class PanelsTest extends UITest {
 
     private static boolean eventTriggered = false;
 
     // TODO check if interactions result in any effects
     @Test
-    public void columnsTest() {
+    public void panelsTest() {
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered = !eventTriggered);
 
         // maximize
@@ -28,7 +28,7 @@ public class ColumnsTest extends UITest {
         push(KeyCode.ENTER);
 
         // Drag
-        // TODO check whether columns are actually reordered
+        // TODO check whether panels are actually reordered
         drag("#dummy/dummy_col1_closeButton").to("#dummy/dummy_col0_closeButton");
 
         // Click

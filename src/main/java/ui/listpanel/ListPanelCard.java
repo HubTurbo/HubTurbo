@@ -14,7 +14,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.Comment;
-import ui.issuecolumn.FilterPanel;
+import ui.issuepanel.FilterPanel;
 import util.Utility;
 
 import java.time.LocalDateTime;

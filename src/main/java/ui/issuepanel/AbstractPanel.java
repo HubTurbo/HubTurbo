@@ -1,4 +1,4 @@
-package ui.issuecolumn;
+package ui.issuepanel;
 
 import backend.interfaces.IModel;
 import javafx.event.Event;

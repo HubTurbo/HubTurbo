@@ -17,16 +17,16 @@ public class KeyboardShortcutsTest extends UITest {
 
     private UIComponentFocusEvent.EventType uiComponentFocusEventType;
     private int selectedIssueId;
-    private int columnIndex;
+    private int panelIndex;
 
     @Test
     public void keyboardShortcutsTest() {
         UI.events.registerEvent((IssueSelectedEventHandler) e -> selectedIssueId = e.id);
         UI.events.registerEvent((UIComponentFocusEventHandler) e -> uiComponentFocusEventType = e.eventType);
-        UI.events.registerEvent((PanelClickedEventHandler) e -> columnIndex = e.columnIndex);
+        UI.events.registerEvent((PanelClickedEventHandler) e -> panelIndex = e.panelIndex);
         clearSelectedIssueId();
         clearUiComponentFocusEventType();
-        clearColumnIndex();
+        clearPanelIndex();
 
         // maximize
         assertEquals(false, stage.getMinWidth() > 500);
@@ -84,17 +84,17 @@ public class KeyboardShortcutsTest extends UITest {
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         push(getKeyCode("RIGHT_PANEL"));
-        assertEquals(0, columnIndex);
-        clearColumnIndex();
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
-        assertEquals(1, columnIndex);
-        clearColumnIndex();
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("RIGHT_PANEL"));
-        assertEquals(0, columnIndex);
-        clearColumnIndex();
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
-        assertEquals(1, columnIndex);
-        clearColumnIndex();
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
 
         click("#dummy/dummy_col1_1");
 
@@ -118,8 +118,8 @@ public class KeyboardShortcutsTest extends UITest {
         selectedIssueId = 0;
     }
 
-    public void clearColumnIndex() {
-        columnIndex = -1;
+    public void clearPanelIndex() {
+        panelIndex = -1;
     }
 
     public void clearUiComponentFocusEventType() {
