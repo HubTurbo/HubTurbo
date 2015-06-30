@@ -97,7 +97,7 @@ public class MenuControl extends MenuBar {
         createRight.setOnAction(e -> {
             logger.info("Menu: Panels > Create");
             panels.createNewPanelAtEnd();
-            // listener is used as columnsScroll's Hmax property doesn't update
+            // listener is used as panelsScroll's Hmax property doesn't update
             // synchronously
             ChangeListener<Number> listener = new ChangeListener<Number>() {
                 @Override
@@ -119,14 +119,14 @@ public class MenuControl extends MenuBar {
         });
         createRight.setAccelerator(KeyboardShortcuts.CREATE_RIGHT_PANEL);
 
-        MenuItem closeColumn = new MenuItem("Close");
-        closeColumn.setOnAction(e -> {
+        MenuItem closePanel = new MenuItem("Close");
+        closePanel.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
             panels.closeCurrentPanel();
         });
-        closeColumn.setAccelerator(KeyboardShortcuts.CLOSE_PANEL);
+        closePanel.setAccelerator(KeyboardShortcuts.CLOSE_PANEL);
 
-        cols.getItems().addAll(createRight, createLeft, closeColumn);
+        cols.getItems().addAll(createRight, createLeft, closePanel);
         return cols;
     }
 
@@ -277,8 +277,8 @@ public class MenuControl extends MenuBar {
         return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
     }
 
-    public void scrollTo(int columnIndex, int numOfColumns){
-        setHvalue(columnIndex * (panelsScrollPane.getHmax()) / (numOfColumns - 1));
+    public void scrollTo(int panelIndex, int numOfPanels){
+        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (numOfPanels - 1));
     }
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
