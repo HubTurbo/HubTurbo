@@ -3,7 +3,7 @@ package util.events;
 import com.google.common.eventbus.Subscribe;
 
 @FunctionalInterface
-public interface ColumnClickedEventHandler extends EventHandler {
+public interface PanelClickedEventHandler extends EventHandler {
     @Subscribe
-    void handle(ColumnClickedEvent e);
+    void handle(PanelClickedEvent e);
 }
