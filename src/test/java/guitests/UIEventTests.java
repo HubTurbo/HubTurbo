@@ -60,7 +60,7 @@ public class UIEventTests extends UITest {
     }
 
     @Test
-    public void columnClickedTest() {
+    public void panelClickedTest() {
         UI.events.registerEvent((PanelClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         click("#dummy/dummy_col0_filterTextField");
