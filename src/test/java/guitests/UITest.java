@@ -1,5 +1,6 @@
 package guitests;
 
+import backend.interfaces.RepoStore;
 import com.google.common.util.concurrent.SettableFuture;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
@@ -10,7 +11,12 @@ import prefs.Preferences;
 import ui.UI;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.io.Files.getFileExtension;
 
 public class UITest extends GuiTest {
 
@@ -32,6 +38,17 @@ public class UITest extends GuiTest {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
 
+    public void clearTestFolder() {
+        try {
+            Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
+                    .filter(Files::isRegularFile)
+                    .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json"))
+                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Before
     @Override
     public void setupStage() throws Throwable {
@@ -40,7 +57,7 @@ public class UITest extends GuiTest {
         if (testConfig.exists()) {
             testConfig.delete();
         }
-
+        clearTestFolder();
         setupMethod();
 
         if (stage == null) {
