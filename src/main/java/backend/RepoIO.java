@@ -79,10 +79,13 @@ public class RepoIO {
     }
 
     private CompletableFuture<Model> downloadRepositoryFromSource(String repoId) {
-        storedRepos.add(repoId);
         UI.status.displayMessage("Downloading " + repoId);
         return repoSource.downloadRepository(repoId)
                 .thenCompose(this::updateModel)
+                .thenApply(model -> {
+                    storedRepos.add(repoId);
+                    return model;
+                })
                 .exceptionally(withResult(new Model(repoId)));
     }
 
