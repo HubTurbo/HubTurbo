@@ -28,19 +28,18 @@ public class RepoIO {
     private List<String> storedRepos;
 
     public RepoIO(boolean isTestMode, boolean enableTestJSON) {
+        if (isTestMode) {
+            repoSource = new DummySource();
+            RepoStore.enableTestDirectory();
+        } else {
+            repoSource = new GitHubSource();
+        }
         if (isTestMode && !enableTestJSON) {
             jsonStore = new JSONStoreStub();
             storedRepos = new ArrayList<>();
         } else {
             jsonStore = new JSONStore();
             storedRepos = new ArrayList<>(jsonStore.getStoredRepos());
-        }
-
-        if (isTestMode) {
-            repoSource = new DummySource();
-            RepoStore.enableTestDirectory();
-        } else {
-            repoSource = new GitHubSource();
         }
     }
 
