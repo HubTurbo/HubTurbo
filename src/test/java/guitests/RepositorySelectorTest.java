@@ -3,12 +3,17 @@ package guitests;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+import prefs.Preferences;
 import ui.UI;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RepositorySelectorTest extends UITest {
 
@@ -33,7 +38,7 @@ public class RepositorySelectorTest extends UITest {
 
     @Override
     public void launchApp() {
-        FXTestUtils.launchApp(RepositorySelectorTestUI.class, "--test=true", "--bypasslogin=true");
+        FXTestUtils.launchApp(RepositorySelectorTestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Test
@@ -54,6 +59,21 @@ public class RepositorySelectorTest extends UITest {
         push(KeyCode.ENTER);
         assertEquals(3, comboBox.getItems().size());
         assertEquals("dummy3/dummy3", primaryRepo);
+
+        // exit program
+        click("Preferences");
+        click("Quit");
+
+        // testing that the correct repo was saved in the json
+        // check if the test JSON is still there...
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        if (!(testConfig.exists() && testConfig.isFile())) fail();
+
+        // ...then check that the JSON file contents are correct.
+        Preferences testPref = new Preferences(true);
+        // Last viewed repository
+        RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
+        assertEquals("dummy3/dummy3", lastViewedRepository.generateId());
     }
 
 }
