@@ -69,4 +69,5 @@ public class RepositorySelector extends HBox {
 
         setText(text);
     }
+
 }

@@ -22,7 +22,6 @@ public class GlobalConfigTest {
         ArrayList<String> emptyList = new ArrayList<>();
         globalConfig.addBoard("board1", emptyList);
         assertEquals(emptyList, globalConfig.getBoardPanels("board1"));
-
     }
 
 }

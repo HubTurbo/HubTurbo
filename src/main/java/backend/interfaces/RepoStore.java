@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 public abstract class RepoStore {
 
     protected static String directory = "store";
-    private static final String TEST_DIRECTORY = "store/test";
+    public static final String TEST_DIRECTORY = "store/test";
     private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
     public static String escapeRepoName(String repoName) {

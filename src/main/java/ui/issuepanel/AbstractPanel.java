@@ -89,9 +89,12 @@ public abstract class AbstractPanel extends VBox {
     /**
      * This method is called when the item list is to be refreshed. This mainly happens
      * when the user selects Refresh from the menu. Subclasses may also require it.
+     * Currently implemented by ListPanel to re-render the list of IssuePanelCards.
      *
-     * hasMetadata implies the issues to be filtered have metadata inside, and thus should
-     * be displayed and sorted accordingly.
+     * @param hasMetadata implies the issues to be filtered have metadata inside,
+     *                    and thus should be displayed and sorted accordingly.
+     *                    Currently it indicates whether the IssuePanelCards will
+     *                    show metadata details.
      */
     public abstract void refreshItems(boolean hasMetadata);
 

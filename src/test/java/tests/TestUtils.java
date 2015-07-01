@@ -1,11 +1,12 @@
 package tests;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import backend.interfaces.IModel;
 import backend.resource.*;
 import prefs.Preferences;
+import ui.UI;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TestUtils {
 
@@ -57,6 +58,21 @@ public class TestUtils {
             new ArrayList<>(Arrays.asList(label)),
             new ArrayList<>(Arrays.asList(milestone)),
             new ArrayList<>(Arrays.asList(user))));
+    }
+
+    /**
+     * Wrapper for Thread.sleep. Taken from TickingTimerTests.
+     *
+     * @param seconds The number of seconds for the thread to sleep.
+     */
+    public static void delay(double seconds) {
+        UI.status.updateTimeToRefresh((int) seconds);
+        int time = (int) (seconds * 1000);
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

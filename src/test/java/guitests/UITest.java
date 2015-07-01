@@ -1,5 +1,6 @@
 package guitests;
 
+import backend.interfaces.RepoStore;
 import com.google.common.util.concurrent.SettableFuture;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
@@ -10,11 +11,16 @@ import prefs.Preferences;
 import ui.UI;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.io.Files.getFileExtension;
 
 public class UITest extends GuiTest {
 
-    private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
+    protected static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
     protected static class TestUI extends UI {
         public TestUI() {
@@ -32,15 +38,26 @@ public class UITest extends GuiTest {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
 
+    public void clearTestFolder() {
+        try {
+            Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
+                    .filter(Files::isRegularFile)
+                    .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json"))
+                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Before
     @Override
     public void setupStage() throws Throwable {
         // delete test.json if it exists
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (testConfig.exists()) {
+        if (testConfig.exists() && testConfig.isFile()) {
             testConfig.delete();
         }
-
+        clearTestFolder();
         setupMethod();
 
         if (stage == null) {
