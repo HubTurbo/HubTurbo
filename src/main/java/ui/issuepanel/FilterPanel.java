@@ -185,12 +185,4 @@ public abstract class FilterPanel extends AbstractPanel {
         ui.unregisterEvent(onModelUpdate);
     }
 
-    /**
-     * Additional logic to be implemented by child classes. Currently implemented by ListPanel
-     * to re-render the list of IssuePanelCards.
-     *
-     * @param hasMetadata Indicates whether the IssuePanelCards will show metadata details.
-     */
-    @Override
-    public void refreshItems(boolean hasMetadata) {}
 }
