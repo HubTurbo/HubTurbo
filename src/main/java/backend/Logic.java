@@ -95,6 +95,9 @@ public class Logic {
     public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we call updateUI even when the repo is already open.
+            if (isPrimaryRepository) updateUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
