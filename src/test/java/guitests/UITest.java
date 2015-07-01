@@ -54,7 +54,7 @@ public class UITest extends GuiTest {
     public void setupStage() throws Throwable {
         // delete test.json if it exists
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (testConfig.exists()) {
+        if (testConfig.exists() && testConfig.isFile()) {
             testConfig.delete();
         }
         clearTestFolder();
