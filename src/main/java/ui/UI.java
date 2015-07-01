@@ -250,7 +250,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void onRepoOpened() {
-        repoSelector.refreshContents();
+        Platform.runLater(repoSelector::refreshContents);
     }
 
     /**
