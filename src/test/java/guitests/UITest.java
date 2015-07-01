@@ -20,7 +20,7 @@ import static com.google.common.io.Files.getFileExtension;
 
 public class UITest extends GuiTest {
 
-    private static final SettableFuture<Stage> stageFuture = SettableFuture.create();
+    protected static final SettableFuture<Stage> stageFuture = SettableFuture.create();
 
     protected static class TestUI extends UI {
         public TestUI() {
