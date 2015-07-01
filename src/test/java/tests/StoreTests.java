@@ -20,22 +20,6 @@ import static org.junit.Assert.*;
 public class StoreTests {
 
     /**
-     * Wrapper for Thread.sleep. Taken from TickingTimerTests. Can be
-     * refactored into TestUtils.
-     *
-     * @param seconds The number of seconds for the thread to sleep.
-     */
-    private static void delay(double seconds) {
-        UI.status.updateTimeToRefresh((int) seconds);
-        int time = (int) (seconds * 1000);
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Needed to avoid NullPointerExceptions
      */
     @BeforeClass
@@ -78,7 +62,7 @@ public class StoreTests {
         dummy1 = testIO.updateModel(dummy1).get();
         assertEquals(11, dummy1.getIssues().size());
 
-        delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
+        TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
 
         // Now we create a new RepoIO object. If we didn't load from the test JSON file, we would have to
         // re-"download" the whole repository from the DummySource. This means that we would end up with
