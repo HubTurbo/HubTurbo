@@ -1,6 +1,17 @@
 package backend;
 
-import static util.Futures.withResult;
+import backend.resource.Model;
+import backend.resource.MultiModel;
+import github.TurboIssueEvent;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
+import prefs.Preferences;
+import ui.UI;
+import util.Futures;
+import util.HTLog;
+import util.Utility;
+import util.events.RepoOpenedEvent;
+import util.events.testevents.ClearLogicModelEventHandler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,19 +19,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import github.TurboIssueEvent;
-import org.apache.logging.log4j.Logger;
-
-import backend.resource.Model;
-import backend.resource.MultiModel;
-import org.eclipse.egit.github.core.Comment;
-import prefs.Preferences;
-import ui.UI;
-import util.Futures;
-import util.HTLog;
-import util.Utility;
-import util.events.testevents.ClearLogicModelEventHandler;
-import util.events.RepoOpenedEvent;
+import static util.Futures.withResult;
 
 public class Logic {
 
@@ -28,12 +27,10 @@ public class Logic {
 
     private final MultiModel models;
     private final UIManager uiManager;
-    private final Preferences prefs;
+    protected final Preferences prefs;
 
     private RepoIO repoIO;
-
-    // Assumed to be always present when app starts
-    public UserCredentials credentials = null;
+    public LoginController loginController;
 
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
         this.uiManager = uiManager;
@@ -41,6 +38,7 @@ public class Logic {
         this.models = new MultiModel(prefs);
 
         repoIO = new RepoIO(isTestMode, enableTestJSON);
+        loginController = new LoginController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) e -> {
@@ -59,7 +57,7 @@ public class Logic {
             models.replace(toReplace);
 
             // Re-"download" repo after clearing
-            openRepository(e.repoId);
+            openPrimaryRepository(e.repoId);
         });
 
         // Pass the currently-empty model to the UI
@@ -68,15 +66,6 @@ public class Logic {
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return repoIO.isRepositoryValid(repoId);
-    }
-
-    public CompletableFuture<Boolean> login(String username, String password) {
-        String message = "Logging in as " + username;
-        logger.info(message);
-        UI.status.displayMessage(message);
-
-        credentials = new UserCredentials(username, password);
-        return repoIO.login(credentials);
     }
 
     public void refresh() {
@@ -95,9 +84,21 @@ public class Logic {
                 .exceptionally(Futures::log);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId) {
+    public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
+        return openRepository(repoId, true);
+    }
+
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
+        return openRepository(repoId, false);
+    }
+
+    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
+        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we call updateUI even when the repo is already open.
+            if (isPrimaryRepository) updateUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -105,15 +106,14 @@ public class Logic {
             if (!valid) {
                 return Futures.unit(false);
             } else {
-                prefs.addToLastViewedRepositories(repoId);
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
-                    .thenApply(models::addPending)
-                    .thenRun(this::updateUI)
-                    .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                    .thenApply(n -> true)
-                    .exceptionally(withResult(false));
+                        .thenApply(models::addPending)
+                        .thenRun(this::updateUI)
+                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
+                        .thenApply(n -> true)
+                        .exceptionally(withResult(false));
             }
         });
     }
@@ -176,9 +176,11 @@ public class Logic {
     }
 
     public Set<String> getOpenRepositories() {
-        return models.toModels().stream()
-            .map(Model::getRepoId)
-            .collect(Collectors.toSet());
+        return models.toModels().stream().map(Model::getRepoId).collect(Collectors.toSet());
+    }
+
+    public Set<String> getStoredRepos() {
+        return repoIO.getStoredRepos().stream().collect(Collectors.toSet());
     }
 
     public boolean isAlreadyOpen(String repoId) {
@@ -199,6 +201,10 @@ public class Logic {
 
     private void updateUIWithMetadata() {
         uiManager.update(models, true);
+    }
+
+    protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
+        return repoIO.login(credentials);
     }
 }
 

@@ -4,44 +4,38 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import ui.issuepanel.IssuePanel;
-import util.events.ColumnClickedEventHandler;
+import ui.listpanel.ListPanel;
+import util.events.PanelClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
-import util.events.testevents.WindowResizeEvent;
-import util.events.testevents.WindowResizeEventHandler;
 
 import static org.junit.Assert.assertEquals;
 import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
 public class KeyboardShortcutsTest extends UITest {
 
-    private WindowResizeEvent.EventType windowResizeEventType;
     private UIComponentFocusEvent.EventType uiComponentFocusEventType;
     private int selectedIssueId;
-    private int columnIndex;
+    private int panelIndex;
 
     @Test
     public void keyboardShortcutsTest() {
-        UI.events.registerEvent((WindowResizeEventHandler) e -> windowResizeEventType = e.eventType);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> selectedIssueId = e.id);
         UI.events.registerEvent((UIComponentFocusEventHandler) e -> uiComponentFocusEventType = e.eventType);
-        UI.events.registerEvent((ColumnClickedEventHandler) e -> columnIndex = e.columnIndex);
-        clearEventType();
+        UI.events.registerEvent((PanelClickedEventHandler) e -> panelIndex = e.panelIndex);
         clearSelectedIssueId();
         clearUiComponentFocusEventType();
-        clearColumnIndex();
+        clearPanelIndex();
 
         // maximize
+        assertEquals(false, stage.getMinWidth() > 500);
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
-        assertEquals(WindowResizeEvent.EventType.MAXIMIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(true, stage.getMinWidth() > 500);
 
         // mid-sized window
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
-        assertEquals(WindowResizeEvent.EventType.DEFAULT_SIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(false, stage.getMinWidth() > 500);
 
         // jump from filter box to first issue
         press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
@@ -90,22 +84,22 @@ public class KeyboardShortcutsTest extends UITest {
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         push(getKeyCode("RIGHT_PANEL"));
-        assertEquals(0, columnIndex);
-        clearColumnIndex();
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
-        assertEquals(1, columnIndex);
-        clearColumnIndex();
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("RIGHT_PANEL"));
-        assertEquals(0, columnIndex);
-        clearColumnIndex();
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
-        assertEquals(1, columnIndex);
-        clearColumnIndex();
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
 
         click("#dummy/dummy_col1_1");
 
         // mark as read/unread
-        IssuePanel issuePanel = find("#dummy/dummy_col1");
+        ListPanel issuePanel = find("#dummy/dummy_col1");
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
         push(getKeyCode("MARK_AS_UNREAD"));
@@ -113,24 +107,19 @@ public class KeyboardShortcutsTest extends UITest {
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
-        assertEquals(WindowResizeEvent.EventType.MINIMIZE_WINDOW, windowResizeEventType);
-        clearEventType();
+        assertEquals(true, stage.isIconified());
     }
 
     public KeyCode getKeyCode(String shortcut) {
         return KeyCode.getKeyCode(KeyboardShortcuts.getDefaultKeyboardShortcuts().get(shortcut));
     }
 
-    public void clearEventType() {
-        windowResizeEventType = WindowResizeEvent.EventType.NONE;
-    }
-
     public void clearSelectedIssueId() {
         selectedIssueId = 0;
     }
 
-    public void clearColumnIndex() {
-        columnIndex = -1;
+    public void clearPanelIndex() {
+        panelIndex = -1;
     }
 
     public void clearUiComponentFocusEventType() {

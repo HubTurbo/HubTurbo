@@ -1,7 +1,5 @@
 package ui.components;
 
-import java.util.concurrent.CompletableFuture;
-
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,9 +8,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
+import java.util.concurrent.CompletableFuture;
+
 public abstract class Dialog<T> {
 
-    private final Stage parentStage;
     private Stage stage = null;
     private CompletableFuture<T> response;
 
@@ -22,11 +21,7 @@ public abstract class Dialog<T> {
     private Modality modality = Modality.APPLICATION_MODAL;
 
     public Dialog(Stage parentStage) {
-        this.parentStage = parentStage;
         this.response = new CompletableFuture<>();
-    }
-
-    public CompletableFuture<T> show() {
         Scene scene = new Scene(content(), width, height);
         stage = new Stage();
         stage.setScene(scene);
@@ -35,8 +30,9 @@ public abstract class Dialog<T> {
         stage.initOwner(parentStage);
         stage.initModality(modality);
         stage.initStyle(stageStyle);
-//        stage.setX(parentStage.getX() + x);
-//        stage.setY(parentStage.getY() + y);
+    }
+
+    public CompletableFuture<T> show() {
         stage.show();
         Platform.runLater(stage::requestFocus);
         return response;
@@ -86,4 +82,5 @@ public abstract class Dialog<T> {
         // To be implemented by extending classes
         return null;
     }
+
 }

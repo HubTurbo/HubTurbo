@@ -13,26 +13,17 @@ public class UIComponentsTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         type("is");
         push(KeyCode.ESCAPE);
+        press(KeyCode.SHIFT).press(KeyCode.DIGIT9).release(KeyCode.DIGIT9).release(KeyCode.SHIFT);
         type("is");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        press(KeyCode.SHIFT).press(KeyCode.DIGIT9).release(KeyCode.DIGIT9).release(KeyCode.SHIFT);
         push(KeyCode.LEFT);
         push(KeyCode.TAB);
         push(KeyCode.RIGHT);
-        type("open OR closed");
+        type("open OR is");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("closed");
         press(KeyCode.SHIFT).press(KeyCode.DIGIT0).release(KeyCode.DIGIT0).release(KeyCode.SHIFT);
         push(KeyCode.ENTER);
-    }
-
-    // TODO check that top issue is indeed highlighted
-    @Test
-    public void navigableListViewTest() {
-        click("#dummy/dummy_col0_1");
-        push(KeyCode.V);
-        push(KeyCode.T);
-        push(KeyCode.ENTER);
-        click("#dummy/dummy_col0_filterTextField");
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
     }
 
     // TODO check that progress bar is updating

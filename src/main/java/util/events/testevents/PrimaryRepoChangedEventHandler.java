@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import util.events.EventHandler;
 
 @FunctionalInterface
-public interface WindowResizeEventHandler extends EventHandler {
+public interface PrimaryRepoChangedEventHandler extends EventHandler {
     @Subscribe
-    void handle(WindowResizeEvent e);
+    void handle(PrimaryRepoChangedEvent e);
 }

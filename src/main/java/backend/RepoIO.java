@@ -1,13 +1,5 @@
 package backend;
 
-import static util.Futures.withResult;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import org.apache.logging.log4j.Logger;
-
 import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
@@ -16,29 +8,43 @@ import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
+import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static util.Futures.withResult;
 
 public class RepoIO {
 
     private static final Logger logger = HTLog.get(RepoIO.class);
 
     private final RepoSource repoSource;
-    private final RepoStore repoStore;
+    private final JSONStore jsonStore;
+
+    private List<String> storedRepos;
 
     public RepoIO(boolean isTestMode, boolean enableTestJSON) {
-        if (isTestMode && !enableTestJSON) {
-            repoStore = new JSONStoreStub();
-        } else {
-            repoStore = new JSONStore();
-        }
-
         if (isTestMode) {
             repoSource = new DummySource();
             RepoStore.enableTestDirectory();
         } else {
             repoSource = new GitHubSource();
         }
+        if (isTestMode && !enableTestJSON) {
+            jsonStore = new JSONStoreStub();
+            storedRepos = new ArrayList<>();
+        } else {
+            jsonStore = new JSONStore();
+            storedRepos = new ArrayList<>(jsonStore.getStoredRepos());
+        }
+    }
+
+    public List<String> getStoredRepos() {
+        return storedRepos;
     }
 
     public CompletableFuture<Boolean> login(UserCredentials credentials) {
@@ -50,14 +56,38 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> openRepository(String repoId) {
-        if (repoStore.isRepoStored(repoId)) {
-            return repoStore.loadRepository(repoId)
-                .thenCompose(this::updateModel)
-                .exceptionally(withResult(new Model(repoId)));
+        if (storedRepos.contains(repoId)) {
+            return loadRepoFromStoreAsync(repoId)
+                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoId));
         } else {
-            return repoSource.downloadRepository(repoId)
+            return downloadRepoFromSourceAsync(repoId);
+        }
+    }
+
+    private CompletableFuture<Model> loadRepoFromStoreAsync(String repoId) {
+        return jsonStore.loadRepository(repoId)
+                .thenCompose(this::updateModel);
+    }
+
+    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId) {
+        UI.status.displayMessage("Downloading " + repoId);
+        return repoSource.downloadRepository(repoId)
                 .thenCompose(this::updateModel)
+                .thenApply(model -> {
+                    storedRepos.add(repoId);
+                    return model;
+                })
                 .exceptionally(withResult(new Model(repoId)));
+    }
+
+    private Model downloadRepoFromSourceBlocking(String repoId) {
+        try {
+            return downloadRepoFromSourceAsync(repoId).get();
+        } catch (ExecutionException | InterruptedException e) {
+            logger.info("Error while downloading " + repoId);
+            logger.error(e.getLocalizedMessage());
+
+            return new Model(repoId);
         }
     }
 
@@ -66,7 +96,7 @@ public class RepoIO {
             .thenApply(newModel -> {
                 UI.status.displayMessage(model.getRepoId() + " is up to date!");
                 if (!model.equals(newModel)) {
-                    repoStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
+                    jsonStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
                 } else {
                     logger.info(HTLog.format(model.getRepoId(),
                         "Nothing changed; not writing to store"));
