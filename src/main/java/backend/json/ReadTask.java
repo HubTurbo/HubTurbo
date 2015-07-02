@@ -32,7 +32,7 @@ class ReadTask extends StoreTask {
             Model model = load(repoId);
             response.complete(model);
         } catch (RepoStoreException e) {
-            logger.error(HTLog.format(repoId, "Failed to load from store"));
+            logger.error(HTLog.format(repoId, "Unable to load from store"));
             response.completeExceptionally(e);
         }
     }
@@ -51,7 +51,7 @@ class ReadTask extends StoreTask {
             logger.error("Unable to load " + repoId + " from JSON cache");
             throw new JSONLoadException();
         } else {
-            logger.info(HTLog.format(repoId, "Loaded from JSON cache"));
+            logger.info(HTLog.format(repoId, "Data loaded from JSON cache"));
 
             try {
                 SerializableModel sModel = new Gson().fromJson(input.get(),

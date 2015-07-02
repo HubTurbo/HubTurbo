@@ -86,7 +86,7 @@ public class StoreTests {
     }
 
     @Test(expected = ExecutionException.class)
-    public void testNonExistedJSON() throws InterruptedException, ExecutionException {
+    public void testNonExistentJSON() throws InterruptedException, ExecutionException {
         JSONStore jsonStore = new JSONStore();
         jsonStore.loadRepository("nonexist/nonexist").get();
     }
@@ -105,7 +105,7 @@ public class StoreTests {
     }
 
     @Test
-    public void testLoadNonExistedRepo() throws InterruptedException, ExecutionException {
+    public void testLoadNonExistentRepo() throws InterruptedException, ExecutionException {
         RepoIO repoIO = new RepoIO(false, false);
         Model model = repoIO.openRepository("nonexist/nonexist").get();
 
