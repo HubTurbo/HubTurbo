@@ -4,9 +4,8 @@ import backend.RepoIO;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import guitests.UITest;
+import org.junit.*;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
@@ -15,7 +14,8 @@ import util.events.testevents.UpdateDummyRepoEvent;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class StoreTests {
 
@@ -76,11 +76,10 @@ public class StoreTests {
 
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
+        TestUtils.delay(1); // allow for file to be written
         assertEquals(11, dummy2.getIssues().size());
 
         UI.status.clear();
-        File toClear = new File("store/test/dummy1-dummy1.json");
-        if (toClear.isFile()) toClear.delete();
     }
 
     @Test(expected = ExecutionException.class)
@@ -89,9 +88,6 @@ public class StoreTests {
 
         JSONStore jsonStore = new JSONStore();
         jsonStore.loadRepository("testrepo/testrepo").get();
-
-        File f = new File("store/test/testrepo/testrepo");
-        f.delete();
     }
 
     @Test(expected = ExecutionException.class)
@@ -107,17 +103,21 @@ public class StoreTests {
         RepoIO repoIO = new RepoIO(true, true);
         Model model = repoIO.openRepository("testrepo/testrepo").get();
 
+        TestUtils.delay(1); // allow for file to be written
         assertEquals(10, model.getIssues().size());
-
-        File f = new File("store/test/testrepo/testrepo");
-        f.delete();
     }
 
     @Test
     public void testLoadNonExistentRepo() throws InterruptedException, ExecutionException {
-        RepoIO repoIO = new RepoIO(true, false);
+        RepoIO repoIO = new RepoIO(true, true);
         Model model = repoIO.openRepository("nonexist/nonexist").get();
+        TestUtils.delay(1); // allow for file to be written
         assertEquals(10, model.getIssues().size());
+    }
+
+    @After
+    public void cleanup() {
+        UITest.clearTestFolder();
     }
 
 }

@@ -38,7 +38,7 @@ public class UITest extends GuiTest {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
 
-    public void clearTestFolder() {
+    public static void clearTestFolder() {
         try {
             Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
                     .filter(Files::isRegularFile)
