@@ -41,7 +41,7 @@ public class WrongLastViewedTest extends UITest {
     }
 
     @Test
-    public void nextJsonLoginTest() throws InterruptedException {
+    public void wrongLastViewedTest() throws InterruptedException {
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals("test2/test2", repositorySelector.getValue());
     }
