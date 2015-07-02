@@ -85,22 +85,26 @@ public class Logic {
     }
 
     public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
-        return openRepository(repoId, true);
+        assert Utility.isWellFormedRepoId(repoId);
+        prefs.setLastViewedRepository(repoId);
+        if ((isAlreadyOpen(repoId) && repoId.equals(getDefaultRepo())) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we call updateUI even when the repo is already open.
+            updateUI();
+            return Futures.unit(false);
+        }
+        return openRepository(repoId);
     }
 
     public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
-        return openRepository(repoId, false);
-    }
-
-    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
-        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
-            // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we call updateUI even when the repo is already open.
-            if (isPrimaryRepository) updateUI();
             return Futures.unit(false);
         }
+        return openRepository(repoId);
+    }
+
+    public CompletableFuture<Boolean> openRepository(String repoId) {
         models.queuePendingRepository(repoId);
         return isRepositoryValid(repoId).thenCompose(valid -> {
             if (!valid) {
