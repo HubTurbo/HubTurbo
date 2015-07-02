@@ -73,6 +73,10 @@ public class RepoIO {
         UI.status.displayMessage("Downloading " + repoId);
         return repoSource.downloadRepository(repoId)
                 .thenCompose(this::updateModel)
+                .thenApply(model -> {
+                    storedRepos.add(repoId);
+                    return model;
+                })
                 .exceptionally(withResult(new Model(repoId)));
     }
 
