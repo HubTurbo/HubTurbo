@@ -119,6 +119,7 @@ public class UI extends Application implements EventDispatcher {
                 });
             }
         }
+        getMainWindowHandle(mainStage.getTitle());
     }
 
     private void disableUI(boolean disable) {
@@ -148,7 +149,6 @@ public class UI extends Application implements EventDispatcher {
         }
 
         setExpandedWidth(false);
-
         panels.init(guiController);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
@@ -285,13 +285,12 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setScene(scene);
         mainStage.show();
         mainStage.setOnCloseRequest(e -> quit());
-        initialiseJNA(mainStage.getTitle());
         mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (!isFocused) {
                 return;
             }
             if (PlatformSpecific.isOnWindows()) {
-                browserComponent.focus(mainWindowHandle);
+                browserComponent.focus(UI.mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {
                 if (browserComponent != null) {
@@ -307,7 +306,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage.hide();
     }
 
-    private static void initialiseJNA(String windowTitle) {
+    private static void getMainWindowHandle(String windowTitle) {
         if (PlatformSpecific.isOnWindows()) {
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
         }
