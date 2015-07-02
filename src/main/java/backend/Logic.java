@@ -88,11 +88,11 @@ public class Logic {
         assert Utility.isWellFormedRepoId(repoId);
         prefs.setLastViewedRepository(repoId);
         if ((isAlreadyOpen(repoId) && repoId.equals(getDefaultRepo())) || models.isRepositoryPending(repoId)) {
-            // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we call updateUI even when the repo is already open.
-            updateUI();
             return Futures.unit(false);
         }
+        // The content of panels with an empty filter text should change when the primary repo is changed.
+        // Thus we call updateUI even when the repo is already open.
+        updateUI();
         return openRepository(repoId);
     }
 
