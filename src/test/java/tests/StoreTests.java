@@ -4,7 +4,7 @@ import backend.RepoIO;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ui.UI;
@@ -26,6 +26,11 @@ public class StoreTests {
     public static void setup() {
         UI.events = new EventDispatcherStub();
         UI.status = new StatusUIStub();
+    }
+
+    @Before
+    public void enableTestDirectory() {
+        RepoStore.enableTestDirectory();
     }
 
     @Test
@@ -72,6 +77,10 @@ public class StoreTests {
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
         assertEquals(11, dummy2.getIssues().size());
+
+        UI.status.clear();
+        File toClear = new File("store/test/dummy1-dummy1.json");
+        if (toClear.isFile()) toClear.delete();
     }
 
     @Test(expected = ExecutionException.class)
@@ -95,10 +104,10 @@ public class StoreTests {
     public void testLoadCorruptedRepository() throws InterruptedException, ExecutionException {
         RepoStore.write("testrepo/testrepo", "abcde");
 
-        RepoIO repoIO = new RepoIO(false, false);
+        RepoIO repoIO = new RepoIO(true, true);
         Model model = repoIO.openRepository("testrepo/testrepo").get();
 
-        assertTrue(model.getIssues().isEmpty());
+        assertEquals(10, model.getIssues().size());
 
         File f = new File("store/test/testrepo/testrepo");
         f.delete();
@@ -106,19 +115,9 @@ public class StoreTests {
 
     @Test
     public void testLoadNonExistentRepo() throws InterruptedException, ExecutionException {
-        RepoIO repoIO = new RepoIO(false, false);
+        RepoIO repoIO = new RepoIO(true, false);
         Model model = repoIO.openRepository("nonexist/nonexist").get();
-
-        assertTrue(model.getIssues().isEmpty());
+        assertEquals(10, model.getIssues().size());
     }
 
-    /**
-     * Attempts to clear the test folder.
-     */
-    @After
-    public void cleanup() {
-        UI.status.clear();
-        File toClear = new File("store/test/dummy1-dummy1.json");
-        if (toClear.isFile()) toClear.delete();
-    }
 }
