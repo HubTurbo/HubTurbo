@@ -1,19 +1,21 @@
 package guitests;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import org.junit.After;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-import prefs.Preferences;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+
+import org.junit.After;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+
+import prefs.Preferences;
 
 public class UseGlobalConfigsTest extends UITest {
 
@@ -40,7 +42,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(2000);
+        sleep(3000);
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals(repositorySelector.getValue(), "dummy/dummy");
 
@@ -59,7 +61,7 @@ public class UseGlobalConfigsTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        sleep(2000);
+        sleep(3000);
 
         // Make a new board
         click("Boards");
