@@ -58,9 +58,7 @@ public class RepoIO {
     public CompletableFuture<Model> openRepository(String repoId) {
         if (storedRepos.contains(repoId)) {
             return loadRepoFromStoreAsync(repoId)
-                    .exceptionally(e -> {
-                        return downloadRepoFromSourceBlocking(repoId);
-                    });
+                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoId));
         } else {
             return downloadRepoFromSourceAsync(repoId);
         }
