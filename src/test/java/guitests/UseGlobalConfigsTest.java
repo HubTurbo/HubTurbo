@@ -1,26 +1,21 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+import prefs.Preferences;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-
-import org.junit.After;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
-import prefs.Preferences;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UseGlobalConfigsTest extends UITest {
-
-    String configFileDirectory = Preferences.DIRECTORY;
-    String testConfigFileName = Preferences.TEST_CONFIG_FILE;
 
     @Override
     public void launchApp() {
@@ -30,10 +25,7 @@ public class UseGlobalConfigsTest extends UITest {
 
     @Test
     public void globalConfigTest() {
-        // Cleaning up with @Before creates race condition.
-        // Neither can we ensure test config file does not exist before starting test,
-        // as the program automatically generates an empty config file if it does not
-        // exist.
+        // Override setupMethod() if you want to do stuff to the JSON beforehand
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
@@ -42,7 +34,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(3000);
+        sleep(2000);
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals(repositorySelector.getValue(), "dummy/dummy");
 
@@ -61,7 +53,7 @@ public class UseGlobalConfigsTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        sleep(3000);
+        sleep(2000);
 
         // Make a new board
         click("Boards");
@@ -74,7 +66,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("Quit");
 
         // ...and check if the test JSON is still there...
-        File testConfig = new File(configFileDirectory, testConfigFileName);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         if (!(testConfig.exists() && testConfig.isFile())) fail();
 
         // ...then check that the JSON file contents are correct.
@@ -87,10 +79,9 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals(2, lastOpenFilters.size());
         assertEquals("", lastOpenFilters.get(0));
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(1));
-        // Last viewed repositories
-        List<String> lastViewedRepositories = testPref.getLastViewedRepositories();
-        assertEquals("dummy/dummy", lastViewedRepositories.get(0));
-        assertEquals("dummy2/dummy2", lastViewedRepositories.get(1));
+        // Last viewed repository
+        RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
+        assertEquals("dummy/dummy", lastViewedRepository.generateId());
         // Boards
         Map<String, List<String>> boards = testPref.getAllBoards();
         List<String> emptyBoard = boards.get("Empty Board");
@@ -102,9 +93,4 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("repo:dummy2/dummy2", dummyBoard.get(1));
     }
 
-    @After
-    public void teardown() {
-        File testConfig = new File(configFileDirectory, testConfigFileName);
-        if (testConfig.exists() && testConfig.isFile()) testConfig.delete();
-    }
 }

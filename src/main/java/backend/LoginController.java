@@ -6,6 +6,8 @@ import ui.UI;
 import util.HTLog;
 import util.Utility;
 
+import java.util.Optional;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 public class LoginController {
@@ -40,9 +42,18 @@ public class LoginController {
     }
 
     public void getPreviousLoginDetails() {
-        if (logic.prefs.getLastViewedRepository().isPresent()) {
-            owner = logic.prefs.getLastViewedRepository().get().getOwner();
-            repo = logic.prefs.getLastViewedRepository().get().getName();
+        Optional<RepositoryId> lastViewedRepository = logic.prefs.getLastViewedRepository();
+        TreeSet<String> storedRepos = new TreeSet<>(logic.getStoredRepos());
+        if (lastViewedRepository.isPresent() &&
+                storedRepos.contains(RepositoryId.create(
+                        lastViewedRepository.get().getOwner(),
+                        lastViewedRepository.get().getName()).generateId())) {
+            owner = lastViewedRepository.get().getOwner();
+            repo = lastViewedRepository.get().getName();
+        } else if (!storedRepos.isEmpty()) {
+            RepositoryId repositoryId = RepositoryId.createFromId(storedRepos.first());
+            owner = repositoryId.getOwner();
+            repo = repositoryId.getName();
         }
         username = logic.prefs.getLastLoginUsername();
         password = logic.prefs.getLastLoginPassword();
@@ -76,6 +87,10 @@ public class LoginController {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getRepoId() {

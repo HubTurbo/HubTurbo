@@ -223,7 +223,7 @@ public class GUIController {
     private void openAllReposInExpression(List<Qualifier> panelMetaQualifiers) {
         panelMetaQualifiers.forEach(metaQualifier -> {
             if (metaQualifier.getName().equals(Qualifier.REPO) && metaQualifier.getContent().isPresent()) {
-                ui.logic.openRepository(metaQualifier.getContent().get());
+                ui.logic.openRepositoryFromFilter(metaQualifier.getContent().get());
             }
         });
     }

@@ -46,12 +46,13 @@ public class LoginDialog extends Dialog<Boolean> {
     private PasswordField passwordField;
     private Button loginButton;
 
-    public LoginDialog(UI ui, Stage parentStage, String owner, String repo, String username) {
+    public LoginDialog(UI ui, Stage parentStage, String owner, String repo, String username, String password) {
         super(parentStage);
         this.ui = ui;
         repoOwnerField.setText(owner);
         repoNameField.setText(repo);
         usernameField.setText(username);
+        passwordField.setText(password);
         changeFocus();
         if (repoOwnerField.getText().isEmpty()) {
             repoOwnerField.setText(FIELD_DEFAULT_REPO_OWNER);
@@ -144,17 +145,15 @@ public class LoginDialog extends Dialog<Boolean> {
 
     private void changeFocus() {
         // Change focus depending on what fields are present
-        Platform.runLater(() -> {
-            if (repoOwnerField.getText().isEmpty()) {
-                repoOwnerField.requestFocus();
-            } else if (repoNameField.getText().isEmpty()) {
-                repoNameField.requestFocus();
-            } else if (usernameField.getText().isEmpty()) {
-                usernameField.requestFocus();
-            } else {
-                passwordField.requestFocus();
-            }
-        });
+        if (repoOwnerField.getText().isEmpty()) {
+            Platform.runLater(repoOwnerField::requestFocus);
+        } else if (repoNameField.getText().isEmpty()) {
+            Platform.runLater(repoNameField::requestFocus);
+        } else if (usernameField.getText().isEmpty()) {
+            Platform.runLater(usernameField::requestFocus);
+        } else {
+            Platform.runLater(passwordField::requestFocus);
+        }
     }
 
     /**

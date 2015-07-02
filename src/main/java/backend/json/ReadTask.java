@@ -1,21 +1,19 @@
 package backend.json;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import org.apache.logging.log4j.Logger;
-
-import util.HTLog;
-import util.exceptions.JSONLoadException;
-import util.exceptions.RepoStoreException;
 import backend.interfaces.RepoStore;
 import backend.interfaces.StoreTask;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.Logger;
+import util.HTLog;
+import util.exceptions.JSONLoadException;
+import util.exceptions.RepoStoreException;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 class ReadTask extends StoreTask {
 
@@ -60,7 +58,7 @@ class ReadTask extends StoreTask {
                         new TypeToken<SerializableModel>(){}.getType());
 
                 return new Model(sModel);
-            } catch (JsonParseException e) {
+            } catch (NullPointerException | JsonParseException e) {
                 logger.error(HTLog.format(repoId, "JSON data is corrupted"));
                 throw new JSONLoadException();
             }

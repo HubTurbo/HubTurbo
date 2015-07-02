@@ -57,7 +57,7 @@ public class Logic {
             models.replace(toReplace);
 
             // Re-"download" repo after clearing
-            openRepository(e.repoId);
+            openPrimaryRepository(e.repoId);
         });
 
         // Pass the currently-empty model to the UI
@@ -84,9 +84,21 @@ public class Logic {
                 .exceptionally(Futures::log);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId) {
+    public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
+        return openRepository(repoId, true);
+    }
+
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
+        return openRepository(repoId, false);
+    }
+
+    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
+        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we call updateUI even when the repo is already open.
+            if (isPrimaryRepository) updateUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -94,15 +106,14 @@ public class Logic {
             if (!valid) {
                 return Futures.unit(false);
             } else {
-                prefs.addToLastViewedRepositories(repoId);
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
-                    .thenApply(models::addPending)
-                    .thenRun(this::updateUI)
-                    .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                    .thenApply(n -> true)
-                    .exceptionally(withResult(false));
+                        .thenApply(models::addPending)
+                        .thenRun(this::updateUI)
+                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
+                        .thenApply(n -> true)
+                        .exceptionally(withResult(false));
             }
         });
     }
@@ -165,9 +176,11 @@ public class Logic {
     }
 
     public Set<String> getOpenRepositories() {
-        return models.toModels().stream()
-            .map(Model::getRepoId)
-            .collect(Collectors.toSet());
+        return models.toModels().stream().map(Model::getRepoId).collect(Collectors.toSet());
+    }
+
+    public Set<String> getStoredRepos() {
+        return repoIO.getStoredRepos().stream().collect(Collectors.toSet());
     }
 
     public boolean isAlreadyOpen(String repoId) {

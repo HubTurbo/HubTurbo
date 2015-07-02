@@ -83,32 +83,21 @@ public class Preferences {
      * Session configuration
      */
 
-    public void addToLastViewedRepositories(String repository) {
-        global.addToLastViewedRepositories(repository);
+    public void setLastViewedRepository(String repository) {
+        global.setLastViewedRepository(repository);
     }
 
-    /**
-     * Helper method to get the most recently viewed repository,
-     * allowing for failure if there are none (on first run).
-     * @return
-     */
     public Optional<RepositoryId> getLastViewedRepository() {
-        List<String> lastViewed = global.getLastViewedRepositories();
-        if (lastViewed.isEmpty()) {
+        if (global.getLastViewedRepository().isEmpty()) {
             return Optional.empty();
         } else {
-            String id = lastViewed.get(lastViewed.size() - 1);
-            RepositoryId repositoryId = RepositoryId.createFromId(id);
+            RepositoryId repositoryId = RepositoryId.createFromId(global.getLastViewedRepository());
             if (repositoryId == null) {
                 return Optional.empty();
             } else {
                 return Optional.of(repositoryId);
             }
         }
-    }
-
-    public List<String> getLastViewedRepositories() {
-        return global.getLastViewedRepositories();
     }
 
     public void clearMarkedReadAt(String repoId, int issue) {

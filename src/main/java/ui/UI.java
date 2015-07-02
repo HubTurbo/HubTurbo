@@ -32,6 +32,7 @@ import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
+import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
 import java.awt.*;
@@ -102,7 +103,8 @@ public class UI extends Application implements EventDispatcher {
                                 mainStage,
                                 logic.loginController.getOwner(),
                                 logic.loginController.getRepo(),
-                                logic.loginController.getUsername())
+                                logic.loginController.getUsername(),
+                                logic.loginController.getPassword())
                                 .show().thenApply(isLoggedIn -> {
                     if (isLoggedIn) {
                         showMainWindow(logic.loginController.getRepoId());
@@ -126,7 +128,8 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        logic.openRepository(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
 
@@ -139,7 +142,6 @@ public class UI extends Application implements EventDispatcher {
             } else {
                 browserComponent = new BrowserComponentStub(this);
             }
-            registerTestEvents();
         } else {
             browserComponent = new BrowserComponent(this, false);
             browserComponent.initialise();
@@ -152,7 +154,7 @@ public class UI extends Application implements EventDispatcher {
         ensureSelectedPanelHasFocus();
     }
 
-    private void registerTestEvents() {
+    protected void registerTestEvents() {
         registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
     }
 
@@ -168,6 +170,9 @@ public class UI extends Application implements EventDispatcher {
         KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
+        if (isTestMode()) {
+            registerTestEvents();
+        }
         registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
 
         uiManager = new UIManager(this);
@@ -249,7 +254,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void onRepoOpened() {
-        repoSelector.refreshContents();
+        Platform.runLater(repoSelector::refreshContents);
     }
 
     /**
@@ -435,10 +440,9 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void primaryRepoChanged(String repoId) {
-        logic.openRepository(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        repoSelector.setText(repoId);
-        panels.refresh();
     }
 
     private void ensureSelectedPanelHasFocus() {
