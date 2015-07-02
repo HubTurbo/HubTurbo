@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 
-public class NextJsonLoginTest extends UITest {
+public class WrongLastViewedTest extends UITest {
 
     @Override
     public void launchApp() {
