@@ -98,10 +98,22 @@ public class KeyboardShortcutsTest extends UITest {
 
         click("#dummy/dummy_col1_1");
 
-        // mark as read/unread
+        // mark as read
         ListPanel issuePanel = find("#dummy/dummy_col1");
+        push(KeyCode.HOME);
+        int issueIdBeforeMark = selectedIssueId;
+        int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
+        assertEquals(issueIdExpected, selectedIssueId);
+        push(getKeyCode("UP_ISSUE")); //required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        
+        push(KeyCode.END);
+        push(getKeyCode("MARK_AS_READ"));
+        assertEquals(1, selectedIssueId);
+        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        
+        // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
         assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
 

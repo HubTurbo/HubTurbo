@@ -160,6 +160,7 @@ public class ListPanel extends FilterPanel {
                 issue.setMarkedReadAt(Optional.of(now));
                 issue.setIsCurrentlyRead(true);
                 parentPanelControl.refresh();
+                listView.selectNextItem();
             }
             if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
