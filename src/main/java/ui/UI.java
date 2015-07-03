@@ -25,6 +25,7 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
+import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
@@ -74,6 +75,7 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
+    private LabelPicker labelPicker;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -152,6 +154,11 @@ public class UI extends Application implements EventDispatcher {
         panels.init(guiController);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
+        initialisePickers();
+    }
+
+    private void initialisePickers() {
+        labelPicker = new LabelPicker(this);
     }
 
     protected void registerTestEvents() {

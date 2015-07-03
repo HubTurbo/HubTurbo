@@ -12,6 +12,7 @@ import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
 
 import java.time.LocalDateTime;
@@ -233,7 +234,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().manageLabels(event.getCode().toString());
+                    ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
                 }
             }
             if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
