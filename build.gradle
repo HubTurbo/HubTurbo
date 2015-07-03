@@ -7,7 +7,7 @@
 
 // Plugins
 plugins {
-    id "com.github.kt3k.coveralls" version "2.3.1"
+    id "com.github.kt3k.coveralls" version "2.4.0"
     id "com.github.johnrengelman.shadow" version "1.2.1"
 }
 
@@ -20,7 +20,7 @@ allprojects {
 
     apply plugin: 'checkstyle'
     checkstyle {
-        toolVersion = "5.9"
+        toolVersion = "6.8.1"
     }
 
     apply plugin: 'java'
@@ -36,17 +36,17 @@ allprojects {
     }
 
     project.ext {
-        log4jVersion = '2.2'
-        controlsfxVersion = '8.20.8'
+        log4jVersion = '2.3'
+        controlsfxVersion = '8.40.9'
         gsonVersion = '2.3.1'
         guavaVersion = '18.0'
         jnaVersion = '4.1.0'
         markdown4jVersion = '2.2-cj-1.0'
-        openjfxDialogsVersion = '1.0.2'
+        openjfxDialogsVersion = '1.0.3'
         egitVersion = '2.1.5_1'
-        prettytimeVersion = '3.2.7.Final'
-        seleniumJavaVersion = '2.45.0'
-        seleniumServerVersion = '2.45.0'
+        prettytimeVersion = '4.0.0.Final'
+        seleniumJavaVersion = '2.46.0'
+        seleniumServerVersion = '2.46.0'
 
         junitVersion = '4.12'
         testFxVersion = '3.1.0'
