@@ -233,7 +233,7 @@ public class BrowserComponent {
             // an exception, thus letting us detect that the HT tab is not active any more.
             return true;
         } catch (WebDriverException e) {
-            logger.warn("Unable to reach bview. Resetting.");
+            logger.warn("Unable to reach bview. ");
             return false;
         }
     }
