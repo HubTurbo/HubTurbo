@@ -19,12 +19,17 @@ public class LabelPicker {
 
     private void showLabelPicker(TurboIssue issue) {
         List<TurboLabel> allLabels = ui.logic.getRepo(issue.getRepoId()).getLabels();
-        System.out.println("All Labels: ");
-        allLabels.forEach(label -> System.out.println("Label: " + label));
-        List<String> currentLabels = ui.logic.getRepo(issue.getRepoId()).getIssueById(issue.getId()).get().getLabels();
-        System.out.println("Current Labels: ");
-        currentLabels.forEach(label -> System.out.println("Label: " + label));
-        ui.logic.replaceIssueLabels(issue.getRepoId(), issue.getId(), currentLabels);
+        ui.logic.replaceIssueLabels(issue, showLabelPickerDialog(issue, allLabels));
+    }
+
+    private List<String> showLabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels) {
+        System.out.print("All Labels: ");
+        allLabels.forEach(label -> System.out.print(label + " "));
+        System.out.println();
+        System.out.print("Current Labels: ");
+        issue.getLabels().forEach(label -> System.out.print(label + " "));
+        System.out.println();
+        return issue.getLabels();
     }
 
 }

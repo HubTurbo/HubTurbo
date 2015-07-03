@@ -6,6 +6,7 @@ import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.json.JSONStoreStub;
 import backend.resource.Model;
+import backend.resource.TurboIssue;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
 import org.apache.logging.log4j.Logger;
@@ -112,10 +113,11 @@ public class RepoIO {
         return repoSource.downloadMetadata(repoId, issues);
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(String repoId, int id, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         // will print out all new labels until this is properly implemented
-        System.out.println("New Labels: ");
-        labels.forEach(label -> System.out.println("Label: " + label));
+        System.out.print("New Labels: ");
+        labels.forEach(label -> System.out.print(label + " "));
+        System.out.println();
         return Futures.unit(true);
     }
 

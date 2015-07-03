@@ -2,6 +2,7 @@ package backend;
 
 import backend.resource.Model;
 import backend.resource.MultiModel;
+import backend.resource.TurboIssue;
 import github.TurboIssueEvent;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
@@ -211,8 +212,8 @@ public class Logic {
         return models.get(repoId);
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(String repoId, int id, List<String> labels) {
-        return repoIO.replaceIssueLabels(repoId, id, labels);
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        return repoIO.replaceIssueLabels(issue, labels);
     }
 
 }
