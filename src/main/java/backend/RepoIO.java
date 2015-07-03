@@ -114,6 +114,7 @@ public class RepoIO {
 
     public CompletableFuture<Boolean> replaceIssueLabels(String repoId, int id, List<String> labels) {
         // will print out all new labels until this is properly implemented
+        System.out.println("New Labels: ");
         labels.forEach(label -> System.out.println("Label: " + label));
         return Futures.unit(true);
     }
