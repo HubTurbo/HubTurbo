@@ -10,9 +10,12 @@ import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
+import util.Futures;
 import util.HTLog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -108,4 +111,11 @@ public class RepoIO {
     public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
         return repoSource.downloadMetadata(repoId, issues);
     }
+
+    public CompletableFuture<Boolean> replaceIssueLabels(String repoId, int id, List<String> labels) {
+        // will print out all new labels until this is properly implemented
+        labels.forEach(label -> System.out.println("Label: " + label));
+        return Futures.unit(true);
+    }
+
 }

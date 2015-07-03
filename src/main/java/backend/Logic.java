@@ -206,5 +206,14 @@ public class Logic {
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
         return repoIO.login(credentials);
     }
+
+    public Model getRepo(String repoId) {
+        return models.get(repoId);
+    }
+
+    public CompletableFuture<Boolean> replaceIssueLabels(String repoId, int id, List<String> labels) {
+        return repoIO.replaceIssueLabels(repoId, id, labels);
+    }
+
 }
 
