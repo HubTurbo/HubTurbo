@@ -100,6 +100,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // mark as read
         ListPanel issuePanel = find("#dummy/dummy_col1");
+        // mark as read an issue that has another issue below it
         push(KeyCode.HOME);
         int issueIdBeforeMark = selectedIssueId;
         int issueIdExpected = issueIdBeforeMark - 1;
@@ -108,6 +109,7 @@ public class KeyboardShortcutsTest extends UITest {
         push(getKeyCode("UP_ISSUE")); //required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
         
+        // mark as read an issue that is at the bottom
         push(KeyCode.END);
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(1, selectedIssueId);
@@ -116,6 +118,18 @@ public class KeyboardShortcutsTest extends UITest {
         // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
         assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
+        clearSelectedIssueId();
+        
+        // testing corner case where there is only one issue displayed
+        click("#dummy/dummy_col1_filterTextField");
+        type("id");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("5");
+        push(KeyCode.ENTER);
+        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        assertEquals(5, selectedIssueId);
+        push(getKeyCode("MARK_AS_READ"));
+        assertEquals(5, selectedIssueId);
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
