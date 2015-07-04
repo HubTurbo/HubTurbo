@@ -3,9 +3,9 @@ package guitests;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
-import ui.issuepanel.IssuePanel;
-import util.events.UILogicRefreshEvent;
-import util.events.UpdateDummyRepoEvent;
+import ui.listpanel.ListPanel;
+import util.events.testevents.UILogicRefreshEvent;
+import util.events.testevents.UpdateDummyRepoEvent;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,9 +15,9 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void keepSelectionTest() {
-        // checks to see if IssuePanel keeps the same issue selected even after
+        // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
-        IssuePanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = find("#dummy/dummy_col0");
         click("#dummy/dummy_col0_filterTextField");
         type("sort");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);

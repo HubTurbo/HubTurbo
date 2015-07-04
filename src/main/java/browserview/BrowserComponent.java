@@ -12,6 +12,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
+import util.events.testevents.JumpToCommentEvent;
+import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -146,6 +148,7 @@ public class BrowserComponent {
     public void newLabel() {
         logger.info("Navigating to New Label page");
         runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo())));
+        bringToTop();
     }
 
     /**
@@ -202,6 +205,9 @@ public class BrowserComponent {
     }
 
     public void jumpToComment(){
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new JumpToCommentEvent());
+        }
         try {
             WebElement comment = driver.findElementById("new_comment_field");
             comment.click();
@@ -227,7 +233,7 @@ public class BrowserComponent {
             // an exception, thus letting us detect that the HT tab is not active any more.
             return true;
         } catch (WebDriverException e) {
-            logger.warn("Unable to reach bview. Resetting.");
+            logger.warn("Unable to reach bview. ");
             return false;
         }
     }
@@ -285,9 +291,9 @@ public class BrowserComponent {
             driver.get(GitHubURL.LOGIN_PAGE);
             try {
                 WebElement searchBox = driver.findElement(By.name("login"));
-                searchBox.sendKeys(ui.logic.credentials.username);
+                searchBox.sendKeys(ui.logic.loginController.credentials.username);
                 searchBox = driver.findElement(By.name("password"));
-                searchBox.sendKeys(ui.logic.credentials.password);
+                searchBox.sendKeys(ui.logic.loginController.credentials.password);
                 searchBox.submit();
             } catch (Exception e) {
                 // Already logged in; do nothing
@@ -397,6 +403,9 @@ public class BrowserComponent {
     }
 
     private void sendKeysToBrowser(String keyCode) {
+        if (isTestChromeDriver) {
+            UI.events.triggerEvent(new SendKeysToBrowserEvent(keyCode));
+        }
         WebElement body;
         try {
             body = driver.findElementByTagName("body");

@@ -92,7 +92,7 @@
     -fx-background-radius: 3; -fx-padding: 1 5;
 }
 
-/* For buttons that are used as labels (the + and x buttons on columns) */
+/* For buttons that are used as labels (the + and x buttons on panels) */
 .label-button {
     -fx-font-size: 13pt;
 }

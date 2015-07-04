@@ -29,13 +29,15 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
-import ui.issuecolumn.ColumnControl;
+import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.TickingTimer;
 import util.Utility;
 import util.events.*;
 import util.events.Event;
+import util.events.testevents.PrimaryRepoChangedEvent;
+import util.events.testevents.UILogicRefreshEventHandler;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -68,11 +70,12 @@ public class UI extends Application implements EventDispatcher {
     public EventBus eventBus;
     private HashMap<String, String> commandLineArgs;
     private TickingTimer refreshTimer;
+    public GUIController guiController;
 
     // Main UI elements
 
     private Stage mainStage;
-    private ColumnControl columns;
+    private PanelControl panels;
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
@@ -83,34 +86,56 @@ public class UI extends Application implements EventDispatcher {
 
     @Override
     public void start(Stage stage) {
-
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
-
-        getUserCredentials();
+        login(isBypassLogin());
     }
 
-    private void getUserCredentials() {
-        if (isBypassLogin()) {
+    private void login(boolean isBypassLogin) {
+        if (isBypassLogin) {
             showMainWindow("dummy/dummy");
+            mainStage.show();
         } else {
-            new LoginDialog(this, prefs, mainStage).show().thenApply(result -> {
-                if (result.success) {
-                    showMainWindow(result.repoId);
-                } else {
-                    quit();
-                }
-                return true;
-            }).exceptionally(e -> {
-                logger.error(e.getLocalizedMessage(), e);
-                return false;
-            });
+            if (logic.loginController.attemptLogin()) {
+                showMainWindow(logic.loginController.getRepoId());
+                mainStage.show();
+            } else {
+                disableUI(true);
+                status.displayMessage("Waiting for login...");
+                mainStage.show();
+                new LoginDialog(this,
+                                mainStage,
+                                logic.loginController.getOwner(),
+                                logic.loginController.getRepo(),
+                                logic.loginController.getUsername(),
+                                logic.loginController.getPassword())
+                                .show().thenApply(isLoggedIn -> {
+                    if (isLoggedIn) {
+                        showMainWindow(logic.loginController.getRepoId());
+                        disableUI(false);
+                    } else {
+                        quit();
+                    }
+                    return true;
+                }).exceptionally(e -> {
+                    logger.error(e.getLocalizedMessage(), e);
+                    return false;
+                });
+            }
         }
+        getMainWindowHandle(mainStage.getTitle());
+    }
+
+    private void disableUI(boolean disable) {
+        mainStage.setResizable(!disable);
+        menuBar.setDisable(disable);
+        repoSelector.setDisable(disable);
     }
 
     private void showMainWindow(String repoId) {
-        logic.openRepository(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
 
@@ -123,20 +148,18 @@ public class UI extends Application implements EventDispatcher {
             } else {
                 browserComponent = new BrowserComponentStub(this);
             }
-            registerTestEvents();
         } else {
             browserComponent = new BrowserComponent(this, false);
             browserComponent.initialise();
         }
 
         setExpandedWidth(false);
-
-        columns.init();
-        // Should only be called after columns have been initialized
+        panels.init(guiController);
+        // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
     }
 
-    private void registerTestEvents() {
+    protected void registerTestEvents() {
         registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
     }
 
@@ -152,6 +175,9 @@ public class UI extends Application implements EventDispatcher {
         KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
+        if (isTestMode()) {
+            registerTestEvents();
+        }
         registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
 
         uiManager = new UIManager(this);
@@ -172,6 +198,9 @@ public class UI extends Application implements EventDispatcher {
         repoSelector = createRepoSelector();
         mainStage = stage;
         stage.setMaximized(false);
+
+        panels = new PanelControl(this, prefs);
+        guiController = new GUIController(this, panels);
 
         Scene scene = new Scene(createRoot());
         setupMainStage(scene);
@@ -218,19 +247,19 @@ public class UI extends Application implements EventDispatcher {
             browserComponent.onAppQuit();
         }
         if (!isTestMode()) {
-            columns.saveSession();
+            panels.saveSession();
             prefs.saveGlobalConfig();
             Platform.exit();
             System.exit(0);
         }
         if (isTestGlobalConfig()) {
-            columns.saveSession();
+            panels.saveSession();
             prefs.saveGlobalConfig();
         }
     }
 
     public void onRepoOpened() {
-        repoSelector.refreshContents();
+        Platform.runLater(repoSelector::refreshContents);
     }
 
     /**
@@ -261,26 +290,28 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setScene(scene);
         mainStage.show();
         mainStage.setOnCloseRequest(e -> quit());
-        initialiseJNA(mainStage.getTitle());
         mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (!isFocused) {
                 return;
             }
             if (PlatformSpecific.isOnWindows()) {
-                browserComponent.focus(mainWindowHandle);
+                browserComponent.focus(UI.mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {
-                boolean shouldRefresh = browserComponent.hasBviewChanged();
-                if (shouldRefresh) {
-                    logger.info("Browser view has changed; refreshing");
-                    logic.refresh();
-                    refreshTimer.restart();
+                if (browserComponent != null) {
+                    boolean shouldRefresh = browserComponent.hasBviewChanged();
+                    if (shouldRefresh) {
+                        logger.info("Browser view has changed; refreshing");
+                        logic.refresh();
+                        refreshTimer.restart();
+                    }
                 }
             });
         });
+        mainStage.hide();
     }
 
-    private static void initialiseJNA(String windowTitle) {
+    private static void getMainWindowHandle(String windowTitle) {
         if (PlatformSpecific.isOnWindows()) {
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
         }
@@ -293,22 +324,20 @@ public class UI extends Application implements EventDispatcher {
 
     private Parent createRoot() {
 
-        columns = new ColumnControl(this, prefs);
-
         VBox top = new VBox();
 
-        ScrollPane columnsScrollPane = new ScrollPane(columns);
-        columnsScrollPane.getStyleClass().add("transparent-bg");
-        columnsScrollPane.setFitToHeight(true);
-        columnsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-        HBox.setHgrow(columnsScrollPane, Priority.ALWAYS);
+        ScrollPane panelsScrollPane = new ScrollPane(panels);
+        panelsScrollPane.getStyleClass().add("transparent-bg");
+        panelsScrollPane.setFitToHeight(true);
+        panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+        HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
-        menuBar = new MenuControl(this, columns, columnsScrollPane, prefs);
+        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
         top.getChildren().addAll(menuBar, repoSelector);
 
         BorderPane root = new BorderPane();
         root.setTop(top);
-        root.setCenter(columnsScrollPane);
+        root.setCenter(panelsScrollPane);
         root.setBottom((HTStatusBar) status);
 
         return root;
@@ -395,7 +424,7 @@ public class UI extends Application implements EventDispatcher {
                 ? dimensions.getWidth()
                 : dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
 
-        mainStage.setMinWidth(columns.getPanelWidth());
+        mainStage.setMinWidth(panels.getPanelWidth());
         mainStage.setMinHeight(dimensions.getHeight());
         mainStage.setMaxWidth(width);
         mainStage.setMaxHeight(dimensions.getHeight());
@@ -415,10 +444,9 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void primaryRepoChanged(String repoId) {
-        logic.openRepository(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        repoSelector.setText(repoId);
-        columns.refresh();
     }
     
     public void switchDefaultRepo(){
@@ -443,11 +471,11 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void ensureSelectedPanelHasFocus() {
-        if (columns.getCurrentlySelectedColumn().isPresent()) {
+        if (panels.getCurrentlySelectedPanel().isPresent()) {
             getMenuControl().scrollTo(
-                columns.getCurrentlySelectedColumn().get(),
-                columns.getChildren().size());
-            columns.getColumn(columns.getCurrentlySelectedColumn().get()).requestFocus();
+                panels.getCurrentlySelectedPanel().get(),
+                panels.getChildren().size());
+            panels.getPanel(panels.getCurrentlySelectedPanel().get()).requestFocus();
         }
     }
 
@@ -458,9 +486,9 @@ public class UI extends Application implements EventDispatcher {
     public void setDefaultWidth() {
         mainStage.setMaximized(false);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(columns.getPanelWidth());
+        mainStage.setMinWidth(panels.getPanelWidth());
         mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(columns.getPanelWidth());
+        mainStage.setMaxWidth(panels.getPanelWidth());
         mainStage.setMaxHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
@@ -479,7 +507,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void minimizeWindow() {
         mainStage.setIconified(true);
-        menuBar.scrollTo(columns.getCurrentlySelectedColumn().get(), columns.getChildren().size());
+        menuBar.scrollTo(panels.getCurrentlySelectedPanel().get(), panels.getChildren().size());
     }
 
     public HWND getMainWindowHandle() {

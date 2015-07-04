@@ -1,14 +1,14 @@
 package backend.stub;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import util.Futures;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class DummySource extends RepoSource {
 

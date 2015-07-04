@@ -3,9 +3,9 @@ package guitests;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
-import ui.issuepanel.IssuePanel;
-import util.events.UILogicRefreshEvent;
-import util.events.UpdateDummyRepoEvent;
+import ui.listpanel.ListPanel;
+import util.events.testevents.UILogicRefreshEvent;
+import util.events.testevents.UpdateDummyRepoEvent;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +19,7 @@ public class ScrollableListViewTests extends UITest {
         }
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(2000);
-        IssuePanel col0 = find("#dummy/dummy_col0");
+        ListPanel col0 = find("#dummy/dummy_col0");
         click("#dummy/dummy_col0_49");
         for (int i = 0; i < 40; i++) {
             push(KeyCode.DOWN);

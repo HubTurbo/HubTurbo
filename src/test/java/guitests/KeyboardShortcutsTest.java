@@ -2,64 +2,139 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
+import ui.UI;
 import ui.components.KeyboardShortcuts;
+import ui.listpanel.ListPanel;
+import util.events.PanelClickedEventHandler;
+import util.events.IssueSelectedEventHandler;
+import util.events.testevents.UIComponentFocusEvent;
+import util.events.testevents.UIComponentFocusEventHandler;
 
+import static org.junit.Assert.assertEquals;
 import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
 public class KeyboardShortcutsTest extends UITest {
 
-    // TODO test that events have been triggered
+    private UIComponentFocusEvent.EventType uiComponentFocusEventType;
+    private int selectedIssueId;
+    private int panelIndex;
+
     @Test
     public void keyboardShortcutsTest() {
+        UI.events.registerEvent((IssueSelectedEventHandler) e -> selectedIssueId = e.id);
+        UI.events.registerEvent((UIComponentFocusEventHandler) e -> uiComponentFocusEventType = e.eventType);
+        UI.events.registerEvent((PanelClickedEventHandler) e -> panelIndex = e.panelIndex);
+        clearSelectedIssueId();
+        clearUiComponentFocusEventType();
+        clearPanelIndex();
+
         // maximize
+        assertEquals(false, stage.getMinWidth() > 500);
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+        assertEquals(true, stage.getMinWidth() > 500);
 
         // mid-sized window
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
+        assertEquals(false, stage.getMinWidth() > 500);
 
         // jump from filter box to first issue
         press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
 
         // jump from issue list to filter box
         press(KeyCode.CONTROL).press(KeyCode.UP).release(KeyCode.UP).release(KeyCode.CONTROL);
+        assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
+        clearUiComponentFocusEventType();
 
         // jump from filter box to first issue
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
 
         // jump from issue list to filter box
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
+        clearUiComponentFocusEventType();
 
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         // jump to last issue
         push(KeyCode.END);
+        assertEquals(1, selectedIssueId);
+        clearSelectedIssueId();
 
         // jump to first issue
         push(KeyCode.HOME);
+        sleep(1000);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
 
         push(getKeyCode("DOWN_ISSUE"));
+        assertEquals(9, selectedIssueId);
+        clearSelectedIssueId();
         push(getKeyCode("DOWN_ISSUE"));
+        assertEquals(8, selectedIssueId);
+        clearSelectedIssueId();
         push(getKeyCode("UP_ISSUE"));
+        assertEquals(9, selectedIssueId);
+        clearSelectedIssueId();
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         push(DOUBLE_PRESS).push(DOUBLE_PRESS);
 
         push(getKeyCode("RIGHT_PANEL"));
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("RIGHT_PANEL"));
+        assertEquals(0, panelIndex);
+        clearPanelIndex();
         push(getKeyCode("LEFT_PANEL"));
+        assertEquals(1, panelIndex);
+        clearPanelIndex();
 
         click("#dummy/dummy_col1_1");
 
-        // mark as read/unread
+        // mark as read
+        ListPanel issuePanel = find("#dummy/dummy_col1");
+        push(KeyCode.HOME);
+        int issueIdBeforeMark = selectedIssueId;
+        int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
+        assertEquals(issueIdExpected, selectedIssueId);
+        push(getKeyCode("UP_ISSUE")); //required since focus has changed to next issue
+        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        
+        push(KeyCode.END);
+        push(getKeyCode("MARK_AS_READ"));
+        assertEquals(1, selectedIssueId);
+        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        
+        // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
+        assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
 
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
+        assertEquals(true, stage.isIconified());
     }
 
     public KeyCode getKeyCode(String shortcut) {
         return KeyCode.getKeyCode(KeyboardShortcuts.getDefaultKeyboardShortcuts().get(shortcut));
+    }
+
+    public void clearSelectedIssueId() {
+        selectedIssueId = 0;
+    }
+
+    public void clearPanelIndex() {
+        panelIndex = -1;
+    }
+
+    public void clearUiComponentFocusEventType() {
+        uiComponentFocusEventType = UIComponentFocusEvent.EventType.NONE;
     }
 }

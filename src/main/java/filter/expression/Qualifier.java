@@ -354,7 +354,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private static boolean isMetaQualifier(Qualifier q) {
+    public static boolean isMetaQualifier(Qualifier q) {
         switch (q.getName()) {
         case "sort":
         case "in":
@@ -519,7 +519,7 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesRepo(TurboIssue issue) {
         if (!content.isPresent()) return false;
-        return issue.getRepoId().equals(content.get());
+        return issue.getRepoId().equalsIgnoreCase(content.get());
     }
 
     private boolean satisfiesCreationDate(TurboIssue issue) {
