@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import backend.RepoIO;
 import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.DefaultRepoSwitchedEventHandler;
@@ -72,6 +73,12 @@ public class UIEventTests extends UITest {
     public void defaultRepoSwitchedTest() {
         UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
+        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        assertEquals(1, eventTestCount);
+        resetEventTestCount();
+        RepoIO testIO = new RepoIO(true, true);
+        testIO.openRepository("dummy3/dummy3");
+        testIO.openRepository("dummy4/dummy4");
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
     }
