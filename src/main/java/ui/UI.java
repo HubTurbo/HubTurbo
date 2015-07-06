@@ -222,7 +222,8 @@ public class UI extends Application implements EventDispatcher {
                 isBypassLogin() ||
                 isTestJSONEnabled() ||
                 isTestChromeDriver() ||
-                isTestGlobalConfig();
+                isTestGlobalConfig() ||
+                isCloseOnQuit();
     }
 
     // Public for use in LoginDialog
@@ -244,19 +245,21 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
     }
 
+    private boolean isCloseOnQuit() {
+        return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
+    }
+
     public void quit() {
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
-        if (!isTestMode()) {
+        if (!isTestMode()|| isTestGlobalConfig()) {
             panels.saveSession();
             prefs.saveGlobalConfig();
+        }
+        if (!isTestMode() || isCloseOnQuit()) {
             Platform.exit();
             System.exit(0);
-        }
-        if (isTestGlobalConfig()) {
-            panels.saveSession();
-            prefs.saveGlobalConfig();
         }
     }
 
