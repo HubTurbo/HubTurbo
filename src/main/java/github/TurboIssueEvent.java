@@ -59,9 +59,10 @@ public class TurboIssueEvent {
         assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
         return labelName;
     }
-    public void setLabelName(String labelName) {
+    public TurboIssueEvent setLabelName(String labelName) {
         assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
         this.labelName = labelName;
+        return this;
     }
     public String getLabelColour() {
         assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
