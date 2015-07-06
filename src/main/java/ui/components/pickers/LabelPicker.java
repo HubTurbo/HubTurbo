@@ -29,8 +29,7 @@ public class LabelPicker {
         ui.registerEvent((ShowLabelPickerEventHandler) e -> Platform.runLater(() -> showLabelPicker(e.issue)));
     }
 
-    // TODO implement multiple dialogs, currently, only one dialog is allowed and it blocks
-    // the main UI when open
+    // TODO implement multiple dialogs, currently, only one dialog is allowed and it blocks the main UI when open
 
     private void showLabelPicker(TurboIssue issue) {
         if (!openDialogs.containsKey(new Pair<>(issue.getRepoId(), issue.getId()))) {
@@ -74,10 +73,6 @@ public class LabelPicker {
 
         public boolean isSelected() {
             return selected.get();
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected.set(selected);
         }
 
     }

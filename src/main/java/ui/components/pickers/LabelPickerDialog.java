@@ -34,14 +34,17 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         vBox.setPadding(new Insets(10));
         textField = new TextField();
         textField.setPrefColumnCount(30);
+        
+        ObservableList<LabelPicker.Label> selectedLabels = FXCollections.observableArrayList(allLabels.stream()
+                .filter(label -> issue.getLabels().contains(label.getActualName()))
+                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), true))
+                .collect(Collectors.toList()));
+        ObservableList<LabelPicker.Label> notSelectedLabels = FXCollections.observableArrayList(allLabels.stream()
+                .filter(label -> !issue.getLabels().contains(label.getActualName()))
+                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), false))
+                .collect(Collectors.toList()));
+        ObservableList<LabelPicker.Label> labels = FXCollections.concat(selectedLabels, notSelectedLabels);
 
-        // TODO sort list with current labels at the top
-        ObservableList<LabelPicker.Label> labels = FXCollections.observableArrayList
-                        (allLabels.stream()
-                        .map(label -> new LabelPicker.Label(label.getActualName(),
-                                label.getStyle(),
-                                issue.getLabels().contains(label.getActualName())))
-                        .collect(Collectors.toList()));
         ListView<LabelPicker.Label> labelList = new ListView<>(labels);
         labelList.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::selectedProperty,
                 new StringConverter<LabelPicker.Label>() {
