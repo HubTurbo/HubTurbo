@@ -13,6 +13,7 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
+import org.eclipse.egit.github.core.Label;
 
 public interface Repo {
 
@@ -34,4 +35,5 @@ public interface Repo {
     List<Comment> getComments(String repoId, int issueId);
 
     boolean isRepositoryValid(String repoId);
+    List<Label> setLabels(String repoId, int issueId, List<String> labels);
 }
