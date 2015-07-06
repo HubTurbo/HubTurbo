@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import backend.resource.TurboIssue;
 import org.apache.logging.log4j.Logger;
 
 import backend.IssueMetadata;
@@ -56,5 +57,10 @@ public class GitHubSource extends RepoSource {
     @Override
     public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return addTask(new RepoValidityTask(this, gitHub, repoId)).response;
+    }
+
+    @Override
+    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        return addTask(new ReplaceIssueLabelsTask(this, gitHub, issue.getRepoId(), issue.getId(), labels)).response;
     }
 }

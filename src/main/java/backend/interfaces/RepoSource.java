@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.resource.Model;
+import backend.resource.TurboIssue;
 
 public abstract class RepoSource implements TaskRunner {
 
@@ -34,4 +35,5 @@ public abstract class RepoSource implements TaskRunner {
         downloadMetadata(String repoId, List<Integer> issues);
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
+    public abstract CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels);
 }
