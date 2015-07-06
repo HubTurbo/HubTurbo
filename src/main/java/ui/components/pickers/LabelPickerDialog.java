@@ -3,34 +3,35 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
     private TextField textField;
+    private TurboIssue issue;
+    private List<TurboLabel> allLabels;
+    private ObservableList<LabelPicker.Label> labels;
+    private ListView<LabelPicker.Label> labelListView;
+    private Map<String, Boolean> resultList;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
-        System.out.print("All Labels: ");
-        allLabels.forEach(label -> System.out.print(label + " "));
-        System.out.println();
-        System.out.print("Current Labels: ");
-        issue.getLabels().forEach(label -> System.out.print(label + " "));
-        System.out.println();
+        this.issue = issue;
+        this.allLabels = allLabels;
+        resultList = new HashMap<>();
+        allLabels.forEach(label -> resultList.put(label.getActualName(),
+                issue.getLabels().contains(label.getActualName())));
 
         initOwner(stage);
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
@@ -46,30 +47,33 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         vBox.setPadding(new Insets(10));
         textField = new TextField();
         textField.setPrefColumnCount(30);
+        setupKeyEvents();
 
-        ObservableList<Label> labels = FXCollections.observableArrayList
-                        (allLabels.stream()
-                        .map(label -> new Label(label.getActualName()))
-                        .collect(Collectors.toList()));
-        ListView<Label> labelList = new ListView<>(labels);
-        labelList.setCellFactory(CheckBoxListCell.forListView(Label::selectedProperty, new StringConverter<Label>() {
-            @Override
-            public String toString(Label object) {
-                return object.getName();
-            }
+        updateLabelsList("");
+        labelListView = new ListView<>(labels);
+        labelListView.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::selectedProperty,
+                new StringConverter<LabelPicker.Label>() {
+                    @Override
+                    public String toString(LabelPicker.Label object) {
+                        return object.getName();
+                    }
 
-            @Override
-            public Label fromString(String string) {
-                return null;
-            }
-        }));
+                    @Override
+                    public LabelPicker.Label fromString(String string) {
+                        return null;
+                    }
+                }));
 
-        vBox.getChildren().addAll(textField, labelList);
+        vBox.getChildren().addAll(textField, labelListView);
         getDialogPane().setContent(vBox);
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return issue.getLabels();
+                return allLabels
+                        .stream()
+                        .filter(label -> resultList.get(label.getName()))
+                        .map(TurboLabel::getActualName)
+                        .collect(Collectors.toList());
             }
             return null;
         });
@@ -81,35 +85,31 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         Platform.runLater(textField::requestFocus);
     }
 
-    public static class Label {
+    private void setupKeyEvents() {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateLabelsList(newValue);
+            labelListView.setItems(null);
+            labelListView.setItems(labels);
+        });
+    }
 
-        private ReadOnlyStringWrapper name = new ReadOnlyStringWrapper();
-        private BooleanProperty selected = new SimpleBooleanProperty(false);
-
-        public Label(String name) {
-            this.name.set(name);
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public ReadOnlyStringProperty nameProperty() {
-            return name.getReadOnlyProperty();
-        }
-
-        public BooleanProperty selectedProperty() {
-            return selected;
-        }
-
-        public boolean isSelected() {
-            return selected.get();
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected.set(selected);
-        }
-
+    private void updateLabelsList(String match) {
+        List<TurboLabel> matchedLabels = allLabels
+                .stream()
+                .filter(label -> label.getActualName().contains(match))
+                .collect(Collectors.toList());
+        ObservableList<LabelPicker.Label> selectedLabels = FXCollections.observableArrayList(matchedLabels.stream()
+                .filter(label -> resultList.get(label.getActualName()))
+                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), true))
+                .collect(Collectors.toList()));
+        ObservableList<LabelPicker.Label> notSelectedLabels = FXCollections.observableArrayList(matchedLabels.stream()
+                .filter(label -> !resultList.get(label.getActualName()))
+                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), false))
+                .collect(Collectors.toList()));
+        labels = FXCollections.concat(selectedLabels, notSelectedLabels);
+        labels.forEach(label -> label.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+            resultList.put(label.getName(), isSelected);
+        }));
     }
 
 }
