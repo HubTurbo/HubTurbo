@@ -3,15 +3,10 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -47,19 +42,22 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField = new TextField();
         textField.setPrefColumnCount(30);
 
-        ObservableList<Label> labels = FXCollections.observableArrayList
+        ObservableList<LabelPicker.Label> labels = FXCollections.observableArrayList
                         (allLabels.stream()
-                        .map(label -> new Label(label.getActualName()))
+                        .map(label -> new LabelPicker.Label(label.getActualName(),
+                                label.getStyle(),
+                                issue.getLabels().contains(label.getActualName())))
                         .collect(Collectors.toList()));
-        ListView<Label> labelList = new ListView<>(labels);
-        labelList.setCellFactory(CheckBoxListCell.forListView(Label::selectedProperty, new StringConverter<Label>() {
+        ListView<LabelPicker.Label> labelList = new ListView<>(labels);
+        labelList.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::selectedProperty,
+                new StringConverter<LabelPicker.Label>() {
             @Override
-            public String toString(Label object) {
+            public String toString(LabelPicker.Label object) {
                 return object.getName();
             }
 
             @Override
-            public Label fromString(String string) {
+            public LabelPicker.Label fromString(String string) {
                 return null;
             }
         }));
@@ -79,37 +77,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     protected void requestFocus() {
         Platform.runLater(textField::requestFocus);
-    }
-
-    public static class Label {
-
-        private ReadOnlyStringWrapper name = new ReadOnlyStringWrapper();
-        private BooleanProperty selected = new SimpleBooleanProperty(false);
-
-        public Label(String name) {
-            this.name.set(name);
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public ReadOnlyStringProperty nameProperty() {
-            return name.getReadOnlyProperty();
-        }
-
-        public BooleanProperty selectedProperty() {
-            return selected;
-        }
-
-        public boolean isSelected() {
-            return selected.get();
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected.set(selected);
-        }
-
     }
 
 }
