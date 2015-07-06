@@ -10,10 +10,12 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
@@ -295,5 +297,36 @@ public class DummyRepoState {
     protected TurboUser deleteUser(String idString) {
         updatedUsers.remove(idString);
         return users.remove(idString);
+    }
+
+    protected List<Label> setLabels(int issueId, List<String> labels) {
+        TurboIssue toSet = new TurboIssue(issues.get(issueId));
+
+        // Update issue events
+        List<TurboIssueEvent> eventsOfIssue = toSet.getMetadata().getEvents();
+        // TODO change to expression lambdas
+        List<String> labelsOfIssue = toSet.getLabels();
+        labelsOfIssue.forEach(labelName -> {
+            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                    IssueEventType.Unlabeled,
+                    new Date()).setLabelName(labelName));
+        });
+        labels.forEach(labelName -> {
+            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                    IssueEventType.Labeled,
+                    new Date()).setLabelName(labelName));
+        });
+        List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
+        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        toSet.setUpdatedAt(LocalDateTime.now());
+
+        // Actually setting label is done after updating issue events
+        toSet.setLabels(labels);
+
+        // Then update the relevant state arrays to reflect changes in UI
+        issues.put(issueId, toSet);
+        updatedIssues.put(issueId, toSet);
+
+        return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 }
