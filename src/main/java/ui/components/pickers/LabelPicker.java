@@ -52,7 +52,7 @@ public class LabelPicker {
 
         private ReadOnlyStringWrapper name = new ReadOnlyStringWrapper();
         private ReadOnlyStringWrapper style = new ReadOnlyStringWrapper();
-        private BooleanProperty selected = new SimpleBooleanProperty(false);
+        private BooleanProperty selected = new SimpleBooleanProperty();
 
         public Label(String name, String style, boolean selected) {
             this.name.set(name);

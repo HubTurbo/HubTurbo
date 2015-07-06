@@ -20,13 +20,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private TextField textField;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
-        System.out.print("All Labels: ");
-        allLabels.forEach(label -> System.out.print(label + " "));
-        System.out.println();
-        System.out.print("Current Labels: ");
-        issue.getLabels().forEach(label -> System.out.print(label + " "));
-        System.out.println();
-
         initOwner(stage);
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
 
@@ -42,6 +35,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField = new TextField();
         textField.setPrefColumnCount(30);
 
+        // TODO sort list with current labels at the top
         ObservableList<LabelPicker.Label> labels = FXCollections.observableArrayList
                         (allLabels.stream()
                         .map(label -> new LabelPicker.Label(label.getActualName(),
@@ -67,7 +61,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return issue.getLabels();
+                return labels
+                        .stream()
+                        .filter(LabelPicker.Label::isSelected)
+                        .map(LabelPicker.Label::getName)
+                        .collect(Collectors.toList());
             }
             return null;
         });
