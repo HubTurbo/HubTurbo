@@ -3,51 +3,46 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.scene.control.Dialog;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import ui.UI;
 import util.events.ShowLabelPickerEventHandler;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class LabelPicker {
 
     private UI ui;
-    private Set<Pair<String, Integer>> openDialogs;
+    private Stage stage;
+    private Map<Pair<String, Integer>, LabelPickerDialog> openDialogs;
 
-    public LabelPicker(UI ui) {
+    public LabelPicker(UI ui, Stage stage) {
         this.ui = ui;
-        openDialogs = new HashSet<>();
+        this.stage = stage;
+        openDialogs = new HashMap<>();
         ui.registerEvent((ShowLabelPickerEventHandler) e -> Platform.runLater(() -> showLabelPicker(e.issue)));
     }
 
+    // TODO implement multiple dialogs, currently, only one dialog is allowed and it blocks
+    // the main UI when open
+
     private void showLabelPicker(TurboIssue issue) {
-        if (!openDialogs.contains(new Pair<>(issue.getRepoId(), issue.getId()))) {
-            openDialogs.add(new Pair<>(issue.getRepoId(), issue.getId()));
+        if (!openDialogs.containsKey(new Pair<>(issue.getRepoId(), issue.getId()))) {
             List<TurboLabel> allLabels = ui.logic.getRepo(issue.getRepoId()).getLabels();
-            ui.logic.replaceIssueLabels(issue, showLabelPickerDialog(issue, allLabels));
+            LabelPickerDialog labelPickerDialog = new LabelPickerDialog(issue, allLabels, stage);
+            openDialogs.put(new Pair<>(issue.getRepoId(), issue.getId()), labelPickerDialog);
+            Optional<List<String>> result = labelPickerDialog.showAndWait();
+            if (result.isPresent()) {
+                ui.logic.replaceIssueLabels(issue, result.get());
+            }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
         } else {
-            // focus on existing dialog
+            // TODO focus on the already open dialog when having multiple dialogs
+            openDialogs.get(new Pair<>(issue.getRepoId(), issue.getId())).requestFocus();
         }
-    }
-
-    private List<String> showLabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels) {
-        System.out.print("All Labels: ");
-        allLabels.forEach(label -> System.out.print(label + " "));
-        System.out.println();
-        System.out.print("Current Labels: ");
-        issue.getLabels().forEach(label -> System.out.print(label + " "));
-        System.out.println();
-
-        Dialog labelPickerDialog = new Dialog();
-        labelPickerDialog.initStyle(StageStyle.UNIFIED);
-        labelPickerDialog.initModality(Modality.NONE);
-        labelPickerDialog.showAndWait();
-
-        return issue.getLabels();
     }
 
 }

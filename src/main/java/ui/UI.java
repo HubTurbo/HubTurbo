@@ -158,7 +158,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initialisePickers() {
-        labelPicker = new LabelPicker(this);
+        labelPicker = new LabelPicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
