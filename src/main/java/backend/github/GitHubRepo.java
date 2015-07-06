@@ -1,5 +1,6 @@
 package backend.github;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SCHEME_OAUTH2;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
@@ -208,6 +210,22 @@ public class GitHubRepo implements Repo {
     public List<Comment> getComments(String repoId, int issueId) {
         try {
             return issueService.getComments(RepositoryId.createFromId(repoId), issueId);
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
+        try {
+            return labelService.setLabels(
+                    RepositoryId.createFromId(repoId),
+                    String.valueOf(issueId),
+                    labels.stream().map(labelName -> {
+                        return new Label().setName(labelName);
+                    }).collect(Collectors.toList())
+            );
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();

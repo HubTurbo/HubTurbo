@@ -15,6 +15,7 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
+import org.eclipse.egit.github.core.Label;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
@@ -141,6 +142,11 @@ public class DummyRepo implements Repo {
     @Override
     public List<Comment> getComments(String repoId, int issueId) {
         return getRepoState(repoId).getComments(issueId);
+    }
+
+    @Override
+    public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
+        return getRepoState(repoId).setLabels(issueId, labels);
     }
 
     @Override
