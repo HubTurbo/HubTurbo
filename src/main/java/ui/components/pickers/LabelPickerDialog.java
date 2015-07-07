@@ -68,9 +68,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         return null;
                     }
                 }));
-        labelListView.setOnItemSelected(i -> {
-
-        });
 
         vBox.getChildren().addAll(instructions, textField, labelListView);
         getDialogPane().setContent(vBox);
