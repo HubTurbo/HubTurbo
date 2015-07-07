@@ -49,6 +49,9 @@ public class ScrollableListView<T> extends ListView<T> {
      */
     public void scrollAndShow(int newIndex) {
         final VirtualFlow<?> flow = getVirtualFlow();
+        if (flow == null) {
+            return;
+        }
         BooleanSupplier condition = () -> {
             if (flow.getFirstVisibleCellWithinViewPort() == null
                     || flow.getLastVisibleCellWithinViewPort() == null) {
