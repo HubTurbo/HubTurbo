@@ -212,7 +212,7 @@ public class Logic {
         return models.get(repoId);
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return repoIO.replaceIssueLabels(issue, labels);
     }
 

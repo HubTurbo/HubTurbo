@@ -11,7 +11,6 @@ import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
-import util.Futures;
 import util.HTLog;
 
 import java.util.ArrayList;
@@ -113,16 +112,8 @@ public class RepoIO {
         return repoSource.downloadMetadata(repoId, issues);
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        // will print out all new labels until this is properly implemented
-        System.out.print("New Labels: ");
-        labels.forEach(label -> System.out.print(label + " "));
-        System.out.println();
-        return Futures.unit(true);
+    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        return repoSource.replaceIssueLabels(issue, labels);
     }
-
-//    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-//        return repoSource.replaceIssueLabels(issue, labels);
-//    }
 
 }

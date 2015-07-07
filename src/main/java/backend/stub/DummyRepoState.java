@@ -306,16 +306,16 @@ public class DummyRepoState {
         List<TurboIssueEvent> eventsOfIssue = toSet.getMetadata().getEvents();
         // TODO change to expression lambdas
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.forEach(labelName -> {
-            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
-                    IssueEventType.Unlabeled,
-                    new Date()).setLabelName(labelName));
-        });
-        labels.forEach(labelName -> {
-            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
-                    IssueEventType.Labeled,
-                    new Date()).setLabelName(labelName));
-        });
+        labelsOfIssue.forEach(labelName ->
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                        IssueEventType.Unlabeled,
+                        new Date()).setLabelName(labelName))
+        );
+        labels.forEach(labelName ->
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                        IssueEventType.Labeled,
+                        new Date()).setLabelName(labelName))
+        );
         List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
         toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
         toSet.setUpdatedAt(LocalDateTime.now());

@@ -1,26 +1,5 @@
 package backend.github;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SCHEME_OAUTH2;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.*;
-import org.eclipse.egit.github.core.service.CollaboratorService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.MilestoneService;
-
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -32,9 +11,28 @@ import github.IssueServiceExtended;
 import github.LabelServiceFixed;
 import github.TurboIssueEvent;
 import github.update.*;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.service.CollaboratorService;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.MilestoneService;
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -222,9 +220,10 @@ public class GitHubRepo implements Repo {
             return labelService.setLabels(
                     RepositoryId.createFromId(repoId),
                     String.valueOf(issueId),
-                    labels.stream().map(labelName -> {
-                        return new Label().setName(labelName);
-                    }).collect(Collectors.toList())
+                    labels
+                            .stream()
+                            .map(labelName -> new Label().setName(labelName))
+                            .collect(Collectors.toList())
             );
         } catch (IOException e) {
             HTLog.error(logger, e);
