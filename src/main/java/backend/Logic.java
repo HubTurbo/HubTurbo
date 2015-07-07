@@ -132,7 +132,7 @@ public class Logic {
                 UI.status.displayMessage(updatedMessage);
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
-            }).thenApply(Futures.tap(this::updateUIWithMetadata))
+            }).thenApply(Futures.tap(this::updateUIAndShow))
             .exceptionally(withResult(new HashMap<>()));
     }
 
@@ -196,11 +196,19 @@ public class Logic {
         return models.getDefaultRepo();
     }
 
+    /**
+     * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
+     * metadata to display their issues, in which case the changes in the model are not presented to the user.
+     */
     private void updateUI() {
         uiManager.update(models, false);
     }
 
-    private void updateUIWithMetadata() {
+    /**
+     * Carries the current model in Logic to the GUI and immediately presents it to the user. Does not trigger
+     * further metadata updates.
+     */
+    private void updateUIAndShow() {
         uiManager.update(models, true);
     }
 
@@ -226,7 +234,7 @@ public class Logic {
         logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
 
         issue.setLabels(labels);
-        updateUIWithMetadata();
+        updateUIAndShow();
 
         return repoIO.replaceIssueLabels(issue, labels);
     }
