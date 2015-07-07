@@ -54,7 +54,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         instructions.setPadding(new Insets(0, 0, 10, 0));
 
         updateLabelsList("");
-        labelListView = new LabelListView();
+        labelListView = new LabelListView(this);
         labelListView.setItems(labels);
         labelListView.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::checkedProperty,
                 new StringConverter<LabelPicker.Label>() {
