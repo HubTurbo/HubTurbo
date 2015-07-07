@@ -39,6 +39,8 @@ public class LabelPicker {
             Optional<List<String>> result = labelPickerDialog.showAndWait();
             if (result.isPresent()) {
                 ui.logic.replaceIssueLabels(issue, result.get());
+                Platform.runLater(() -> ui.getBrowserComponent().showIssue(
+                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true));
             }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
         } else {
