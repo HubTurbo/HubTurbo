@@ -7,6 +7,11 @@ import java.util.Optional;
 public class LabelListView extends NavigableListView<LabelPicker.Label> {
 
     private Optional<LabelPicker.Label> previousSelection = Optional.empty();
+    private LabelPickerDialog labelPickerDialog;
+
+    public LabelListView(LabelPickerDialog labelPickerDialog) {
+        this.labelPickerDialog = labelPickerDialog;
+    }
 
     public boolean areItemsEqual(LabelPicker.Label item1, LabelPicker.Label item2) {
         return item1.getName().equals(item2.getName());
@@ -38,17 +43,10 @@ public class LabelListView extends NavigableListView<LabelPicker.Label> {
 
     @Override
     protected void setupMouseEvents() {
-        setOnMouseClicked(e -> {
-            int currentlySelected = getSelectionModel().getSelectedIndex();
-
-            // The currently-selected index is sometimes -1 when an issue is clicked.
-            // When this happens we ignore this event.
-
-            if (currentlySelected != -1) {
-                selectedIndex = Optional.of(currentlySelected);
-                toggleSelectedItem();
-            }
-        });
+        setOnMouseClicked(e -> labelPickerDialog.requestFocus());
     }
+
+    @Override
+    protected void setupKeyEvents() {}
 
 }
