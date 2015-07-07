@@ -83,7 +83,7 @@ public class ListPanel extends FilterPanel {
     /**
      * Refreshes the list of issue cards shown to the user.
      *
-     * @param hasMetadata Indicates the commnet count hashmap to be used.
+     * @param hasMetadata Indicates the comment count hashmap to be used.
      */
     @Override
     public void refreshItems(boolean hasMetadata) {
