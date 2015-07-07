@@ -6,10 +6,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -53,6 +50,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField.setPrefColumnCount(30);
         setupKeyEvents();
 
+        Label instructions = new Label("UP/DOWN to navigate, TAB to toggle selection");
+        instructions.setPadding(new Insets(0, 0, 10, 0));
+
         updateLabelsList("");
         labelListView = new LabelListView();
         labelListView.setItems(labels);
@@ -72,7 +72,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         });
 
-        vBox.getChildren().addAll(textField, labelListView);
+        vBox.getChildren().addAll(instructions, textField, labelListView);
         getDialogPane().setContent(vBox);
 
         setResultConverter(dialogButton -> {
