@@ -173,9 +173,6 @@ public class ListPanel extends FilterPanel {
                 issue.setIsCurrentlyRead(false);
                 parentPanelControl.refresh();
             }
-            if (event.getCode() == KeyboardShortcuts.REFRESH) {
-                ui.logic.refresh();
-            }
             if (event.getCode() == KeyboardShortcuts.SHOW_DOCS) {
                 ui.getBrowserComponent().showDocs();
             }
