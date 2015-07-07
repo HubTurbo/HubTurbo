@@ -52,7 +52,7 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
     @Override public void updateItem(LabelPicker.Label item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (! empty) {
+        if (!empty) {
             StringConverter<LabelPicker.Label> c = getConverter();
             Callback<LabelPicker.Label, ObservableValue<Boolean>> callback = getSelectedStateCallback();
             if (callback == null) {
@@ -65,11 +65,11 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
             setStyle(item != null ? item.getStyle() : null);
 
             if (booleanProperty != null) {
-                checkBox.selectedProperty().unbindBidirectional((BooleanProperty)booleanProperty);
+                checkBox.selectedProperty().unbindBidirectional((BooleanProperty) booleanProperty);
             }
             booleanProperty = callback.call(item);
             if (booleanProperty != null) {
-                checkBox.selectedProperty().bindBidirectional((BooleanProperty)booleanProperty);
+                checkBox.selectedProperty().bindBidirectional((BooleanProperty) booleanProperty);
             }
         } else {
             setGraphic(null);
