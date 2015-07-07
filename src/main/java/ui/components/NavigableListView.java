@@ -139,7 +139,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
             if (e.getCode() == KeyCode.ENTER) {
                 e.consume();
                 if (selectedIndex.isPresent()) {
-                    logger.info("Enter key selection on issue " + selectedIndex.get());
+                    logger.info("Enter key selection on item " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
             }
