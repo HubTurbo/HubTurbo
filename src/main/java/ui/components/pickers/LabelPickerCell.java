@@ -61,7 +61,11 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
             }
 
             setGraphic(checkBox);
-            setText(c != null ? c.toString(item) : (item == null ? "" : item.toString()));
+            if (item != null && item.isSelected()) {
+                setText(c != null ? "▶ " + c.toString(item) : item.toString());
+            } else {
+                setText(c != null ? c.toString(item) : (item == null ? "" : item.toString()));
+            }
             setStyle(item != null ? item.getStyle() : null);
 
             if (booleanProperty != null) {
