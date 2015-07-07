@@ -26,6 +26,7 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
                     this, "selectedStateCallback");
     private ObjectProperty<StringConverter<LabelPicker.Label>> converter =
             new SimpleObjectProperty<>(this, "converter");
+    private LabelPicker.Label item;
 
     public static Callback<ListView<LabelPicker.Label>, ListCell<LabelPicker.Label>> forListView(
             final Callback<LabelPicker.Label, ObservableValue<Boolean>> getSelectedProperty,
@@ -47,12 +48,18 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
 
         // by default the graphic is null until the cell stops being empty
         setGraphic(null);
+
+        setOnMouseClicked(e -> {
+            item.toggleChecked();
+            updateItem(item, false);
+        });
     }
 
     @Override public void updateItem(LabelPicker.Label item, boolean empty) {
         super.updateItem(item, empty);
 
         if (!empty) {
+            this.item = item;
             StringConverter<LabelPicker.Label> c = getConverter();
             Callback<LabelPicker.Label, ObservableValue<Boolean>> callback = getSelectedStateCallback();
             if (callback == null) {
