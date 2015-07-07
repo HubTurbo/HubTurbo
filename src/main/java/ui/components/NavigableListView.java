@@ -131,7 +131,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         });
     }
 
-    private void setupKeyEvents() {
+    protected void setupKeyEvents() {
         setOnKeyPressed(e -> {
             if (e.isControlDown()) {
                 return;
