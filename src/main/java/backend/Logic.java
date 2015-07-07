@@ -213,6 +213,7 @@ public class Logic {
     }
 
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
         return repoIO.replaceIssueLabels(issue, labels);
     }
 
