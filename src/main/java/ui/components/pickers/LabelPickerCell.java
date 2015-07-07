@@ -50,8 +50,10 @@ public class LabelPickerCell extends ListCell<LabelPicker.Label> {
         setGraphic(null);
 
         setOnMouseClicked(e -> {
-            item.toggleChecked();
-            updateItem(item, false);
+            if (item != null) {
+                item.toggleChecked();
+                updateItem(item, false);
+            }
         });
     }
 
