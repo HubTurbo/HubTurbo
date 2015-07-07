@@ -6,7 +6,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -23,7 +27,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private TurboIssue issue;
     private List<TurboLabel> allLabels;
     private ObservableList<LabelPicker.Label> labels;
-    private ListView<LabelPicker.Label> labelListView;
+    private LabelListView labelListView;
     private Map<String, Boolean> resultList;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
@@ -50,8 +54,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         setupKeyEvents();
 
         updateLabelsList("");
-        labelListView = new ListView<>(labels);
-        labelListView.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::selectedProperty,
+        labelListView = new LabelListView();
+        labelListView.setItems(labels);
+        labelListView.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::checkedProperty,
                 new StringConverter<LabelPicker.Label>() {
                     @Override
                     public String toString(LabelPicker.Label object) {
@@ -63,6 +68,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         return null;
                     }
                 }));
+        labelListView.setOnItemSelected(i -> {
+
+        });
 
         vBox.getChildren().addAll(textField, labelListView);
         getDialogPane().setContent(vBox);
@@ -78,6 +86,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             return null;
         });
 
+        labelListView.setFirstItem();
         requestFocus();
     }
 
@@ -88,8 +97,30 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void setupKeyEvents() {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             updateLabelsList(newValue);
+            labelListView.setItems(labels);
+            labelListView.setFirstItem();
             labelListView.setItems(null);
             labelListView.setItems(labels);
+        });
+        textField.setOnKeyPressed(e -> {
+            if (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown()) {
+                if (e.getCode() == KeyCode.DOWN) {
+                    labelListView.handleUpDownKeys(true);
+                    labelListView.showSelectedItemChange();
+                    labelListView.setItems(null);
+                    labelListView.setItems(labels);
+                    e.consume();
+                } else if (e.getCode() == KeyCode.UP) {
+                    labelListView.handleUpDownKeys(false);
+                    labelListView.showSelectedItemChange();
+                    labelListView.setItems(null);
+                    labelListView.setItems(labels);
+                    e.consume();
+                } else if (e.getCode() == KeyCode.TAB) {
+                    labelListView.toggleSelectedItem();
+                    e.consume();
+                }
+            }
         });
     }
 
@@ -107,7 +138,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), false))
                 .collect(Collectors.toList()));
         labels = FXCollections.concat(selectedLabels, notSelectedLabels);
-        labels.forEach(label -> label.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+        labels.forEach(label -> label.checkedProperty().addListener((observable, wasSelected, isSelected) -> {
             resultList.put(label.getName(), isSelected);
         }));
     }
