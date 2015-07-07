@@ -1,8 +1,5 @@
 package ui.issuepanel;
 
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
 import javafx.application.Platform;
 import ui.UI;
 import util.TickingTimer;
@@ -10,6 +7,9 @@ import util.events.IssueCreatedEventHandler;
 import util.events.IssueSelectedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A abstract component in charge of creating, displaying, and enabling edits of issues.
@@ -55,7 +55,7 @@ public class UIBrowserBridge {
         }, () -> {
             Platform.runLater(() -> {
                 if (nextRepoId.isPresent() && nextIssueId.isPresent() && isPullRequest.isPresent()) {
-                    ui.getBrowserComponent().showIssue(nextRepoId.get(), nextIssueId.get(), isPullRequest.get());
+                    ui.getBrowserComponent().showIssue(nextRepoId.get(), nextIssueId.get(), isPullRequest.get(), false);
                 }
             });
             timer.pause();
