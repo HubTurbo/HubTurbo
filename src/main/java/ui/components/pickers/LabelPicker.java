@@ -39,7 +39,6 @@ public class LabelPicker {
             Optional<List<String>> result = labelPickerDialog.showAndWait();
             if (result.isPresent()) {
                 ui.logic.replaceIssueLabels(issue, result.get());
-                Platform.runLater(ui.logic::refresh);
             }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
         } else {
@@ -52,12 +51,13 @@ public class LabelPicker {
 
         private ReadOnlyStringWrapper name = new ReadOnlyStringWrapper();
         private ReadOnlyStringWrapper style = new ReadOnlyStringWrapper();
-        private BooleanProperty selected = new SimpleBooleanProperty();
+        private BooleanProperty checked = new SimpleBooleanProperty();
+        private BooleanProperty selected = new SimpleBooleanProperty(false);
 
-        public Label(String name, String style, boolean selected) {
+        public Label(String name, String style, boolean checked) {
             this.name.set(name);
             this.style.set(style);
-            this.selected.set(selected);
+            this.checked.set(checked);
         }
 
         public String getName() {
@@ -68,12 +68,20 @@ public class LabelPicker {
             return style.get();
         }
 
-        public BooleanProperty selectedProperty() {
-            return selected;
+        public BooleanProperty checkedProperty() {
+            return checked;
         }
 
         public boolean isSelected() {
             return selected.get();
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected.set(selected);
+        }
+
+        public void toggleChecked() {
+            checked.set(!checked.get());
         }
 
     }
