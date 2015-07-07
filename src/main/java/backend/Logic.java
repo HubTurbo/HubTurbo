@@ -212,8 +212,22 @@ public class Logic {
         return models.get(repoId);
     }
 
+    /**
+     * Dispatches a PUT request to the GitHub API to replace the given issue's labels.
+     * At the same time, immediately change the GUI to pre-empt this change.
+     *
+     * Assumes that the model object is shared among GUI and Logic.
+     *
+     * @param issue The issue whose labels are to be replaced
+     * @param labels The labels to be applied to the given issue
+     * @return The list of labels on the issue after the request is received by GitHub
+     */
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
+
+        issue.setLabels(labels);
+        updateUIWithMetadata();
+
         return repoIO.replaceIssueLabels(issue, labels);
     }
 
