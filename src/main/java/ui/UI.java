@@ -451,7 +451,7 @@ public class UI extends Application implements EventDispatcher {
     
     public void switchDefaultRepo(){
         logger.info("Triggered switch default repo");
-        String[] openRepos = logic.getOpenRepositories().toArray(new String[0]);
+        String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
         
         // Cycle to the next open repository
@@ -459,13 +459,13 @@ public class UI extends Application implements EventDispatcher {
             if (openRepos[i].equals(currentRepo)) {
                 if (i == openRepos.length - 1) {
                     primaryRepoChanged(openRepos[0]);
+                    repoSelector.setText(openRepos[0]);
                     UI.events.triggerEvent(new DefaultRepoSwitchedEvent(openRepos[0]));
                 } else {
                     primaryRepoChanged(openRepos[i + 1]);
+                    repoSelector.setText(openRepos[i + 1]);
                     UI.events.triggerEvent(new DefaultRepoSwitchedEvent(openRepos[i + 1]));
                 }
-                
-                break;
             }
         }
     }
