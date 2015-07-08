@@ -23,7 +23,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private static final int LABELS_LIST_WIDTH = 350;
 
     private TextField textField;
-    private List<PickerLabel> allLabels;
+    private List<TurboLabel> allLabels;
     private List<PickerLabel> topLabels;
     private List<PickerLabel> bottomLabels;
     private Map<String, Boolean> resultList;
@@ -37,16 +37,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 issue.getId() + " in " + issue.getRepoId());
         setHeaderText((issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
 
-        this.allLabels = new ArrayList<>();
+        this.allLabels = allLabels;
         resultList = new HashMap<>();
         topLabels = new ArrayList<>();
-        allLabels.forEach(label -> {
-            this.allLabels.add(new PickerLabel(label));
-            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
-            if (issue.getLabels().contains(label.getActualName())) {
-                topLabels.add(new PickerLabel(label));
-            }
-        });
+        allLabels.forEach(label ->
+                resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName())));
 
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
@@ -72,6 +67,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.setHgap(5);
         bottomPane.setVgap(5);
 
+        updateTopLabels();
         populateTopPanel();
         updateBottomLabels("");
         populateBottomPane();
@@ -81,10 +77,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return allLabels
-                        .stream()
-                        .filter(label -> resultList.get(label.getActualName()))
-                        .map(TurboLabel::getActualName)
+                return resultList.entrySet().stream()
+                        .filter(Map.Entry::getValue)
+                        .map(Map.Entry::getKey)
                         .collect(Collectors.toList());
             }
             return null;
@@ -111,7 +106,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (newValue.equals(" ")) {
                 textField.setText("");
             } else {
-                updateBottomLabels(newValue);
+                updateBottomLabels(newValue.toLowerCase());
                 populateBottomPane();
             }
         });
@@ -127,6 +122,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     populateBottomPane();
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
+                    toggleSelectedLabel();
                     updateTopLabels();
                     updateBottomLabels("");
                     textField.setText("");
@@ -137,14 +133,29 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         });
     }
 
-    private void updateTopLabels() {
+    private void toggleSelectedLabel() {
+        if (!bottomLabels.isEmpty()) {
+            bottomLabels
+                    .stream()
+                    .filter(PickerLabel::isHighlighted)
+                    .forEach(label -> resultList.put(label.getActualName(), !resultList.get(label.getActualName())));
+        }
+    }
 
+    private void updateTopLabels() {
+        topLabels.clear();
+        allLabels.forEach(label -> {
+            if (resultList.get(label.getActualName())) {
+                topLabels.add(new PickerLabel(label));
+            }
+        });
     }
 
     private void updateBottomLabels(String match) {
         List<PickerLabel> matchedLabels = allLabels
                 .stream()
-                .filter(label -> label.getActualName().contains(match))
+                .filter(label -> label.getActualName().toLowerCase().contains(match))
+                .map(PickerLabel::new)
                 .collect(Collectors.toList());
         List<PickerLabel> selectedLabels = matchedLabels.stream()
                 .filter(label -> resultList.get(label.getActualName()))
@@ -163,19 +174,25 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
         if (!bottomLabels.isEmpty()) {
             bottomLabels.get(0).setIsHighlighted(true);
+            if (bottomLabels.size() > 1) {
+                for (int i = 1; i < bottomLabels.size(); i++) {
+                    bottomLabels.get(i).setIsHighlighted(false);
+                }
+            }
         }
     }
 
     private void moveHighlightOnLabel(boolean isDown) {
         for (int i = 0; i < bottomLabels.size(); i++) {
             if (bottomLabels.get(i).isHighlighted()) {
-                if (isDown && i < bottomLabels.size() - 2) {
+                if (isDown && i < bottomLabels.size() - 1) {
                     bottomLabels.get(i).setIsHighlighted(false);
                     bottomLabels.get(i + 1).setIsHighlighted(true);
-                } else if (i > 0) {
+                } else if (!isDown && i > 0) {
                     bottomLabels.get(i - 1).setIsHighlighted(true);
                     bottomLabels.get(i).setIsHighlighted(false);
                 }
+                break;
             }
         }
     }
