@@ -134,7 +134,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     public void toggleLabel(String name) {
-        resultList.put(name, !resultList.get(name));
+        processLabelChange(name);
         updateTopLabels();
         populateTopPanel();
         textField.setText("");
@@ -144,10 +144,26 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void toggleSelectedLabel() {
         if (!bottomLabels.isEmpty()) {
-            bottomLabels
-                    .stream()
-                    .filter(PickerLabel::isHighlighted)
-                    .forEach(label -> resultList.put(label.getActualName(), !resultList.get(label.getActualName())));
+            processLabelChange(
+                    bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
+        }
+    }
+
+    private void processLabelChange(String name) {
+        Optional<TurboLabel> turboLabel =
+                allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
+        if (turboLabel.isPresent()) {
+            if (turboLabel.get().isExclusive() && !resultList.get(name)) {
+                String group = turboLabel.get().getGroup().get();
+                allLabels
+                        .stream()
+                        .filter(TurboLabel::isExclusive)
+                        .filter(label -> label.getGroup().get().equals(group))
+                        .forEach(label -> resultList.put(label.getActualName(), false));
+                resultList.put(name, true);
+            } else {
+                resultList.put(name, !resultList.get(name));
+            }
         }
     }
 
