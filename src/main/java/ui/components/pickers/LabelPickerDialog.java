@@ -119,8 +119,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown()) {
                 if (e.getCode() == KeyCode.DOWN) {
                     e.consume();
+                    moveHighlightOnLabel(true);
+                    populateBottomPane();
                 } else if (e.getCode() == KeyCode.UP) {
                     e.consume();
+                    moveHighlightOnLabel(false);
+                    populateBottomPane();
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
                     updateTopLabels();
@@ -143,7 +147,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .filter(label -> label.getActualName().contains(match))
                 .collect(Collectors.toList());
         List<PickerLabel> selectedLabels = matchedLabels.stream()
-                .filter(label -> resultList.get(label.getActualName())).collect(Collectors.toList());
+                .filter(label -> resultList.get(label.getActualName()))
+                .map(label -> {
+                    label.setIsSelected(true);
+                    return label;
+                })
+                .collect(Collectors.toList());
         List<PickerLabel> notSelectedLabels = matchedLabels.stream()
                 .filter(label -> !resultList.get(label.getActualName())).collect(Collectors.toList());
         if (match.isEmpty()) {
@@ -151,6 +160,23 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         } else {
             bottomLabels = Stream.of(selectedLabels, notSelectedLabels)
                     .flatMap(Collection::stream).collect(Collectors.toList());
+        }
+        if (!bottomLabels.isEmpty()) {
+            bottomLabels.get(0).setIsHighlighted(true);
+        }
+    }
+
+    private void moveHighlightOnLabel(boolean isDown) {
+        for (int i = 0; i < bottomLabels.size(); i++) {
+            if (bottomLabels.get(i).isHighlighted()) {
+                if (isDown && i < bottomLabels.size() - 2) {
+                    bottomLabels.get(i).setIsHighlighted(false);
+                    bottomLabels.get(i + 1).setIsHighlighted(true);
+                } else if (i > 0) {
+                    bottomLabels.get(i - 1).setIsHighlighted(true);
+                    bottomLabels.get(i).setIsHighlighted(false);
+                }
+            }
         }
     }
 
