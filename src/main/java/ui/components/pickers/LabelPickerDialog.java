@@ -4,10 +4,7 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -95,7 +92,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         topPane.getChildren().clear();
         topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
         if (topPane.getChildren().size() == 0) {
-            topPane.getChildren().add(new javafx.scene.control.Label("No currently selected labels. "));
+            Label label = new Label("No currently selected labels. ");
+            label.setPadding(new Insets(5));
+            topPane.getChildren().add(label);
         }
     }
 
@@ -103,7 +102,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.getChildren().clear();
         bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
         if (bottomPane.getChildren().size() == 0) {
-            bottomPane.getChildren().add(new javafx.scene.control.Label("No labels in repository. "));
+            Label label = new Label("No labels in repository. ");
+            label.setPadding(new Insets(5));
+            bottomPane.getChildren().add(label);
         }
     }
 
