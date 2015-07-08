@@ -94,11 +94,17 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void populateTopPanel() {
         topPane.getChildren().clear();
         topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+        if (topPane.getChildren().size() == 0) {
+            topPane.getChildren().add(new javafx.scene.control.Label("No currently selected labels. "));
+        }
     }
 
     private void populateBottomPane() {
         bottomPane.getChildren().clear();
         bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
+        if (bottomPane.getChildren().size() == 0) {
+            bottomPane.getChildren().add(new javafx.scene.control.Label("No labels in repository. "));
+        }
     }
 
     private void setupKeyEvents() {
