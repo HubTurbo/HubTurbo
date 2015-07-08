@@ -7,26 +7,22 @@ import javafx.scene.control.Tooltip;
 public class PickerLabel extends TurboLabel {
 
     private boolean isSelected;
-    private boolean isRemoved;
     private boolean isHighlighted;
 
     public PickerLabel(TurboLabel label) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
         isSelected = false;
-        isRemoved = false;
         isHighlighted = false;
-    }
-
-    public PickerLabel(TurboLabel label, boolean isSelected, boolean isRemoved, boolean isHighlighted) {
-        super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.isSelected = isSelected;
-        this.isRemoved = isRemoved;
-        this.isHighlighted = isHighlighted;
     }
 
     @Override
     public Node getNode() {
-        javafx.scene.control.Label node = new javafx.scene.control.Label(getName());
+        javafx.scene.control.Label node;
+        if (isSelected) {
+            node = new javafx.scene.control.Label(getName() + " ✓");
+        } else {
+            node = new javafx.scene.control.Label(getName());
+        }
         node.getStyleClass().add("labels");
         if (isHighlighted) {
             node.setStyle(getStyle() + "-fx-border-color: black;");
@@ -40,20 +36,8 @@ public class PickerLabel extends TurboLabel {
         return node;
     }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
     public void setIsSelected(boolean isSelected) {
         this.isSelected = isSelected;
-    }
-
-    public boolean isRemoved() {
-        return isRemoved;
-    }
-
-    public void setIsRemoved(boolean isRemoved) {
-        this.isRemoved = isRemoved;
     }
 
     public boolean isHighlighted() {
