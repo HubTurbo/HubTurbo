@@ -3,73 +3,80 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
+    private static final int LABELS_LIST_WIDTH = 350;
+
     private TextField textField;
-    private TurboIssue issue;
-    private List<TurboLabel> allLabels;
-    private ObservableList<LabelPicker.Label> labels;
-    private LabelListView labelListView;
+    private List<PickerLabel> allLabels;
+    private List<PickerLabel> topLabels;
+    private List<PickerLabel> bottomLabels;
     private Map<String, Boolean> resultList;
+    private FlowPane topPane;
+    private FlowPane bottomPane;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
-        this.issue = issue;
-        this.allLabels = allLabels;
-        resultList = new HashMap<>();
-        allLabels.forEach(label -> resultList.put(label.getActualName(),
-                issue.getLabels().contains(label.getActualName())));
-
         initOwner(stage);
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
-
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
         setHeaderText((issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
+
+        this.allLabels = new ArrayList<>();
+        resultList = new HashMap<>();
+        topLabels = new ArrayList<>();
+        allLabels.forEach(label -> {
+            this.allLabels.add(new PickerLabel(label));
+            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
+            if (issue.getLabels().contains(label.getActualName())) {
+                topLabels.add(new PickerLabel(label));
+            }
+        });
 
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(10));
+
+        topPane = new FlowPane();
+        topPane.setPadding(new Insets(0, 0, 10, 0));
+        topPane.setMaxWidth(LABELS_LIST_WIDTH);
+        topPane.setPrefWrapLength(LABELS_LIST_WIDTH);
+        topPane.setHgap(5);
+        topPane.setVgap(5);
+
         textField = new TextField();
         textField.setPrefColumnCount(30);
         setupKeyEvents();
 
-        Label instructions = new Label("UP/DOWN to navigate, TAB to toggle selection");
-        instructions.setPadding(new Insets(0, 0, 10, 0));
+        bottomPane = new FlowPane();
+        bottomPane.setPadding(new Insets(10, 0, 0, 0));
+        bottomPane.setMaxWidth(LABELS_LIST_WIDTH);
+        bottomPane.setPrefWrapLength(LABELS_LIST_WIDTH);
+        bottomPane.setHgap(5);
+        bottomPane.setVgap(5);
 
-        updateLabelsList("");
-        labelListView = new LabelListView(this);
-        labelListView.setItems(labels);
-        labelListView.setCellFactory(LabelPickerCell.forListView(LabelPicker.Label::checkedProperty,
-                new StringConverter<LabelPicker.Label>() {
-                    @Override
-                    public String toString(LabelPicker.Label object) {
-                        return object.getName();
-                    }
+        populateTopPanel();
+        updateBottomLabels("");
+        populateBottomPane();
 
-                    @Override
-                    public LabelPicker.Label fromString(String string) {
-                        return null;
-                    }
-                }));
-
-        vBox.getChildren().addAll(instructions, textField, labelListView);
+        vBox.getChildren().addAll(topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
 
         setResultConverter(dialogButton -> {
@@ -82,8 +89,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             }
             return null;
         });
-
-        labelListView.setFirstItem();
         requestFocus();
     }
 
@@ -91,53 +96,62 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         Platform.runLater(textField::requestFocus);
     }
 
+    private void populateTopPanel() {
+        topPane.getChildren().clear();
+        topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+    }
+
+    private void populateBottomPane() {
+        bottomPane.getChildren().clear();
+        bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
+    }
+
     private void setupKeyEvents() {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateLabelsList(newValue);
-            labelListView.setItems(labels);
-            labelListView.setFirstItem();
-            labelListView.setItems(null);
-            labelListView.setItems(labels);
+            if (newValue.equals(" ")) {
+                textField.setText("");
+            } else {
+                updateBottomLabels(newValue);
+                populateBottomPane();
+            }
         });
         textField.setOnKeyPressed(e -> {
             if (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown()) {
                 if (e.getCode() == KeyCode.DOWN) {
-                    labelListView.handleUpDownKeys(true);
-                    labelListView.showSelectedItemChange();
-                    labelListView.setItems(null);
-                    labelListView.setItems(labels);
                     e.consume();
                 } else if (e.getCode() == KeyCode.UP) {
-                    labelListView.handleUpDownKeys(false);
-                    labelListView.showSelectedItemChange();
-                    labelListView.setItems(null);
-                    labelListView.setItems(labels);
                     e.consume();
-                } else if (e.getCode() == KeyCode.TAB) {
-                    labelListView.toggleSelectedItem();
+                } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
+                    updateTopLabels();
+                    updateBottomLabels("");
+                    textField.setText("");
+                    populateTopPanel();
+                    populateBottomPane();
                 }
             }
         });
     }
 
-    private void updateLabelsList(String match) {
-        List<TurboLabel> matchedLabels = allLabels
+    private void updateTopLabels() {
+
+    }
+
+    private void updateBottomLabels(String match) {
+        List<PickerLabel> matchedLabels = allLabels
                 .stream()
                 .filter(label -> label.getActualName().contains(match))
                 .collect(Collectors.toList());
-        ObservableList<LabelPicker.Label> selectedLabels = FXCollections.observableArrayList(matchedLabels.stream()
-                .filter(label -> resultList.get(label.getActualName()))
-                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), true))
-                .collect(Collectors.toList()));
-        ObservableList<LabelPicker.Label> notSelectedLabels = FXCollections.observableArrayList(matchedLabels.stream()
-                .filter(label -> !resultList.get(label.getActualName()))
-                .map(label -> new LabelPicker.Label(label.getActualName(), label.getStyle(), false))
-                .collect(Collectors.toList()));
-        labels = FXCollections.concat(selectedLabels, notSelectedLabels);
-        labels.forEach(label -> label.checkedProperty().addListener((observable, wasSelected, isSelected) -> {
-            resultList.put(label.getName(), isSelected);
-        }));
+        List<PickerLabel> selectedLabels = matchedLabels.stream()
+                .filter(label -> resultList.get(label.getActualName())).collect(Collectors.toList());
+        List<PickerLabel> notSelectedLabels = matchedLabels.stream()
+                .filter(label -> !resultList.get(label.getActualName())).collect(Collectors.toList());
+        if (match.isEmpty()) {
+            bottomLabels = notSelectedLabels;
+        } else {
+            bottomLabels = Stream.of(selectedLabels, notSelectedLabels)
+                    .flatMap(Collection::stream).collect(Collectors.toList());
+        }
     }
 
 }
