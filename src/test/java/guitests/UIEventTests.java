@@ -5,8 +5,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import backend.RepoIO;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
+import tests.TestUtils;
 import ui.UI;
+import util.events.DefaultRepoSwitchedEvent;
 import util.events.DefaultRepoSwitchedEventHandler;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
@@ -14,7 +17,8 @@ import util.events.MilestoneCreatedEventHandler;
 import util.events.PanelClickedEventHandler;
 
 public class UIEventTests extends UITest {
-
+	
+	private static String defaultRepoId;
     public static int eventTestCount;
 
     public static void increaseEventTestCount() {
@@ -23,6 +27,10 @@ public class UIEventTests extends UITest {
 
     private static void resetEventTestCount() {
         eventTestCount = 0;
+    }
+    
+    private static void getEventRepoId(DefaultRepoSwitchedEvent e) {
+    	defaultRepoId = e.newDefaultRepoId;
     }
 
     @Test
@@ -72,14 +80,22 @@ public class UIEventTests extends UITest {
     @Test
     public void defaultRepoSwitchedTest() {
         UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.increaseEventTestCount());
+        UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.getEventRepoId(e));
         resetEventTestCount();
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
-        RepoIO testIO = new RepoIO(true, true);
-        testIO.openRepository("dummy3/dummy3");
-        testIO.openRepository("dummy4/dummy4");
+
+        // Test with multiple repositories
+        ComboBox<String> comboBox = find("#repositorySelector");
+        doubleClick(comboBox);
+        doubleClick();
+        type("dummy3/dummy3");
+        push(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
+        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        assertEquals("dummy3/dummy3", defaultRepoId);
     }
 }
