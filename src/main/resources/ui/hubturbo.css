@@ -89,7 +89,11 @@
 }
 
 .labels {
-    -fx-background-radius: 3; -fx-padding: 1 5;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-padding: 1 5;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
 }
 
 /* For buttons that are used as labels (the + and x buttons on panels) */
