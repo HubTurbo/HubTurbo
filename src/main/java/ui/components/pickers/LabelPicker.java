@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import ui.UI;
-import util.PlatformEx;
 import util.events.ShowLabelPickerEventHandler;
 
 import java.util.HashMap;
@@ -40,8 +39,8 @@ public class LabelPicker {
             Optional<List<String>> result = labelPickerDialog.showAndWait();
             if (result.isPresent()) {
                 ui.logic.replaceIssueLabels(issue, result.get())
-                        .thenRun(() -> Platform.runLater(() -> ui.getBrowserComponent().showIssue(
-                                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true))
+                        .thenRun(() -> ui.getBrowserComponent().showIssue(
+                                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true)
                         );
             }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
