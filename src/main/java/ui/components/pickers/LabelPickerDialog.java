@@ -133,6 +133,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         });
     }
 
+    public void toggleLabel(String name) {
+        resultList.put(name, !resultList.get(name));
+        updateTopLabels();
+        populateTopPanel();
+        textField.setText("");
+        updateBottomLabels("");
+        populateBottomPane();
+    }
+
     private void toggleSelectedLabel() {
         if (!bottomLabels.isEmpty()) {
             bottomLabels
@@ -146,7 +155,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         topLabels.clear();
         allLabels.forEach(label -> {
             if (resultList.get(label.getActualName())) {
-                topLabels.add(new PickerLabel(label));
+                topLabels.add(new PickerLabel(label, this));
             }
         });
     }
@@ -155,7 +164,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         List<PickerLabel> matchedLabels = allLabels
                 .stream()
                 .filter(label -> label.getActualName().toLowerCase().contains(match))
-                .map(PickerLabel::new)
+                .map(label -> new PickerLabel(label, this))
                 .collect(Collectors.toList());
         List<PickerLabel> selectedLabels = matchedLabels.stream()
                 .filter(label -> resultList.get(label.getActualName()))
