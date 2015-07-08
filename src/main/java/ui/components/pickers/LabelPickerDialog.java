@@ -76,7 +76,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (dialogButton == confirmButtonType) {
                 return allLabels
                         .stream()
-                        .filter(label -> resultList.get(label.getName()))
+                        .filter(label -> resultList.get(label.getActualName()))
                         .map(TurboLabel::getActualName)
                         .collect(Collectors.toList());
             }
