@@ -6,11 +6,13 @@ import javafx.scene.control.Tooltip;
 
 public class PickerLabel extends TurboLabel {
 
+    private LabelPickerDialog labelPickerDialog;
     private boolean isSelected;
     private boolean isHighlighted;
 
-    public PickerLabel(TurboLabel label) {
+    public PickerLabel(TurboLabel label, LabelPickerDialog labelPickerDialog) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
+        this.labelPickerDialog = labelPickerDialog;
         isSelected = false;
         isHighlighted = false;
     }
@@ -33,6 +35,7 @@ public class PickerLabel extends TurboLabel {
             Tooltip groupTooltip = new Tooltip(getGroup().get());
             node.setTooltip(groupTooltip);
         }
+        node.setOnMouseClicked(e -> labelPickerDialog.toggleLabel(getActualName()));
         return node;
     }
 
