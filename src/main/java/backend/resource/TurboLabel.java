@@ -1,15 +1,14 @@
 package backend.resource;
 
 
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.eclipse.egit.github.core.Label;
-
 import backend.resource.serialization.SerializableLabel;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
+import org.eclipse.egit.github.core.Label;
+
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class TurboLabel {
@@ -148,7 +147,7 @@ public class TurboLabel {
         int b = Integer.parseInt(colour.substring(4, 6), 16);
         double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
         boolean bright = luminance > 128;
-        return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
+        return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black;" : "white;");
     }
 
     public Node getNode() {
