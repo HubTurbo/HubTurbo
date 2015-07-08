@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import ui.UI;
+import util.DialogMessage;
 import util.events.ShowLabelPickerEventHandler;
 
 import java.util.HashMap;
@@ -39,9 +40,23 @@ public class LabelPicker {
             Optional<List<String>> result = labelPickerDialog.showAndWait();
             if (result.isPresent()) {
                 ui.logic.replaceIssueLabels(issue, result.get())
-                        .thenRun(() -> ui.getBrowserComponent().showIssue(
-                                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true)
-                        );
+                        .thenApply(success -> {
+                            if (success) {
+                                ui.getBrowserComponent().showIssue(
+                                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true);
+                            } else {
+                                Platform.runLater(() -> DialogMessage.showErrorDialog(
+                                    "GitHub Write Error",
+                                    String.format(
+                                            "An error occurred while attempting to apply labels to:\n\n%s\n\n"
+                                                    + "Please check if you have write permissions to %s.",
+                                            issue,
+                                            issue.getRepoId()
+                                    )
+                                ));
+                            }
+                            return success;
+                        });
             }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
         } else {
