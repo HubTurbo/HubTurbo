@@ -40,29 +40,32 @@ public class LabelPicker {
             Optional<List<String>> result = labelPickerDialog.showAndWait();
             if (result.isPresent()) {
                 ui.logic.replaceIssueLabels(issue, result.get())
-                        .thenApply(success -> {
-                            if (success) {
-                                ui.getBrowserComponent().showIssue(
-                                        issue.getRepoId(), issue.getId(), issue.isPullRequest(), true);
-                            } else {
-                                Platform.runLater(() -> DialogMessage.showErrorDialog(
-                                    "GitHub Write Error",
-                                    String.format(
-                                            "An error occurred while attempting to apply labels to:\n\n%s\n\n"
-                                                    + "Please check if you have write permissions to %s.",
-                                            issue,
-                                            issue.getRepoId()
-                                    )
-                                ));
-                            }
-                            return success;
-                        });
+                        .thenApply(success -> postLabelApplication(success, issue));
             }
             openDialogs.remove(new Pair<>(issue.getRepoId(), issue.getId()));
         } else {
             // TODO focus on the already open dialog when having multiple dialogs
             openDialogs.get(new Pair<>(issue.getRepoId(), issue.getId())).requestFocus();
         }
+    }
+
+    public boolean postLabelApplication(Boolean success, TurboIssue issue) {
+        if (success) {
+            ui.getBrowserComponent().showIssue(
+                    issue.getRepoId(), issue.getId(), issue.isPullRequest(), true
+            );
+        } else {
+            Platform.runLater(() -> DialogMessage.showErrorDialog(
+                "GitHub Write Error",
+                String.format(
+                    "An error occurred while attempting to apply labels to:\n\n%s\n\n"
+                            + "Please check if you have write permissions to %s.",
+                    issue,
+                    issue.getRepoId()
+                )
+            ));
+        }
+        return success;
     }
 
     public static class Label {
