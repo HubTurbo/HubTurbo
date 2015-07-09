@@ -1,5 +1,6 @@
 package backend.stub;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -146,5 +147,15 @@ public class DummyRepo implements Repo {
     @Override
     public boolean isRepositoryValid(String repoId) {
         return true;
+    }
+
+    /**
+     * Presents reasonable defaults to the user.
+     *
+     * @return 3500 remaining calls, reset time ~45 minutes from call.
+     */
+    @Override
+    public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() {
+        return new ImmutablePair<>(3500, LocalDateTime.now().plusMinutes(45));
     }
 }

@@ -4,6 +4,7 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -231,6 +232,11 @@ public class GitHubRepo implements Repo {
             HTLog.error(logger, e);
         }
         return false;
+    }
+
+    @Override
+    public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() throws IOException {
+        return client.getRateLimitResetTime();
     }
 }
 
