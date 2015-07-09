@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class DialogMessage {
 
-    public static void showErrorDialog(String header, String message){
+    public static void showErrorDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText(header);
         alert.setContentText(message);
@@ -28,6 +28,13 @@ public class DialogMessage {
         Optional<ButtonType> result = alert.showAndWait();
 
         return result.get().equals(yesButton);
+    }
+
+    public static void showInfoDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 }
