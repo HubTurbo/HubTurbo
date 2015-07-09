@@ -230,13 +230,18 @@ public class Logic {
      * @param labels The labels to be applied to the given issue
      * @return The list of labels on the issue after the request is received by GitHub
      */
-    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
 
-        issue.setLabels(labels);
-        updateUIAndShow();
-
-        return repoIO.replaceIssueLabels(issue, labels);
+        return repoIO.replaceIssueLabels(issue, labels).handle((resultLabels, ex) -> {
+            if (ex == null) {
+                issue.setLabels(labels);
+                updateUIAndShow();
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
 }

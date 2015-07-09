@@ -4,6 +4,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Label;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,14 @@ public class ReplaceIssueLabelsTask extends GitHubRepoTask<List<String>> {
 
     @Override
     public void run() {
-        response.complete(
-                repo.setLabels(repoId, issueId, labels).stream().map(Label::getName).collect(Collectors.toList())
-        );
+        try {
+            response.complete(
+                    repo.setLabels(repoId, issueId, labels).stream()
+                            .map(Label::getName)
+                            .collect(Collectors.toList())
+            );
+        } catch (IOException e) {
+            response.completeExceptionally(e);
+        }
     }
 }

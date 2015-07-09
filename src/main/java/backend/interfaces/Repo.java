@@ -1,5 +1,6 @@
 package backend.interfaces;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -35,5 +36,5 @@ public interface Repo {
     List<Comment> getComments(String repoId, int issueId);
 
     boolean isRepositoryValid(String repoId);
-    List<Label> setLabels(String repoId, int issueId, List<String> labels);
+    List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException;
 }

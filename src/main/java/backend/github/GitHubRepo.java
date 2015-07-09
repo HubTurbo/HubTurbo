@@ -215,20 +215,14 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
-        try {
-            return labelService.setLabels(
-                    RepositoryId.createFromId(repoId),
-                    String.valueOf(issueId),
-                    labels
-                            .stream()
-                            .map(labelName -> new Label().setName(labelName))
-                            .collect(Collectors.toList())
-            );
-        } catch (IOException e) {
-            HTLog.error(logger, e);
-            return new ArrayList<>();
-        }
+    public List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException {
+        return labelService.setLabels(
+                RepositoryId.createFromId(repoId),
+                String.valueOf(issueId),
+                labels.stream()
+                        .map(labelName -> new Label().setName(labelName))
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
