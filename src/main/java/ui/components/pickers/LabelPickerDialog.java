@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
-    private static final int LABELS_LIST_WIDTH = 350;
+    public static final int VBOX_SPACING = 105; // seems like some magic number
 
     private TextField textField;
     private List<TurboLabel> allLabels;
@@ -26,6 +26,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private Map<String, Boolean> resultList;
     private FlowPane topPane;
     private FlowPane bottomPane;
+    private VBox vBox;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -43,13 +44,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
-        VBox vBox = new VBox();
+        vBox = new VBox();
         vBox.setPadding(new Insets(10));
+        vBox.setPrefHeight(1);
 
         topPane = new FlowPane();
         topPane.setPadding(new Insets(0, 0, 10, 0));
-        topPane.setMaxWidth(LABELS_LIST_WIDTH);
-        topPane.setPrefWrapLength(LABELS_LIST_WIDTH);
         topPane.setHgap(5);
         topPane.setVgap(5);
 
@@ -59,8 +59,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         bottomPane = new FlowPane();
         bottomPane.setPadding(new Insets(10, 0, 0, 0));
-        bottomPane.setMaxWidth(LABELS_LIST_WIDTH);
-        bottomPane.setPrefWrapLength(LABELS_LIST_WIDTH);
         bottomPane.setHgap(5);
         bottomPane.setVgap(5);
 
@@ -71,6 +69,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         vBox.getChildren().addAll(topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
+        setHeight(vBox.getHeight() + VBOX_SPACING);
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
@@ -93,9 +92,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
         if (topPane.getChildren().size() == 0) {
             Label label = new Label("No currently selected labels. ");
-            label.setPadding(new Insets(5));
+            label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
         }
+        setHeight(vBox.getHeight() + VBOX_SPACING);
     }
 
     private void populateBottomPane() {
@@ -103,9 +103,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
         if (bottomPane.getChildren().size() == 0) {
             Label label = new Label("No labels in repository. ");
-            label.setPadding(new Insets(5));
+            label.setPadding(new Insets(2, 5, 2, 5));
             bottomPane.getChildren().add(label);
         }
+        setHeight(vBox.getHeight() + VBOX_SPACING);
     }
 
     private void setupKeyEvents() {
