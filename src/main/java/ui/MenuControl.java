@@ -42,6 +42,8 @@ public class MenuControl extends MenuBar {
     }
 
     private void createMenuItems() {
+        Menu file = createFileMenu();
+
         Menu newMenu = new Menu("New");
         newMenu.getItems().addAll(createNewMenuItems());
 
@@ -55,13 +57,11 @@ public class MenuControl extends MenuBar {
             createRefreshMenuItem(),
             createDocumentationMenuItem());
 
-        Menu preferences = createPreferencesMenu();
-
-        getMenus().addAll(newMenu, panels, boards, view, preferences);
+        getMenus().addAll(file, newMenu, panels, boards, view);
     }
 
-    private Menu createPreferencesMenu() {
-        Menu preferences = new Menu("Preferences");
+    private Menu createFileMenu() {
+        Menu file = new Menu("File");
         
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
@@ -76,9 +76,9 @@ public class MenuControl extends MenuBar {
             ui.quit();
         });
         
-        preferences.getItems().addAll(logout, quit);
+        file.getItems().addAll(logout, quit);
         
-        return preferences;
+        return file;
 
     }
 
