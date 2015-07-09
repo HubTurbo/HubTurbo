@@ -1,5 +1,6 @@
 package backend.interfaces;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -9,6 +10,7 @@ import java.util.concurrent.Executors;
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.resource.Model;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 public abstract class RepoSource implements TaskRunner {
 
@@ -34,4 +36,5 @@ public abstract class RepoSource implements TaskRunner {
         downloadMetadata(String repoId, List<Integer> issues);
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
+    public abstract CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime();
 }

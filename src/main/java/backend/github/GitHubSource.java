@@ -1,9 +1,11 @@
 package backend.github;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 
 import backend.IssueMetadata;
@@ -56,5 +58,10 @@ public class GitHubSource extends RepoSource {
     @Override
     public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return addTask(new RepoValidityTask(this, gitHub, repoId)).response;
+    }
+
+    @Override
+    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+        return addTask(new CheckRateLimitTask(this, gitHub)).response;
     }
 }
