@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -11,18 +12,21 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.ocpsoft.prettytime.PrettyTime;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
+import util.DialogMessage;
+import util.Utility;
 import util.events.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 public class MenuControl extends MenuBar {
 
@@ -54,8 +58,9 @@ public class MenuControl extends MenuBar {
 
         Menu view = new Menu("View");
         view.getItems().addAll(
-            createRefreshMenuItem(),
-            createDocumentationMenuItem());
+                createRefreshMenuItem(),
+                createDocumentationMenuItem(),
+                createRateLimitsMenuItem());
 
         getMenus().addAll(file, newMenu, panels, boards, view);
     }
@@ -232,6 +237,17 @@ public class MenuControl extends MenuBar {
         }).collect(Collectors.toList());
     }
 
+    private MenuItem createRateLimitsMenuItem() {
+        MenuItem rateLimitsMenuItem = new MenuItem("Rate Limits");
+        rateLimitsMenuItem.setOnAction((e) -> {
+            logger.info("Menu: View > Rate Limits");
+            ui.logic.getRateLimitResetTime().whenComplete((rateLimits, ex) ->
+                            showDialogOnAPICheck(rateLimits.left, rateLimits.right, ex)
+            );
+        });
+        return rateLimitsMenuItem;
+    }
+
     private MenuItem createDocumentationMenuItem() {
         MenuItem documentationMenuItem = new MenuItem("Documentation");
         documentationMenuItem.setOnAction((e) -> {
@@ -280,8 +296,30 @@ public class MenuControl extends MenuBar {
     public void scrollTo(int panelIndex, int numOfPanels){
         setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (numOfPanels - 1));
     }
+
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
     }
 
+    private void showDialogOnAPICheck(int remaining, LocalDateTime reset, Throwable ex) {
+        if (ex == null) {
+            Platform.runLater(() -> DialogMessage.showInfoDialog(
+                "GitHub API Status",
+                String.format(
+                    "You are currently logged in as %s.\n\n" +
+                            "Remaining API calls for the hour: %s\n" +
+                            "Next reset at: %s (%s)",
+                    prefs.getLastLoginUsername(),
+                    remaining,
+                    reset,
+                    new PrettyTime().format(Utility.localDateTimeToDate(reset))
+                )
+            ));
+        } else {
+            Platform.runLater(() -> DialogMessage.showErrorDialog(
+                "Could not connect to GitHub",
+                "An error occurred while attempting to query the GitHub API."
+            ));
+        }
+    }
 }
