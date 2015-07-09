@@ -69,7 +69,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         vBox.getChildren().addAll(topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
-        setHeight(vBox.getHeight() + VBOX_SPACING);
+        vBox.heightProperty().addListener((observable, oldValue, newValue) -> {
+            setHeight(newValue.intValue() + VBOX_SPACING);
+        });
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
@@ -95,7 +97,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
         }
-        setHeight(vBox.getHeight() + VBOX_SPACING);
     }
 
     private void populateBottomPane() {
@@ -106,7 +107,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             label.setPadding(new Insets(2, 5, 2, 5));
             bottomPane.getChildren().add(label);
         }
-        setHeight(vBox.getHeight() + VBOX_SPACING);
     }
 
     private void setupKeyEvents() {
