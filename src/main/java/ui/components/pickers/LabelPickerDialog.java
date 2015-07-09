@@ -62,7 +62,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.setHgap(5);
         bottomPane.setVgap(5);
 
-        updateTopLabels();
+        updateTopLabels("", true);
         populateTopPanel();
         updateBottomLabels("");
         populateBottomPane();
@@ -131,11 +131,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
                     toggleSelectedLabel();
-                    updateTopLabels();
-                    updateBottomLabels("");
-                    textField.setText("");
-                    populateTopPanel();
-                    populateBottomPane();
                 }
             }
         });
@@ -143,7 +138,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     public void toggleLabel(String name) {
         processLabelChange(name);
-        updateTopLabels();
         populateTopPanel();
         textField.setText("");
         updateBottomLabels("");
@@ -152,7 +146,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void toggleSelectedLabel() {
         if (!bottomLabels.isEmpty()) {
-            processLabelChange(
+            toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
     }
@@ -167,21 +161,27 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .stream()
                         .filter(TurboLabel::isExclusive)
                         .filter(label -> label.getGroup().get().equals(group))
-                        .forEach(label -> resultList.put(label.getActualName(), false));
-                resultList.put(name, true);
+                        .forEach(label -> updateTopLabels(label.getActualName(), false));
+                updateTopLabels(name, true);
             } else {
-                resultList.put(name, !resultList.get(name));
+                updateTopLabels(name, !resultList.get(name));
             }
         }
     }
 
-    private void updateTopLabels() {
-        topLabels.clear();
-        allLabels.forEach(label -> {
-            if (resultList.get(label.getActualName())) {
-                topLabels.add(new PickerLabel(label, this));
-            }
-        });
+    private void updateTopLabels(String name, boolean isAdd) {
+        resultList.put(name, isAdd);
+        if (isAdd) {
+            allLabels.stream()
+                    .filter(label -> label.getActualName().contains(name))
+                    .filter(label -> resultList.get(label.getActualName()))
+                    .forEach(label -> topLabels.add(new PickerLabel(label, this)));
+        } else {
+            topLabels.stream()
+                    .filter(label -> label.getActualName().contains(name))
+                    .findFirst()
+                    .ifPresent(topLabels::remove);
+        }
     }
 
     private void updateBottomLabels(String match) {
@@ -225,7 +225,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     bottomLabels.get(i - 1).setIsHighlighted(true);
                     bottomLabels.get(i).setIsHighlighted(false);
                 }
-                break;
+                return;
             }
         }
     }
