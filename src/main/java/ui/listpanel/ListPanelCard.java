@@ -228,6 +228,6 @@ public class ListPanelCard extends VBox {
             assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
             issueDetails.getChildren().add(assigneeBox);
         }
-
     }
+
 }

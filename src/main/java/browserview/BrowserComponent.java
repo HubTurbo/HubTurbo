@@ -415,11 +415,6 @@ public class BrowserComponent {
         }
     }
 
-    public void manageLabels(String keyCode) {
-        sendKeysToBrowser(keyCode.toLowerCase());
-        bringToTop();
-    }
-
     public void manageAssignees(String keyCode) {
         sendKeysToBrowser(keyCode.toLowerCase());
         bringToTop();
