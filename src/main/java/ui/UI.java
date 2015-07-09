@@ -450,7 +450,6 @@ public class UI extends Application implements EventDispatcher {
     }
     
     public void switchDefaultRepo(){
-        logger.info("Triggered switch default repo");
         String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
         
