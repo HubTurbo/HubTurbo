@@ -17,7 +17,7 @@ import util.events.MilestoneCreatedEventHandler;
 import util.events.PanelClickedEventHandler;
 
 public class UIEventTests extends UITest {
-	
+
     private static String defaultRepoId;
     public static int eventTestCount;
 
