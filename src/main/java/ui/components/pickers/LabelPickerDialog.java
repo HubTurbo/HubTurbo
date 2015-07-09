@@ -62,7 +62,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.setHgap(5);
         bottomPane.setVgap(5);
 
-        updateTopLabels("", true);
+        addExistingLabels(issue.getLabels());
         populateTopPanel();
         updateBottomLabels("");
         populateBottomPane();
@@ -167,6 +167,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 updateTopLabels(name, !resultList.get(name));
             }
         }
+    }
+
+    private void addExistingLabels(List<String> labels) {
+        allLabels.stream()
+                .filter(label -> labels.contains(label.getActualName()))
+                .forEach(label -> topLabels.add(new PickerLabel(label, this)));
     }
 
     private void updateTopLabels(String name, boolean isAdd) {
