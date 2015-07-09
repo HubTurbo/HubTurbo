@@ -3,6 +3,7 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import prefs.Preferences;
@@ -205,6 +206,10 @@ public class Logic {
 
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
         return repoIO.login(credentials);
+    }
+
+    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+        return repoIO.getRateLimitResetTime();
     }
 }
 
