@@ -18,7 +18,7 @@ import util.events.PanelClickedEventHandler;
 
 public class UIEventTests extends UITest {
 	
-	private static String defaultRepoId;
+    private static String defaultRepoId;
     public static int eventTestCount;
 
     public static void increaseEventTestCount() {

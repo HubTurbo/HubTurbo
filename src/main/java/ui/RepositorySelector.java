@@ -54,7 +54,7 @@ public class RepositorySelector extends HBox {
     }
     
     public List<String> getContents() {
-        return comboBox.getItems();    	
+        return comboBox.getItems();
     }
 
     public String getText() {
