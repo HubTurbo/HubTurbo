@@ -42,7 +42,7 @@ public class ChromeDriverEx {
         if (!isTestChromeDriver) driver.quit();
     }
 
-    public void get(String url, boolean forceRefresh) throws WebDriverException {
+    public void get(String url, boolean isForceRefresh) throws WebDriverException {
         if (isTestChromeDriver) {
             if (!url.equalsIgnoreCase(GitHubURL.LOGIN_PAGE)) {
                 UI.events.triggerEvent(new NavigateToPageEvent(url));
@@ -50,7 +50,7 @@ public class ChromeDriverEx {
             logger.info("Test loading page: " + url);
             testGet();
         } else {
-            if (!forceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url)) {
+            if (!isForceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url)) {
                 logger.info("Already on page: " + url + " will not load it again. ");
             } else {
                 logger.info("Previous page was: " + driver.getCurrentUrl());

@@ -194,13 +194,13 @@ public class BrowserComponent {
      * driver window.
      * Run on a separate thread.
      */
-    public void showIssue(String repoId, int id, boolean isPullRequest, boolean forceRefresh) {
+    public void showIssue(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {
         if (isPullRequest) {
             logger.info("Showing pull request #" + id);
-            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), forceRefresh));
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
         } else {
             logger.info("Showing issue #" + id);
-            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), forceRefresh));
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
         }
     }
 
