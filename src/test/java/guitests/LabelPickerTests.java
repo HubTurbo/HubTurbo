@@ -10,11 +10,13 @@ import static org.loadui.testfx.controls.Commons.hasText;
 
 public class LabelPickerTests extends UITest {
 
+    public static final int EVENT_DELAY = 500;
+
     @Test
     public void showLabelPickerTest() {
         click("#dummy/dummy_col0_9");
         push(KeyCode.L);
-        sleep(1000);
+        sleep(EVENT_DELAY);
         assertNodeExists(hasText("Issue #9: Issue 9"));
         push(KeyCode.ENTER);
     }
@@ -25,14 +27,16 @@ public class LabelPickerTests extends UITest {
         click(listPanelCell);
         assertEquals(1, listPanelCell.getIssueLabels().size());
         push(KeyCode.L);
-        sleep(500);
+        sleep(EVENT_DELAY);
         type("3 ");
         push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         assertEquals(2, listPanelCell.getIssueLabels().size());
-        sleep(500);
+        sleep(EVENT_DELAY);
         push(KeyCode.L);
         type("3 ");
         push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
