@@ -26,21 +26,27 @@ public class LabelPicker {
     // TODO implement multiple dialogs, currently, only one dialog is allowed and it blocks the main UI when open
 
     private void showLabelPicker(TurboIssue issue) {
+        // get all labels from issue's repo
         List<TurboLabel> allLabels = ui.logic.getRepo(issue.getRepoId()).getLabels();
+        // create new LabelPickerDialog
         LabelPickerDialog labelPickerDialog = new LabelPickerDialog(issue, allLabels, stage);
+        // show LabelPickerDialog and wait for result
         Optional<List<String>> result = labelPickerDialog.showAndWait();
+        // if result is present (user did not cancel) then replace issue labels with result
         if (result.isPresent()) {
             ui.logic.replaceIssueLabels(issue, result.get())
-                    .thenApply(success -> postLabelApplication(success, issue));
+                    .thenApply(success -> postReplaceLabelActions(success, issue));
         }
     }
 
-    public boolean postLabelApplication(Boolean success, TurboIssue issue) {
+    public boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {
         if (success) {
+            // if label replacement is successful, force refresh issue page
             ui.getBrowserComponent().showIssue(
                     issue.getRepoId(), issue.getId(), issue.isPullRequest(), true
             );
         } else {
+            // if not, show error dialog
             Platform.runLater(() -> DialogMessage.showErrorDialog(
                 "GitHub Write Error",
                 String.format(
