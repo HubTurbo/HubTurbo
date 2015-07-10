@@ -10,7 +10,7 @@ import static org.loadui.testfx.controls.Commons.hasText;
 
 public class LabelPickerTests extends UITest {
 
-    public static final int EVENT_DELAY = 1000;
+    public static final int EVENT_DELAY = 500;
 
     @Test
     public void showLabelPickerTest() {
@@ -32,8 +32,8 @@ public class LabelPickerTests extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         assertEquals(2, listPanelCell.getIssueLabels().size());
-        sleep(EVENT_DELAY);
         push(KeyCode.L);
+        sleep(EVENT_DELAY);
         type("3 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
