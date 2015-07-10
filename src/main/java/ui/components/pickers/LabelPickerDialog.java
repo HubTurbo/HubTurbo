@@ -18,13 +18,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     public static final int VBOX_SPACING = 105; // seems like some magic number
 
+    private TurboIssue issue;
     private TextField textField;
     private List<TurboLabel> allLabels;
-    private List<PickerLabel> topLabels;
+    private List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
-    private Map<String, Boolean> resultList;
+    private Map<String, Boolean> resultList = new HashMap<>();
     private FlowPane topPane;
     private FlowPane bottomPane;
+    private Optional<PickerLabel> possibleAddition = Optional.empty();
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -33,9 +35,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 issue.getId() + " in " + issue.getRepoId());
         setHeaderText((issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
 
+        this.issue = issue;
         this.allLabels = allLabels;
-        resultList = new HashMap<>();
-        topLabels = new ArrayList<>();
         // populate resultList by going through allLabels and seeing which ones currently exist
         // in issue.getLabels()
         allLabels.forEach(label ->
@@ -62,7 +63,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.setHgap(5);
         bottomPane.setVgap(5);
 
-        addExistingLabels(issue.getLabels());
+        addExistingLabels();
         populateTopPanel();
         updateBottomLabels("");
         populateBottomPane();
@@ -93,6 +94,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void populateTopPanel() {
         topPane.getChildren().clear();
         topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+        if (possibleAddition.isPresent()) topPane.getChildren().add(possibleAddition.get().getNode());
         if (topPane.getChildren().size() == 0) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
@@ -116,6 +118,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 textField.setText("");
             } else {
                 updateBottomLabels(newValue.toLowerCase());
+                populateTopPanel();
                 populateBottomPane();
             }
         });
@@ -124,10 +127,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 if (e.getCode() == KeyCode.DOWN) {
                     e.consume();
                     moveHighlightOnLabel(true);
+                    populateTopPanel();
                     populateBottomPane();
                 } else if (e.getCode() == KeyCode.UP) {
                     e.consume();
                     moveHighlightOnLabel(false);
+                    populateTopPanel();
                     populateBottomPane();
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
@@ -171,10 +176,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
-    private void addExistingLabels(List<String> labels) {
+    private void addExistingLabels() {
         // used once to populate topLabels at the start
         allLabels.stream()
-                .filter(label -> labels.contains(label.getActualName()))
+                .filter(label -> issue.getLabels().contains(label.getActualName()))
                 .forEach(label -> topLabels.add(new PickerLabel(label, this)));
     }
 
@@ -213,7 +218,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     if (resultList.get(label.getActualName())) {
                         label.setIsSelected(true); // add tick if selected
                     }
-                    if (!match.isEmpty() && !label.getActualName().contains(match)) {
+                    if (!match.isEmpty() && !containsIgnoreCase(label.getActualName(), match)) {
                         label.setIsFaded(true); // fade out if does not match search query
                     }
                     return label;
@@ -223,10 +228,25 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         if (!match.isEmpty() && !bottomLabels.isEmpty()) {
             // highlight the first matching item
             bottomLabels.stream()
-                    .filter(label -> label.getActualName().contains(match))
+                    .filter(label -> containsIgnoreCase(label.getActualName(), match))
                     .findFirst()
-                    .ifPresent(label -> label.setIsHighlighted(true));
+                    .ifPresent(label -> {
+                        label.setIsHighlighted(true);
+                        possibleAddition = Optional.of(new PickerLabel(label, this, false, false, false, true));
+                    });
         }
+        if (!bottomLabelsHasHighlightedItem()) possibleAddition = Optional.empty();
+    }
+
+    private boolean bottomLabelsHasHighlightedItem() {
+        return bottomLabels.stream()
+                .filter(PickerLabel::isHighlighted)
+                .findAny()
+                .isPresent();
+    }
+
+    private boolean containsIgnoreCase(String source, String query) {
+        return source.toLowerCase().contains(query.toLowerCase());
     }
 
     private void moveHighlightOnLabel(boolean isDown) {
