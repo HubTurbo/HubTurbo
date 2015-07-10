@@ -325,24 +325,29 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         if (!name.isEmpty()) {
             // deal with current selection
-            topLabels.stream()
-                    .filter(label -> label.getActualName().equals(name))
-                    .findFirst()
-                    .ifPresent(label -> {
-                        if (issue.getLabels().contains(name)) {
-                            // if it is an existing label toggle fade and strike through
-                            label.setIsFaded(resultList.get(name));
-                            label.setIsRemoved(resultList.get(name));
-                        } else {
-                            // else add or remove it from the end of topLabels
-                            if (resultList.get(name)) {
+            if (isInTopLabels(name)) {
+                // if it exists in the top pane
+                topLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .findFirst()
+                        .ifPresent(label -> {
+                            if (issue.getLabels().contains(name)) {
+                                // if it is an existing label toggle fade and strike through
+                                label.setIsFaded(resultList.get(name));
+                                label.setIsRemoved(resultList.get(name));
+                            } else {
+                                // else set fade and strike through
                                 label.setIsFaded(true);
                                 label.setIsRemoved(true);
-                            } else {
-                                topLabels.add(new PickerLabel(label, this, false, false, false, true));
                             }
-                        }
-                    });
+                        });
+            } else {
+                // add it to the top pane
+                allLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .findFirst()
+                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, false, false, true)));
+            }
             possibleAddition = Optional.of(name);
         }
     }
