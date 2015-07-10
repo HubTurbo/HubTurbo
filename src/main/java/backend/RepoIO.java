@@ -115,4 +115,8 @@ public class RepoIO {
     public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
     }
+
+    public int getRemainingRate() {
+        return repoSource.getRemainingRate();
+    }
 }
