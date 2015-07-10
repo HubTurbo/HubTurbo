@@ -96,6 +96,10 @@
     -fx-border-width: 1;
 }
 
+.labels-removed .text {
+    -fx-strikethrough: true;
+}
+
 /* For buttons that are used as labels (the + and x buttons on panels) */
 .label-button {
     -fx-font-size: 13pt;

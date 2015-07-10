@@ -2,6 +2,7 @@ package ui.components.pickers;
 
 import backend.resource.TurboLabel;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
 // for use with LabelPickerDialog
@@ -10,34 +11,33 @@ public class PickerLabel extends TurboLabel {
     private LabelPickerDialog labelPickerDialog;
     private boolean isSelected;
     private boolean isHighlighted;
+    private boolean isRemoved;
+    private boolean isFaded;
 
     public PickerLabel(TurboLabel label, LabelPickerDialog labelPickerDialog) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
         this.labelPickerDialog = labelPickerDialog;
         isSelected = false;
         isHighlighted = false;
+        isRemoved = false;
     }
 
     @Override
     public Node getNode() {
-        javafx.scene.control.Label node;
-        if (isSelected) { // add selection tick
-            node = new javafx.scene.control.Label(getName() + " ✓");
-        } else {
-            node = new javafx.scene.control.Label(getName());
-        }
-        node.getStyleClass().add("labels");
-        if (isHighlighted) { // add highlight border
-            node.setStyle(getStyle() + "-fx-border-color: black;");
-        } else {
-            node.setStyle(getStyle());
-        }
+        Label label = new Label(getName() + (isSelected ? " ✓" : "")); // add selection tick
+        label.getStyleClass().add("labels");
+        if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
+        String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
+        style += (isFaded ? " -fx-opacity: 50%;" : ""); // change opacity if needed
+        label.setStyle(style);
+
         if (getGroup().isPresent()) {
             Tooltip groupTooltip = new Tooltip(getGroup().get());
-            node.setTooltip(groupTooltip);
+            label.setTooltip(groupTooltip);
         }
-        node.setOnMouseClicked(e -> labelPickerDialog.toggleLabel(getActualName()));
-        return node;
+
+        label.setOnMouseClicked(e -> labelPickerDialog.toggleLabel(getActualName()));
+        return label;
     }
 
     public void setIsSelected(boolean isSelected) {
@@ -52,4 +52,19 @@ public class PickerLabel extends TurboLabel {
         this.isHighlighted = isHighlighted;
     }
 
+    public boolean isRemoved() {
+        return isRemoved;
+    }
+
+    public void setIsRemoved(boolean isRemoved) {
+        this.isRemoved = isRemoved;
+    }
+
+    public boolean isFaded() {
+        return isFaded;
+    }
+
+    public void setIsFaded(boolean isFaded) {
+        this.isFaded = isFaded;
+    }
 }
