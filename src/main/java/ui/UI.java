@@ -245,6 +245,8 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
     }
 
+    // Used for test mode to shutdown jvm on quit (not used for ci/tests because that will cause
+    // tests to fail).
     private boolean isCloseOnQuit() {
         return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
