@@ -28,7 +28,7 @@ public class PickerLabel extends TurboLabel {
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
-        style += (isFaded ? " -fx-opacity: 50%;" : ""); // change opacity if needed
+        style += (isFaded ? " -fx-opacity: 25%;" : ""); // change opacity if needed
         label.setStyle(style);
 
         if (getGroup().isPresent()) {

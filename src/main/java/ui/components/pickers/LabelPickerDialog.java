@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
@@ -206,43 +205,27 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void updateBottomLabels(String match) {
         // get all labels that contain search query
-        List<PickerLabel> matchedLabels = allLabels
+        // fade out labels which do not match
+        bottomLabels = allLabels
                 .stream()
-                .filter(label -> label.getActualName().toLowerCase().contains(match))
                 .map(label -> new PickerLabel(label, this))
-                .collect(Collectors.toList());
-        // get currently selected labels
-        List<PickerLabel> selectedLabels = matchedLabels.stream()
-                .filter(label -> resultList.get(label.getActualName()))
                 .map(label -> {
-                    label.setIsSelected(true);
+                    if (resultList.get(label.getActualName())) {
+                        label.setIsSelected(true); // add tick if selected
+                    }
+                    if (!match.isEmpty() && !label.getActualName().contains(match)) {
+                        label.setIsFaded(true); // fade out if does not match search query
+                    }
                     return label;
                 })
                 .collect(Collectors.toList());
-        // get NOT currently selected labels
-        List<PickerLabel> notSelectedLabels = matchedLabels.stream()
-                .filter(label -> !resultList.get(label.getActualName())).collect(Collectors.toList());
 
-        if (match.isEmpty()) {
-            bottomLabels = notSelectedLabels;
-        } else {
-            // selected labels always appear first for easy removal
-            bottomLabels = Stream.of(selectedLabels, notSelectedLabels)
-                    .flatMap(Collection::stream).collect(Collectors.toList());
-        }
-
-        // updated highlighted label
-        if (!bottomLabels.isEmpty() && match.isEmpty()) {
-            // no highlight for empty search query
-            bottomLabels.forEach(label -> label.setIsHighlighted(false));
-        } else if (!bottomLabels.isEmpty()) {
-            // else highlight the first item
-            bottomLabels.get(0).setIsHighlighted(true);
-            if (bottomLabels.size() > 1) {
-                for (int i = 1; i < bottomLabels.size(); i++) {
-                    bottomLabels.get(i).setIsHighlighted(false);
-                }
-            }
+        if (!match.isEmpty() && !bottomLabels.isEmpty()) {
+            // highlight the first matching item
+            bottomLabels.stream()
+                    .filter(label -> label.getActualName().contains(match))
+                    .findFirst()
+                    .ifPresent(label -> label.setIsHighlighted(true));
         }
     }
 
