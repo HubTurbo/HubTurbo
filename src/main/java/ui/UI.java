@@ -11,6 +11,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
@@ -74,6 +75,7 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
+    private Label apiBox;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -191,11 +193,13 @@ public class UI extends Application implements EventDispatcher {
 
     private void initUI(Stage stage) {
         repoSelector = createRepoSelector();
+        apiBox = new Label("API Rate Limit: -");
+
         mainStage = stage;
         stage.setMaximized(false);
 
         panels = new PanelControl(this, prefs);
-        guiController = new GUIController(this, panels);
+        guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRoot());
         setupMainStage(scene);
@@ -328,7 +332,11 @@ public class UI extends Application implements EventDispatcher {
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
-        top.getChildren().addAll(menuBar, repoSelector);
+
+        HBox repoSelectorBar = new HBox();
+        repoSelectorBar.getChildren().addAll(repoSelector, apiBox);
+
+        top.getChildren().addAll(menuBar, repoSelectorBar);
 
         BorderPane root = new BorderPane();
         root.setTop(top);

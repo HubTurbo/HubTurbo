@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
+import javafx.scene.control.Label;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.UIBrowserBridge;
@@ -31,14 +32,16 @@ import java.util.function.Predicate;
 public class GUIController {
     private PanelControl panelControl;
     private UI ui;
+    private Label apiBox;
 
     // Synchronised with Logic's latest updated multimodel.
     // Not to be modified from this point or any further in the GUI.
     private IModel multiModel;
 
-    public GUIController(UI ui, PanelControl panelControl) {
+    public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
         this.panelControl = panelControl;
+        this.apiBox = apiBox;
 
         // Set up the connection to the browser
         new UIBrowserBridge(ui);
@@ -65,6 +68,10 @@ public class GUIController {
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
+        if (e.remainingRequests.isPresent()) {
+            Platform.runLater(() -> apiBox.setText("API Rate Limit: " + e.remainingRequests.get()));
+        }
+
         multiModel = e.model;
 
         // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
