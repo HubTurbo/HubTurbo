@@ -145,7 +145,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void toggleSelectedLabel() {
-        if (!bottomLabels.isEmpty()) {
+        if (!bottomLabels.isEmpty() && !textField.getText().isEmpty()) {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
@@ -181,6 +181,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             allLabels.stream()
                     .filter(label -> label.getActualName().contains(name))
                     .filter(label -> resultList.get(label.getActualName()))
+                    .filter(label -> !isInTopLabels(label.getActualName()))
                     .forEach(label -> topLabels.add(new PickerLabel(label, this)));
         } else {
             topLabels.stream()
@@ -188,6 +189,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     .findFirst()
                     .ifPresent(topLabels::remove);
         }
+    }
+
+    private boolean isInTopLabels(String name) {
+        return topLabels.stream()
+                .filter(label -> label.getActualName().equals(name))
+                .findFirst()
+                .isPresent();
     }
 
     private void updateBottomLabels(String match) {
@@ -211,7 +219,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             bottomLabels = Stream.of(selectedLabels, notSelectedLabels)
                     .flatMap(Collection::stream).collect(Collectors.toList());
         }
-        if (!bottomLabels.isEmpty()) {
+        if (!bottomLabels.isEmpty() && match.isEmpty()) {
+            bottomLabels.forEach(label -> label.setIsHighlighted(false));
+        } else if (!bottomLabels.isEmpty()) {
             bottomLabels.get(0).setIsHighlighted(true);
             if (bottomLabels.size() > 1) {
                 for (int i = 1; i < bottomLabels.size(); i++) {
