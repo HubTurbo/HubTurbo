@@ -158,4 +158,9 @@ public class DummyRepo implements Repo {
     public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() {
         return new ImmutablePair<>(3500, LocalDateTime.now().plusMinutes(45));
     }
+
+    @Override
+    public int getRemainingRate() {
+        return 3500;
+    }
 }

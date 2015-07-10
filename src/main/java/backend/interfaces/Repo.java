@@ -37,4 +37,5 @@ public interface Repo {
 
     boolean isRepositoryValid(String repoId);
     ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() throws IOException;
+    int getRemainingRate();
 }
