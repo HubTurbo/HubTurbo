@@ -5,6 +5,8 @@ import javafx.application.Platform;
 import ui.UI;
 import util.events.ModelUpdatedEvent;
 
+import java.util.Optional;
+
 public class UIManager {
 
     private final UI ui;
@@ -13,13 +15,14 @@ public class UIManager {
         this.ui = ui;
     }
 
-    public void update(MultiModel models, boolean hasMetadata) {
+    public void update(MultiModel models, Optional<Integer> remainingRequests, boolean hasMetadata) {
+        System.out.println(remainingRequests.get());
         Platform.runLater(() ->
-            ui.triggerEvent(new ModelUpdatedEvent(models, hasMetadata)));
+            ui.triggerEvent(new ModelUpdatedEvent(models, remainingRequests, hasMetadata)));
     }
 
-    public void updateNow(MultiModel models) {
-        ui.triggerEvent(new ModelUpdatedEvent(models, false));
+    public void updateNow(MultiModel models, Optional<Integer> remainingRequests) {
+        ui.triggerEvent(new ModelUpdatedEvent(models, remainingRequests, false));
     }
 }
 

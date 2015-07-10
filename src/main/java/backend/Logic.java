@@ -29,6 +29,7 @@ public class Logic {
     private final MultiModel models;
     private final UIManager uiManager;
     protected final Preferences prefs;
+    private Optional<Integer> remainingRequests;
 
     private RepoIO repoIO;
     public LoginController loginController;
@@ -36,6 +37,7 @@ public class Logic {
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
         this.uiManager = uiManager;
         this.prefs = prefs;
+        this.remainingRequests = Optional.empty();
         this.models = new MultiModel(prefs);
 
         repoIO = new RepoIO(isTestMode, enableTestJSON);
@@ -62,7 +64,7 @@ public class Logic {
         });
 
         // Pass the currently-empty model to the UI
-        uiManager.updateNow(models);
+        uiManager.updateNow(models, remainingRequests);
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -81,6 +83,7 @@ public class Logic {
             .map(repoIO::updateModel)
             .collect(Collectors.toList()))
                 .thenApply(models::replace)
+                .thenRun(this::updateRemainingRate)
                 .thenRun(this::updateUI)
                 .exceptionally(Futures::log);
     }
@@ -111,6 +114,7 @@ public class Logic {
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
                         .thenApply(models::addPending)
+                        .thenRun(this::updateRemainingRate)
                         .thenRun(this::updateUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
                         .thenApply(n -> true)
@@ -119,7 +123,7 @@ public class Logic {
         });
     }
 
-    public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<Integer> issues) {
         String message = "Getting metadata for " + repoId + "...";
         logger.info("Getting metadata for issues " + issues);
         UI.status.displayMessage(message);
@@ -132,8 +136,11 @@ public class Logic {
                 UI.status.displayMessage(updatedMessage);
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
-            }).thenApply(Futures.tap(this::updateUIWithMetadata))
-            .exceptionally(withResult(new HashMap<>()));
+            })
+            .thenApply(Futures.tap(this::updateRemainingRate))
+            .thenApply(Futures.tap(this::updateUIWithMetadata))
+            .thenApply(metadata -> true)
+            .exceptionally(withResult(false));
     }
 
     // Adds update times to the metadata map
@@ -197,11 +204,11 @@ public class Logic {
     }
 
     private void updateUI() {
-        uiManager.update(models, false);
+        uiManager.update(models, remainingRequests, false);
     }
 
     private void updateUIWithMetadata() {
-        uiManager.update(models, true);
+        uiManager.update(models, remainingRequests, true);
     }
 
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
@@ -210,6 +217,10 @@ public class Logic {
 
     public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
+    }
+
+    private void updateRemainingRate() {
+        remainingRequests = Optional.of(repoIO.getRemainingRate());
     }
 }
 
