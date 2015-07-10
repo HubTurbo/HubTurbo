@@ -101,7 +101,7 @@ public class ScrollableListView<T> extends ListView<T> {
     }
 
     private VirtualFlow<?> getVirtualFlow() {
-        return (VirtualFlow<?>) lookup(".virtual-flow");
+        return (VirtualFlow<?>) lookup("VirtualFlow");
     }
 
     private class ScrollThread extends Thread {
