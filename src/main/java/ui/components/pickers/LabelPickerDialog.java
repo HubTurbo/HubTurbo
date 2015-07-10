@@ -26,7 +26,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private Map<String, Boolean> resultList = new HashMap<>();
     private FlowPane topPane;
     private FlowPane bottomPane;
-    private Optional<PickerLabel> possibleAddition = Optional.empty();
+    private Optional<String> possibleAddition = Optional.empty();
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -64,9 +64,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         bottomPane.setVgap(5);
 
         addExistingLabels();
-        populateTopPanel();
         updateBottomLabels("");
-        populateBottomPane();
+        populatePanes();
 
         vBox.getChildren().addAll(topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
@@ -91,10 +90,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         Platform.runLater(textField::requestFocus);
     }
 
-    private void populateTopPanel() {
+    private void populatePanes() {
+        populateTopPane();
+        populateBottomPane();
+    }
+
+    private void populateTopPane() {
         topPane.getChildren().clear();
         topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
-        if (possibleAddition.isPresent()) topPane.getChildren().add(possibleAddition.get().getNode());
         if (topPane.getChildren().size() == 0) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
@@ -118,8 +121,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 textField.setText("");
             } else {
                 updateBottomLabels(newValue.toLowerCase());
-                populateTopPanel();
-                populateBottomPane();
+                if (hasHighlightedLabel()) {
+                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
+                } else {
+                    addRemovePossibleLabel("");
+                }
+                populatePanes();
             }
         });
         textField.setOnKeyPressed(e -> {
@@ -127,15 +134,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 if (e.getCode() == KeyCode.DOWN) {
                     e.consume();
                     moveHighlightOnLabel(true);
-                    populateTopPanel();
-                    populateBottomPane();
+                    populatePanes();
                 } else if (e.getCode() == KeyCode.UP) {
                     e.consume();
                     moveHighlightOnLabel(false);
-                    populateTopPanel();
-                    populateBottomPane();
+                    populatePanes();
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
+                    addRemovePossibleLabel("");
                     toggleSelectedLabel();
                 }
             }
@@ -144,14 +150,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     public void toggleLabel(String name) {
         processLabelChange(name);
-        populateTopPanel();
         textField.setText("");
         updateBottomLabels("");
-        populateBottomPane();
+        populatePanes();
     }
 
     private void toggleSelectedLabel() {
-        if (!bottomLabels.isEmpty() && !textField.getText().isEmpty()) {
+        if (!bottomLabels.isEmpty() && !textField.getText().isEmpty() && hasHighlightedLabel()) {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
@@ -187,16 +192,33 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         // adds new labels to the end of the list
         resultList.put(name, isAdd); // update resultList first
         if (isAdd) {
-            allLabels.stream()
-                    .filter(label -> label.getActualName().contains(name))
-                    .filter(label -> resultList.get(label.getActualName()))
-                    .filter(label -> !isInTopLabels(label.getActualName()))
-                    .forEach(label -> topLabels.add(new PickerLabel(label, this)));
+            if (issue.getLabels().contains(name)) {
+                topLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .forEach(label -> {
+                            label.setIsRemoved(false);
+                            label.setIsFaded(false);
+                        });
+            } else {
+                allLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .filter(label -> resultList.get(label.getActualName()))
+                        .filter(label -> !isInTopLabels(label.getActualName()))
+                        .findFirst()
+                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this)));
+            }
         } else {
-            topLabels.stream()
-                    .filter(label -> label.getActualName().contains(name))
-                    .findFirst()
-                    .ifPresent(topLabels::remove);
+            if (issue.getLabels().contains(name)) {
+                topLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .findFirst()
+                        .ifPresent(label -> label.setIsRemoved(true));
+            } else {
+                topLabels.stream()
+                        .filter(label -> label.getActualName().equals(name))
+                        .findFirst()
+                        .ifPresent(topLabels::remove);
+            }
         }
     }
 
@@ -204,7 +226,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         // used to prevent duplicates in topLabels
         return topLabels.stream()
                 .filter(label -> label.getActualName().equals(name))
-                .findFirst()
+                .findAny()
                 .isPresent();
     }
 
@@ -232,17 +254,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     .findFirst()
                     .ifPresent(label -> {
                         label.setIsHighlighted(true);
-                        possibleAddition = Optional.of(new PickerLabel(label, this, false, false, false, true));
                     });
         }
-        if (!bottomLabelsHasHighlightedItem()) possibleAddition = Optional.empty();
     }
 
-    private boolean bottomLabelsHasHighlightedItem() {
+    private boolean hasHighlightedLabel() {
         return bottomLabels.stream()
                 .filter(PickerLabel::isHighlighted)
                 .findAny()
                 .isPresent();
+    }
+
+    private Optional<PickerLabel> getHighlightedLabelName() {
+        return bottomLabels.stream()
+                .filter(PickerLabel::isHighlighted)
+                .findAny();
     }
 
     private boolean containsIgnoreCase(String source, String query) {
@@ -250,18 +276,74 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void moveHighlightOnLabel(boolean isDown) {
-        // used to move the highlight on the bottom labels
-        for (int i = 0; i < bottomLabels.size(); i++) {
-            if (bottomLabels.get(i).isHighlighted()) {
-                if (isDown && i < bottomLabels.size() - 1) {
-                    bottomLabels.get(i).setIsHighlighted(false);
-                    bottomLabels.get(i + 1).setIsHighlighted(true);
-                } else if (!isDown && i > 0) {
-                    bottomLabels.get(i - 1).setIsHighlighted(true);
-                    bottomLabels.get(i).setIsHighlighted(false);
+        if (hasHighlightedLabel()) {
+            // used to move the highlight on the bottom labels
+            // find all matching labels
+            List<PickerLabel> matchingLabels = bottomLabels.stream()
+                    .filter(label -> !label.isFaded())
+                    .collect(Collectors.toList());
+
+            // move highlight around
+            for (int i = 0; i < matchingLabels.size(); i++) {
+                if (matchingLabels.get(i).isHighlighted()) {
+                    if (isDown && i < matchingLabels.size() - 1) {
+                        matchingLabels.get(i).setIsHighlighted(false);
+                        matchingLabels.get(i + 1).setIsHighlighted(true);
+                    } else if (!isDown && i > 0) {
+                        matchingLabels.get(i - 1).setIsHighlighted(true);
+                        matchingLabels.get(i).setIsHighlighted(false);
+                    }
+                    return;
                 }
-                return;
             }
+        }
+    }
+
+    private void addRemovePossibleLabel(String name) {
+        // deal with previous selection
+        if (possibleAddition.isPresent()) {
+            // if there's a previous possible selection
+            topLabels.stream()
+                    .filter(label -> label.getActualName().equals(possibleAddition.get()))
+                    .findFirst()
+                    .ifPresent(label -> {
+                        if (issue.getLabels().contains(possibleAddition.get())) {
+                            // if it is an existing label toggle fade and strike through
+                            label.setIsFaded(false);
+                            if (resultList.get(label.getActualName())) {
+                                label.setIsRemoved(false);
+                            } else {
+                                label.setIsRemoved(true);
+                            }
+                        } else {
+                            // if not then remove it
+                            topLabels.remove(label);
+                        }
+                    });
+            possibleAddition = Optional.empty();
+        }
+
+        if (!name.isEmpty()) {
+            // deal with current selection
+            topLabels.stream()
+                    .filter(label -> label.getActualName().equals(name))
+                    .findFirst()
+                    .ifPresent(label -> {
+                        if (issue.getLabels().contains(name)) {
+                            // if it is an existing label toggle fade and strike through
+                            label.setIsFaded(resultList.get(name));
+                            label.setIsRemoved(resultList.get(name));
+                        } else {
+                            // else add or remove it from the end of topLabels
+                            if (resultList.get(name)) {
+                                label.setIsFaded(true);
+                                label.setIsRemoved(true);
+                            } else {
+                                topLabels.add(new PickerLabel(label, this, false, false, false, true));
+                            }
+                        }
+                    });
+            possibleAddition = Optional.of(name);
         }
     }
 
