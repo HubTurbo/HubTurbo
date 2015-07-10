@@ -4,6 +4,7 @@ import backend.resource.TurboLabel;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
+// for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
     private LabelPickerDialog labelPickerDialog;
@@ -20,13 +21,13 @@ public class PickerLabel extends TurboLabel {
     @Override
     public Node getNode() {
         javafx.scene.control.Label node;
-        if (isSelected) {
+        if (isSelected) { // add selection tick
             node = new javafx.scene.control.Label(getName() + " ✓");
         } else {
             node = new javafx.scene.control.Label(getName());
         }
         node.getStyleClass().add("labels");
-        if (isHighlighted) {
+        if (isHighlighted) { // add highlight border
             node.setStyle(getStyle() + "-fx-border-color: black;");
         } else {
             node.setStyle(getStyle());
