@@ -20,6 +20,17 @@ public class PickerLabel extends TurboLabel {
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
+        isFaded = false;
+    }
+
+    public PickerLabel(TurboLabel label, LabelPickerDialog labelPickerDialog,
+                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded) {
+        super(label.getRepoId(), label.getColour(), label.getActualName());
+        this.labelPickerDialog = labelPickerDialog;
+        this.isSelected = isSelected;
+        this.isHighlighted = isHighlighted;
+        this.isRemoved = isRemoved;
+        this.isFaded = isFaded;
     }
 
     @Override
@@ -28,7 +39,7 @@ public class PickerLabel extends TurboLabel {
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
-        style += (isFaded ? " -fx-opacity: 25%;" : ""); // change opacity if needed
+        style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
         label.setStyle(style);
 
         if (getGroup().isPresent()) {
