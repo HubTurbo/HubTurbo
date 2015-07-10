@@ -52,4 +52,9 @@ public class DummySource extends RepoSource {
     public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, dummy)).response;
     }
+
+    @Override
+    public int getRemainingRate() {
+        return dummy.getRemainingRate();
+    }
 }

@@ -37,4 +37,11 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
     public abstract CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime();
+
+    /**
+     * Does not initiate a connection with the API, so we don't need to use the executor service here.
+     *
+     * @return The remaining possible requests within the hour, as kept track of by the GitHubClientExtended.
+     */
+    public abstract int getRemainingRate();
 }

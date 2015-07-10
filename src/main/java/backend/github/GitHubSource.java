@@ -64,4 +64,9 @@ public class GitHubSource extends RepoSource {
     public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, gitHub)).response;
     }
+
+    @Override
+    public int getRemainingRate() {
+        return gitHub.getRemainingRate();
+    }
 }
