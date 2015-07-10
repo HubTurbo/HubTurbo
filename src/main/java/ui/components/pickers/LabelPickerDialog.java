@@ -26,7 +26,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private Map<String, Boolean> resultList;
     private FlowPane topPane;
     private FlowPane bottomPane;
-    private VBox vBox;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -38,13 +37,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         this.allLabels = allLabels;
         resultList = new HashMap<>();
         topLabels = new ArrayList<>();
+        // populate resultList by going through allLabels and seeing which ones currently exist
+        // in issue.getLabels()
         allLabels.forEach(label ->
                 resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName())));
 
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
-        vBox = new VBox();
+        VBox vBox = new VBox();
         vBox.setPadding(new Insets(10));
         vBox.setPrefHeight(1);
 
@@ -70,11 +71,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         vBox.getChildren().addAll(topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
         vBox.heightProperty().addListener((observable, oldValue, newValue) -> {
-            setHeight(newValue.intValue() + VBOX_SPACING);
+            setHeight(newValue.intValue() + VBOX_SPACING); // dialog box should auto-resize
         });
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
+                // if user confirms selection, return list of labels
                 return resultList.entrySet().stream()
                         .filter(Map.Entry::getValue)
                         .map(Map.Entry::getKey)
@@ -156,6 +158,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
         if (turboLabel.isPresent()) {
             if (turboLabel.get().isExclusive() && !resultList.get(name)) {
+                // exclusive label check
                 String group = turboLabel.get().getGroup().get();
                 allLabels
                         .stream()
@@ -170,13 +173,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void addExistingLabels(List<String> labels) {
+        // used once to populate topLabels at the start
         allLabels.stream()
                 .filter(label -> labels.contains(label.getActualName()))
                 .forEach(label -> topLabels.add(new PickerLabel(label, this)));
     }
 
     private void updateTopLabels(String name, boolean isAdd) {
-        resultList.put(name, isAdd);
+        // adds new labels to the end of the list
+        resultList.put(name, isAdd); // update resultList first
         if (isAdd) {
             allLabels.stream()
                     .filter(label -> label.getActualName().contains(name))
@@ -192,6 +197,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private boolean isInTopLabels(String name) {
+        // used to prevent duplicates in topLabels
         return topLabels.stream()
                 .filter(label -> label.getActualName().equals(name))
                 .findFirst()
@@ -199,11 +205,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void updateBottomLabels(String match) {
+        // get all labels that contain search query
         List<PickerLabel> matchedLabels = allLabels
                 .stream()
                 .filter(label -> label.getActualName().toLowerCase().contains(match))
                 .map(label -> new PickerLabel(label, this))
                 .collect(Collectors.toList());
+        // get currently selected labels
         List<PickerLabel> selectedLabels = matchedLabels.stream()
                 .filter(label -> resultList.get(label.getActualName()))
                 .map(label -> {
@@ -211,17 +219,24 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     return label;
                 })
                 .collect(Collectors.toList());
+        // get NOT currently selected labels
         List<PickerLabel> notSelectedLabels = matchedLabels.stream()
                 .filter(label -> !resultList.get(label.getActualName())).collect(Collectors.toList());
+
         if (match.isEmpty()) {
             bottomLabels = notSelectedLabels;
         } else {
+            // selected labels always appear first for easy removal
             bottomLabels = Stream.of(selectedLabels, notSelectedLabels)
                     .flatMap(Collection::stream).collect(Collectors.toList());
         }
+
+        // updated highlighted label
         if (!bottomLabels.isEmpty() && match.isEmpty()) {
+            // no highlight for empty search query
             bottomLabels.forEach(label -> label.setIsHighlighted(false));
         } else if (!bottomLabels.isEmpty()) {
+            // else highlight the first item
             bottomLabels.get(0).setIsHighlighted(true);
             if (bottomLabels.size() > 1) {
                 for (int i = 1; i < bottomLabels.size(); i++) {
@@ -232,6 +247,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void moveHighlightOnLabel(boolean isDown) {
+        // used to move the highlight on the bottom labels
         for (int i = 0; i < bottomLabels.size(); i++) {
             if (bottomLabels.get(i).isHighlighted()) {
                 if (isDown && i < bottomLabels.size() - 1) {
