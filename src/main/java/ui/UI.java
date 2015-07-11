@@ -459,11 +459,9 @@ public class UI extends Application implements EventDispatcher {
                 if (i == openRepos.length - 1) {
                     primaryRepoChanged(openRepos[0]);
                     repoSelector.setText(openRepos[0]);
-                    UI.events.triggerEvent(new DefaultRepoSwitchedEvent(openRepos[0]));
                 } else {
                     primaryRepoChanged(openRepos[i + 1]);
                     repoSelector.setText(openRepos[i + 1]);
-                    UI.events.triggerEvent(new DefaultRepoSwitchedEvent(openRepos[i + 1]));
                 }
             }
         }

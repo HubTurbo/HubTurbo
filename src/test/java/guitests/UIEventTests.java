@@ -4,17 +4,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import tests.TestUtils;
 import ui.UI;
-import util.events.DefaultRepoSwitchedEvent;
-import util.events.DefaultRepoSwitchedEventHandler;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
 import util.events.PanelClickedEventHandler;
+import util.events.testevents.PrimaryRepoChangedEvent;
+import util.events.testevents.PrimaryRepoChangedEventHandler;
 
 public class UIEventTests extends UITest {
 
@@ -29,8 +28,8 @@ public class UIEventTests extends UITest {
         eventTestCount = 0;
     }
     
-    private static void getEventRepoId(DefaultRepoSwitchedEvent e) {
-        defaultRepoId = e.newDefaultRepoId;
+    private static void getEventRepoId(PrimaryRepoChangedEvent e) {
+        defaultRepoId = e.repoId;
     }
 
     @Test
@@ -79,8 +78,8 @@ public class UIEventTests extends UITest {
     
     @Test
     public void defaultRepoSwitchedTest() {
-        UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.increaseEventTestCount());
-        UI.events.registerEvent((DefaultRepoSwitchedEventHandler) e -> UIEventTests.getEventRepoId(e));
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.increaseEventTestCount());
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.getEventRepoId(e));
         resetEventTestCount();
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
@@ -93,6 +92,7 @@ public class UIEventTests extends UITest {
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         click("#dummy/dummy_col0_filterTextField");
+        resetEventTestCount();
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
         assertEquals(1, eventTestCount);
         press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
