@@ -52,7 +52,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         Label titleLabel = new Label(
                 (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
-        titleLabel.setWrapText(true);
         titleLabel.setMaxWidth(ELEMENT_MAX_WIDTH);
         titleLabel.setStyle("-fx-font-size: 125%");
         Tooltip titleTooltip = new Tooltip(
