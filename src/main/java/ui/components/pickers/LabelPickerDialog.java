@@ -73,8 +73,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             setHeight(newValue.intValue() + VBOX_SPACING); // dialog box should auto-resize
         });
 
+        // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
+                // if there is a highlighted label, toggle that label first
+                if (hasHighlightedLabel()) {
+                    toggleSelectedLabel();
+                }
                 // if user confirms selection, return list of labels
                 return resultList.entrySet().stream()
                         .filter(Map.Entry::getValue)
