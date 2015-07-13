@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry kind="lib" path="lib/controlsfx-8.20.8.jar"/>
+	<classpathentry kind="lib" path="lib/controlsfx-8.40.9.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.2.4.jar" sourcepath="lib/gson-2.2.4-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/gson-2.2.4-javadoc.jar!/"/>
@@ -17,16 +17,16 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/org.eclipse.egit.github.core-3.7.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/prettytime-3.2.7.Final.jar" sourcepath="lib/prettytime-3.2.7.Final-sources.jar">
+	<classpathentry kind="lib" path="lib/prettytime-4.0.0.Final.jar" sourcepath="lib/prettytime-4.0.0.Final-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/prettytime-3.2.7.Final-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/HubTurbo/lib/prettytime-4.0.0.Final-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/selenium-java-2.44.0.jar" sourcepath="lib/selenium-java-2.44.0-srcs.jar"/>
+	<classpathentry kind="lib" path="lib/selenium-java-2.46.0.jar" sourcepath="lib/selenium-java-2.46.0-srcs.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-core-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/apache-log4j-2.0.1-bin/log4j-api-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/selenium-server-standalone-2.44.0.jar"/>
+	<classpathentry kind="lib" path="lib/apache-log4j-2.3-bin/log4j-core-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/apache-log4j-2.3-bin/log4j-api-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/selenium-server-standalone-2.46.0.jar"/>
 	<classpathentry kind="lib" path="lib/testFx-3.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
