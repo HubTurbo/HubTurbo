@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
@@ -24,6 +25,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private List<TurboLabel> allLabels;
     private List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
+    private Set<String> groups = new HashSet<>();
     private Map<String, Boolean> resultList = new HashMap<>();
     private FlowPane topPane;
     private FlowPane bottomPane;
@@ -41,8 +43,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         this.allLabels = allLabels;
         // populate resultList by going through allLabels and seeing which ones currently exist
         // in issue.getLabels()
-        allLabels.forEach(label ->
-                resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName())));
+        allLabels.forEach(label -> {
+            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
+            if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
+        });
 
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
@@ -89,9 +93,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 // if there is a highlighted label, toggle that label first
-                if (hasHighlightedLabel()) {
-                    toggleSelectedLabel();
-                }
+                if (hasHighlightedLabel()) toggleSelectedLabel();
                 // if user confirms selection, return list of labels
                 return resultList.entrySet().stream()
                         .filter(Map.Entry::getValue)
@@ -333,6 +335,39 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
+    private void updateBottomLabels(String group, String match) {
+        boolean isValidGroup = groups.stream()
+                .filter(validGroup -> validGroup.startsWith(group))
+                .findAny()
+                .isPresent();
+
+        if (isValidGroup) {
+            List<String> validGroups = groups.stream()
+                    .filter(validGroup -> validGroup.startsWith(group))
+                    .collect(Collectors.toList());
+            // get all labels that contain search query
+            // fade out labels which do not match
+            bottomLabels = allLabels
+                    .stream()
+                    .map(label -> new PickerLabel(label, this))
+                    .map(label -> {
+                        if (resultList.get(label.getActualName())) {
+                            label.setIsSelected(true); // add tick if selected
+                        }
+                        if (!label.getGroup().isPresent() ||
+                                !validGroups.contains(label.getGroup().get()) ||
+                                !label.getName().contains(match)) {
+                            label.setIsFaded(true); // fade out if does not match search query
+                        }
+                        return label;
+                    })
+                    .collect(Collectors.toList());
+            if (!bottomLabels.isEmpty()) highlightFirstMatchingItem();
+        } else {
+            updateBottomLabels(match);
+        }
+    }
+
     private void updateBottomLabels(String match) {
         // get all labels that contain search query
         // fade out labels which do not match
@@ -350,15 +385,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 })
                 .collect(Collectors.toList());
 
-        if (!match.isEmpty() && !bottomLabels.isEmpty()) {
-            // highlight the first matching item
-            bottomLabels.stream()
-                    .filter(label -> containsIgnoreCase(label.getActualName(), match))
-                    .findFirst()
-                    .ifPresent(label -> {
-                        label.setIsHighlighted(true);
-                    });
-        }
+        if (!match.isEmpty() && !bottomLabels.isEmpty()) highlightFirstMatchingItem();
+    }
+
+    private void highlightFirstMatchingItem() {
+        bottomLabels.stream()
+                .filter(label -> !label.isFaded())
+                .findFirst()
+                .ifPresent(label -> label.setIsHighlighted(true));
     }
 
     private void processTextFieldChange(String text) {
@@ -368,7 +402,25 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (previousNumberOfActions != textArray.length || !query.equals(lastAction)) {
                 previousNumberOfActions = textArray.length;
                 lastAction = query;
-                updateBottomLabels(query);
+                boolean isBottomLabelsUpdated = false;
+
+                // group check
+                if (TurboLabel.getDelimiter(query).isPresent()) {
+                    String delimiter = TurboLabel.getDelimiter(query).get();
+                    String[] queryArray = query.split(Pattern.quote(delimiter));
+                    if (queryArray.length == 1) {
+                        isBottomLabelsUpdated = true;
+                        updateBottomLabels(queryArray[0], "");
+                    } else if (queryArray.length == 2) {
+                        isBottomLabelsUpdated = true;
+                        updateBottomLabels(queryArray[0], queryArray[1]);
+                    }
+                }
+
+                if (!isBottomLabelsUpdated) {
+                    updateBottomLabels(query);
+                }
+
                 if (hasHighlightedLabel()) {
                     addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
                 } else {
