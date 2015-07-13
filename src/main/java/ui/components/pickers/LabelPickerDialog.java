@@ -29,6 +29,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private FlowPane bottomPane;
     private Optional<String> possibleAddition = Optional.empty();
     private String lastAction = "";
+    private int previousNumberOfActions = 0;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -286,6 +287,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         if (issue.getLabels().contains(possibleAddition.get()) ||
                                 resultList.get(possibleAddition.get())) {
                             // if it is an existing label toggle fade and strike through
+                            label.setIsHighlighted(false);
                             label.setIsFaded(false);
                             if (resultList.get(label.getActualName())) {
                                 label.setIsRemoved(false);
@@ -308,6 +310,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .filter(label -> label.getActualName().equals(name))
                         .findFirst()
                         .ifPresent(label -> {
+                            label.setIsHighlighted(true);
                             if (issue.getLabels().contains(name)) {
                                 // if it is an existing label toggle fade and strike through
                                 label.setIsFaded(resultList.get(name));
@@ -323,7 +326,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 allLabels.stream()
                         .filter(label -> label.getActualName().equals(name))
                         .findFirst()
-                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, false, false, true)));
+                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, true, false, true)));
             }
             possibleAddition = Optional.of(name);
         }
@@ -361,7 +364,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         String[] textArray = text.split(" ");
         if (textArray.length > 0) {
             String query = textArray[textArray.length - 1];
-            if (!query.equals(lastAction)) {
+            if (previousNumberOfActions != textArray.length || !query.equals(lastAction)) {
+                previousNumberOfActions = textArray.length;
                 lastAction = query;
                 updateBottomLabels(query);
                 if (hasHighlightedLabel()) {
