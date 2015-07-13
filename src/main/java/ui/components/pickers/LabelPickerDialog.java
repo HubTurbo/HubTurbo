@@ -307,7 +307,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     .filter(label -> label.getActualName().equals(possibleAddition.get()))
                     .findFirst()
                     .ifPresent(label -> {
-                        if (issue.getLabels().contains(possibleAddition.get())) {
+                        if (issue.getLabels().contains(possibleAddition.get()) ||
+                                resultList.get(possibleAddition.get())) {
                             // if it is an existing label toggle fade and strike through
                             label.setIsFaded(false);
                             if (resultList.get(label.getActualName())) {
