@@ -35,7 +35,7 @@ public class PickerLabel extends TurboLabel {
 
     @Override
     public Node getNode() {
-        Label label = new Label(getName() + (isSelected ? " ✓" : "")); // add selection tick
+        Label label = new Label(getActualName() + (isSelected ? " ✓" : "")); // add selection tick
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
