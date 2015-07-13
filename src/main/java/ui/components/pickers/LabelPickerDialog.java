@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
-    public static final int VBOX_SPACING = 105; // seems like some magic number
+    private static final int VBOX_SPACING = 105; // seems like some magic number
+    private static final int ELEMENT_MAX_WIDTH = 400;
 
     private TurboIssue issue;
     private TextField textField;
@@ -33,7 +34,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
-        setHeaderText((issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
 
         this.issue = issue;
         this.allLabels = allLabels;
@@ -49,8 +49,19 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         vBox.setPadding(new Insets(10));
         vBox.setPrefHeight(1);
 
+        Label titleLabel = new Label(
+                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
+        titleLabel.setWrapText(true);
+        titleLabel.setMaxWidth(ELEMENT_MAX_WIDTH);
+        titleLabel.setStyle("-fx-font-size: 125%");
+        Tooltip titleTooltip = new Tooltip(
+                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
+        titleTooltip.setWrapText(true);
+        titleTooltip.setMaxWidth(500);
+        titleLabel.setTooltip(titleTooltip);
+
         topPane = new FlowPane();
-        topPane.setPadding(new Insets(0, 0, 10, 0));
+        topPane.setPadding(new Insets(20, 0, 10, 0));
         topPane.setHgap(5);
         topPane.setVgap(5);
 
@@ -67,7 +78,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         updateBottomLabels("");
         populatePanes();
 
-        vBox.getChildren().addAll(topPane, textField, bottomPane);
+        vBox.getChildren().addAll(titleLabel, topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
         vBox.heightProperty().addListener((observable, oldValue, newValue) -> {
             setHeight(newValue.intValue() + VBOX_SPACING); // dialog box should auto-resize
