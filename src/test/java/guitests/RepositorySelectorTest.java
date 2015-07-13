@@ -90,7 +90,7 @@ public class RepositorySelectorTest extends UITest {
         assertEquals("dummy3/dummy3", primaryRepo);
 
         // exit program
-        click("Preferences");
+        click("File");
         click("Quit");
 
         // testing that the correct repo was saved in the json

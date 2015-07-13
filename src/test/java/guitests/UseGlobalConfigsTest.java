@@ -62,7 +62,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("OK");
 
         // Then exit program...
-        click("Preferences");
+        click("File");
         click("Quit");
 
         // ...and check if the test JSON is still there...
