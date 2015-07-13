@@ -28,6 +28,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private FlowPane topPane;
     private FlowPane bottomPane;
     private Optional<String> possibleAddition = Optional.empty();
+    private String lastAction = "";
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
         initOwner(stage);
@@ -133,31 +134,18 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void setupKeyEvents() {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.equals(" ")) {
-                textField.setText("");
-            } else {
-                updateBottomLabels(newValue.toLowerCase());
-                if (hasHighlightedLabel()) {
-                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
-                } else {
-                    addRemovePossibleLabel("");
-                }
-                populatePanes();
-            }
+            processTextFieldChange(newValue.toLowerCase());
         });
         textField.setOnKeyPressed(e -> {
             if (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown()) {
                 if (e.getCode() == KeyCode.DOWN) {
                     e.consume();
                     moveHighlightOnLabel(true);
-                    populatePanes();
                 } else if (e.getCode() == KeyCode.UP) {
                     e.consume();
                     moveHighlightOnLabel(false);
-                    populatePanes();
                 } else if (e.getCode() == KeyCode.SPACE) {
                     e.consume();
-                    addRemovePossibleLabel("");
                     toggleSelectedLabel();
                 }
             }
@@ -166,12 +154,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     public void toggleLabel(String name) {
         processLabelChange(name);
-        textField.setText("");
         updateBottomLabels("");
         populatePanes();
     }
 
     private void toggleSelectedLabel() {
+        addRemovePossibleLabel("");
         if (!bottomLabels.isEmpty() && !textField.getText().isEmpty() && hasHighlightedLabel()) {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
@@ -224,17 +212,16 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .ifPresent(label -> topLabels.add(new PickerLabel(label, this)));
             }
         } else {
-            if (issue.getLabels().contains(name)) {
-                topLabels.stream()
-                        .filter(label -> label.getActualName().equals(name))
-                        .findFirst()
-                        .ifPresent(label -> label.setIsRemoved(true));
-            } else {
-                topLabels.stream()
-                        .filter(label -> label.getActualName().equals(name))
-                        .findFirst()
-                        .ifPresent(topLabels::remove);
-            }
+            topLabels.stream()
+                    .filter(label -> label.getActualName().equals(name))
+                    .findFirst()
+                    .ifPresent(label -> {
+                        if (issue.getLabels().contains(name)) {
+                            label.setIsRemoved(true);
+                        } else {
+                            topLabels.remove(label);
+                        }
+                    });
         }
     }
 
@@ -244,34 +231,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .filter(label -> label.getActualName().equals(name))
                 .findAny()
                 .isPresent();
-    }
-
-    private void updateBottomLabels(String match) {
-        // get all labels that contain search query
-        // fade out labels which do not match
-        bottomLabels = allLabels
-                .stream()
-                .map(label -> new PickerLabel(label, this))
-                .map(label -> {
-                    if (resultList.get(label.getActualName())) {
-                        label.setIsSelected(true); // add tick if selected
-                    }
-                    if (!match.isEmpty() && !containsIgnoreCase(label.getActualName(), match)) {
-                        label.setIsFaded(true); // fade out if does not match search query
-                    }
-                    return label;
-                })
-                .collect(Collectors.toList());
-
-        if (!match.isEmpty() && !bottomLabels.isEmpty()) {
-            // highlight the first matching item
-            bottomLabels.stream()
-                    .filter(label -> containsIgnoreCase(label.getActualName(), match))
-                    .findFirst()
-                    .ifPresent(label -> {
-                        label.setIsHighlighted(true);
-                    });
-        }
     }
 
     private boolean hasHighlightedLabel() {
@@ -312,6 +271,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     return;
                 }
             }
+
+            populatePanes();
         }
     }
 
@@ -366,6 +327,51 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, false, false, true)));
             }
             possibleAddition = Optional.of(name);
+        }
+    }
+
+    private void updateBottomLabels(String match) {
+        // get all labels that contain search query
+        // fade out labels which do not match
+        bottomLabels = allLabels
+                .stream()
+                .map(label -> new PickerLabel(label, this))
+                .map(label -> {
+                    if (resultList.get(label.getActualName())) {
+                        label.setIsSelected(true); // add tick if selected
+                    }
+                    if (!match.isEmpty() && !containsIgnoreCase(label.getActualName(), match)) {
+                        label.setIsFaded(true); // fade out if does not match search query
+                    }
+                    return label;
+                })
+                .collect(Collectors.toList());
+
+        if (!match.isEmpty() && !bottomLabels.isEmpty()) {
+            // highlight the first matching item
+            bottomLabels.stream()
+                    .filter(label -> containsIgnoreCase(label.getActualName(), match))
+                    .findFirst()
+                    .ifPresent(label -> {
+                        label.setIsHighlighted(true);
+                    });
+        }
+    }
+
+    private void processTextFieldChange(String text) {
+        String[] textArray = text.split(" ");
+        if (textArray.length > 0) {
+            String query = textArray[textArray.length - 1];
+            if (!query.equals(lastAction)) {
+                lastAction = query;
+                updateBottomLabels(query);
+                if (hasHighlightedLabel()) {
+                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
+                } else {
+                    addRemovePossibleLabel("");
+                }
+                populatePanes();
+            }
         }
     }
 
