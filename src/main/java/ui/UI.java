@@ -9,6 +9,7 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -334,6 +335,7 @@ public class UI extends Application implements EventDispatcher {
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
 
         HBox repoSelectorBar = new HBox();
+        repoSelectorBar.setAlignment(Pos.CENTER_LEFT);
         repoSelectorBar.getChildren().addAll(repoSelector, apiBox);
 
         top.getChildren().addAll(menuBar, repoSelectorBar);
