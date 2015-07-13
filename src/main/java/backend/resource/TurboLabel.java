@@ -65,7 +65,7 @@ public class TurboLabel {
     private void ______METHODS______() {
     }
 
-    private Optional<String> getDelimiter() {
+    public static Optional<String> getDelimiter(String name) {
 
         // Escaping due to constants not being valid regexes
         Pattern p = Pattern.compile(String.format("^[^\\%s\\%s]+(\\%s|\\%s)",
@@ -73,7 +73,7 @@ public class TurboLabel {
             NONEXCLUSIVE_DELIMITER,
             EXCLUSIVE_DELIMITER,
             NONEXCLUSIVE_DELIMITER));
-        Matcher m = p.matcher(actualName);
+        Matcher m = p.matcher(name);
 
         if (m.find()) {
             return Optional.of(m.group(1));
@@ -87,12 +87,12 @@ public class TurboLabel {
     }
 
     public boolean isExclusive() {
-        return getDelimiter().isPresent() && getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
+        return getDelimiter(actualName).isPresent() && getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER);
     }
 
     public Optional<String> getGroup() {
-        if (getDelimiter().isPresent()) {
-            String delimiter = getDelimiter().get();
+        if (getDelimiter(actualName).isPresent()) {
+            String delimiter = getDelimiter(actualName).get();
             // Escaping due to constants not being valid regexes
             String[] segments = actualName.split("\\" + delimiter);
             assert segments.length >= 1;
@@ -116,8 +116,8 @@ public class TurboLabel {
     }
 
     public String getName() {
-        if (getDelimiter().isPresent()) {
-            String delimiter = getDelimiter().get();
+        if (getDelimiter(actualName).isPresent()) {
+            String delimiter = getDelimiter(actualName).get();
             // Escaping due to constants not being valid regexes
             String[] segments = actualName.split("\\" + delimiter);
             assert segments.length >= 1;
