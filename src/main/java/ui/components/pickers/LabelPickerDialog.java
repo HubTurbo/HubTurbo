@@ -264,15 +264,16 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                     if (isDown && i < matchingLabels.size() - 1) {
                         matchingLabels.get(i).setIsHighlighted(false);
                         matchingLabels.get(i + 1).setIsHighlighted(true);
+                        addRemovePossibleLabel(matchingLabels.get(i + 1).getActualName());
                     } else if (!isDown && i > 0) {
                         matchingLabels.get(i - 1).setIsHighlighted(true);
                         matchingLabels.get(i).setIsHighlighted(false);
+                        addRemovePossibleLabel(matchingLabels.get(i - 1).getActualName());
                     }
+                    populatePanes();
                     return;
                 }
             }
-
-            populatePanes();
         }
     }
 
