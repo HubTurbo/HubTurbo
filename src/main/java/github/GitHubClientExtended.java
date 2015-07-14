@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
 import util.IOUtilities;
+import util.Utility;
 
 public class GitHubClientExtended extends GitHubClient {
     public static final int NO_UPDATE_RESPONSE_CODE = 304;
@@ -106,6 +111,33 @@ public class GitHubClientExtended extends GitHubClient {
     }
 
     /**
+     * Accesses the Rate Limit API endpoint to retrieve the number of remaining requests for the hour,
+     * as well as the next reset time. Calling this function itself does not count towards the API limit.
+     *
+     * @return A pair consisting of the number of requests remaining for the hour and the next reset time.
+     * @throws IOException
+     */
+    @SuppressWarnings("unchecked")
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+        HttpURLConnection httpRequest = createGet("/rate_limit");
+        if (isOk(httpRequest.getResponseCode())) {
+            // We extract from rate, which is similar to resources.core
+            String json = String.valueOf(
+                    IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
+            Map<String, Object> map =
+                    new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+            Map<String, Double> mapRate = (Map<String, Double>) map.get("rate");
+
+            long reset = mapRate.get("reset").longValue() * 1000; // seconds to milliseconds
+            int remaining = mapRate.get("remaining").intValue();
+
+            return new ImmutablePair<>(remaining, reset);
+        } else {
+            throw new IOException(httpRequest.getResponseCode() + " " + httpRequest.getResponseMessage());
+        }
+    }
+
+    /**
      * Overridden to make public.
      */
     @Override
@@ -165,24 +197,4 @@ public class GitHubClientExtended extends GitHubClient {
     public void sendParams(HttpURLConnection request, Object params) throws IOException {
         super.sendParams(request, params);
     }
-
-    // TODO re-enable this
-//    public Optional<LocalDateTime> getRateLimitResetTime() {
-//        try {
-//            HttpURLConnection httpRequest = createGet("/rate_limit");
-//            if (isOk(httpRequest.getResponseCode())) {
-//                String json = String.valueOf(
-// IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
-//                Map<String, Object> map =
-//                    new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
-//                double unixSeconds = ((Map<String, Map<String, Double>>) map.get("resources"))
-//                    .get("core").get("reset");
-//                return Optional.of(Utility.longToLocalDateTime((long) unixSeconds * 1000));
-//            } else {
-//                return Optional.empty();
-//            }
-//        } catch (IOException e) {
-//            return Optional.empty();
-//        }
-//    }
 }

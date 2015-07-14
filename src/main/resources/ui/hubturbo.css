@@ -203,3 +203,7 @@
     -fx-font-weight: bold;
 }
 
+.text-grey {
+    -fx-text-fill: derive(black, 90%);
+}
+

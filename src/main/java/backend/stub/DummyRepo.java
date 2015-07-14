@@ -147,4 +147,14 @@ public class DummyRepo implements Repo {
     public boolean isRepositoryValid(String repoId) {
         return true;
     }
+
+    /**
+     * Presents reasonable defaults to the user.
+     *
+     * @return 3500 remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
+     */
+    @Override
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() {
+        return new ImmutablePair<>(3500, new Date().getTime() + 2700000);
+    }
 }

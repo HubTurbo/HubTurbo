@@ -2,8 +2,10 @@ package backend;
 
 import backend.resource.MultiModel;
 import javafx.application.Platform;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.UI;
 import util.events.ModelUpdatedEvent;
+import util.events.UpdateRateLimitsEvent;
 
 public class UIManager {
 
@@ -20,6 +22,10 @@ public class UIManager {
 
     public void updateNow(MultiModel models) {
         ui.triggerEvent(new ModelUpdatedEvent(models, false));
+    }
+
+    public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
+        ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.left, rateLimits.right));
     }
 }
 

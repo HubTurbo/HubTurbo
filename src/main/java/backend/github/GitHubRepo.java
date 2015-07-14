@@ -33,6 +33,7 @@ import github.update.*;
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
+
 public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -231,6 +232,11 @@ public class GitHubRepo implements Repo {
             HTLog.error(logger, e);
         }
         return false;
+    }
+
+    @Override
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+        return client.getRateLimitResetTime();
     }
 }
 

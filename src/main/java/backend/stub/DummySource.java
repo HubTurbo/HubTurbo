@@ -4,6 +4,7 @@ import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import util.Futures;
 
 import java.util.List;
@@ -44,5 +45,10 @@ public class DummySource extends RepoSource {
     @Override
     public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return Futures.unit(true);
+    }
+
+    @Override
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+        return addTask(new CheckRateLimitTask(this, dummy)).response;
     }
 }

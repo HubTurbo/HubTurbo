@@ -1,5 +1,7 @@
 package backend.interfaces;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,4 +36,5 @@ public interface Repo {
     List<Comment> getComments(String repoId, int issueId);
 
     boolean isRepositoryValid(String repoId);
+    ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
 }

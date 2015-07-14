@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -11,18 +12,21 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.ocpsoft.prettytime.PrettyTime;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
+import util.DialogMessage;
+import util.Utility;
 import util.events.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 public class MenuControl extends MenuBar {
 
@@ -42,6 +46,8 @@ public class MenuControl extends MenuBar {
     }
 
     private void createMenuItems() {
+        Menu file = createFileMenu();
+
         Menu newMenu = new Menu("New");
         newMenu.getItems().addAll(createNewMenuItems());
 
@@ -52,16 +58,14 @@ public class MenuControl extends MenuBar {
 
         Menu view = new Menu("View");
         view.getItems().addAll(
-            createRefreshMenuItem(),
-            createDocumentationMenuItem());
+                createRefreshMenuItem(),
+                createDocumentationMenuItem());
 
-        Menu preferences = createPreferencesMenu();
-
-        getMenus().addAll(newMenu, panels, boards, view, preferences);
+        getMenus().addAll(file, newMenu, panels, boards, view);
     }
 
-    private Menu createPreferencesMenu() {
-        Menu preferences = new Menu("Preferences");
+    private Menu createFileMenu() {
+        Menu file = new Menu("File");
         
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
@@ -76,9 +80,9 @@ public class MenuControl extends MenuBar {
             ui.quit();
         });
         
-        preferences.getItems().addAll(logout, quit);
+        file.getItems().addAll(logout, quit);
         
-        return preferences;
+        return file;
 
     }
 
@@ -280,8 +284,8 @@ public class MenuControl extends MenuBar {
     public void scrollTo(int panelIndex, int numOfPanels){
         setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (numOfPanels - 1));
     }
+
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
     }
-
 }

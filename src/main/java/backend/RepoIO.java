@@ -8,6 +8,7 @@ import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
@@ -107,5 +108,9 @@ public class RepoIO {
 
     public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
         return repoSource.downloadMetadata(repoId, issues);
+    }
+
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+        return repoSource.getRateLimitResetTime();
     }
 }
