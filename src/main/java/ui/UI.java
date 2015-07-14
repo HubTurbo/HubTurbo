@@ -4,11 +4,9 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
-
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -21,10 +19,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
@@ -43,7 +39,6 @@ import util.events.testevents.UILogicRefreshEventHandler;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
