@@ -1,6 +1,5 @@
 package backend.interfaces;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -28,20 +27,18 @@ public abstract class RepoSource implements TaskRunner {
     }
 
     public abstract String getName();
+
     public abstract CompletableFuture<Boolean> login(UserCredentials credentials);
+
     public abstract CompletableFuture<Model> downloadRepository(String repoId);
+
     public abstract CompletableFuture<Model> updateModel(Model model);
 
     public abstract CompletableFuture<Map<Integer, IssueMetadata>>
         downloadMetadata(String repoId, List<Integer> issues);
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
-    public abstract CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime();
 
-    /**
-     * Does not initiate a connection with the API, so we don't need to use the executor service here.
-     *
-     * @return The remaining possible requests within the hour, as kept track of by the GitHubClientExtended.
-     */
-    public abstract int getRemainingRate();
+    public abstract CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime();
+
 }

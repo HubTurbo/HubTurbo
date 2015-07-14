@@ -7,7 +7,6 @@ import backend.resource.Model;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import util.Futures;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -49,12 +48,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, dummy)).response;
-    }
-
-    @Override
-    public int getRemainingRate() {
-        return dummy.getRemainingRate();
     }
 }

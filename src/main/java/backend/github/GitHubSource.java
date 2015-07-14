@@ -1,6 +1,5 @@
 package backend.github;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -61,12 +60,7 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, gitHub)).response;
-    }
-
-    @Override
-    public int getRemainingRate() {
-        return gitHub.getRemainingRate();
     }
 }
