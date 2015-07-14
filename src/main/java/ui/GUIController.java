@@ -14,8 +14,11 @@ import javafx.scene.control.Label;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.UIBrowserBridge;
+import util.Utility;
 import util.events.ModelUpdatedEvent;
 import util.events.ModelUpdatedEventHandler;
+import util.events.UpdateRateLimitsEvent;
+import util.events.UpdateRateLimitsEventHandler;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +55,7 @@ public class GUIController {
 
     public void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
+        UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
     }
 
     /**
@@ -68,10 +72,6 @@ public class GUIController {
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        if (e.remainingRequests.isPresent()) {
-            Platform.runLater(() -> apiBox.setText("API Rate Limit: " + e.remainingRequests.get()));
-        }
-
         multiModel = e.model;
 
         // Use updatedModel while handling a ModelUpdatedEvent to avoid race conditions.
@@ -301,5 +301,14 @@ public class GUIController {
             if (metaQualifier.getName().equals("updated")) return true;
         }
         return false;
+    }
+
+    private void updateAPIBox(UpdateRateLimitsEvent e) {
+        Platform.runLater(() -> {
+            apiBox.setText(String.format("%s/%s",
+                    e.remainingRequests,
+                    Utility.minutesFromNow(e.nextRefreshInMillisecs)
+            ));
+        });
     }
 }
