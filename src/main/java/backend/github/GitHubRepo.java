@@ -243,5 +243,10 @@ public class GitHubRepo implements Repo {
         }
         return false;
     }
+
+    @Override
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+        return client.getRateLimitResetTime();
+    }
 }
 

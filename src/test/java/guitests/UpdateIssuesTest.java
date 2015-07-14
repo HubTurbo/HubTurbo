@@ -1,18 +1,17 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-
-import org.junit.Test;
-
 import javafx.scene.input.KeyCode;
+import org.junit.Test;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+import static org.junit.Assert.assertEquals;
 
 public class UpdateIssuesTest extends UITest {
 

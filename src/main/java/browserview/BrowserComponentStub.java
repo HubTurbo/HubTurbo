@@ -1,7 +1,6 @@
 package browserview;
 
 import com.sun.jna.platform.win32.WinDef;
-
 import ui.UI;
 
 public class BrowserComponentStub extends BrowserComponent {

@@ -1,17 +1,16 @@
 package backend.resource;
 
+import backend.IssueMetadata;
+import backend.resource.serialization.SerializableIssue;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import util.Utility;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-
-import backend.IssueMetadata;
-import backend.resource.serialization.SerializableIssue;
-import util.Utility;
 
 /**
  * The guidelines in this class apply to all TurboResources.

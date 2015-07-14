@@ -1,14 +1,5 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.QualifierApplicationException;
@@ -16,7 +7,15 @@ import filter.expression.Conjunction;
 import filter.expression.Disjunction;
 import filter.expression.Negation;
 import filter.expression.Qualifier;
+import org.junit.Test;
 import prefs.Preferences;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class FilterApplyTests {
 

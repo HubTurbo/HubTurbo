@@ -1,13 +1,5 @@
 package backend.stub;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -15,10 +7,17 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class DummyRepo implements Repo {
 
@@ -152,5 +151,15 @@ public class DummyRepo implements Repo {
     @Override
     public boolean isRepositoryValid(String repoId) {
         return true;
+    }
+
+    /**
+     * Presents reasonable defaults to the user.
+     *
+     * @return 3500 remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
+     */
+    @Override
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() {
+        return new ImmutablePair<>(3500, new Date().getTime() + 2700000);
     }
 }

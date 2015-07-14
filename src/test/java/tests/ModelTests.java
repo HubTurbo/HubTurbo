@@ -1,17 +1,16 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
-import java.util.*;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import backend.UpdateSignature;
 import backend.resource.*;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummyRepo;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ModelTests {
 

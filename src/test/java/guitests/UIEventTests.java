@@ -1,12 +1,8 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
-import tests.TestUtils;
+import org.junit.Test;
 import ui.UI;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
@@ -14,6 +10,8 @@ import util.events.MilestoneCreatedEventHandler;
 import util.events.PanelClickedEventHandler;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
+
+import static org.junit.Assert.assertEquals;
 
 public class UIEventTests extends UITest {
 

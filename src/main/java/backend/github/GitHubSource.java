@@ -1,18 +1,18 @@
 package backend.github;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import backend.resource.TurboIssue;
-import org.apache.logging.log4j.Logger;
-
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
+import backend.resource.TurboIssue;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.Logger;
 import util.HTLog;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
 
@@ -63,4 +63,10 @@ public class GitHubSource extends RepoSource {
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return addTask(new ReplaceIssueLabelsTask(this, gitHub, issue.getRepoId(), issue.getId(), labels)).response;
     }
+
+@Override
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+        return addTask(new CheckRateLimitTask(this, gitHub)).response;
+    }
+
 }

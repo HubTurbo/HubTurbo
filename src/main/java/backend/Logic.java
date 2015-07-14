@@ -4,6 +4,7 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import prefs.Preferences;
@@ -16,7 +17,10 @@ import util.events.testevents.ClearLogicModelEventHandler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -82,6 +86,8 @@ public class Logic {
             .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::updateUI)
+                .thenCompose(n -> getRateLimitResetTime())
+                .thenApply(this::updateRemainingRate)
                 .exceptionally(Futures::log);
     }
 
@@ -113,13 +119,15 @@ public class Logic {
                         .thenApply(models::addPending)
                         .thenRun(this::updateUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                        .thenApply(n -> true)
+                        .thenCompose(n -> getRateLimitResetTime())
+                        .thenApply(this::updateRemainingRate)
+                        .thenApply(rateLimits -> true)
                         .exceptionally(withResult(false));
             }
         });
     }
 
-    public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<Integer> issues) {
         String message = "Getting metadata for " + repoId + "...";
         logger.info("Getting metadata for issues " + issues);
         UI.status.displayMessage(message);
@@ -132,8 +140,12 @@ public class Logic {
                 UI.status.displayMessage(updatedMessage);
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
-            }).thenApply(Futures.tap(this::updateUIAndShow))
-            .exceptionally(withResult(new HashMap<>()));
+            })
+            .thenApply(Futures.tap(this::updateUIWithMetadata))
+            .thenCompose(n -> getRateLimitResetTime())
+            .thenApply(this::updateRemainingRate)
+            .thenApply(rateLimits -> true)
+            .exceptionally(withResult(false));
     }
 
     // Adds update times to the metadata map
@@ -212,12 +224,22 @@ public class Logic {
         uiManager.update(models, true);
     }
 
+    private ImmutablePair<Integer, Long> updateRemainingRate
+            (ImmutablePair<Integer, Long> rateLimits) {
+        uiManager.updateRateLimits(rateLimits);
+        return rateLimits;
+    }
+
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
         return repoIO.login(credentials);
     }
 
     public Model getRepo(String repoId) {
         return models.get(repoId);
+    }
+
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+        return repoIO.getRateLimitResetTime();
     }
 
     /**

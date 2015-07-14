@@ -1,10 +1,10 @@
 package tests;
 
-import static org.junit.Assert.*;
-
+import filter.expression.NumberRange;
 import org.junit.Test;
 
-import filter.expression.NumberRange;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class NumberRangeTest {
 

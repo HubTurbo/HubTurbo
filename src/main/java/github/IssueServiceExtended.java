@@ -1,16 +1,16 @@
 package github;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.*;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-import org.eclipse.egit.github.core.service.IssueService;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 public class IssueServiceExtended extends IssueService{
     private GitHubClientExtended ghClient;

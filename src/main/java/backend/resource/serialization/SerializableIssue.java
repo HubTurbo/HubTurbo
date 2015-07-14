@@ -1,11 +1,11 @@
 package backend.resource.serialization;
 
+import backend.resource.TurboIssue;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import backend.resource.TurboIssue;
 
 public class SerializableIssue {
     private int id = 0;

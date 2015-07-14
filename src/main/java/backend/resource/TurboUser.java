@@ -1,9 +1,8 @@
 package backend.resource;
 
-import org.eclipse.egit.github.core.User;
-
 import backend.resource.serialization.SerializableUser;
 import javafx.scene.image.Image;
+import org.eclipse.egit.github.core.User;
 
 @SuppressWarnings("unused")
 public class TurboUser {

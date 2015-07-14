@@ -156,7 +156,7 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.DOCS_PAGE, url);
         clearUrl();
 
-        click("Preferences");
+        click("File");
         click("Logout");
     }
 

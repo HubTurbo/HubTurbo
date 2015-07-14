@@ -1,11 +1,5 @@
 package github;
 
-import java.util.Date;
-import java.util.Optional;
-
-import org.eclipse.egit.github.core.User;
-import org.ocpsoft.prettytime.PrettyTime;
-
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -14,7 +8,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import org.eclipse.egit.github.core.User;
+import org.ocpsoft.prettytime.PrettyTime;
 import util.Utility;
+
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * Models an event that could happen to an issue.

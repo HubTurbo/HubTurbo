@@ -1,13 +1,13 @@
 package backend.resource;
 
+import backend.UpdateSignature;
+import backend.interfaces.IBaseModel;
+import backend.resource.serialization.SerializableModel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import backend.UpdateSignature;
-import backend.interfaces.IBaseModel;
-import backend.resource.serialization.SerializableModel;
 
 @SuppressWarnings("unused")
 public class Model implements IBaseModel {

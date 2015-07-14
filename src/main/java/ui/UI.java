@@ -9,10 +9,13 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -76,6 +79,7 @@ public class UI extends Application implements EventDispatcher {
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
     private LabelPicker labelPicker;
+    private Label apiBox;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -198,11 +202,13 @@ public class UI extends Application implements EventDispatcher {
 
     private void initUI(Stage stage) {
         repoSelector = createRepoSelector();
+        apiBox = new Label("-/-");
+
         mainStage = stage;
         stage.setMaximized(false);
 
         panels = new PanelControl(this, prefs);
-        guiController = new GUIController(this, panels);
+        guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRoot());
         setupMainStage(scene);
@@ -340,7 +346,15 @@ public class UI extends Application implements EventDispatcher {
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
-        top.getChildren().addAll(menuBar, repoSelector);
+        menuBar.setUseSystemMenuBar(true);
+
+        HBox repoSelectorBar = new HBox();
+        repoSelectorBar.setAlignment(Pos.CENTER_LEFT);
+        apiBox.getStyleClass().add("text-grey");
+        apiBox.setTooltip(new Tooltip("Remaining calls / Minutes to next refresh"));
+        repoSelectorBar.getChildren().addAll(repoSelector, apiBox);
+
+        top.getChildren().addAll(menuBar, repoSelectorBar);
 
         BorderPane root = new BorderPane();
         root.setTop(top);

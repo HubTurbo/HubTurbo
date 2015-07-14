@@ -1,20 +1,19 @@
 package backend.interfaces;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-
 import backend.UserCredentials;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 public interface Repo {
 
@@ -37,4 +36,6 @@ public interface Repo {
 
     boolean isRepositoryValid(String repoId);
     List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException;
+    ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
+
 }

@@ -10,17 +10,17 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
-import ui.issuepanel.PanelControl;
+import javafx.scene.control.Label;
 import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
+import util.Utility;
 import util.events.ModelUpdatedEvent;
 import util.events.ModelUpdatedEventHandler;
+import util.events.UpdateRateLimitsEvent;
+import util.events.UpdateRateLimitsEventHandler;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Comparator;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -31,14 +31,16 @@ import java.util.function.Predicate;
 public class GUIController {
     private PanelControl panelControl;
     private UI ui;
+    private Label apiBox;
 
     // Synchronised with Logic's latest updated multimodel.
     // Not to be modified from this point or any further in the GUI.
     private IModel multiModel;
 
-    public GUIController(UI ui, PanelControl panelControl) {
+    public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
         this.panelControl = panelControl;
+        this.apiBox = apiBox;
 
         // Set up the connection to the browser
         new UIBrowserBridge(ui);
@@ -49,6 +51,7 @@ public class GUIController {
 
     public void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
+        UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
     }
 
     /**
@@ -294,5 +297,14 @@ public class GUIController {
             if (metaQualifier.getName().equals("updated")) return true;
         }
         return false;
+    }
+
+    private void updateAPIBox(UpdateRateLimitsEvent e) {
+        Platform.runLater(() -> {
+            apiBox.setText(String.format("%s/%s",
+                    e.remainingRequests,
+                    Utility.minutesFromNow(e.nextRefreshInMillisecs)
+            ));
+        });
     }
 }

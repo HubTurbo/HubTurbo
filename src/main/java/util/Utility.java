@@ -105,6 +105,14 @@ public class Utility {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
+    public static long millisecToMinutes(long millisecDuration) {
+        return millisecDuration / 1000 / 60;
+    }
+
+    public static long minutesFromNow(long targetTime) {
+        return millisecToMinutes(targetTime - new Date().getTime());
+    }
+
     /**
      * Parses a version number string in the format V1.2.3.
      * @param version version number string
