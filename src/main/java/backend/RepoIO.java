@@ -8,13 +8,11 @@ import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -112,11 +110,7 @@ public class RepoIO {
         return repoSource.downloadMetadata(repoId, issues);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
-    }
-
-    public int getRemainingRate() {
-        return repoSource.getRemainingRate();
     }
 }
