@@ -334,6 +334,7 @@ public class UI extends Application implements EventDispatcher {
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
+        menuBar.setUseSystemMenuBar(true);
 
         HBox repoSelectorBar = new HBox();
         repoSelectorBar.setAlignment(Pos.CENTER_LEFT);
