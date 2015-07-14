@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -119,7 +118,7 @@ public class GitHubClientExtended extends GitHubClient {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() throws IOException {
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
         HttpURLConnection httpRequest = createGet("/rate_limit");
         if (isOk(httpRequest.getResponseCode())) {
             // We extract from rate, which is similar to resources.core
@@ -129,11 +128,10 @@ public class GitHubClientExtended extends GitHubClient {
                     new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
             Map<String, Double> mapRate = (Map<String, Double>) map.get("rate");
 
-            long reset = mapRate.get("reset").longValue();
+            long reset = mapRate.get("reset").longValue() * 1000; // seconds to milliseconds
             int remaining = mapRate.get("remaining").intValue();
 
-            LocalDateTime nextReset = Utility.longToLocalDateTime(reset);
-            return new ImmutablePair<>(remaining, nextReset);
+            return new ImmutablePair<>(remaining, reset);
         } else {
             throw new IOException(httpRequest.getResponseCode() + " " + httpRequest.getResponseMessage());
         }
