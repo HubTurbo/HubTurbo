@@ -6,6 +6,7 @@ import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import util.Futures;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,11 @@ public class DummySource extends RepoSource {
     @Override
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return addTask(new ReplaceIssueLabelsTask(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+        return Futures.unit(true);
     }
 
     @Override

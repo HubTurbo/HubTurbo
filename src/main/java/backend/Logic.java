@@ -141,7 +141,7 @@ public class Logic {
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
             })
-            .thenApply(Futures.tap(this::updateUIWithMetadata))
+            .thenApply(Futures.tap(this::updateUIAndShow))
             .thenCompose(n -> getRateLimitResetTime())
             .thenApply(this::updateRemainingRate)
             .thenApply(rateLimits -> true)
