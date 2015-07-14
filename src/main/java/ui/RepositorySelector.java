@@ -1,12 +1,14 @@
 package ui;
 
 import com.google.common.collect.Ordering;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import util.Utility;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RepositorySelector extends HBox {
@@ -49,6 +51,10 @@ public class RepositorySelector extends HBox {
     private void loadContents() {
         comboBox.getItems().addAll(ui.logic.getStoredRepos());
         comboBox.getItems().sort(Ordering.natural());
+    }
+    
+    public List<String> getContents() {
+        return comboBox.getItems();
     }
 
     public String getText() {

@@ -146,6 +146,9 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
+            if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
+                ui.switchDefaultRepo();
+            }
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -252,6 +255,9 @@ public class ListPanel extends FilterPanel {
             }
             if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
+            }
+            if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
+                ui.switchDefaultRepo();
             }
         });
     }
