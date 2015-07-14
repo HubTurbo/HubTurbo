@@ -4,7 +4,6 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -34,6 +33,7 @@ import github.update.*;
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
+
 public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -235,13 +235,8 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() throws IOException {
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
         return client.getRateLimitResetTime();
-    }
-
-    @Override
-    public int getRemainingRate() {
-        return client.getRemainingRequests();
     }
 }
 

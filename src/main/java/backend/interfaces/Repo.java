@@ -36,6 +36,5 @@ public interface Repo {
     List<Comment> getComments(String repoId, int issueId);
 
     boolean isRepositoryValid(String repoId);
-    ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() throws IOException;
-    int getRemainingRate();
+    ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
 }

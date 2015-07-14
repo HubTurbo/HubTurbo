@@ -1,6 +1,5 @@
 package backend.stub;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -152,15 +151,10 @@ public class DummyRepo implements Repo {
     /**
      * Presents reasonable defaults to the user.
      *
-     * @return 3500 remaining calls, reset time ~45 minutes from call.
+     * @return 3500 remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
      */
     @Override
-    public ImmutablePair<Integer, LocalDateTime> getRateLimitResetTime() {
-        return new ImmutablePair<>(3500, LocalDateTime.now().plusMinutes(45));
-    }
-
-    @Override
-    public int getRemainingRate() {
-        return 3500;
+    public ImmutablePair<Integer, Long> getRateLimitResetTime() {
+        return new ImmutablePair<>(3500, new Date().getTime() + 2700000);
     }
 }
