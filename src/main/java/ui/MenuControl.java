@@ -59,8 +59,7 @@ public class MenuControl extends MenuBar {
         Menu view = new Menu("View");
         view.getItems().addAll(
                 createRefreshMenuItem(),
-                createDocumentationMenuItem(),
-                createRateLimitsMenuItem());
+                createDocumentationMenuItem());
 
         getMenus().addAll(file, newMenu, panels, boards, view);
     }
@@ -235,17 +234,6 @@ public class MenuControl extends MenuBar {
                 return Stream.of();
             }
         }).collect(Collectors.toList());
-    }
-
-    private MenuItem createRateLimitsMenuItem() {
-        MenuItem rateLimitsMenuItem = new MenuItem("Rate Limits");
-        rateLimitsMenuItem.setOnAction((e) -> {
-            logger.info("Menu: View > Rate Limits");
-            ui.logic.getRateLimitResetTime().whenComplete((rateLimits, ex) ->
-                            showDialogOnAPICheck(rateLimits.left, rateLimits.right, ex)
-            );
-        });
-        return rateLimitsMenuItem;
     }
 
     private MenuItem createDocumentationMenuItem() {
