@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -194,7 +195,7 @@ public class UI extends Application implements EventDispatcher {
 
     private void initUI(Stage stage) {
         repoSelector = createRepoSelector();
-        apiBox = new Label("API Rate Limit: -");
+        apiBox = new Label("-/-");
 
         mainStage = stage;
         stage.setMaximized(false);
@@ -336,6 +337,8 @@ public class UI extends Application implements EventDispatcher {
 
         HBox repoSelectorBar = new HBox();
         repoSelectorBar.setAlignment(Pos.CENTER_LEFT);
+        apiBox.getStyleClass().add("text-grey");
+        apiBox.setTooltip(new Tooltip("Remaining calls / Minutes to next refresh"));
         repoSelectorBar.getChildren().addAll(repoSelector, apiBox);
 
         top.getChildren().addAll(menuBar, repoSelectorBar);
