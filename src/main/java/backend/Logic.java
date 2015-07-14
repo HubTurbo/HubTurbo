@@ -219,12 +219,8 @@ public class Logic {
         return repoIO.login(credentials);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, LocalDateTime>> getRateLimitResetTime() {
+    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
-    }
-
-    private void updateRemainingRate() {
-        remainingRequests = Optional.of(repoIO.getRemainingRate());
     }
 }
 
