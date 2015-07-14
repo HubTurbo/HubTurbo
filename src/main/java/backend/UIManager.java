@@ -2,10 +2,10 @@ package backend;
 
 import backend.resource.MultiModel;
 import javafx.application.Platform;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.UI;
 import util.events.ModelUpdatedEvent;
-
-import java.util.Optional;
+import util.events.UpdateRateLimitsEvent;
 
 public class UIManager {
 
@@ -15,14 +15,17 @@ public class UIManager {
         this.ui = ui;
     }
 
-    public void update(MultiModel models, Optional<Integer> remainingRequests, boolean hasMetadata) {
-        System.out.println(remainingRequests.get());
+    public void update(MultiModel models, boolean hasMetadata) {
         Platform.runLater(() ->
-            ui.triggerEvent(new ModelUpdatedEvent(models, remainingRequests, hasMetadata)));
+            ui.triggerEvent(new ModelUpdatedEvent(models, hasMetadata)));
     }
 
-    public void updateNow(MultiModel models, Optional<Integer> remainingRequests) {
-        ui.triggerEvent(new ModelUpdatedEvent(models, remainingRequests, false));
+    public void updateNow(MultiModel models) {
+        ui.triggerEvent(new ModelUpdatedEvent(models, false));
+    }
+
+    public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
+        ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.left, rateLimits.right));
     }
 }
 

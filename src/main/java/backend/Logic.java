@@ -209,6 +209,10 @@ public class Logic {
 
     private void updateUIWithMetadata() {
         uiManager.update(models, remainingRequests, true);
+    private ImmutablePair<Integer, Long> updateRemainingRate
+            (ImmutablePair<Integer, Long> rateLimits) {
+        uiManager.updateRateLimits(rateLimits);
+        return rateLimits;
     }
 
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
