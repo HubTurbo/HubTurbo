@@ -50,7 +50,9 @@ public class ChromeDriverEx {
             logger.info("Test loading page: " + url);
             testGet();
         } else {
-            if (!isForceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url)) {
+            if ((!isForceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url)) ||
+                    (!isForceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url + "/commits")) ||
+                    (!isForceRefresh && driver.getCurrentUrl().equalsIgnoreCase(url + "/files"))) {
                 logger.info("Already on page: " + url + " will not load it again. ");
             } else {
                 logger.info("Previous page was: " + driver.getCurrentUrl());
