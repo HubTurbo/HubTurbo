@@ -29,7 +29,6 @@ public class Logic {
     private final MultiModel models;
     private final UIManager uiManager;
     protected final Preferences prefs;
-    private Optional<Integer> remainingRequests;
 
     private RepoIO repoIO;
     public LoginController loginController;
@@ -37,7 +36,6 @@ public class Logic {
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        this.remainingRequests = Optional.empty();
         this.models = new MultiModel(prefs);
 
         repoIO = new RepoIO(isTestMode, enableTestJSON);
@@ -64,7 +62,7 @@ public class Logic {
         });
 
         // Pass the currently-empty model to the UI
-        uiManager.updateNow(models, remainingRequests);
+        uiManager.updateNow(models);
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -204,11 +202,13 @@ public class Logic {
     }
 
     private void updateUI() {
-        uiManager.update(models, remainingRequests, false);
+        uiManager.update(models, false);
     }
 
     private void updateUIWithMetadata() {
-        uiManager.update(models, remainingRequests, true);
+        uiManager.update(models, true);
+    }
+
     private ImmutablePair<Integer, Long> updateRemainingRate
             (ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateRateLimits(rateLimits);
