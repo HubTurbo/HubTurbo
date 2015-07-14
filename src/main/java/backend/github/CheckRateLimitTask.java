@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class CheckRateLimitTask extends GitHubRepoTask<ImmutablePair<Integer, LocalDateTime>> {
+public class CheckRateLimitTask extends GitHubRepoTask<ImmutablePair<Integer, Long>> {
 
     public CheckRateLimitTask(TaskRunner taskRunner, Repo repo) {
         super(taskRunner, repo);
