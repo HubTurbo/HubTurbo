@@ -81,8 +81,9 @@ public class Logic {
             .map(repoIO::updateModel)
             .collect(Collectors.toList()))
                 .thenApply(models::replace)
-                .thenRun(this::updateRemainingRate)
                 .thenRun(this::updateUI)
+                .thenCompose(n -> getRateLimitResetTime())
+                .thenApply(this::updateRemainingRate)
                 .exceptionally(Futures::log);
     }
 
@@ -112,10 +113,11 @@ public class Logic {
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
                         .thenApply(models::addPending)
-                        .thenRun(this::updateRemainingRate)
                         .thenRun(this::updateUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                        .thenApply(n -> true)
+                        .thenCompose(n -> getRateLimitResetTime())
+                        .thenApply(this::updateRemainingRate)
+                        .thenApply(rateLimits -> true)
                         .exceptionally(withResult(false));
             }
         });
@@ -135,9 +137,10 @@ public class Logic {
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
             })
-            .thenApply(Futures.tap(this::updateRemainingRate))
             .thenApply(Futures.tap(this::updateUIWithMetadata))
-            .thenApply(metadata -> true)
+            .thenCompose(n -> getRateLimitResetTime())
+            .thenApply(this::updateRemainingRate)
+            .thenApply(rateLimits -> true)
             .exceptionally(withResult(false));
     }
 
