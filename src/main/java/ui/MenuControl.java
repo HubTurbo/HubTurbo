@@ -288,26 +288,4 @@ public class MenuControl extends MenuBar {
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
     }
-
-    private void showDialogOnAPICheck(int remaining, LocalDateTime reset, Throwable ex) {
-        if (ex == null) {
-            Platform.runLater(() -> DialogMessage.showInfoDialog(
-                "GitHub API Status",
-                String.format(
-                    "You are currently logged in as %s.\n\n" +
-                            "Remaining API calls for the hour: %s\n" +
-                            "Next reset at: %s (%s)",
-                    prefs.getLastLoginUsername(),
-                    remaining,
-                    reset,
-                    new PrettyTime().format(Utility.localDateTimeToDate(reset))
-                )
-            ));
-        } else {
-            Platform.runLater(() -> DialogMessage.showErrorDialog(
-                "Could not connect to GitHub",
-                "An error occurred while attempting to query the GitHub API."
-            ));
-        }
-    }
 }
