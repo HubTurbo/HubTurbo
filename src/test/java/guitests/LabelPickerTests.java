@@ -26,20 +26,18 @@ public class LabelPickerTests extends UITest {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
         click(listPanelCell);
         assertEquals(1, listPanelCell.getIssueLabels().size());
-        sleep(EVENT_DELAY);
         push(KeyCode.L);
         sleep(EVENT_DELAY);
         type("3 ");
-        sleep(EVENT_DELAY);
         push(KeyCode.ENTER);
+        listPanelCell = find("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
         assertEquals(2, listPanelCell.getIssueLabels().size());
-        sleep(EVENT_DELAY);
         push(KeyCode.L);
         sleep(EVENT_DELAY);
         type("3 ");
-        sleep(EVENT_DELAY);
         push(KeyCode.ENTER);
+        listPanelCell = find("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
