@@ -70,6 +70,6 @@ public class GitHubURL {
     }
 
     public static boolean isUrlIssue(String url) {
-        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)");
+        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)([/commits,/files]*)");
     }
 }
