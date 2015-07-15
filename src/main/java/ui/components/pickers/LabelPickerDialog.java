@@ -40,7 +40,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 issue.getId() + " in " + issue.getRepoId());
 
         this.issue = issue;
-        this.allLabels = allLabels;
+        this.allLabels = new ArrayList<>(allLabels);
+        Collections.sort(this.allLabels);
         // populate resultList by going through allLabels and seeing which ones currently exist
         // in issue.getLabels()
         allLabels.forEach(label -> {
