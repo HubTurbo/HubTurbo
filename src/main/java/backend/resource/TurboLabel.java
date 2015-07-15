@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
-public class TurboLabel {
+public class TurboLabel implements Comparable {
 
     public static final String EXCLUSIVE_DELIMITER = ".";
     public static final String NONEXCLUSIVE_DELIMITER = "-";
@@ -193,4 +193,10 @@ public class TurboLabel {
         result = 31 * result + colour.hashCode();
         return result;
     }
+
+    @Override
+    public int compareTo(Object o) {
+        return actualName.compareTo(((TurboLabel) o).getActualName());
+    }
+
 }
