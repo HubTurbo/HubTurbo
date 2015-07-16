@@ -234,7 +234,7 @@ public class ListPanel extends FilterPanel {
             if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
-                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                } else {
                     ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
                 }
             }
