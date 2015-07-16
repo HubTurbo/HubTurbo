@@ -307,7 +307,7 @@ public class UI extends Application implements EventDispatcher {
             if (!isFocused) {
                 return;
             }
-            if (PlatformSpecific.isOnWindows()) {
+            if (browserComponent != null && PlatformSpecific.isOnWindows()) {
                 browserComponent.focus(UI.mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {
