@@ -357,7 +357,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         }
                         if (!label.getGroup().isPresent() ||
                                 !validGroups.contains(label.getGroup().get()) ||
-                                !label.getName().contains(match)) {
+                                !containsIgnoreCase(label.getName(), match)) {
                             label.setIsFaded(true); // fade out if does not match search query
                         }
                         return label;
