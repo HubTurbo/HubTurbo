@@ -72,6 +72,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         topPane.setVgap(5);
 
         textField = new TextField();
+        textField.setId("labelPickerTextField");
         textField.setPrefColumnCount(30);
         setupKeyEvents();
 

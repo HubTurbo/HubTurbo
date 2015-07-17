@@ -47,4 +47,8 @@ public class ListPanelCell extends ListCell<TurboIssue> {
         return issue.getLabels();
     }
 
+    public TurboIssue getIssue() {
+        return issue;
+    }
+
 }

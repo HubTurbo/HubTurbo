@@ -33,6 +33,7 @@ public class LabelPicker {
         LabelPickerDialog labelPickerDialog = new LabelPickerDialog(issue, allLabels, stage);
         // show LabelPickerDialog and wait for result
         Optional<List<String>> result = labelPickerDialog.showAndWait();
+        stage.show(); // ensures stage is showing after label picker is closed (mostly for tests)
         // if result is present (user did not cancel) then replace issue labels with result
         if (result.isPresent()) {
             ui.logic.replaceIssueLabels(issue, result.get())
