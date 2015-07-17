@@ -22,9 +22,7 @@ public class SerializableLabel {
 
     @Override
     public String toString() {
-        return "Label: {"
-               + "name: " + getActualName() + ", "
-               + "color: " + getColour()
-               + "}";
+        String formatter = "Label: {name: %s, color: %s}";
+        return String.format(formatter, getActualName(), getColour());
     }
 }
