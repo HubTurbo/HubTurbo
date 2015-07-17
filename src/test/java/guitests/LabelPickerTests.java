@@ -5,12 +5,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
+import ui.components.FilterTextField;
 import ui.listpanel.ListPanelCell;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
 
 public class LabelPickerTests extends UITest {
 
@@ -19,20 +18,15 @@ public class LabelPickerTests extends UITest {
 
     @Test
     public void showLabelPickerTest() {
-        click("#dummy/dummy_col0_9");
-        push(KeyCode.L);
+        FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
+        click(filterTextField);
+        type("hello");
         sleep(EVENT_DELAY);
-        assertNodeExists(hasText("Issue #9: Issue 9"));
-        push(KeyCode.ENTER);
-    }
-
-    @Test
-    public void addAndRemoveLabelTest() {
-        click("#dummy/dummy_col0_filterTextField");
+        assertEquals("hello", filterTextField.getText());
+        filterTextField.setText("");
 
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
         click(listPanelCell);
-        assertEquals(1, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
@@ -40,50 +34,58 @@ public class LabelPickerTests extends UITest {
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
+        type("world");
+        sleep(EVENT_DELAY);
+        assertEquals("world", labelPickerTextField.getText());
+        push(KeyCode.ESCAPE);
+        sleep(EVENT_DELAY);
+    }
+
+    @Test
+    public void addAndRemoveLabelTest() {
+        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(SHOW_DIALOG_DELAY);
+
         type("3 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        click("#dummy/dummy_col0_filterTextField");
         assertEquals(2, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
         sleep(SHOW_DIALOG_DELAY);
 
-        click(labelPickerTextField);
         type("3 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
         sleep(SHOW_DIALOG_DELAY);
 
-        click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        click("#dummy/dummy_col0_filterTextField");
         assertEquals(0, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
         sleep(SHOW_DIALOG_DELAY);
 
-        click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
     @Test
     public void moveHighlightTest() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
-        click(listPanelCell);
         assertEquals(1, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
@@ -91,9 +93,13 @@ public class LabelPickerTests extends UITest {
         sleep(SHOW_DIALOG_DELAY);
 
         type("1");
+        sleep(EVENT_DELAY);
         push(KeyCode.DOWN);
+        sleep(EVENT_DELAY);
         push(KeyCode.UP);
+        sleep(EVENT_DELAY);
         push(KeyCode.DOWN);
+        sleep(EVENT_DELAY);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         assertEquals(true, listPanelCell.getIssueLabels().contains("Label 10"));
