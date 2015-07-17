@@ -454,4 +454,8 @@ public class BrowserComponent {
         return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
     }
 
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+
 }

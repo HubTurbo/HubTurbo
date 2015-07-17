@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 import ui.UI;
 import util.DialogMessage;
+import util.GitHubURL;
 import util.events.ShowLabelPickerEventHandler;
 
 import java.util.List;
@@ -41,10 +42,13 @@ public class LabelPicker {
 
     public boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {
         if (success) {
-            // if label replacement is successful, force refresh issue page
-            ui.getBrowserComponent().showIssue(
-                    issue.getRepoId(), issue.getId(), issue.isPullRequest(), true
-            );
+            // if label replacement is successful, force refresh issue page only if already on that issue page
+            if (ui.getBrowserComponent().getCurrentUrl().startsWith(
+                    GitHubURL.getPathForPullRequest(issue.getRepoId(), issue.getId())) ||
+                    ui.getBrowserComponent().getCurrentUrl().startsWith(
+                            GitHubURL.getPathForIssue(issue.getRepoId(), issue.getId()))) {
+                ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), true);
+            }
         } else {
             // if not, show error dialog
             Platform.runLater(() -> DialogMessage.showErrorDialog(
