@@ -80,4 +80,32 @@ public class LabelPickerTests extends UITest {
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
+    @Test
+    public void moveHighlightTest() {
+        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
+        click(listPanelCell);
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(SHOW_DIALOG_DELAY);
+
+        type("1");
+        push(KeyCode.DOWN);
+        push(KeyCode.UP);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(true, listPanelCell.getIssueLabels().contains("Label 10"));
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(SHOW_DIALOG_DELAY);
+
+        type("10 ");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+    }
+
 }
