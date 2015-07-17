@@ -363,7 +363,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         return label;
                     })
                     .collect(Collectors.toList());
-            if (!bottomLabels.isEmpty()) highlightFirstMatchingItem();
+            if (!bottomLabels.isEmpty()) highlightFirstMatchingItem(match);
         } else {
             updateBottomLabels(match);
         }
@@ -386,14 +386,27 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 })
                 .collect(Collectors.toList());
 
-        if (!match.isEmpty() && !bottomLabels.isEmpty()) highlightFirstMatchingItem();
+        if (!match.isEmpty() && !bottomLabels.isEmpty()) highlightFirstMatchingItem(match);
     }
 
-    private void highlightFirstMatchingItem() {
-        bottomLabels.stream()
-                .filter(label -> !label.isFaded())
+    private void highlightFirstMatchingItem(String match) {
+        List<PickerLabel> matches = bottomLabels.stream()
+                        .filter(label -> !label.isFaded())
+                        .collect(Collectors.toList());
+
+        // try to highlight labels that begin with match first
+        matches.stream()
+                .filter(label -> label.getName().startsWith(match))
                 .findFirst()
                 .ifPresent(label -> label.setIsHighlighted(true));
+
+        // if not then highlight first matching label
+        if (!hasHighlightedLabel()) {
+            bottomLabels.stream()
+                            .filter(label -> !label.isFaded())
+                            .findFirst()
+                            .ifPresent(label -> label.setIsHighlighted(true));
+        }
     }
 
     private void processTextFieldChange(String text) {
