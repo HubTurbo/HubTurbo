@@ -91,9 +91,9 @@ public class DummyRepoState {
         issues.get(6).setOpen(false);
 
         // add more labels into repo
-        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.low"));
-        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.medium"));
-        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.high"));
+        labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
+        labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
+        labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
