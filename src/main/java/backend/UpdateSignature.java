@@ -2,6 +2,8 @@ package backend;
 
 import java.util.Date;
 
+import util.Utility;
+
 /**
  * Aggregation of resource ETags and last-check time.
  * Characterises the state of a Model after the last update that occurred.
@@ -38,6 +40,15 @@ public class UpdateSignature {
 
     public boolean isEmpty() {
         return this == EMPTY;
+    }
+
+    @Override
+    public String toString() {
+        String formatter = "%s|%s|%s|%s|%s";
+        return String.format(
+                formatter,
+                issuesETag, labelsETag, milestonesETag, collaboratorsETag,
+                Utility.dateToLocalDateTime(lastCheckTime));
     }
 
     /**
