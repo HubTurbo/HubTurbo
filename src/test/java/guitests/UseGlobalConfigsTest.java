@@ -36,7 +36,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(4000);
+        sleep(8000);
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals(repositorySelector.getValue(), "dummy/dummy");
 
@@ -50,13 +50,13 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Load dummy2/dummy2 too
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        sleep(1000);
+        sleep(2000);
         click("#dummy/dummy_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        sleep(4000);
+        sleep(8000);
 
         // Make a new board
         click("Boards");
