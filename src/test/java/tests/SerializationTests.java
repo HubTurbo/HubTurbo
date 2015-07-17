@@ -10,8 +10,10 @@ import org.junit.Test;
 
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
 import backend.resource.serialization.SerializableLabel;
 import backend.resource.serialization.SerializableMilestone;
+import backend.resource.serialization.SerializableUser;
 
 public class SerializationTests {
 
@@ -48,13 +50,13 @@ public class SerializationTests {
         SerializableMilestone serializedMilestone = new SerializableMilestone(turboMilestone);
 
         String formatter = "Milestone: {%n"
-                + "  id: 1%n"
-                + "  title: test milestone%n"
-                + "  dueDate: %n"
-                + "  description: test description%n"
-                + "  isOpen: false%n"
-                + "  openIssues: 0%n"
-                + "  closedIssues: 0%n"
+                + "  id: 1,%n"
+                + "  title: test milestone,%n"
+                + "  dueDate: ,%n"
+                + "  description: test description,%n"
+                + "  isOpen: false,%n"
+                + "  openIssues: 0,%n"
+                + "  closedIssues: 0,%n"
                 + "}";
 
         assertEquals(serializedMilestone.toString(), String.format(formatter));
@@ -77,15 +79,25 @@ public class SerializationTests {
         SerializableMilestone serializedMilestone = new SerializableMilestone(turboMilestone);
 
         String formatter = "Milestone: {%n"
-                + "  id: 1%n"
-                + "  title: test milestone%n"
-                + "  dueDate: 0001-01-01%n"
-                + "  description: test description%n"
-                + "  isOpen: true%n"
-                + "  openIssues: 0%n"
-                + "  closedIssues: 0%n"
+                + "  id: 1,%n"
+                + "  title: test milestone,%n"
+                + "  dueDate: 0001-01-01,%n"
+                + "  description: test description,%n"
+                + "  isOpen: true,%n"
+                + "  openIssues: 0,%n"
+                + "  closedIssues: 0,%n"
                 + "}";
 
         assertEquals(serializedMilestone.toString(), String.format(formatter));
+    }
+
+    @Test
+    public void testSerializableUserToString() {
+        TurboUser user = new TurboUser("dummy/dummy", "alice123", "Alice");
+        String expectedString = "User: {loginName: alice123, realName: Alice, avatarURL: }";
+
+        SerializableUser serializedUser = new SerializableUser(user);
+
+        assertEquals(expectedString, serializedUser.toString());
     }
 }
