@@ -36,4 +36,10 @@ public class BrowserComponentStub extends BrowserComponent {
     public boolean isCurrentUrlIssue() {
         return true;
     }
+
+    @Override
+    public String getCurrentUrl() {
+        return "https://github.com/HubTurbo/HubTurbo/issues/1";
+    }
+
 }
