@@ -49,13 +49,13 @@ public class SerializableMilestone {
     @Override
     public String toString() {
         String formatter = "Milestone: {%n"
-                + "  id: %d%n"
-                + "  title: %s%n"
-                + "  dueDate: %s%n"
-                + "  description: %s%n"
-                + "  isOpen: %b%n"
-                + "  openIssues: %d%n"
-                + "  closedIssues: %d%n"
+                + "  id: %d,%n"
+                + "  title: %s,%n"
+                + "  dueDate: %s,%n"
+                + "  description: %s,%n"
+                + "  isOpen: %b,%n"
+                + "  openIssues: %d,%n"
+                + "  closedIssues: %d,%n"
                 + "}";
 
         return String.format(
