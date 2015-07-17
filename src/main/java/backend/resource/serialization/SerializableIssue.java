@@ -72,4 +72,31 @@ public class SerializableIssue {
     public Optional<Integer> getMilestone() {
         return milestone;
     }
+
+    @Override
+    public String toString() {
+        String formatter = "Issue: {%n"
+                + "  id: %d,%n"
+                + "  title: %s,%n"
+                + "  creator: %s,%n"
+                + "  createdAt: %s,%n"
+                + "  isPullRequest: %b,%n"
+                + "  description: %s,%n"
+                + "  updatedAt: %s,%n"
+                + "  commentCount: %s,%n"
+                + "  isOpen: %s,%n"
+                + "  assignee: %s,%n"
+                + "  labels: %s,%n"
+                + "  milestone: %s,%n"
+                + "}";
+
+        return String.format(
+                formatter,
+                getId(), getTitle(), getCreator(), getCreatedAt(),
+                isPullRequest(), getDescription(), getUpdatedAt(),
+                getCommentCount(), isOpen(),
+                getAssignee().isPresent() ? getAssignee().get() : "",
+                getLabels(),
+                getMilestone().isPresent() ? getMilestone().get().toString() : "");
+    }
 }
