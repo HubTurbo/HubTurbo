@@ -56,6 +56,28 @@ public class LabelPickerTests extends UITest {
         sleep(EVENT_DELAY);
         click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(SHOW_DIALOG_DELAY);
+
+        click(labelPickerTextField);
+        type("2 ");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        click("#dummy/dummy_col0_filterTextField");
+        assertEquals(0, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(SHOW_DIALOG_DELAY);
+
+        click(labelPickerTextField);
+        type("2 ");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        click("#dummy/dummy_col0_filterTextField");
+        assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
 }
