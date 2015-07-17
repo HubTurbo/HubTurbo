@@ -15,7 +15,16 @@ public class SerializableLabel {
     public String getActualName() {
         return actualName;
     }
+
     public String getColour() {
         return colour;
+    }
+
+    @Override
+    public String toString() {
+        return "Label: {"
+               + "name: " + getActualName() + ", "
+               + "color: " + getColour()
+               + "}";
     }
 }
