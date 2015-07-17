@@ -54,17 +54,21 @@ public class DummyRepoState {
         for (int i = 1; i <= 5; i++) {
             issues.get(i).setMilestone(milestones.get(i));
         }
+
         // Odd issues are assigned label 1, even issues are assigned label 2
         for (int i = 1; i <= 10; i++) {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
         }
+
         // We assign a colorful label to issue 10
         labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
         issues.get(10).addLabel("Label 11");
+
         // Each user is assigned to his corresponding issue
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
         }
+
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
         Comment dummyComment2 = new Comment();
@@ -82,8 +86,14 @@ public class DummyRepoState {
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
+
         // Issue 6 is closed
         issues.get(6).setOpen(false);
+
+        // add more labels into repo
+        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.low"));
+        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.medium"));
+        labels.put("Label 11", new TurboLabel(dummyRepoId, "p.high"));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -329,4 +339,5 @@ public class DummyRepoState {
 
         return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
+
 }
