@@ -30,7 +30,8 @@ public class SerializationTests {
         TurboLabel label = new TurboLabel("dummy/dummy", "label.name");
         SerializableLabel serializedLabel = new SerializableLabel(label);
 
-        assertEquals(serializedLabel.toString(), "Label: {name: label.name, color: ffffff}");
+        assertEquals("Label: {name: label.name, color: ffffff}",
+                     serializedLabel.toString());
     }
 
     @Test
@@ -38,7 +39,8 @@ public class SerializationTests {
         TurboLabel label = new TurboLabel("dummy/dummy", "abcdef", "label.name");
         SerializableLabel serializedLabel = new SerializableLabel(label);
 
-        assertEquals(serializedLabel.toString(), "Label: {name: label.name, color: abcdef}");
+        assertEquals("Label: {name: label.name, color: abcdef}",
+                     serializedLabel.toString());
     }
 
     @Test
@@ -67,7 +69,7 @@ public class SerializationTests {
                 + "  closedIssues: 0,%n"
                 + "}";
 
-        assertEquals(serializedMilestone.toString(), String.format(formatter));
+        assertEquals(String.format(formatter), serializedMilestone.toString());
     }
 
     @Test
@@ -96,7 +98,7 @@ public class SerializationTests {
                 + "  closedIssues: 0,%n"
                 + "}";
 
-        assertEquals(serializedMilestone.toString(), String.format(formatter));
+        assertEquals(String.format(formatter), serializedMilestone.toString());
     }
 
     @Test
