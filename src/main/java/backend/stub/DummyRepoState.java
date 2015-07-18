@@ -94,6 +94,8 @@ public class DummyRepoState {
         labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
         labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
         labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
+        labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
+        labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
