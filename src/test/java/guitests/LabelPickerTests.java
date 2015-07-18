@@ -13,8 +13,8 @@ import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final int SHOW_DIALOG_DELAY = 2000;
-    public static final int EVENT_DELAY = 500;
+    private static final int DIALOG_DELAY = 1500;
+    public static final int EVENT_DELAY = 1000;
 
     @Test
     public void showLabelPickerTest() {
@@ -30,7 +30,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
@@ -48,7 +48,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("3 ");
         push(KeyCode.ENTER);
@@ -57,7 +57,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("3 ");
         push(KeyCode.ENTER);
@@ -66,7 +66,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("2 ");
         push(KeyCode.ENTER);
@@ -75,7 +75,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("2 ");
         push(KeyCode.ENTER);
@@ -90,7 +90,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("1");
         sleep(EVENT_DELAY);
@@ -101,12 +101,12 @@ public class LabelPickerTests extends UITest {
         push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        sleep(DIALOG_DELAY);
         assertEquals(true, listPanelCell.getIssueLabels().contains("Label 10"));
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(SHOW_DIALOG_DELAY);
+        sleep(DIALOG_DELAY);
 
         type("10 ");
         push(KeyCode.ENTER);
