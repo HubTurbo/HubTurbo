@@ -12,6 +12,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Button;
+import javafx.scene.text.Text;
 import javafx.scene.layout.HBox;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -22,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * An FilterPanel is a AbstractPanel meant for containing issues and an accompanying filter text field,
@@ -37,12 +42,15 @@ public abstract class FilterPanel extends AbstractPanel {
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
     private UI ui;
+    private String panelName = "Panel";
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
     public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(model, parentPanelControl, panelIndex);
         this.ui = ui;
+        
+        getChildren().add(createNameBox());
         getChildren().add(createFilterBox());
         this.setOnMouseClicked(e-> {
             ui.triggerEvent(new PanelClickedEvent(panelIndex));
@@ -67,6 +75,28 @@ public abstract class FilterPanel extends AbstractPanel {
 
         filterTextField.setKeywords(all);
     };
+    
+    private Node createNameBox() {
+        Text nameBox = new Text();
+        nameBox.setText(panelName);
+        
+        Button renameButton = new Button();
+        renameButton.setText("RENAME");
+        renameButton.setOnMouseClicked(e-> {
+            Dialog<String> renameDialog = new TextInputDialog(panelName);
+            renameDialog.setTitle("Rename Panel");
+            renameDialog.setHeaderText("Enter a new name for this panel.");
+            Optional<String> result = renameDialog.showAndWait();
+            String name = result.get();
+            if (!name.equals("")) {
+                panelName = name;
+            }
+            nameBox.setText(panelName);
+        });
+        HBox nameArea = new HBox();
+        nameArea.getChildren().addAll(nameBox, renameButton);
+        return nameArea;
+    }
 
     private Node createFilterBox() {
         filterTextField = new FilterTextField("", 0)
