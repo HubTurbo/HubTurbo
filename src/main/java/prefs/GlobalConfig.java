@@ -8,6 +8,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
+
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -22,8 +24,7 @@ public class GlobalConfig {
 
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
-    private List<String> lastOpenFilters = new ArrayList<>();
-    private List<String> panelNames = new ArrayList<>();
+    private List<PanelInfo> panelInfo = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
@@ -82,20 +83,28 @@ public class GlobalConfig {
         boards.remove(name);
     }
 
-    public void setLastOpenFilters(List<String> filter) {
-        lastOpenFilters = new ArrayList<>(filter);
-    }
-
     public List<String> getLastOpenFilters() {
-        return new ArrayList<>(lastOpenFilters);
-    }
-    
-    public void setPanelNames(List<String> names) {
-        panelNames = new ArrayList<>(names);
+        List<String> lastOpenFilters = new ArrayList<>();
+        for (int i = 0; i < panelInfo.size(); i++) {
+            lastOpenFilters.add(panelInfo.get(i).getPanelFilter());
+        }
+        return lastOpenFilters;
     }
     
     public List<String> getPanelNames() {
-        return new ArrayList<>(panelNames);
+        List<String> openPanelNames = new ArrayList<>();
+        for (int i = 0; i < panelInfo.size(); i++) {
+            openPanelNames.add(panelInfo.get(i).getPanelName());
+        }
+        return openPanelNames;
+    }
+    
+    public void setPanelInfo(List<PanelInfo> panelInfo) {
+        this.panelInfo = new ArrayList<PanelInfo>(panelInfo);
+    }
+    
+    public List<PanelInfo> getPanelInfo() {
+        return new ArrayList<PanelInfo>(panelInfo);
     }
 
     public void setLastViewedRepository(String repository) {

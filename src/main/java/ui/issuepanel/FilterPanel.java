@@ -43,6 +43,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected FilterTextField filterTextField;
     private UI ui;
     private String panelName = "Panel";
+    private Text nameBox;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
@@ -77,8 +78,7 @@ public abstract class FilterPanel extends AbstractPanel {
     };
     
     private Node createNameBox() {
-        Text nameBox = new Text();
-        nameBox.setText(panelName);
+        nameBox = new Text(panelName);
         
         Button renameButton = new Button();
         renameButton.setText("RENAME");
@@ -93,6 +93,7 @@ public abstract class FilterPanel extends AbstractPanel {
             }
             nameBox.setText(panelName);
         });
+        
         HBox nameArea = new HBox();
         nameArea.getChildren().addAll(nameBox, renameButton);
         return nameArea;
@@ -192,6 +193,15 @@ public abstract class FilterPanel extends AbstractPanel {
 
     public void filterByString(String filterString) {
         filterTextField.setFilterText(filterString);
+    }
+    
+    public void restorePanel(String filterString, String name) {
+        filterTextField.setFilterText(filterString);
+        this.nameBox.setText(name);
+    }
+    
+    public String getPanelName() {
+        return this.panelName;
     }
 
     public FilterExpression getCurrentFilterExpression() {
