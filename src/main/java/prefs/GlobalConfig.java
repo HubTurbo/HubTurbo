@@ -23,6 +23,7 @@ public class GlobalConfig {
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
     private List<String> lastOpenFilters = new ArrayList<>();
+    private List<String> panelNames = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
@@ -87,6 +88,14 @@ public class GlobalConfig {
 
     public List<String> getLastOpenFilters() {
         return new ArrayList<>(lastOpenFilters);
+    }
+    
+    public void setPanelNames(List<String> names) {
+        panelNames = new ArrayList<>(names);
+    }
+    
+    public List<String> getPanelNames() {
+        return new ArrayList<>(panelNames);
     }
 
     public void setLastViewedRepository(String repository) {

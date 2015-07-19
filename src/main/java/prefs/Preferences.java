@@ -57,6 +57,14 @@ public class Preferences {
     public void setLastOpenFilters(List<String> filter) {
         global.setLastOpenFilters(filter);
     }
+    
+    public List<String> getPanelNames() {
+        return global.getPanelNames();
+    }
+    
+    public void setPanelNames(List<String> names) {
+        global.setPanelNames(names);
+    }
 
     /**
      * Interface to configuration files
