@@ -112,7 +112,7 @@ public class PanelControl extends HBox {
 
         // Populates the panel with the default repo issues.
         guiController.panelFilterExpressionChanged(panel);
-
+        
         updatePanelIndices();
         setCurrentlySelectedPanel(Optional.of(index));
         return panel;
@@ -155,7 +155,6 @@ public class PanelControl extends HBox {
     }
 
     private void updatePanelIndices() {
-        System.out.println("Updating panels");
         int i = 0;
         for (Node c : getChildren()) {
             ((AbstractPanel) c).updateIndex(i++);

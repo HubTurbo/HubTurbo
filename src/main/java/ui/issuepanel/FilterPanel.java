@@ -197,7 +197,8 @@ public abstract class FilterPanel extends AbstractPanel {
     
     public void restorePanel(String filterString, String name) {
         filterTextField.setFilterText(filterString);
-        this.nameBox.setText(name);
+        this.panelName = name;
+        this.nameBox.setText(panelName);
     }
     
     public String getPanelName() {
