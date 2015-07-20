@@ -1,13 +1,12 @@
 package ui.components;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.controlsfx.control.StatusBar;
-
 import javafx.application.Platform;
+import org.controlsfx.control.StatusBar;
 import ui.UI;
 import util.events.UpdateProgressEventHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HTStatusBar extends StatusBar implements StatusUI {
 

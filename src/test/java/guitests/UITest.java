@@ -40,10 +40,12 @@ public class UITest extends GuiTest {
 
     public static void clearTestFolder() {
         try {
-            Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
-                    .filter(Files::isRegularFile)
-                    .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json"))
-                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+            if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
+                Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
+                        .filter(Files::isRegularFile)
+                        .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json"))
+                        .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,18 +1,17 @@
 package backend.resource;
 
 
+import backend.resource.serialization.SerializableLabel;
+import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
+import org.eclipse.egit.github.core.Label;
+
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.egit.github.core.Label;
-
-import backend.resource.serialization.SerializableLabel;
-import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
-
 @SuppressWarnings("unused")
-public class TurboLabel {
+public class TurboLabel implements Comparable {
 
     public static final String EXCLUSIVE_DELIMITER = ".";
     public static final String NONEXCLUSIVE_DELIMITER = "-";
@@ -66,7 +65,7 @@ public class TurboLabel {
     private void ______METHODS______() {
     }
 
-    private Optional<String> getDelimiter() {
+    public static Optional<String> getDelimiter(String name) {
 
         // Escaping due to constants not being valid regexes
         Pattern p = Pattern.compile(String.format("^[^\\%s\\%s]+(\\%s|\\%s)",
@@ -74,7 +73,7 @@ public class TurboLabel {
             NONEXCLUSIVE_DELIMITER,
             EXCLUSIVE_DELIMITER,
             NONEXCLUSIVE_DELIMITER));
-        Matcher m = p.matcher(actualName);
+        Matcher m = p.matcher(name);
 
         if (m.find()) {
             return Optional.of(m.group(1));
@@ -88,12 +87,12 @@ public class TurboLabel {
     }
 
     public boolean isExclusive() {
-        return getDelimiter().isPresent() && getDelimiter().get().equals(EXCLUSIVE_DELIMITER);
+        return getDelimiter(actualName).isPresent() && getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER);
     }
 
     public Optional<String> getGroup() {
-        if (getDelimiter().isPresent()) {
-            String delimiter = getDelimiter().get();
+        if (getDelimiter(actualName).isPresent()) {
+            String delimiter = getDelimiter(actualName).get();
             // Escaping due to constants not being valid regexes
             String[] segments = actualName.split("\\" + delimiter);
             assert segments.length >= 1;
@@ -117,8 +116,8 @@ public class TurboLabel {
     }
 
     public String getName() {
-        if (getDelimiter().isPresent()) {
-            String delimiter = getDelimiter().get();
+        if (getDelimiter(actualName).isPresent()) {
+            String delimiter = getDelimiter(actualName).get();
             // Escaping due to constants not being valid regexes
             String[] segments = actualName.split("\\" + delimiter);
             assert segments.length >= 1;
@@ -148,7 +147,7 @@ public class TurboLabel {
         int b = Integer.parseInt(colour.substring(4, 6), 16);
         double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
         boolean bright = luminance > 128;
-        return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black" : "white");
+        return "-fx-background-color: #" + getColour() + "; -fx-text-fill: " + (bright ? "black;" : "white;");
     }
 
     public Node getNode() {
@@ -194,4 +193,10 @@ public class TurboLabel {
         result = 31 * result + colour.hashCode();
         return result;
     }
+
+    @Override
+    public int compareTo(Object o) {
+        return actualName.compareTo(((TurboLabel) o).getActualName());
+    }
+
 }

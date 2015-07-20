@@ -32,7 +32,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     private static final Logger logger = LogManager.getLogger(NavigableListView.class.getName());
 
     // Tracks the index of the item in the list which should be currently selected
-    private Optional<Integer> selectedIndex = Optional.empty();
+    protected Optional<Integer> selectedIndex = Optional.empty();
 
     // Used for saving and restoring selection by item.
     // selectedIndex should be used to get the currently-selected item, through the provided getter.
@@ -113,9 +113,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         }
     }
 
-    abstract boolean areItemsEqual(T item1, T item2);
+    public abstract boolean areItemsEqual(T item1, T item2);
 
-    private void setupMouseEvents() {
+    protected void setupMouseEvents() {
         setOnMouseClicked(e -> {
             int currentlySelected = getSelectionModel().getSelectedIndex();
 
@@ -131,7 +131,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         });
     }
 
-    private void setupKeyEvents() {
+    protected void setupKeyEvents() {
         setOnKeyPressed(e -> {
             if (e.isControlDown()) {
                 return;
@@ -139,7 +139,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
             if (e.getCode() == KeyCode.ENTER) {
                 e.consume();
                 if (selectedIndex.isPresent()) {
-                    logger.info("Enter key selection on issue " + selectedIndex.get());
+                    logger.info("Enter key selection on item " + selectedIndex.get());
                     onItemSelected.accept(selectedIndex.get());
                 }
             }
@@ -164,7 +164,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         });
     }
 
-    private void handleUpDownKeys(boolean isDownKey) {
+    public void handleUpDownKeys(boolean isDownKey) {
         // Nothing is selected or the list is empty; do nothing
         if (!selectedIndex.isPresent()) return;
         if (getItems().size() == 0) return;
@@ -216,4 +216,5 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     public Optional<T> getSelectedItem() {
         return selectedIndex.map(getItems()::get);
     }
+
 }

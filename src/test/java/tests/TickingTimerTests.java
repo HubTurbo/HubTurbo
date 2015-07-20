@@ -1,6 +1,7 @@
 package tests;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
+import util.TickingTimer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,9 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
-import util.TickingTimer;
+import static org.junit.Assert.fail;
 
 public class TickingTimerTests {
 

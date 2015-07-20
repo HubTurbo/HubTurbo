@@ -1,13 +1,5 @@
 package backend.stub;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -15,9 +7,17 @@ import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Label;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class DummyRepo implements Repo {
 
@@ -141,6 +141,11 @@ public class DummyRepo implements Repo {
     @Override
     public List<Comment> getComments(String repoId, int issueId) {
         return getRepoState(repoId).getComments(issueId);
+    }
+
+    @Override
+    public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
+        return getRepoState(repoId).setLabels(issueId, labels);
     }
 
     @Override

@@ -132,12 +132,6 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.getPathForKeyboardShortcuts(), url);
         clearUrl();
 
-        // manage labels
-        push(KeyCode.L);
-        sleep(EVENT_DELAY);
-        assertEquals("l", keyCode);
-        clearKeyCode();
-
         // manage assignee
         push(KeyCode.A);
         sleep(EVENT_DELAY);

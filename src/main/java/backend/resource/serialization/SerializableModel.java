@@ -1,10 +1,10 @@
 package backend.resource.serialization;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import backend.UpdateSignature;
 import backend.resource.Model;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 100% immutable.

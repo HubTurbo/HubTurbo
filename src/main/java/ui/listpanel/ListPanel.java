@@ -6,12 +6,13 @@ import filter.expression.Qualifier;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
-import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
-import ui.issuepanel.PanelControl;
+import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
 
 import java.time.LocalDateTime;
@@ -82,7 +83,7 @@ public class ListPanel extends FilterPanel {
     /**
      * Refreshes the list of issue cards shown to the user.
      *
-     * @param hasMetadata Indicates the commnet count hashmap to be used.
+     * @param hasMetadata Indicates the comment count hashmap to be used.
      */
     @Override
     public void refreshItems(boolean hasMetadata) {
@@ -233,8 +234,8 @@ public class ListPanel extends FilterPanel {
             if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
-                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().manageLabels(event.getCode().toString());
+                } else {
+                    ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
                 }
             }
             if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {

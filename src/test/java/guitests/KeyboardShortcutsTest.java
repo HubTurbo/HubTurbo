@@ -5,8 +5,8 @@ import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
-import util.events.PanelClickedEventHandler;
 import util.events.IssueSelectedEventHandler;
+import util.events.PanelClickedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
 

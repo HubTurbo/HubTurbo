@@ -1,8 +1,8 @@
 package backend.stub;
 
-import java.util.List;
-
 import backend.interfaces.TaskRunner;
+
+import java.util.List;
 
 public class DownloadMetadataTask extends backend.github.DownloadMetadataTask {
 

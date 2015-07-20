@@ -1,21 +1,20 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.Qualifier;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import prefs.Preferences;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class FilterEvalTests {
 

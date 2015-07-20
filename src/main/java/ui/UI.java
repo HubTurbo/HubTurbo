@@ -4,11 +4,9 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
-
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -24,14 +22,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
+import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
@@ -45,7 +42,6 @@ import util.events.testevents.UILogicRefreshEventHandler;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
@@ -82,6 +78,7 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
+    private LabelPicker labelPicker;
     private Label apiBox;
 
     public static void main(String[] args) {
@@ -161,6 +158,11 @@ public class UI extends Application implements EventDispatcher {
         panels.init(guiController);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
+        initialisePickers();
+    }
+
+    private void initialisePickers() {
+        labelPicker = new LabelPicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
@@ -226,7 +228,8 @@ public class UI extends Application implements EventDispatcher {
                 isBypassLogin() ||
                 isTestJSONEnabled() ||
                 isTestChromeDriver() ||
-                isTestGlobalConfig();
+                isTestGlobalConfig() ||
+                isCloseOnQuit();
     }
 
     // Public for use in LoginDialog
@@ -248,19 +251,23 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
     }
 
+    // Used for test mode to shutdown jvm on quit (not used for ci/tests because that will cause
+    // tests to fail).
+    private boolean isCloseOnQuit() {
+        return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
+    }
+
     public void quit() {
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
-        if (!isTestMode()) {
+        if (!isTestMode() || isTestGlobalConfig()) {
             panels.saveSession();
             prefs.saveGlobalConfig();
+        }
+        if (!isTestMode() || isCloseOnQuit()) {
             Platform.exit();
             System.exit(0);
-        }
-        if (isTestGlobalConfig()) {
-            panels.saveSession();
-            prefs.saveGlobalConfig();
         }
     }
 
@@ -300,7 +307,7 @@ public class UI extends Application implements EventDispatcher {
             if (!isFocused) {
                 return;
             }
-            if (PlatformSpecific.isOnWindows()) {
+            if (browserComponent != null && PlatformSpecific.isOnWindows()) {
                 browserComponent.focus(UI.mainWindowHandle);
             }
             PlatformEx.runLaterDelayed(() -> {

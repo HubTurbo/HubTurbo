@@ -147,7 +147,7 @@ public class BrowserComponent {
      */
     public void newLabel() {
         logger.info("Navigating to New Label page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewLabel(ui.logic.getDefaultRepo()), false));
         bringToTop();
     }
 
@@ -157,7 +157,7 @@ public class BrowserComponent {
      */
     public void newMilestone() {
         logger.info("Navigating to New Milestone page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewMilestone(ui.logic.getDefaultRepo()), false));
         bringToTop();
     }
 
@@ -167,7 +167,7 @@ public class BrowserComponent {
      */
     public void newIssue() {
         logger.info("Navigating to New Issue page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForNewIssue(ui.logic.getDefaultRepo()), false));
         bringToTop();
     }
 
@@ -177,7 +177,7 @@ public class BrowserComponent {
      */
     public void showDocs() {
         logger.info("Showing documentation page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForDocsPage()));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForDocsPage(), false));
     }
 
     /**
@@ -194,13 +194,13 @@ public class BrowserComponent {
      * driver window.
      * Run on a separate thread.
      */
-    public void showIssue(String repoId, int id, boolean isPullRequest) {
+    public void showIssue(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {
         if (isPullRequest) {
             logger.info("Showing pull request #" + id);
-            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id)));
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
         } else {
             logger.info("Showing issue #" + id);
-            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id)));
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
         }
     }
 
@@ -260,15 +260,15 @@ public class BrowserComponent {
                     pageContentOnLoad = getCurrentPageSource();
                 } catch (WebDriverException e) {
                     switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-                    case NoSuchWindow:
-                        resetBrowser();
-                        runBrowserOperation(operation); // Recurse and repeat
-                        break;
-                    case NoSuchElement:
-                        logger.info("Warning: no such element! " + e.getMessage());
-                        break;
-                    default:
-                        break;
+                        case NoSuchWindow:
+                            resetBrowser();
+                            runBrowserOperation(operation); // Recurse and repeat
+                            break;
+                        case NoSuchElement:
+                            logger.info("Warning: no such element! " + e.getMessage());
+                            break;
+                        default:
+                            break;
                     }
                 }
             } else {
@@ -288,7 +288,7 @@ public class BrowserComponent {
         logger.info("Logging in on GitHub...");
         focus(ui.getMainWindowHandle());
         runBrowserOperation(() -> {
-            driver.get(GitHubURL.LOGIN_PAGE);
+            driver.get(GitHubURL.LOGIN_PAGE, false);
             try {
                 WebElement searchBox = driver.findElement(By.name("login"));
                 searchBox.sendKeys(ui.logic.loginController.credentials.username);
@@ -415,11 +415,6 @@ public class BrowserComponent {
         }
     }
 
-    public void manageLabels(String keyCode) {
-        sendKeysToBrowser(keyCode.toLowerCase());
-        bringToTop();
-    }
-
     public void manageAssignees(String keyCode) {
         sendKeysToBrowser(keyCode.toLowerCase());
         bringToTop();
@@ -432,31 +427,35 @@ public class BrowserComponent {
 
     public void showIssues() {
         logger.info("Navigating to Issues page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()), false));
     }
 
     public void showPullRequests() {
         logger.info("Navigating to Pull requests page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequests(ui.logic.getDefaultRepo()), false));
     }
 
     public void showKeyboardShortcuts() {
         logger.info("Navigating to Keyboard Shortcuts");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForKeyboardShortcuts()));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForKeyboardShortcuts(), false));
     }
 
     public void showMilestones() {
         logger.info("Navigating to Milestones page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForMilestones(ui.logic.getDefaultRepo()), false));
     }
 
     public void showContributors() {
         logger.info("Navigating to Contributors page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo())));
+        runBrowserOperation(() -> driver.get(GitHubURL.getPathForContributors(ui.logic.getDefaultRepo()), false));
     }
 
     public boolean isCurrentUrlIssue() {
         return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
+    }
+
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
     }
 
 }

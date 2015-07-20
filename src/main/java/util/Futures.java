@@ -1,13 +1,13 @@
 package util;
 
+import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Logger;
 
 /**
  * Combinators for dealing with CompletableFutures.

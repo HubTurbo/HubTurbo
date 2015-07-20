@@ -1,6 +1,5 @@
 package ui;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -12,16 +11,12 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.ocpsoft.prettytime.PrettyTime;
 import prefs.Preferences;
 import ui.components.KeyboardShortcuts;
-import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
-import util.DialogMessage;
-import util.Utility;
+import ui.issuepanel.PanelControl;
 import util.events.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

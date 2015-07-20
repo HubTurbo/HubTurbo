@@ -2,11 +2,9 @@ package guitests;
 
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-
 import prefs.Preferences;
 
 import java.io.File;

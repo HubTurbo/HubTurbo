@@ -1,13 +1,13 @@
 package backend.resource;
 
+import backend.IssueMetadata;
+import backend.interfaces.IModel;
+import prefs.Preferences;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import backend.IssueMetadata;
-import backend.interfaces.IModel;
-import prefs.Preferences;
 
 /**
  * Thread-safe. The only top-level state in the application.

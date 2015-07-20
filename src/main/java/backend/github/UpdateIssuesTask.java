@@ -1,16 +1,15 @@
 package backend.github;
 
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.logging.log4j.Logger;
-
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.Logger;
 import util.HTLog;
+
+import java.util.Date;
+import java.util.List;
 
 public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<TurboIssue>> {
 
