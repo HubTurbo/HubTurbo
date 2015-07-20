@@ -403,10 +403,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         // if not then highlight first matching label
         if (!hasHighlightedLabel()) {
-            bottomLabels.stream()
-                            .filter(label -> !label.isFaded())
-                            .findFirst()
-                            .ifPresent(label -> label.setIsHighlighted(true));
+            matches.stream()
+                    .findFirst()
+                    .ifPresent(label -> label.setIsHighlighted(true));
         }
     }
 
