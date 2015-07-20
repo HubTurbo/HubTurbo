@@ -101,11 +101,11 @@ public abstract class FilterPanel extends AbstractPanel {
             nameBox.setText(panelName);
         });
         
-        StackPane nameSpace = new StackPane();
-        nameSpace.getChildren().addAll(nameBox, renameButton);
+        StackPane nameBar = new StackPane();
+        nameBar.getChildren().addAll(nameBox, renameButton);
         StackPane.setAlignment(nameBox, Pos.TOP_LEFT);
         StackPane.setAlignment(renameButton, Pos.TOP_RIGHT);
-        return nameSpace;
+        return nameBar;
     }
 
     private Node createFilterBox() {
