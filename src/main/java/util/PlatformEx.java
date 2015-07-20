@@ -1,13 +1,12 @@
 package util;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javafx.application.Platform;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Extensions to JavaFX's Platform class.
@@ -26,9 +25,13 @@ public class PlatformEx {
      * @param action
      */
     public static void runLaterDelayed(Runnable action) {
+        runLaterDelayed(action, 300);
+    }
+
+    public static void runLaterDelayed(Runnable action, int delay) {
         delayExecutor.execute(() -> {
             try {
-                Thread.sleep(300);
+                Thread.sleep(delay);
             } catch (InterruptedException e) {
                 assert false;
             }

@@ -174,6 +174,7 @@ public class ListPanelCard extends VBox {
         issueDetails.setMaxWidth(CARD_WIDTH);
         issueDetails.setPrefWrapLength(CARD_WIDTH);
         issueDetails.setHgap(3);
+        issueDetails.setVgap(3);
 
         updateDetails();
     }
@@ -227,6 +228,6 @@ public class ListPanelCard extends VBox {
             assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
             issueDetails.getChildren().add(assigneeBox);
         }
-
     }
+
 }

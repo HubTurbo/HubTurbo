@@ -10,10 +10,12 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
@@ -52,17 +54,21 @@ public class DummyRepoState {
         for (int i = 1; i <= 5; i++) {
             issues.get(i).setMilestone(milestones.get(i));
         }
+
         // Odd issues are assigned label 1, even issues are assigned label 2
         for (int i = 1; i <= 10; i++) {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
         }
+
         // We assign a colorful label to issue 10
         labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
         issues.get(10).addLabel("Label 11");
+
         // Each user is assigned to his corresponding issue
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
         }
+
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
         Comment dummyComment2 = new Comment();
@@ -80,8 +86,16 @@ public class DummyRepoState {
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
+
         // Issue 6 is closed
         issues.get(6).setOpen(false);
+
+        // Label groups for testing label picker exclusivity
+        labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
+        labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
+        labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
+        labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
+        labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -296,4 +310,36 @@ public class DummyRepoState {
         updatedUsers.remove(idString);
         return users.remove(idString);
     }
+
+    protected List<Label> setLabels(int issueId, List<String> labels) {
+        TurboIssue toSet = new TurboIssue(issues.get(issueId));
+
+        // Update issue events
+        List<TurboIssueEvent> eventsOfIssue = toSet.getMetadata().getEvents();
+        // TODO change to expression lambdas
+        List<String> labelsOfIssue = toSet.getLabels();
+        labelsOfIssue.forEach(labelName ->
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                        IssueEventType.Unlabeled,
+                        new Date()).setLabelName(labelName))
+        );
+        labels.forEach(labelName ->
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                        IssueEventType.Labeled,
+                        new Date()).setLabelName(labelName))
+        );
+        List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
+        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        toSet.setUpdatedAt(LocalDateTime.now());
+
+        // Actually setting label is done after updating issue events
+        toSet.setLabels(labels);
+
+        // Then update the relevant state arrays to reflect changes in UI
+        issues.put(issueId, toSet);
+        updatedIssues.put(issueId, toSet);
+
+        return labels.stream().map(new Label()::setName).collect(Collectors.toList());
+    }
+
 }

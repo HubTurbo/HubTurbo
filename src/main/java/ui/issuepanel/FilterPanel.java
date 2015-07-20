@@ -15,8 +15,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import ui.UI;
 import ui.components.FilterTextField;
-import util.events.PanelClickedEvent;
 import util.events.ModelUpdatedEventHandler;
+import util.events.PanelClickedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;

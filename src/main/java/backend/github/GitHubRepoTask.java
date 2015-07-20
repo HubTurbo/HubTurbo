@@ -1,11 +1,11 @@
 package backend.github;
 
-import java.util.Date;
-import java.util.List;
-
 import backend.interfaces.Repo;
 import backend.interfaces.RepoTask;
 import backend.interfaces.TaskRunner;
+
+import java.util.Date;
+import java.util.List;
 
 public abstract class GitHubRepoTask<R> extends RepoTask<R> {
 

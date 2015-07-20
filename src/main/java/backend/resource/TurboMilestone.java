@@ -1,12 +1,11 @@
 package backend.resource;
 
+import backend.resource.serialization.SerializableMilestone;
+import org.eclipse.egit.github.core.Milestone;
+import util.Utility;
+
 import java.time.LocalDate;
 import java.util.Optional;
-
-import org.eclipse.egit.github.core.Milestone;
-
-import backend.resource.serialization.SerializableMilestone;
-import util.Utility;
 
 @SuppressWarnings("unused")
 public class TurboMilestone {

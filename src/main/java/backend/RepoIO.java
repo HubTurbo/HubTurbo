@@ -6,6 +6,7 @@ import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.json.JSONStoreStub;
 import backend.resource.Model;
+import backend.resource.TurboIssue;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummySource;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -13,7 +14,9 @@ import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -110,7 +113,12 @@ public class RepoIO {
         return repoSource.downloadMetadata(repoId, issues);
     }
 
+    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        return repoSource.replaceIssueLabels(issue, labels);
+    }
+
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
     }
+
 }

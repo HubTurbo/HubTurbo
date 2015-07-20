@@ -1,7 +1,6 @@
 package ui;
 
 import com.google.common.collect.Ordering;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;

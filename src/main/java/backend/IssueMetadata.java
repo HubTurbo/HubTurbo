@@ -1,13 +1,12 @@
 package backend;
 
+import github.TurboIssueEvent;
+import org.eclipse.egit.github.core.Comment;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.egit.github.core.Comment;
-
-import github.TurboIssueEvent;
 
 public class IssueMetadata {
     private final List<TurboIssueEvent> events;

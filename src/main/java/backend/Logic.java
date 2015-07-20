@@ -2,6 +2,7 @@ package backend;
 
 import backend.resource.Model;
 import backend.resource.MultiModel;
+import backend.resource.TurboIssue;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +17,10 @@ import util.events.testevents.ClearLogicModelEventHandler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -137,7 +141,7 @@ public class Logic {
                 models.insertMetadata(repoId, metadata, currentUser);
                 return metadata;
             })
-            .thenApply(Futures.tap(this::updateUIWithMetadata))
+            .thenApply(Futures.tap(this::updateUIAndShow))
             .thenCompose(n -> getRateLimitResetTime())
             .thenApply(this::updateRemainingRate)
             .thenApply(rateLimits -> true)
@@ -204,11 +208,19 @@ public class Logic {
         return models.getDefaultRepo();
     }
 
+    /**
+     * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
+     * metadata to display their issues, in which case the changes in the model are not presented to the user.
+     */
     private void updateUI() {
         uiManager.update(models, false);
     }
 
-    private void updateUIWithMetadata() {
+    /**
+     * Carries the current model in Logic to the GUI and immediately presents it to the user. Does not trigger
+     * further metadata updates.
+     */
+    private void updateUIAndShow() {
         uiManager.update(models, true);
     }
 
@@ -222,8 +234,37 @@ public class Logic {
         return repoIO.login(credentials);
     }
 
+    public Model getRepo(String repoId) {
+        return models.get(repoId);
+    }
+
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
     }
+
+    /**
+     * Dispatches a PUT request to the GitHub API to replace the given issue's labels.
+     * At the same time, immediately change the GUI to pre-empt this change.
+     *
+     * Assumes that the model object is shared among GUI and Logic.
+     *
+     * @param issue The issue whose labels are to be replaced
+     * @param labels The labels to be applied to the given issue
+     * @return The list of labels on the issue after the request is received by GitHub
+     */
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
+
+        return repoIO.replaceIssueLabels(issue, labels).handle((resultLabels, ex) -> {
+            if (ex == null) {
+                issue.setLabels(labels);
+                updateUIAndShow();
+                return true;
+            } else {
+                return false;
+            }
+        });
+    }
+
 }
 

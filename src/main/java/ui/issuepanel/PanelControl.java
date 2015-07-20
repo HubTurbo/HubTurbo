@@ -10,9 +10,9 @@ import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
+import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEvent;
 import util.events.PanelClickedEventHandler;
-import util.events.IssueSelectedEventHandler;
 
 import java.util.ArrayList;
 import java.util.List;

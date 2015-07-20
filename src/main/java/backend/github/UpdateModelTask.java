@@ -1,14 +1,13 @@
 package backend.github;
 
-import java.util.concurrent.ExecutionException;
-
-import org.apache.logging.log4j.Logger;
-
 import backend.UpdateSignature;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.*;
+import org.apache.logging.log4j.Logger;
 import util.HTLog;
+
+import java.util.concurrent.ExecutionException;
 
 public class UpdateModelTask extends GitHubRepoTask<Model> {
 

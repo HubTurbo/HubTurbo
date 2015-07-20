@@ -11,8 +11,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.collections.transformation.TransformationList;
 import javafx.scene.control.Label;
-import ui.issuepanel.PanelControl;
 import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
 import util.Utility;
 import util.events.ModelUpdatedEvent;
@@ -20,11 +20,7 @@ import util.events.ModelUpdatedEventHandler;
 import util.events.UpdateRateLimitsEvent;
 import util.events.UpdateRateLimitsEventHandler;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Comparator;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**

@@ -1,17 +1,16 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
-import java.util.*;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import backend.UpdateSignature;
 import backend.resource.*;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummyRepo;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ModelTests {
 
@@ -167,10 +166,12 @@ public class ModelTests {
         Collections.sort(labelNames); // Label 1, Label 10, Label 2..9
         int labelCount = 1;
         for (TurboLabel label : modelUpdated.getLabels()) {
-            assertEquals(labelNames.get(labelCount - 1), label.getActualName());
-            assertEquals("Label " + labelCount,
-                    modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
-            labelCount++;
+            if (label.getActualName().startsWith("Label")) {
+                assertEquals(labelNames.get(labelCount - 1), label.getActualName());
+                assertEquals("Label " + labelCount,
+                        modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
+                labelCount++;
+            }
         }
 
         // Milestones

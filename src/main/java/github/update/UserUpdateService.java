@@ -1,17 +1,15 @@
 package github.update;
 
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COLLABORATORS;
-
-import java.util.ArrayList;
-
+import com.google.gson.reflect.TypeToken;
+import github.GitHubClientExtended;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PagedRequest;
 
-import com.google.gson.reflect.TypeToken;
+import java.util.ArrayList;
 
-import github.GitHubClientExtended;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COLLABORATORS;
 
 public class UserUpdateService extends UpdateService<User>{
 

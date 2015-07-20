@@ -1,10 +1,10 @@
 package backend.interfaces;
 
+import backend.resource.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import backend.resource.*;
 
 /**
  * Only implemented by MultiModel.

@@ -1,16 +1,14 @@
 package prefs;
 
+import com.google.gson.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import util.HTLog;
+
 import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.google.gson.*;
-
-import util.HTLog;
 
 public class ConfigFileHandler {
 
