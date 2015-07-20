@@ -44,6 +44,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private UI ui;
     private String panelName = "Panel";
     private Text nameBox;
+    private Button renameButton;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
@@ -80,8 +81,9 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createNameBox() {
         nameBox = new Text(panelName);
         
-        Button renameButton = new Button();
+        renameButton = new Button();
         renameButton.setText("RENAME");
+        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e-> {
             Dialog<String> renameDialog = new TextInputDialog(panelName);
             renameDialog.setTitle("Rename Panel");
