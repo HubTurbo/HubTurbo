@@ -29,7 +29,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private Map<String, Boolean> resultList = new HashMap<>();
     private FlowPane topPane;
     private FlowPane bottomPane;
-    private Optional<String> possibleAddition = Optional.empty();
+    private Optional<String> targetLabel = Optional.empty();
+
+    // Used for multiple spaces
     private String lastAction = "";
     private int previousNumberOfActions = 0;
 
@@ -157,20 +159,19 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     public void toggleLabel(String name) {
-        processLabelChange(name);
-        updateBottomLabels("");
+        preProcessAndUpdateTopLabels(name);
+        updateBottomLabels(""); // clears search query, removes faded-out overlay on bottom labels
         populatePanes();
     }
 
     private void toggleSelectedLabel() {
-        addRemovePossibleLabel("");
         if (!bottomLabels.isEmpty() && !textField.getText().isEmpty() && hasHighlightedLabel()) {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
     }
 
-    private void processLabelChange(String name) {
+    private void preProcessAndUpdateTopLabels(String name) {
         Optional<TurboLabel> turboLabel =
                 allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
         if (turboLabel.isPresent()) {
@@ -282,15 +283,16 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void addRemovePossibleLabel(String name) {
-        // deal with previous selection
-        if (possibleAddition.isPresent()) {
-            // if there's a previous possible selection
+        // Deletes previous selection
+        if (targetLabel.isPresent()) {
+            // if there's a previous possible selection, delete it
+            // targetLabel can be
             topLabels.stream()
-                    .filter(label -> label.getActualName().equals(possibleAddition.get()))
+                    .filter(label -> label.getActualName().equals(targetLabel.get()))
                     .findFirst()
                     .ifPresent(label -> {
-                        if (issue.getLabels().contains(possibleAddition.get()) ||
-                                resultList.get(possibleAddition.get())) {
+                        if (issue.getLabels().contains(targetLabel.get()) ||
+                                resultList.get(targetLabel.get())) {
                             // if it is an existing label toggle fade and strike through
                             label.setIsHighlighted(false);
                             label.setIsFaded(false);
@@ -304,11 +306,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                             topLabels.remove(label);
                         }
                     });
-            possibleAddition = Optional.empty();
+            targetLabel = Optional.empty();
         }
 
         if (!name.isEmpty()) {
-            // deal with current selection
+            // Try to add current selection
             if (isInTopLabels(name)) {
                 // if it exists in the top pane
                 topLabels.stream()
@@ -322,6 +324,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                                 label.setIsRemoved(resultList.get(name));
                             } else {
                                 // else set fade and strike through
+                                // if space is pressed afterwards, label is removed from topLabels altogether
                                 label.setIsFaded(true);
                                 label.setIsRemoved(true);
                             }
@@ -333,7 +336,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .findFirst()
                         .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, true, false, true)));
             }
-            possibleAddition = Optional.of(name);
+            targetLabel = Optional.of(name);
         }
     }
 
