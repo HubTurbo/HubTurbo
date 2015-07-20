@@ -75,13 +75,9 @@ public class LabelPickerTests extends UITest {
         sleep(DIALOG_DELAY);
 
         type("1");
-        sleep(EVENT_DELAY);
         push(KeyCode.DOWN);
-        sleep(EVENT_DELAY);
         push(KeyCode.UP);
-        sleep(EVENT_DELAY);
         push(KeyCode.DOWN);
-        sleep(EVENT_DELAY);
         push(KeyCode.ENTER);
         sleep(DIALOG_DELAY);
         assertEquals(true, listPanelCell.getIssueLabels().contains("Label 10"));

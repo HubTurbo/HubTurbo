@@ -90,7 +90,7 @@ public class DummyRepoState {
         // Issue 6 is closed
         issues.get(6).setOpen(false);
 
-        // add more labels into repo
+        // Label groups for testing label picker exclusivity
         labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
         labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
         labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
