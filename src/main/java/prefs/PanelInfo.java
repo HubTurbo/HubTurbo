@@ -10,16 +10,8 @@ public class PanelInfo {
         this.filter = filter;
     }
     
-    public void setPanelName(String name) {
-        this.name = name;
-    }
-    
     public String getPanelName() {
         return this.name;
-    }
-    
-    public void setPanelFilter(String filter) {
-        this.filter = filter;
     }
     
     public String getPanelFilter() {
