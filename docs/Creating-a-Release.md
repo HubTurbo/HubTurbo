@@ -7,12 +7,12 @@
 
 ## Document changes
 
-- Update the [changelog](https://github.com/HubTurbo/HubTurbo/wiki/Changelog)
+- Update the [changelog](Changelog.md)
 
 ## Bump version numbers
 
-- Update version number in [build.gradle](https://github.com/HubTurbo/HubTurbo/blob/master/build.gradle)
-- Update version number in [`ui.UI`](https://github.com/HubTurbo/HubTurbo/blob/master/src/main/java/ui/UI.java)
+- Update version number in [build.gradle](build.gradle)
+- Update version number in [`ui.UI`](src/main/java/ui/UI.java)
 
 ## Tag
 
