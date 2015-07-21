@@ -20,15 +20,15 @@ That's it -- you're now all set to start using HubTurbo!
 
 Using HubTurbo
 ---
-[Let's start with the basics of navigating GitHub using HubTurbo](https://github.com/HubTurbo/HubTurbo/wiki/UI-Basics), then move on to HubTurbo's more advanced features!
+[Let's start with the basics of navigating GitHub using HubTurbo](UI-Basics.md), then move on to HubTurbo's more advanced features!
 
-### [Panels](https://github.com/HubTurbo/HubTurbo/wiki/Working-with-Panels)
+### [Panels](Working-with-Panels.md)
 
 ![](images/getting-started/3.png?raw=true)
 
 HubTurbo presents issues in *panels*, which are like little windows into GitHub's issue tracker. You can have as many panels as you want and can easily customise them to enhance your workflow.
 
-### [Filters](https://github.com/HubTurbo/HubTurbo/wiki/Filtering-Issues)
+### [Filters](Filtering-Issues.md)
 
 ![](images/getting-started/4.png?raw=true)
 
