@@ -531,4 +531,8 @@ public class UI extends Application implements EventDispatcher {
     public HWND getMainWindowHandle() {
         return mainWindowHandle;
     }
+
+    public static String getCurrentVersion() {
+        return Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+    }
 }
