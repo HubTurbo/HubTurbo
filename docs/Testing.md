@@ -14,7 +14,7 @@ E.g. `--test=true --bypasslogin=true --closeonquit=true` (in program arguments) 
 - `testchromedriver` - used to test `BrowserComponent` and `ChromeDriverEx`
 - `closeonquit` - used for test mode to shutdown `JVM` on quit (mostly for manual testing, not used for ci/tests because that will cause tests to fail)
 
-Most GUI Tests extend `UITest` which in turn extends `GuiTest` which is part of `TestFX`. 
+Most GUI Tests extend [`UITest`](../src/test/java/guitests/UITest.java) which in turn extends `GuiTest` which is part of `TestFX`. 
 - Override `launchApp` to define your own program arguments for the test
 - Override `setupMethod` to add any pre-test configuration/setup before the stage is launched
 
@@ -32,4 +32,4 @@ HubTurbo uses Travis as a CI and even the GUI Tests are run on it. This does exp
 
 ## Unit Tests
 
-Unit tests are meant to extensively test the functionality of a HubTurbo component. In most cases, this should be done without the use of File I/O. When testing file I/O components, however, do remember to include code to clean up the project directory at the end of the test, such as through `UITest.clearTestFolder`.
+Unit tests are meant to extensively test the functionality of a HubTurbo component. In most cases, this should be done without the use of File I/O. When testing file I/O components, however, do remember to include code to clean up the project directory at the end of the test, such as through [`UITest.clearTestFolder`](../src/test/java/guitests/UITest.java).
