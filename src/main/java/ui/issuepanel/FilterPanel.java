@@ -215,6 +215,16 @@ public abstract class FilterPanel extends AbstractPanel {
     public FilterExpression getCurrentFilterExpression() {
         return currentFilterExpression;
     }
+    
+    public void restorePanel(String name, String filterString) {
+    	filterTextField.setFilterText(filterString);
+    	this.panelName = name;
+    	this.nameBox.setText(panelName);
+    }
+    
+    public String getCurrentName() {
+    	return panelName;
+    }
 
     public String getCurrentFilterString() {
         return filterTextField.getText();

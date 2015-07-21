@@ -58,6 +58,10 @@ public class Preferences {
     	return global.getPanelNames();
     }
     
+    public List<PanelInfo> getPanelInfo() {
+        return global.getPanelInfo();
+    }
+    
     public void setPanelInfo(List<PanelInfo> panelInfo) {
     	global.setPanelInfo(panelInfo);
     }
