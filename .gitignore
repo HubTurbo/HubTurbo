@@ -135,4 +135,4 @@ chromedriver.exe
 .hubturbocache/
 settings/
 store/
-
+hubturbo-log.log-*
