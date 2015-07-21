@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +53,16 @@ public class Utility {
             writer.println(content);
             writer.close();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
+    }
+
+    public static void copyLog() {
+        try {
+            Files.copy(Paths.get("hubturbo-log.log"),
+                    Paths.get("hubturbo-err-log.log"),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
     }
