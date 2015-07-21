@@ -1,3 +1,5 @@
+# Architecture
+
 HubTurbo loosely follows an MVC architecture.
 
 ## Model

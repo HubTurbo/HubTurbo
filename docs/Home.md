@@ -1,3 +1,5 @@
+# Home
+
 Welcome to the HubTurbo wiki! Here you can find all kinds of information about its functionality and usage.
 
 ## Contents

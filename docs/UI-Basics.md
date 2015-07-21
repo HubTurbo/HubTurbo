@@ -1,3 +1,5 @@
+# UI Basics
+
 Here we'll get an overview of the essential parts of HubTurbo's user interface.
 
 ![](images/ui-basics/1.png?raw=true)

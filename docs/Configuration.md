@@ -1,3 +1,5 @@
+# Configuration
+
 HubTurbo creates and manages a number of configuration files in its own directory.
 
 # Contents

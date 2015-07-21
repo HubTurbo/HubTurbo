@@ -1,3 +1,5 @@
+# Issues
+
 Issues are the main entities that HubTurbo manages.
 
 ## Creating Issues <a name="creating"></a>

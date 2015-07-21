@@ -1,3 +1,5 @@
+# Getting Started
+
 ![](images/getting-started/1.png?raw=true)
 
 Setting up

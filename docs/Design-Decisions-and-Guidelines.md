@@ -1,3 +1,5 @@
+# Design Decisions and Guidelines
+
 This document contains explanations for some of the design decisions made, as well as tips on how to safely extend the codebase.
 
 It makes reference to many points first covered in [[Architecture]].

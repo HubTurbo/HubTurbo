@@ -1,3 +1,5 @@
+# Filtering Issues
+
 An essential part of navigating GitHub with HubTurbo is having multiple panels, all filled with exactly the issues you're interested in. Controlling what shows up in panels is done by writing a filter which precisely expresses what it should contain.
 
 Don't worry, there isn't much syntax to learn!

@@ -1,3 +1,5 @@
+# Working with Panels
+
 HubTurbo presents issues in vertically-arranged, flexible panels. You can create as many panels as you need, each with a different [filter](https://github.com/HubTurbo/HubTurbo/wiki/Filtering-Issues), representing a view in a particular part of the issue tracker. Knowing all the ways in which panels can be manipulated is essential to making HubTurbo a part of your workflow.
 
 ### Adding a New Panel <a name="add"></a>

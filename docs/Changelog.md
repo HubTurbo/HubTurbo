@@ -1,3 +1,5 @@
+# Changelog
+
 # V2.9.0
 
 - `updated` filter now differentiates between issue event actors by ignoring own events
