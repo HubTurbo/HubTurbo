@@ -43,7 +43,6 @@ public class PanelInfoBasicTest extends UITest {
         type("new panel").press(KeyCode.ENTER);
         
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        click("#dummy/dummy_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2").push(KeyCode.ENTER);

@@ -21,7 +21,7 @@ public class PanelInfoEmptyTest extends UITest {
     }
 
     @Test
-    public void panelsTest() {
+    public void emptyPanelsInfoTest() {
         
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
