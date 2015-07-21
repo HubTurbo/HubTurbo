@@ -44,7 +44,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Text nameBox;
     protected Button renameButton;
     private String panelName = "Panel";
-    private final int MAX_PANEL_NAME_LENGTH = 48;
+    private final int MAX_NAME_LENGTH = 48;
     private UI ui;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
@@ -78,8 +78,9 @@ public abstract class FilterPanel extends AbstractPanel {
     };
     
     private Node createNameBar() {
-    	nameBox = new Text(panelName);
-    	renameButton = new Button();
+        nameBox = new Text(panelName);
+    
+        renameButton = new Button();
         renameButton.setText("RENAME");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
@@ -88,11 +89,11 @@ public abstract class FilterPanel extends AbstractPanel {
             renameDialog.setHeaderText("Enter a new name for this panel.");
             Optional<String> result = renameDialog.showAndWait();
             String name = result.get();
-            if (!name.equals("")) {
+            if (name.length() != 0) {
                 panelName = name;
             }
-            if (panelName.length() > MAX_PANEL_NAME_LENGTH) {
-                panelName = panelName.substring(0, MAX_PANEL_NAME_LENGTH);
+            if (panelName.length() > MAX_NAME_LENGTH) {
+                panelName = panelName.substring(0, MAX_NAME_LENGTH);
             }
             nameBox.setText(panelName);
         });
@@ -217,13 +218,13 @@ public abstract class FilterPanel extends AbstractPanel {
     }
     
     public void restorePanel(String name, String filterString) {
-    	filterTextField.setFilterText(filterString);
-    	this.panelName = name;
-    	this.nameBox.setText(panelName);
+        filterTextField.setFilterText(filterString);
+        this.panelName = name;
+        this.nameBox.setText(panelName);
     }
     
     public String getCurrentName() {
-    	return panelName;
+        return this.panelName;
     }
 
     public String getCurrentFilterString() {

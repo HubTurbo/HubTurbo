@@ -86,7 +86,7 @@ public class PanelControl extends HBox {
         }
 
         for (int i = 0; i < panelInfo.size(); i++) {
-        	addPanel().restorePanel(panelInfo.get(i).getPanelName(), panelInfo.get(i).getPanelFilter());
+            addPanel().restorePanel(panelInfo.get(i).getPanelName(), panelInfo.get(i).getPanelFilter());
         }
     }
 

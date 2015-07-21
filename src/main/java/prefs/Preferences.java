@@ -55,7 +55,7 @@ public class Preferences {
     }
 
     public List<String> getPanelNames() {
-    	return global.getPanelNames();
+        return global.getPanelNames();
     }
     
     public List<PanelInfo> getPanelInfo() {
@@ -63,7 +63,7 @@ public class Preferences {
     }
     
     public void setPanelInfo(List<PanelInfo> panelInfo) {
-    	global.setPanelInfo(panelInfo);
+        global.setPanelInfo(panelInfo);
     }
 
     /**
