@@ -11,8 +11,8 @@
 
 ## Bump version numbers
 
-- Update version number in [build.gradle](build.gradle)
-- Update version number in [`ui.UI`](src/main/java/ui/UI.java)
+- Update version number in [build.gradle](../build.gradle)
+- Update version number in [`ui.UI`](../src/main/java/ui/UI.java)
 
 ## Tag
 
