@@ -10,9 +10,9 @@
 
 ## Environment Setup
 
-### Check out current `master`
+### Check out current `[master](https://github.com/HubTurbo/HubTurbo)`
 
-Development of HubTurbo moves fairly quickly. The `master` branch is generally always slightly ahead of the released version and contains features which will go into the next version, so you should check it out and build it to get started.
+Development of HubTurbo moves fairly quickly. The `[master](https://github.com/HubTurbo/HubTurbo)` branch is generally always slightly ahead of the released version and contains features which will go into the next version, so you should check it out and build it to get started.
 
 ### Eclipse
 
@@ -69,9 +69,9 @@ If errors occur, trying running `clean` before the task (e.g. `./gradlew clean t
 
 ## What now?
 
-The [User Guide](https://github.com/HubTurbo/HubTurbo/wiki/Getting-Started) has lots of detail on how to use HubTurbo. Be sure to give it a quick read!
+The [User Guide](Getting-Started.md) has lots of detail on how to use HubTurbo. Be sure to give it a quick read!
 
-After that, check out the documentation on [architecture](https://github.com/HubTurbo/HubTurbo/wiki/Architecture) and [design](https://github.com/HubTurbo/HubTurbo/wiki/Design-Decisions-and-Guidelines) for an overview of the codebase, and why it's the way it is. Read about the [workflow](https://github.com/HubTurbo/HubTurbo/wiki/Workflow) once you are ready to contribute.
+After that, check out the documentation on [architecture](Architecture.md) and [design](Design-Decisions-and-Guidelines.md) for an overview of the codebase, and why it's the way it is. Read about the [workflow](Workflow.md) once you are ready to contribute.
 
 ## Troubleshooting
 
