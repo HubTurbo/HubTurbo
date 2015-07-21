@@ -9,8 +9,6 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
  */
 public class HTLog {
 
-    private static final Logger logger = HTLog.get(HTLog.class);
-
     public static Logger get(Class<?> c) {
         return LogManager.getLogger(c.getName());
     }
@@ -30,4 +28,5 @@ public class HTLog {
     public static void error(Logger logger, Exception e) {
         logger.error(e.getLocalizedMessage(), e);
     }
+
 }
