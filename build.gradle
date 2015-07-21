@@ -33,6 +33,9 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven {
+            url "https://repo.eclipse.org/content/repositories/egit-releases/"
+        }
     }
 
     project.ext {
@@ -43,7 +46,7 @@ allprojects {
         jnaVersion = '4.1.0'
         markdown4jVersion = '2.2-cj-1.0'
         openjfxDialogsVersion = '1.0.3'
-        egitVersion = '2.1.5_1'
+        egitVersion = '4.0.1.201506240215-r'
         prettytimeVersion = '4.0.0.Final'
         seleniumJavaVersion = '2.46.0'
         seleniumServerVersion = '2.46.0'
@@ -61,7 +64,7 @@ allprojects {
         compile "net.java.dev.jna:jna:$jnaVersion"
         compile "org.commonjava.googlecode.markdown4j:markdown4j:$markdown4jVersion"
         compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
-        compile "org.apache.servicemix.bundles:org.apache.servicemix.bundles.egit.github.core:$egitVersion"
+        compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:$egitVersion"
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
