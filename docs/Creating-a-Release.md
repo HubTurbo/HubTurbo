@@ -5,11 +5,6 @@
 - Close completed issues and put them under the appropriate milestone
 - Issues which weren't finished should be moved to the next milestone
 
-## Update doc variables
-
-- Change the URL variables in `util.GitHubURL` to use the appropriate tags e.g. from `[...]/blob/V3.0.0/docs/[...]` to `[...]/blob/V3.1.0/docs/[...]`
-- Note that these are not valid URLs until you have pushed the tag
-
 ## Document changes
 
 - Update the [changelog](Changelog.md)
