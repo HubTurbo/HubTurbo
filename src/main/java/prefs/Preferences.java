@@ -54,8 +54,12 @@ public class Preferences {
         return global.getLastOpenFilters();
     }
 
-    public void setLastOpenFilters(List<String> filter) {
-        global.setLastOpenFilters(filter);
+    public List<String> getPanelNames() {
+    	return global.getPanelNames();
+    }
+    
+    public void setPanelInfo(List<PanelInfo> panelInfo) {
+    	global.setPanelInfo(panelInfo);
     }
 
     /**
