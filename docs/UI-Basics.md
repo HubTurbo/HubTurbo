@@ -1,10 +1,10 @@
 Here we'll get an overview of the essential parts of HubTurbo's user interface.
 
-[[images/ui-basics/1.png]]
+![](images/ui-basics/1.png?raw=true)
 
 HubTurbo's interface is split in two. These parts are the **panel view** and the **browser view**.
 
-[[images/ui-basics/2.png]]
+![](images/ui-basics/2.png?raw=true)
 
 The **panel view** displays panels of issues, serving as an overview of the issue tracker. HubTurbo is meant to be used alongside GitHub, so the **browser view** generally shows a GitHub page; for example, clicking on an issue in a panel will navigate to its page in the browser view.
 
