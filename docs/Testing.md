@@ -1,6 +1,6 @@
 # Testing
 
-There are two kinds of tests for HubTurbo, GUI Tests and Unit Tests. They are separated into two packages in the `test` folder, namely `guitests` and `tests`. Currently all tests are run sequentially, with a new `JVM` started for each new test class (mainly because you can't run more than one GUI Test at once).  
+There are two kinds of tests for HubTurbo, GUI Tests and Unit Tests. They are separated into two packages in the [`test`](../src/test/java) folder, namely [`guitests`](../src/test/java/guitests) and [`tests`](../src/test/java/tests). Currently all tests are run sequentially, with a new `JVM` started for each new test class (mainly because you can't run more than one GUI Test at once).  
 
 ## GUI Tests
 
