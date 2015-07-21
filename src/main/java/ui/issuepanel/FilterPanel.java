@@ -17,7 +17,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.PanelClickedEvent;
@@ -44,7 +43,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected FilterTextField filterTextField;
     private UI ui;
     private String panelName = "Panel";
-    private final int MAX_PANEL_NAME = 32;
+    private final int MAX_PANEL_NAME_LENGTH = 48;
     private Text nameBox;
     private Button renameButton;
 
@@ -86,7 +85,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton = new Button();
         renameButton.setText("RENAME");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
-        renameButton.setOnMouseClicked(e-> {
+        renameButton.setOnMouseClicked(e -> {
             Dialog<String> renameDialog = new TextInputDialog(panelName);
             renameDialog.setTitle("Rename Panel");
             renameDialog.setHeaderText("Enter a new name for this panel.");
@@ -95,16 +94,28 @@ public abstract class FilterPanel extends AbstractPanel {
             if (!name.equals("")) {
                 panelName = name;
             }
-            if (panelName.length() > MAX_PANEL_NAME) {
-                panelName = panelName.substring(0, MAX_PANEL_NAME);
+            if (panelName.length() > MAX_PANEL_NAME_LENGTH) {
+                panelName = panelName.substring(0, MAX_PANEL_NAME_LENGTH);
             }
             nameBox.setText(panelName);
         });
         
-        StackPane nameBar = new StackPane();
-        nameBar.getChildren().addAll(nameBox, renameButton);
-        StackPane.setAlignment(nameBox, Pos.TOP_LEFT);
-        StackPane.setAlignment(renameButton, Pos.TOP_RIGHT);
+        HBox nameArea = new HBox();
+        nameArea.getChildren().add(nameBox);
+        nameArea.setAlignment(Pos.TOP_LEFT);
+        nameArea.setMinWidth(320);
+        nameArea.setMaxWidth(320);
+        
+        HBox renameArea = new HBox();
+        renameArea.getChildren().add(renameButton);
+        renameArea.setAlignment(Pos.TOP_RIGHT);
+        renameArea.setMinWidth(60);
+        
+        HBox nameBar = new HBox();
+        nameBar.setSpacing(10);
+        nameBar.setMinWidth(PANEL_WIDTH);
+        nameBar.setMaxWidth(PANEL_WIDTH);
+        nameBar.getChildren().addAll(nameArea, renameArea);
         return nameBar;
     }
 
