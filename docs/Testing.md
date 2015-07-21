@@ -20,11 +20,11 @@ Most GUI Tests extend [`UITest`](../src/test/java/guitests/UITest.java) which in
 
 Ensure that anything that causes the UI to change is wrapped in a `Platform.runLater` (if not you will get a `not on FX thread` error). You may need to specify a delay (using `sleep(X)`) to ensure that the wrapped command has been executed before proceeding on to the next line. Alternatively you can consider using `PlatformEx.runAndWait`. 
 
-To test for events, you can create new events for the test in `util.events.testevents`, ensure that you also create the corresponding event handler. You can then test for event triggering using `UI.events.registerEvent((EventHandler))`. 
+To test for events, you can create new events for the test in [`util.events.testevents`](../src/main/java/util/events/testevents), ensure that you also create the corresponding event handler. You can then test for event triggering using [`UI.events.registerEvent((EventHandler))`](../src/main/java/ui/UI.java). 
 
-When testing certain GUI components, if they are children of the JavaFX `Node` class, they can be interacted directly within the test using their identifier. Make sure that the component's identifier has been set using `setId(<identifier>)` and then you can use `find(#<identifier>)` select it. Any method that uses identifiers can also be used such as `click(#<identifier>)`. 
+When testing certain GUI components, if they are children of the JavaFX [`Node`](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/Node.html) class, they can be interacted directly within the test using their identifier. Make sure that the component's identifier has been set using `setId(<identifier>)` and then you can use `find(#<identifier>)` select it. Any method that uses identifiers can also be used such as `click(#<identifier>)`. 
 
-In order to interact with a text field within a pop-up/dialog window within the CI, the main stage must be hidden first. See `LabelPickerTests` for an example of this. 
+In order to interact with a text field within a pop-up/dialog window within the CI, the main stage must be hidden first. See [`LabelPickerTests`](../src/test/java/guitests/LabelPickerTests.java) for an example of this. 
 
 ## CI Quirks
 
