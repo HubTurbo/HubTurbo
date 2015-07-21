@@ -1,4 +1,4 @@
-Labels and milestones are the main metadata items that may be associated with [issues](Issues).
+Labels and milestones are the main metadata items that may be associated with [issues](Issues.md).
 
 ## Creating Labels <a name="labels"></a>
 
