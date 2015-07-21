@@ -1,5 +1,3 @@
-**Upcoming Feature**
-
 Pressing <kbd>L</kbd> after selecting an item brings up the Label Picker. 
 
 ![](images/label-picker/1.png?raw=true)
