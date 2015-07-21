@@ -5,6 +5,11 @@
 - Close completed issues and put them under the appropriate milestone
 - Issues which weren't finished should be moved to the next milestone
 
+## Update doc variables
+
+- Change the URL variables in `util.GitHubURL` to use the appropriate tags e.g. from `[...]/blob/V3.0.0/docs/[...]` to `[...]/blob/V3.1.0/docs/[...]`
+- Note that these are not valid URLs until you have pushed the tag
+
 ## Document changes
 
 - Update the [changelog](Changelog.md)
@@ -36,23 +41,6 @@
 - `./gradlew build`
 - The JAR will be in `build/libs/HubTurbo-x.x.x-all`
 - Name the JAR in the format: `resource-vMAJOR.MINOR.PATCH.jar`
-
-<!--
-
-IntelliJ instructions don't seem to work?
-
-**IntelliJ IDEA**
-
-- `File` > `Project Structure` > `Artifacts`
-- `+` > `JAR` > `From modules with dependencies`
-- Fill out form
-    - Main class: `ui.UI`
-    - JAR files from libraries: `extract to target jar`
-    - Directory for META-INF/MANIFEST.MF: `src/main/resources`
-- `OK` > `OK`
-- `Build` > `Build Artifacts` > `Build`
-
--->
 
 **Afterwards**
 

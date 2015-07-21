@@ -1,5 +1,16 @@
 # Changelog
 
+# V3.0.0
+
+- Added the label picker
+- Documentation is now part of the main repository
+- Removed the majority of `.jar` dependencies from the repository
+- Streamlined the user login process
+- Allowed user customisation of keyboard shortcuts
+- Fixed issues with the repository selector
+- Rewrite of GUI logic
+- More robust testing
+
 # V2.9.0
 
 - `updated` filter now differentiates between issue event actors by ignoring own events
