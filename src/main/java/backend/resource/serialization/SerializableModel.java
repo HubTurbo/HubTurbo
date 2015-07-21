@@ -31,6 +31,23 @@ public class SerializableModel {
         this.users = model.getUsers().stream()
             .map(SerializableUser::new).collect(Collectors.toList());
     }
+
+    @Override
+    public String toString() {
+        String formatter = "Model: {%n"
+                + "repoId: %s%n"
+                + "updateSignature: %s%n"
+                + "users:%n%s,%n"
+                + "labels:%n%s,%n"
+                + "milestones:%n%s,%n"
+                + "issues:%n%s%n"
+                + "}";
+
+        return String.format(
+                formatter,
+                repoId, updateSignature,
+                users, labels, milestones, issues);
+    }
 }
 
 
