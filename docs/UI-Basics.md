@@ -14,6 +14,6 @@ The general workflow is to switch back and forth between the two windows as need
 
 Other user interface elements are more typical: the **menu** contains ways to add new panels, navigate to different pages in the browser view, and other application-level operations, and the **repository** dropdown allows you to change the *default repository* that HubTurbo is viewing. HubTurbo can be viewing many repositories at once; the default repository is just the one used when no repository is explicitly specified.
 
-An **issue panel** provides a view into a section of the issue tracker. It displays **issue cards** according to the filter set in it. The filter can help you [refine](https://github.com/HubTurbo/HubTurbo/wiki/Filtering-Issues) the portion of the issue tracker that you're interested in, so you can get to the information you need faster. You can also have [as many panels as you want](https://github.com/HubTurbo/HubTurbo/wiki/Working-with-Panels), ensuring that all information relevant to you is shown at once.
+An **issue panel** provides a view into a section of the issue tracker. It displays **issue cards** according to the filter set in it. The filter can help you [refine](Filtering-Issues.md) the portion of the issue tracker that you're interested in, so you can get to the information you need faster. You can also have [as many panels as you want](Working-with-Panels.md), ensuring that all information relevant to you is shown at once.
 
-To get the most out of the user interface, check out how to navigate it with [keyboard shortcuts](https://github.com/HubTurbo/HubTurbo/wiki/Keyboard-Shortcuts).
+To get the most out of the user interface, check out how to navigate it with [keyboard shortcuts](Keyboard-Shortcuts.md).
