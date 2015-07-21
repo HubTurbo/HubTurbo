@@ -10,9 +10,9 @@
 
 ## Environment Setup
 
-### Check out current `[master](https://github.com/HubTurbo/HubTurbo)`
+### Check out current [`master`](https://github.com/HubTurbo/HubTurbo)
 
-Development of HubTurbo moves fairly quickly. The `[master](https://github.com/HubTurbo/HubTurbo)` branch is generally always slightly ahead of the released version and contains features which will go into the next version, so you should check it out and build it to get started.
+Development of HubTurbo moves fairly quickly. The [`master`](https://github.com/HubTurbo/HubTurbo) branch is generally always slightly ahead of the released version and contains features which will go into the next version, so you should check it out and build it to get started.
 
 ### Eclipse
 
