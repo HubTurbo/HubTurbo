@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
+import prefs.PanelInfo;
 import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
@@ -57,27 +58,35 @@ public class PanelControl extends HBox {
 
     public void saveSession() {
         List<String> sessionFilters = new ArrayList<>();
+        List<String> panelNames = new ArrayList<>();
         getChildren().forEach(child -> {
             if (child instanceof FilterPanel) {
                 String filter = ((FilterPanel) child).getCurrentFilterString();
                 sessionFilters.add(filter);
+                String panelName = ((FilterPanel) child).getPanelName();
+                panelNames.add(panelName);
             }
         });
-        prefs.setLastOpenFilters(sessionFilters);
+        List<PanelInfo> panelInfo = new ArrayList<>();
+        for (int i = 0; i < sessionFilters.size(); i++) {
+            assert sessionFilters.size() == panelNames.size();
+            panelInfo.add(new PanelInfo(panelNames.get(i), sessionFilters.get(i)));
+        }
+        prefs.setPanelInfo(panelInfo);
     }
 
     public void restorePanels() {
         getChildren().clear();
-
-        List<String> filters = prefs.getLastOpenFilters();
-
-        if (filters.isEmpty()) {
+        
+        List<PanelInfo> panelInfo = prefs.getPanelInfo();
+        
+        if (panelInfo.isEmpty()) {
             addPanel();
             return;
         }
 
-        for (String filter : filters) {
-            addPanel().filterByString(filter);
+        for (int i = 0; i < panelInfo.size(); i++) {
+            addPanel().restorePanel(panelInfo.get(i).getPanelFilter(), panelInfo.get(i).getPanelName());
         }
     }
 
@@ -98,11 +107,12 @@ public class PanelControl extends HBox {
 
     public FilterPanel addPanelAt(int index) {
         FilterPanel panel = new ListPanel(ui, model, this, index);
+        
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.
         guiController.panelFilterExpressionChanged(panel);
-
+        
         updatePanelIndices();
         setCurrentlySelectedPanel(Optional.of(index));
         return panel;
