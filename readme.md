@@ -4,4 +4,4 @@
 
 Check out the [user guide](docs/Getting-Started.md)!
 
-To get started contributing to HubTurbo, check out the [setup guide](docs/Development-Environment.md). Developer documentation can be found in the [documentation](docs/Home.md).
+To get started contributing to HubTurbo, check out the [setup guide](docs/Development-Environment.md). Other user and developer documentation can be found [here](docs/Home.md).
