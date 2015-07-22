@@ -66,7 +66,7 @@ public class Utility {
         // we consider the json to have exploded.
         if (sizeAfterWrite > ((long) issueCount * 1000)) {
             Platform.runLater(() -> DialogMessage.showErrorDialog(
-                    "Expected local storage growth",
+                    "Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
                             + "It is recommended that you delete the file and reopen the program to prevent "
                             + "further corruption.\n\n"
