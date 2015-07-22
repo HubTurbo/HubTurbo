@@ -1,19 +1,21 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Button;
 
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
+import ui.components.FilterTextField;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
-	
-	private static final int EVENT_DELAY = 1000;
+
+    public static final int EVENT_DELAY = 200;
 
     @Override
     public void launchApp() {
@@ -30,25 +32,39 @@ public class PanelInfoBasicTest extends UITest {
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
         
-        click("RENAME");
-        type("new panel").press(KeyCode.ENTER);
+        Button renameButton1 = find("#dummy/dummy_col0_renameButton");
+        click(renameButton1);
+        type("Renamed panel").press(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        FilterTextField filterTextField2 = find("#dummy/dummy_col1_filterTextField");
+        click(filterTextField2);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2").push(KeyCode.ENTER);
-        click("RENAME");
-        type("Dummy 2 repo").push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        
+        Button renameButton2 = find("#dummy/dummy_col1_renameButton");
+        click(renameButton2);
+        type("Dummy 2 panel").push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         // Creating panel to the left
         press(KeyCode.SHIFT).press(KeyCode.CONTROL).press(KeyCode.P);
         release(KeyCode.P).release(KeyCode.CONTROL).release(KeyCode.SHIFT);
-        click("#dummy/dummy_col0_filterTextField");
+        
+        FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
+        click(filterTextField3);
         type("is");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("open").push(KeyCode.ENTER);
-        click("#dummy/dummy_col0_renameButton");
+        sleep(EVENT_DELAY);
+        
+        Button renameButton3 = find("#dummy/dummy_col0_renameButton");
+        click(renameButton3);
         type("Open issues").push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         // Quitting to update json
         click("File");
@@ -57,8 +73,6 @@ public class PanelInfoBasicTest extends UITest {
         
         Preferences testPref = new Preferences(true);
         
-        assertEquals("dummy/dummy", testPref.getLastViewedRepository());
-        
         List<String> openPanels = testPref.getPanelNames();
         List<String> openFilters = testPref.getLastOpenFilters();
         
@@ -66,8 +80,8 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals(3, openFilters.size());
 
         assertEquals("Open issues", openPanels.get(0));
-        assertEquals("new panel", openPanels.get(1));
-        assertEquals("Dummy 2 repo", openPanels.get(2));
+        assertEquals("Renamed panel", openPanels.get(1));
+        assertEquals("Dummy 2 panel", openPanels.get(2));
 
         assertEquals("is:open", openFilters.get(0));
         assertEquals("", openFilters.get(1));
