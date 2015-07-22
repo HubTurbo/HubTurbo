@@ -47,33 +47,27 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static void writeFile(String fileName, String content) {
+    public static void writeFile(String fileName, String content, int issueCount) {
         PrintWriter writer;
         try {
-            boolean fileExists = Files.exists(Paths.get(fileName));
-            long sizeBeforeWrite = fileExists ? Files.size(Paths.get(fileName)) : 0;
-            long sizeAfterWrite = 0;
-
             writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
 
-            if (fileExists) {
-                sizeAfterWrite = Files.size(Paths.get(fileName));
-                checkFileGrowth(sizeBeforeWrite, sizeAfterWrite, fileName);
-            }
+            long sizeAfterWrite = Files.size(Paths.get(fileName));
+            checkFileGrowth(sizeAfterWrite, issueCount, fileName);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
     }
 
-    private static void checkFileGrowth(long sizeBeforeWrite, long sizeAfterWrite, String fileName) {
-        // If size grew by more than 10 times in the past write, copy the log and raise an error.
-        if (((sizeAfterWrite - sizeBeforeWrite) / sizeAfterWrite) > 0.9) {
+    private static void checkFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
+        // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
+        // we consider the json to have exploded.
+        if (sizeAfterWrite > ((long) issueCount * 1000)) {
             Platform.runLater(() -> DialogMessage.showErrorDialog(
                     "Expected local storage growth",
-                    fileName + " has grown by an exceptionally large amount of "
-                            + (sizeAfterWrite - sizeBeforeWrite) / 1000000 + "MB in the last update.\n\n"
+                    fileName + " is unusually large.\n\n"
                             + "It is recommended that you delete the file and reopen the program to prevent "
                             + "further corruption.\n\n"
                             + "The error log of the program has been stored in the file hubturbo-err-log.log."

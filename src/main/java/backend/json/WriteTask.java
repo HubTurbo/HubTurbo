@@ -25,7 +25,7 @@ class WriteTask extends StoreTask {
 
     private void save(String repoId, SerializableModel model) {
         String output = new Gson().toJson(model);
-        RepoStore.write(repoId, output);
+        RepoStore.write(repoId, output, model.issues.size());
         logger.info(HTLog.format(repoId, "Written to JSON store"));
     }
 }
