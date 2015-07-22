@@ -22,7 +22,7 @@ public class GlobalConfig {
 
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
-    private List<String> lastOpenFilters = new ArrayList<>();
+    private List<PanelInfo> openPanels = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
@@ -81,12 +81,28 @@ public class GlobalConfig {
         boards.remove(name);
     }
 
-    public void setLastOpenFilters(List<String> filter) {
-        lastOpenFilters = new ArrayList<>(filter);
-    }
-
     public List<String> getLastOpenFilters() {
-        return new ArrayList<>(lastOpenFilters);
+        List<String> lastOpenFilters = new ArrayList<>();
+        for (int i = 0; i < openPanels.size(); i++) {
+            lastOpenFilters.add(openPanels.get(i).getPanelFilter());
+        }
+        return lastOpenFilters;
+    }
+    
+    public List<String> getPanelNames() {
+        List<String> openPanelNames = new ArrayList<>();
+        for (int i = 0; i < openPanels.size(); i++) {
+            openPanelNames.add(openPanels.get(i).getPanelName());
+        }
+        return openPanelNames;
+    }
+    
+    public void setPanelInfo(List<PanelInfo> panelInfo) {
+        this.openPanels = new ArrayList<PanelInfo>(panelInfo);
+    }
+    
+    public List<PanelInfo> getPanelInfo() {
+        return new ArrayList<PanelInfo>(openPanels);
     }
 
     public void setLastViewedRepository(String repository) {
