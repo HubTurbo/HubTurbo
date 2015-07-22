@@ -55,8 +55,6 @@ public class PanelInfoBasicTest extends UITest {
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         
         Preferences testPref = new Preferences(true);
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
         
         List<String> openPanels = testPref.getPanelNames();
         List<String> openFilters = testPref.getLastOpenFilters();
