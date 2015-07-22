@@ -1,6 +1,5 @@
 package guitests;
 
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
@@ -51,7 +50,7 @@ public class PanelInfoBasicTest extends UITest {
         
         // Quitting to update json
         click("File");
-        click("Quit");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         
         Preferences testPref = new Preferences(true);
         List<String> openPanels = testPref.getPanelNames();
