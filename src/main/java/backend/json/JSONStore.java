@@ -34,8 +34,10 @@ public class JSONStore extends RepoStore {
     }
 
     @Override
-    public void saveRepository(String repoId, SerializableModel model) {
-        addTask(new WriteTask(repoId, model));
+    public CompletableFuture<Boolean> saveRepository(String repoId, SerializableModel model) {
+        CompletableFuture<Boolean> response = new CompletableFuture<>();
+        addTask(new WriteTask(repoId, model, response));
+        return response;
     }
 
     public List<String> getStoredRepos() {

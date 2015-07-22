@@ -47,7 +47,7 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static void writeFile(String fileName, String content, int issueCount) {
+    public static boolean writeFile(String fileName, String content, int issueCount) {
         PrintWriter writer;
         try {
             writer = new PrintWriter(fileName, "UTF-8");
@@ -55,13 +55,14 @@ public class Utility {
             writer.close();
 
             long sizeAfterWrite = Files.size(Paths.get(fileName));
-            checkFileGrowth(sizeAfterWrite, issueCount, fileName);
+            return checkFileGrowth(sizeAfterWrite, issueCount, fileName);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
+            return true;
         }
     }
 
-    private static void checkFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
+    private static boolean checkFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
         // we consider the json to have exploded.
         if (sizeAfterWrite > ((long) issueCount * 1000)) {
@@ -73,7 +74,10 @@ public class Utility {
                             + "The error log of the program has been stored in the file hubturbo-err-log.log."
             ));
             copyLog();
+            return true;
         }
+
+        return false;
     }
 
     public static void copyLog() {
