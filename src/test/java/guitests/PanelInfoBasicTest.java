@@ -17,21 +17,11 @@ public class PanelInfoBasicTest extends UITest {
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Test
     public void basicPanelInfoTest() {
-        
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
-        type("dummy").push(KeyCode.TAB);
-        type("dummy").push(KeyCode.TAB);
-        type("test").push(KeyCode.TAB);
-        type("test");
-        click("Sign in");
-        sleep(2000);
         
         // Test for basic functions of saving panel information.
         // Only involves panel additions.
@@ -46,7 +36,7 @@ public class PanelInfoBasicTest extends UITest {
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2").push(KeyCode.ENTER);
-        click("#dummy/dummy_col1_renameButton");
+        click("RENAME");
         type("Dummy 2 repo").push(KeyCode.ENTER);
         
         // Creating panel to the left

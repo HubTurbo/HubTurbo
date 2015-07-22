@@ -17,21 +17,11 @@ public class PanelInfoEmptyTest extends UITest {
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Test
     public void emptyPanelsInfoTest() {
-        
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
-        type("dummy").push(KeyCode.TAB);
-        type("dummy").push(KeyCode.TAB);
-        type("test").push(KeyCode.TAB);
-        type("test");
-        click("Sign in");
-        sleep(2000);
         
         // Test for saving panel information when there are no panels at termination.
         
