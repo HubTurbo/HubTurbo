@@ -12,11 +12,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
+	
+	private static final int EVENT_DELAY = 1000;
 
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--testjson=true", "--bypasslogin=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Test
@@ -51,6 +53,7 @@ public class PanelInfoBasicTest extends UITest {
         // Quitting to update json
         click("File");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         Preferences testPref = new Preferences(true);
         
