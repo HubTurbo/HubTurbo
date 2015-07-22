@@ -2,7 +2,8 @@
 
 Notes:
 * The development workflow is a simplified version of the one used in [TEAMMATES](https://github.com/TEAMMATES/repo/blob/master/devdocs/process.md). 
-* The `master` branch always contains the latest stable code.
+* The `master` branch always contains the latest stable code (may contain unreleased features/fixes).
+* The `release` branch always contains the latest release version.
 
 ## Workflow for new contributors
 

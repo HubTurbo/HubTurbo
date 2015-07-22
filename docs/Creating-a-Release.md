@@ -24,22 +24,15 @@
 
 ## Create and upload JAR
 
-**Eclipse**
-
-- `File` > `Export` > `Runnable JAR file`
-- `Extract required libraries into generated JAR` **(important!)**
-- Name the JAR in the format: `resource-vMAJOR.MINOR.PATCH.jar`
-- Finish wizard
-
-**Gradle**
-
-- `./gradlew build`
+- Can be executed from the command line (using `gradlew`), Eclipse or IntelliJ IDEA
+- Use `clean shadowJar` (E.g. `./gradlew clean shadowJar`)
 - The JAR will be in `build/libs/HubTurbo-x.x.x-all`
 - Name the JAR in the format: `resource-vMAJOR.MINOR.PATCH.jar`
 
 **Afterwards**
 
 - Upload JAR to [Releases](https://github.com/HubTurbo/HubTurbo/releases/new) under the tag you just created
+- Merge `master` into `release`
 
 ## Enable automatic updates
 
