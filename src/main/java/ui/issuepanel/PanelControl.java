@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
+import prefs.PanelInfo;
 import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
@@ -56,28 +57,36 @@ public class PanelControl extends HBox {
     }
 
     public void saveSession() {
-        List<String> sessionFilters = new ArrayList<>();
+        List<String> panelFilters = new ArrayList<>();
+        List<String> panelNames = new ArrayList<>();
         getChildren().forEach(child -> {
             if (child instanceof FilterPanel) {
                 String filter = ((FilterPanel) child).getCurrentFilterString();
-                sessionFilters.add(filter);
+                panelFilters.add(filter);
+                String name = ((FilterPanel) child).getCurrentName();
+                panelNames.add(name);
             }
         });
-        prefs.setLastOpenFilters(sessionFilters);
+        List<PanelInfo> panelInfo = new ArrayList<>();
+        for (int i = 0; i < panelFilters.size(); i++) {
+            assert panelFilters.size() == panelNames.size();
+            panelInfo.add(new PanelInfo(panelNames.get(i), panelFilters.get(i)));
+        }
+        prefs.setPanelInfo(panelInfo);
     }
 
     public void restorePanels() {
         getChildren().clear();
 
-        List<String> filters = prefs.getLastOpenFilters();
+        List<PanelInfo> panelInfo = prefs.getPanelInfo();
 
-        if (filters.isEmpty()) {
+        if (panelInfo.isEmpty()) {
             addPanel();
             return;
         }
 
-        for (String filter : filters) {
-            addPanel().filterByString(filter);
+        for (int i = 0; i < panelInfo.size(); i++) {
+            addPanel().restorePanel(panelInfo.get(i).getPanelName(), panelInfo.get(i).getPanelFilter());
         }
     }
 
