@@ -57,6 +57,8 @@ public class PanelInfoBasicTest extends UITest {
         
         Preferences testPref = new Preferences(true);
         
+        assertEquals("dummy/dummy", testPref.getLastViewedRepository());
+        
         List<String> openPanels = testPref.getPanelNames();
         List<String> openFilters = testPref.getLastOpenFilters();
         
