@@ -49,11 +49,27 @@ public class Utility {
     public static void writeFile(String fileName, String content) {
         PrintWriter writer;
         try {
+            boolean fileExists = Files.exists(Paths.get(fileName));
+            long sizeBeforeWrite = fileExists ? Files.size(Paths.get(fileName)) : 0;
+            long sizeAfterWrite = 0;
+
             writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+
+            if (fileExists) {
+                sizeAfterWrite = Files.size(Paths.get(fileName));
+                checkFileGrowth(sizeBeforeWrite, sizeAfterWrite);
+            }
+        } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
+        }
+    }
+
+    private static void checkFileGrowth(long sizeBeforeWrite, long sizeAfterWrite) {
+        // If size grew by more than 10 times in the past write, copy the log.
+        if (((sizeAfterWrite - sizeBeforeWrite) / sizeAfterWrite) > 0.9) {
+            copyLog();
         }
     }
 
