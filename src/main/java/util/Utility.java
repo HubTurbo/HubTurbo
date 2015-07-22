@@ -59,7 +59,6 @@ public class Utility {
             writer.close();
 
             if (fileExists) {
-                System.out.println("lol");
                 sizeAfterWrite = Files.size(Paths.get(fileName));
                 checkFileGrowth(sizeBeforeWrite, sizeAfterWrite, fileName);
             }
