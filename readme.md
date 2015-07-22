@@ -2,6 +2,6 @@
 
 ### A companion to GitHub for your desktop.
 
-Check out the [user guide](docs/Getting-Started.md)!
+Check out the [user guide](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Getting-Started.md) for the latest release version!
 
-To get started contributing to HubTurbo, check out the [setup guide](docs/Development-Environment.md). Other user and developer documentation can be found [here](docs/Home.md).
+To get started contributing to HubTurbo, check out the [setup guide](docs/Development-Environment.md). Other user and developer documentation can be found [here](docs/Home.md) (may be newer than release version).
