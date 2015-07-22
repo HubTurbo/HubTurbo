@@ -37,6 +37,7 @@ public class PanelInfoBasicTest extends UITest {
         type("Renamed panel").press(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
+        // Creating new panel
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         FilterTextField filterTextField2 = find("#dummy/dummy_col1_filterTextField");
         click(filterTextField2);
