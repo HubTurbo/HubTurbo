@@ -12,8 +12,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
-	
-	private static final int EVENT_DELAY = 1000;
+
+    private static final int EVENT_DELAY = 4000;
 
     @Override
     public void launchApp() {
@@ -56,8 +56,6 @@ public class PanelInfoBasicTest extends UITest {
         sleep(EVENT_DELAY);
         
         Preferences testPref = new Preferences(true);
-        
-        assertEquals("dummy/dummy", testPref.getLastViewedRepository());
         
         List<String> openPanels = testPref.getPanelNames();
         List<String> openFilters = testPref.getLastOpenFilters();
