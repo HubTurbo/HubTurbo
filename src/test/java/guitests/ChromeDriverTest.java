@@ -129,7 +129,7 @@ public class ChromeDriverTest extends UITest {
         // go to keyboard shortcuts page
         push(KeyCode.G).push(KeyCode.K);
         sleep(EVENT_DELAY);
-        assertEquals(GitHubURL.getPathForKeyboardShortcuts(), url);
+        assertEquals(GitHubURL.KEYBOARD_SHORTCUTS_PAGE, url);
         clearUrl();
 
         // manage assignee

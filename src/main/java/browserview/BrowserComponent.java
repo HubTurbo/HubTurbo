@@ -177,7 +177,7 @@ public class BrowserComponent {
      */
     public void showDocs() {
         logger.info("Showing documentation page");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForDocsPage(), false));
+        runBrowserOperation(() -> driver.get(GitHubURL.DOCS_PAGE, false));
     }
 
     /**
@@ -437,7 +437,7 @@ public class BrowserComponent {
 
     public void showKeyboardShortcuts() {
         logger.info("Navigating to Keyboard Shortcuts");
-        runBrowserOperation(() -> driver.get(GitHubURL.getPathForKeyboardShortcuts(), false));
+        runBrowserOperation(() -> driver.get(GitHubURL.KEYBOARD_SHORTCUTS_PAGE, false));
     }
 
     public void showMilestones() {
