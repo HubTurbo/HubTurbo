@@ -9,3 +9,7 @@ Are you a GitHub power user? Enhance your GitHub Issue Tracker experience with t
 To **start using HubTurbo**, click [here](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Home.md).
 
 To **contribute to HubTurbo as a developer**, click [here](docs/Home.md).
+
+<br>
+<hr>
+| [**Changelog**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Changelog.md) | [**Team**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Team.md) | 
