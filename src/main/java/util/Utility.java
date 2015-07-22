@@ -1,5 +1,6 @@
 package util;
 
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -58,17 +59,26 @@ public class Utility {
             writer.close();
 
             if (fileExists) {
+                System.out.println("lol");
                 sizeAfterWrite = Files.size(Paths.get(fileName));
-                checkFileGrowth(sizeBeforeWrite, sizeAfterWrite);
+                checkFileGrowth(sizeBeforeWrite, sizeAfterWrite, fileName);
             }
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
     }
 
-    private static void checkFileGrowth(long sizeBeforeWrite, long sizeAfterWrite) {
-        // If size grew by more than 10 times in the past write, copy the log.
+    private static void checkFileGrowth(long sizeBeforeWrite, long sizeAfterWrite, String fileName) {
+        // If size grew by more than 10 times in the past write, copy the log and raise an error.
         if (((sizeAfterWrite - sizeBeforeWrite) / sizeAfterWrite) > 0.9) {
+            Platform.runLater(() -> DialogMessage.showErrorDialog(
+                    "Expected local storage growth",
+                    fileName + " has grown by an exceptionally large amount of "
+                            + (sizeAfterWrite - sizeBeforeWrite) / 1000000 + "MB in the last update.\n\n"
+                            + "It is recommended that you delete the file and reopen the program to prevent "
+                            + "further corruption.\n\n"
+                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
+            ));
             copyLog();
         }
     }
