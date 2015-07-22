@@ -7,9 +7,11 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 
+import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class PanelInfoBasicTest extends UITest {
 
@@ -53,6 +55,9 @@ public class PanelInfoBasicTest extends UITest {
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         
         Preferences testPref = new Preferences(true);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        
         List<String> openPanels = testPref.getPanelNames();
         List<String> openFilters = testPref.getLastOpenFilters();
         
