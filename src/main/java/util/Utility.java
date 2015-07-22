@@ -55,28 +55,28 @@ public class Utility {
             writer.close();
 
             long sizeAfterWrite = Files.size(Paths.get(fileName));
-            return checkFileGrowth(sizeAfterWrite, issueCount, fileName);
+            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
             return true;
         }
     }
 
-    private static boolean checkFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
+    private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
         // we consider the json to have exploded.
         if (sizeAfterWrite > ((long) issueCount * 1000)) {
             Platform.runLater(() -> DialogMessage.showErrorDialog(
                     "Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
-                            + "It is recommended that you delete the file and reopen the program to prevent "
+                            + "Now proceeding to delete the file and redownload the repository to prevent "
                             + "further corruption.\n\n"
                             + "The error log of the program has been stored in the file hubturbo-err-log.log."
             ));
+            deleteFile(fileName);
             copyLog();
             return true;
         }
-
         return false;
     }
 
@@ -85,6 +85,16 @@ public class Utility {
             Files.copy(Paths.get("hubturbo-log.log"),
                     Paths.get("hubturbo-err-log.log"),
                     StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
+    }
+
+    public static void deleteFile(String fileName) {
+        try {
+            if (Files.exists(Paths.get(fileName))) {
+                Files.delete(Paths.get(fileName));
+            }
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }

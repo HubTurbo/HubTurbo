@@ -84,7 +84,7 @@ public class RepoIO {
                 .exceptionally(withResult(new Model(repoId)));
     }
 
-    private Model downloadRepoFromSourceBlocking(String repoId) {
+        private Model downloadRepoFromSourceBlocking(String repoId) {
         try {
             return downloadRepoFromSourceAsync(repoId).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -99,13 +99,23 @@ public class RepoIO {
         return repoSource.updateModel(model)
             .thenApply(newModel -> {
                 UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                boolean corruptedJson = false;
                 if (!model.equals(newModel)) {
-                    jsonStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
+                    try {
+                        corruptedJson =
+                                jsonStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel)).get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        corruptedJson = true;
+                    }
                 } else {
                     logger.info(HTLog.format(model.getRepoId(),
-                        "Nothing changed; not writing to store"));
+                            "Nothing changed; not writing to store"));
                 }
-                return newModel;
+                if (corruptedJson) {
+                    return openRepository(model.getRepoId()).join();
+                } else {
+                    return newModel;
+                }
             }).exceptionally(withResult(new Model(model.getRepoId())));
     }
 
