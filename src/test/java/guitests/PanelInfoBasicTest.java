@@ -7,18 +7,16 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 
-import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class PanelInfoBasicTest extends UITest {
 
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--testjson=true", "--bypasslogin=true");
     }
 
     @Test
