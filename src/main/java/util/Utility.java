@@ -1,5 +1,6 @@
 package util;
 
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -8,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,13 +47,55 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static void writeFile(String fileName, String content) {
+    public static boolean writeFile(String fileName, String content, int issueCount) {
         PrintWriter writer;
         try {
             writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+
+            long sizeAfterWrite = Files.size(Paths.get(fileName));
+            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return true;
+        }
+    }
+
+    private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
+        // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
+        // we consider the json to have exploded.
+        if (sizeAfterWrite > ((long) issueCount * 1000)) {
+            Platform.runLater(() -> DialogMessage.showErrorDialog(
+                    "Possible data corruption detected",
+                    fileName + " is unusually large.\n\n"
+                            + "Now proceeding to delete the file and redownload the repository to prevent "
+                            + "further corruption.\n\n"
+                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
+            ));
+            deleteFile(fileName);
+            copyLog();
+            return true;
+        }
+        return false;
+    }
+
+    public static void copyLog() {
+        try {
+            Files.copy(Paths.get("hubturbo-log.log"),
+                    Paths.get("hubturbo-err-log.log"),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
+    }
+
+    public static void deleteFile(String fileName) {
+        try {
+            if (Files.exists(Paths.get(fileName))) {
+                Files.delete(Paths.get(fileName));
+            }
+        } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
     }

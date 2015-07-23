@@ -25,7 +25,7 @@ public abstract class RepoStore {
     }
 
     public abstract CompletableFuture<Model> loadRepository(String repoId);
-    public abstract void saveRepository(String repoId, SerializableModel model);
+    public abstract CompletableFuture<Boolean> saveRepository(String repoId, SerializableModel model);
 
     private static String getRepoPath(String repoId) {
         ensureDirectoryExists();
@@ -33,8 +33,8 @@ public abstract class RepoStore {
         return new File(RepoStore.directory, newRepoName).getAbsolutePath();
     }
 
-    public static void write(String repoId, String output) {
-        Utility.writeFile(getRepoPath(repoId), output);
+    public static boolean write(String repoId, String output, int issueCount) {
+        return Utility.writeFile(getRepoPath(repoId), output, issueCount);
     }
 
     public static Optional<String> read(String repoId) {

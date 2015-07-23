@@ -87,7 +87,7 @@ public class StoreTests {
 
     @Test(expected = ExecutionException.class)
     public void testCorruptedJSON() throws InterruptedException, ExecutionException {
-        RepoStore.write("testrepo/testrepo", "abcde");
+        RepoStore.write("testrepo/testrepo", "abcde", 10);
 
         JSONStore jsonStore = new JSONStore();
         jsonStore.loadRepository("testrepo/testrepo").get();
@@ -101,7 +101,7 @@ public class StoreTests {
 
     @Test
     public void testLoadCorruptedRepository() throws InterruptedException, ExecutionException {
-        RepoStore.write("testrepo/testrepo", "abcde");
+        RepoStore.write("testrepo/testrepo", "abcde", 10);
 
         RepoIO repoIO = new RepoIO(true, true);
         Model model = repoIO.openRepository("testrepo/testrepo").get();

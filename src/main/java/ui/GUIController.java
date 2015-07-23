@@ -300,11 +300,10 @@ public class GUIController {
     }
 
     private void updateAPIBox(UpdateRateLimitsEvent e) {
-        Platform.runLater(() -> {
-            apiBox.setText(String.format("%s/%s",
+        Platform.runLater(() -> apiBox.setText(String.format("%s/%s",
                     e.remainingRequests,
-                    Utility.minutesFromNow(e.nextRefreshInMillisecs)
-            ));
-        });
+                    Utility.minutesFromNow(e.nextRefreshInMillisecs)))
+        );
     }
+
 }
