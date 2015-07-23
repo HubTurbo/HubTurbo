@@ -9,6 +9,7 @@ HubTurbo's interface has two parts: The **panel view** and the **browser view**.
 ![](images/ui-basics/UiMainComponentsBreakdown.png?raw=true)
 
 ## Panel View
+
 <img src="images/ui-basics/PanelViewBreakdown.png" width="600">
 
 The **panel view** displays a **board** which contains a collection of **panels**. 
@@ -31,7 +32,7 @@ However, HubTurbo can display only one board at a time.
 The **default repository** dropdown allows you to change the *default repository* that HubTurbo is viewing. 
 HubTurbo can be viewing many repositories at once; the default repository is just the one used when no repository is explicitly specified.
 
-Further references: [working with panels](Working-with-Panels.md) | [filtering issues](Filtering-Issues.md)
+Further references: [boards and panels](Boards-and-Panels.md) | [issues](Issues.md) | [filters](Filters.md)
 
 ## Browser View
 

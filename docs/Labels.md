@@ -1,6 +1,14 @@
-# Label Picker
+# Labels
 
-Pressing <kbd>L</kbd> after selecting an item brings up the Label Picker. 
+## Creating Labels <a name="labels"></a>
+
+Labels are created through GitHub's UI.
+
+- Select `New > Label` (<kbd>Ctrl</kbd> + <kbd>L</kbd>) from the menu.
+
+## Adding/editing labels of an issue/PR
+
+Pressing <kbd>L</kbd> after selecting an issue card brings up the Label Picker. 
 
 ![](images/label-picker/1.png?raw=true)
 

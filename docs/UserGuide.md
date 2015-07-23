@@ -2,7 +2,9 @@
 
 - [Getting Started](Getting-Started.md)
 - [UI Basics](UI-Basics.md)
-- [Label Picker](Label-Picker.md)
-- [Working with Panels](Working-with-Panels.md)
-- [Filtering Issues](Filtering-Issues.md)
+- [Boards and Panels](Boards-and-Panels.md)
+- [Filters](Filtering-Issues.md)
+- [Issues and PRs] (Issues-and-PRs.md)
+- [Labels](Labels.md)
+- [Milestones](Milestones.md)
 - [Keyboard Shortcuts](Keyboard-Shortcuts.md)

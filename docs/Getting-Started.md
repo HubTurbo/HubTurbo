@@ -21,15 +21,3 @@ When you click the `Sign in` button, HubTurbo will download the issues from the 
 That's it -- you're now all set to start using HubTurbo!
 
 Before you start using HubTurbo features, you may want to check out [the basics of navigating GitHub using HubTurbo](UI-Basics.md).
-
-### [Panels](Working-with-Panels.md)
-
-![](images/getting-started/3.png?raw=true)
-
-HubTurbo presents issues in *panels*, which are like little windows into GitHub's issue tracker. You can have as many panels as you want and can easily customise them to enhance your workflow.
-
-### [Filters](Filtering-Issues.md)
-
-![](images/getting-started/4.png?raw=true)
-
-HubTurbo uses the same search syntax as GitHub does for its panels, but takes it a step further, by extending it with more qualifiers and operators! You'll be able to precisely express queries, narrowing down the issues in panels to only the ones you're interested in.
