@@ -15,6 +15,8 @@ import util.events.EventDispatcherStub;
 import util.events.testevents.UpdateDummyRepoEvent;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -79,8 +81,11 @@ public class StoreTests {
 
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
-        TestUtils.delay(1); // allow for file to be written
         assertEquals(11, dummy2.getIssues().size());
+
+        // It even works if we enter the repo name in different case
+        Model dummy3 = new RepoIO(true, true).openRepository("DUMMY1/DUMMY1").get();
+        assertEquals(11, dummy3.getIssues().size());
 
         UI.status.clear();
     }
