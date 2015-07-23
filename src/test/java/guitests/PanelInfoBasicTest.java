@@ -15,8 +15,8 @@ import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
 
-    public static final int DIALOG_DELAY = 1000;
-    public static final int EVENT_DELAY = 1500;
+    public static final int DIALOG_DELAY = 4000;
+    public static final int EVENT_DELAY = 8000;
 
     @Override
     public void launchApp() {
@@ -35,23 +35,31 @@ public class PanelInfoBasicTest extends UITest {
         Button renameButton1 = find("#dummy/dummy_col0_renameButton");
         click(renameButton1);
         sleep(DIALOG_DELAY);
-        type("Renamed panel").press(KeyCode.ENTER);
+        type("Renamed panel");
+        sleep(DIALOG_DELAY);
+        press(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         sleep(EVENT_DELAY);
+        
         FilterTextField filterTextField2 = find("#dummy/dummy_col1_filterTextField");
         click(filterTextField2);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("dummy2/dummy2").push(KeyCode.ENTER);
+        type("dummy2/dummy2");
+        sleep(DIALOG_DELAY);
+        assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         Button renameButton2 = find("#dummy/dummy_col1_renameButton");
         click(renameButton2);
         sleep(DIALOG_DELAY);
-        type("Dummy 2 panel").push(KeyCode.ENTER);
+        type("Dummy 2 panel");
+        sleep(DIALOG_DELAY);
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
@@ -63,13 +71,18 @@ public class PanelInfoBasicTest extends UITest {
         click(filterTextField3);
         type("is");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("open").push(KeyCode.ENTER);
+        type("open");
+        sleep(DIALOG_DELAY);
+        assertEquals("is:open", filterTextField3.getText());
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         Button renameButton3 = find("#dummy/dummy_col0_renameButton");
         click(renameButton3);
         sleep(DIALOG_DELAY);
-        type("Open issues").push(KeyCode.ENTER);
+        type("Open issues");
+        sleep(DIALOG_DELAY);
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Quitting to update json
