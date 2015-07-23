@@ -136,3 +136,4 @@ chromedriver.exe
 settings/
 store/
 hubturbo-log.log-*
+hubturbo-err-log.log
