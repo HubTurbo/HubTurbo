@@ -36,20 +36,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private int previousNumberOfActions = 0;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> allLabels, Stage stage) {
-        initOwner(stage);
-        initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
-        setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
-                issue.getId() + " in " + issue.getRepoId());
-
         this.issue = issue;
-        this.allLabels = new ArrayList<>(allLabels);
-        Collections.sort(this.allLabels);
-        // populate resultList by going through allLabels and seeing which ones currently exist
-        // in issue.getLabels()
-        allLabels.forEach(label -> {
-            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
-            if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
-        });
+        initialiseDialog(stage);
+        populateAllLabels(allLabels);
 
         // UI creation
         createButtons();
@@ -68,36 +57,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         vBox.getChildren().addAll(titleLabel, topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
 
-        requestFocus();
-    }
-
-    protected void requestFocus() {
         Platform.runLater(textField::requestFocus);
-    }
-
-    private void populatePanes() {
-        populateTopPane();
-        populateBottomPane();
-    }
-
-    private void populateTopPane() {
-        topPane.getChildren().clear();
-        topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
-        if (topPane.getChildren().size() == 0) {
-            Label label = new Label("No currently selected labels. ");
-            label.setPadding(new Insets(2, 5, 2, 5));
-            topPane.getChildren().add(label);
-        }
-    }
-
-    private void populateBottomPane() {
-        bottomPane.getChildren().clear();
-        bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
-        if (bottomPane.getChildren().size() == 0) {
-            Label label = new Label("No labels in repository. ");
-            label.setPadding(new Insets(2, 5, 2, 5));
-            bottomPane.getChildren().add(label);
-        }
     }
 
     private void setupKeyEvents() {
@@ -133,6 +93,48 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
+    private boolean containsIgnoreCase(String source, String query) {
+        return source.toLowerCase().contains(query.toLowerCase());
+    }
+
+    private void processTextFieldChange(String text) {
+        String[] textArray = text.split(" ");
+        if (textArray.length > 0) {
+            String query = textArray[textArray.length - 1];
+            if (previousNumberOfActions != textArray.length || !query.equals(lastAction)) {
+                previousNumberOfActions = textArray.length;
+                lastAction = query;
+                boolean isBottomLabelsUpdated = false;
+
+                // group check
+                if (TurboLabel.getDelimiter(query).isPresent()) {
+                    String delimiter = TurboLabel.getDelimiter(query).get();
+                    String[] queryArray = query.split(Pattern.quote(delimiter));
+                    if (queryArray.length == 1) {
+                        isBottomLabelsUpdated = true;
+                        updateBottomLabels(queryArray[0], "");
+                    } else if (queryArray.length == 2) {
+                        isBottomLabelsUpdated = true;
+                        updateBottomLabels(queryArray[0], queryArray[1]);
+                    }
+                }
+
+                if (!isBottomLabelsUpdated) {
+                    updateBottomLabels(query);
+                }
+
+                if (hasHighlightedLabel()) {
+                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
+                } else {
+                    addRemovePossibleLabel("");
+                }
+                populatePanes();
+            }
+        }
+    }
+
+    private void ______TOP_PANE______() {}
+
     private void preProcessAndUpdateTopLabels(String name) {
         Optional<TurboLabel> turboLabel =
                 allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
@@ -150,13 +152,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 updateTopLabels(name, !resultList.get(name));
             }
         }
-    }
-
-    private void addExistingLabels() {
-        // used once to populate topLabels at the start
-        allLabels.stream()
-                .filter(label -> issue.getLabels().contains(label.getActualName()))
-                .forEach(label -> topLabels.add(new PickerLabel(label, this)));
     }
 
     private void updateTopLabels(String name, boolean isAdd) {
@@ -198,50 +193,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .filter(label -> label.getActualName().equals(name))
                 .findAny()
                 .isPresent();
-    }
-
-    private boolean hasHighlightedLabel() {
-        return bottomLabels.stream()
-                .filter(PickerLabel::isHighlighted)
-                .findAny()
-                .isPresent();
-    }
-
-    private Optional<PickerLabel> getHighlightedLabelName() {
-        return bottomLabels.stream()
-                .filter(PickerLabel::isHighlighted)
-                .findAny();
-    }
-
-    private boolean containsIgnoreCase(String source, String query) {
-        return source.toLowerCase().contains(query.toLowerCase());
-    }
-
-    private void moveHighlightOnLabel(boolean isDown) {
-        if (hasHighlightedLabel()) {
-            // used to move the highlight on the bottom labels
-            // find all matching labels
-            List<PickerLabel> matchingLabels = bottomLabels.stream()
-                    .filter(label -> !label.isFaded())
-                    .collect(Collectors.toList());
-
-            // move highlight around
-            for (int i = 0; i < matchingLabels.size(); i++) {
-                if (matchingLabels.get(i).isHighlighted()) {
-                    if (isDown && i < matchingLabels.size() - 1) {
-                        matchingLabels.get(i).setIsHighlighted(false);
-                        matchingLabels.get(i + 1).setIsHighlighted(true);
-                        addRemovePossibleLabel(matchingLabels.get(i + 1).getActualName());
-                    } else if (!isDown && i > 0) {
-                        matchingLabels.get(i - 1).setIsHighlighted(true);
-                        matchingLabels.get(i).setIsHighlighted(false);
-                        addRemovePossibleLabel(matchingLabels.get(i - 1).getActualName());
-                    }
-                    populatePanes();
-                    return;
-                }
-            }
-        }
     }
 
     private void addRemovePossibleLabel(String name) {
@@ -302,6 +253,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
+    private void ______BOTTOM_PANE______() {}
+
     private void updateBottomLabels(String group, String match) {
         boolean isValidGroup = groups.stream()
                 .filter(validGroup -> validGroup.startsWith(group))
@@ -355,10 +308,37 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         if (!match.isEmpty() && !bottomLabels.isEmpty()) highlightFirstMatchingItem(match);
     }
 
+    private void moveHighlightOnLabel(boolean isDown) {
+        if (hasHighlightedLabel()) {
+            // used to move the highlight on the bottom labels
+            // find all matching labels
+            List<PickerLabel> matchingLabels = bottomLabels.stream()
+                    .filter(label -> !label.isFaded())
+                    .collect(Collectors.toList());
+
+            // move highlight around
+            for (int i = 0; i < matchingLabels.size(); i++) {
+                if (matchingLabels.get(i).isHighlighted()) {
+                    if (isDown && i < matchingLabels.size() - 1) {
+                        matchingLabels.get(i).setIsHighlighted(false);
+                        matchingLabels.get(i + 1).setIsHighlighted(true);
+                        addRemovePossibleLabel(matchingLabels.get(i + 1).getActualName());
+                    } else if (!isDown && i > 0) {
+                        matchingLabels.get(i - 1).setIsHighlighted(true);
+                        matchingLabels.get(i).setIsHighlighted(false);
+                        addRemovePossibleLabel(matchingLabels.get(i - 1).getActualName());
+                    }
+                    populatePanes();
+                    return;
+                }
+            }
+        }
+    }
+
     private void highlightFirstMatchingItem(String match) {
         List<PickerLabel> matches = bottomLabels.stream()
-                        .filter(label -> !label.isFaded())
-                        .collect(Collectors.toList());
+                .filter(label -> !label.isFaded())
+                .collect(Collectors.toList());
 
         // try to highlight labels that begin with match first
         matches.stream()
@@ -374,40 +354,71 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
-    private void processTextFieldChange(String text) {
-        String[] textArray = text.split(" ");
-        if (textArray.length > 0) {
-            String query = textArray[textArray.length - 1];
-            if (previousNumberOfActions != textArray.length || !query.equals(lastAction)) {
-                previousNumberOfActions = textArray.length;
-                lastAction = query;
-                boolean isBottomLabelsUpdated = false;
+    private boolean hasHighlightedLabel() {
+        return bottomLabels.stream()
+                .filter(PickerLabel::isHighlighted)
+                .findAny()
+                .isPresent();
+    }
 
-                // group check
-                if (TurboLabel.getDelimiter(query).isPresent()) {
-                    String delimiter = TurboLabel.getDelimiter(query).get();
-                    String[] queryArray = query.split(Pattern.quote(delimiter));
-                    if (queryArray.length == 1) {
-                        isBottomLabelsUpdated = true;
-                        updateBottomLabels(queryArray[0], "");
-                    } else if (queryArray.length == 2) {
-                        isBottomLabelsUpdated = true;
-                        updateBottomLabels(queryArray[0], queryArray[1]);
-                    }
-                }
+    private Optional<PickerLabel> getHighlightedLabelName() {
+        return bottomLabels.stream()
+                .filter(PickerLabel::isHighlighted)
+                .findAny();
+    }
 
-                if (!isBottomLabelsUpdated) {
-                    updateBottomLabels(query);
-                }
+    private void ______PANE_POPULATION______() {}
 
-                if (hasHighlightedLabel()) {
-                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
-                } else {
-                    addRemovePossibleLabel("");
-                }
-                populatePanes();
-            }
+    private void populatePanes() {
+        populateTopPane();
+        populateBottomPane();
+    }
+
+    private void populateTopPane() {
+        topPane.getChildren().clear();
+        topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+        if (topPane.getChildren().size() == 0) {
+            Label label = new Label("No currently selected labels. ");
+            label.setPadding(new Insets(2, 5, 2, 5));
+            topPane.getChildren().add(label);
         }
+    }
+
+    private void populateBottomPane() {
+        bottomPane.getChildren().clear();
+        bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
+        if (bottomPane.getChildren().size() == 0) {
+            Label label = new Label("No labels in repository. ");
+            label.setPadding(new Insets(2, 5, 2, 5));
+            bottomPane.getChildren().add(label);
+        }
+    }
+
+    private void ______INITIALISATION______() {}
+
+    private void initialiseDialog(Stage stage) {
+        initOwner(stage);
+        initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
+        setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
+                issue.getId() + " in " + issue.getRepoId());
+    }
+
+    private void populateAllLabels(List<TurboLabel> allLabels) {
+        this.allLabels = new ArrayList<>(allLabels);
+        Collections.sort(this.allLabels);
+        // populate resultList by going through allLabels and seeing which ones currently exist
+        // in issue.getLabels()
+        allLabels.forEach(label -> {
+            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
+            if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
+        });
+    }
+
+    private void addExistingLabels() {
+        // used once to populate topLabels at the start
+        allLabels.stream()
+                .filter(label -> issue.getLabels().contains(label.getActualName()))
+                .forEach(label -> topLabels.add(new PickerLabel(label, this)));
     }
 
     private void ______UI_CREATION______() {}
