@@ -84,7 +84,7 @@ public class RepoIO {
                 .exceptionally(withResult(new Model(repoId)));
     }
 
-        private Model downloadRepoFromSourceBlocking(String repoId) {
+    private Model downloadRepoFromSourceBlocking(String repoId) {
         try {
             return downloadRepoFromSourceAsync(repoId).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -112,7 +112,7 @@ public class RepoIO {
                             "Nothing changed; not writing to store"));
                 }
                 if (corruptedJson) {
-                    return openRepository(model.getRepoId()).join();
+                    return downloadRepoFromSourceAsync(model.getRepoId()).join();
                 } else {
                     return newModel;
                 }
