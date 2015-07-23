@@ -4,7 +4,7 @@
 
 Are you a GitHub power user? Enhance your GitHub Issue Tracker experience with this desktop companion: more features, more flexibility, faster interactions. 
 
-![](https://github.com/HubTurbo/HubTurbo/blob/release/docs/images/getting-started/1.png?raw=true)
+![](https://github.com/HubTurbo/HubTurbo/blob/release/docs/images/getting-started/bothViewsScreenshot.png?raw=true)
 
 To **start using HubTurbo**, check out our [User Guide](https://github.com/HubTurbo/HubTurbo/blob/release/docs/UserGuide.md).
 
