@@ -15,4 +15,5 @@ To **contribute to HubTurbo as a developer**, check out our [Developer Guide](do
 | [**About**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/About.md)
 | [**Team**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Team.md) 
 | [**Changelog**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Changelog.md) 
+| [**Contact**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Contact.md)
 |
