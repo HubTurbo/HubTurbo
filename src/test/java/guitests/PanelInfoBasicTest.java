@@ -15,11 +15,11 @@ import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
 
-    public static final int EVENT_DELAY = 200;
+    public static final int DIALOG_DELAY = 1000;
+    public static final int EVENT_DELAY = 1500;
 
     @Override
     public void launchApp() {
-        // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
         FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
@@ -34,11 +34,13 @@ public class PanelInfoBasicTest extends UITest {
         
         Button renameButton1 = find("#dummy/dummy_col0_renameButton");
         click(renameButton1);
+        sleep(DIALOG_DELAY);
         type("Renamed panel").press(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
-        // Creating new panel
+        // Creating panel
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        sleep(EVENT_DELAY);
         FilterTextField filterTextField2 = find("#dummy/dummy_col1_filterTextField");
         click(filterTextField2);
         type("repo");
@@ -48,12 +50,14 @@ public class PanelInfoBasicTest extends UITest {
         
         Button renameButton2 = find("#dummy/dummy_col1_renameButton");
         click(renameButton2);
+        sleep(DIALOG_DELAY);
         type("Dummy 2 panel").push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
         press(KeyCode.SHIFT).press(KeyCode.CONTROL).press(KeyCode.P);
         release(KeyCode.P).release(KeyCode.CONTROL).release(KeyCode.SHIFT);
+        sleep(EVENT_DELAY);
         
         FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
         click(filterTextField3);
@@ -64,6 +68,7 @@ public class PanelInfoBasicTest extends UITest {
         
         Button renameButton3 = find("#dummy/dummy_col0_renameButton");
         click(renameButton3);
+        sleep(DIALOG_DELAY);
         type("Open issues").push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
