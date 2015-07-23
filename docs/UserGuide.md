@@ -1,4 +1,4 @@
-# UserGuide
+# User Guide
 
 - [Getting Started](Getting-Started.md)
 - [UI Basics](UI-Basics.md)
