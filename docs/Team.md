@@ -2,7 +2,7 @@
 
 ## Current Team Members
 
-- [Damith C. Rajapakse](http://damith.info) (project mentor)
+- [Damith C. Rajapakse](http://www.comp.nus.edu.sg/~damithch) (project mentor)
 - [Darius Foo](http://github.com/dariusf) (project lead)
 - [Rajan Dhir](http://github.com/rd1992)
 - [Nguyen Quoc Dat](http://github.com/acruis)
@@ -15,3 +15,10 @@
 - [Tan Wei Lin](http://github.com/xeluna)
 - [Wong Jun Wei](http://github.com/jwwong)
 - [Naomi Leow](http://github.com/naomilwx)
+
+## Contributors
+
+- [Hyung Jon] (https://github.com/HyungJon)
+- [Ian Ngiaw] (https://github.com/ianngiaw)
+- [Su Gi Chandran] (https://github.com/Honoo)
+- [Thien Nguyen] (https://github.com/ndt93)
