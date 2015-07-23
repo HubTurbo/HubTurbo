@@ -54,35 +54,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
-        VBox vBox = new VBox();
-        vBox.setPadding(new Insets(10));
-        vBox.setPrefHeight(1);
+        // UI creation
+        VBox vBox = createVBox();
+        Label titleLabel = createTitleLabel();
+        titleLabel.setTooltip(createTitleTooltip());
+        topPane = createTopPane();
+        textField = createTextField();
+        bottomPane = createBottomPane();
 
-        Label titleLabel = new Label(
-                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
-        titleLabel.setMaxWidth(ELEMENT_MAX_WIDTH);
-        titleLabel.setStyle("-fx-font-size: 125%");
-        Tooltip titleTooltip = new Tooltip(
-                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
-        titleTooltip.setWrapText(true);
-        titleTooltip.setMaxWidth(500);
-        titleLabel.setTooltip(titleTooltip);
-
-        topPane = new FlowPane();
-        topPane.setPadding(new Insets(20, 0, 10, 0));
-        topPane.setHgap(5);
-        topPane.setVgap(5);
-
-        textField = new TextField();
-        textField.setId("labelPickerTextField");
-        textField.setPrefColumnCount(30);
         setupKeyEvents();
-
-        bottomPane = new FlowPane();
-        bottomPane.setPadding(new Insets(10, 0, 0, 0));
-        bottomPane.setHgap(5);
-        bottomPane.setVgap(5);
-
         addExistingLabels();
         updateBottomLabels("");
         populatePanes();
@@ -446,6 +426,54 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 populatePanes();
             }
         }
+    }
+
+    private void ______UI_CREATION______() {}
+
+    private VBox createVBox() {
+        VBox vBox = new VBox();
+        vBox.setPadding(new Insets(10));
+        vBox.setPrefHeight(1);
+        return vBox;
+    }
+
+    private Label createTitleLabel() {
+        Label titleLabel = new Label(
+                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
+        titleLabel.setMaxWidth(ELEMENT_MAX_WIDTH);
+        titleLabel.setStyle("-fx-font-size: 125%");
+        return titleLabel;
+    }
+
+    private Tooltip createTitleTooltip() {
+        Tooltip titleTooltip = new Tooltip(
+                (issue.isPullRequest() ? "PR #" : "Issue #") + issue.getId() + ": " + issue.getTitle());
+        titleTooltip.setWrapText(true);
+        titleTooltip.setMaxWidth(500);
+        return titleTooltip;
+    }
+
+    private FlowPane createTopPane() {
+        FlowPane topPane = new FlowPane();
+        topPane.setPadding(new Insets(20, 0, 10, 0));
+        topPane.setHgap(5);
+        topPane.setVgap(5);
+        return topPane;
+    }
+
+    private TextField createTextField() {
+        TextField textField = new TextField();
+        textField.setId("labelPickerTextField");
+        textField.setPrefColumnCount(30);
+        return textField;
+    }
+
+    private FlowPane createBottomPane() {
+        FlowPane bottomPane = new FlowPane();
+        bottomPane.setPadding(new Insets(10, 0, 0, 0));
+        bottomPane.setHgap(5);
+        bottomPane.setVgap(5);
+        return bottomPane;
     }
 
 }
