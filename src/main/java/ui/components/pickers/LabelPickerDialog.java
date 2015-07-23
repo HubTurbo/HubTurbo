@@ -51,10 +51,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
         });
 
-        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
-
         // UI creation
+        createButtons();
         VBox vBox = createVBox();
         Label titleLabel = createTitleLabel();
         titleLabel.setTooltip(createTitleTooltip());
@@ -69,23 +67,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
         vBox.getChildren().addAll(titleLabel, topPane, textField, bottomPane);
         getDialogPane().setContent(vBox);
-        vBox.heightProperty().addListener((observable, oldValue, newValue) -> {
-            setHeight(newValue.intValue() + VBOX_SPACING); // dialog box should auto-resize
-        });
 
-        // defines what happens when user confirms/presses enter
-        setResultConverter(dialogButton -> {
-            if (dialogButton == confirmButtonType) {
-                // if there is a highlighted label, toggle that label first
-                if (hasHighlightedLabel()) toggleSelectedLabel();
-                // if user confirms selection, return list of labels
-                return resultList.entrySet().stream()
-                        .filter(Map.Entry::getValue)
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList());
-            }
-            return null;
-        });
         requestFocus();
     }
 
@@ -430,10 +412,32 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void ______UI_CREATION______() {}
 
+    private void createButtons() {
+        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // defines what happens when user confirms/presses enter
+        setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                // if there is a highlighted label, toggle that label first
+                if (hasHighlightedLabel()) toggleSelectedLabel();
+                // if user confirms selection, return list of labels
+                return resultList.entrySet().stream()
+                        .filter(Map.Entry::getValue)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+            }
+            return null;
+        });
+    }
+
     private VBox createVBox() {
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(10));
         vBox.setPrefHeight(1);
+        vBox.heightProperty().addListener((observable, oldValue, newValue) -> {
+            setHeight(newValue.intValue() + VBOX_SPACING); // dialog box should auto-resize
+        });
         return vBox;
     }
 
