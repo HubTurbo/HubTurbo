@@ -1,6 +1,5 @@
 package ui;
 
-import com.google.common.collect.Ordering;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
@@ -49,7 +48,7 @@ public class RepositorySelector extends HBox {
 
     private void loadContents() {
         comboBox.getItems().addAll(ui.logic.getStoredRepos());
-        comboBox.getItems().sort(Ordering.natural());
+        comboBox.getItems().sort(String.CASE_INSENSITIVE_ORDER);
     }
     
     public List<String> getContents() {
