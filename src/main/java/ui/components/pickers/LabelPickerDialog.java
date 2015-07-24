@@ -104,11 +104,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 Label groupName = new Label(group);
                 groupName.setPadding(new Insets(0, 0, 5, 5));
                 groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
-                groupName.setStyle("-fx-font-size: 110%");
+                groupName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold;");
                 FlowPane groupPane = new FlowPane();
                 groupPane.setHgap(5);
                 groupPane.setVgap(5);
-                groupPane.setPadding(new Insets(0, 0, 10, 0));
+                groupPane.setPadding(new Insets(0, 0, 10, 10));
                 bottomLabels
                         .stream()
                         .filter(label -> label.getGroup().isPresent())
