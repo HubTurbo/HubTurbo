@@ -1,6 +1,6 @@
 # Keyboard Shortcuts
 
-HubTurbo can be navigated entirely using the keyboard. This section documents all the shortcut keys that can be used.
+HubTurbo many shortcuts that help you interact with it faster.
 
 ## General
 

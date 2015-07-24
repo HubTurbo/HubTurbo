@@ -2,6 +2,8 @@
 
 An essential part of navigating GitHub with HubTurbo is having multiple panels, all filled with exactly the issues you're interested in. Controlling what shows up in panels is done by writing a filter which precisely expresses what it should contain.
 
+<img src="images/ui-basics/PanelExplanation.png" width="600">
+
 Don't worry, there isn't much syntax to learn!
 
 ## Contents
@@ -22,17 +24,17 @@ Filters are compatible with a subset of GitHub's search syntax. Their documentat
 - [Search Syntax](https://help.github.com/articles/search-syntax/)
 - [Examples](http://zachholman.com/posts/searching-github-issues/)
 
-To very quickly summarise the key points in our own words:
+To very quickly summarize the key points in our own words:
 
 - Filters contain **keywords**, **qualifiers**, and **meta-qualifiers**.
-    + A **keyword** is a search term which matches issue text. The filter `cats dogs` will pick issues containing both the words `cats` and `dogs`.
-    + A **qualifier** is a search term which matches metadata instead of text. `label:red` will match issues with the label `red`.
+    + A **keyword** is a search term which matches issue text. The filter `cats dogs` will pick issues containing BOTH the words `cats` and `dogs` in any order.
+    + A **qualifier** is a search term which matches metadata instead of text. `label:red` will match issues with the label containing `red`.
     + A **meta-qualifier** changes the semantics of keywords or qualifiers. `in:title meow` will pick issues with the text `meow` in their titles only. `repo:hubturbo/hubturbo` will search in HubTurbo's repository, loading it if it's not already loaded.
 - All of the above can be freely intermixed and combined with operators.
 
 ## Examples
 
-The filter "all issues assigned to John that aren't closed and are due in milestones v0.1 and v0.2" may be expressed as:
+The filter "all issues assigned to John that aren't closed and are due in milestones v0.1 or v0.2" may be expressed as:
 
 ```
 assignee:john -state:closed (milestone:v0.1 OR milestone:v0.2)
@@ -76,12 +78,16 @@ Operators may be written in any of the following forms:
 - NOT: `NOT` `!` `~` `-`
 
 As in C-like languages, NOT is prefix, AND and OR are infix and left-associative, and precedence goes: NOT > AND > OR.
+Note that operators are case sensitive: `AND` is a valid operator, but `and` is not.
+
+<!-- To be enabled later
 
 ## Application
 
 Predicates are useful for specifying the exact subset of labels to show in a panel. This admits a useful secondary function -- dragging an issue onto a panel will cause HubTurbo to automatically apply the attributes required to make it show up in that panel! In other words, the issue will be modified such that it will be matched by the filter of the target panel.
 
 This will not work for ambiguous expressions (containing OR or NOT operators) and expressions containing predicates for which this does not make sense (`title`, `id`, `in`, `has`, etc.).
+-->
 
 ## Qualifiers
 
