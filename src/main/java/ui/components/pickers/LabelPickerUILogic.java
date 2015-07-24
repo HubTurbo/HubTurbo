@@ -53,7 +53,7 @@ public class LabelPickerUILogic {
     }
 
     private void populatePanes() {
-        if (dialog!= null) dialog.populatePanes(topLabels, bottomLabels, groups);
+        if (dialog != null) dialog.populatePanes(topLabels, bottomLabels, groups);
     }
 
     public void toggleLabel(String name) {
@@ -231,7 +231,8 @@ public class LabelPickerUILogic {
                 allLabels.stream()
                         .filter(label -> label.getActualName().equals(name))
                         .findFirst()
-                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, true, false, true, true)));
+                        .ifPresent(label -> topLabels.add(
+                                new PickerLabel(label, this, false, true, false, true, true)));
             }
             targetLabel = Optional.of(name);
         }
