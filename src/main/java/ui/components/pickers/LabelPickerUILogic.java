@@ -57,6 +57,7 @@ public class LabelPickerUILogic {
     }
 
     public void toggleLabel(String name) {
+        addRemovePossibleLabel("");
         preProcessAndUpdateTopLabels(name);
         updateBottomLabels(""); // clears search query, removes faded-out overlay on bottom labels
         populatePanes();
