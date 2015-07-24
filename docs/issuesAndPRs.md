@@ -11,7 +11,7 @@ Issues are created through GitHub's UI, shown in the browser view.
 When an issue is selected on the panel view, its details are shown in the browser view.
 The issue can be edited using the browser view.
 
-<img src="images/uiBasics/browserViewExplanation.png" src="600">
+<img src="images/gettingStarted/browserViewExplanation.png" src="600">
 
 Any of the following will select an issue for viewing:
 
