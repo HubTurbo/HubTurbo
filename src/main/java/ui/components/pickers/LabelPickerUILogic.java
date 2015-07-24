@@ -14,7 +14,7 @@ public class LabelPickerUILogic {
     private List<TurboLabel> allLabels;
     private List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
-    private Set<String> groups = new HashSet<>();
+    private List<String> groups = new ArrayList<>();
     private Map<String, Boolean> resultList = new HashMap<>();
     private Optional<String> targetLabel = Optional.empty();
 
@@ -40,6 +40,7 @@ public class LabelPickerUILogic {
             resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
             if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
         });
+        Collections.sort(groups, String.CASE_INSENSITIVE_ORDER);
     }
 
     private void populatePanes() {
@@ -344,6 +345,10 @@ public class LabelPickerUILogic {
 
     public Map<String, Boolean> getResultList() {
         return resultList;
+    }
+
+    public List<String> getGroups() {
+        return groups;
     }
 
 }
