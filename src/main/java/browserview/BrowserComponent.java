@@ -1,23 +1,34 @@
 package browserview;
 
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
+
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -319,9 +330,23 @@ public class BrowserComponent {
     }
 
     private static String determineChromeDriverBinaryName() {
-        return PlatformSpecific.isOnMac() ? "chromedriver"
-            : PlatformSpecific.isOnWindows() ? "chromedriver.exe"
-            : "chromedriver_linux";
+        if (PlatformSpecific.isOnMac()) {
+            logger.info("Using chrome driver binary: chromedriver");
+            return "chromedriver";
+        } else if (PlatformSpecific.isOnWindows()) {
+            logger.info("Using chrome driver binary: chromedriver.exe");
+            return "chromedriver.exe";
+        } else if (PlatformSpecific.isOn32BitsLinux()) {
+            logger.info("Using chrome driver binary: chromedriver_linux");
+            return "chromedriver_linux";
+        } else if (PlatformSpecific.isOn64BitsLinux()) {
+            logger.info("Using chrome driver binary: chromedriver_linux_x86_64");
+            return "chromedriver_linux_x86_64";
+        } else {
+            logger.error("Unable to determine platform for chrome driver");
+            logger.info("Using chrome driver binary: chromedriver_linux");
+            return "chromedriver_linux";
+        }
     }
 
     /**
