@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 public class LabelPickerUILogic {
 
-    private final LabelPickerDialog dialog;
     private final TurboIssue issue;
+    private final LabelPickerDialog dialog;
     private List<TurboLabel> allLabels;
     private List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
@@ -31,6 +31,15 @@ public class LabelPickerUILogic {
         populatePanes();
     }
 
+    public LabelPickerUILogic(TurboIssue issue, List<TurboLabel> repoLabels) {
+        this.issue = issue;
+        this.dialog = null;
+        populateAllLabels(repoLabels);
+        addExistingLabels();
+        updateBottomLabels("");
+        populatePanes();
+    }
+
     private void populateAllLabels(List<TurboLabel> repoLabels) {
         this.allLabels = new ArrayList<>(repoLabels);
         Collections.sort(this.allLabels);
@@ -44,7 +53,7 @@ public class LabelPickerUILogic {
     }
 
     private void populatePanes() {
-        dialog.populatePanes(topLabels, bottomLabels, groups);
+        if (dialog!= null) dialog.populatePanes(topLabels, bottomLabels, groups);
     }
 
     public void toggleLabel(String name) {
