@@ -105,7 +105,7 @@ public class LabelPickerUILogic {
         // used once to populate topLabels at the start
         allLabels.stream()
                 .filter(label -> issue.getLabels().contains(label.getActualName()))
-                .forEach(label -> topLabels.add(new PickerLabel(label, this)));
+                .forEach(label -> topLabels.add(new PickerLabel(label, this, true)));
     }
 
     private void preProcessAndUpdateTopLabels(String name) {
@@ -144,7 +144,7 @@ public class LabelPickerUILogic {
                         .filter(label -> resultList.get(label.getActualName()))
                         .filter(label -> !isInTopLabels(label.getActualName()))
                         .findFirst()
-                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this)));
+                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, true)));
             }
         } else {
             topLabels.stream()
@@ -220,7 +220,7 @@ public class LabelPickerUILogic {
                 allLabels.stream()
                         .filter(label -> label.getActualName().equals(name))
                         .findFirst()
-                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, true, false, true)));
+                        .ifPresent(label -> topLabels.add(new PickerLabel(label, this, false, true, false, true, true)));
             }
             targetLabel = Optional.of(name);
         }
@@ -242,7 +242,7 @@ public class LabelPickerUILogic {
             // fade out labels which do not match
             bottomLabels = allLabels
                     .stream()
-                    .map(label -> new PickerLabel(label, this))
+                    .map(label -> new PickerLabel(label, this, false))
                     .map(label -> {
                         if (resultList.get(label.getActualName())) {
                             label.setIsSelected(true); // add tick if selected
@@ -266,7 +266,7 @@ public class LabelPickerUILogic {
         // fade out labels which do not match
         bottomLabels = allLabels
                 .stream()
-                .map(label -> new PickerLabel(label, this))
+                .map(label -> new PickerLabel(label, this, false))
                 .map(label -> {
                     if (resultList.get(label.getActualName())) {
                         label.setIsSelected(true); // add tick if selected

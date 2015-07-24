@@ -13,29 +13,33 @@ public class PickerLabel extends TurboLabel {
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
+    private boolean isTop;
 
-    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic) {
+    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
         this.labelPickerUILogic = labelPickerUILogic;
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
         isFaded = false;
+        this.isTop = isTop;
     }
 
     public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic,
-                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded) {
+                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
         this.labelPickerUILogic = labelPickerUILogic;
         this.isSelected = isSelected;
         this.isHighlighted = isHighlighted;
         this.isRemoved = isRemoved;
         this.isFaded = isFaded;
+        this.isTop = isTop;
     }
 
     @Override
     public Node getNode() {
-        Label label = new Label(getActualName() + (isSelected ? " ✓" : "    ")); // add selection tick
+        // actual name for labels at the top, add tick for selected labels
+        Label label = new Label((isTop? getActualName() : getName()) + (isSelected ? " ✓" : "    "));
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
