@@ -102,20 +102,20 @@ public class LabelPickerLogicTests {
         assertEquals(true, logic.getHighlightedLabelName().isPresent());
         assertEquals("Label 10", logic.getHighlightedLabelName().get().getActualName());
         // toggle label
-        logic.toggleSelectedLabel("1");
+        logic.toggleSelectedLabel("1 ");
         assertEquals(1, getLabels(logic).size());
-        assertEquals("Label 10", getLabels(logic).get(0));
+        assertEquals(true, getLabels(logic).contains("Label 10"));
         assertEquals(false, logic.getHighlightedLabelName().isPresent());
         // enter search query and move down and up
-        logic.processTextFieldChange("1");
+        logic.processTextFieldChange("1 1");
         logic.moveHighlightOnLabel(true);
         logic.moveHighlightOnLabel(false);
         assertEquals(true, logic.getHighlightedLabelName().isPresent());
         assertEquals("Label 1", logic.getHighlightedLabelName().get().getActualName());
         // toggle label
-        logic.toggleSelectedLabel("1");
+        logic.toggleSelectedLabel("1 1 ");
         assertEquals(2, getLabels(logic).size());
-        assertEquals("Label 11", getLabels(logic).get(1));
+        assertEquals(true, getLabels(logic).contains("Label 1"));
         assertEquals(false, logic.getHighlightedLabelName().isPresent());
     }
 
