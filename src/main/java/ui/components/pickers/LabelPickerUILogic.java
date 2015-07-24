@@ -228,7 +228,7 @@ public class LabelPickerUILogic {
         }
     }
 
-    private void ______BOTTOM_PANE______() {}
+    private void ______BOTTOM_BOX______() {}
 
     private void updateBottomLabels(String group, String match) {
         boolean isValidGroup = groups.stream()
