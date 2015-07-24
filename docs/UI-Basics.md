@@ -29,8 +29,9 @@ For example, a board can contain three panels showing,
 Boards can be named, saved, and reloaded. For example you can have one board called 'work projects' and another called 'pet projects'. 
 However, HubTurbo can display only one board at a time.
 
-The **default repository** dropdown allows you to change what HubTurbo considers to be the *default repository*. 
-HubTurbo can be viewing many repositories at once; if you do not specify a repository, HubTurbo assumes you meant to work the default repository.
+The **default repository** dropdown allows you to specify what HubTurbo considers to be the *default repository*. 
+HubTurbo can be viewing many repositories at once; if you do not specify a repository, 
+HubTurbo assumes you meant to work with the default repository. 
 
 Further references: [boards and panels](Boards-and-Panels.md) | [issues](Issues.md) | [filters](Filters.md)
 
