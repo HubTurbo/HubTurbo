@@ -33,11 +33,11 @@ The **default repository** dropdown allows you to specify what HubTurbo consider
 HubTurbo can be viewing many repositories at once; if you do not specify a repository, 
 HubTurbo assumes you meant to work with the default repository. 
 
-Further references: [boards and panels](boardsAndPanels.md) | [issues](Issues.md) | [filters](filters.md)
+Further references: [boards and panels](boardsAndPanels.md) | [issues](issuesAndPRs.md) | [filters](filters.md)
 
 ## Browser View
 
-<img src="images/uiBasics/BrowserViewExplanation.png" width="800">
+<img src="images/uiBasics/browserViewExplanation.png" width="800">
 
 The **browser view** is a Chrome Window controlled by HubTurbo, and it shows GitHub pages as needed by the panel view; 
 for example, clicking on an issue in a panel will make the browser view to navigate to the corresponding issue page on GitHub.
