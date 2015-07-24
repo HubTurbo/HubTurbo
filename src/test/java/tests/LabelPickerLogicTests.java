@@ -30,6 +30,8 @@ public class LabelPickerLogicTests {
         repoLabels.add(new TurboLabel("dummy/dummy", "f-aaa"));
         repoLabels.add(new TurboLabel("dummy/dummy", "f-bbb"));
         repoLabels.add(new TurboLabel("dummy/dummy", "f-ccc"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "f-cdc"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "f-dcd"));
         return new LabelPickerUILogic(issue, repoLabels);
     }
 
@@ -84,6 +86,32 @@ public class LabelPickerLogicTests {
         // we should be left with one label
         assertEquals(1, getLabels(logic).size());
         assertEquals(true, logic.getResultList().get("p.high"));
+
+        // starting with an issue with no labels
+        logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // check for correct label selection
+        logic.processTextFieldChange("f.d");
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("f-dcd", logic.getHighlightedLabelName().get().getActualName());
+        // move highlight up once
+        logic.moveHighlightOnLabel(false);
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("f-cdc", logic.getHighlightedLabelName().get().getActualName());
+        // keep moving it upwards
+        logic.moveHighlightOnLabel(false);
+        logic.moveHighlightOnLabel(false);
+        logic.moveHighlightOnLabel(false);
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("f-cdc", logic.getHighlightedLabelName().get().getActualName());
+
+        // starting with an issue with no labels
+        logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // check for correct label selection
+        logic.processTextFieldChange("p-");
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("p.high", logic.getHighlightedLabelName().get().getActualName());
     }
 
     @Test
