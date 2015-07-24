@@ -14,7 +14,7 @@ public class LabelPickerUILogic {
     private List<TurboLabel> allLabels;
     private List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
-    private List<String> groups = new ArrayList<>();
+    private Map<String, Boolean> groups = new HashMap<>();
     private Map<String, Boolean> resultList = new HashMap<>();
     private Optional<String> targetLabel = Optional.empty();
 
@@ -38,10 +38,9 @@ public class LabelPickerUILogic {
         // in issue.getLabels()
         repoLabels.forEach(label -> {
             resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
-            if (label.getGroup().isPresent() && !groups.contains(label.getGroup().get()))
-                groups.add(label.getGroup().get());
+            if (label.getGroup().isPresent() && !groups.containsKey(label.getGroup().get()))
+                groups.put(label.getGroup().get(), label.isExclusive());
         });
-        Collections.sort(groups, String.CASE_INSENSITIVE_ORDER);
     }
 
     private void populatePanes() {
@@ -231,13 +230,14 @@ public class LabelPickerUILogic {
     private void ______BOTTOM_BOX______() {}
 
     private void updateBottomLabels(String group, String match) {
-        boolean isValidGroup = groups.stream()
+        List<String> groupNames = groups.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
+        boolean isValidGroup = groupNames.stream()
                 .filter(validGroup -> validGroup.startsWith(group))
                 .findAny()
                 .isPresent();
 
         if (isValidGroup) {
-            List<String> validGroups = groups.stream()
+            List<String> validGroups = groupNames.stream()
                     .filter(validGroup -> validGroup.startsWith(group))
                     .collect(Collectors.toList());
             // get all labels that contain search query

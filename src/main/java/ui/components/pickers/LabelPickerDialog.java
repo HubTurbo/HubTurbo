@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,7 +68,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void ______POPULATION______() {}
 
-    protected void populatePanes(List<PickerLabel> topLabels, List<PickerLabel> bottomLabels, List<String> groups) {
+    protected void populatePanes(
+            List<PickerLabel> topLabels, List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
         populateTopPane(topLabels);
         populateBottomBox(bottomLabels, groups);
     }
@@ -83,28 +85,22 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
-    private void populateBottomBox(List<PickerLabel> bottomLabels, List<String> groups) {
+    private void populateBottomBox(List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
         bottomBox.getChildren().clear();
         if (bottomLabels.size() == 0) {
             Label label = new Label("No labels in repository. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             bottomBox.getChildren().add(label);
         } else {
-            FlowPane noGroup = new FlowPane();
-            noGroup.setHgap(5);
-            noGroup.setVgap(5);
-            noGroup.setPadding(new Insets(0, 0, 10, 0));
-            bottomLabels
-                    .stream()
-                    .filter(label -> !label.getGroup().isPresent())
-                    .forEach(label -> noGroup.getChildren().add(label.getNode()));
-            if (noGroup.getChildren().size() > 0) bottomBox.getChildren().add(noGroup);
+            List<String> groupNames = groups.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
+            Collections.sort(groupNames, String.CASE_INSENSITIVE_ORDER);
 
-            groups.stream().forEach(group -> {
-                Label groupName = new Label(group);
-                groupName.setPadding(new Insets(0, 0, 5, 5));
+            groupNames.stream().forEach(group -> {
+                Label groupName = new Label(group + (groups.get(group) ? "." : "-"));
+                groupName.setPadding(new Insets(0, 5, 5, 0));
                 groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
                 groupName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold;");
+
                 FlowPane groupPane = new FlowPane();
                 groupPane.setHgap(5);
                 groupPane.setVgap(5);
@@ -116,6 +112,16 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         .forEach(label -> groupPane.getChildren().add(label.getNode()));
                 bottomBox.getChildren().addAll(groupName, groupPane);
             });
+
+            FlowPane noGroup = new FlowPane();
+            noGroup.setHgap(5);
+            noGroup.setVgap(5);
+            noGroup.setPadding(new Insets(5, 0, 0, 0));
+            bottomLabels
+                    .stream()
+                    .filter(label -> !label.getGroup().isPresent())
+                    .forEach(label -> noGroup.getChildren().add(label.getNode()));
+            if (noGroup.getChildren().size() > 0) bottomBox.getChildren().add(noGroup);
         }
     }
 
