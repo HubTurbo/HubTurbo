@@ -33,7 +33,18 @@ public class PlatformSpecific {
         return getLinuxKernelArchitecture() == Architecture.X86_64;
     }
 
-    private static boolean isOnLinux() {
+    public static boolean isOn32BitsLinux() {
+        if (!isOnLinux()) {
+            return false;
+        }
+
+        Architecture architecture = getLinuxKernelArchitecture();
+
+        return architecture == Architecture.I386 ||
+                architecture == Architecture.I686;
+    }
+
+    public static boolean isOnLinux() {
         return osName.startsWith("Linux");
     }
 
