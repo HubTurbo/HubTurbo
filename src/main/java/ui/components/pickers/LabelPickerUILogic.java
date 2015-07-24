@@ -38,13 +38,14 @@ public class LabelPickerUILogic {
         // in issue.getLabels()
         repoLabels.forEach(label -> {
             resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
-            if (label.getGroup().isPresent()) groups.add(label.getGroup().get());
+            if (label.getGroup().isPresent() && !groups.contains(label.getGroup().get()))
+                groups.add(label.getGroup().get());
         });
         Collections.sort(groups, String.CASE_INSENSITIVE_ORDER);
     }
 
     private void populatePanes() {
-        dialog.populatePanes(topLabels, bottomLabels);
+        dialog.populatePanes(topLabels, bottomLabels, groups);
     }
 
     public void toggleLabel(String name) {
@@ -345,10 +346,6 @@ public class LabelPickerUILogic {
 
     public Map<String, Boolean> getResultList() {
         return resultList;
-    }
-
-    public List<String> getGroups() {
-        return groups;
     }
 
 }

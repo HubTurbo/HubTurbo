@@ -23,7 +23,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private final LabelPickerUILogic uiLogic;
     private TextField textField;
     private FlowPane topPane;
-    private FlowPane bottomPane;
+    private VBox bottomBox;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         // UI creation
@@ -34,12 +34,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         titleLabel.setTooltip(createTitleTooltip(issue));
         topPane = createTopPane();
         textField = createTextField();
-        bottomPane = createBottomPane();
+        bottomBox = createBottomBox();
 
         setupKeyEvents();
         uiLogic = new LabelPickerUILogic(issue, repoLabels, this);
 
-        vBox.getChildren().addAll(titleLabel, topPane, textField, bottomPane);
+        vBox.getChildren().addAll(titleLabel, topPane, textField, bottomBox);
         getDialogPane().setContent(vBox);
 
         Platform.runLater(textField::requestFocus);
@@ -65,30 +65,55 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         });
     }
 
-    private void ______PANE_POPULATION______() {}
+    private void ______POPULATION______() {}
 
-    protected void populatePanes(List<PickerLabel> topLabels, List<PickerLabel> bottomLabels) {
+    protected void populatePanes(List<PickerLabel> topLabels, List<PickerLabel> bottomLabels, List<String> groups) {
         populateTopPane(topLabels);
-        populateBottomPane(bottomLabels);
+        populateBottomBox(bottomLabels, groups);
     }
 
     private void populateTopPane(List<PickerLabel> topLabels) {
         topPane.getChildren().clear();
-        topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
-        if (topPane.getChildren().size() == 0) {
+        if (topLabels.size() == 0) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
+        } else {
+            topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
         }
     }
 
-    private void populateBottomPane(List<PickerLabel> bottomLabels) {
-        bottomPane.getChildren().clear();
-        bottomLabels.forEach(label -> bottomPane.getChildren().add(label.getNode()));
-        if (bottomPane.getChildren().size() == 0) {
+    private void populateBottomBox(List<PickerLabel> bottomLabels, List<String> groups) {
+        bottomBox.getChildren().clear();
+        if (bottomLabels.size() == 0) {
             Label label = new Label("No labels in repository. ");
             label.setPadding(new Insets(2, 5, 2, 5));
-            bottomPane.getChildren().add(label);
+            bottomBox.getChildren().add(label);
+        } else {
+            FlowPane noGroup = new FlowPane();
+            noGroup.setHgap(5);
+            noGroup.setVgap(5);
+            bottomLabels
+                    .stream()
+                    .filter(label -> !label.getGroup().isPresent())
+                    .forEach(label -> noGroup.getChildren().add(label.getNode()));
+            if (noGroup.getChildren().size() > 0) bottomBox.getChildren().add(noGroup);
+
+            groups.stream().forEach(group -> {
+                Label groupName = new Label(group);
+                groupName.setPadding(new Insets(5));
+                groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
+                groupName.setStyle("-fx-font-size: 110%");
+                FlowPane groupPane = new FlowPane();
+                groupPane.setHgap(5);
+                groupPane.setVgap(5);
+                bottomLabels
+                        .stream()
+                        .filter(label -> label.getGroup().isPresent())
+                        .filter(label -> label.getGroup().get().equalsIgnoreCase(group))
+                        .forEach(label -> groupPane.getChildren().add(label.getNode()));
+                bottomBox.getChildren().addAll(groupName, groupPane);
+            });
         }
     }
 
@@ -161,12 +186,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         return textField;
     }
 
-    private FlowPane createBottomPane() {
-        FlowPane bottomPane = new FlowPane();
-        bottomPane.setPadding(new Insets(10, 0, 0, 0));
-        bottomPane.setHgap(5);
-        bottomPane.setVgap(5);
-        return bottomPane;
+    private VBox createBottomBox() {
+        VBox bottomBox = new VBox();
+        bottomBox.setPadding(new Insets(10, 0, 0, 0));
+        return bottomBox;
     }
 
 }
