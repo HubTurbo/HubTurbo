@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class LabelPickerLogicTests {
 
@@ -22,8 +22,8 @@ public class LabelPickerLogicTests {
     public LabelPickerUILogic prepareLogic(TurboIssue issue) {
         ArrayList<TurboLabel> repoLabels = new ArrayList<>();
         repoLabels.add(new TurboLabel("dummy/dummy", "Label 1"));
-        repoLabels.add(new TurboLabel("dummy/dummy", "Label 2"));
-        repoLabels.add(new TurboLabel("dummy/dummy", "Label 3"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "Label 10"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "Label 11"));
         repoLabels.add(new TurboLabel("dummy/dummy", "p.low"));
         repoLabels.add(new TurboLabel("dummy/dummy", "p.mid"));
         repoLabels.add(new TurboLabel("dummy/dummy", "p.high"));
@@ -51,7 +51,7 @@ public class LabelPickerLogicTests {
         logic.toggleLabel("p.mid");
         // check to see that only one label has been applied
         assertEquals(1, getLabels(logic).size());
-        assertEquals(true, (boolean) logic.getResultList().get("p.mid"));
+        assertEquals(true, logic.getResultList().get("p.mid"));
         // let's toggle two non-exclusive labels
         logic.toggleLabel("f-aaa");
         logic.toggleLabel("f-bbb");
@@ -71,7 +71,7 @@ public class LabelPickerLogicTests {
         logic.toggleLabel("p.mid");
         // we should be left with one label
         assertEquals(1, getLabels(logic).size());
-        assertEquals(true, (boolean) logic.getResultList().get("p.low"));
+        assertEquals(true, logic.getResultList().get("p.low"));
 
         // let's try starting with an issue with two exclusive labels in the same group
         issue = new TurboIssue("dummy/dummy", 1, "Issue 1");
@@ -83,7 +83,40 @@ public class LabelPickerLogicTests {
         logic.toggleLabel("p.high");
         // we should be left with one label
         assertEquals(1, getLabels(logic).size());
-        assertEquals(true, (boolean) logic.getResultList().get("p.high"));
+        assertEquals(true, logic.getResultList().get("p.high"));
+    }
+
+    @Test
+    public void moveHighlightTest() {
+        // check for highlighted label movement
+        LabelPickerUILogic logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // check for no highlight
+        assertEquals(false, logic.getHighlightedLabelName().isPresent());
+        // enter search query
+        logic.processTextFieldChange("1");
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("Label 1", logic.getHighlightedLabelName().get().getActualName());
+        // press down key
+        logic.moveHighlightOnLabel(true);
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("Label 10", logic.getHighlightedLabelName().get().getActualName());
+        // toggle label
+        logic.toggleSelectedLabel("1");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals("Label 10", getLabels(logic).get(0));
+        assertEquals(false, logic.getHighlightedLabelName().isPresent());
+        // enter search query and move down and up
+        logic.processTextFieldChange("1");
+        logic.moveHighlightOnLabel(true);
+        logic.moveHighlightOnLabel(false);
+        assertEquals(true, logic.getHighlightedLabelName().isPresent());
+        assertEquals("Label 1", logic.getHighlightedLabelName().get().getActualName());
+        // toggle label
+        logic.toggleSelectedLabel("1");
+        assertEquals(2, getLabels(logic).size());
+        assertEquals("Label 11", getLabels(logic).get(1));
+        assertEquals(false, logic.getHighlightedLabelName().isPresent());
     }
 
 }
