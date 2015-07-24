@@ -92,41 +92,4 @@ public class LabelPickerTests extends UITest {
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
-    @Test
-    public void groupTest() {
-        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
-        assertEquals(1, listPanelCell.getIssueLabels().size());
-
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
-
-        type("t.s");
-        sleep(EVENT_DELAY);
-        push(KeyCode.ENTER);
-        sleep(DIALOG_DELAY);
-        assertEquals(true, listPanelCell.getIssueLabels().contains("type.story"));
-
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
-
-        type("t.r");
-        sleep(EVENT_DELAY);
-        push(KeyCode.ENTER);
-        sleep(DIALOG_DELAY);
-        assertEquals(true, listPanelCell.getIssueLabels().contains("type.research"));
-        assertEquals(2, listPanelCell.getIssueLabels().size());
-
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
-
-        type("t.r");
-        sleep(EVENT_DELAY);
-        push(KeyCode.ENTER);
-        sleep(DIALOG_DELAY);
-        assertEquals(1, listPanelCell.getIssueLabels().size());
-    }
-
 }
