@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
@@ -71,9 +72,10 @@ public class Utility {
                     fileName + " is unusually large.\n\n"
                             + "Now proceeding to delete the file and redownload the repository to prevent "
                             + "further corruption.\n\n"
+                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
                             + "The error log of the program has been stored in the file hubturbo-err-log.log."
             ));
-            deleteFile(fileName);
+            copyAndDeleteFile(fileName);
             copyLog();
             return true;
         }
@@ -90,10 +92,13 @@ public class Utility {
         }
     }
 
-    public static void deleteFile(String fileName) {
+    public static void copyAndDeleteFile(String fileName) {
         try {
-            if (Files.exists(Paths.get(fileName))) {
-                Files.delete(Paths.get(fileName));
+            Path corruptedFile = Paths.get(fileName);
+            if (Files.exists(corruptedFile)) {
+                Files.move(corruptedFile,
+                        Paths.get(fileName + "-err"),
+                        StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
