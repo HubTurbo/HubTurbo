@@ -6,6 +6,13 @@ Labels are created through GitHub's UI.
 
 - Select `New > Label` (<kbd>Ctrl</kbd> + <kbd>L</kbd>) from the menu.
 
+## Label Groups
+
+HubTurbo supports label groups using two different delimiters. 
+
+- `.` indicates an exclusive group, multiple labels from this kind of group cannot be applied (e.g. `priority.low`)
+- `-` indicates a non-exclusive group, multiple labels from this kind of group can be applied (e.g. `feature-labels`)
+
 ## Adding/editing labels of an issue/PR
 
 Pressing <kbd>L</kbd> after selecting an issue card brings up the Label Picker. 
