@@ -93,6 +93,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             FlowPane noGroup = new FlowPane();
             noGroup.setHgap(5);
             noGroup.setVgap(5);
+            noGroup.setPadding(new Insets(0, 0, 10, 0));
             bottomLabels
                     .stream()
                     .filter(label -> !label.getGroup().isPresent())
@@ -101,12 +102,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
             groups.stream().forEach(group -> {
                 Label groupName = new Label(group);
-                groupName.setPadding(new Insets(5));
+                groupName.setPadding(new Insets(0, 0, 5, 5));
                 groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
                 groupName.setStyle("-fx-font-size: 110%");
                 FlowPane groupPane = new FlowPane();
                 groupPane.setHgap(5);
                 groupPane.setVgap(5);
+                groupPane.setPadding(new Insets(0, 0, 10, 0));
                 bottomLabels
                         .stream()
                         .filter(label -> label.getGroup().isPresent())
