@@ -7,7 +7,7 @@
 
 ## Document changes
 
-- Update the [changelog](Changelog.md)
+- Update the [changelog](changelog.md)
 
 ## Bump version numbers
 

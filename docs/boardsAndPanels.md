@@ -1,6 +1,6 @@
 # Working with Boards and Panels
 
-An overview of Panels was provided in the [UI Basics](UI-Basics.md).
+An overview of Panels was provided in the [UI Basics](uiBasics.md).
 
 ### Adding a New Panel <a name="add"></a>
 

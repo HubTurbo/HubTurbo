@@ -11,10 +11,10 @@ Issues are created through GitHub's UI, shown in the browser view.
 When an issue is selected on the panel view, its details are shown in the browser view.
 The issue can be edited using the browser view.
 
-<img src="images/ui-basics/BrowserViewExplanation.png" src="600">
+<img src="images/uiBasics/browserViewExplanation.png" src="600">
 
 Any of the following will select an issue for viewing:
 
 - Clicking on an issue.
-- Navigating the issue list with the keyboard (refer [Keyboard shortcuts](Keyboard-Shortcuts.md)).
+- Navigating the issue list with the keyboard (refer [Keyboard shortcuts](keyboardShortcuts.md)).
 
