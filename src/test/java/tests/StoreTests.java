@@ -15,8 +15,6 @@ import util.events.EventDispatcherStub;
 import util.events.testevents.UpdateDummyRepoEvent;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
