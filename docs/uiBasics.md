@@ -33,8 +33,6 @@ The **default repository** dropdown allows you to specify what HubTurbo consider
 HubTurbo can be viewing many repositories at once; if you do not specify a repository, 
 HubTurbo assumes you meant to work with the default repository. 
 
-Further references: [boards and panels](boardsAndPanels.md) | [issues](issuesAndPRs.md) | [filters](filters.md)
-
 ## Browser View
 
 <img src="images/uiBasics/browserViewExplanation.png" width="800">
@@ -48,4 +46,3 @@ The general workflow is to switch back and forth between the two windows,
 staying in the panel view as much as possible to take advantage of extra productivity features 
 provided by HubTurbo (e.g. keyboard shortcuts), and going to the browser view for working with issue details when necessary.
 
-Further references: [keyboard shortcuts](keyboardShortcuts.md)

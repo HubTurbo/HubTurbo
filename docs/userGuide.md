@@ -2,7 +2,8 @@
 
 - [Getting Started](gettingStarted.md)
 - [UI Basics](uiBasics.md)
-- [Boards and Panels](boardsAndPanels.md)
+- [Boards](boards.md)
+- [Panels](panels.md)
 - [Filters](filters.md)
 - [Issues and PRs] (issuesAndPRs.md)
 - [Labels](labels.md)
