@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -23,6 +24,14 @@ public class PlatformSpecificTests {
                      PlatformSpecific.getArchitectureFromString(""));
         assertEquals(Architecture.UNKNOWN,
                      PlatformSpecific.getArchitectureFromString(null));
+    }
+
+    @Test
+    public void testGettingLinuxArchitecture() {
+        if (PlatformSpecific.isOnLinux()) {
+            assertTrue(PlatformSpecific.isOn32BitsLinux() ||
+                       PlatformSpecific.isOn64BitsLinux());
+        }
     }
 
 }
