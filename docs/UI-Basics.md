@@ -2,18 +2,50 @@
 
 Here we'll get an overview of the essential parts of HubTurbo's user interface.
 
-![](images/ui-basics/1.png?raw=true)
+![](images/ui-basics/UiMainComponentsScreenshot.png?raw=true)
 
-HubTurbo's interface is split in two. These parts are the **panel view** and the **browser view**.
+HubTurbo's interface has two parts: The **panel view** and the **browser view**.
 
-![](images/ui-basics/2.png?raw=true)
+![](images/ui-basics/UiMainComponentsBreakdown.png?raw=true)
 
-The **panel view** displays panels of issues, serving as an overview of the issue tracker. HubTurbo is meant to be used alongside GitHub, so the **browser view** generally shows a GitHub page; for example, clicking on an issue in a panel will navigate to its page in the browser view.
+## Panel View
 
-The general workflow is to switch back and forth between the two windows as needed, going to the panel view for an overview of the issue tracker, and to the browser view to make changes to issues.
+<img src="images/ui-basics/PanelViewBreakdown.png" width="600">
 
-Other user interface elements are more typical: the **menu** contains ways to add new panels, navigate to different pages in the browser view, and other application-level operations, and the **repository** dropdown allows you to change the *default repository* that HubTurbo is viewing. HubTurbo can be viewing many repositories at once; the default repository is just the one used when no repository is explicitly specified.
+The **panel view** displays a **board** which contains a collection of **panels**. 
 
-An **issue panel** provides a view into a section of the issue tracker. It displays **issue cards** according to the filter set in it. The filter can help you [refine](Filtering-Issues.md) the portion of the issue tracker that you're interested in, so you can get to the information you need faster. You can also have [as many panels as you want](Working-with-Panels.md), ensuring that all information relevant to you is shown at once.
+<img src="images/ui-basics/PanelExplanation.png" width="600">
 
-To get the most out of the user interface, check out how to navigate it with [keyboard shortcuts](Keyboard-Shortcuts.md).
+A panel provides a 'filtered view' into the issue tracker by displaying a list of 
+**issue cards** that match the **filter** you specify at the top of the panel. 
+You can have any number of panels in a board, to get a side-by-side view of all issues you are interested in. 
+
+For example, a board can contain three panels showing,
+
+1. all open issues assigned to you from projects *alpha*, *beta*, and *gamma* (yes, a panel can show issues from multiple projects)
+2. all issues of project *beta* updated within the last 24 hours  
+3. all open issues allocated to the next upcoming milestone in *project alpha*
+
+Boards can be named, saved, and reloaded. For example you can have one board called 'work projects' and another called 'pet projects'. 
+However, HubTurbo can display only one board at a time.
+
+The **default repository** dropdown allows you to specify what HubTurbo considers to be the *default repository*. 
+HubTurbo can be viewing many repositories at once; if you do not specify a repository, 
+HubTurbo assumes you meant to work with the default repository. 
+
+Further references: [boards and panels](Boards-and-Panels.md) | [issues](Issues.md) | [filters](Filters.md)
+
+## Browser View
+
+<img src="images/ui-basics/BrowserViewExplanation.png" width="800">
+
+The **browser view** is a Chrome Window controlled by HubTurbo, and it shows GitHub pages as needed by the panel view; 
+for example, clicking on an issue in a panel will make the browser view to navigate to the corresponding issue page on GitHub.
+
+## HubTurbo Workflow
+
+The general workflow is to switch back and forth between the two windows, 
+staying in the panel view as much as possible to take advantage of extra productivity features 
+provided by HubTurbo (e.g. keyboard shortcuts), and going to the browser view for working with issue details when necessary.
+
+Further references: [keyboard shortcuts](Keyboard-Shortcuts.md)

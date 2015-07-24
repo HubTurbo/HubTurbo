@@ -1,23 +1,23 @@
-# Working with Panels
+# Working with Boards and Panels
 
-HubTurbo presents issues in vertically-arranged, flexible panels. You can create as many panels as you need, each with a different [filter](Filtering-Issues.md), representing a view in a particular part of the issue tracker. Knowing all the ways in which panels can be manipulated is essential to making HubTurbo a part of your workflow.
+An overview of Panels was provided in the [UI Basics](UI-Basics.md).
 
 ### Adding a New Panel <a name="add"></a>
 
-Panels can be added easily, from the menu or via hotkeys. Hotkeys are available for adding both left and right of the current panel for efficiency.
+Panels can be added using the menu or keyboard shortcuts. 
 
-- `Panels > Create Panel` to add a panel on the right.
-    - `Ctrl + P` will do the same.
+- `Panels > Create Panel` to add a panel on the right of the currently selected panel.
+    - <kbd>Ctrl</kbd> + <kbd>P</kbd> will do the same.
 
 - `Panels > Create Panel (Left)` to add a panel on the left.
-    - `Ctrl + Shift + P` will do the same.
+    - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> will do the same.
 
 ### Closing a Panel <a name="close"></a>
 
 - Click on the `x` button at the top of the panel.
 
 - `Panels > Close Panel`
-    - `Ctrl + W` will do the same.
+    - <kbd>Ctrl</kbd> + <kbd>W</kbd> will do the same.
 
 ### Reordering Panels <a name="reorder"></a>
 
@@ -31,7 +31,7 @@ A collection of panels is called a board. HubTurbo has ways to manage them as we
 
 ### Saving a Board
 
-- The current board will be saved when you quit the application.
+- The current board will be saved when you quit the application. The same borad will be loaded next time you run HubTurbo.
 
 - You may also save a board under a name via `Boards > Save`.
 
