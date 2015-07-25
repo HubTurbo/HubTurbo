@@ -131,6 +131,7 @@ local-config.json
 hubturbo-log.log
 chromedriver
 chromedriver_linux
+chromedriver_linux_x86_64
 chromedriver.exe
 .hubturbocache/
 settings/

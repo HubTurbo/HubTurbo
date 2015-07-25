@@ -87,7 +87,7 @@ public class PlatformSpecific {
     public static Architecture getArchitectureFromString(String architectureDescription) {
         if (architectureDescription == null) {
             return Architecture.UNKNOWN;
-        } if (architectureDescription.contains("x86_64")) {
+        } else if (architectureDescription.contains("x86_64")) {
             return Architecture.X86_64;
         } else if (architectureDescription.contains("i386")) {
             return Architecture.I386;
