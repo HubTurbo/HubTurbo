@@ -1,13 +1,12 @@
 package util;
 
-import javafx.application.Platform;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -22,6 +21,14 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javafx.application.Platform;
+
+import javax.swing.UIManager;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
 
 public class Utility {
 
@@ -200,7 +207,14 @@ public class Utility {
 
     public static Optional<Rectangle> getUsableScreenDimensions() {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            if (PlatformSpecific.isOnLinux()) {
+                UIManager.setLookAndFeel(
+                    UIManager.getCrossPlatformLookAndFeelClassName());
+            } else {
+                UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+            }
+
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             return Optional.of(ge.getMaximumWindowBounds());
         } catch (Exception e) {
