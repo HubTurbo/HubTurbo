@@ -97,7 +97,7 @@ If errors occur, trying running `clean` before the task (e.g. `./gradlew clean t
 
 If you have not used HubTurbo before, the [User Guide](userGuide.md) has lots of detail on how to use HubTurbo. Be sure to give it a quick read and try out HubTrubo features first.
 
-After that, check out the documentation on [architecture](Architecture.md) and [design](Design-Decisions-and-Guidelines.md) for an overview of the codebase, and why it's the way it is. Read about the [workflow](Workflow.md) once you are ready to contribute.
+After that, check out the documentation on [architecture](architecture.md) and [design](designRationalesAndGuidelines.md) for an overview of the codebase, and why it's the way it is. Read about the [workflow](workflow.md) once you are ready to contribute.
 
 ## Troubleshooting
 
