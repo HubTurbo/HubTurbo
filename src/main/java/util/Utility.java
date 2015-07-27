@@ -59,9 +59,7 @@ public class Utility {
             writer.close();
 
             long sizeAfterWrite = Files.size(Paths.get(fileName));
-            boolean jsonIsCorrupted = processFileGrowth(sizeAfterWrite, issueCount, fileName);
-
-            return jsonIsCorrupted;
+            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
             return true;

@@ -41,7 +41,7 @@ public class HTStatusBar extends StatusBar implements StatusUI {
                 } else {
                     progressBars.get(e.repoId).setProgress(e.progress);
                 }
-            } else {
+            } else if (!e.done) {
                 TextProgressBar progressBar = new TextProgressBar(e.repoId);
                 progressBars.put(e.repoId, progressBar);
                 getRightItems().add(progressBar);

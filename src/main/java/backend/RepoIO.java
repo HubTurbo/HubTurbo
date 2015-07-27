@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
+import util.events.UpdateProgressEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,6 +125,7 @@ public class RepoIO {
                     return downloadRepoFromSourceAsync(model.getRepoId(), remainingTries - 1).join();
                 } else {
                     UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                    UI.events.triggerEvent(new UpdateProgressEvent(model.getRepoId()));
                     return newModel;
                 }
             }).exceptionally(withResult(new Model(model.getRepoId())));
