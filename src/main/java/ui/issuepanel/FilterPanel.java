@@ -91,7 +91,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton.setText("RENAME");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-        	Dialog<String> renameDialog = new TextInputDialog(panelName);
+            Dialog<String> renameDialog = new TextInputDialog(panelName);
             renameDialog.setTitle("Rename Panel");
             renameDialog.setHeaderText("Enter a new name for this panel.");
             Optional<String> result = renameDialog.showAndWait();
