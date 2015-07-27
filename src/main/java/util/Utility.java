@@ -1,5 +1,7 @@
 package util;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,21 +50,15 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static boolean writeFile(String fileName, String content, String prettyContent, int issueCount) {
-        PrintWriter writer;
+    public static boolean writeFile(String fileName, String content, int issueCount) {
         try {
-            writer = new PrintWriter(fileName, "UTF-8");
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
 
             long sizeAfterWrite = Files.size(Paths.get(fileName));
             boolean jsonIsCorrupted = processFileGrowth(sizeAfterWrite, issueCount, fileName);
-            if (jsonIsCorrupted) {
-                System.out.println("THIS");
-                writer = new PrintWriter(fileName + "-err", "UTF-8");
-                writer.println(prettyContent);
-                writer.close();
-            }
+
             return jsonIsCorrupted;
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
@@ -82,7 +78,7 @@ public class Utility {
 //                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
 //                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
 //            ));
-            deleteFile(fileName);
+            parseAndDeleteFile(fileName);
             copyLog();
             return true;
         }
@@ -99,10 +95,19 @@ public class Utility {
         }
     }
 
-    public static void deleteFile(String fileName) {
+    public static void parseAndDeleteFile(String fileName) {
         try {
             Path corruptedFile = Paths.get(fileName);
-            if (Files.exists(corruptedFile)) Files.delete(corruptedFile);
+            if (Files.exists(corruptedFile)) {
+                String corruptedFileData = readFile(fileName).get();
+                PrintWriter writer = new PrintWriter(fileName + "-err", "UTF-8");
+                writer.println(new GsonBuilder().setPrettyPrinting().create().toJson(
+                        new JsonParser().parse(corruptedFileData)
+                ));
+                writer.close();
+
+                Files.delete(corruptedFile);
+            }
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }

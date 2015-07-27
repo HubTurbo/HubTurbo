@@ -33,8 +33,8 @@ public abstract class RepoStore {
         return new File(RepoStore.directory, newRepoName).getAbsolutePath();
     }
 
-    public static boolean write(String repoId, String output, String prettyOutput, int issueCount) {
-        return Utility.writeFile(getRepoPath(repoId), output, prettyOutput, issueCount);
+    public static boolean write(String repoId, String output, int issueCount) {
+        return Utility.writeFile(getRepoPath(repoId), output, issueCount);
     }
 
     public static Optional<String> read(String repoId) {

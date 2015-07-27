@@ -30,8 +30,7 @@ class WriteTask extends StoreTask {
 
     private boolean save(String repoId, SerializableModel model) {
         String output = new Gson().toJson(model);
-        String prettyOutput = new GsonBuilder().setPrettyPrinting().create().toJson(model);
-        boolean corruptedJson = RepoStore.write(repoId, output, prettyOutput, model.issues.size());
+        boolean corruptedJson = RepoStore.write(repoId, output, model.issues.size());
         logger.info(HTLog.format(repoId, "Written to JSON store"));
         return corruptedJson;
     }
