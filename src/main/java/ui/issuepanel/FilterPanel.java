@@ -7,7 +7,6 @@ import filter.ParseException;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import javafx.stage.Stage;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,12 +14,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 
 import ui.UI;
 import ui.components.FilterTextField;
+import util.events.ShowRenamePanelEvent;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
 
@@ -28,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 /**
  * An FilterPanel is a AbstractPanel meant for containing issues and an accompanying filter text field,
@@ -46,17 +43,14 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Text nameBox;
     protected Button renameButton;
     private String panelName = "Panel";
-    private final int MAX_NAME_LENGTH = 48;
     private UI ui;
-    private Stage mainStage;
-    
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
     public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(model, parentPanelControl, panelIndex);
         this.ui = ui;
-        this.mainStage = parentPanelControl.mainStage;
+        this.setId(model.getDefaultRepo() + "_col" + panelIndex);
         
         getChildren().addAll(createNameBar(), createFilterBox());
         this.setOnMouseClicked(e-> {
@@ -91,19 +85,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton.setText("RENAME");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-            Dialog<String> renameDialog = new TextInputDialog(panelName);
-            renameDialog.setTitle("Rename Panel");
-            renameDialog.setHeaderText("Enter a new name for this panel.");
-            Optional<String> result = renameDialog.showAndWait();
-            mainStage.show();
-            String name = result.get();
-            if (name.length() != 0) {
-                panelName = name;
-            }
-            if (panelName.length() > MAX_NAME_LENGTH) {
-                panelName = panelName.substring(0, MAX_NAME_LENGTH);
-            }
-            nameBox.setText(panelName);
+            ui.triggerEvent(new ShowRenamePanelEvent(this));
         });
         
         HBox nameArea = new HBox();
@@ -123,6 +105,15 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBar.setMaxWidth(PANEL_WIDTH);
         nameBar.getChildren().addAll(nameArea, renameArea);
         return nameBar;
+    }
+    
+    public void renamePanel(String newName) {
+        panelName = newName;
+        nameBox.setText(newName);
+    }
+    
+    public String getPanelName() {
+        return this.panelName;
     }
 
     private Node createFilterBox() {

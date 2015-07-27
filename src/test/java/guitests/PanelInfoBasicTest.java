@@ -2,13 +2,14 @@ package guitests;
 
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
-import javafx.scene.control.Button;
-
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import ui.components.FilterTextField;
+import ui.UI;
+import ui.issuepanel.FilterPanel;
+import util.events.ShowRenamePanelEvent;
 
 import java.util.List;
 
@@ -16,8 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
 
-    public static final int DIALOG_DELAY = 4000;
-    public static final int EVENT_DELAY = 8000;
+    public static final int EVENT_DELAY = 2000;
 
     @Override
     public void launchApp() {
@@ -33,11 +33,11 @@ public class PanelInfoBasicTest extends UITest {
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
         
-        Button renameButton1 = find("#dummy/dummy_col0_renameButton");
-        click(renameButton1);
+        FilterPanel panel1 = find("#dummy/dummy_col0");
         Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowRenamePanelEvent(panel1));
         type("Renamed panel");
-        press(KeyCode.ENTER);
+        click("OK");
         sleep(EVENT_DELAY);
         
         // Creating panel
@@ -49,20 +49,17 @@ public class PanelInfoBasicTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
-        push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
         
-        Button renameButton2 = find("#dummy/dummy_col1_renameButton");
-        click(renameButton2);
+        FilterPanel panel2 = find("#dummy/dummy_col1");
         Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowRenamePanelEvent(panel2));
         type("Dummy 2 panel");
-        push(KeyCode.ENTER);
+        click("OK");
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
         press(KeyCode.SHIFT).press(KeyCode.CONTROL).press(KeyCode.P);
         release(KeyCode.P).release(KeyCode.CONTROL).release(KeyCode.SHIFT);
-        sleep(EVENT_DELAY);
         
         FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
         click(filterTextField3);
@@ -73,16 +70,15 @@ public class PanelInfoBasicTest extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
-        Button renameButton3 = find("#dummy/dummy_col0_renameButton");
-        click(renameButton3);
+        FilterPanel panel3 = find("#dummy/dummy_col0");
         Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowRenamePanelEvent(panel3));
         type("Open issues");
-        push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        click("OK");
         
         // Quitting to update json
         click("File");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        click("Quit");
         
         Preferences testPref = new Preferences(true);
         
