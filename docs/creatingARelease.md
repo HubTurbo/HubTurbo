@@ -7,7 +7,7 @@
 
 ## Document changes
 
-- Update the [changelog](Changelog.md)
+- Update the [changelog](changelog.md)
 
 ## Bump version numbers
 
@@ -21,6 +21,8 @@
     - Example: `V0.12.1`
 - `git push`
 - `git push --tags`
+
+Further reading: [Semantic versioning](http://semver.org/)
 
 ## Create and upload JAR
 
@@ -41,5 +43,6 @@
 
 ## Housekeeping
 
-- Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain
-- **Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back.
+- Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain <br>
+**Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back.
+- Close the previous milestone, and create a new milestone for the next release.

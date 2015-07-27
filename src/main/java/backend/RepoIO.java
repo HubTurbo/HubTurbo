@@ -18,8 +18,10 @@ import util.events.UpdateProgressEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static util.Futures.withResult;
 
@@ -63,9 +65,22 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> openRepository(String repoId) {
-        if (storedRepos.contains(repoId)) {
-            return loadRepoFromStoreAsync(repoId)
-                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoId));
+        // The ignoreCase logic is necessary when we are opening a repo from the login dialog window
+        // i.e. when the isAlreadyOpen check in Logic fails.
+        Optional<String> matchingRepoName = storedRepos.stream().filter(repoName ->
+                repoName.equalsIgnoreCase(repoId)).findFirst();
+        if (matchingRepoName.isPresent()) {
+            // TODO avoid CI deadlock in the .exceptionally call. Explanation:
+            /* loadRepoFromStoreAsync will execute in jsonStore's single thread pool, and if
+             it has an exception then downloadRepoFromSourceBlocking will also run there. Eventually,
+             this results in jsonStore.saveRepository in updateModel being placed as another Task on the
+             same thread pool. However, since the current task is still carrying out and waiting for the second
+             task to complete, the program gets deadlocked on the CI.
+             One example of how this can happen is when storedRepos contains the repo name but the json was
+             deleted while the program is still running. */
+            String repoToLoad = matchingRepoName.get();
+            return loadRepoFromStoreAsync(repoToLoad)
+                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoToLoad));
         } else {
             return downloadRepoFromSourceAsync(repoId);
         }
