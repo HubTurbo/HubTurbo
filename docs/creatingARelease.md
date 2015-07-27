@@ -22,6 +22,8 @@
 - `git push`
 - `git push --tags`
 
+Further reading: [Semantic versioning](http://semver.org/)
+
 ## Create and upload JAR
 
 - Can be executed from the command line (using `gradlew`), Eclipse or IntelliJ IDEA
@@ -41,5 +43,6 @@
 
 ## Housekeeping
 
-- Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain
-- **Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back.
+- Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain <br>
+**Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back.
+- Close the previous milestone, and create a new milestone for the next release.
