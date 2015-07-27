@@ -31,6 +31,8 @@ public class RepoIO {
 
     private List<String> storedRepos;
 
+    private static final int MAX_REDOWNLOAD_TRIES = 2;
+
     public RepoIO(boolean isTestMode, boolean enableTestJSON) {
         if (isTestMode) {
             repoSource = new DummySource();
@@ -73,10 +75,14 @@ public class RepoIO {
                 .thenCompose(this::updateModel);
     }
 
-    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId) {
+    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoID) {
+        return downloadRepoFromSourceAsync(repoID, MAX_REDOWNLOAD_TRIES);
+    }
+
+    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId, int remainingTries) {
         UI.status.displayMessage("Downloading " + repoId);
         return repoSource.downloadRepository(repoId)
-                .thenCompose(this::updateModel)
+                .thenCompose(newModel -> updateModel(newModel, remainingTries))
                 .thenApply(model -> {
                     storedRepos.add(repoId);
                     return model;
@@ -96,9 +102,12 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> updateModel(Model model) {
+        return updateModel(model, MAX_REDOWNLOAD_TRIES);
+    }
+
+    public CompletableFuture<Model> updateModel(Model model, int remainingTries) {
         return repoSource.updateModel(model)
             .thenApply(newModel -> {
-                UI.status.displayMessage(model.getRepoId() + " is up to date!");
                 boolean corruptedJson = false;
                 if (!model.equals(newModel)) {
                     try {
@@ -111,9 +120,10 @@ public class RepoIO {
                     logger.info(HTLog.format(model.getRepoId(),
                             "Nothing changed; not writing to store"));
                 }
-                if (corruptedJson) {
-                    return downloadRepoFromSourceAsync(model.getRepoId()).join();
+                if (corruptedJson && remainingTries > 0) {
+                    return downloadRepoFromSourceAsync(model.getRepoId(), remainingTries - 1).join();
                 } else {
+                    UI.status.displayMessage(model.getRepoId() + " is up to date!");
                     return newModel;
                 }
             }).exceptionally(withResult(new Model(model.getRepoId())));
