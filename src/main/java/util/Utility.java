@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,15 +71,15 @@ public class Utility {
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.
-        if (sizeAfterWrite > ((long) issueCount * 2000) || true) {
-//            Platform.runLater(() -> DialogMessage.showErrorDialog(
-//                    "Possible data corruption detected",
-//                    fileName + " is unusually large.\n\n"
-//                            + "Now proceeding to delete the file and redownload the repository to prevent "
-//                            + "further corruption.\n\n"
-//                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
-//                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
-//            ));
+        if (sizeAfterWrite > ((long) issueCount * 2000)) {
+            UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
+                    fileName + " is unusually large.\n\n"
+                            + "Now proceeding to delete the file and redownload the repository to prevent "
+                            + "further corruption.\n\n"
+                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
+                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
+                    )
+            );
             parseAndDeleteFile(fileName);
             copyLog();
             return true;

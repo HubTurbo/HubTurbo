@@ -14,11 +14,9 @@ import javafx.scene.control.Label;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
+import util.DialogMessage;
 import util.Utility;
-import util.events.ModelUpdatedEvent;
-import util.events.ModelUpdatedEventHandler;
-import util.events.UpdateRateLimitsEvent;
-import util.events.UpdateRateLimitsEventHandler;
+import util.events.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -52,6 +50,7 @@ public class GUIController {
     public void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
         UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
+        UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
     }
 
     /**
@@ -306,4 +305,7 @@ public class GUIController {
         );
     }
 
+    private void showErrorDialog(ShowErrorDialogEvent e) {
+        Platform.runLater(() -> DialogMessage.showErrorDialog(e.header, e.message));
+    }
 }
