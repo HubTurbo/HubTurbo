@@ -48,7 +48,7 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static boolean writeFile(String fileName, String content, int issueCount) {
+    public static boolean writeFile(String fileName, String content, String prettyContent, int issueCount) {
         PrintWriter writer;
         try {
             writer = new PrintWriter(fileName, "UTF-8");
@@ -56,7 +56,14 @@ public class Utility {
             writer.close();
 
             long sizeAfterWrite = Files.size(Paths.get(fileName));
-            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
+            boolean jsonIsCorrupted = processFileGrowth(sizeAfterWrite, issueCount, fileName);
+            if (jsonIsCorrupted) {
+                System.out.println("THIS");
+                writer = new PrintWriter(fileName + "-err", "UTF-8");
+                writer.println(prettyContent);
+                writer.close();
+            }
+            return jsonIsCorrupted;
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
             return true;
@@ -66,16 +73,16 @@ public class Utility {
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.
-        if (sizeAfterWrite > ((long) issueCount * 2000)) {
-            Platform.runLater(() -> DialogMessage.showErrorDialog(
-                    "Possible data corruption detected",
-                    fileName + " is unusually large.\n\n"
-                            + "Now proceeding to delete the file and redownload the repository to prevent "
-                            + "further corruption.\n\n"
-                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
-                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
-            ));
-            copyAndDeleteFile(fileName);
+        if (sizeAfterWrite > ((long) issueCount * 2000) || true) {
+//            Platform.runLater(() -> DialogMessage.showErrorDialog(
+//                    "Possible data corruption detected",
+//                    fileName + " is unusually large.\n\n"
+//                            + "Now proceeding to delete the file and redownload the repository to prevent "
+//                            + "further corruption.\n\n"
+//                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
+//                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
+//            ));
+            deleteFile(fileName);
             copyLog();
             return true;
         }
@@ -92,14 +99,10 @@ public class Utility {
         }
     }
 
-    public static void copyAndDeleteFile(String fileName) {
+    public static void deleteFile(String fileName) {
         try {
             Path corruptedFile = Paths.get(fileName);
-            if (Files.exists(corruptedFile)) {
-                Files.move(corruptedFile,
-                        Paths.get(fileName + "-err"),
-                        StandardCopyOption.REPLACE_EXISTING);
-            }
+            if (Files.exists(corruptedFile)) Files.delete(corruptedFile);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }

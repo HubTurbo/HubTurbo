@@ -4,6 +4,7 @@ import backend.interfaces.RepoStore;
 import backend.interfaces.StoreTask;
 import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 
@@ -29,7 +30,8 @@ class WriteTask extends StoreTask {
 
     private boolean save(String repoId, SerializableModel model) {
         String output = new Gson().toJson(model);
-        boolean corruptedJson = RepoStore.write(repoId, output, model.issues.size());
+        String prettyOutput = new GsonBuilder().setPrettyPrinting().create().toJson(model);
+        boolean corruptedJson = RepoStore.write(repoId, output, prettyOutput, model.issues.size());
         logger.info(HTLog.format(repoId, "Written to JSON store"));
         return corruptedJson;
     }
