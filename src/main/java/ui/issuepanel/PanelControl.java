@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import prefs.Preferences;
 import prefs.PanelInfo;
 import ui.GUIController;
@@ -28,10 +29,12 @@ public class PanelControl extends HBox {
     private IModel model;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
+    public Stage mainStage;
 
-    public PanelControl(UI ui, Preferences prefs) {
+    public PanelControl(UI ui, Preferences prefs, Stage stage) {
         this.ui = ui;
         this.prefs = prefs;
+        this.mainStage = stage;
 
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));

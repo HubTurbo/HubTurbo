@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Button;
 
@@ -34,31 +35,27 @@ public class PanelInfoBasicTest extends UITest {
         
         Button renameButton1 = find("#dummy/dummy_col0_renameButton");
         click(renameButton1);
-        sleep(DIALOG_DELAY);
+        Platform.runLater(stage::hide);
         type("Renamed panel");
-        sleep(DIALOG_DELAY);
         press(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        sleep(EVENT_DELAY);
         
         FilterTextField filterTextField2 = find("#dummy/dummy_col1_filterTextField");
         click(filterTextField2);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
-        sleep(DIALOG_DELAY);
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         Button renameButton2 = find("#dummy/dummy_col1_renameButton");
         click(renameButton2);
-        sleep(DIALOG_DELAY);
+        Platform.runLater(stage::hide);
         type("Dummy 2 panel");
-        sleep(DIALOG_DELAY);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
@@ -72,23 +69,20 @@ public class PanelInfoBasicTest extends UITest {
         type("is");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("open");
-        sleep(DIALOG_DELAY);
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         Button renameButton3 = find("#dummy/dummy_col0_renameButton");
         click(renameButton3);
-        sleep(DIALOG_DELAY);
+        Platform.runLater(stage::hide);
         type("Open issues");
-        sleep(DIALOG_DELAY);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Quitting to update json
         click("File");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
         
         Preferences testPref = new Preferences(true);
         
