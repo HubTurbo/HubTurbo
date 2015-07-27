@@ -64,9 +64,9 @@ public class Utility {
     }
 
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
-        // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
-        // we consider the json to have exploded.
-        if (sizeAfterWrite > ((long) issueCount * 1000)) {
+        // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
+        // we consider the json to have exploded as the file is unusually large.
+        if (sizeAfterWrite > ((long) issueCount * 2000)) {
             Platform.runLater(() -> DialogMessage.showErrorDialog(
                     "Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
