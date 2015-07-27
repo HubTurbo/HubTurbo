@@ -331,21 +331,21 @@ public class BrowserComponent {
 
     private static String determineChromeDriverBinaryName() {
         if (PlatformSpecific.isOnMac()) {
-            logger.info("Using chrome driver binary: chromedriver");
-            return "chromedriver";
+            logger.info("Using chrome driver binary: chromedriver_2-16");
+            return "chromedriver_2-16";
         } else if (PlatformSpecific.isOnWindows()) {
-            logger.info("Using chrome driver binary: chromedriver.exe");
-            return "chromedriver.exe";
+            logger.info("Using chrome driver binary: chromedriver_2-16.exe");
+            return "chromedriver_2-16.exe";
         } else if (PlatformSpecific.isOn32BitsLinux()) {
-            logger.info("Using chrome driver binary: chromedriver_linux");
-            return "chromedriver_linux";
+            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
+            return "chromedriver_linux_2-16";
         } else if (PlatformSpecific.isOn64BitsLinux()) {
-            logger.info("Using chrome driver binary: chromedriver_linux_x86_64");
-            return "chromedriver_linux_x86_64";
+            logger.info("Using chrome driver binary: chromedriver_linux_x86_64_2-16");
+            return "chromedriver_linux_x86_64_2-16";
         } else {
             logger.error("Unable to determine platform for chrome driver");
-            logger.info("Using chrome driver binary: chromedriver_linux");
-            return "chromedriver_linux";
+            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
+            return "chromedriver_linux_2-16";
         }
     }
 
