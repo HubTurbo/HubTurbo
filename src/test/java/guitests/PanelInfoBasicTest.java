@@ -78,7 +78,7 @@ public class PanelInfoBasicTest extends UITest {
         
         // Quitting to update json
         click("File");
-        click("Quit");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         
         Preferences testPref = new Preferences(true);
         
