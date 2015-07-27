@@ -4,7 +4,7 @@ HubTurbo loosely follows an MVC architecture.
 
 ## Model
 
-![](images/architecture/1.png?raw=true)
+![](images/architecture/model.png?raw=true)
 
 The above diagram is of the so-called 'back end', or the 'M' in MVC: application logic that isn't directly tied to JavaFX. These components are responsible for the end-to-end process of loading repositories, fetching updates to issues, caching, and so on.
 
@@ -42,7 +42,7 @@ Subclassing `RepoStore` may be used to implement an alternative store.
 
 ## Views and Controllers
 
-![](images/architecture/2.png?raw=true)
+![](images/architecture/viewsAndControllers.png?raw=true)
 
 HubTurbo's user interface is implemented using JavaFX. The 'V' and 'C' in MVC, views and controllers, are conflated here, and are essentially the same thing in the current implementation. Future work could involve better conceptual separation with FXML.
 
@@ -50,7 +50,7 @@ The user interface is implemented in an intuitive hierarchical fashion. Much lik
 
 # Filters
 
-![](images/architecture/3.png?raw=true)
+![](images/architecture/filters.png?raw=true)
 
 Filtering is implemented via a tiny external [DSL](http://en.wikipedia.org/wiki/Domain-specific_language) written in Java. Language expressions consist of a series of predicates (called *qualifiers* in GitHub parlance), composed with operators. Issues are then checked against these expressions to determine if they match.
 
