@@ -14,6 +14,7 @@ public class IssueMetadata {
     private final LocalDateTime nonSelfUpdatedAt;
     private final int nonSelfCommentCount;
     private final boolean isUpdated;
+    private final String ETag;
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
@@ -22,6 +23,7 @@ public class IssueMetadata {
         nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         nonSelfCommentCount = 0;
         isUpdated = false;
+        ETag = "";
     }
 
     // Copy constructor used in TurboIssue
@@ -31,6 +33,7 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.isUpdated = other.isUpdated;
+        this.ETag = other.ETag;
     }
 
     // Constructor used in DownloadMetadataTask
@@ -40,6 +43,7 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
         this.isUpdated = false;
+        this.ETag = "";
     }
 
     // Constructor used in Logic
@@ -49,6 +53,7 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
         this.nonSelfCommentCount = nonSelfCommentCount; // Calculated just prior to calling
         this.isUpdated = true;
+        this.ETag = other.ETag;
     }
 
     // Constructor used in MultiModel
@@ -58,6 +63,7 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.isUpdated = other.isUpdated;
+        this.ETag = other.ETag;
     }
 
     public String summarise() {
@@ -82,6 +88,10 @@ public class IssueMetadata {
 
     public boolean isUpdated() {
         return isUpdated;
+    }
+
+    public String getIssueETag() {
+        return ETag;
     }
 
     @Override
