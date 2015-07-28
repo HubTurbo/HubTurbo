@@ -50,7 +50,6 @@ public abstract class FilterPanel extends AbstractPanel {
     public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(model, parentPanelControl, panelIndex);
         this.ui = ui;
-        this.setId(model.getDefaultRepo() + "_col" + panelIndex);
         
         getChildren().addAll(createNameBar(), createFilterBox());
         this.setOnMouseClicked(e-> {
@@ -85,7 +84,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton.setText("RENAME");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-            ui.triggerEvent(new ShowRenamePanelEvent(this));
+            ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
         });
         
         HBox nameArea = new HBox();

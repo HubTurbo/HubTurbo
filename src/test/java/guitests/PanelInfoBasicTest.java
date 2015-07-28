@@ -8,7 +8,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
 import ui.components.FilterTextField;
 import ui.UI;
-import ui.issuepanel.FilterPanel;
 import util.events.ShowRenamePanelEvent;
 
 import java.util.List;
@@ -33,9 +32,8 @@ public class PanelInfoBasicTest extends UITest {
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
         
-        FilterPanel panel1 = find("#dummy/dummy_col0");
         Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(panel1));
+        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Renamed panel");
         click("OK");
         sleep(EVENT_DELAY);
@@ -50,9 +48,8 @@ public class PanelInfoBasicTest extends UITest {
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
         
-        FilterPanel panel2 = find("#dummy/dummy_col1");
         Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(panel2));
+        UI.events.triggerEvent(new ShowRenamePanelEvent(1));
         type("Dummy 2 panel");
         click("OK");
         sleep(EVENT_DELAY);
@@ -70,9 +67,8 @@ public class PanelInfoBasicTest extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
-        FilterPanel panel3 = find("#dummy/dummy_col0");
         Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(panel3));
+        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Open issues");
         click("OK");
         

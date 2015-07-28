@@ -40,7 +40,7 @@ public class PanelControl extends HBox {
         this.ui = ui;
         this.prefs = prefs;
         this.mainStage = stage;
-        this.ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> showRenameDialog(e.panel)));
+        this.ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> showRenameDialog(e.panelId)));
         
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
@@ -192,7 +192,8 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, one);
     }
     
-    public void showRenameDialog(FilterPanel panel) {
+    public void showRenameDialog(int panelId) {
+        FilterPanel panel = (FilterPanel) getPanel(panelId);
         String panelName = panel.getPanelName();
         
         Dialog<String> renameDialog = new TextInputDialog(panelName);

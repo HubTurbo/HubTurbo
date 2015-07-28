@@ -1,13 +1,11 @@
 package util.events;
 
-import ui.issuepanel.FilterPanel;
-
 public class ShowRenamePanelEvent extends Event {
 
-    public FilterPanel panel;
+    public int panelId;
 
-    public ShowRenamePanelEvent(FilterPanel panel) {
-        this.panel = panel;
+    public ShowRenamePanelEvent(int panelId) {
+        this.panelId = panelId;
     }
 
 }
