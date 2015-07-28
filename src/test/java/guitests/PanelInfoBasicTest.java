@@ -35,7 +35,7 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Renamed panel");
-        click("OK");
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel
@@ -51,7 +51,7 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(1));
         type("Dummy 2 panel");
-        click("OK");
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
@@ -70,11 +70,13 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Open issues");
-        click("OK");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         // Quitting to update json
         click("File");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         Preferences testPref = new Preferences(true);
         
