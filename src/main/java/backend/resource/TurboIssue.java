@@ -116,12 +116,16 @@ public class TurboIssue {
 
     public TurboIssue(String repoId, Issue issue) {
         this.id = issue.getNumber();
-        this.title = issue.getTitle();
+        this.title = issue.getTitle() == null
+            ? ""
+            : issue.getTitle();
         this.creator = issue.getUser().getLogin();
         this.createdAt = Utility.dateToLocalDateTime(issue.getCreatedAt());
         this.isPullRequest = isPullRequest(issue);
 
-        this.description = issue.getBody();
+        this.description = issue.getBody() == null
+            ? ""
+            : issue.getBody();
         this.updatedAt = Utility.dateToLocalDateTime(issue.getUpdatedAt());
         this.commentCount = issue.getComments();
         this.isOpen = issue.getState().equals(STATE_OPEN);
