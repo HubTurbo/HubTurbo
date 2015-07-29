@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
+import util.events.ShowErrorDialogEvent;
 import util.events.UpdateProgressEvent;
 
 import java.util.ArrayList;
@@ -139,7 +140,15 @@ public class RepoIO {
                 if (corruptedJson && remainingTries > 0) {
                     return downloadRepoFromSourceAsync(model.getRepoId(), remainingTries - 1).join();
                 } else {
-                    UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                    if (corruptedJson && remainingTries == 0) {
+                        UI.events.triggerEvent(new ShowErrorDialogEvent("Could not sync " + model.getRepoId(),
+                                "We were not able to sync with GitHub to retrieve and store data for the repository "
+                                + model.getRepoId()
+                                + ". Please let us know if you encounter this issue consistently."
+                        ));
+                    } else {
+                        UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                    }
                     UI.events.triggerEvent(new UpdateProgressEvent(model.getRepoId()));
                     return newModel;
                 }
