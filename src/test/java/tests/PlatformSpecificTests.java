@@ -1,12 +1,18 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.junit.Test;
 
 import util.PlatformSpecific;
 import util.PlatformSpecific.Architecture;
+import browserview.BrowserComponent;
 
 public class PlatformSpecificTests {
 
@@ -32,6 +38,60 @@ public class PlatformSpecificTests {
             assertTrue(PlatformSpecific.isOn32BitsLinux() ||
                        PlatformSpecific.isOn64BitsLinux());
         }
+
+        if (PlatformSpecific.isOnMac()) {
+            assertFalse(PlatformSpecific.isOn32BitsLinux());
+            assertFalse(PlatformSpecific.isOn64BitsLinux());
+        }
+
+        if (PlatformSpecific.isOnWindows()) {
+            assertFalse(PlatformSpecific.isOn32BitsLinux());
+            assertFalse(PlatformSpecific.isOn64BitsLinux());
+        }
     }
 
+    @Test
+    public void testMutuallyExclusiveOSName() {
+        if (PlatformSpecific.isOnLinux()) {
+            assertFalse(PlatformSpecific.isOnWindows());
+            assertFalse(PlatformSpecific.isOnMac());
+        }
+
+        if (PlatformSpecific.isOnMac()) {
+            assertFalse(PlatformSpecific.isOnWindows());
+            assertFalse(PlatformSpecific.isOnLinux());
+        }
+
+        if (PlatformSpecific.isOnWindows()) {
+            assertFalse(PlatformSpecific.isOnLinux());
+            assertFalse(PlatformSpecific.isOnMac());
+        }
+    }
+
+    @Test
+    public void testDetermineChromeDriverBinaryName()
+            throws NoSuchMethodException, SecurityException,
+            IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+
+        Method testedMethod = BrowserComponent.class.getDeclaredMethod(
+                "determineChromeDriverBinaryName");
+        testedMethod.setAccessible(true);
+
+        String chromeDriverBinaryName = (String) testedMethod.invoke(null);
+
+        assertNotNull(chromeDriverBinaryName);
+
+        if (PlatformSpecific.isOnMac()) {
+            assertEquals("chromedriver_2-16", chromeDriverBinaryName);
+        } else if (PlatformSpecific.isOnWindows()) {
+            assertEquals("chromedriver_2-16.exe", chromeDriverBinaryName);
+        } else if (PlatformSpecific.isOn32BitsLinux()) {
+            assertEquals("chromedriver_linux_2-16", chromeDriverBinaryName);
+        } else if (PlatformSpecific.isOn64BitsLinux()) {
+            assertEquals("chromedriver_linux_x86_64_2-16", chromeDriverBinaryName);
+        } else {
+            assertEquals("chromedriver_linux_2-16", chromeDriverBinaryName);
+        }
+    }
 }
