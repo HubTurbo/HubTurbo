@@ -5,9 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.junit.Test;
 
 import util.PlatformSpecific;
@@ -37,6 +34,11 @@ public class PlatformSpecificTests {
         if (PlatformSpecific.isOnLinux()) {
             assertTrue(PlatformSpecific.isOn32BitsLinux() ||
                        PlatformSpecific.isOn64BitsLinux());
+        }
+
+        if (!PlatformSpecific.isOnLinux()) {
+            assertFalse(PlatformSpecific.isOn32BitsLinux());
+            assertFalse(PlatformSpecific.isOn64BitsLinux());
         }
 
         if (PlatformSpecific.isOnMac()) {
@@ -69,16 +71,9 @@ public class PlatformSpecificTests {
     }
 
     @Test
-    public void testDetermineChromeDriverBinaryName()
-            throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
-
-        Method testedMethod = BrowserComponent.class.getDeclaredMethod(
-                "determineChromeDriverBinaryName");
-        testedMethod.setAccessible(true);
-
-        String chromeDriverBinaryName = (String) testedMethod.invoke(null);
+    public void testDetermineChromeDriverBinaryName() {
+        String chromeDriverBinaryName =
+                BrowserComponent.determineChromeDriverBinaryName();
 
         assertNotNull(chromeDriverBinaryName);
 

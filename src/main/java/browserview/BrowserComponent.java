@@ -329,7 +329,7 @@ public class BrowserComponent {
         }
     }
 
-    private static String determineChromeDriverBinaryName() {
+    public static String determineChromeDriverBinaryName() {
         if (PlatformSpecific.isOnMac()) {
             logger.info("Using chrome driver binary: chromedriver_2-16");
             return "chromedriver_2-16";
