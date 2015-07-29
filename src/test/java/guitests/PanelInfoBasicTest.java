@@ -2,6 +2,7 @@ package guitests;
 
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.TextField;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
@@ -31,10 +32,10 @@ public class PanelInfoBasicTest extends UITest {
         
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+
+        click("#dummy/dummy_col0_renameButton");
+        ((TextField) find("#panelrenameinput")).setText("Renamed panel");
         
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
-        type("Renamed panel");
         click("OK");
         sleep(EVENT_DELAY);
         
@@ -47,10 +48,10 @@ public class PanelInfoBasicTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
+
+        click("#dummy/dummy_col1_renameButton");
+        ((TextField) find("#panelrenameinput")).setText("Dummy 2 panel");
         
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(1));
-        type("Dummy 2 panel");
         click("OK");
         sleep(EVENT_DELAY);
         
@@ -66,10 +67,10 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
+
+        click("#dummy/dummy_col0_renameButton");
+        ((TextField) find("#panelrenameinput")).setText("Open issues");
         
-        Platform.runLater(stage::hide);
-        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
-        type("Open issues");
         click("OK");
         
         // Quitting to update json

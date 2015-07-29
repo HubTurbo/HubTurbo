@@ -4,7 +4,6 @@ import backend.interfaces.IModel;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -196,8 +195,10 @@ public class PanelControl extends HBox {
         FilterPanel panel = (FilterPanel) getPanel(panelId);
         String panelName = panel.getPanelName();
         
-        Dialog<String> renameDialog = new TextInputDialog(panelName);
+        TextInputDialog renameDialog = new TextInputDialog("");
+        renameDialog.getEditor().setId("panelrenameinput");
         renameDialog.setTitle("Rename Panel");
+        renameDialog.setContentText("Rename " + panelName);
         renameDialog.setHeaderText("Enter a new name for this panel.");
         Optional<String> result = renameDialog.showAndWait();
         mainStage.show();
