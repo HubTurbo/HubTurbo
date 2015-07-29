@@ -35,7 +35,7 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Renamed panel");
-        push(KeyCode.ENTER);
+        click("OK");
         sleep(EVENT_DELAY);
         
         // Creating panel
@@ -51,7 +51,7 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(1));
         type("Dummy 2 panel");
-        push(KeyCode.ENTER);
+        click("OK");
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
@@ -70,8 +70,7 @@ public class PanelInfoBasicTest extends UITest {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Open issues");
-        push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        click("OK");
         
         // Quitting to update json
         click("File");
@@ -86,12 +85,12 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals(3, openPanels.size());
         assertEquals(3, openFilters.size());
 
-        assertEquals("Open issues", openPanels.get(0));
-        assertEquals("Renamed panel", openPanels.get(1));
-        assertEquals("Dummy 2 panel", openPanels.get(2));
-
         assertEquals("is:open", openFilters.get(0));
         assertEquals("", openFilters.get(1));
         assertEquals("repo:dummy2/dummy2", openFilters.get(2));
+
+        assertEquals("Open issues", openPanels.get(0));
+        assertEquals("Renamed panel", openPanels.get(1));
+        assertEquals("Dummy 2 panel", openPanels.get(2));
     }
 }
