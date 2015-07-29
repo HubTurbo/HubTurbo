@@ -234,6 +234,14 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 Sorts a repository by the list of keys, going from left to right. Negated keys will reverse the ordering that they describe.
 
+## Additional features
+
+HubTurbo automatically downloads detailed information about issues when the [`updated`](#updated) filter is specified, and then displays them within the issue cards in the form of a timeline.
+
+When the [`updated`](#updated) filter is specified, the issues to be displayed are also automatically sorted by the latest *non-self update* i.e. the last time someone other than the currently logged-in user makes a change to the issue. This order can be explicitly overridden by specifying another sort order through the [`sort`](#sort) filter.
+
+To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments` 
+
 ## Incompatibilities
 
 HubTurbo's filter system is incompatible with GitHub's in a number of ways.

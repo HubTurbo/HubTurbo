@@ -1,8 +1,11 @@
 # Developer Guide
 
-- [Development Environment](Development-Environment.md)
-- [Workflow](Workflow.md)
-- [Testing](Testing.md)
-- [Architecture](Architecture.md)
-- [Design Decisions and Guidelines](Design-Decisions-and-Guidelines.md)
-- [Creating a Release](Creating-a-Release.md)
+For contributors:
+- [Setting up dev environment](settingUpDevEnvironment.md)
+- [Dev workflow](workflow.md)
+- [Testing instructions](testing.md)
+- [Design](design.md)
+- [Decision rationales and guidelines](designRationalesAndGuidelines.md)
+
+For core team members:
+- [Creating a Release](creatingARelease.md)

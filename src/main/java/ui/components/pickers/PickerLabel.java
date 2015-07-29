@@ -8,34 +8,38 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
-    private LabelPickerDialog labelPickerDialog;
+    private LabelPickerUILogic labelPickerUILogic;
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
+    private boolean isTop;
 
-    public PickerLabel(TurboLabel label, LabelPickerDialog labelPickerDialog) {
+    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerDialog = labelPickerDialog;
+        this.labelPickerUILogic = labelPickerUILogic;
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
         isFaded = false;
+        this.isTop = isTop;
     }
 
-    public PickerLabel(TurboLabel label, LabelPickerDialog labelPickerDialog,
-                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded) {
+    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic,
+                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerDialog = labelPickerDialog;
+        this.labelPickerUILogic = labelPickerUILogic;
         this.isSelected = isSelected;
         this.isHighlighted = isHighlighted;
         this.isRemoved = isRemoved;
         this.isFaded = isFaded;
+        this.isTop = isTop;
     }
 
     @Override
     public Node getNode() {
-        Label label = new Label(getActualName() + (isSelected ? " ✓" : "    ")); // add selection tick
+        // actual name for labels at the top, add tick for selected labels
+        Label label = new Label((isTop ? getActualName() : (getName() + (isSelected ? " ✓" : "   "))));
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
@@ -47,7 +51,7 @@ public class PickerLabel extends TurboLabel {
             label.setTooltip(groupTooltip);
         }
 
-        label.setOnMouseClicked(e -> labelPickerDialog.toggleLabel(getActualName()));
+        label.setOnMouseClicked(e -> labelPickerUILogic.toggleLabel(getActualName()));
         return label;
     }
 
