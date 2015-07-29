@@ -1,6 +1,5 @@
 package guitests;
 
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.TextField;
 import org.junit.Test;
@@ -8,8 +7,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import ui.components.FilterTextField;
-import ui.UI;
-import util.events.ShowRenamePanelEvent;
 
 import java.util.List;
 
