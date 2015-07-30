@@ -3,6 +3,9 @@ package tests;
 import org.junit.Test;
 import util.GitHubURL;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -22,6 +25,17 @@ public class GitHubURLTest {
         assertEquals("https://github.com/dummy/dummy/graphs/contributors",
                 GitHubURL.getPathForContributors("dummy/dummy"));
         assertTrue(GitHubURL.isUrlIssue("https://github.com/dummy/dummy/issues/1"));
+    }
+
+    @Test
+    public void docsURLTest() {
+        String releaseBlobLink = "https://github.com/HubTurbo/HubTurbo/blob/release/";
+
+        String docsPath = GitHubURL.DOCS_PAGE.substring(releaseBlobLink.length());
+        String shortcutsPath = GitHubURL.KEYBOARD_SHORTCUTS_PAGE.substring(releaseBlobLink.length());
+
+        assertTrue(Files.exists(Paths.get(docsPath)));
+        assertTrue(Files.exists(Paths.get(shortcutsPath)));
     }
 
 }
