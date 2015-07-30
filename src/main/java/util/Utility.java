@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
@@ -22,13 +23,17 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javafx.application.Platform;
-
 import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class Utility {
 
@@ -55,9 +60,8 @@ public class Utility {
     }
 
     public static boolean writeFile(String fileName, String content, int issueCount) {
-        PrintWriter writer;
         try {
-            writer = new PrintWriter(fileName, "UTF-8");
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
 
@@ -70,17 +74,18 @@ public class Utility {
     }
 
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
-        // The average issue is about 0.75KB in size. Hence, if the total filesize is more than (issueCount KB),
-        // we consider the json to have exploded.
-        if (sizeAfterWrite > ((long) issueCount * 1000)) {
-            Platform.runLater(() -> DialogMessage.showErrorDialog(
-                    "Possible data corruption detected",
+        // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
+        // we consider the json to have exploded as the file is unusually large.
+        if (sizeAfterWrite > ((long) issueCount * 2000)) {
+            UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
                             + "Now proceeding to delete the file and redownload the repository to prevent "
                             + "further corruption.\n\n"
+                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
                             + "The error log of the program has been stored in the file hubturbo-err-log.log."
-            ));
-            deleteFile(fileName);
+                    )
+            );
+            parseAndDeleteFile(fileName);
             copyLog();
             return true;
         }
@@ -97,10 +102,18 @@ public class Utility {
         }
     }
 
-    public static void deleteFile(String fileName) {
+    public static void parseAndDeleteFile(String fileName) {
         try {
-            if (Files.exists(Paths.get(fileName))) {
-                Files.delete(Paths.get(fileName));
+            Path corruptedFile = Paths.get(fileName);
+            if (Files.exists(corruptedFile)) {
+                String corruptedFileData = readFile(fileName).get();
+                PrintWriter writer = new PrintWriter(fileName + "-err", "UTF-8");
+                writer.println(new GsonBuilder().setPrettyPrinting().create().toJson(
+                        new JsonParser().parse(corruptedFileData)
+                ));
+                writer.close();
+
+                Files.delete(corruptedFile);
             }
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);

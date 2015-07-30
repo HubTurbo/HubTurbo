@@ -34,8 +34,11 @@ public class MultiModel implements IModel {
 
     public synchronized MultiModel addPending(Model model) {
         String repoId = model.getRepoId();
-        assert pendingRepositories.contains(repoId) : "No pending repository " + repoId + "!";
-        pendingRepositories.remove(repoId);
+        Optional<String> matchingRepoId = pendingRepositories.stream()
+                .filter(pendingRepo -> pendingRepo.equalsIgnoreCase(repoId))
+                .findFirst();
+        assert matchingRepoId.isPresent() : "No pending repository " + repoId + "!";
+        pendingRepositories.remove(matchingRepoId.get());
         add(model);
         preprocessNewIssues(model);
         return this;
@@ -166,7 +169,7 @@ public class MultiModel implements IModel {
     }
 
     public synchronized boolean isRepositoryPending(String repoId) {
-        return pendingRepositories.contains(repoId);
+        return pendingRepositories.stream().anyMatch(pendingRepo -> pendingRepo.equalsIgnoreCase(repoId));
     }
 
     public void queuePendingRepository(String repoId) {
