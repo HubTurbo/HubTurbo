@@ -43,7 +43,10 @@ public class UITest extends GuiTest {
             if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
                 Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
                         .filter(Files::isRegularFile)
-                        .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json"))
+                        .filter(p ->
+                                getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
+                                getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
+                        )
                         .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
             }
         } catch (IOException e) {
