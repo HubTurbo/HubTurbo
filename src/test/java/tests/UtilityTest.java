@@ -1,6 +1,16 @@
 package tests;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static util.Utility.dateToLocalDateTime;
+import static util.Utility.formatDateISO8601;
+import static util.Utility.localDateTimeToDate;
+import static util.Utility.localDateTimeToLong;
+import static util.Utility.parseHTTPLastModifiedDate;
+import static util.Utility.parseVersionNumber;
+import static util.Utility.snakeCaseToCamelCase;
+import static util.Utility.stripQuotes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,9 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static util.Utility.*;
+import org.junit.Test;
+
+import util.Utility;
 
 public class UtilityTest {
 
@@ -49,4 +59,9 @@ public class UtilityTest {
         assertEquals(3, parseVersionNumber("1.2.3a").get()[2]);
     }
 
+    @Test(timeout = 5000)
+    public void testGettingLookAndFeelOnLinux() {
+        assertTrue(Utility.getUsableScreenDimensions().isPresent());
+        assertTrue(Utility.getScreenDimensions() != null);
+    }
 }
