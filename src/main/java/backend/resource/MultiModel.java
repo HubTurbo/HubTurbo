@@ -68,9 +68,12 @@ public class MultiModel implements IModel {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
                 IssueMetadata toBeInserted = metadata.get(issue.getId());
-                LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
-                        issue.getCreatedAt(), currentUser, issue.getCreator());
-                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
+                // Only set new metadata if ETag is different
+                if (!toBeInserted.getIssueETag().equals(issue.getMetadata().getIssueETag())) {
+                    LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
+                            issue.getCreatedAt(), currentUser, issue.getCreator());
+                    issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
+                }
             }
         });
     }
