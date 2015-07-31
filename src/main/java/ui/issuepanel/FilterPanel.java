@@ -13,10 +13,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.ModelUpdatedEventHandler;
@@ -42,7 +42,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
     protected Text nameBox;
-    protected Button renameButton;
+    protected Label renameButton;
     private String panelName = "Panel";
     private UI ui;
     private Stage mainStage;
@@ -84,14 +84,14 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createNameBar() {
         nameBox = new Text(panelName);
     
-        renameButton = new Button();
-        renameButton.setText("RENAME");
+        renameButton = new Label(RENAME_PANEL);
+        renameButton.getStyleClass().add("label-button");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-            TextInputDialog renameDialog = new TextInputDialog("");
+            TextInputDialog renameDialog = new TextInputDialog(panelName);
+            renameDialog.initStyle(StageStyle.UTILITY);
             renameDialog.getEditor().setId("panelrenameinput");
-            renameDialog.setTitle("Rename Panel");
-            renameDialog.setContentText("Rename " + panelName);
+            renameDialog.setTitle("Rename " + panelName);
             renameDialog.setHeaderText("Enter a new name for this panel.");
             Optional<String> result = renameDialog.showAndWait();
             mainStage.show();
@@ -110,24 +110,22 @@ public abstract class FilterPanel extends AbstractPanel {
         HBox nameArea = new HBox();
         nameArea.getChildren().add(nameBox);
         nameArea.setAlignment(Pos.TOP_LEFT);
-        nameArea.setMinWidth(320);
-        nameArea.setMaxWidth(320);
+        nameArea.setMinWidth(340);
+        nameArea.setMaxWidth(340);
         
         HBox renameArea = new HBox();
         renameArea.getChildren().add(renameButton);
         renameArea.setAlignment(Pos.TOP_RIGHT);
-        renameArea.setMinWidth(60);
+        
+        HBox closeButtonArea = new HBox();
+        closeButtonArea.getChildren().addAll(createButtons());
         
         HBox nameBar = new HBox();
-        nameBar.setSpacing(10);
+        nameBar.setSpacing(5);
         nameBar.setMinWidth(PANEL_WIDTH);
         nameBar.setMaxWidth(PANEL_WIDTH);
-        nameBar.getChildren().addAll(nameArea, renameArea);
+        nameBar.getChildren().addAll(nameArea, renameArea, closeButtonArea);
         return nameBar;
-    }
-    
-    public String getPanelName() {
-        return this.panelName;
     }
 
     private Node createFilterBox() {
@@ -150,7 +148,7 @@ public abstract class FilterPanel extends AbstractPanel {
         buttonsBox.getChildren().addAll(createButtons());
 
         HBox layout = new HBox();
-        layout.getChildren().addAll(filterTextField, buttonsBox);
+        layout.getChildren().addAll(filterTextField);
         layout.setPadding(new Insets(0, 0, 3, 0));
 
         setupPanelDragEvents(layout);
