@@ -155,7 +155,7 @@ public class IssueServiceExtended extends IssueService{
         uri.append(SEGMENT_EVENTS);
         request.setUri(uri);
         request.setType(IssueEvent[].class);
-        GitHubEventsResponse response = ghClient.getEvent(request);
+        GitHubEventsResponse response = ghClient.getEvent(request, eTag);
         return response;
     }
 }
