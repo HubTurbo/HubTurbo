@@ -136,13 +136,17 @@ public class IssueServiceExtended extends IssueService{
     }
 
     /**
-     * Retrieves a list of all issue events.
-     * @param user
+     * Retrieves a list of issue events if the events are updated,
+     * and an empty list if there are no new events.
+     *
+     * @param issueId
      * @param repository
+     * @param eTag
      * @return list of issue events
      * @throws IOException
      */
-    public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId) throws IOException {
+    public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId, String eTag)
+            throws IOException {
         GitHubRequest request = createRequest();
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repository.generateId());

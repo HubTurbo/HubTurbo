@@ -6,10 +6,7 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
-import github.GitHubClientExtended;
-import github.IssueServiceExtended;
-import github.LabelServiceFixed;
-import github.TurboIssueEvent;
+import github.*;
 import github.update.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -195,16 +192,21 @@ public class GitHubRepo implements Repo {
         return elements;
     }
 
-    public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+    @Override
+    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId,
+                                                                         int issueId,
+                                                                         String currentETag) {
         try {
-            return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId)
-                .getTurboIssueEvents();
+            GitHubEventsResponse eventsResponse = issueService.getIssueEvents(
+                    RepositoryId.createFromId(repoId), issueId, currentETag);
+            return new ImmutablePair<>(eventsResponse.getTurboIssueEvents(), eventsResponse.getUpdatedETag());
         } catch (IOException e) {
             HTLog.error(logger, e);
-            return new ArrayList<>();
+            return new ImmutablePair<>(new ArrayList<>(), currentETag);
         }
     }
 
+    @Override
     public List<Comment> getComments(String repoId, int issueId) {
         try {
             return issueService.getComments(RepositoryId.createFromId(repoId), issueId);

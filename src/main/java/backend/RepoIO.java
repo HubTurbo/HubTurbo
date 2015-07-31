@@ -155,7 +155,7 @@ public class RepoIO {
             }).exceptionally(withResult(new Model(model.getRepoId())));
     }
 
-    public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, List<Integer> issues) {
+    public CompletableFuture<Map<Integer, IssueMetadata>> getIssueMetadata(String repoId, Map<Integer, String> issues) {
         return repoSource.downloadMetadata(repoId, issues);
     }
 

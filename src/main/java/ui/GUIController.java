@@ -81,7 +81,7 @@ public class GUIController {
         ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
 
         // Populated in processPanel calls.
-        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+        HashMap<String, HashMap<Integer, String>> toUpdate = new HashMap<>();
 
         panelControl.getChildren().forEach(child -> {
             if (child instanceof FilterPanel) {
@@ -106,7 +106,7 @@ public class GUIController {
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
         ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
-        HashMap<String, HashSet<Integer>> toUpdate = new HashMap<>();
+        HashMap<String, HashMap<Integer, String>> toUpdate = new HashMap<>();
 
         // This is not triggered by a (metadata) update, so we pass false into the call.
         processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
@@ -133,7 +133,7 @@ public class GUIController {
     public void processPanel(FilterPanel panelToProcess,
                              IModel updatedModel,
                              ObservableList<TurboIssue> allModelIssues,
-                             HashMap<String, HashSet<Integer>> toUpdate,
+                             HashMap<String, HashMap<Integer, String>> toUpdate,
                              boolean isMetadataUpdate) {
 
         // Extract the filter expression and the meta qualifiers within it. The expression is used for
@@ -255,18 +255,18 @@ public class GUIController {
      * @param issuesToUpdate The HashMap to be populated.
      */
     private static void populateUpdateList(TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
-                                           HashMap<String, HashSet<Integer>> issuesToUpdate) {
+                                           HashMap<String, HashMap<Integer, String>> issuesToUpdate) {
 
         for (TurboIssue issueToUpdate : filteredAndSortedIssues) {
             // Retrieve to check if the HashSet representing the issue's repo already exists.
-            HashSet<Integer> issuesInRepo = issuesToUpdate.get(issueToUpdate.getRepoId());
+            HashMap<Integer, String> issuesInRepo = issuesToUpdate.get(issueToUpdate.getRepoId());
             if (issuesInRepo != null) {
                 // If yes, just add the issue.
-                issuesInRepo.add(issueToUpdate.getId());
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getIssueETag());
             } else {
                 // If no, initialize the HashSet first, then add the issue.
-                issuesInRepo = new HashSet<>();
-                issuesInRepo.add(issueToUpdate.getId());
+                issuesInRepo = new HashMap<>();
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getIssueETag());
                 issuesToUpdate.put(issueToUpdate.getRepoId(), issuesInRepo);
             }
         }
@@ -278,9 +278,9 @@ public class GUIController {
      *
      * @param toUpdate The HashMap containing issues for which to get metadata.
      */
-    private void dispatchMetadataRequests(HashMap<String, HashSet<Integer>> toUpdate) {
-        toUpdate.entrySet().forEach(repoSetEntry ->
-                        ui.logic.getIssueMetadata(repoSetEntry.getKey(), new ArrayList<>(repoSetEntry.getValue()))
+    private void dispatchMetadataRequests(HashMap<String, HashMap<Integer, String>> toUpdate) {
+        toUpdate.forEach((repoId, issues) ->
+            ui.logic.getIssueMetadata(repoId, new HashMap<>(issues))
         );
     }
 

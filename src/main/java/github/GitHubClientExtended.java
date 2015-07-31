@@ -80,7 +80,7 @@ public class GitHubClientExtended extends GitHubClient {
      * @return response
      * @throws IOException
      */
-    public GitHubEventsResponse getEvent(GitHubRequest request) throws IOException {
+    public GitHubEventsResponse getEvent(GitHubRequest request, String currentETag) throws IOException {
         HttpURLConnection httpRequest = createGet(request.generateUri());
         String accept = request.getResponseContentType();
         if (accept != null)

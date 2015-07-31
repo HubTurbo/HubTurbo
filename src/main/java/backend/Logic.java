@@ -127,9 +127,9 @@ public class Logic {
         });
     }
 
-    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<Integer> issues) {
+    public CompletableFuture<Boolean> getIssueMetadata(String repoId, Map<Integer, String> issues) {
         String message = "Getting metadata for " + repoId + "...";
-        logger.info("Getting metadata for issues " + issues);
+        logger.info("Getting metadata for issues " + issues.keySet().toString());
         UI.status.displayMessage(message);
 
         String currentUser = prefs.getLastLoginUsername();

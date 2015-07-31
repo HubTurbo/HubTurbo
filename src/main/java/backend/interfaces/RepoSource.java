@@ -36,7 +36,7 @@ public abstract class RepoSource implements TaskRunner {
     public abstract CompletableFuture<Model> updateModel(Model model);
 
     public abstract CompletableFuture<Map<Integer, IssueMetadata>>
-        downloadMetadata(String repoId, List<Integer> issues);
+        downloadMetadata(String repoId, Map<Integer, String> issues);
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
 

@@ -134,7 +134,7 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId, int issueId, String currentETag) {
         return getRepoState(repoId).getEvents(issueId);
     }
 

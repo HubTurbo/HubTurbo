@@ -39,7 +39,8 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
+    public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId,
+                                                                           Map<Integer, String> issues) {
         return addTask(new DownloadMetadataTask(this, dummy, repoId, issues)).response;
     }
 

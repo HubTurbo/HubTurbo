@@ -18,13 +18,13 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
     private static final Logger logger = HTLog.get(DownloadMetadataTask.class);
 
     private final String repoId;
-    private final List<Integer> issueIds;
+    private final Map<Integer, String> issueIdETags;
 
     public DownloadMetadataTask(TaskRunner taskRunner, Repo repo, String repoId,
-                                List<Integer> issueIds) {
+                                Map<Integer, String> issueIdETags) {
         super(taskRunner, repo);
         this.repoId = repoId;
-        this.issueIds = issueIds;
+        this.issueIdETags = issueIdETags;
     }
 
     @Override
