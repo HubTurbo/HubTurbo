@@ -136,12 +136,12 @@ public class IssueServiceExtended extends IssueService{
     }
 
     /**
-     * Retrieves a list of issue events if the events are updated,
-     * and an empty list if there are no new events.
+     * Retrieves a list of issue events together with the new ETag if the events are updated,
+     * and an empty list with the current ETag if there are no new events.
      *
-     * @param issueId
-     * @param repository
-     * @param eTag
+     * @param repository The repository from which to retrieve the issue
+     * @param issueId The numeric ID of the issue
+     * @param eTag The eTag to be added to the request header
      * @return list of issue events
      * @throws IOException
      */
