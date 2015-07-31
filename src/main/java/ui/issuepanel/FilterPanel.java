@@ -83,6 +83,7 @@ public abstract class FilterPanel extends AbstractPanel {
     
     private Node createNameBar() {
         nameBox = new Text(panelName);
+        nameBox.setId(model.getDefaultRepo() + "_col" + panelIndex + "_name");
     
         renameButton = new Label(RENAME_PANEL);
         renameButton.getStyleClass().add("label-button");
@@ -225,6 +226,7 @@ public abstract class FilterPanel extends AbstractPanel {
     
     public void namePanel(String name) {
         this.panelName = name;
+        this.nameBox.setText(name);
     }
 
     public FilterExpression getCurrentFilterExpression() {

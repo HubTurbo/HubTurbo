@@ -9,6 +9,11 @@ public class PanelInfo {
         this.name = name;
         this.filter = filter;
     }
+    
+    public PanelInfo() {
+        this.name = "Panel";
+        this.filter = "";
+    }
 
     public String getPanelName() {
         return this.name;
@@ -16,6 +21,14 @@ public class PanelInfo {
 
     public String getPanelFilter() {
         return this.filter;
+    }
+    
+    public void setPanelName(String name) {
+        this.name = name;
+    }
+    
+    public void setPanelFilter(String filter) {
+        this.filter = filter;
     }
 
 }
