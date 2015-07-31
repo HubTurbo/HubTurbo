@@ -7,6 +7,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 import util.IOUtilities;
+import util.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,12 +83,20 @@ public class GitHubClientExtended extends GitHubClient {
      */
     public GitHubEventsResponse getEvent(GitHubRequest request, String currentETag) throws IOException {
         HttpURLConnection httpRequest = createGet(request.generateUri());
+
+        // Headers for the request
+        httpRequest.setRequestProperty("If-None-Match", "\"" + currentETag + "\"");
         String accept = request.getResponseContentType();
         if (accept != null)
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
+
+        // We send the request here.
         final int code = httpRequest.getResponseCode();
+
+        // Then we process the response.
         updateRateLimits(httpRequest);
-        if (isOk(code)) {
+        if (isOk(code)) { // 200 OK
+            String updatedEtag = Utility.stripQuotes(httpRequest.getHeaderField("ETag"));
 
             // Copy the httpRequest input stream into a byte array
             InputStream reqIS = getStream(httpRequest);
@@ -99,10 +108,13 @@ public class GitHubClientExtended extends GitHubClient {
             GitHubResponse ghResponse = new GitHubResponse(httpRequest, getBody(request, reqIS2));
 
             // The second is parsed again for event-specific information
-            return new GitHubEventsResponse(ghResponse, reqIS3);
+            return new GitHubEventsResponse(ghResponse, reqIS3, updatedEtag);
+        } else if (isNotModified(code)) { // 304 Not Modified
+            GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
+            return new GitHubEventsResponse(ghResponse, null, currentETag);
         } else if (isEmpty(code)) {
             GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
-            return new GitHubEventsResponse(ghResponse, null);
+            return new GitHubEventsResponse(ghResponse, null, "");
         } else {
             throw createException(getStream(httpRequest), code, httpRequest.getResponseMessage());
         }
@@ -123,7 +135,8 @@ public class GitHubClientExtended extends GitHubClient {
             String json = String.valueOf(
                     IOUtilities.inputStreamToByteArrayOutputStream(getStream(httpRequest)));
             Map<String, Object> map =
-                    new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+                    new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {
+                    }.getType());
             Map<String, Double> mapRate = (Map<String, Double>) map.get("rate");
 
             long reset = mapRate.get("reset").longValue() * 1000; // seconds to milliseconds
@@ -194,5 +207,15 @@ public class GitHubClientExtended extends GitHubClient {
      */
     public void sendParams(HttpURLConnection request, Object params) throws IOException {
         super.sendParams(request, params);
+    }
+
+    /**
+     * Checks whether there is new updates.
+     *
+     * @param code
+     * @return
+     */
+    public boolean isNotModified(final int code) {
+        return code == 304;
     }
 }
