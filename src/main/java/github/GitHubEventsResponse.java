@@ -88,6 +88,7 @@ public class GitHubEventsResponse {
                     // No need to do anything
                     break;
                 case Subscribed:
+                case Unsubscribed:
                 case Merged:
                 case HeadRefDeleted:
                 case HeadRefRestored:
