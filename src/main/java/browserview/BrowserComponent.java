@@ -41,6 +41,7 @@ public class BrowserComponent {
 
     private static final int SWP_NOSIZE = 0x0001;
     private static final int SWP_NOMOVE = 0x0002;
+    private static final int SWP_NOACTIVATE = 0x0010;
     private static HWND browserWindowHandle;
     private static User32 user32;
 
@@ -362,9 +363,9 @@ public class BrowserComponent {
 
     public void focus(HWND mainWindowHandle){
         if (PlatformSpecific.isOnWindows()) {
-            user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
-            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-            user32.SetForegroundWindow(mainWindowHandle);
+            // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
+            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
     }
 
