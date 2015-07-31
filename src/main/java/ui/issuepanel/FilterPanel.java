@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.ModelUpdatedEventHandler;
@@ -88,8 +87,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton.getStyleClass().add("label-button");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-            TextInputDialog renameDialog = new TextInputDialog(panelName);
-            renameDialog.initStyle(StageStyle.UTILITY);
+        	TextInputDialog renameDialog = new TextInputDialog(panelName);
             renameDialog.getEditor().setId("panelrenameinput");
             renameDialog.setTitle("Rename " + panelName);
             renameDialog.setHeaderText("Enter a new name for this panel.");

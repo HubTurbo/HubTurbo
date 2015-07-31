@@ -21,7 +21,7 @@ public abstract class AbstractPanel extends VBox {
 
     public static final int PANEL_WIDTH = 400;
 
-    public static final String CLOSE_PANEL = "\u2716";
+    public static final String CLOSE_PANEL = "\u2715";
     public static final String RENAME_PANEL = "\u270E";
 
     protected final IModel model;
