@@ -4,6 +4,7 @@ import backend.interfaces.RepoStore;
 import backend.interfaces.StoreTask;
 import backend.resource.serialization.SerializableModel;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 

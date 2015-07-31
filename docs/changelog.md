@@ -1,5 +1,15 @@
 # Changelog
 
+# V3.1.0
+
+- Polished and standardized user and developer documentation
+- Added visual support for groups in label picker
+- Improved support for older GitHub repositories
+- Added support for 64-bit Linux chromedriver
+- bView no longer takes away focus from pView on Windows
+- Fixed bug where the login dialog redownloads the primary repository if wrong casing is specified
+- Additional detection and recovery mechanisms for local cache corruption
+
 # V3.0.0
 
 - Added the label picker

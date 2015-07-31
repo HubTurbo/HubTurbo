@@ -1,23 +1,34 @@
 package browserview;
 
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
+
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -41,6 +52,7 @@ public class BrowserComponent {
 
     private static final int SWP_NOSIZE = 0x0001;
     private static final int SWP_NOMOVE = 0x0002;
+    private static final int SWP_NOACTIVATE = 0x0010;
     private static HWND browserWindowHandle;
     private static User32 user32;
 
@@ -318,10 +330,24 @@ public class BrowserComponent {
         }
     }
 
-    private static String determineChromeDriverBinaryName() {
-        return PlatformSpecific.isOnMac() ? "chromedriver"
-            : PlatformSpecific.isOnWindows() ? "chromedriver.exe"
-            : "chromedriver_linux";
+    public static String determineChromeDriverBinaryName() {
+        if (PlatformSpecific.isOnMac()) {
+            logger.info("Using chrome driver binary: chromedriver_2-16");
+            return "chromedriver_2-16";
+        } else if (PlatformSpecific.isOnWindows()) {
+            logger.info("Using chrome driver binary: chromedriver_2-16.exe");
+            return "chromedriver_2-16.exe";
+        } else if (PlatformSpecific.isOn32BitsLinux()) {
+            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
+            return "chromedriver_linux_2-16";
+        } else if (PlatformSpecific.isOn64BitsLinux()) {
+            logger.info("Using chrome driver binary: chromedriver_linux_x86_64_2-16");
+            return "chromedriver_linux_x86_64_2-16";
+        } else {
+            logger.error("Unable to determine platform for chrome driver");
+            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
+            return "chromedriver_linux_2-16";
+        }
     }
 
     /**
@@ -362,9 +388,9 @@ public class BrowserComponent {
 
     public void focus(HWND mainWindowHandle){
         if (PlatformSpecific.isOnWindows()) {
-            user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
-            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-            user32.SetForegroundWindow(mainWindowHandle);
+            // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
+            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
     }
 
