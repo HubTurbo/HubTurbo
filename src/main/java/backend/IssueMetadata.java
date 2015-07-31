@@ -37,13 +37,13 @@ public class IssueMetadata {
     }
 
     // Constructor used in DownloadMetadataTask
-    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
+    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments, String ETag) {
         this.events = events;
         this.comments = comments;
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
         this.isUpdated = false;
-        this.ETag = "";
+        this.ETag = ETag;
     }
 
     // Constructor used in Logic

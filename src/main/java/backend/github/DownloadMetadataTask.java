@@ -4,10 +4,12 @@ import backend.IssueMetadata;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import github.TurboIssueEvent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import util.HTLog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +33,16 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
     public void run() {
         Map<Integer, IssueMetadata> result = new HashMap<>();
 
-        issueIds.forEach(id -> {
-            List<TurboIssueEvent> events = repo.getEvents(repoId, id);
-            List<Comment> comments = repo.getComments(repoId, id);
-            IssueMetadata metadata = new IssueMetadata(events, comments);
+        issueIdETags.forEach((id, currentETag) -> {
+            ImmutablePair<List<TurboIssueEvent>, String> changes = repo.getUpdatedEvents(repoId, id, currentETag);
+
+            List<TurboIssueEvent> events = changes.getLeft();
+            String updatedETag = changes.getRight();
+
+            List<Comment> comments = new ArrayList<>();
+            if (!updatedETag.equals(currentETag)) comments = repo.getComments(repoId, id);
+
+            IssueMetadata metadata = new IssueMetadata(events, comments, updatedETag);
             result.put(id, metadata);
         });
 

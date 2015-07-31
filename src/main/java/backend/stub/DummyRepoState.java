@@ -82,7 +82,8 @@ public class DummyRepoState {
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
         issues.get(10).setMetadata(new IssueMetadata(
                 new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(dummyComments))
+                new ArrayList<Comment>(Arrays.asList(dummyComments)),
+                ""
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
@@ -190,13 +191,14 @@ public class DummyRepoState {
         return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
     }
 
-    protected List<TurboIssueEvent> getEvents(int issueId) {
+    protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId) {
         TurboIssue issueToGet = issues.get(issueId);
         if (issueToGet != null) {
-            return issueToGet.getMetadata().getEvents();
+            // Don't care about the ETag, just give a different ETag each time.
+            return new ImmutablePair<>(issueToGet.getMetadata().getEvents(), UUID.randomUUID().toString());
         }
         // Fail silently
-        return new ArrayList<>();
+        return new ImmutablePair<>(new ArrayList<>(), "");
     }
 
     protected List<Comment> getComments(int issueId) {
@@ -260,7 +262,7 @@ public class DummyRepoState {
                 IssueEventType.Renamed,
                 new Date()));
         List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
-        updatedIssue.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        updatedIssue.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
         updatedIssue.setUpdatedAt(LocalDateTime.now());
 
         // Add to list of updated issues, and replace issueToUpdate in main issues store.
@@ -329,7 +331,7 @@ public class DummyRepoState {
                         new Date()).setLabelName(labelName))
         );
         List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
-        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Actually setting label is done after updating issue events
