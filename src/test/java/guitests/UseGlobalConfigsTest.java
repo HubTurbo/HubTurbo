@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
+import prefs.PanelInfo;
 
 public class UseGlobalConfigsTest extends UITest {
 
@@ -86,14 +87,14 @@ public class UseGlobalConfigsTest extends UITest {
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy/dummy", lastViewedRepository.generateId());
         // Boards
-        Map<String, List<String>> boards = testPref.getAllBoards();
-        List<String> emptyBoard = boards.get("Empty Board");
+        Map<String, List<PanelInfo>> boards = testPref.getAllBoards();
+        List<PanelInfo> emptyBoard = boards.get("Empty Board");
         assertEquals(1, emptyBoard.size());
         assertEquals("", emptyBoard.get(0));
-        List<String> dummyBoard = boards.get("Dummy Board");
+        List<PanelInfo> dummyBoard = boards.get("Dummy Board");
         assertEquals(2, dummyBoard.size());
         assertEquals("", dummyBoard.get(0));
-        assertEquals("repo:dummy2/dummy2", dummyBoard.get(1));
+        assertEquals("repo:dummy2/dummy2", dummyBoard.get(1).getPanelFilter());
     }
 
 }

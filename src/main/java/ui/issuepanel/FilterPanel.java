@@ -20,6 +20,7 @@ import ui.UI;
 import ui.components.FilterTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
+import prefs.PanelInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,6 +222,10 @@ public abstract class FilterPanel extends AbstractPanel {
     public void filterByString(String filterString) {
         filterTextField.setFilterText(filterString);
     }
+    
+    public void namePanel(String name) {
+        this.panelName = name;
+    }
 
     public FilterExpression getCurrentFilterExpression() {
         return currentFilterExpression;
@@ -238,6 +243,10 @@ public abstract class FilterPanel extends AbstractPanel {
 
     public String getCurrentFilterString() {
         return filterTextField.getText();
+    }
+    
+    public PanelInfo getCurrentInfo() {
+        return new PanelInfo(this.panelName, filterTextField.getText());
     }
 
     public TransformationList<TurboIssue, TurboIssue> getIssueList() {

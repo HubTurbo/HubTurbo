@@ -143,10 +143,11 @@ public class PanelControl extends HBox {
         // There aren't any children left, so we don't need to update indices
     }
 
-    public void openPanelsWithFilters(List<String> filters) {
-        for (String filter : filters) {
-            FilterPanel panel = addPanel();
-            panel.filterByString(filter);
+    public void openPanels(List<PanelInfo> panels) {
+        for (PanelInfo panel : panels) {
+            FilterPanel filterPanel = addPanel();
+            filterPanel.namePanel(panel.getPanelName());
+            filterPanel.filterByString(panel.getPanelFilter());
         }
     }
 
