@@ -26,7 +26,7 @@ public class GlobalConfig {
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
-    private Map<String, List<PanelInfo>> boards = new HashMap<>();
+    private Map<String, List<PanelInfo>> savedBoards = new HashMap<String, List<PanelInfo>>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
 
@@ -66,19 +66,19 @@ public class GlobalConfig {
     }
 
     public void addBoard(String name, List<PanelInfo> panels) {
-        boards.put(name, panels);
+    	savedBoards.put(name, panels);
     }
 
     public List<PanelInfo> getBoardPanels(String name) {
-        return boards.get(name);
+        return savedBoards.get(name);
     }
 
     public Map<String, List<PanelInfo>> getAllBoards() {
-        return new HashMap<>(boards);
+        return new HashMap<>(savedBoards);
     }
 
     public void removeBoard(String name) {
-        boards.remove(name);
+    	savedBoards.remove(name);
     }
 
     public List<String> getLastOpenFilters() {
