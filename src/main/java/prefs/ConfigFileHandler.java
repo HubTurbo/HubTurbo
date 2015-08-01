@@ -1,8 +1,10 @@
 package prefs;
 
 import com.google.gson.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import util.HTLog;
 
 import java.io.*;

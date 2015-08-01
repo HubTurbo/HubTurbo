@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +27,7 @@ public class GlobalConfig {
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
-    private Map<String, List<PanelInfo>> savedBoards = new HashMap<String, List<PanelInfo>>();
+    private Map<String, List<PanelInfo>> savedBoards = new HashMap<>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
 
@@ -66,7 +67,7 @@ public class GlobalConfig {
     }
 
     public void addBoard(String name, List<PanelInfo> panels) {
-    	savedBoards.put(name, panels);
+        savedBoards.put(name, panels);
     }
 
     public List<PanelInfo> getBoardPanels(String name) {
@@ -78,7 +79,7 @@ public class GlobalConfig {
     }
 
     public void removeBoard(String name) {
-    	savedBoards.remove(name);
+        savedBoards.remove(name);
     }
 
     public List<String> getLastOpenFilters() {
