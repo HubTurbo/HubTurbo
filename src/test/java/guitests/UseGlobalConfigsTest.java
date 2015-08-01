@@ -93,7 +93,7 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("", emptyBoard.get(0).getPanelFilter());
         List<PanelInfo> dummyBoard = boards.get("Dummy Board");
         assertEquals(2, dummyBoard.size());
-        assertEquals("", dummyBoard.get(0));
+        assertEquals("", dummyBoard.get(0).getPanelFilter());
         assertEquals("repo:dummy2/dummy2", dummyBoard.get(1).getPanelFilter());
     }
 
