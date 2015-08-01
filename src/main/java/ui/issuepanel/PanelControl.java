@@ -60,22 +60,14 @@ public class PanelControl extends HBox {
     }
 
     public void saveSession() {
-        List<String> panelFilters = new ArrayList<>();
-        List<String> panelNames = new ArrayList<>();
+        List<PanelInfo> panels = new ArrayList<>();
         getChildren().forEach(child -> {
             if (child instanceof FilterPanel) {
-                String filter = ((FilterPanel) child).getCurrentFilterString();
-                panelFilters.add(filter);
-                String name = ((FilterPanel) child).getCurrentName();
-                panelNames.add(name);
+                PanelInfo panel = ((FilterPanel) child).getCurrentInfo();
+                panels.add(panel);
             }
         });
-        List<PanelInfo> panelInfo = new ArrayList<>();
-        for (int i = 0; i < panelFilters.size(); i++) {
-            assert panelFilters.size() == panelNames.size();
-            panelInfo.add(new PanelInfo(panelNames.get(i), panelFilters.get(i)));
-        }
-        prefs.setPanelInfo(panelInfo);
+        prefs.setPanelInfo(panels);
     }
 
     public void restorePanels() {
@@ -146,8 +138,7 @@ public class PanelControl extends HBox {
     public void openPanels(List<PanelInfo> panels) {
         for (PanelInfo panel : panels) {
             FilterPanel filterPanel = addPanel();
-            filterPanel.namePanel(panel.getPanelName());
-            filterPanel.filterByString(panel.getPanelFilter());
+            filterPanel.restorePanel(panel.getPanelName(), panel.getPanelFilter());
         }
     }
 
