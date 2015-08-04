@@ -78,6 +78,14 @@ public class Preferences {
     public void removeBoard(String name) {
         global.removeBoard(name);
     }
+    
+    public void setOpenBoard(String board) {
+        global.setLastOpenBoard(board);
+    }
+    
+    public String getOpenBoard() {
+        return global.getLastOpenBoard();
+    }
 
     /**
      * Session configuration

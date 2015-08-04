@@ -27,6 +27,7 @@ public class GlobalConfig {
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
     private Map<String, List<String>> boards = new HashMap<>();
+    private String lastOpenBoard = "";
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
 
@@ -79,6 +80,14 @@ public class GlobalConfig {
 
     public void removeBoard(String name) {
         boards.remove(name);
+    }
+    
+    public void setLastOpenBoard(String board) {
+        lastOpenBoard = board;
+    }
+    
+    public String getLastOpenBoard() {
+        return lastOpenBoard;
     }
 
     public void setLastOpenFilters(List<String> filter) {

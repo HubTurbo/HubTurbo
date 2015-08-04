@@ -31,12 +31,14 @@ public class MenuControl extends MenuBar {
     private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
+    private String openBoardName = "";
 
     public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
         this.panels = panels;
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
+        openBoardName = prefs.getOpenBoard();
         createMenuItems();
     }
 
@@ -128,9 +130,26 @@ public class MenuControl extends MenuBar {
         cols.getItems().addAll(createRight, createLeft, closePanel);
         return cols;
     }
+    
+    private void onBoardSave() {
+        logger.info("Menu: Boards > Save");
+        
+        
+
+        List<String> filterStrings = getCurrentFilterExprs();
+
+        if (filterStrings.isEmpty() || openBoardName.equals("")) {
+            logger.info("Did not save board");
+            return;
+        }
+        
+        prefs.addBoard(openBoardName, filterStrings);
+        ui.triggerEvent(new BoardSavedEvent());
+        logger.info("Board" + openBoardName + " saved, containing " + filterStrings);
+    }
 
     /**
-     * Called upon the Boards > Save being clicked
+     * Called upon the Boards > Save as being clicked
      */
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
@@ -164,6 +183,8 @@ public class MenuControl extends MenuBar {
 
         panels.closeAllPanels();
         panels.openPanelsWithFilters(filters);
+        prefs.setOpenBoard(boardName);
+        openBoardName = boardName;
     }
 
     /**
@@ -189,8 +210,11 @@ public class MenuControl extends MenuBar {
     }
 
     private MenuItem[] createBoardsMenu() {
-        MenuItem save = new MenuItem("Save as");
-        save.setOnAction(e -> onBoardSaveAs());
+        MenuItem saveAs = new MenuItem("Save as");
+        saveAs.setOnAction(e -> onBoardSaveAs());
+        
+        MenuItem save = new MenuItem("Save");
+        save.setOnAction(e -> onBoardSave());
 
         Menu open = new Menu("Open");
         Menu delete = new Menu("Delete");
@@ -214,7 +238,7 @@ public class MenuControl extends MenuBar {
             }
         });
 
-        return new MenuItem[] {save, open, delete};
+        return new MenuItem[] {save, saveAs, open, delete};
     }
 
     /**
