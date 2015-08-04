@@ -132,8 +132,8 @@ public class MenuControl extends MenuBar {
     /**
      * Called upon the Boards > Save being clicked
      */
-    private void onBoardSave() {
-        logger.info("Menu: Boards > Save");
+    private void onBoardSaveAs() {
+        logger.info("Menu: Boards > Save as");
 
         List<String> filterStrings = getCurrentFilterExprs();
 
@@ -189,8 +189,8 @@ public class MenuControl extends MenuBar {
     }
 
     private MenuItem[] createBoardsMenu() {
-        MenuItem save = new MenuItem("Save");
-        save.setOnAction(e -> onBoardSave());
+        MenuItem save = new MenuItem("Save as");
+        save.setOnAction(e -> onBoardSaveAs());
 
         Menu open = new Menu("Open");
         Menu delete = new Menu("Delete");
