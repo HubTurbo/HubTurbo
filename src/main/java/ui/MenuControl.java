@@ -38,7 +38,7 @@ public class MenuControl extends MenuBar {
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
-        openBoardName = prefs.getOpenBoard();
+        openBoardName = prefs.getLastOpenBoard();
         createMenuItems();
     }
 
@@ -183,7 +183,7 @@ public class MenuControl extends MenuBar {
 
         panels.closeAllPanels();
         panels.openPanelsWithFilters(filters);
-        prefs.setOpenBoard(boardName);
+        prefs.setLastOpenBoard(boardName);
         openBoardName = boardName;
     }
 
@@ -202,6 +202,10 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
+            if (openBoardName.equals(boardName)) {
+                openBoardName = "";
+                prefs.setLastOpenBoard("");
+            }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");
         } else {

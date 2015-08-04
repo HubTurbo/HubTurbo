@@ -79,11 +79,11 @@ public class Preferences {
         global.removeBoard(name);
     }
     
-    public void setOpenBoard(String board) {
+    public void setLastOpenBoard(String board) {
         global.setLastOpenBoard(board);
     }
     
-    public String getOpenBoard() {
+    public String getLastOpenBoard() {
         return global.getLastOpenBoard();
     }
 
