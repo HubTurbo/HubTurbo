@@ -388,6 +388,8 @@ public class BrowserComponent {
 
     public void focus(HWND mainWindowHandle){
         if (PlatformSpecific.isOnWindows()) {
+            // Restores browser window if it is minimized / maximized
+            user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
             user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
