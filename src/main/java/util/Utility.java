@@ -124,6 +124,10 @@ public class Utility {
         return s.replaceAll("^\"|\"$", "");
     }
 
+    public static String removeAllWhiteSpaces(String s) {
+        return s.replaceAll("\\s", "");
+    }
+
     public static int safeLongToInt(long l) {
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
             throw new IllegalArgumentException
