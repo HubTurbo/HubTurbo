@@ -70,10 +70,14 @@ public class LoginController {
     }
 
     public boolean attemptLogin(String owner, String repo, String username, String password) {
+        owner = Utility.removeAllWhiteSpaces(owner);
+        repo = Utility.removeAllWhiteSpaces(repo);
+
         this.owner = owner;
         this.repo = repo;
         this.username = username;
         this.password = password;
+
         return attemptLogin();
     }
 

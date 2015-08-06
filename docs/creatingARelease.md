@@ -1,0 +1,48 @@
+# Creating a Release
+
+## Wrap up the milestone
+
+- Close completed issues and put them under the appropriate milestone
+- Issues which weren't finished should be moved to the next milestone
+
+## Document changes
+
+- Update the [changelog](changelog.md)
+
+## Bump version numbers
+
+- Update version number in [build.gradle](../build.gradle)
+- Update version number in [`ui.UI`](../src/main/java/ui/UI.java)
+
+## Tag
+
+- Commit, then tag in the following format: `VMAJOR.MINOR.PATCH`
+    - No leading zeroes (i.e. `1` instead of `01`)
+    - Example: `V0.12.1`
+- `git push`
+- `git push --tags`
+
+Further reading: [Semantic versioning](http://semver.org/)
+
+## Create and upload JAR
+
+- Can be executed from the command line (using `gradlew`), Eclipse or IntelliJ IDEA
+- Use `clean shadowJar` (E.g. `./gradlew clean shadowJar`)
+- The JAR will be in `build/libs/HubTurbo-x.x.x-all`
+- Name the JAR in the format: `resource-vMAJOR.MINOR.PATCH.jar`
+
+**Afterwards**
+
+- Upload JAR to [Releases](https://github.com/HubTurbo/HubTurbo/releases/new) under the tag you just created
+- Merge `master` into `release`
+
+## Enable automatic updates
+
+- Update [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) (both `serverURI` and `version`)
+- Commit in the same format as before
+
+## Housekeeping
+
+- Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain <br>
+**Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back.
+- Close the previous milestone, and create a new milestone for the next release.

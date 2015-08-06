@@ -4,12 +4,16 @@
 
 Are you a GitHub power user? Enhance your GitHub Issue Tracker experience with this desktop companion: more features, more flexibility, faster interactions. 
 
-![](https://github.com/HubTurbo/HubTurbo/blob/release/docs/images/getting-started/1.png?raw=true)
+![](https://github.com/HubTurbo/HubTurbo/blob/release/docs/images/gettingStarted/bothViewsScreenshot.png?raw=true)
 
-To **start using HubTurbo**, click [here](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Home.md).
+To **start using HubTurbo**, check out our [User Guide](https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md).
 
-To **contribute to HubTurbo as a developer**, click [here](docs/Home.md).
+To **contribute to HubTurbo as a developer**, check out our [Developer Guide](docs/developerGuide.md).
 
 <br>
 <hr>
-| [**Changelog**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Changelog.md) | [**Team**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/Team.md) | 
+| [**About**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/about.md)
+| [**Team**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/team.md) 
+| [**Changelog**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/changelog.md) 
+| [**Contact**](https://github.com/HubTurbo/HubTurbo/blob/release/docs/contact.md)
+|

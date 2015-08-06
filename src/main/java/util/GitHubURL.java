@@ -4,9 +4,9 @@ public class GitHubURL {
 
     public static final String LOGIN_PAGE = "https://github.com/login";
     public static final String DOCS_PAGE =
-            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/Getting-Started.md";
+            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md";
     public static final String KEYBOARD_SHORTCUTS_PAGE =
-            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/Keyboard-Shortcuts.md";
+            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/keyboardShortcuts.md";
 
     public static String getPathForAllIssues(String repoId) {
         return String.format("https://github.com/%s/issues", repoId);

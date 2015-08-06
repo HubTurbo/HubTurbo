@@ -13,12 +13,16 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
+import util.events.ShowErrorDialogEvent;
+import util.events.UpdateProgressEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static util.Futures.withResult;
 
@@ -30,6 +34,8 @@ public class RepoIO {
     private final JSONStore jsonStore;
 
     private List<String> storedRepos;
+
+    private static final int MAX_REDOWNLOAD_TRIES = 2;
 
     public RepoIO(boolean isTestMode, boolean enableTestJSON) {
         if (isTestMode) {
@@ -60,9 +66,22 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> openRepository(String repoId) {
-        if (storedRepos.contains(repoId)) {
-            return loadRepoFromStoreAsync(repoId)
-                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoId));
+        // The ignoreCase logic is necessary when we are opening a repo from the login dialog window
+        // i.e. when the isAlreadyOpen check in Logic fails.
+        Optional<String> matchingRepoName = storedRepos.stream().filter(repoName ->
+                repoName.equalsIgnoreCase(repoId)).findFirst();
+        if (matchingRepoName.isPresent()) {
+            // TODO avoid CI deadlock in the .exceptionally call. Explanation:
+            /* loadRepoFromStoreAsync will execute in jsonStore's single thread pool, and if
+             it has an exception then downloadRepoFromSourceBlocking will also run there. Eventually,
+             this results in jsonStore.saveRepository in updateModel being placed as another Task on the
+             same thread pool. However, since the current task is still carrying out and waiting for the second
+             task to complete, the program gets deadlocked on the CI.
+             One example of how this can happen is when storedRepos contains the repo name but the json was
+             deleted while the program is still running. */
+            String repoToLoad = matchingRepoName.get();
+            return loadRepoFromStoreAsync(repoToLoad)
+                    .exceptionally(e -> downloadRepoFromSourceBlocking(repoToLoad));
         } else {
             return downloadRepoFromSourceAsync(repoId);
         }
@@ -73,10 +92,14 @@ public class RepoIO {
                 .thenCompose(this::updateModel);
     }
 
-    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId) {
+    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoID) {
+        return downloadRepoFromSourceAsync(repoID, MAX_REDOWNLOAD_TRIES);
+    }
+
+    private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId, int remainingTries) {
         UI.status.displayMessage("Downloading " + repoId);
         return repoSource.downloadRepository(repoId)
-                .thenCompose(this::updateModel)
+                .thenCompose(newModel -> updateModel(newModel, remainingTries))
                 .thenApply(model -> {
                     storedRepos.add(repoId);
                     return model;
@@ -96,16 +119,39 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> updateModel(Model model) {
+        return updateModel(model, MAX_REDOWNLOAD_TRIES);
+    }
+
+    public CompletableFuture<Model> updateModel(Model model, int remainingTries) {
         return repoSource.updateModel(model)
             .thenApply(newModel -> {
-                UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                boolean corruptedJson = false;
                 if (!model.equals(newModel)) {
-                    jsonStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel));
+                    try {
+                        corruptedJson =
+                                jsonStore.saveRepository(newModel.getRepoId(), new SerializableModel(newModel)).get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        corruptedJson = true;
+                    }
                 } else {
                     logger.info(HTLog.format(model.getRepoId(),
-                        "Nothing changed; not writing to store"));
+                            "Nothing changed; not writing to store"));
                 }
-                return newModel;
+                if (corruptedJson && remainingTries > 0) {
+                    return downloadRepoFromSourceAsync(model.getRepoId(), remainingTries - 1).join();
+                } else {
+                    if (corruptedJson && remainingTries == 0) {
+                        UI.events.triggerEvent(new ShowErrorDialogEvent("Could not sync " + model.getRepoId(),
+                                "We were not able to sync with GitHub to retrieve and store data for the repository "
+                                + model.getRepoId()
+                                + ". Please let us know if you encounter this issue consistently."
+                        ));
+                    } else {
+                        UI.status.displayMessage(model.getRepoId() + " is up to date!");
+                    }
+                    UI.events.triggerEvent(new UpdateProgressEvent(model.getRepoId()));
+                    return newModel;
+                }
             }).exceptionally(withResult(new Model(model.getRepoId())));
     }
 

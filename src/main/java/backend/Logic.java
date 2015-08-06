@@ -189,7 +189,7 @@ public class Logic {
     }
 
     public Set<String> getOpenRepositories() {
-        return models.toModels().stream().map(Model::getRepoId).collect(Collectors.toSet());
+        return models.toModels().stream().map(Model::getRepoId).map(String::toLowerCase).collect(Collectors.toSet());
     }
 
     public Set<String> getStoredRepos() {
@@ -197,7 +197,7 @@ public class Logic {
     }
 
     public boolean isAlreadyOpen(String repoId) {
-        return getOpenRepositories().contains(repoId);
+        return getOpenRepositories().contains(repoId.toLowerCase());
     }
 
     public void setDefaultRepo(String repoId) {

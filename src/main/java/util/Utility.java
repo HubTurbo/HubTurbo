@@ -1,13 +1,16 @@
 package util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,6 +22,18 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.UIManager;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class Utility {
 
@@ -44,19 +59,73 @@ public class Utility {
         return Optional.empty();
     }
 
-    public static void writeFile(String fileName, String content) {
-        PrintWriter writer;
+    public static boolean writeFile(String fileName, String content, int issueCount) {
         try {
-            writer = new PrintWriter(fileName, "UTF-8");
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
             writer.println(content);
             writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+
+            long sizeAfterWrite = Files.size(Paths.get(fileName));
+            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return true;
+        }
+    }
+
+    private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
+        // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
+        // we consider the json to have exploded as the file is unusually large.
+        if (sizeAfterWrite > ((long) issueCount * 2000)) {
+            UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
+                    fileName + " is unusually large.\n\n"
+                            + "Now proceeding to delete the file and redownload the repository to prevent "
+                            + "further corruption.\n\n"
+                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
+                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
+                    )
+            );
+            parseAndDeleteFile(fileName);
+            copyLog();
+            return true;
+        }
+        return false;
+    }
+
+    public static void copyLog() {
+        try {
+            Files.copy(Paths.get("hubturbo-log.log"),
+                    Paths.get("hubturbo-err-log.log"),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
+    }
+
+    public static void parseAndDeleteFile(String fileName) {
+        try {
+            Path corruptedFile = Paths.get(fileName);
+            if (Files.exists(corruptedFile)) {
+                String corruptedFileData = readFile(fileName).get();
+                PrintWriter writer = new PrintWriter(fileName + "-err", "UTF-8");
+                writer.println(new GsonBuilder().setPrettyPrinting().create().toJson(
+                        new JsonParser().parse(corruptedFileData)
+                ));
+                writer.close();
+
+                Files.delete(corruptedFile);
+            }
+        } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
     }
 
     public static String stripQuotes(String s) {
         return s.replaceAll("^\"|\"$", "");
+    }
+
+    public static String removeAllWhiteSpaces(String s) {
+        return s.replaceAll("\\s", "");
     }
 
     public static int safeLongToInt(long l) {
@@ -155,7 +224,14 @@ public class Utility {
 
     public static Optional<Rectangle> getUsableScreenDimensions() {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            if (PlatformSpecific.isOnLinux()) {
+                UIManager.setLookAndFeel(
+                    UIManager.getCrossPlatformLookAndFeelClassName());
+            } else {
+                UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+            }
+
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             return Optional.of(ge.getMaximumWindowBounds());
         } catch (Exception e) {

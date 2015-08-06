@@ -1,6 +1,5 @@
 package ui;
 
-import com.google.common.collect.Ordering;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
@@ -36,8 +35,18 @@ public class RepositorySelector extends HBox {
         comboBox.setFocusTraversable(false);
         comboBox.setEditable(true);
         comboBox.valueProperty().addListener((observable, old, newVal) -> {
-            if (Utility.isWellFormedRepoId(newVal) && !changesDisabled) {
-                onValueChangeCallback.accept(newVal);
+            if (newVal == null) {
+                return;
+            }
+
+            String repoId = Utility.removeAllWhiteSpaces(newVal);
+            if (!repoId.equals(newVal)) {
+                comboBox.setValue(repoId);
+                return;
+            }
+
+            if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
+                onValueChangeCallback.accept(repoId);
             }
         });
     }
@@ -49,9 +58,9 @@ public class RepositorySelector extends HBox {
 
     private void loadContents() {
         comboBox.getItems().addAll(ui.logic.getStoredRepos());
-        comboBox.getItems().sort(Ordering.natural());
+        comboBox.getItems().sort(String.CASE_INSENSITIVE_ORDER);
     }
-    
+
     public List<String> getContents() {
         return comboBox.getItems();
     }
