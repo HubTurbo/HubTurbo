@@ -41,7 +41,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
-    protected Text nameBox;
+    protected Text nameText;
     protected Label renameButton;
     private String panelName = "Panel";
     private UI ui;
@@ -82,7 +82,7 @@ public abstract class FilterPanel extends AbstractPanel {
     };
     
     private Node createNameBar() {
-        nameBox = new Text(panelName);
+        nameText = new Text(panelName);
     
         renameButton = new Label(RENAME_PANEL);
         renameButton.getStyleClass().add("label-button");
@@ -105,18 +105,13 @@ public abstract class FilterPanel extends AbstractPanel {
                 panelName = panelName.substring(0, MAX_NAME_LENGTH);
             }
             
-            nameBox.setText(panelName);
+            nameText.setText(panelName);
         });
         
         HBox nameArea = new HBox();
-        nameArea.getChildren().add(nameBox);
-        nameArea.setAlignment(Pos.TOP_LEFT);
+        nameArea.getChildren().add(nameText);
         nameArea.setMinWidth(340);
         nameArea.setMaxWidth(340);
-        
-        HBox renameArea = new HBox();
-        renameArea.getChildren().add(renameButton);
-        renameArea.setAlignment(Pos.TOP_RIGHT);
         
         HBox closeButtonArea = new HBox();
         closeButtonArea.getChildren().addAll(createButtons());
@@ -125,7 +120,8 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBar.setSpacing(5);
         nameBar.setMinWidth(PANEL_WIDTH);
         nameBar.setMaxWidth(PANEL_WIDTH);
-        nameBar.getChildren().addAll(nameArea, renameArea, closeButtonArea);
+        nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
+        nameBar.setPadding(new Insets(0, 0, 0, 0));
         return nameBar;
     }
 
@@ -232,7 +228,7 @@ public abstract class FilterPanel extends AbstractPanel {
     public void restorePanel(String name, String filterString) {
         filterTextField.setFilterText(filterString);
         this.panelName = name;
-        this.nameBox.setText(panelName);
+        this.nameText.setText(panelName);
     }
     
     public String getCurrentName() {
