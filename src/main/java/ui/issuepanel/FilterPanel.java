@@ -94,16 +94,18 @@ public abstract class FilterPanel extends AbstractPanel {
             renameDialog.setHeaderText("Enter a new name for this panel.");
             Optional<String> result = renameDialog.showAndWait();
             mainStage.show();
-            String newName = result.get();
-            if (newName.length() != 0) {
+            String newName = "";
+            if (result.isPresent()) {
+                newName = result.get();
+            }
+            if (!newName.equals("")) {
                 panelName = newName;
             }
             if (panelName.length() > MAX_NAME_LENGTH) {
                 panelName = panelName.substring(0, MAX_NAME_LENGTH);
             }
             
-            panelName = newName;
-            nameBox.setText(newName);
+            nameBox.setText(panelName);
         });
         
         HBox nameArea = new HBox();
