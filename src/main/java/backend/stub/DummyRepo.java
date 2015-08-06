@@ -134,7 +134,8 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId, int issueId, String currentETag) {
+    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents
+            (String repoId, int issueId, String currentETag) {
         return getRepoState(repoId).getEvents(issueId);
     }
 
@@ -162,4 +163,5 @@ public class DummyRepo implements Repo {
     public ImmutablePair<Integer, Long> getRateLimitResetTime() {
         return new ImmutablePair<>(3500, new Date().getTime() + 2700000);
     }
+
 }
