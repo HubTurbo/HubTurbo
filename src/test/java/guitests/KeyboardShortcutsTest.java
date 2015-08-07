@@ -1,7 +1,10 @@
 package guitests;
 
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
+
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
@@ -9,7 +12,6 @@ import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
-
 import static org.junit.Assert.assertEquals;
 import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
@@ -96,6 +98,13 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(1, panelIndex);
         clearPanelIndex();
 
+        // remove focus from repo selector
+        ComboBox<String> comboBox = find("#repositorySelector");
+        doubleClick(comboBox);
+        press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
+        assertEquals(false, comboBox.isFocused());
+        clearUiComponentFocusEventType();
+        
         click("#dummy/dummy_col1_1");
 
         // mark as read
@@ -132,10 +141,11 @@ public class KeyboardShortcutsTest extends UITest {
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at the only issue shown
         assertEquals(5, selectedIssueId);
-
+        
         // minimize window
         press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
         assertEquals(true, stage.isIconified());
+
     }
 
     public KeyCode getKeyCode(String shortcut) {
