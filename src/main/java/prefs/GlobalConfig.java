@@ -99,11 +99,11 @@ public class GlobalConfig {
     }
     
     public void setPanelInfo(List<PanelInfo> panelInfo) {
-        this.openPanels = new ArrayList<PanelInfo>(panelInfo);
+        this.openPanels = new ArrayList<>(panelInfo);
     }
     
     public List<PanelInfo> getPanelInfo() {
-        return new ArrayList<PanelInfo>(openPanels);
+        return new ArrayList<>(openPanels);
     }
 
     public void setLastViewedRepository(String repository) {

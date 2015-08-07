@@ -73,15 +73,15 @@ public class PanelControl extends HBox {
     public void restorePanels() {
         getChildren().clear();
 
-        List<PanelInfo> panelInfo = prefs.getPanelInfo();
+        List<PanelInfo> panels = prefs.getPanelInfo();
 
-        if (panelInfo.isEmpty()) {
+        if (panels.isEmpty()) {
             addPanel();
             return;
         }
 
-        for (int i = 0; i < panelInfo.size(); i++) {
-            addPanel().restorePanel(panelInfo.get(i).getPanelName(), panelInfo.get(i).getPanelFilter());
+        for (PanelInfo panel : panels) {
+        	addPanel().restorePanel(panel.getPanelName(), panel.getPanelFilter());
         }
     }
 

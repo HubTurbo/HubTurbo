@@ -2,8 +2,8 @@ package prefs;
 
 public class PanelInfo {
 
-    private String name;
-    private String filter;
+    private final String name;
+    private final String filter;
 
     public PanelInfo(String name, String filter) {
         this.name = name;
@@ -21,14 +21,6 @@ public class PanelInfo {
 
     public String getPanelFilter() {
         return this.filter;
-    }
-    
-    public void setPanelName(String name) {
-        this.name = name;
-    }
-    
-    public void setPanelFilter(String filter) {
-        this.filter = filter;
     }
 
 }
