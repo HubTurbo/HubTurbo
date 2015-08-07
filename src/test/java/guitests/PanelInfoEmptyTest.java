@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
+import prefs.PanelInfo;
 
 import java.util.List;
 
@@ -30,12 +31,10 @@ public class PanelInfoEmptyTest extends UITest {
         click("Quit");
         
         Preferences testPref = new Preferences(true);
-        List<String> openPanels = testPref.getPanelNames();
-        List<String> openFilters = testPref.getLastOpenFilters();
+        List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();
         
         // Expected result: nothing stored in panelInfo
         
-        assertEquals(0, openPanels.size());
-        assertEquals(0, openFilters.size());
+        assertEquals(0, lastSessionPanels.size());
     }
 }

@@ -77,18 +77,18 @@ public class PanelInfoBasicTest extends UITest {
         
         Preferences testPref = new Preferences(true);
         
-        List<String> openPanels = testPref.getPanelNames();
-        List<String> openFilters = testPref.getLastOpenFilters();
+        List<String> openPanelNames = testPref.getPanelNames();
+        List<String> openPanelFilters = testPref.getLastOpenFilters();
         
-        assertEquals(3, openPanels.size());
-        assertEquals(3, openFilters.size());
+        assertEquals(3, openPanelNames.size());
+        assertEquals(3, openPanelFilters.size());
 
-        assertEquals("is:open", openFilters.get(0));
-        assertEquals("", openFilters.get(1));
-        assertEquals("repo:dummy2/dummy2", openFilters.get(2));
+        assertEquals("is:open", openPanelFilters.get(0));
+        assertEquals("", openPanelFilters.get(1));
+        assertEquals("repo:dummy2/dummy2", openPanelFilters.get(2));
 
-        assertEquals("Open issues", openPanels.get(0));
-        assertEquals("Renamed panel", openPanels.get(1));
-        assertEquals("Dummy 2 panel", openPanels.get(2));
+        assertEquals("Open issues", openPanelNames.get(0));
+        assertEquals("Renamed panel", openPanelNames.get(1));
+        assertEquals("Dummy 2 panel", openPanelNames.get(2));
     }
 }

@@ -1,5 +1,6 @@
 package ui.issuepanel;
 
+import util.events.ShowRenamePanelEvent;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -13,9 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.ModelUpdatedEventHandler;
@@ -25,7 +24,6 @@ import prefs.PanelInfo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -45,15 +43,12 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Label renameButton;
     private String panelName = "Panel";
     private UI ui;
-    private Stage mainStage;
-    private final int MAX_NAME_LENGTH = 48;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
     public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(model, parentPanelControl, panelIndex);
         this.ui = ui;
-        this.mainStage = parentPanelControl.mainStage;
         
         getChildren().addAll(createNameBar(), createFilterBox());
         this.setOnMouseClicked(e-> {
@@ -88,21 +83,7 @@ public abstract class FilterPanel extends AbstractPanel {
         renameButton.getStyleClass().add("label-button");
         renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
-            TextInputDialog renameDialog = new TextInputDialog(panelName);
-            renameDialog.getEditor().setId("panelrenameinput");
-            renameDialog.setTitle("Rename " + panelName);
-            renameDialog.setHeaderText("Enter a new name for this panel.");
-            Optional<String> result = renameDialog.showAndWait();
-            mainStage.show();
-            String newName = result.orElse(panelName);
-            if (newName.equals("")) {
-            	newName = panelName;
-            }
-            if (panelName.length() > MAX_NAME_LENGTH) {
-            	panelName = panelName.substring(0, MAX_NAME_LENGTH);
-            }
-            
-            nameText.setText(panelName);
+            ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
         });
         
         HBox nameArea = new HBox();
@@ -226,6 +207,11 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.setFilterText(filterString);
         this.panelName = name;
         this.nameText.setText(panelName);
+    }
+    
+    public void renamePanel(String name) {
+        this.panelName = name;
+        nameText.setText(name);
     }
     
     public String getCurrentName() {

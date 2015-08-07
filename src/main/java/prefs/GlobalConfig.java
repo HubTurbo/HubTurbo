@@ -23,7 +23,7 @@ public class GlobalConfig {
 
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
-    private List<PanelInfo> openPanels = new ArrayList<>();
+    private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
@@ -84,26 +84,26 @@ public class GlobalConfig {
 
     public List<String> getLastOpenFilters() {
         List<String> lastOpenFilters = new ArrayList<>();
-        for (int i = 0; i < openPanels.size(); i++) {
-            lastOpenFilters.add(openPanels.get(i).getPanelFilter());
+        for (int i = 0; i < lastSessionPanels.size(); i++) {
+            lastOpenFilters.add(lastSessionPanels.get(i).getPanelFilter());
         }
         return lastOpenFilters;
     }
     
     public List<String> getPanelNames() {
         List<String> openPanelNames = new ArrayList<>();
-        for (int i = 0; i < openPanels.size(); i++) {
-            openPanelNames.add(openPanels.get(i).getPanelName());
+        for (int i = 0; i < lastSessionPanels.size(); i++) {
+            openPanelNames.add(lastSessionPanels.get(i).getPanelName());
         }
         return openPanelNames;
     }
     
     public void setPanelInfo(List<PanelInfo> panelInfo) {
-        this.openPanels = new ArrayList<>(panelInfo);
+        this.lastSessionPanels = new ArrayList<>(panelInfo);
     }
     
     public List<PanelInfo> getPanelInfo() {
-        return new ArrayList<>(openPanels);
+        return new ArrayList<>(lastSessionPanels);
     }
 
     public void setLastViewedRepository(String repository) {

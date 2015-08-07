@@ -1,8 +1,10 @@
 package ui.issuepanel;
 
 import backend.interfaces.IModel;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -15,6 +17,7 @@ import ui.listpanel.ListPanel;
 import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEvent;
 import util.events.PanelClickedEventHandler;
+import util.events.ShowRenamePanelEventHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class PanelControl extends HBox {
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
     public Stage mainStage;
+    private final int MAX_NAME_LENGTH = 48;
 
     public PanelControl(UI ui, Preferences prefs, Stage stage) {
         this.ui = ui;
@@ -43,6 +47,7 @@ public class PanelControl extends HBox {
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
+        ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> showRenameDialog(e.panelId)));
 
         setupKeyEvents();
     }
@@ -81,7 +86,7 @@ public class PanelControl extends HBox {
         }
 
         for (PanelInfo panel : panels) {
-        	addPanel().restorePanel(panel.getPanelName(), panel.getPanelFilter());
+            addPanel().restorePanel(panel.getPanelName(), panel.getPanelFilter());
         }
     }
 
@@ -176,6 +181,27 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, new HBox());
         getChildren().set(panelIndex, two);
         getChildren().set(panelIndex2, one);
+    }
+    
+    public void showRenameDialog(int panelId) {
+        FilterPanel panel = (FilterPanel) getPanel(panelId);
+        String panelName = panel.getCurrentName();
+        
+        TextInputDialog renameDialog = new TextInputDialog(panelName);
+        renameDialog.getEditor().setId("panelrenameinput");
+        renameDialog.setTitle("Rename " + panelName);
+        renameDialog.setHeaderText("Enter a new name for this panel.");
+        Optional<String> result = renameDialog.showAndWait();
+        mainStage.show();
+        
+        String newName = result.orElse(panelName);
+        if (newName.equals("")) {
+            newName = panelName;
+        }
+        if (newName.length() > MAX_NAME_LENGTH) {
+            newName = newName.substring(0, MAX_NAME_LENGTH);
+        }
+        panel.renamePanel(newName);
     }
 
     public Optional<Integer> getCurrentlySelectedPanel() {
