@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.Collections;
@@ -132,6 +133,18 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
+        positionDialog(stage);
+    }
+
+    private void positionDialog(Stage stage) {
+        double totalScreenWidth = Screen.getScreens().stream()
+                .mapToDouble(screen -> {
+                    return screen.getVisualBounds().getWidth();
+                }).sum();
+        double maxX = Math.max(0, totalScreenWidth - stage.getMinWidth());
+
+        setX(Math.min(maxX, stage.getX() + stage.getScene().getWidth()));
+        setY(stage.getY() + stage.getScene().getY());
     }
 
     private void createButtons() {
