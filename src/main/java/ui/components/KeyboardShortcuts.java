@@ -88,6 +88,9 @@ public class KeyboardShortcuts {
     public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
 
     public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
+    
+    //ui.RepositorySelector
+    public static final KeyCode REMOVE_FOCUS = KeyCode.ESCAPE;
 
     // ui.MenuControl
     public static final KeyCombination NEW_ISSUE =

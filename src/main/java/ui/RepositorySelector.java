@@ -3,7 +3,10 @@ package ui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import ui.components.KeyboardShortcuts;
 import util.Utility;
 
 import java.util.List;
@@ -47,6 +50,13 @@ public class RepositorySelector extends HBox {
 
             if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
                 onValueChangeCallback.accept(repoId);
+            }
+        });
+        comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+        	event.consume();
+        	System.out.println(event.getCode() + " was pressed");
+        	if (event.getCode() == KeyboardShortcuts.REMOVE_FOCUS) {
+                getParent().requestFocus();
             }
         });
     }
