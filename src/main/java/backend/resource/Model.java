@@ -212,4 +212,8 @@ public class Model implements IBaseModel {
         result = 31 * result + users.hashCode();
         return result;
     }
+
+	public Optional<TurboUser> getCreatorOfIssue(TurboIssue issue) {
+		return getUserByLogin(issue.getCreator());
+	}
 }

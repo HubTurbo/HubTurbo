@@ -186,6 +186,24 @@ public class ListPanelCard extends VBox {
             Label icon = new Label(OCTICON_PULL_REQUEST);
             icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
             issueDetails.getChildren().add(icon);
+            
+            if (model.getCreatorOfIssue(issue).isPresent()) {
+		        TurboUser creator = model.getCreatorOfIssue(issue).get();
+		        Label creatorLabel = new Label(issue.getCreator());
+		        creatorLabel.getStyleClass().add("display-box-padding");
+		
+		        ImageView avatar = new ImageView();
+		        if (creator.getAvatarURL().length() != 0) {
+		            Image image = creator.getAvatar();
+		            assert image != null;
+		            avatar.setImage(image);
+		        }
+		
+		        HBox creatorBox = new HBox();
+		        creatorBox.setAlignment(Pos.BASELINE_CENTER);
+		        creatorBox.getChildren().addAll(avatar, creatorLabel);
+		        issueDetails.getChildren().add(creatorBox);
+            }
         }
 
         if (issue.getCommentCount() > 0){
