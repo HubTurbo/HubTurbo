@@ -53,9 +53,9 @@ public class RepositorySelector extends HBox {
             }
         });
         comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-        	event.consume();
-        	System.out.println(event.getCode() + " was pressed");
-        	if (event.getCode() == KeyboardShortcuts.REMOVE_FOCUS) {
+            event.consume();
+            System.out.println(event.getCode() + " was pressed");
+            if (event.getCode() == KeyboardShortcuts.REMOVE_FOCUS) {
                 getParent().requestFocus();
             }
         });
