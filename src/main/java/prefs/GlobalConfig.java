@@ -14,6 +14,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -83,19 +84,11 @@ public class GlobalConfig {
     }
 
     public List<String> getLastOpenFilters() {
-        List<String> lastOpenFilters = new ArrayList<>();
-        for (int i = 0; i < lastSessionPanels.size(); i++) {
-            lastOpenFilters.add(lastSessionPanels.get(i).getPanelFilter());
-        }
-        return lastOpenFilters;
+        return lastSessionPanels.stream().map(PanelInfo::getPanelFilter).collect(Collectors.toList());
     }
     
     public List<String> getPanelNames() {
-        List<String> openPanelNames = new ArrayList<>();
-        for (int i = 0; i < lastSessionPanels.size(); i++) {
-            openPanelNames.add(lastSessionPanels.get(i).getPanelName());
-        }
-        return openPanelNames;
+        return lastSessionPanels.stream().map(PanelInfo::getPanelName).collect(Collectors.toList());
     }
     
     public void setPanelInfo(List<PanelInfo> panelInfo) {
