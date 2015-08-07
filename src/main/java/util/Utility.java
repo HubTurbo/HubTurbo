@@ -52,7 +52,7 @@ public class Utility {
 
     public static Optional<String> readFile(String filename) {
         try {
-            return Optional.of(new String(Files.readAllBytes(new File(filename).toPath())));
+            return Optional.of(new String(Files.readAllBytes(new File(filename).toPath()), "UTF-8"));
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
