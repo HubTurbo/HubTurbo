@@ -4,7 +4,6 @@ import backend.interfaces.IModel;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -32,13 +31,10 @@ public class PanelControl extends HBox {
     private IModel model;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
-    public Stage mainStage;
-    private final int MAX_NAME_LENGTH = 48;
 
     public PanelControl(UI ui, Preferences prefs, Stage stage) {
         this.ui = ui;
         this.prefs = prefs;
-        this.mainStage = stage;
         
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
@@ -47,7 +43,7 @@ public class PanelControl extends HBox {
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
-        ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> showRenameDialog(e.panelId)));
+        ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> ui.renamePanel(e.panelId)));
 
         setupKeyEvents();
     }
@@ -182,7 +178,7 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex, two);
         getChildren().set(panelIndex2, one);
     }
-    
+    /**
     public void showRenameDialog(int panelId) {
         FilterPanel panel = (FilterPanel) getPanel(panelId);
         String panelName = panel.getCurrentName();
@@ -203,6 +199,7 @@ public class PanelControl extends HBox {
         }
         panel.renamePanel(newName);
     }
+    **/
 
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
