@@ -145,13 +145,17 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
+        // MacOS may need this call here to position the dialog properly
+        positionDialog(stage);
     }
 
     public void positionDialog(Stage stage) {
-        setX(stage.getX() + stage.getScene().getX());
-        setY(stage.getY() +
-             stage.getScene().getY() +
-             (stage.getScene().getHeight() - getHeight()) / 2);
+        if (!Double.isNaN(getHeight())) {
+            setX(stage.getX() + stage.getScene().getX());
+            setY(stage.getY() +
+                 stage.getScene().getY() +
+                 (stage.getScene().getHeight() - getHeight()) / 2);
+        }
     }
 
     private void createButtons() {
