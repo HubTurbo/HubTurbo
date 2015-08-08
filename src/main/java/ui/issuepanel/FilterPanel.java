@@ -40,7 +40,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
     protected FilterTextField filterTextField;
     protected Text nameText;
-    protected Label renameButton;
+    protected HBox nameArea;
     private String panelName = "Panel";
     private UI ui;
 
@@ -80,12 +80,12 @@ public abstract class FilterPanel extends AbstractPanel {
         nameText = new Text(panelName);
         nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
         
-        HBox nameArea = new HBox();
+        nameArea = new HBox();
         nameArea.getChildren().add(nameText);
         nameArea.setMinWidth(360);
         nameArea.setMaxWidth(360);
         nameText.setOnMouseClicked(e -> {
-            renamePanel(nameArea);
+            renamePanel();
         });
         
         HBox closeButtonArea = new HBox();
@@ -206,8 +206,8 @@ public abstract class FilterPanel extends AbstractPanel {
         this.nameText.setText(panelName);
     }
     
-    private void renamePanel(HBox nameArea) {
-        PanelNameTextField renameTextField = new PanelNameTextField(panelName);
+    private void renamePanel() {
+        PanelNameTextField renameTextField = new PanelNameTextField(panelName, this);
         nameArea.getChildren().remove(nameText);
         nameArea.getChildren().add(renameTextField);
         
@@ -218,9 +218,13 @@ public abstract class FilterPanel extends AbstractPanel {
             }
             this.panelName = newName;
             nameText.setText(newName);
-            nameArea.getChildren().remove(renameTextField);
-            nameArea.getChildren().add(nameText);
+            closeRenameTextField(renameTextField);
         });
+    }
+    
+    public void closeRenameTextField(PanelNameTextField renameTextField) {
+        nameArea.getChildren().remove(renameTextField);
+        nameArea.getChildren().add(nameText);
     }
     
     public String getCurrentName() {
