@@ -20,9 +20,9 @@ public class PanelNameTextField extends TextField {
             requestFocus();
             selectAll();
         });
+        setText(panelName);
         setup();
         setPrefColumnCount(30);
-        setText(panelName);
     }
 
     private void setup() {
@@ -36,6 +36,12 @@ public class PanelNameTextField extends TextField {
             previousText = getText();
             
             if (e.getCode() == KeyCode.ESCAPE) {
+                panel.closeRenameTextField(this);
+            } else if (e.getCode() == KeyCode.ENTER) {
+                String newName = getText().trim();
+                if (!newName.equals("")) {
+                    panel.setPanelName(newName);
+                }
                 panel.closeRenameTextField(this);
             }
         });

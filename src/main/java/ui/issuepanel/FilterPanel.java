@@ -222,19 +222,9 @@ public abstract class FilterPanel extends AbstractPanel {
         PanelNameTextField renameTextField = new PanelNameTextField(panelName, this);
         nameArea.getChildren().remove(nameText);
         nameArea.getChildren().add(renameTextField);
-        
-        renameTextField.setOnAction(renameEvent -> {
-            String newName = renameTextField.getText();
-            if (newName.equals("")) {
-                newName = panelName;
-            }
-            setPanelName(newName);
-            closeRenameTextField(renameTextField);
-        });
     }
     
     public void setPanelName(String newName) {
-        newName = newName.trim();
         this.panelName = newName;
         nameText.setText(newName);
     }

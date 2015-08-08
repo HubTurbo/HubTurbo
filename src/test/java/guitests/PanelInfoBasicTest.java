@@ -1,6 +1,7 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.TextField;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PanelInfoBasicTest extends UITest {
 
-    public static final int EVENT_DELAY = 2000;
+    public static final int EVENT_DELAY = 500;
 
     @Override
     public void launchApp() {
