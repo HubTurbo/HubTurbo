@@ -29,8 +29,7 @@ public class PanelInfoBasicTest extends UITest {
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
 
-        click("#dummy/dummy_col0_nameText");
-        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        doubleClick("#dummy/dummy_col0_nameText");
         type("Renamed panel");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -45,8 +44,7 @@ public class PanelInfoBasicTest extends UITest {
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
 
-        click("#dummy/dummy_col1_nameText");
-        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        doubleClick("#dummy/dummy_col1_nameText");
         type("Dummy 2 panel");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -63,8 +61,7 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
 
-        click("#dummy/dummy_col0_nameText");
-        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        doubleClick("#dummy/dummy_col0_nameText");
         type("Open issues");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);

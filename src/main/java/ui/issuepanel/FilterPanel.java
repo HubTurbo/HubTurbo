@@ -14,11 +14,14 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import javafx.scene.input.MouseEvent;
+import javafx.event.EventHandler;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
+import util.events.ShowRenamePanelEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected FilterTextField filterTextField;
     protected Text nameText;
     protected HBox nameArea;
+    protected Label renameButton;
     private String panelName = "Panel";
     private UI ui;
 
@@ -80,12 +84,24 @@ public abstract class FilterPanel extends AbstractPanel {
         nameText = new Text(panelName);
         nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
         
+        renameButton = new Label(RENAME_PANEL);
+        renameButton.getStyleClass().add("label-button");
+        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
+        renameButton.setOnMouseClicked(e -> {
+            ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
+        });
+        
         nameArea = new HBox();
         nameArea.getChildren().add(nameText);
-        nameArea.setMinWidth(360);
-        nameArea.setMaxWidth(360);
-        nameText.setOnMouseClicked(e -> {
-            renamePanel();
+        nameArea.setMinWidth(334);
+        nameArea.setMaxWidth(334);
+        nameArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) {
+                    showRenameTextField();
+                }
+            }
         });
         
         HBox closeButtonArea = new HBox();
@@ -95,7 +111,7 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBar.setSpacing(5);
         nameBar.setMinWidth(PANEL_WIDTH);
         nameBar.setMaxWidth(PANEL_WIDTH);
-        nameBar.getChildren().addAll(nameArea, closeButtonArea);
+        nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
         nameBar.setPadding(new Insets(0, 0, 0, 0));
         return nameBar;
     }
@@ -112,12 +128,6 @@ public abstract class FilterPanel extends AbstractPanel {
         ui.registerEvent(onModelUpdate);
 
         filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(panelIndex)));
-
-        HBox buttonsBox = new HBox();
-        buttonsBox.setSpacing(5);
-        buttonsBox.setAlignment(Pos.TOP_RIGHT);
-        buttonsBox.setMinWidth(50);
-        buttonsBox.getChildren().addAll(createButtons());
 
         HBox layout = new HBox();
         layout.getChildren().addAll(filterTextField);
@@ -206,8 +216,9 @@ public abstract class FilterPanel extends AbstractPanel {
         this.nameText.setText(panelName);
     }
     
-    private void renamePanel() {
+    private void showRenameTextField() {
         PanelNameTextField renameTextField = new PanelNameTextField(panelName, this);
+        renameTextField.setPrefWidth(400);
         nameArea.getChildren().remove(nameText);
         nameArea.getChildren().add(renameTextField);
         
@@ -216,10 +227,15 @@ public abstract class FilterPanel extends AbstractPanel {
             if (newName.equals("")) {
                 newName = panelName;
             }
-            this.panelName = newName;
-            nameText.setText(newName);
+            setPanelName(newName);
             closeRenameTextField(renameTextField);
         });
+    }
+    
+    public void setPanelName(String newName) {
+        newName = newName.trim();
+        this.panelName = newName;
+        nameText.setText(newName);
     }
     
     public void closeRenameTextField(PanelNameTextField renameTextField) {

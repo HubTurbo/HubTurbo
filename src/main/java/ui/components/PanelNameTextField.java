@@ -18,8 +18,10 @@ public class PanelNameTextField extends TextField {
         previousText = panelName;
         Platform.runLater(() -> {
             requestFocus();
+            selectAll();
         });
         setup();
+        setPrefColumnCount(30);
         setText(panelName);
     }
 
