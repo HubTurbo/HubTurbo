@@ -1,21 +1,25 @@
 package ui.components.pickers;
 
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
@@ -137,13 +141,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private void positionDialog(Stage stage) {
-        double totalScreenWidth = Screen.getScreens().stream()
-                .mapToDouble(screen -> {
-                    return screen.getVisualBounds().getWidth();
-                }).sum();
-        double maxX = Math.max(0, totalScreenWidth - stage.getMinWidth());
-
-        setX(Math.min(maxX, stage.getX() + stage.getScene().getWidth()));
+        setX(stage.getX() + stage.getScene().getX());
         setY(stage.getY() + stage.getScene().getY());
     }
 
