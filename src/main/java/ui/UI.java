@@ -16,7 +16,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
@@ -34,7 +33,6 @@ import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
-import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.PlatformSpecific;
@@ -59,7 +57,6 @@ public class UI extends Application implements EventDispatcher {
     public static final String ARG_UPDATED_TO = "--updated-to";
 
     private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
-    private final int PANEL_MAX_NAME_LENGTH = 48;
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
@@ -493,27 +490,6 @@ public class UI extends Application implements EventDispatcher {
                 }
             }
         }
-    }
-    
-    public void renamePanel(int panelId) {
-        FilterPanel panel = (FilterPanel) panels.getPanel(panelId);
-        String panelName = panel.getCurrentName();
-        
-        TextInputDialog renameDialog = new TextInputDialog(panelName);
-        renameDialog.getEditor().setId("panelrenameinput");
-        renameDialog.setTitle("Rename " + panelName);
-        renameDialog.setHeaderText("Enter a new name for this panel.");
-        Optional<String> result = renameDialog.showAndWait();
-        mainStage.show();
-        
-        String newName = result.orElse(panelName);
-        if (newName.equals("")) {
-            newName = panelName;
-        }
-        if (newName.length() > PANEL_MAX_NAME_LENGTH) {
-            newName = newName.substring(0, PANEL_MAX_NAME_LENGTH);
-        }
-        panel.renamePanel(newName);
     }
 
     private void ensureSelectedPanelHasFocus() {

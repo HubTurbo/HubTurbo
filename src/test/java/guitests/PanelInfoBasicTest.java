@@ -1,7 +1,6 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.control.TextField;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
@@ -30,10 +29,10 @@ public class PanelInfoBasicTest extends UITest {
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
 
-        click("#dummy/dummy_col0_renameButton");
-        ((TextField) find("#panelrenameinput")).setText("Renamed panel");
-        
-        click("OK");
+        click("#dummy/dummy_col0_nameText");
+        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        type("Renamed panel");
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel
@@ -46,10 +45,10 @@ public class PanelInfoBasicTest extends UITest {
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
 
-        click("#dummy/dummy_col1_renameButton");
-        ((TextField) find("#panelrenameinput")).setText("Dummy 2 panel");
-        
-        click("OK");
+        click("#dummy/dummy_col1_nameText");
+        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        type("Dummy 2 panel");
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
         // Creating panel to the left
@@ -63,12 +62,12 @@ public class PanelInfoBasicTest extends UITest {
         type("open");
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
 
-        click("#dummy/dummy_col0_renameButton");
-        ((TextField) find("#panelrenameinput")).setText("Open issues");
-        
-        click("OK");
+        click("#dummy/dummy_col0_nameText");
+        press(KeyCode.CONTROL).press(KeyCode.A).release(KeyCode.A).release(KeyCode.CONTROL);
+        type("Open issues");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         
         // Quitting to update json
         click("File");

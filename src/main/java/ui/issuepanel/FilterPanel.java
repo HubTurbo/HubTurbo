@@ -1,6 +1,5 @@
 package ui.issuepanel;
 
-import util.events.ShowRenamePanelEvent;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -17,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import ui.UI;
 import ui.components.FilterTextField;
+import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
 import prefs.PanelInfo;
@@ -78,18 +78,15 @@ public abstract class FilterPanel extends AbstractPanel {
     
     private Node createNameBar() {
         nameText = new Text(panelName);
-    
-        renameButton = new Label(RENAME_PANEL);
-        renameButton.getStyleClass().add("label-button");
-        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
-        renameButton.setOnMouseClicked(e -> {
-            ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
-        });
+        nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
         
         HBox nameArea = new HBox();
         nameArea.getChildren().add(nameText);
-        nameArea.setMinWidth(340);
-        nameArea.setMaxWidth(340);
+        nameArea.setMinWidth(360);
+        nameArea.setMaxWidth(360);
+        nameText.setOnMouseClicked(e -> {
+            renamePanel(nameArea);
+        });
         
         HBox closeButtonArea = new HBox();
         closeButtonArea.getChildren().addAll(createButtons());
@@ -98,7 +95,7 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBar.setSpacing(5);
         nameBar.setMinWidth(PANEL_WIDTH);
         nameBar.setMaxWidth(PANEL_WIDTH);
-        nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
+        nameBar.getChildren().addAll(nameArea, closeButtonArea);
         nameBar.setPadding(new Insets(0, 0, 0, 0));
         return nameBar;
     }
@@ -209,9 +206,21 @@ public abstract class FilterPanel extends AbstractPanel {
         this.nameText.setText(panelName);
     }
     
-    public void renamePanel(String name) {
-        this.panelName = name;
-        nameText.setText(name);
+    private void renamePanel(HBox nameArea) {
+        PanelNameTextField renameTextField = new PanelNameTextField(panelName);
+        nameArea.getChildren().remove(nameText);
+        nameArea.getChildren().add(renameTextField);
+        
+        renameTextField.setOnAction(renameEvent -> {
+            String newName = renameTextField.getText();
+            if (newName.equals("")) {
+                newName = panelName;
+            }
+            this.panelName = newName;
+            nameText.setText(newName);
+            nameArea.getChildren().remove(renameTextField);
+            nameArea.getChildren().add(nameText);
+        });
     }
     
     public String getCurrentName() {
