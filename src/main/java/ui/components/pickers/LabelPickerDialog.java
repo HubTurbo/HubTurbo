@@ -147,7 +147,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 issue.getId() + " in " + issue.getRepoId());
     }
 
-    private void positionDialog(Stage stage) {
+    public void positionDialog(Stage stage) {
         setX(stage.getX() + stage.getScene().getX());
         setY(stage.getY() +
              stage.getScene().getY() +
