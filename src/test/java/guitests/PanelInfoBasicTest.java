@@ -30,6 +30,7 @@ public class PanelInfoBasicTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
 
         doubleClick("#dummy/dummy_col0_nameText");
+        sleep(EVENT_DELAY);
         type("Renamed panel");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -45,6 +46,7 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
 
         doubleClick("#dummy/dummy_col1_nameText");
+        sleep(EVENT_DELAY);
         type("Dummy 2 panel");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -62,6 +64,7 @@ public class PanelInfoBasicTest extends UITest {
         push(KeyCode.ENTER);
 
         doubleClick("#dummy/dummy_col0_nameText");
+        sleep(EVENT_DELAY);
         type("Open issues");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);

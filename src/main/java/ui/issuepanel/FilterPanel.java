@@ -9,11 +9,11 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.event.EventHandler;
 import ui.UI;
@@ -93,13 +93,15 @@ public abstract class FilterPanel extends AbstractPanel {
         
         nameArea = new HBox();
         nameArea.getChildren().add(nameText);
-        nameArea.setMinWidth(334);
-        nameArea.setMaxWidth(334);
+        nameArea.setMinWidth(350);
+        nameArea.setMaxWidth(350);
         nameArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    showRenameTextField();
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    if (mouseEvent.getClickCount() == 2) {
+                        showRenameTextField();
+                    }
                 }
             }
         });
@@ -108,11 +110,11 @@ public abstract class FilterPanel extends AbstractPanel {
         closeButtonArea.getChildren().addAll(createButtons());
         
         HBox nameBar = new HBox();
-        nameBar.setSpacing(5);
+        nameBar.setSpacing(2);
         nameBar.setMinWidth(PANEL_WIDTH);
         nameBar.setMaxWidth(PANEL_WIDTH);
         nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
-        nameBar.setPadding(new Insets(0, 0, 0, 0));
+        nameBar.setPadding(new Insets(0, 0, 3, 0));
         return nameBar;
     }
 
