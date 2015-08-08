@@ -42,13 +42,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField = createTextField();
         bottomBox = createBottomBox();
 
-        setupKeyEvents();
+        setupEvents(stage);
         uiLogic = new LabelPickerUILogic(issue, repoLabels, this);
 
         vBox.getChildren().addAll(titleLabel, topPane, textField, bottomBox);
         getDialogPane().setContent(vBox);
 
         Platform.runLater(textField::requestFocus);
+    }
+
+    private void setupEvents(Stage stage) {
+        setupKeyEvents();
+
+        heightProperty().addListener(e -> {
+            positionDialog(stage);
+        });
     }
 
     private void setupKeyEvents() {
@@ -137,12 +145,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
-        positionDialog(stage);
     }
 
     private void positionDialog(Stage stage) {
         setX(stage.getX() + stage.getScene().getX());
-        setY(stage.getY() + stage.getScene().getY());
+        setY(stage.getY() +
+             stage.getScene().getY() +
+             (stage.getScene().getHeight() - getHeight()) / 2);
     }
 
     private void createButtons() {
