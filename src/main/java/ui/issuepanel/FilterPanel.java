@@ -220,7 +220,6 @@ public abstract class FilterPanel extends AbstractPanel {
     
     private void showRenameTextField() {
         PanelNameTextField renameTextField = new PanelNameTextField(panelName, this);
-        renameTextField.setPrefWidth(400);
         nameArea.getChildren().remove(nameText);
         nameArea.getChildren().add(renameTextField);
         
@@ -243,6 +242,7 @@ public abstract class FilterPanel extends AbstractPanel {
     public void closeRenameTextField(PanelNameTextField renameTextField) {
         nameArea.getChildren().remove(renameTextField);
         nameArea.getChildren().add(nameText);
+        this.requestFocus();
     }
     
     public String getCurrentName() {
