@@ -11,7 +11,7 @@ public class PanelNameTextField extends TextField {
     private final FilterPanel panel;
     private final int PANEL_MAX_NAME_LENGTH = 48;
     private String previousText = "";
-    private int caretPosition = 0;
+    private int caretPosition;
 
     public PanelNameTextField(String panelName, FilterPanel panel) {
         this.panel = panel;
@@ -30,8 +30,11 @@ public class PanelNameTextField extends TextField {
             e.consume();
             caretPosition = getCaretPosition();
             if (getText().length() > PANEL_MAX_NAME_LENGTH) {
+                int extraLettersCount = (getText().length() - previousText.length());
                 setText(previousText);
-                positionCaret(caretPosition - 1);
+                Platform.runLater(() -> {
+                    positionCaret(caretPosition - extraLettersCount);
+                });
             }
             previousText = getText();
             
