@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -21,6 +22,7 @@ import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
+import util.events.ShowRenameTextFieldEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
@@ -98,8 +100,10 @@ public abstract class FilterPanel extends AbstractPanel {
         nameArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    showRenameTextField();
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    if (mouseEvent.getClickCount() == 2) {
+                        activateInplaceRename();
+                    }
                 }
             }
         });
@@ -114,6 +118,10 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
         nameBar.setPadding(new Insets(0, 0, 3, 0));
         return nameBar;
+    }
+    
+    private void activateInplaceRename() {
+        ui.triggerEvent(new ShowRenameTextFieldEvent(this.panelIndex));
     }
 
     private Node createFilterBox() {
@@ -216,7 +224,7 @@ public abstract class FilterPanel extends AbstractPanel {
         this.nameText.setText(panelName);
     }
     
-    private void showRenameTextField() {
+    public void showRenameTextField() {
         renameTextField = new PanelNameTextField(panelName, this);
         renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
         nameArea.getChildren().remove(nameText);

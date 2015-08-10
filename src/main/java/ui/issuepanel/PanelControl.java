@@ -17,6 +17,7 @@ import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEvent;
 import util.events.PanelClickedEventHandler;
 import util.events.ShowRenamePanelEventHandler;
+import util.events.ShowRenameTextFieldEventHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,8 @@ public class PanelControl extends HBox {
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() -> ui.renamePanel(e.panelId)));
+        ui.registerEvent((ShowRenameTextFieldEventHandler) e -> Platform.runLater(() -> 
+                ((FilterPanel) getPanel(e.panelId)).showRenameTextField()));
 
         setupKeyEvents();
     }
