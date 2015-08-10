@@ -13,7 +13,6 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.event.EventHandler;
 import ui.UI;
@@ -45,6 +44,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Text nameText;
     protected HBox nameArea;
     protected Label renameButton;
+    protected PanelNameTextField renameTextField;
     private String panelName = "Panel";
     private UI ui;
 
@@ -98,10 +98,8 @@ public abstract class FilterPanel extends AbstractPanel {
         nameArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                    if (mouseEvent.getClickCount() == 2) {
-                        showRenameTextField();
-                    }
+                if (mouseEvent.getClickCount() == 2) {
+                    showRenameTextField();
                 }
             }
         });
@@ -219,7 +217,8 @@ public abstract class FilterPanel extends AbstractPanel {
     }
     
     private void showRenameTextField() {
-        PanelNameTextField renameTextField = new PanelNameTextField(panelName, this);
+        renameTextField = new PanelNameTextField(panelName, this);
+        renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
         nameArea.getChildren().remove(nameText);
         nameArea.getChildren().add(renameTextField);
     }

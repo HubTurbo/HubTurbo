@@ -28,6 +28,8 @@ public class PanelNameTextField extends TextField {
     private void setup() {
         setOnKeyReleased(e -> {
             e.consume();
+            
+            // Removing excessive characters and resetting caret position
             caretPosition = getCaretPosition();
             if (getText().length() > PANEL_MAX_NAME_LENGTH) {
                 int extraLettersCount = (getText().length() - previousText.length());

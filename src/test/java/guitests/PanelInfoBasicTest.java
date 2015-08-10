@@ -1,12 +1,12 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.control.TextField;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import ui.components.FilterTextField;
+import ui.components.PanelNameTextField;
 
 import java.util.List;
 
@@ -33,6 +33,8 @@ public class PanelInfoBasicTest extends UITest {
 
         doubleClick("#dummy/dummy_col0_nameText");
         type("Renamed panel");
+        PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
+        assertEquals("Renamed panel", renameTextField1.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
@@ -48,6 +50,8 @@ public class PanelInfoBasicTest extends UITest {
 
         doubleClick("#dummy/dummy_col1_nameText");
         type("Dummy 2 panel");
+        PanelNameTextField renameTextField2 = find("#dummy/dummy_col1_renameTextField");
+        assertEquals("Dummy 2 panel", renameTextField2.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
@@ -65,6 +69,8 @@ public class PanelInfoBasicTest extends UITest {
 
         doubleClick("#dummy/dummy_col0_nameText");
         type("Open issues");
+        PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
+        assertEquals("Open issues", renameTextField3.getText());
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         
