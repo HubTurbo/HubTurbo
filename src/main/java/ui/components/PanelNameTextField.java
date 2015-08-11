@@ -5,13 +5,14 @@ import ui.issuepanel.FilterPanel;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ChangeListener;
 
 public class PanelNameTextField extends TextField {
 
     private final FilterPanel panel;
-    private final int PANEL_MAX_NAME_LENGTH = 48;
+    private final int PANEL_MAX_NAME_LENGTH = 36;
     private String previousText = "";
-    private int caretPosition;
 
     public PanelNameTextField(String panelName, FilterPanel panel) {
         this.panel = panel;
@@ -22,23 +23,21 @@ public class PanelNameTextField extends TextField {
         });
         setText(panelName);
         setup();
+        textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String s2) {
+                // Prevent excessive characters
+                if (getText().length() > PANEL_MAX_NAME_LENGTH) {
+                    setText(previousText);
+                }
+                previousText = getText();
+            }
+        });
         setPrefColumnCount(30);
     }
 
     private void setup() {
         setOnKeyReleased(e -> {
-            e.consume();
-            
-            // Removing excessive characters and resetting caret position
-            caretPosition = getCaretPosition();
-            if (getText().length() > PANEL_MAX_NAME_LENGTH) {
-                int extraLettersCount = (getText().length() - previousText.length());
-                setText(previousText);
-                Platform.runLater(() -> {
-                    positionCaret(caretPosition - extraLettersCount);
-                });
-            }
-            previousText = getText();
             
             if (e.getCode() == KeyCode.ESCAPE) {
                 panel.closeRenameTextField(this);
@@ -49,6 +48,8 @@ public class PanelNameTextField extends TextField {
                 }
                 panel.closeRenameTextField(this);
             }
+
+            e.consume();
         });
     }
 }

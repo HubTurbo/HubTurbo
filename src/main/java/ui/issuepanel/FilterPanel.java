@@ -9,6 +9,7 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import javafx.collections.transformation.TransformationList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
@@ -22,7 +23,6 @@ import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
-import util.events.ShowRenameTextFieldEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
@@ -42,11 +42,15 @@ import java.util.stream.Collectors;
 public abstract class FilterPanel extends AbstractPanel {
 
     private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
-    protected FilterTextField filterTextField;
+
+    protected HBox panelMenuBar;
     protected Text nameText;
-    protected HBox nameArea;
+    protected HBox nameBox;
+    protected HBox menuBarNameArea;
     protected Label renameButton;
     protected PanelNameTextField renameTextField;
+    protected FilterTextField filterTextField;
+    
     private String panelName = "Panel";
     private UI ui;
 
@@ -56,7 +60,7 @@ public abstract class FilterPanel extends AbstractPanel {
         super(model, parentPanelControl, panelIndex);
         this.ui = ui;
         
-        getChildren().addAll(createNameBar(), createFilterBox());
+        getChildren().addAll(createPanelMenuBar(), createFilterBox());
         this.setOnMouseClicked(e-> {
             ui.triggerEvent(new PanelClickedEvent(panelIndex));
             requestFocus();
@@ -82,46 +86,78 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.setKeywords(all);
     };
     
-    private Node createNameBar() {
+    private Node createPanelMenuBar() {
+        menuBarNameArea = createNameArea();
+        HBox menuBarCloseArea = createCloseButton();
+        
+        panelMenuBar = new HBox();
+        panelMenuBar.setSpacing(2);
+        panelMenuBar.setMinWidth(PANEL_WIDTH);
+        panelMenuBar.setMaxWidth(PANEL_WIDTH);
+        panelMenuBar.getChildren().addAll(menuBarNameArea, menuBarCloseArea);
+        panelMenuBar.setPadding(new Insets(0, 0, 8, 0));
+        return panelMenuBar;
+    }
+    
+    private HBox createNameArea() {
+        HBox nameArea = new HBox();
+        
         nameText = new Text(panelName);
         nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
         
-        renameButton = new Label(RENAME_PANEL);
-        renameButton.getStyleClass().add("label-button");
-        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
-        renameButton.setOnMouseClicked(e -> {
-            ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
-        });
-        
-        nameArea = new HBox();
-        nameArea.getChildren().add(nameText);
-        nameArea.setMinWidth(350);
-        nameArea.setMaxWidth(350);
-        nameArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        nameBox = new HBox();
+        nameBox.getChildren().add(nameText);
+        nameBox.setMinWidth(330);
+        nameBox.setMaxWidth(330);
+        nameBox.setAlignment(Pos.CENTER_LEFT);
+        nameBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                     if (mouseEvent.getClickCount() == 2) {
+                        mouseEvent.consume();
                         activateInplaceRename();
                     }
                 }
             }
         });
         
-        HBox closeButtonArea = new HBox();
-        closeButtonArea.getChildren().addAll(createButtons());
+        renameButton = new Label(RENAME_PANEL);
+        renameButton.getStyleClass().add("label-button");
+        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
+        renameButton.setOnMouseClicked(e -> {
+            e.consume();
+            activateInplaceRename();
+        });
         
-        HBox nameBar = new HBox();
-        nameBar.setSpacing(2);
-        nameBar.setMinWidth(PANEL_WIDTH);
-        nameBar.setMaxWidth(PANEL_WIDTH);
-        nameBar.getChildren().addAll(nameArea, renameButton, closeButtonArea);
-        nameBar.setPadding(new Insets(0, 0, 3, 0));
-        return nameBar;
+        HBox renameBox = new HBox();
+        renameBox.getChildren().add(renameButton);
+        renameBox.setAlignment(Pos.TOP_RIGHT);
+        
+        nameArea.getChildren().addAll(nameBox, renameButton);
+        nameArea.setMinWidth(360);
+        nameArea.setMaxWidth(360);
+        return nameArea;
+    }
+
+    private HBox createCloseButton() {
+        HBox closeArea = new HBox();
+        
+        Label closeButton = new Label(CLOSE_PANEL);
+        closeButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_closeButton");
+        closeButton.getStyleClass().add("label-button");
+        closeButton.setOnMouseClicked((e) -> {
+            e.consume();
+            parentPanelControl.closePanel(panelIndex);
+        });
+        
+        closeArea.getChildren().add(closeButton);
+
+        return closeArea;
     }
     
     private void activateInplaceRename() {
-        ui.triggerEvent(new ShowRenameTextFieldEvent(this.panelIndex));
+        ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
     }
 
     private Node createFilterBox() {
@@ -132,6 +168,8 @@ public abstract class FilterPanel extends AbstractPanel {
                 })
                 .setOnCancel(this::requestFocus);
         filterTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
+        filterTextField.setMinWidth(380);
+        filterTextField.setMaxWidth(380);
 
         ui.registerEvent(onModelUpdate);
 
@@ -144,18 +182,6 @@ public abstract class FilterPanel extends AbstractPanel {
         setupPanelDragEvents(layout);
 
         return layout;
-    }
-
-    private Label[] createButtons() {
-        Label closeList = new Label(CLOSE_PANEL);
-        closeList.setId(model.getDefaultRepo() + "_col" + panelIndex + "_closeButton");
-        closeList.getStyleClass().add("label-button");
-        closeList.setOnMouseClicked((e) -> {
-            e.consume();
-            parentPanelControl.closePanel(panelIndex);
-        });
-
-        return new Label[] { closeList };
     }
 
     private void setupPanelDragEvents(Node dropNode) {
@@ -227,8 +253,8 @@ public abstract class FilterPanel extends AbstractPanel {
     public void showRenameTextField() {
         renameTextField = new PanelNameTextField(panelName, this);
         renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
-        nameArea.getChildren().remove(nameText);
-        nameArea.getChildren().add(renameTextField);
+        menuBarNameArea.getChildren().removeAll(nameBox, renameButton);
+        menuBarNameArea.getChildren().addAll(renameTextField);
     }
     
     public void setPanelName(String newName) {
@@ -237,8 +263,8 @@ public abstract class FilterPanel extends AbstractPanel {
     }
     
     public void closeRenameTextField(PanelNameTextField renameTextField) {
-        nameArea.getChildren().remove(renameTextField);
-        nameArea.getChildren().add(nameText);
+        menuBarNameArea.getChildren().remove(renameTextField);
+        menuBarNameArea.getChildren().addAll(nameBox, renameButton);
         this.requestFocus();
     }
     

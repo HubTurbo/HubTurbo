@@ -8,7 +8,7 @@ import prefs.Preferences;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
-import util.events.ShowRenameTextFieldEvent;
+import util.events.ShowRenamePanelEvent;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class PanelInfoBasicTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
         sleep(EVENT_DELAY);
 
-        UI.events.triggerEvent(new ShowRenameTextFieldEvent(0));
+        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Renamed panel");
         PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Renamed panel", renameTextField1.getText());
@@ -50,7 +50,8 @@ public class PanelInfoBasicTest extends UITest {
         type("dummy2/dummy2");
         assertEquals("repo:dummy2/dummy2", filterTextField2.getText());
 
-        UI.events.triggerEvent(new ShowRenameTextFieldEvent(1));
+        // Testing rename button
+        click("#dummy/dummy_col1_renameButton");
         type("Dummy 2 panel");
         PanelNameTextField renameTextField2 = find("#dummy/dummy_col1_renameTextField");
         assertEquals("Dummy 2 panel", renameTextField2.getText());
@@ -69,7 +70,7 @@ public class PanelInfoBasicTest extends UITest {
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
 
-        UI.events.triggerEvent(new ShowRenameTextFieldEvent(0));
+        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
         type("Open issues");
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Open issues", renameTextField3.getText());
