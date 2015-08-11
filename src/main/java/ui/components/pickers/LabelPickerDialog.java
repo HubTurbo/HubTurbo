@@ -54,7 +54,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void setupEvents(Stage stage) {
         setupKeyEvents();
 
-        heightProperty().addListener(e -> {
+        showingProperty().addListener(e -> {
             positionDialog(stage);
         });
     }
@@ -145,8 +145,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
-        // MacOS may need this call here to position the dialog properly
-        positionDialog(stage);
     }
 
     public void positionDialog(Stage stage) {

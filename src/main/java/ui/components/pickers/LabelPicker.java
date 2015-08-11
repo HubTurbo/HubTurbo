@@ -31,12 +31,6 @@ public class LabelPicker {
         List<TurboLabel> allLabels = ui.logic.getRepo(issue.getRepoId()).getLabels();
         // create new LabelPickerDialog
         LabelPickerDialog labelPickerDialog = new LabelPickerDialog(issue, allLabels, stage);
-
-        // Needs this since dialog's size is not available before the blocking showAndWait
-        Platform.runLater(() -> {
-            labelPickerDialog.positionDialog(stage);
-        });
-
         // show LabelPickerDialog and wait for result
         Optional<List<String>> result = labelPickerDialog.showAndWait();
         stage.show(); // ensures stage is showing after label picker is closed (mostly for tests)
