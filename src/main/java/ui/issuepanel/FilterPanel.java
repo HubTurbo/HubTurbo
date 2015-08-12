@@ -155,10 +155,6 @@ public abstract class FilterPanel extends AbstractPanel {
 
         return closeArea;
     }
-    
-    private void activateInplaceRename() {
-        ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
-    }
 
     private Node createFilterBox() {
         filterTextField = new FilterTextField("", 0)
@@ -168,8 +164,8 @@ public abstract class FilterPanel extends AbstractPanel {
                 })
                 .setOnCancel(this::requestFocus);
         filterTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
-        filterTextField.setMinWidth(380);
-        filterTextField.setMaxWidth(380);
+        filterTextField.setMinWidth(388);
+        filterTextField.setMaxWidth(388);
 
         ui.registerEvent(onModelUpdate);
 
@@ -248,6 +244,10 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.setFilterText(filterString);
         this.panelName = name;
         this.nameText.setText(panelName);
+    }
+    
+    private void activateInplaceRename() {
+        ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
     }
     
     public void showRenameTextField() {
