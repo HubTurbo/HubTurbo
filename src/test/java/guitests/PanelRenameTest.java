@@ -23,7 +23,7 @@ public class PanelRenameTest extends UITest {
     }
 
     @Test
-    public void basicPanelInfoTest() {
+    public void panelRenameTest() {
         
         // Test for saving panel information with corner cases
         

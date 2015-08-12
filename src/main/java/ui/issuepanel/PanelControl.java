@@ -29,12 +29,14 @@ public class PanelControl extends HBox {
     private final UI ui;
     private final Preferences prefs;
     private IModel model;
+    private Stage mainStage;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
     public PanelControl(UI ui, Preferences prefs, Stage stage) {
         this.ui = ui;
         this.prefs = prefs;
+        this.mainStage = stage;
         
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
@@ -111,6 +113,7 @@ public class PanelControl extends HBox {
 
         updatePanelIndices();
         setCurrentlySelectedPanel(Optional.of(index));
+        mainStage.show();
         return panel;
     }
 
