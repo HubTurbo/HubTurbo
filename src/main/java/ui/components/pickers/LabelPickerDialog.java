@@ -1,20 +1,25 @@
 package ui.components.pickers;
 
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
@@ -37,13 +42,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField = createTextField();
         bottomBox = createBottomBox();
 
-        setupKeyEvents();
+        setupEvents(stage);
         uiLogic = new LabelPickerUILogic(issue, repoLabels, this);
 
         vBox.getChildren().addAll(titleLabel, topPane, textField, bottomBox);
         getDialogPane().setContent(vBox);
 
         Platform.runLater(textField::requestFocus);
+    }
+
+    private void setupEvents(Stage stage) {
+        setupKeyEvents();
+
+        showingProperty().addListener(e -> {
+            positionDialog(stage);
+        });
     }
 
     private void setupKeyEvents() {
@@ -132,6 +145,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
+    }
+
+    public void positionDialog(Stage stage) {
+        if (!Double.isNaN(getHeight())) {
+            setX(stage.getX() + stage.getScene().getX());
+            setY(stage.getY() +
+                 stage.getScene().getY() +
+                 (stage.getScene().getHeight() - getHeight()) / 2);
+        }
     }
 
     private void createButtons() {
