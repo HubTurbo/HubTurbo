@@ -13,14 +13,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import org.eclipse.egit.github.core.Comment;
+
 import ui.issuepanel.FilterPanel;
 import util.Utility;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class ListPanelCard extends VBox {
@@ -28,6 +32,9 @@ public class ListPanelCard extends VBox {
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
     private static final String OCTICON_COMMENT = "\uf02b";
+
+    // Maximum time difference in minutes between label update events in the same group
+    private static final long MAX_TIME_DIFF = 1;
 
     /**
      * A card that is constructed with an issue as argument. Its components
@@ -124,6 +131,13 @@ public class ListPanelCard extends VBox {
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
+        // Label update events
+        getLabelUpdateEventNodes(model,
+                events.stream()
+                .filter(e -> e.isLabelUpdateEvent())
+                .collect(Collectors.toList()))
+        .forEach(node -> result.getChildren().add(node));;
+
         // Other events beside label updates
         events.stream()
             .filter(e -> !e.isLabelUpdateEvent())
@@ -146,6 +160,59 @@ public class ListPanelCard extends VBox {
         }
 
         return result;
+    }
+
+    private static List<Node> getLabelUpdateEventNodes(
+            Model model, List<TurboIssueEvent> labelUpdateEvents) {
+        List<List<TurboIssueEvent>> groupedEvents = groupLabelUpdateEvents(labelUpdateEvents);
+        return null;
+    }
+
+    /**
+     * Group label update events into a list of sub-lists of events.
+     * Events in the same sub-list will have the same author
+     * and with time-stamps less than MAX_TIME_DIFF minutes of each other
+     * @param labelUpdateEvents
+     * @return list of sub-lists of label update events
+     */
+    private static List<List<TurboIssueEvent>> groupLabelUpdateEvents(
+            List<TurboIssueEvent> labelUpdateEvents) {
+        List<List<TurboIssueEvent>> result = new ArrayList<>();
+        List<TurboIssueEvent> currentSubList = new ArrayList<>();
+
+        for (TurboIssueEvent e : labelUpdateEvents) {
+            if (currentSubList.isEmpty() ||
+                isInSameLabelGroup(e, currentSubList.get(currentSubList.size() - 1))) {
+                currentSubList.add(e);
+            } else {
+                result.add(currentSubList);
+                currentSubList = new ArrayList<>();
+            }
+        }
+
+        if (!currentSubList.isEmpty()) {
+            result.add(currentSubList);
+        }
+
+        return result;
+    }
+
+    /**
+     * Check if label update events e1 and e2
+     * are considered to be in the same group
+     * @param e1
+     * @param e2
+     * @return true if e1 and e2 have same author and times within
+     *              MAX_TIME_DIFF from each other.
+     *         false otherwise
+     */
+    private static boolean isInSameLabelGroup(
+            TurboIssueEvent e1, TurboIssueEvent e2) {
+        long timeDiffMs = Math.abs(e1.getDate().getTime() - e2.getDate().getTime());
+        long timeDiffMin = TimeUnit.MICROSECONDS.toMinutes(timeDiffMs);
+
+        return e1.getActor().equals(e2.getActor()) &&
+               timeDiffMin < MAX_TIME_DIFF;
     }
 
     private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
