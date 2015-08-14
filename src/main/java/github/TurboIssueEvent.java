@@ -54,21 +54,25 @@ public class TurboIssueEvent {
 
     // Mutable fields
 
+    public boolean isLabelUpdateEvent() {
+        return type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+    }
+
     public String getLabelName() {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         return labelName;
     }
     public TurboIssueEvent setLabelName(String labelName) {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         this.labelName = labelName;
         return this;
     }
     public String getLabelColour() {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         return labelColour;
     }
     public void setLabelColour(String labelColour) {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         this.labelColour = labelColour;
     }
     public String getMilestoneTitle() {

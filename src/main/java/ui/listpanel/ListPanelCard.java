@@ -124,8 +124,9 @@ public class ListPanelCard extends VBox {
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
-        // Events
+        // Other events beside label updates
         events.stream()
+            .filter(e -> !e.isLabelUpdateEvent())
             .map(e -> e.display(model, issue))
             .forEach(e -> result.getChildren().add(e));
 
