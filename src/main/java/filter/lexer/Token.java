@@ -1,38 +1,20 @@
 package filter.lexer;
 
 public class Token {
-    private TokenType type;
-    private String value;
-    private int position;
+    private final TokenType type;
+    private final String value;
 
-    public Token(TokenType type, String value, int position) {
+    public Token(TokenType type, String value) {
         this.type = type;
         this.value = value;
-        this.position = position;
     }
 
     public TokenType getType() {
         return type;
     }
 
-    public void setType(TokenType type) {
-        this.type = type;
-    }
-
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 
     @Override
@@ -40,23 +22,22 @@ public class Token {
         return type + " " + value;
     }
 
-    // Tokens are not equated based on position
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Token other = (Token) obj;
-        if (type != other.type)
-            return false;
-        if (value == null) {
-            if (other.value != null)
-                return false;
-        } else if (!value.equals(other.value))
-            return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Token token = (Token) o;
+
+        if (type != token.type) return false;
+        if (value != null ? !value.equals(token.value) : token.value != null) return false;
+
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }

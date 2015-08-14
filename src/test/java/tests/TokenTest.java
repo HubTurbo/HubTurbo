@@ -1,38 +1,36 @@
 package tests;
 
-import filter.lexer.Token;
-import filter.lexer.TokenType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import filter.lexer.Token;
+import filter.lexer.TokenType;
 
 public class TokenTest {
 
     @Test
-    public void tokenTest() {
-        Token token = new Token(TokenType.COLON, ":", 5);
-        assertEquals(TokenType.COLON, token.getType());
-        token.setType(TokenType.DOTDOT);
-        assertEquals(TokenType.DOTDOT, token.getType());
-        assertEquals(":", token.getValue());
-        token.setValue("..");
-        assertEquals("..", token.getValue());
-        assertEquals(5, token.getPosition());
-        token.setPosition(3);
-        assertEquals(3, token.getPosition());
-        Token token1 = new Token(TokenType.COLON, ":", 5);
-        assertEquals(false, token.equals(token1));
-        assertEquals(true, token.equals(token));
-        assertEquals(false, token.equals(null));
-        assertEquals(false, token.equals(""));
-        token.setValue(null);
-        assertEquals(false, token.equals(token1));
-        token1.setType(TokenType.DOTDOT);
-        assertEquals(false, token.equals(token1));
-        token.setValue(":");
-        assertEquals(true, token.equals(token1));
-        token.setValue("..");
-        assertEquals(false, token.equals(token1));
+    public void equalityOnValue() {
+        Token token = new Token(TokenType.QUALIFIER, ":");
+        Token token2 = new Token(TokenType.COLON, ":");
+        assertNotEquals(token, token2);
+        assertNotEquals(token.hashCode(), token2.hashCode());
     }
 
+    @Test
+    public void equalityOnType() {
+        Token token = new Token(TokenType.COLON, "a");
+        Token token2 = new Token(TokenType.COLON, ":");
+        assertNotEquals(token, token2);
+        assertNotEquals(token.hashCode(), token2.hashCode());
+    }
+
+    @Test
+    public void equality() {
+        Token token = new Token(TokenType.COLON, ":");
+        Token token2 = new Token(TokenType.COLON, ":");
+        assertEquals(token, token2);
+        assertEquals(token.hashCode(), token2.hashCode());
+    }
 }
