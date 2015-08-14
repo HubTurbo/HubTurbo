@@ -153,7 +153,7 @@ public class ListPanel extends FilterPanel {
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyboardShortcuts.MARK_AS_READ) {
+            if (event.getCode() == KeyboardShortcuts.markAsRead) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -166,7 +166,7 @@ public class ListPanel extends FilterPanel {
                 parentPanelControl.refresh();
                 listView.selectNextItem();
             }
-            if (event.getCode() == KeyboardShortcuts.MARK_AS_UNREAD) {
+            if (event.getCode() == KeyboardShortcuts.markAsUnread) {
                 Optional<TurboIssue> item = listView.getSelectedItem();
                 if (!item.isPresent()) {
                     return;
@@ -214,16 +214,16 @@ public class ListPanel extends FilterPanel {
                     event.consume();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_TOP) {
+            if (event.getCode() == KeyboardShortcuts.scrollToTop) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (event.getCode() == KeyboardShortcuts.SCROLL_TO_BOTTOM) {
+            if (event.getCode() == KeyboardShortcuts.scrollToBottom) {
                 if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SCROLL_UP || event.getCode() == KeyboardShortcuts.SCROLL_DOWN) {
-                ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.SCROLL_DOWN);
+            if (event.getCode() == KeyboardShortcuts.scrollUp || event.getCode() == KeyboardShortcuts.scrollDown) {
+                ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.scrollDown);
             }
             if (event.getCode() == KeyboardShortcuts.GOTO_MODIFIER) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
@@ -272,8 +272,8 @@ public class ListPanel extends FilterPanel {
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyboardShortcuts.DOWN_ISSUE ||
-                    event.getCode() == KeyboardShortcuts.UP_ISSUE) {
+            if (event.getCode() == KeyboardShortcuts.downIssue ||
+                    event.getCode() == KeyboardShortcuts.upIssue) {
                 listView.selectFirstItem();
             }
         });

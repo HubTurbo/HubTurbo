@@ -59,4 +59,20 @@
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
     </Match>
 
+    <Match>
+        <Class name="ui.components.KeyboardShortcuts" />
+        <Bug pattern="MS_CANNOT_BE_FINAL" />
+        <Or>
+            <Field name="downIssue" />
+            <Field name="leftPanel" />
+            <Field name="markAsRead" />
+            <Field name="markAsUnread" />
+            <Field name="rightPanel" />
+            <Field name="scrollDown" />
+            <Field name="scrollToBottom" />
+            <Field name="scrollToTop" />
+            <Field name="scrollUp" />
+            <Field name="upIssue" />
+        </Or>
+    </Match>
 </FindBugsFilter>

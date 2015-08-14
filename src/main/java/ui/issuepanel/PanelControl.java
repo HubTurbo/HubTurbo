@@ -213,8 +213,8 @@ public class PanelControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyboardShortcuts.RIGHT_PANEL || event.getCode() == KeyboardShortcuts.LEFT_PANEL) {
-                handleKeys(event.getCode() == KeyboardShortcuts.RIGHT_PANEL);
+            if (event.getCode() == KeyboardShortcuts.rightPanel || event.getCode() == KeyboardShortcuts.leftPanel) {
+                handleKeys(event.getCode() == KeyboardShortcuts.rightPanel);
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });
