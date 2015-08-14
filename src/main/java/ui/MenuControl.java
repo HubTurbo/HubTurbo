@@ -201,8 +201,9 @@ public class MenuControl extends MenuBar {
 
             Map<String, List<String>> boards = prefs.getAllBoards();
 
-            for (final String boardName : boards.keySet()) {
-                final List<String> filterSet = boards.get(boardName);
+            for (Map.Entry<String, List<String>> entry : boards.entrySet()) {
+                final String boardName = entry.getKey();
+                final List<String> filterSet = entry.getValue();
 
                 MenuItem openItem = new MenuItem(boardName);
                 openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));

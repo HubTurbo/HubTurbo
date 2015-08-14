@@ -39,7 +39,7 @@ public class TurboIssueEvent {
     public TurboIssueEvent(User actor, IssueEventType type, Date date) {
         this.type = type;
         this.actor = actor;
-        this.date = date;
+        this.date = new Date(date.getTime());
     }
 
     public IssueEventType getType() {
@@ -49,7 +49,7 @@ public class TurboIssueEvent {
         return actor;
     }
     public Date getDate() {
-        return date;
+        return new Date(date.getTime());
     }
 
     // Mutable fields

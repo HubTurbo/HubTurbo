@@ -52,6 +52,10 @@ HubTurbo runs GUI tests on Travis as well. As its testing environment may differ
     + Open and close the pull request. The downside is that this leaves traces on GitHub.
 - Alternatively, you can comment on the PR to signal to the dev team that the PR is ready to be reviewed. We will ascertain if the build failed due to the aforementioned quirks and/or nondeterminism, and if yes restart the CI build until it is successful.
 
+**Linters**
+
+Certain things we do in tests are unidiomatic and may require us to make exceptions for them with Findbugs or CheckStyle. Be as specific as possible when targeting code to exclude from checks.
+
 ## Unit Tests
 
 Unit tests are meant to extensively test the functionality of a HubTurbo component. In most cases, this should be done without the use of File I/O. When testing file I/O components, however, do remember to include code to clean up the project directory at the end of the test, such as through [`UITest.clearTestFolder()`](../src/test/java/guitests/UITest.java).

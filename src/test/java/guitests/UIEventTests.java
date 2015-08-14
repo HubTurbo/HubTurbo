@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class UIEventTests extends UITest {
 
     private static String defaultRepoId;
-    public static int eventTestCount;
+    static int eventTestCount;
 
     public static void increaseEventTestCount() {
         eventTestCount++;

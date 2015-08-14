@@ -49,6 +49,8 @@ public class LogoutTest extends UITest {
     @After
     public void teardown() {
         File testConfig = new File(configFileDirectory, testConfigFileName);
-        if (testConfig.exists() && testConfig.isFile()) testConfig.delete();
+        if (testConfig.exists() && testConfig.isFile()) {
+            assert testConfig.delete();
+        }
     }
 }

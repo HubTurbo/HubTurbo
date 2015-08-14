@@ -1,22 +1,31 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
-import org.junit.Test;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
-import ui.UI;
-import util.events.PanelClickedEventHandler;
-
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Test;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
+
+import javafx.scene.input.KeyCode;
+import ui.UI;
+import util.events.PanelClickedEventHandler;
+
 public class PanelsTest extends UITest {
 
-    private static boolean eventTriggered = false;
+    private static class Bool {
+        public boolean value = false;
+        public void negate() {
+            value = !value;
+        }
+    }
 
     // TODO check if interactions result in any effects
     @Test
     public void panelsTest() {
-        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered = !eventTriggered);
+
+        Bool eventTriggered = new Bool();
+
+        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());
 
         // maximize
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
@@ -32,11 +41,11 @@ public class PanelsTest extends UITest {
         drag("#dummy/dummy_col1_closeButton").to("#dummy/dummy_col0_closeButton");
 
         // Click
-        eventTriggered = false;
+        eventTriggered.value = false;
         find("#dummy/dummy_col0_closeButton");
         moveBy(-50, 0);
         click(); // Click
-        assertTrue(eventTriggered);
+        assertTrue(eventTriggered.value);
 
         // Close
         click("#dummy/dummy_col0_closeButton");
