@@ -1,6 +1,7 @@
 package github;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +33,8 @@ public class TurboIssueEvent {
     private static final String OCTICON_PERSON = "\uf018";
     public static final String OCTICON_QUOTE = "\uf063";
 
-    // Maximum time difference in minutes between label update events in the same group
-    private static final long MAX_TIME_DIFF = 1;
+    // Maximum time difference in seconds between label update events in the same group
+    private static final long MAX_TIME_DIFF = 60;
 
     private final Date date;
     private final IssueEventType type;
@@ -281,29 +282,47 @@ public class TurboIssueEvent {
      */
     public static List<List<TurboIssueEvent>> groupLabelUpdateEvents(
             List<TurboIssueEvent> labelUpdateEvents) {
+
         List<List<TurboIssueEvent>> result = new ArrayList<>();
         List<TurboIssueEvent> currentSubList = new ArrayList<>();
 
+        // Sort according to time
+        Collections.sort(labelUpdateEvents,
+                (TurboIssueEvent e1, TurboIssueEvent e2) -> {
+                    return e1.getDate().compareTo(e2.getDate());
+                });
+        // Sort according to author
+        Collections.sort(labelUpdateEvents,
+                (TurboIssueEvent e1, TurboIssueEvent e2) -> {
+                    return e1.getActor().getLogin().compareTo(e2.getActor().getLogin());
+                });
+
         for (TurboIssueEvent e : labelUpdateEvents) {
             if (currentSubList.isEmpty() ||
-                e.isInSameLabelUpdateEventGroup(currentSubList.get(currentSubList.size() - 1))) {
+                e.isInSameLabelUpdateEventGroup(currentSubList.get(0))) {
                 currentSubList.add(e);
             } else {
                 result.add(currentSubList);
                 currentSubList = new ArrayList<>();
+                currentSubList.add(e);
             }
         }
-
         if (!currentSubList.isEmpty()) {
             result.add(currentSubList);
         }
+
+        // Sort according to time of the first event of each group
+        Collections.sort(result,
+                (List<TurboIssueEvent> l1, List<TurboIssueEvent> l2) -> {
+                    return l1.get(0).getDate().compareTo(l2.get(0).getDate());
+                });
 
         return result;
     }
 
     /**
-     * Checks if this label update event in in the same group
-     * with the another label update event e
+     * Checks if this label update event in the same group
+     * as another label update event e
      * @param e another label update event
      * @return true if this event and e have same author and times within
      *              MAX_TIME_DIFF from each other.
@@ -311,10 +330,10 @@ public class TurboIssueEvent {
      */
     public boolean isInSameLabelUpdateEventGroup(TurboIssueEvent e) {
         long timeDiffMs = Math.abs(getDate().getTime() - e.getDate().getTime());
-        long timeDiffMin = TimeUnit.MICROSECONDS.toMinutes(timeDiffMs);
+        long timeDiffMin = TimeUnit.MILLISECONDS.toSeconds(timeDiffMs);
 
-        return getActor().equals(e.getActor()) &&
-               timeDiffMin < MAX_TIME_DIFF;
+        return getActor().getLogin().equals(e.getActor().getLogin()) &&
+               timeDiffMin <= MAX_TIME_DIFF;
     }
 
     @Override
