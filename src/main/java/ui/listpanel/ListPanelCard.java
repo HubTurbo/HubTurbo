@@ -124,8 +124,8 @@ public class ListPanelCard extends VBox {
      * @param comments
      * @return
      */
-    private static Node layoutEvents(Model model, TurboIssue issue,
-                                     List<TurboIssueEvent> events, List<Comment> comments) {
+    public static Node layoutEvents(Model model, TurboIssue issue,
+                                    List<TurboIssueEvent> events, List<Comment> comments) {
         VBox result = new VBox();
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));

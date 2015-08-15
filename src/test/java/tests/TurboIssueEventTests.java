@@ -60,13 +60,13 @@ public class TurboIssueEventTests {
     }
 
     @Test
-    public void testLabelUpdateEventsGroupingNoEvent() {
+    public void testLabelUpdateEventsGroupingForNoEvent() {
         assertEquals(new ArrayList<TurboIssueEvent>(),
                      TurboIssueEvent.groupLabelUpdateEvents(new ArrayList<TurboIssueEvent>()));
     }
 
     @Test
-    public void testLabelUpdateEventsGroupingOneEvent() {
+    public void testLabelUpdateEventsGroupingForOneEvent() {
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(sampleEvents.get(0));
 
@@ -81,7 +81,7 @@ public class TurboIssueEventTests {
     }
 
     @Test
-    public void testLabelUpdateEventsGroupingSampleEvents() {
+    public void testLabelUpdateEventsGroupingForSampleEvents() {
         List<TurboIssueEvent> events = new ArrayList<>(sampleEvents);
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
