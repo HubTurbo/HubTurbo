@@ -23,6 +23,8 @@ allprojects {
         toolVersion = "6.7"
     }
 
+    apply plugin: 'findbugs'
+
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
@@ -106,6 +108,17 @@ allprojects {
     }
 
     assemble.dependsOn shadowJar
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+findbugs {
+    excludeFilter = file("${projectDir}/config/findbugs/excludeFilter.xml")
 }
 
 task jacocoRootReport(type: JacocoReport) {
