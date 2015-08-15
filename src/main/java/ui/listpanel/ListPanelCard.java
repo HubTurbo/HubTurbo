@@ -131,10 +131,11 @@ public class ListPanelCard extends VBox {
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
         // Label update events
-        TurboIssueEvent.createLabelUpdateEventNodes(model,
+        TurboIssueEvent.createLabelUpdateEventNodes(
+                model,
                 events.stream()
-                .filter(e -> e.isLabelUpdateEvent())
-                .collect(Collectors.toList()))
+                      .filter(e -> e.isLabelUpdateEvent())
+                      .collect(Collectors.toList()))
         .forEach(node -> result.getChildren().add(node));;
 
         // Other events beside label updates

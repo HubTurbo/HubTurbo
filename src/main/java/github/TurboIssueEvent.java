@@ -269,8 +269,45 @@ public class TurboIssueEvent {
      */
     public static List<Node> createLabelUpdateEventNodes(
             Model model, List<TurboIssueEvent> labelUpdateEvents) {
+
         List<List<TurboIssueEvent>> groupedEvents = groupLabelUpdateEvents(labelUpdateEvents);
-        return null;
+        List<Node> result = new ArrayList<>();
+
+        groupedEvents.forEach(group -> {
+            TurboIssueEvent firstEvent = group.get(0);
+            String actorName = firstEvent.getActor().getLogin();
+            String time = new PrettyTime().format(firstEvent.getDate());
+
+            HBox box = new HBox();
+            box.setSpacing(3);
+
+            box.getChildren().addAll(
+                    octicon(OCTICON_TAG),
+                    new Text(String.format("%s :", actorName)));
+
+            group.forEach(e -> {
+                Node node = createLabelNode(model, e);
+                box.getChildren().add(node);
+            });
+
+            box.getChildren().add(new Text(String.format("%s.", time)));
+
+            result.add(box);
+        });
+
+        return result;
+    }
+
+    private static Node createLabelNode(Model model, TurboIssueEvent e) {
+        Optional<TurboLabel> label = model.getLabelByActualName(e.getLabelName());
+
+        Node node = label.isPresent() ?
+                    label.get().getNode() : new Label(e.getLabelName());
+        if (e.getType() == IssueEventType.Unlabeled) {
+            node.getStyleClass().add("labels-removed");
+        }
+
+        return node;
     }
 
     /**
