@@ -1,19 +1,24 @@
 package github;
 
-import backend.resource.Model;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
-import util.Utility;
 
-import java.util.Date;
-import java.util.Optional;
+import util.Utility;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 
 /**
  * Models an event that could happen to an issue.
@@ -26,6 +31,9 @@ public class TurboIssueEvent {
     private static final String OCTICON_MEGAPHONE = "\uf077";
     private static final String OCTICON_PERSON = "\uf018";
     public static final String OCTICON_QUOTE = "\uf063";
+
+    // Maximum time difference in minutes between label update events in the same group
+    private static final long MAX_TIME_DIFF = 1;
 
     private final Date date;
     private final IssueEventType type;
@@ -250,6 +258,63 @@ public class TurboIssueEvent {
                 return conditionallyBold(bold, new Text(
                     String.format("%s %s %s.", actorName, getType(), time)));
         }
+    }
+
+    /**
+     * Create a list of JavaFX nodes to display label update events
+     * @param model
+     * @param labelUpdateEvents
+     * @return list of Node corresponding to groups of label update events
+     */
+    public static List<Node> createLabelUpdateEventNodes(
+            Model model, List<TurboIssueEvent> labelUpdateEvents) {
+        List<List<TurboIssueEvent>> groupedEvents = groupLabelUpdateEvents(labelUpdateEvents);
+        return null;
+    }
+
+    /**
+     * Groups label update events into a list of sub-lists of events.
+     * Events in the same sub-list will have the same author
+     * and with time-stamps less than MAX_TIME_DIFF minutes of each other
+     * @param labelUpdateEvents
+     * @return list of sub-lists of label update events
+     */
+    public static List<List<TurboIssueEvent>> groupLabelUpdateEvents(
+            List<TurboIssueEvent> labelUpdateEvents) {
+        List<List<TurboIssueEvent>> result = new ArrayList<>();
+        List<TurboIssueEvent> currentSubList = new ArrayList<>();
+
+        for (TurboIssueEvent e : labelUpdateEvents) {
+            if (currentSubList.isEmpty() ||
+                e.isInSameLabelUpdateEventGroup(currentSubList.get(currentSubList.size() - 1))) {
+                currentSubList.add(e);
+            } else {
+                result.add(currentSubList);
+                currentSubList = new ArrayList<>();
+            }
+        }
+
+        if (!currentSubList.isEmpty()) {
+            result.add(currentSubList);
+        }
+
+        return result;
+    }
+
+    /**
+     * Checks if this label update event in in the same group
+     * with the another label update event e
+     * @param e another label update event
+     * @return true if this event and e have same author and times within
+     *              MAX_TIME_DIFF from each other.
+     *         false otherwise
+     */
+    public boolean isInSameLabelUpdateEventGroup(TurboIssueEvent e) {
+        long timeDiffMs = Math.abs(getDate().getTime() - e.getDate().getTime());
+        long timeDiffMin = TimeUnit.MICROSECONDS.toMinutes(timeDiffMs);
+
+        return getActor().equals(e.getActor()) &&
+               timeDiffMin < MAX_TIME_DIFF;
     }
 
     @Override
