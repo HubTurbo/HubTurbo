@@ -124,19 +124,20 @@ public class ListPanelCard extends VBox {
      * @param comments
      * @return
      */
-    public static Node layoutEvents(Model model, TurboIssue issue,
-                                    List<TurboIssueEvent> events, List<Comment> comments) {
+    private static Node layoutEvents(Model model, TurboIssue issue,
+                                     List<TurboIssueEvent> events, List<Comment> comments) {
         VBox result = new VBox();
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
         // Label update events
-        TurboIssueEvent.createLabelUpdateEventNodes(
-                model,
-                events.stream()
-                      .filter(e -> e.isLabelUpdateEvent())
-                      .collect(Collectors.toList()))
-        .forEach(node -> result.getChildren().add(node));;
+        List<TurboIssueEvent> labelUpdateEvents =
+                        events.stream()
+                        .filter(e -> e.isLabelUpdateEvent())
+                        .collect(Collectors.toList());
+        List<Node> labelUpdateEventNodes =
+                TurboIssueEvent.createLabelUpdateEventNodes(model, labelUpdateEvents);
+        labelUpdateEventNodes.forEach(node -> result.getChildren().add(node));
 
         // Other events beside label updates
         events.stream()

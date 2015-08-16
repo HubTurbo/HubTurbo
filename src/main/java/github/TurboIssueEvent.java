@@ -372,10 +372,10 @@ public class TurboIssueEvent {
      */
     public boolean isInSameLabelUpdateEventGroup(TurboIssueEvent e) {
         long timeDiffMs = Math.abs(getDate().getTime() - e.getDate().getTime());
-        long timeDiffMin = TimeUnit.MILLISECONDS.toSeconds(timeDiffMs);
+        long timeDiffSec = TimeUnit.MILLISECONDS.toSeconds(timeDiffMs);
 
         return getActor().getLogin().equals(e.getActor().getLogin()) &&
-               timeDiffMin <= MAX_TIME_DIFF;
+               timeDiffSec <= MAX_TIME_DIFF;
     }
 
     @Override

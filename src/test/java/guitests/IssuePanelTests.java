@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -63,7 +65,14 @@ public class IssuePanelTests extends UITest {
     }
 
     @Test
-    public void testCreateLabelUpdateEventNodesForSampleEvents() {
+    public void testCreateLabelUpdateEventNodesForSampleEvents()
+            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+                   NoSuchMethodException, SecurityException {
+
+        Method layoutMethod = ListPanelCard.class.getDeclaredMethod(
+                "layoutEvents", Model.class, TurboIssue.class, List.class, List.class);
+        layoutMethod.setAccessible(true);
+
         List<TurboLabel> labels = new ArrayList<>();
         labels.add(new TurboLabel("test/test", "A1"));
         labels.add(new TurboLabel("test/test", "A2"));
@@ -77,20 +86,15 @@ public class IssuePanelTests extends UITest {
                 new ArrayList<>(new TurboIssueEventTests().sampleEvents);
         List<Node> nodes = TurboIssueEvent.createLabelUpdateEventNodes(sampleModel, events);
 
-        assertEquals(5,
-                TurboIssueEvent.createLabelUpdateEventNodes(
-                        sampleModel, events).size());
+        assertEquals(5, TurboIssueEvent.createLabelUpdateEventNodes(sampleModel, events).size());
         assertEquals(5, ((HBox) nodes.get(0)).getChildren().size());
         assertEquals(5, ((HBox) nodes.get(1)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(2)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(3)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(4)).getChildren().size());
-        assertEquals(5,
-                ((VBox) ListPanelCard.layoutEvents(
-                        sampleModel,
-                        new TurboIssue("test/test", 1, "issue"),
-                        events, new ArrayList<Comment>()))
-                .getChildren().size());
+        assertEquals(5, ((VBox) layoutMethod.invoke(null,
+                                    sampleModel, new TurboIssue("test/test", 1, "issue"),
+                                    events, new ArrayList<Comment>())).getChildren().size());
     }
 
     @Test

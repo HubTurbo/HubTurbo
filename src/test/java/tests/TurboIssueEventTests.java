@@ -15,7 +15,7 @@ public class TurboIssueEventTests {
 
     public List<TurboIssueEvent> sampleEvents;
 
-    public static TurboIssueEvent createLabelUpdateEvent(
+    private static TurboIssueEvent createLabelUpdateEvent(
             String userName, IssueEventType eventType,
             GregorianCalendar time, String labelName) {
 
@@ -68,7 +68,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test the events grouping when list of events is empty
+     * Tests the events grouping when list of events is empty
      */
     @Test
     public void testLabelUpdateEventsGroupingForNoEvent() {
@@ -77,7 +77,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test the events grouping when there is only 1 event
+     * Tests the events grouping when there is only 1 event
      */
     @Test
     public void testLabelUpdateEventsGroupingForOneEvent() {
@@ -90,12 +90,11 @@ public class TurboIssueEventTests {
         List<List<TurboIssueEvent>> expected = new ArrayList<>();
         expected.add(expectedSubList1);
 
-        assertEquals(expected,
-                     TurboIssueEvent.groupLabelUpdateEvents(events));
+        assertEquals(expected, TurboIssueEvent.groupLabelUpdateEvents(events));
     }
 
     /**
-     * Test when A and B update the overlapping set of labels
+     * Tests when A and B update the overlapping set of labels
      * at overlapping time. The order of modification are
      * A:+L1 -> B:-L1 -> A:+L2 -> B:+L2
      * Expected: [A:[+L1, +L2], B:[-L1, +L2]]
@@ -135,7 +134,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test when A and B update at exactly the same time
+     * Tests when A and B update at exactly the same time
      * at overlapping time. The order of modification are
      * (A:+L1 = B:-L1) -> (A:+L2 = B:+L2)
      * Expected: [A:[+L1, +L2], B:[-L1, +L2]] according
@@ -174,7 +173,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test when A modify same set of labels multiple times
+     * Tests when A modify same set of labels multiple times
      * A: +L1, +L1, -L1, +L2, +L3, -L2, +L2
      * Expected: [[+L1, +L1, -L1, +L2, +L3, -L2, +L2]] since
      * all events are reflected and groupLabelUpdateEvents does not
@@ -213,7 +212,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test when A modify a set of labels but are separated into
+     * Tests when A modify a set of labels but are separated into
      * 3 groups due to time stamp's difference
      * A: +L1, +L1, -L1, +L2, +L3, -L2, +L2
      * Expected: [[+L1, +L1, -L1, +L2], [+L3, -L2], [+L2]]
@@ -266,7 +265,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test a generic events list with several corner cases:
+     * Tests a generic events list with several corner cases:
      * All events are not in chronological order in the input events list
      * A has 2 events exactly 1 minute from each other
      * B has 3 events 2 of which are 30s part
@@ -308,7 +307,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test when A and B update the overlapping set of labels
+     * Tests when A and B update the overlapping set of labels
      * immediately following each other. The order of modification are
      * A:+L1 -> A:+L2 -> B:-L1 -> B:-L2
      * Expected: [A:[+L1, +L2], B:[-L1, -L2]]
@@ -346,7 +345,7 @@ public class TurboIssueEventTests {
     }
 
     /**
-     * Test when A and B and C update at overlapping times but
+     * Tests when A and B and C update at overlapping times but
      * C's events appear before A and B in the input events List
      * A's events are too far apart to be considered in the same group
      * A1 -> C1 -> A2 -> B1 -> C2 -> B2
@@ -394,6 +393,87 @@ public class TurboIssueEventTests {
         expected.add(expectedSubList2);
         expected.add(expectedSubList3);
         expected.add(expectedSubList4);
+
+        assertEquals(expected, TurboIssueEvent.groupLabelUpdateEvents(events));
+    }
+
+    /**
+     * Tests when A modify labels at 61s away from each other
+     * A: +L1, -L1
+     * Expected: [[+L1], [-L1]]
+     */
+    @Test
+    public void testLabelUpdateEventsGrouping8() {
+        List<TurboIssueEvent> events = new ArrayList<>();
+
+        events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          "L1"));
+        events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 2, 1),
+                                          "L2"));
+
+        List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
+        expectedSubList1.add(events.get(0));
+
+        List<TurboIssueEvent> expectedSubList2 = new ArrayList<>();
+        expectedSubList2.add(events.get(1));
+
+        List<List<TurboIssueEvent>> expected = new ArrayList<>();
+        expected.add(expectedSubList1);
+        expected.add(expectedSubList2);
+
+        assertEquals(expected, TurboIssueEvent.groupLabelUpdateEvents(events));
+    }
+
+    /**
+     * Tests when A modify labels at 60s away from each other
+     * A: +L1, -L1
+     * Expected: [[+L1], [-L1]]
+     */
+    @Test
+    public void testLabelUpdateEventsGrouping9() {
+        List<TurboIssueEvent> events = new ArrayList<>();
+
+        events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          "L1"));
+        events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                                          "L2"));
+
+        List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
+        expectedSubList1.add(events.get(0));
+        expectedSubList1.add(events.get(1));
+
+        List<List<TurboIssueEvent>> expected = new ArrayList<>();
+        expected.add(expectedSubList1);
+
+        assertEquals(expected, TurboIssueEvent.groupLabelUpdateEvents(events));
+    }
+
+    /**
+     * Tests when A modify labels at 59s away from each other
+     * A: +L1, -L1
+     * Expected: [[+L1], [-L1]]
+     */
+    @Test
+    public void testLabelUpdateEventsGrouping10() {
+        List<TurboIssueEvent> events = new ArrayList<>();
+
+        events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          "L1"));
+        events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
+                                          new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                                          "L2"));
+
+        List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
+        expectedSubList1.add(events.get(0));
+        expectedSubList1.add(events.get(1));
+
+        List<List<TurboIssueEvent>> expected = new ArrayList<>();
+        expected.add(expectedSubList1);
 
         assertEquals(expected, TurboIssueEvent.groupLabelUpdateEvents(events));
     }
