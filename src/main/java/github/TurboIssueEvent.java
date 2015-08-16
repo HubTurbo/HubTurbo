@@ -325,12 +325,12 @@ public class TurboIssueEvent {
 
         // Sort according to time
         Collections.sort(labelUpdateEvents,
-                (TurboIssueEvent e1, TurboIssueEvent e2) -> {
+        		(e1, e2) -> {
                     return e1.getDate().compareTo(e2.getDate());
                 });
         // Sort according to author
         Collections.sort(labelUpdateEvents,
-                (TurboIssueEvent e1, TurboIssueEvent e2) -> {
+        		(e1, e2) -> {
                     return e1.getActor().getLogin().compareTo(e2.getActor().getLogin());
                 });
 
@@ -350,7 +350,7 @@ public class TurboIssueEvent {
 
         // Sort according to time of the first event of each group
         Collections.sort(result,
-                (List<TurboIssueEvent> l1, List<TurboIssueEvent> l2) -> {
+        		(l1, l2) -> {
                     return l1.get(0).getDate().compareTo(l2.get(0).getDate());
                 });
 
