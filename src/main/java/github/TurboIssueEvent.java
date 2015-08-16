@@ -270,6 +270,8 @@ public class TurboIssueEvent {
     public static List<Node> createLabelUpdateEventNodes(
             Model model, List<TurboIssueEvent> labelUpdateEvents) {
 
+        assert labelUpdateEvents != null : "Error: Received null list of events";
+
         List<List<TurboIssueEvent>> groupedEvents = groupLabelUpdateEvents(labelUpdateEvents);
         List<Node> result = new ArrayList<>();
 
@@ -320,21 +322,24 @@ public class TurboIssueEvent {
     public static List<List<TurboIssueEvent>> groupLabelUpdateEvents(
             List<TurboIssueEvent> labelUpdateEvents) {
 
+        assert labelUpdateEvents != null : "Error: Received null list of events";
+
+        List<TurboIssueEvent> events = new ArrayList<>(labelUpdateEvents);
         List<List<TurboIssueEvent>> result = new ArrayList<>();
         List<TurboIssueEvent> currentSubList = new ArrayList<>();
 
         // Sort according to time
-        Collections.sort(labelUpdateEvents,
+        Collections.sort(events,
         		(e1, e2) -> {
                     return e1.getDate().compareTo(e2.getDate());
                 });
         // Sort according to author
-        Collections.sort(labelUpdateEvents,
+        Collections.sort(events,
         		(e1, e2) -> {
                     return e1.getActor().getLogin().compareTo(e2.getActor().getLogin());
                 });
 
-        for (TurboIssueEvent e : labelUpdateEvents) {
+        for (TurboIssueEvent e : events) {
             if (currentSubList.isEmpty() ||
                 e.isInSameLabelUpdateEventGroup(currentSubList.get(0))) {
                 currentSubList.add(e);

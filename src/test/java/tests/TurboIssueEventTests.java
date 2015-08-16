@@ -13,50 +13,48 @@ import org.junit.Test;
 
 public class TurboIssueEventTests {
 
-    private List<TurboIssueEvent> sampleEvents;
+    public List<TurboIssueEvent> sampleEvents;
+
+    public static TurboIssueEvent createLabelUpdateEvent(
+            String userName, IssueEventType eventType,
+            GregorianCalendar time, String labelName) {
+
+        return new TurboIssueEvent(
+                   new User().setLogin(userName), eventType, time.getTime())
+               .setLabelName(labelName);
+    }
 
     public TurboIssueEventTests() {
         sampleEvents = new ArrayList<>();
 
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("A"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("A1"));
+                createLabelUpdateEvent("A", IssueEventType.Labeled,
+                        new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                        "A1"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("A"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 1, 2, 0).getTime())
-            .setLabelName("A2"));
-
+                createLabelUpdateEvent("A", IssueEventType.Unlabeled,
+                        new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                        "A2"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 0, 30).getTime())
-            .setLabelName("B1"));
+                createLabelUpdateEvent("B", IssueEventType.Labeled,
+                        new GregorianCalendar(2015, 1, 1, 1, 0, 30),
+                        "B1"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("B2"));
+                createLabelUpdateEvent("B", IssueEventType.Labeled,
+                        new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                        "B2"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 31).getTime())
-            .setLabelName("B1"));
-
+                createLabelUpdateEvent("B", IssueEventType.Unlabeled,
+                        new GregorianCalendar(2015, 1, 1, 1, 1, 31),
+                        "B1"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("C"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 2, 30, 15).getTime())
-            .setLabelName("C1"));
-
-
+                createLabelUpdateEvent("C", IssueEventType.Labeled,
+                        new GregorianCalendar(2015, 1, 1, 2, 30, 15),
+                        "C1"));
         sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("D"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 3, 20, 59).getTime())
-            .setLabelName("D1"));
+                createLabelUpdateEvent("D", IssueEventType.Unlabeled,
+                        new GregorianCalendar(2015, 1, 1, 3, 20, 59),
+                        "D1"));
     }
 
     @Test

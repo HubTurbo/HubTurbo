@@ -17,6 +17,7 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
+import tests.TurboIssueEventTests;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
@@ -63,48 +64,6 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void testCreateLabelUpdateEventNodesForSampleEvents() {
-        List<TurboIssueEvent> sampleEvents = new ArrayList<>();
-
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("A"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("A1"));
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("A"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 1, 2, 0).getTime())
-            .setLabelName("A2"));
-
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 0, 30).getTime())
-            .setLabelName("B1"));
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("B2"));
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("B"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 31).getTime())
-            .setLabelName("B1"));
-
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("C"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 2, 30, 15).getTime())
-            .setLabelName("C1"));
-
-
-        sampleEvents.add(
-            new TurboIssueEvent(
-                new User().setLogin("D"), IssueEventType.Unlabeled,
-                new GregorianCalendar(2015, 1, 1, 3, 20, 59).getTime())
-            .setLabelName("D1"));
-
         List<TurboLabel> labels = new ArrayList<>();
         labels.add(new TurboLabel("test/test", "A1"));
         labels.add(new TurboLabel("test/test", "A2"));
@@ -114,7 +73,8 @@ public class IssuePanelTests extends UITest {
         labels.add(new TurboLabel("test/test", "D1"));
         Model sampleModel = new Model("test/test", null, labels, null, null);
 
-        List<TurboIssueEvent> events = new ArrayList<>(sampleEvents);
+        List<TurboIssueEvent> events =
+                new ArrayList<>(new TurboIssueEventTests().sampleEvents);
         List<Node> nodes = TurboIssueEvent.createLabelUpdateEventNodes(sampleModel, events);
 
         assertEquals(5,
@@ -129,7 +89,7 @@ public class IssuePanelTests extends UITest {
                 ((VBox) ListPanelCard.layoutEvents(
                         sampleModel,
                         new TurboIssue("test/test", 1, "issue"),
-                        sampleEvents, new ArrayList<Comment>()))
+                        events, new ArrayList<Comment>()))
                 .getChildren().size());
     }
 
