@@ -486,8 +486,8 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
-    public void loadTab(String currentUrl) {
-        if (isCurrentUrlIssue() && (currentUrl.endsWith("/commits") || currentUrl.endsWith("/files"))) {
+    public void switchToConversationTab() {
+        if (isCurrentUrlIssue() && GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
             driver.findElement(By.xpath("//a[@data-container-id='discussion_bucket']")).click();
         }
     }
