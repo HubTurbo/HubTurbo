@@ -133,7 +133,7 @@ public class ListPanelCard extends VBox {
         // Label update events
         List<TurboIssueEvent> labelUpdateEvents =
                         events.stream()
-                        .filter(e -> e.isLabelUpdateEvent())
+                        .filter(TurboIssueEvent::isLabelUpdateEvent)
                         .collect(Collectors.toList());
         List<Node> labelUpdateEventNodes =
                 TurboIssueEvent.createLabelUpdateEventNodes(model, labelUpdateEvents);
