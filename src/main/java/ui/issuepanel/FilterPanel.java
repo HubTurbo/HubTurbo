@@ -14,9 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
-import javafx.event.EventHandler;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
@@ -110,14 +108,12 @@ public abstract class FilterPanel extends AbstractPanel {
         nameBox.setMinWidth(330);
         nameBox.setMaxWidth(330);
         nameBox.setAlignment(Pos.CENTER_LEFT);
-        nameBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                    if (mouseEvent.getClickCount() == 2) {
-                        mouseEvent.consume();
-                        activateInplaceRename();
-                    }
+        
+        nameBox.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                if (mouseEvent.getClickCount() == 2) {
+                    mouseEvent.consume();
+                    activateInplaceRename();
                 }
             }
         });

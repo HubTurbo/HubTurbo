@@ -211,7 +211,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage = stage;
         stage.setMaximized(false);
 
-        panels = new PanelControl(this, prefs, mainStage);
+        panels = new PanelControl(this, prefs);
         guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRoot());
@@ -503,6 +503,13 @@ public class UI extends Application implements EventDispatcher {
 
     public MenuControl getMenuControl() {
         return menuBar;
+    }
+    
+    /**
+     * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
+     */
+    public void showMainStage() {
+        mainStage.show();
     }
 
     public void setDefaultWidth() {

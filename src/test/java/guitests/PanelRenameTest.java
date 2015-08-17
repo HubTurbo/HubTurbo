@@ -90,6 +90,7 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col6_renameTextField");
         renameTextField3.setText("123456789012345678901234567890");
+        renameTextField3.copy();
         renameTextField3.positionCaret(20); // between second 0 and 1
         type("1234567890");
         push(KeyCode.ENTER);

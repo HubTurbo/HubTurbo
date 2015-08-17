@@ -6,7 +6,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import prefs.Preferences;
 import prefs.PanelInfo;
 import ui.GUIController;
@@ -29,14 +28,12 @@ public class PanelControl extends HBox {
     private final UI ui;
     private final Preferences prefs;
     private IModel model;
-    private Stage mainStage;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
-    public PanelControl(UI ui, Preferences prefs, Stage stage) {
+    public PanelControl(UI ui, Preferences prefs) {
         this.ui = ui;
         this.prefs = prefs;
-        this.mainStage = stage;
         
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
@@ -113,7 +110,7 @@ public class PanelControl extends HBox {
 
         updatePanelIndices();
         setCurrentlySelectedPanel(Optional.of(index));
-        mainStage.show();
+        ui.showMainStage();
         return panel;
     }
 
@@ -182,28 +179,6 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex, two);
         getChildren().set(panelIndex2, one);
     }
-    /**
-    public void showRenameDialog(int panelId) {
-        FilterPanel panel = (FilterPanel) getPanel(panelId);
-        String panelName = panel.getCurrentName();
-        
-        TextInputDialog renameDialog = new TextInputDialog(panelName);
-        renameDialog.getEditor().setId("panelrenameinput");
-        renameDialog.setTitle("Rename " + panelName);
-        renameDialog.setHeaderText("Enter a new name for this panel.");
-        Optional<String> result = renameDialog.showAndWait();
-        mainStage.show();
-        
-        String newName = result.orElse(panelName);
-        if (newName.equals("")) {
-            newName = panelName;
-        }
-        if (newName.length() > MAX_NAME_LENGTH) {
-            newName = newName.substring(0, MAX_NAME_LENGTH);
-        }
-        panel.renamePanel(newName);
-    }
-    **/
 
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
