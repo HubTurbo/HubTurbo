@@ -1,7 +1,6 @@
 package ui.issuepanel;
 
 import backend.interfaces.IModel;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
@@ -42,8 +41,7 @@ public class PanelControl extends HBox {
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
-        ui.registerEvent((ShowRenamePanelEventHandler) e -> Platform.runLater(() ->
-                ((FilterPanel) getPanel(e.panelId)).showRenameTextField()));
+        ui.registerEvent((ShowRenamePanelEventHandler) e -> ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
 
         setupKeyEvents();
     }

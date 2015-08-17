@@ -20,6 +20,7 @@ import prefs.PanelInfo;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
+import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
 public class UseGlobalConfigsTest extends UITest {
@@ -55,7 +56,7 @@ public class UseGlobalConfigsTest extends UITest {
         ((TextField) find("#boardnameinput")).setText("Empty Board");
         click("OK");
         
-        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Renamed panel");
         PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Renamed panel", renameTextField1.getText());
@@ -88,7 +89,7 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("is:open", filterTextField3.getText());
         push(KeyCode.ENTER);
 
-        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Open issues");
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Open issues", renameTextField3.getText());

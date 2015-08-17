@@ -1,12 +1,14 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import ui.UI;
 import ui.components.PanelNameTextField;
+import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
 import java.util.List;
@@ -32,14 +34,14 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
 
         // Testing rename cancel
-        UI.events.triggerEvent(new ShowRenamePanelEvent(0));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
         
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         
         // Testing panel names between whitespaces
-        UI.events.triggerEvent(new ShowRenamePanelEvent(1));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(1)));
         type("   Renamed panel  ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -47,7 +49,7 @@ public class PanelRenameTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         
         // Testing empty panel name
-        UI.events.triggerEvent(new ShowRenamePanelEvent(2));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(2)));
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -55,7 +57,7 @@ public class PanelRenameTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
 
         // Testing typing excessive panel name
-        UI.events.triggerEvent(new ShowRenamePanelEvent(3));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
         sleep(EVENT_DELAY);
         type("1234567890123456789012345678901234567890");
         push(KeyCode.ENTER);
@@ -64,7 +66,7 @@ public class PanelRenameTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
 
         // Testing pasting excessive panel name
-        UI.events.triggerEvent(new ShowRenamePanelEvent(4));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(4)));
         sleep(EVENT_DELAY);
         PanelNameTextField renameTextField1 = find("#dummy/dummy_col4_renameTextField");
         renameTextField1.setText("1234567890123456789012345678901234567890");
@@ -74,7 +76,7 @@ public class PanelRenameTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         
         // Testing typing more characters when textfield is full
-        UI.events.triggerEvent(new ShowRenamePanelEvent(5));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
         sleep(EVENT_DELAY);
         PanelNameTextField renameTextField2 = find("#dummy/dummy_col5_renameTextField");
         renameTextField2.setText("123456789012345678901234567890123456");
@@ -86,7 +88,7 @@ public class PanelRenameTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
         
         // Testing typing excessive characters when textfield is almost full
-        UI.events.triggerEvent(new ShowRenamePanelEvent(6));
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(6)));
         sleep(EVENT_DELAY);
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col6_renameTextField");
         renameTextField3.setText("123456789012345678901234567890");
