@@ -27,25 +27,33 @@ public abstract class RepoStore {
     public abstract CompletableFuture<Model> loadRepository(String repoId);
     public abstract CompletableFuture<Boolean> saveRepository(String repoId, SerializableModel model);
 
-    private static String getRepoPath(String repoId) {
-        ensureDirectoryExists();
-        String newRepoName = RepoStore.escapeRepoName(repoId);
-        return new File(RepoStore.directory, newRepoName).getAbsolutePath();
+    private static Optional<String> getRepoPath(String repoId) {
+        if (ensureDirectoryExists()) {
+            String newRepoName = RepoStore.escapeRepoName(repoId);
+            return Optional.of(new File(RepoStore.directory, newRepoName).getAbsolutePath());
+        }
+        return Optional.empty();
     }
 
     public static boolean write(String repoId, String output, int issueCount) {
-        return Utility.writeFile(getRepoPath(repoId), output, issueCount);
+        return Utility.writeFile(getRepoPath(repoId).orElse(""), output, issueCount);
     }
 
     public static Optional<String> read(String repoId) {
-        return Utility.readFile(getRepoPath(repoId));
+        return Utility.readFile(getRepoPath(repoId).orElse(""));
     }
 
-    protected static void ensureDirectoryExists() {
+    /**
+     * Returns true on success.
+     * @return
+     */
+    protected static boolean ensureDirectoryExists() {
         File directory = new File(RepoStore.directory);
-        if (!directory.exists() || !directory.isDirectory()) {
-            directory.mkdirs();
+        boolean directoryNonExistent = !directory.exists() || !directory.isDirectory();
+        if (directoryNonExistent) {
+            return directory.mkdirs();
         }
+        return true;
     }
 
     public static void enableTestDirectory() {

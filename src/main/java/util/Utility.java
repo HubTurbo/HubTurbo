@@ -50,27 +50,42 @@ public class Utility {
             && repositoryId.generateId().equals(repoId);
     }
 
-    public static Optional<String> readFile(String filename) {
-        try {
-            return Optional.of(new String(Files.readAllBytes(new File(filename).toPath()), "UTF-8"));
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
+    public static Optional<String> readFile(String fileName) {
+        boolean validPath = !(fileName == null || fileName.isEmpty());
+        if (validPath) {
+            try {
+                return Optional.of(new String(Files.readAllBytes(new File(fileName).toPath()), "UTF-8"));
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+            }
         }
         return Optional.empty();
     }
 
+    /**
+     * Returns true on JSON corruption.
+     * TODO remove JSON-specific parts
+     * @param fileName
+     * @param content
+     * @param issueCount
+     * @return
+     */
     public static boolean writeFile(String fileName, String content, int issueCount) {
-        try {
-            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-            writer.println(content);
-            writer.close();
+        boolean validPath = !(fileName == null || fileName.isEmpty());
+        if (validPath) {
+            try {
+                PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+                writer.println(content);
+                writer.close();
 
-            long sizeAfterWrite = Files.size(Paths.get(fileName));
-            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
-            return true;
+                long sizeAfterWrite = Files.size(Paths.get(fileName));
+                return processFileGrowth(sizeAfterWrite, issueCount, fileName);
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+                return true;
+            }
         }
+        return false;
     }
 
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {

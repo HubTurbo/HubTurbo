@@ -144,9 +144,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
-                    e.getCode() == KeyboardShortcuts.UP_ISSUE || e.getCode() == KeyboardShortcuts.DOWN_ISSUE) {
+                    e.getCode() == KeyboardShortcuts.upIssue || e.getCode() == KeyboardShortcuts.downIssue) {
                 e.consume();
-                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyboardShortcuts.DOWN_ISSUE);
+                handleUpDownKeys(e.getCode() == KeyCode.DOWN || e.getCode() == KeyboardShortcuts.downIssue);
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());

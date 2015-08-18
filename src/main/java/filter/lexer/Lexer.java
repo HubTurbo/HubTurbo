@@ -54,14 +54,14 @@ public class Lexer {
     private Token nextToken() {
 
         if (position >= input.length()) {
-            return new Token(TokenType.EOF, "", position);
+            return new Token(TokenType.EOF, "");
         }
 
         if (SKIP_WHITESPACE) {
             Matcher matcher = NO_WHITESPACE.matcher(input).region(position, input.length());
             boolean found = matcher.find();
             if (!found) {
-                return new Token(TokenType.EOF, "", position);
+                return new Token(TokenType.EOF, "");
             }
             position = matcher.start();
         }
@@ -73,7 +73,7 @@ public class Lexer {
                 String match = matcher.group();
                 position += match.length();
 
-                return new Token(r.getTokenType(), match, matcher.start());
+                return new Token(r.getTokenType(), match);
             }
         }
         throw new ParseException("Unrecognised token " + input.charAt(position) + " at " + position);

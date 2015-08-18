@@ -8,6 +8,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -114,12 +116,12 @@ public class GlobalConfig {
         byte[] result = new byte[0];
         try {
             String key = "HubTurboHubTurbo";
-            Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+            Key aesKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-            result = cipher.doFinal(lastPassword.getBytes());
+            result = cipher.doFinal(lastPassword.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException e) {
+            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }
@@ -130,12 +132,12 @@ public class GlobalConfig {
         String result = "";
         try {
             String key = "HubTurboHubTurbo";
-            Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+            Key aesKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
-            result = new String(cipher.doFinal(lastLoginEncrypted));
+            result = new String(cipher.doFinal(lastLoginEncrypted), "UTF-8");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException e) {
+            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }
