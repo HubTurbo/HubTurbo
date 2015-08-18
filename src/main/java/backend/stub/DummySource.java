@@ -30,22 +30,22 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<Model> downloadRepository(String repoId) {
-        return addTask(new DownloadRepoTask(this, dummy, repoId)).response;
+        return addTask(new DownloadRepoTaskStub(this, dummy, repoId)).response;
     }
 
     @Override
     public CompletableFuture<Model> updateModel(Model model) {
-        return addTask(new UpdateModelTask(this, dummy, model)).response;
+        return addTask(new UpdateModelTaskStub(this, dummy, model)).response;
     }
 
     @Override
     public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<Integer> issues) {
-        return addTask(new DownloadMetadataTask(this, dummy, repoId, issues)).response;
+        return addTask(new DownloadMetadataTaskStub(this, dummy, repoId, issues)).response;
     }
 
     @Override
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        return addTask(new ReplaceIssueLabelsTask(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
+        return addTask(new ReplaceIssueLabelsTaskStub(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
-        return addTask(new CheckRateLimitTask(this, dummy)).response;
+        return addTask(new CheckRateLimitTaskStub(this, dummy)).response;
     }
 
 }

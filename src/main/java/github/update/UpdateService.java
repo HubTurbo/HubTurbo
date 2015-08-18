@@ -169,7 +169,7 @@ public class UpdateService<T> extends GitHubService {
      * @return time at which updated items were sent from server
      */
     public Date getUpdatedCheckTime() {
-        return updatedCheckTime;
+        return new Date(updatedCheckTime.getTime());
     }
 
     private void updateCheckTime(HttpURLConnection connection) {

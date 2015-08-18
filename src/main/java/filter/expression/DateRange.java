@@ -91,14 +91,12 @@ public class DateRange {
                 return ">=" + start;
             }
         } else if (start == null) {
-            assert end != null;
             if (strictly) {
                 return "<" + end;
             } else {
                 return "<=" + end;
             }
         } else {
-            assert start != null && end != null;
             return start + " .. " + end;
         }
     }

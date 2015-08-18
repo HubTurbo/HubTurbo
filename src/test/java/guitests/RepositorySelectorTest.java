@@ -30,7 +30,7 @@ public class RepositorySelectorTest extends UITest {
         @Override
         public void start(Stage primaryStage) {
             super.start(primaryStage);
-            stageFuture.set(primaryStage);
+            STAGE_FUTURE.set(primaryStage);
         }
 
         @Override

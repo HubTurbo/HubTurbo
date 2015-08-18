@@ -106,7 +106,6 @@ public class NumberRange {
                 return ">=" + start;
             }
         } else {
-            assert start != null && end != null;
             return start + " .. " + end;
         }
     }
