@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PanelInfoEmptyTest extends UITest {
+public class NoPanelAtQuitTest extends UITest {
 
     @Override
     public void launchApp() {
