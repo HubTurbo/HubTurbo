@@ -41,7 +41,8 @@ public class PanelControl extends HBox {
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
-        ui.registerEvent((ShowRenamePanelEventHandler) e -> ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
+        ui.registerEvent((ShowRenamePanelEventHandler) e -> 
+                ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
 
         setupKeyEvents();
     }
