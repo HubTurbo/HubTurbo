@@ -1,0 +1,78 @@
+<FindBugsFilter>        
+
+    <!-- EC_UNRELATED_TYPES: Call to equals() comparing different types -->
+    <!-- Add exceptions for tests here-->
+
+    <Match>
+        <Or>
+            <Class name="tests.DateRangeTest" />
+            <Class name="tests.RepoViewRecordTest" />
+            <Class name="tests.MultiModel" />
+            <Class name="tests.NumberRangeTest" />
+        </Or>
+        <Bug pattern="EC_UNRELATED_TYPES" />
+        <Method name="equality" />
+    </Match>
+
+    <Match>
+        <Class name="ui.UI"/>
+        <Method name="quit" />
+        <Bug pattern="DM_EXIT" />
+    </Match>
+
+    <Match>
+        <Class name="ui.UI"/>
+        <Or>
+            <Field name="events" />
+            <Field name="status" />
+        </Or>
+        <Bug pattern="MS_CANNOT_BE_FINAL" />
+    </Match>
+
+    <Match>
+        <Class name="backend.interfaces.RepoStore"/>
+        <Field name="directory" />
+        <Bug pattern="MS_CANNOT_BE_FINAL" />
+    </Match>
+
+    <Match>
+        <Class name="tests.FilterApplyTests"/>
+        <Method name="state" />
+        <Bug pattern="DE_MIGHT_IGNORE" />
+    </Match>
+
+    <Match>
+        <Class name="guitests.UITest"/>
+        <Method name="setupStage" />
+        <Or>
+            <Bug pattern="LI_LAZY_INIT_UPDATE_STATIC" />
+            <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+        </Or>
+    </Match>
+
+    <Match>
+        <Or>
+            <Class name="guitests.SavedLoginTest"/>
+            <Class name="guitests.WrongLastViewedTest"/>
+        </Or>
+        <Method name="setupMethod" />
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+    </Match>
+
+    <Match>
+        <Class name="ui.components.KeyboardShortcuts" />
+        <Bug pattern="MS_CANNOT_BE_FINAL" />
+        <Or>
+            <Field name="downIssue" />
+            <Field name="leftPanel" />
+            <Field name="markAsRead" />
+            <Field name="markAsUnread" />
+            <Field name="rightPanel" />
+            <Field name="scrollDown" />
+            <Field name="scrollToBottom" />
+            <Field name="scrollToTop" />
+            <Field name="scrollUp" />
+            <Field name="upIssue" />
+        </Or>
+    </Match>
+</FindBugsFilter>

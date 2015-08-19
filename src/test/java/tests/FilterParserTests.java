@@ -245,24 +245,6 @@ public class FilterParserTests {
     }
 
     @Test
-    public void dateRangeTest() {
-        DateRange dateRange = new DateRange(LocalDate.now(), LocalDate.now());
-        DateRange dateRange1 = new DateRange(LocalDate.MIN, LocalDate.MAX);
-        DateRange dateRange2 = new DateRange(LocalDate.MIN, LocalDate.now());
-        DateRange dateRange3 = new DateRange(LocalDate.now(), LocalDate.now(), true);
-        assertEquals(true, dateRange.equals(dateRange));
-        assertEquals(false, dateRange.equals(null));
-        assertEquals(false, dateRange.equals(""));
-        assertEquals(false, dateRange.equals(dateRange1));
-        DateRange startNull = new DateRange(null, LocalDate.now());
-        DateRange endNull = new DateRange(LocalDate.now(), null);
-        assertEquals(false, endNull.equals(startNull));
-        assertEquals(false, startNull.equals(endNull));
-        assertEquals(false, dateRange.equals(dateRange2));
-        assertEquals(false, dateRange.equals(dateRange3));
-    }
-
-    @Test
     public void dates() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
                 new Qualifier("created", LocalDate.of(2014, 6, 1)));

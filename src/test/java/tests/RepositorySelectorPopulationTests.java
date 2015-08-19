@@ -46,7 +46,7 @@ public class RepositorySelectorPopulationTests {
     @Test
     public void oneInvalidJsonFile() throws IOException {
         File invalidJson = new File("store/test/dummy-dummy.json");
-        invalidJson.createNewFile();
+        assert invalidJson.createNewFile();
         RepoIO testIO = new RepoIO(true, true);
         assertEquals(0, testIO.getStoredRepos().size());
     }
@@ -54,7 +54,7 @@ public class RepositorySelectorPopulationTests {
     @Test
     public void oneValidJsonFile() throws ExecutionException, InterruptedException {
         RepoIO testIO = new RepoIO(true, true);
-        Model dummyModel = testIO.openRepository("dummy/dummy").get();
+        testIO.openRepository("dummy/dummy").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
         RepoIO alternateIO = new RepoIO(true, true);
         assertEquals(1, alternateIO.getStoredRepos().size());
@@ -63,12 +63,12 @@ public class RepositorySelectorPopulationTests {
     @Test
     public void mixedJsonFiles() throws IOException, ExecutionException, InterruptedException {
         File invalidJson1 = new File("store/test/dummy1-dummy1.json");
-        invalidJson1.createNewFile();
+        assert invalidJson1.createNewFile();
         File invalidJson2 = new File("store/test/dummy2-dummy2.json");
-        invalidJson2.createNewFile();
+        assert invalidJson2.createNewFile();
         RepoIO testIO = new RepoIO(true, true);
-        Model dummy3Model = testIO.openRepository("dummy3/dummy3").get();
-        Model dummy4Model = testIO.openRepository("dummy4/dummy4").get();
+        testIO.openRepository("dummy3/dummy3").get();
+        testIO.openRepository("dummy4/dummy4").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
         RepoIO alternateIO = new RepoIO(true, true);
         assertEquals(2, alternateIO.getStoredRepos().size());

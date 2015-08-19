@@ -35,7 +35,7 @@ public class UpdateSignature {
         this.labelsETag = labelsETag;
         this.milestonesETag = milestonesETag;
         this.collaboratorsETag = collaboratorsETag;
-        this.lastCheckTime = lastCheckTime;
+        this.lastCheckTime = new Date(lastCheckTime.getTime());
     }
 
     public boolean isEmpty() {

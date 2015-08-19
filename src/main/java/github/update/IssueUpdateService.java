@@ -20,7 +20,7 @@ public class IssueUpdateService extends UpdateService<Issue>{
 
     public IssueUpdateService(GitHubClientExtended client, String issuesETag, Date lastIssueCheckTime){
         super(client, SEGMENT_ISSUES, issuesETag);
-        this.lastIssueCheckTime = lastIssueCheckTime;
+        this.lastIssueCheckTime = new Date(lastIssueCheckTime.getTime());
     }
 
     private Map<String, String> createUpdatedIssuesParams(){

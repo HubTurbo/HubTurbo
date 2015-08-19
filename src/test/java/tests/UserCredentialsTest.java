@@ -15,7 +15,6 @@ public class UserCredentialsTest {
         assertNotEquals(userCredentials.hashCode(), userCredentials1.hashCode());
         assertEquals(true, userCredentials.equals(userCredentials));
         assertEquals(false, userCredentials.equals(null));
-        assertEquals(false, userCredentials.equals(""));
         assertEquals(false, userCredentials.equals(userCredentials1));
     }
 
