@@ -104,11 +104,11 @@ public class ModelUpdateUITest extends UITest {
         sleep(EVENT_DELAY);
 
         UI.events.triggerEvent(new UpdateDummyRepoEvent(
-            UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 1, null, "Issue 11"));
+            UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 1, "Issue 11"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(new UpdateDummyRepoEvent(
-            UpdateDummyRepoEvent.UpdateType.UPDATE_MILESTONE, "dummy/dummy", 1, null, "Milestone 11"));
+            UpdateDummyRepoEvent.UpdateType.UPDATE_MILESTONE, "dummy/dummy", 1, "Milestone 11"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
