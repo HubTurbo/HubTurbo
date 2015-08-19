@@ -1,9 +1,15 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,18 +28,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.UIManager;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 public class Utility {
 
@@ -254,4 +248,13 @@ public class Utility {
         }
         return Optional.empty();
     }
+
+    public static boolean containsIgnoreCase(String source, String query) {
+        return source.toLowerCase().contains(query.toLowerCase());
+    }
+
+    public static boolean startsWithIgnoreCase(String source, String query) {
+        return source.toLowerCase().startsWith(query.toLowerCase());
+    }
+
 }

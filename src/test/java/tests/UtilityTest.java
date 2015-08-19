@@ -1,9 +1,8 @@
 package tests;
 
-import static org.junit.Assert.*;
-import static util.Utility.*;
+import org.junit.Test;
+import util.Utility;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -11,9 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.junit.Test;
-
-import util.Utility;
+import static org.junit.Assert.*;
+import static util.Utility.*;
 
 public class UtilityTest {
 
@@ -80,4 +78,17 @@ public class UtilityTest {
         assertTrue(Utility.getUsableScreenDimensions().isPresent());
         assertTrue(Utility.getScreenDimensions() != null);
     }
+
+    @Test
+    public void ignoreCaseTest() {
+        assertTrue(Utility.containsIgnoreCase("HeLlO wOrLd", "lLo"));
+        assertTrue(Utility.containsIgnoreCase("hello world", "O W"));
+        assertTrue(Utility.containsIgnoreCase("!@#$%test^&*()", "$%TeSt^&"));
+        assertTrue(Utility.containsIgnoreCase("1A2B3C", "a2b3"));
+        assertTrue(Utility.startsWithIgnoreCase("HeLlO wOrLd", "hello"));
+        assertTrue(Utility.startsWithIgnoreCase("HeLlO wOrLd", "hElLo"));
+        assertTrue(Utility.startsWithIgnoreCase("!@#$%test^&*()", "!@#$%Te"));
+        assertTrue(Utility.startsWithIgnoreCase("1A2B3C", "1a2B"));
+    }
+
 }
