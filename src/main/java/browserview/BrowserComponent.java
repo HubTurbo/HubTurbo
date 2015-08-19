@@ -396,6 +396,7 @@ public class BrowserComponent {
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
             user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            user32.SetForegroundWindow(mainWindowHandle);
         }
     }
 
