@@ -95,6 +95,7 @@ public class UI extends Application implements EventDispatcher {
 
     private void login(boolean isBypassLogin) {
         if (isBypassLogin) {
+            prefs.setLastLoginCredentials("test", "test");
             showMainWindow("dummy/dummy");
             mainStage.show();
         } else {

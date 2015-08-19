@@ -278,7 +278,7 @@ public class DummyRepoState {
         // from repo (which should not be the case).
         // (but this approach works if the metadata of the issue is not modified, which is the current case)
         // TODO make TurboIssueEvent immutable
-        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                 IssueEventType.Renamed,
                 new Date()));
         List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
@@ -341,12 +341,12 @@ public class DummyRepoState {
         // TODO change to expression lambdas
         List<String> labelsOfIssue = toSet.getLabels();
         labelsOfIssue.forEach(labelName ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Unlabeled,
                         new Date()).setLabelName(labelName))
         );
         labels.forEach(labelName ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Labeled,
                         new Date()).setLabelName(labelName))
         );
