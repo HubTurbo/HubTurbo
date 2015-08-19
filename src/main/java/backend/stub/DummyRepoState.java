@@ -34,6 +34,12 @@ public class DummyRepoState {
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
 
+        initializeRepoEntities();
+        connectRepoEntities();
+        insertInitialMetadata();
+    }
+
+    private void initializeRepoEntities() {
         for (int i = 0; i < 10; i++) {
             // Issue #7 is a PR
             TurboIssue dummyIssue = (i != 6) ? makeDummyIssue() : makeDummyPR();
@@ -50,6 +56,18 @@ public class DummyRepoState {
             users.put(dummyUser.getLoginName(), dummyUser);
         }
 
+        // Issue 6 is closed
+        issues.get(6).setOpen(false);
+
+        // Label groups for testing label picker exclusivity
+        labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
+        labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
+        labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
+        labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
+        labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
+    }
+
+    private void connectRepoEntities() {
         // Issues #1-5 are assigned milestones 1-5 respectively
         for (int i = 1; i <= 5; i++) {
             issues.get(i).setMilestone(milestones.get(i));
@@ -64,10 +82,24 @@ public class DummyRepoState {
         labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
         issues.get(10).addLabel("Label 11");
 
-        // Each user is assigned to his corresponding issue
+        // Each contributor is assigned to his corresponding issue
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
         }
+    }
+
+    private void insertInitialMetadata() {
+        // Put down a comment by current HT user (empty string) for issue 9
+        Comment ownComment = new Comment();
+        ownComment.setCreatedAt(new Date());
+        ownComment.setUser(new User().setLogin("test"));
+        Comment[] ownComments = { ownComment };
+        issues.get(9).setMetadata(new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(ownComments))
+        ));
+        issues.get(9).setCommentCount(1);
+        issues.get(9).setUpdatedAt(LocalDateTime.now());
 
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
@@ -86,16 +118,6 @@ public class DummyRepoState {
         ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
-
-        // Issue 6 is closed
-        issues.get(6).setOpen(false);
-
-        // Label groups for testing label picker exclusivity
-        labels.put("p.low", new TurboLabel(dummyRepoId, "p.low"));
-        labels.put("p.medium", new TurboLabel(dummyRepoId, "p.medium"));
-        labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
-        labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
-        labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
