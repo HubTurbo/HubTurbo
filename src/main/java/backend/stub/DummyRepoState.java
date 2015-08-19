@@ -364,4 +364,29 @@ public class DummyRepoState {
         return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
+    protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {
+        // Copy constructor used so that changes in the GUI are not introduced immediately
+        TurboIssue toComment = new TurboIssue(issues.get(issueId));
+
+        List<TurboIssueEvent> eventsOfIssue = toComment.getMetadata().getEvents();
+
+        // Again, to prevent immediate changes, we create a new arraylist from comments
+        List<Comment> commentsOfIssue = new ArrayList<>(toComment.getMetadata().getComments());
+        Comment toAdd = new Comment();
+        toAdd.setBody(commentText);
+        toAdd.setCreatedAt(new Date());
+        toAdd.setUser(new User().setLogin(author));
+        commentsOfIssue.add(toAdd);
+
+        toComment.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        toComment.setUpdatedAt(LocalDateTime.now());
+        toComment.setCommentCount(toComment.getCommentCount() + 1);
+
+        // Add to list of updated issues, and replace issueToUpdate in main issues store.
+        updatedIssues.put(toComment.getId(), toComment);
+        issues.put(toComment.getId(), toComment);
+
+        return toComment;
+    }
+
 }

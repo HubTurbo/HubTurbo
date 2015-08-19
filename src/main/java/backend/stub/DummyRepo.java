@@ -69,6 +69,9 @@ public class DummyRepo implements Repo {
                     getRepoState(e.repoId).deleteUser(e.idString);
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
+                case ADD_COMMENT:
+                    getRepoState(e.repoId).commentOnIssue(e.actor, e.updateText, e.itemId);
+                    break;
                 case RESET_REPO:
                     repoStates.put(e.repoId, new DummyRepoState(e.repoId));
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
