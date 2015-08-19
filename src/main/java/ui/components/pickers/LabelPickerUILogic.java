@@ -243,13 +243,13 @@ public class LabelPickerUILogic {
     private void updateBottomLabels(String group, String match) {
         List<String> groupNames = groups.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
         boolean isValidGroup = groupNames.stream()
-                .filter(validGroup -> validGroup.startsWith(group))
+                .filter(validGroup -> validGroup.toLowerCase().startsWith(group.toLowerCase()))
                 .findAny()
                 .isPresent();
 
         if (isValidGroup) {
             List<String> validGroups = groupNames.stream()
-                    .filter(validGroup -> validGroup.startsWith(group))
+                    .filter(validGroup -> validGroup.toLowerCase().startsWith(group.toLowerCase()))
                     .collect(Collectors.toList());
             // get all labels that contain search query
             // fade out labels which do not match

@@ -111,6 +111,7 @@ public class TickingTimer {
         }
         executor.scheduleWithFixedDelay(() -> {
             boolean restarted = false;
+            int currentTime;
             synchronized (this) {
                 if (paused) {
                     return;
@@ -120,8 +121,9 @@ public class TickingTimer {
                     restart();
                     restarted = true;
                 }
+                currentTime = time;
             }
-            onTick.accept(time);
+            onTick.accept(currentTime);
             if (restarted) {
                 onTimeout.run();
             }

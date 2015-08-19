@@ -97,7 +97,7 @@ public class FilterApplyTests {
         try {
             new Qualifier("milestone", "v1").applyTo(issue, TestUtils.modelWith(issue, milestone));
             assertEquals(true, issue.getMilestone().isPresent());
-            assertEquals(new Integer(7), issue.getMilestone().get());
+            assertEquals(Integer.valueOf(7), issue.getMilestone().get());
         } catch (QualifierApplicationException e) {
             fail();
         }
@@ -114,7 +114,7 @@ public class FilterApplyTests {
         try {
             new Qualifier("milestone", "1").applyTo(issue, model);
             assertEquals(true, issue.getMilestone().isPresent());
-            assertEquals(new Integer(7), issue.getMilestone().get());
+            assertEquals(Integer.valueOf(7), issue.getMilestone().get());
         } catch (QualifierApplicationException e) {
             fail();
         }
@@ -248,7 +248,7 @@ public class FilterApplyTests {
             assertEquals("bug", issue.getLabels().get(0));
 
             assertEquals(true, issue.getMilestone().isPresent());
-            assertEquals(new Integer(7), issue.getMilestone().get());
+            assertEquals(Integer.valueOf(7), issue.getMilestone().get());
 
             assertEquals(false, issue.isOpen());
 

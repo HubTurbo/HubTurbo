@@ -4,25 +4,25 @@ import java.time.LocalDateTime;
 
 public class RepoViewRecord implements Comparable<RepoViewRecord>{
 
-    private String repository;
+    private final String repository;
+    private final LocalDateTime timestamp;
 
     public String getRepository() {
         return repository;
     }
 
-    private LocalDateTime timestamp;
-
     public LocalDateTime getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime lastViewedTimestamp) {
-        this.timestamp = lastViewedTimestamp;
     }
 
     public RepoViewRecord(String repository) {
         this.repository = repository;
         this.timestamp = LocalDateTime.now();
+    }
+
+    public RepoViewRecord(String repository, LocalDateTime timestamp) {
+        this.repository = repository;
+        this.timestamp = timestamp;
     }
 
     @Override

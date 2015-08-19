@@ -60,7 +60,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
 
         // Update keywords
-        List<String> all = new ArrayList<>(Arrays.asList(Qualifier.KEYWORDS));
+        List<String> all = new ArrayList<>(Qualifier.KEYWORDS);
         all.addAll(e.model.getUsers().stream()
             .map(TurboUser::getLoginName)
             .collect(Collectors.toList()));

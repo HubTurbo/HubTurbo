@@ -39,7 +39,7 @@ public class BrowserComponent {
     private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
     private static final boolean USE_MOBILE_USER_AGENT = false;
-    private static boolean isTestChromeDriver;
+    private boolean isTestChromeDriver;
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
@@ -74,7 +74,7 @@ public class BrowserComponent {
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
         executor = Executors.newSingleThreadExecutor();
-        BrowserComponent.isTestChromeDriver = isTestChromeDriver;
+        this.isTestChromeDriver = isTestChromeDriver;
         setupJNA();
         setupChromeDriverExecutable();
     }
@@ -138,7 +138,10 @@ public class BrowserComponent {
 
     private void removeChromeDriverIfNecessary() {
         if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
-            new File(CHROME_DRIVER_BINARY_NAME).delete();
+            boolean success = new File(CHROME_DRIVER_BINARY_NAME).delete();
+            if (!success) {
+                logger.warn("Failed to delete chromedriver");
+            }
         }
     }
 

@@ -2,6 +2,8 @@ package github;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -102,7 +104,7 @@ public class GitHubClientExtended extends GitHubClient {
             return new GitHubEventsResponse(ghResponse, reqIS3);
         } else if (isEmpty(code)) {
             GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
-            return new GitHubEventsResponse(ghResponse, null);
+            return new GitHubEventsResponse(ghResponse, new NullInputStream(0));
         } else {
             throw createException(getStream(httpRequest), code, httpRequest.getResponseMessage());
         }
