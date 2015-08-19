@@ -33,6 +33,15 @@ public class IssueMetadata {
         this.isUpdated = other.isUpdated;
     }
 
+    // Copy constructor used in reconciliation
+    public IssueMetadata(IssueMetadata other, boolean isUpdated) {
+        this.events = new ArrayList<>(other.events);
+        this.comments = new ArrayList<>(other.comments);
+        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.isUpdated = isUpdated;
+    }
+
     // Constructor used in DownloadMetadataTask
     public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
         this.events = events;

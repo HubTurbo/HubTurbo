@@ -196,7 +196,7 @@ public class TurboIssue {
      * @param fromIssue
      */
     private void transferTransientState(TurboIssue fromIssue) {
-        this.metadata = fromIssue.metadata;
+        this.metadata = new IssueMetadata(fromIssue.metadata, false);
         this.markedReadAt = fromIssue.markedReadAt;
         this.isCurrentlyRead = fromIssue.isCurrentlyRead;
     }
