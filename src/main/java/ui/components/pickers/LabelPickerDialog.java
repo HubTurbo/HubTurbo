@@ -1,25 +1,20 @@
 package ui.components.pickers;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
 
@@ -81,20 +76,24 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void ______POPULATION______() {}
 
-    protected void populatePanes(
-            List<PickerLabel> topLabels, List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
-        populateTopPane(topLabels);
+    protected void populatePanes(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels,
+            List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
+        populateTopPane(existingLabels, newTopLabels);
         populateBottomBox(bottomLabels, groups);
     }
 
-    private void populateTopPane(List<PickerLabel> topLabels) {
+    private void populateTopPane(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels) {
         topPane.getChildren().clear();
-        if (topLabels.size() == 0) {
+        if (existingLabels.size() == 0 && newTopLabels.size() == 0) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
         } else {
-            topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            existingLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            if (newTopLabels.size() > 0) {
+                topPane.getChildren().add(new Label("|"));
+                newTopLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            }
         }
     }
 
