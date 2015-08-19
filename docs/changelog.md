@@ -1,5 +1,12 @@
 # Changelog
 
+# V3.2.0
+
+- Fixed bug with label picker going off-screen
+- Fixed bug where an abbreviated string wouldn't match a label
+- Fixed documentation of keyboard shortcut for Mark As Read
+- Findbugs integrated into build process
+
 # V3.1.0
 
 - Polished and standardized user and developer documentation
