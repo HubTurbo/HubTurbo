@@ -349,7 +349,7 @@ public class LabelPickerUILogic {
                 .isPresent();
     }
 
-    public Optional<PickerLabel> getHighlightedLabelName() {
+    private Optional<PickerLabel> getHighlightedLabelName() {
         return bottomLabels.stream()
                 .filter(PickerLabel::isHighlighted)
                 .findAny();
