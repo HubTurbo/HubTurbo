@@ -142,7 +142,7 @@ public class MenuControl extends MenuBar {
         }
 
         if (panels.isEmpty()) {
-            logger.info("Did not save board");
+            logger.info("Did not save board " + openBoardName);
             return;
         }
         
@@ -173,11 +173,11 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent()) {
             String boardName = response.get();
-            prefs.addBoard(response.get(), panels);
-            ui.triggerEvent(new BoardSavedEvent());
-            openBoardName = boardName;
+            prefs.addBoard(boardName, panels);
             prefs.setLastOpenBoard(boardName);
-            logger.info("New board" + boardName + " saved");
+            openBoardName = boardName;
+            ui.triggerEvent(new BoardSavedEvent());
+            logger.info("New board " + boardName + " saved");
         }
     }
 

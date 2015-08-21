@@ -94,6 +94,10 @@ public class Preferences {
     public String getLastOpenBoard() {
         return global.getLastOpenBoard();
     }
+    
+    public List<PanelInfo> getBoardPanels(String board) {
+        return global.getBoardPanels(board);
+    }
 
     /**
      * Session configuration
