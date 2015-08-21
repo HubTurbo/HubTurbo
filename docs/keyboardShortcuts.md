@@ -27,8 +27,6 @@ These key sequences (one key followed by the other) are used to load (in the bro
 
 ## Move focus to ...
 
-Use arrow keys to move from one issue to another. Pressing shift with arrow key will not load the issue in browser. These will work when an issue is selected in a panel. 
-
 | **Focus moves to**| **Shortcut**|**Explanation**|
 | ------------- |:-------------:| ------------|
 | Next panel (Forward)|<kbd>F</kbd>|Focus moves to the next panel on the right of the current panel. If there are no more panels on the right, goes back to the leftmost panel|
