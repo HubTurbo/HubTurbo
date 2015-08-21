@@ -40,7 +40,7 @@ public class MenuControlTest extends UITest {
         assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Boards");
-        click("Save");
+        click("Save as");
         type("1");
         click("OK");
         assertEquals(1, panelControl.getNumberOfSavedBoards());
@@ -50,13 +50,13 @@ public class MenuControlTest extends UITest {
         assertEquals(0, panelControl.getNumberOfPanels());
 
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN); // Opening Board "1"
         push(KeyCode.RIGHT);
         push(KeyCode.ENTER);
         assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN); // Deleting Board "1"
         push(KeyCode.RIGHT);
         push(KeyCode.ENTER);
         click("OK");
