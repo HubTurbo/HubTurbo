@@ -4,9 +4,11 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
+
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -22,8 +24,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
@@ -47,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 1;
+    private static final int VERSION_MINOR = 2;
     private static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -499,6 +503,13 @@ public class UI extends Application implements EventDispatcher {
 
     public MenuControl getMenuControl() {
         return menuBar;
+    }
+    
+    /**
+     * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
+     */
+    public void showMainStage() {
+        mainStage.show();
     }
 
     public void setDefaultWidth() {

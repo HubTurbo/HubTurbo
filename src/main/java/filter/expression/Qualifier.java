@@ -25,13 +25,13 @@ public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier("", "");
 
-    public static final String[] KEYWORDS = new String[] {
+    public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
         "assignees", "author", "body", "closed", "comments", "created", "creator",
         "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
         "title", "type", "unmerged", "unread", "updated", "user"
-    };
+    ));
 
     private final String name;
 
@@ -623,20 +623,20 @@ public class Qualifier implements FilterExpression {
 
         String group = "";
         if (tokens.getGroup().isPresent()) {
-            group = tokens.getGroup().get().toLowerCase();
+            group = tokens.getGroup().get();
         }
-        String labelName = tokens.getName().toLowerCase();
+        String labelName = tokens.getName();
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
             if (label.getGroup().isPresent()) {
                 if (labelName.isEmpty()) {
                     // Check the group
-                    if (label.getGroup().get().toLowerCase().contains(group)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)) {
                        return true;
                     }
                 } else {
-                    if (label.getGroup().get().toLowerCase().contains(group)
-                        && label.getName().toLowerCase().contains(labelName)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)
+                        && Utility.containsIgnoreCase(label.getName(), labelName)) {
                        return true;
                     }
                 }
@@ -644,7 +644,7 @@ public class Qualifier implements FilterExpression {
                 // Check only the label name
                 if (!group.isEmpty()) {
                     return false;
-                } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+                } else if (!labelName.isEmpty() && Utility.containsIgnoreCase(label.getName(), labelName)) {
                     return true;
                 }
             }

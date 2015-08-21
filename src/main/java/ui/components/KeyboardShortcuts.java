@@ -35,21 +35,21 @@ public class KeyboardShortcuts {
 
     // customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static KeyCode MARK_AS_READ;
-    public static KeyCode MARK_AS_UNREAD;
+    public static KeyCode markAsRead;
+    public static KeyCode markAsUnread;
 
-    public static KeyCode SCROLL_TO_TOP;
-    public static KeyCode SCROLL_TO_BOTTOM;
-    public static KeyCode SCROLL_UP;
-    public static KeyCode SCROLL_DOWN;
+    public static KeyCode scrollToTop;
+    public static KeyCode scrollToBottom;
+    public static KeyCode scrollUp;
+    public static KeyCode scrollDown;
 
     //ui.issuepanel.PanelControl
-    public static KeyCode LEFT_PANEL;
-    public static KeyCode RIGHT_PANEL;
+    public static KeyCode leftPanel;
+    public static KeyCode rightPanel;
 
     // ui.components.NavigableListView && ui.listpanel.ListPanel
-    public static KeyCode UP_ISSUE;
-    public static KeyCode DOWN_ISSUE;
+    public static KeyCode upIssue;
+    public static KeyCode downIssue;
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
@@ -129,16 +129,16 @@ public class KeyboardShortcuts {
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
-        MARK_AS_READ = getKeyCode("MARK_AS_READ");
-        MARK_AS_UNREAD = getKeyCode("MARK_AS_UNREAD");
-        SCROLL_TO_TOP = getKeyCode("SCROLL_TO_TOP");
-        SCROLL_TO_BOTTOM = getKeyCode("SCROLL_TO_BOTTOM");
-        SCROLL_UP = getKeyCode("SCROLL_UP");
-        SCROLL_DOWN = getKeyCode("SCROLL_DOWN");
-        LEFT_PANEL = getKeyCode("LEFT_PANEL");
-        RIGHT_PANEL = getKeyCode("RIGHT_PANEL");
-        UP_ISSUE = getKeyCode("UP_ISSUE");
-        DOWN_ISSUE = getKeyCode("DOWN_ISSUE");
+        markAsRead = getKeyCode("MARK_AS_READ");
+        markAsUnread = getKeyCode("MARK_AS_UNREAD");
+        scrollToTop = getKeyCode("SCROLL_TO_TOP");
+        scrollToBottom = getKeyCode("SCROLL_TO_BOTTOM");
+        scrollUp = getKeyCode("SCROLL_UP");
+        scrollDown = getKeyCode("SCROLL_DOWN");
+        leftPanel = getKeyCode("LEFT_PANEL");
+        rightPanel = getKeyCode("RIGHT_PANEL");
+        upIssue = getKeyCode("UP_ISSUE");
+        downIssue = getKeyCode("DOWN_ISSUE");
     }
 
     public static void loadKeyboardShortcuts(Preferences prefs) {

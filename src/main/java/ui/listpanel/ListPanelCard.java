@@ -1,9 +1,11 @@
 package ui.listpanel;
 
-import backend.resource.*;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
-import github.TurboIssueEvent;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,15 +15,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 import org.eclipse.egit.github.core.Comment;
+
 import ui.issuepanel.FilterPanel;
 import util.Utility;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import github.TurboIssueEvent;
 
 public class ListPanelCard extends VBox {
 
@@ -124,8 +130,18 @@ public class ListPanelCard extends VBox {
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
 
-        // Events
+        // Label update events
+        List<TurboIssueEvent> labelUpdateEvents =
+                        events.stream()
+                        .filter(TurboIssueEvent::isLabelUpdateEvent)
+                        .collect(Collectors.toList());
+        List<Node> labelUpdateEventNodes =
+                TurboIssueEvent.createLabelUpdateEventNodes(model, labelUpdateEvents);
+        labelUpdateEventNodes.forEach(node -> result.getChildren().add(node));
+
+        // Other events beside label updates
         events.stream()
+            .filter(e -> !e.isLabelUpdateEvent())
             .map(e -> e.display(model, issue))
             .forEach(e -> result.getChildren().add(e));
 

@@ -1,19 +1,25 @@
 package github;
 
-import backend.resource.Model;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
-import util.Utility;
 
-import java.util.Date;
-import java.util.Optional;
+import util.Utility;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 
 /**
  * Models an event that could happen to an issue.
@@ -27,6 +33,9 @@ public class TurboIssueEvent {
     private static final String OCTICON_PERSON = "\uf018";
     public static final String OCTICON_QUOTE = "\uf063";
 
+    // Maximum time difference in seconds between label update events in the same group
+    private static final long MAX_TIME_DIFF = 60;
+
     private final Date date;
     private final IssueEventType type;
     private final User actor;
@@ -39,7 +48,7 @@ public class TurboIssueEvent {
     public TurboIssueEvent(User actor, IssueEventType type, Date date) {
         this.type = type;
         this.actor = actor;
-        this.date = date;
+        this.date = new Date(date.getTime());
     }
 
     public IssueEventType getType() {
@@ -49,26 +58,30 @@ public class TurboIssueEvent {
         return actor;
     }
     public Date getDate() {
-        return date;
+        return new Date(date.getTime());
     }
 
     // Mutable fields
 
+    public boolean isLabelUpdateEvent() {
+        return type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+    }
+
     public String getLabelName() {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         return labelName;
     }
     public TurboIssueEvent setLabelName(String labelName) {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         this.labelName = labelName;
         return this;
     }
     public String getLabelColour() {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         return labelColour;
     }
     public void setLabelColour(String labelColour) {
-        assert type == IssueEventType.Labeled || type == IssueEventType.Unlabeled;
+        assert isLabelUpdateEvent();
         this.labelColour = labelColour;
     }
     public String getMilestoneTitle() {
@@ -246,6 +259,111 @@ public class TurboIssueEvent {
                 return conditionallyBold(bold, new Text(
                     String.format("%s %s %s.", actorName, getType(), time)));
         }
+    }
+
+    /**
+     * Create a list of JavaFX nodes to display label update events
+     * @param model
+     * @param labelUpdateEvents
+     * @return list of Node corresponding to groups of label update events
+     */
+    public static List<Node> createLabelUpdateEventNodes(
+            Model model, List<TurboIssueEvent> labelUpdateEvents) {
+
+        assert labelUpdateEvents != null : "Error: Received null list of events";
+
+        List<List<TurboIssueEvent>> groupedEvents = groupLabelUpdateEvents(labelUpdateEvents);
+        List<Node> result = new ArrayList<>();
+
+        groupedEvents.forEach(group -> {
+            TurboIssueEvent firstEvent = group.get(0);
+            String actorName = firstEvent.getActor().getLogin();
+            String time = new PrettyTime().format(firstEvent.getDate());
+
+            HBox box = new HBox();
+            box.setSpacing(3);
+
+            box.getChildren().addAll(
+                    octicon(OCTICON_TAG),
+                    new Text(String.format("%s :", actorName)));
+
+            group.forEach(e -> {
+                Node node = createLabelNode(model, e);
+                box.getChildren().add(node);
+            });
+
+            box.getChildren().add(new Text(String.format("%s.", time)));
+
+            result.add(box);
+        });
+
+        return result;
+    }
+
+    private static Node createLabelNode(Model model, TurboIssueEvent e) {
+        Optional<TurboLabel> label = model.getLabelByActualName(e.getLabelName());
+
+        Node node = label.isPresent() ?
+                    label.get().getNode() : new Label(e.getLabelName());
+        if (e.getType() == IssueEventType.Unlabeled) {
+            node.getStyleClass().add("labels-removed");
+        }
+
+        return node;
+    }
+
+    /**
+     * Groups label update events into a list of sub-lists of events.
+     * Events in the same sub-list will have the same author
+     * and with time-stamps less than MAX_TIME_DIFF minutes of each other
+     * @param labelUpdateEvents
+     * @return list of sub-lists of label update events
+     */
+    public static List<List<TurboIssueEvent>> groupLabelUpdateEvents(
+            List<TurboIssueEvent> labelUpdateEvents) {
+
+        assert labelUpdateEvents != null : "Error: Received null list of events";
+
+        List<TurboIssueEvent> events = new ArrayList<>(labelUpdateEvents);
+        List<List<TurboIssueEvent>> result = new ArrayList<>();
+        List<TurboIssueEvent> currentSubList = new ArrayList<>();
+
+        Collections.sort(events, (e1, e2) -> e1.getDate().compareTo(e2.getDate()));
+        Collections.sort(events, (e1, e2) -> e1.getActor().getLogin().compareTo(e2.getActor().getLogin()));
+
+        for (TurboIssueEvent e : events) {
+            if (currentSubList.isEmpty() ||
+                e.isInSameLabelUpdateEventGroup(currentSubList.get(0))) {
+                currentSubList.add(e);
+            } else {
+                result.add(currentSubList);
+                currentSubList = new ArrayList<>();
+                currentSubList.add(e);
+            }
+        }
+        if (!currentSubList.isEmpty()) {
+            result.add(currentSubList);
+        }
+
+        Collections.sort(result, (l1, l2) -> l1.get(0).getDate().compareTo(l2.get(0).getDate()));
+
+        return result;
+    }
+
+    /**
+     * Checks if this label update event in the same group
+     * as another label update event e
+     * @param e another label update event
+     * @return true if this event and e have same author and times within
+     *              MAX_TIME_DIFF from each other.
+     *         false otherwise
+     */
+    public boolean isInSameLabelUpdateEventGroup(TurboIssueEvent e) {
+        long timeDiffMs = Math.abs(getDate().getTime() - e.getDate().getTime());
+        long timeDiffSec = TimeUnit.MILLISECONDS.toSeconds(timeDiffMs);
+
+        return getActor().getLogin().equals(e.getActor().getLogin()) &&
+               timeDiffSec <= MAX_TIME_DIFF;
     }
 
     @Override

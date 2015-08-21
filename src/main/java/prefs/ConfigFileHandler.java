@@ -1,8 +1,10 @@
 package prefs;
 
 import com.google.gson.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import util.HTLog;
 
 import java.io.*;
@@ -30,8 +32,13 @@ public class ConfigFileHandler {
 
     private void ensureDirectoryExists() {
         File directory = new File(configDirectory);
-        if (!directory.exists() || !directory.isDirectory()) {
-            directory.mkdirs();
+        boolean directoryNonExistent = !directory.exists() || !directory.isDirectory();
+        boolean exists = true;
+        if (directoryNonExistent) {
+            exists = directory.mkdirs();
+        }
+        if (!exists) {
+            logger.warn("Could not create config file directory");
         }
     }
 
@@ -57,17 +64,20 @@ public class ConfigFileHandler {
 
         File configFile = getGlobalConfigFile();
         if (configFile.exists()) {
-            try {
-                Reader reader = new InputStreamReader(new FileInputStream(configFile), CHARSET);
+            try (Reader reader =
+                     new InputStreamReader(new FileInputStream(configFile), CHARSET)) {
                 config = gson.fromJson(reader, GlobalConfig.class);
-                reader.close();
             } catch (IOException e) {
                 HTLog.error(logger, e);
             }
         } else {
             try {
-                configFile.createNewFile();
-                saveGlobalConfig(config);
+                boolean couldCreate = configFile.createNewFile();
+                if (!couldCreate) {
+                    logger.warn("Could not create config file " + configFile.toString());
+                } else {
+                    saveGlobalConfig(config);
+                }
             } catch (IOException e) {
                 HTLog.error(logger, e);
             }

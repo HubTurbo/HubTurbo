@@ -30,7 +30,7 @@ public class RepositorySelectorTest extends UITest {
         @Override
         public void start(Stage primaryStage) {
             super.start(primaryStage);
-            stageFuture.set(primaryStage);
+            STAGE_FUTURE.set(primaryStage);
         }
 
         @Override
@@ -89,6 +89,14 @@ public class RepositorySelectorTest extends UITest {
         assertEquals(3, comboBox.getItems().size());
         assertEquals("dummy3/dummy3", primaryRepo);
 
+        // we check if repo's id with white spaces are handled correctly
+        doubleClick(comboBox);
+        doubleClick();
+        type(" dummy4 / dummy4 ");
+        push(KeyCode.ENTER);
+        assertEquals(4, comboBox.getItems().size());
+        assertEquals("dummy4/dummy4", primaryRepo);
+
         // exit program
         click("File");
         click("Quit");
@@ -101,7 +109,7 @@ public class RepositorySelectorTest extends UITest {
         Preferences testPref = new Preferences(true);
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
-        assertEquals("dummy3/dummy3", lastViewedRepository.generateId());
+        assertEquals("dummy4/dummy4", lastViewedRepository.generateId());
     }
 
 }

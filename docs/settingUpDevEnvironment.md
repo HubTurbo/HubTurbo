@@ -1,33 +1,26 @@
 # Development Environment
 
-## Tool stack
-
-- [**JDK**](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 1.8u40 or later
-- [**Eclipse** Luna](https://www.eclipse.org/downloads/) or later
+- [Oracle JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 1.8u40 or later
+- [Eclipse Luna](https://www.eclipse.org/downloads/) or later
     - For Eclipse, please install [Buildship Gradle Integration](http://marketplace.eclipse.org/content/buildship-gradle-integration)
     - (Alternative IDE) [IntelliJ IDEA 14](https://www.jetbrains.com/idea/) or later
-- [**Chrome**](http://www.google.com/chrome/) 43 or later
-- **log4j**
-- **controlsfx**
-- **Gson**
-- **Guava**
-- **JNA**
-- **Markdown4j**
-- **OpenJFX**
-- **eGit**
-- **PrettyTime**
-- **Selenium** : Used to instantiate and control a Browser window (for the Browser view)
-- **Junit**
-- **TestFx**
+- [Google Chrome](http://www.google.com/chrome/) 43 or later
 
-## Useful background knowledge
+## Tool Stack
+
+Most of HubTurbo is written in Java. [ControlsFX](http://fxexperience.com/controlsfx/) extends JavaFX with lots of useful components. [EGit](https://github.com/eclipse/egit-github) helps us interface with GitHub. We also make use of [PrettyTime](https://github.com/ocpsoft/prettytime/), [Guava](https://github.com/google/guava), [Gson](https://github.com/google/gson), and [log4j](http://logging.apache.org/log4j/2.x/) for essential tasks, and [JUnit](http://junit.org/) and [TestFx](https://github.com/TestFX/TestFX) for testing.
+
+We use a few platform-specific components: [Selenium](http://www.seleniumhq.org/) to instantiate and control a browser window, and [JNA](https://github.com/twall/jna) for Windows integration.
+
+## Useful Background Knowledge
 
 **Must have**: Basic Java programming skills, basic Git knowledge
 
 **Good to have** (you may not need these at the beginning, but be prepared to learn these along the way):
-- Java FX 
-- Java Threading 
-- Java 8 features: streams, lambda expressions
+
+- JavaFX
+- Java threading
+- Familiarity with Java 8 features: streams, lambda expressions
 
 ## Environment Setup
 

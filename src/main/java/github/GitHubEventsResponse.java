@@ -2,6 +2,8 @@ package github;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.io.input.NullInputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IssueEvent;
@@ -15,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
 
@@ -42,7 +45,13 @@ public class GitHubEventsResponse {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new InputStreamReader(jsonBody, CHARSET_UTF8));
+
             Map<String, Object>[] eventsWithParameters = gson.fromJson(reader, type);
+
+            if (eventsWithParameters == null) {
+                return;
+            }
+
             IssueEvent[] issueEvents = (IssueEvent[]) response.getBody();
 
             Map<String, String> parameters;

@@ -48,33 +48,31 @@ public class PlatformSpecific {
         return osName.startsWith("Linux");
     }
 
+    private static Architecture unknownArchitecture(Exception e) {
+        logger.error("Unknown Linux kernel architecture: " + e.getLocalizedMessage());
+        return Architecture.UNKNOWN;
+    }
+
     private static Architecture getLinuxKernelArchitecture() {
         try {
             Process process = Runtime.getRuntime().exec("uname -m");
             process.waitFor();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+            try (BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"))) {
+                StringBuilder output = new StringBuilder();
+                String nextOutputLine = reader.readLine();
 
-            String output = "";
-            String nextOutputLine = reader.readLine();
+                while (nextOutputLine != null) {
+                    output.append(nextOutputLine).append(" ");
+                    nextOutputLine = reader.readLine();
+                }
 
-            while (nextOutputLine != null) {
-                output += nextOutputLine + " ";
-                nextOutputLine = reader.readLine();
+                return getArchitectureFromString(output.toString());
             }
 
-            return getArchitectureFromString(output);
-        } catch (IOException e) {
-            logger.error("Unable to get linux kernel architecture");
-            logger.error(e.getLocalizedMessage());
-
-            return Architecture.UNKNOWN;
-        } catch (InterruptedException e) {
-            logger.error("Unable to get linux kernel architecture");
-            logger.error(e.getLocalizedMessage());
-
-            return Architecture.UNKNOWN;
+        } catch (IOException | InterruptedException e) {
+            return unknownArchitecture(e);
         }
     }
 

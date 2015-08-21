@@ -54,8 +54,16 @@ public class Preferences {
         return global.getLastOpenFilters();
     }
 
-    public void setLastOpenFilters(List<String> filter) {
-        global.setLastOpenFilters(filter);
+    public List<String> getPanelNames() {
+        return global.getPanelNames();
+    }
+    
+    public List<PanelInfo> getPanelInfo() {
+        return global.getPanelInfo();
+    }
+    
+    public void setPanelInfo(List<PanelInfo> panelInfo) {
+        global.setPanelInfo(panelInfo);
     }
 
     /**
@@ -66,12 +74,12 @@ public class Preferences {
      * Boards
      */
 
-    public void addBoard(String name, List<String> filterExprs) {
-        assert name != null && filterExprs != null;
-        global.addBoard(name, filterExprs);
+    public void addBoard(String name, List<PanelInfo> panels) {
+        assert name != null && panels != null;
+        global.addBoard(name, panels);
     }
 
-    public Map<String, List<String>> getAllBoards() {
+    public Map<String, List<PanelInfo>> getAllBoards() {
         return global.getAllBoards();
     }
 

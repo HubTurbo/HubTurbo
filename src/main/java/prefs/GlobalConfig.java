@@ -8,11 +8,13 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -22,12 +24,12 @@ public class GlobalConfig {
 
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 
-    private List<String> lastOpenFilters = new ArrayList<>();
+    private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
-    private Map<String, List<String>> boards = new HashMap<>();
     private String lastOpenBoard = "";
+    private Map<String, List<PanelInfo>> savedBoards = new HashMap<>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
 
@@ -66,20 +68,20 @@ public class GlobalConfig {
         }
     }
 
-    public void addBoard(String name, List<String> filterExprs) {
-        boards.put(name, filterExprs);
+    public void addBoard(String name, List<PanelInfo> panels) {
+        savedBoards.put(name, panels);
     }
 
-    public List<String> getBoardPanels(String name) {
-        return boards.get(name);
+    public List<PanelInfo> getBoardPanels(String name) {
+        return savedBoards.get(name);
     }
 
-    public Map<String, List<String>> getAllBoards() {
-        return new HashMap<>(boards);
+    public Map<String, List<PanelInfo>> getAllBoards() {
+        return new HashMap<>(savedBoards);
     }
 
     public void removeBoard(String name) {
-        boards.remove(name);
+        savedBoards.remove(name);
     }
     
     public void setLastOpenBoard(String board) {
@@ -90,12 +92,20 @@ public class GlobalConfig {
         return lastOpenBoard;
     }
 
-    public void setLastOpenFilters(List<String> filter) {
-        lastOpenFilters = new ArrayList<>(filter);
-    }
-
     public List<String> getLastOpenFilters() {
-        return new ArrayList<>(lastOpenFilters);
+        return lastSessionPanels.stream().map(PanelInfo::getPanelFilter).collect(Collectors.toList());
+    }
+    
+    public List<String> getPanelNames() {
+        return lastSessionPanels.stream().map(PanelInfo::getPanelName).collect(Collectors.toList());
+    }
+    
+    public void setPanelInfo(List<PanelInfo> panelInfo) {
+        this.lastSessionPanels = new ArrayList<>(panelInfo);
+    }
+    
+    public List<PanelInfo> getPanelInfo() {
+        return new ArrayList<>(lastSessionPanels);
     }
 
     public void setLastViewedRepository(String repository) {
@@ -123,12 +133,12 @@ public class GlobalConfig {
         byte[] result = new byte[0];
         try {
             String key = "HubTurboHubTurbo";
-            Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+            Key aesKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-            result = cipher.doFinal(lastPassword.getBytes());
+            result = cipher.doFinal(lastPassword.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException e) {
+            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }
@@ -139,12 +149,12 @@ public class GlobalConfig {
         String result = "";
         try {
             String key = "HubTurboHubTurbo";
-            Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+            Key aesKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
-            result = new String(cipher.doFinal(lastLoginEncrypted));
+            result = new String(cipher.doFinal(lastLoginEncrypted), "UTF-8");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException e) {
+            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }

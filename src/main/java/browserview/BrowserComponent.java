@@ -20,6 +20,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
@@ -39,7 +40,7 @@ public class BrowserComponent {
     private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
     private static final boolean USE_MOBILE_USER_AGENT = false;
-    private static boolean isTestChromeDriver;
+    private boolean isTestChromeDriver;
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
@@ -74,7 +75,7 @@ public class BrowserComponent {
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
         executor = Executors.newSingleThreadExecutor();
-        BrowserComponent.isTestChromeDriver = isTestChromeDriver;
+        this.isTestChromeDriver = isTestChromeDriver;
         setupJNA();
         setupChromeDriverExecutable();
     }
@@ -138,7 +139,10 @@ public class BrowserComponent {
 
     private void removeChromeDriverIfNecessary() {
         if (ui.getCommandLineArgs().containsKey(UI.ARG_UPDATED_TO)) {
-            new File(CHROME_DRIVER_BINARY_NAME).delete();
+            boolean success = new File(CHROME_DRIVER_BINARY_NAME).delete();
+            if (!success) {
+                logger.warn("Failed to delete chromedriver");
+            }
         }
     }
 
@@ -388,9 +392,17 @@ public class BrowserComponent {
 
     public void focus(HWND mainWindowHandle){
         if (PlatformSpecific.isOnWindows()) {
+            // Restores browser window if it is minimized / maximized
+            user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
-            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
+            logger.info("Bringing bView to front");
+            boolean success = user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            if (!success) {
+                logger.info("Failed to bring bView to front.");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
+            user32.SetForegroundWindow(mainWindowHandle);
         }
     }
 

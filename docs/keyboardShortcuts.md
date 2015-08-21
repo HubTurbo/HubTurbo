@@ -27,8 +27,6 @@ These key sequences (one key followed by the other) are used to load (in the bro
 
 ## Move focus to ...
 
-Use arrow keys to move from one issue to another. Pressing shift with arrow key will not load the issue in browser. These will work when an issue is selected in a panel. 
-
 | **Focus moves to**| **Shortcut**|**Explanation**|
 | ------------- |:-------------:| ------------|
 | Next panel (Forward)|<kbd>F</kbd>|Focus moves to the next panel on the right of the current panel. If there are no more panels on the right, goes back to the leftmost panel|
@@ -54,7 +52,7 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Edit **L**abels|<kbd>L</kbd>|Opens the pop-up window for editing labels|
 | Edit **A**ssignee|<kbd>A</kbd>|Jump to *assignees* property of the issue in the browser view|
 | Set **M**ilestone|<kbd>M</kbd>|Jump to the *milestone* property of the issue in the browser view|
-| Mark as **R**ead|<kbd>R</kbd>|Mark an issue as read. Read issues will be shown in a different color and can be filtered. After marking an issue as *read*, it will remain in *read* state until the issue is updated.|
+| Mark as R**e**ad|<kbd>E</kbd>|Mark an issue as read. Read issues will be shown in a different color and can be filtered. After marking an issue as *read*, it will remain in *read* state until the issue is updated.|
 | Mark as **U**nread|<kbd>U</kbd>|Reverts an issue's *read* status|
 
 ## Control the panel view Window ...

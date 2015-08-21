@@ -32,6 +32,9 @@ public class LabelPickerLogicTests {
         repoLabels.add(new TurboLabel("dummy/dummy", "f-ccc"));
         repoLabels.add(new TurboLabel("dummy/dummy", "f-cdc"));
         repoLabels.add(new TurboLabel("dummy/dummy", "f-dcd"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "Priority.High"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "Priority.Mid"));
+        repoLabels.add(new TurboLabel("dummy/dummy", "Priority.Low"));
         return new LabelPickerUILogic(issue, repoLabels);
     }
 
@@ -109,9 +112,9 @@ public class LabelPickerLogicTests {
         logic = prepareLogic();
         assertEquals(0, getLabels(logic).size());
         // check for correct label selection
-        logic.processTextFieldChange("p-");
+        logic.processTextFieldChange("pri.h");
         assertEquals(true, logic.getHighlightedLabelName().isPresent());
-        assertEquals("p.high", logic.getHighlightedLabelName().get().getActualName());
+        assertEquals("Priority.High", logic.getHighlightedLabelName().get().getActualName());
     }
 
     @Test
