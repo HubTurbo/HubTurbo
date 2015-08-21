@@ -15,6 +15,7 @@ public class MenuControlTest extends UITest {
 
     @Test
     public void menuControlTest() {
+        
         modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         PanelControl panelControl = (PanelControl) find("#dummy/dummy_col0").getParent();
@@ -39,29 +40,61 @@ public class MenuControlTest extends UITest {
         click("Close");
         assertEquals(2, panelControl.getNumberOfPanels());
 
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board save as
         click("Boards");
         click("Save as");
-        type("1");
+        type("Board 1");
         click("OK");
         assertEquals(1, panelControl.getNumberOfSavedBoards());
+        assertEquals(2, panelControl.getNumberOfPanels());
 
+        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        assertEquals(3, panelControl.getNumberOfPanels());
+        
+        click("Boards");
+        click("Save as");
+        type("Board 2");
+        click("OK");
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+
+        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         assertEquals(0, panelControl.getNumberOfPanels());
-
+        
+        // Testing board open
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN); // Opening Board "1"
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
-        push(KeyCode.ENTER);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER); // Opening Board "1"
         assertEquals(2, panelControl.getNumberOfPanels());
-
+        
+        // Testing board save
+        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN); // Deleting Board "1"
+        click("Save");
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board delete
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
-        push(KeyCode.ENTER);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER); // Deleting current board (Board 1): no board is set as open
         click("OK");
-        assertEquals(0, panelControl.getNumberOfSavedBoards());
-
+        assertEquals(1, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board save when no board is open
+        // Expected: prompts user to save as new board
+        click("Boards");
+        click("Save");
+        type("new Board 1");
+        click("OK");
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
         click("View");
         click("Refresh");
         push(KeyboardShortcuts.REFRESH);

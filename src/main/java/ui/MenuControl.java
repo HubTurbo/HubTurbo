@@ -136,8 +136,12 @@ public class MenuControl extends MenuBar {
         logger.info("Menu: Boards > Save");
         
         List<PanelInfo> panels = getCurrentPanels();
+        
+        if (openBoardName.equals("")) {
+            onBoardSaveAs();
+        }
 
-        if (panels.isEmpty() || openBoardName.equals("")) {
+        if (panels.isEmpty()) {
             logger.info("Did not save board");
             return;
         }
@@ -172,6 +176,7 @@ public class MenuControl extends MenuBar {
             prefs.addBoard(response.get(), panels);
             ui.triggerEvent(new BoardSavedEvent());
             openBoardName = boardName;
+            prefs.setLastOpenBoard(boardName);
             logger.info("New board" + boardName + " saved");
         }
     }
