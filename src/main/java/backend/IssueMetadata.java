@@ -13,6 +13,8 @@ public class IssueMetadata {
     private final List<Comment> comments;
     private final LocalDateTime nonSelfUpdatedAt;
     private final int nonSelfCommentCount;
+
+    // If isUpdated is true, nonSelfUpdatedAt will be used to sort/filter instead of updatedAt in TurboIssue
     private final boolean isUpdated;
 
     // Constructor for default use when initializing TurboIssue
