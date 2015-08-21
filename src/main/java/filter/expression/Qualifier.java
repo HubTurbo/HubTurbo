@@ -623,20 +623,20 @@ public class Qualifier implements FilterExpression {
 
         String group = "";
         if (tokens.getGroup().isPresent()) {
-            group = tokens.getGroup().get().toLowerCase();
+            group = tokens.getGroup().get();
         }
-        String labelName = tokens.getName().toLowerCase();
+        String labelName = tokens.getName();
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
             if (label.getGroup().isPresent()) {
                 if (labelName.isEmpty()) {
                     // Check the group
-                    if (label.getGroup().get().toLowerCase().contains(group)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)) {
                        return true;
                     }
                 } else {
-                    if (label.getGroup().get().toLowerCase().contains(group)
-                        && label.getName().toLowerCase().contains(labelName)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)
+                        && Utility.containsIgnoreCase(label.getName(), labelName)) {
                        return true;
                     }
                 }
@@ -644,7 +644,7 @@ public class Qualifier implements FilterExpression {
                 // Check only the label name
                 if (!group.isEmpty()) {
                     return false;
-                } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+                } else if (!labelName.isEmpty() && Utility.containsIgnoreCase(label.getName(), labelName)) {
                     return true;
                 }
             }
