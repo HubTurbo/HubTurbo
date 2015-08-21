@@ -171,6 +171,7 @@ public class MenuControl extends MenuBar {
             String boardName = response.get();
             prefs.addBoard(response.get(), panels);
             ui.triggerEvent(new BoardSavedEvent());
+            openBoardName = boardName;
             logger.info("New board" + boardName + " saved");
         }
     }
