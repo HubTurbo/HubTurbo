@@ -2,6 +2,7 @@ package ui.components.pickers;
 
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
+import util.Utility;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -46,6 +47,7 @@ public class LabelPickerUILogic {
         // populate resultList by going through repoLabels and seeing which ones currently exist
         // in issue.getLabels()
         repoLabels.forEach(label -> {
+            // matching with exact labels so no need to worry about capitalisation
             resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
             if (label.getGroup().isPresent() && !groups.containsKey(label.getGroup().get()))
                 groups.put(label.getGroup().get(), label.isExclusive());
@@ -68,10 +70,6 @@ public class LabelPickerUILogic {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
-    }
-
-    private boolean containsIgnoreCase(String source, String query) {
-        return source.toLowerCase().contains(query.toLowerCase());
     }
 
     public void processTextFieldChange(String text) {
@@ -110,6 +108,10 @@ public class LabelPickerUILogic {
         }
     }
 
+    /*
+    * Top pane methods do not need to worry about capitalisation because they
+    * all deal with actual labels.
+    */
     private void ______TOP_PANE______() {}
 
     private void addExistingLabels() {
@@ -188,8 +190,7 @@ public class LabelPickerUILogic {
                     .filter(label -> label.getActualName().equals(targetLabel.get()))
                     .findFirst()
                     .ifPresent(label -> {
-                        if (issue.getLabels().contains(targetLabel.get()) ||
-                                resultList.get(targetLabel.get())) {
+                        if (issue.getLabels().contains(targetLabel.get()) || resultList.get(targetLabel.get())) {
                             // if it is an existing label toggle fade and strike through
                             label.setIsHighlighted(false);
                             label.setIsFaded(false);
@@ -238,18 +239,19 @@ public class LabelPickerUILogic {
         }
     }
 
+    // Bottom box deals with possible matches so we usually ignore the case for these methods.
     private void ______BOTTOM_BOX______() {}
 
     private void updateBottomLabels(String group, String match) {
         List<String> groupNames = groups.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
         boolean isValidGroup = groupNames.stream()
-                .filter(validGroup -> validGroup.toLowerCase().startsWith(group.toLowerCase()))
+                .filter(validGroup -> Utility.startsWithIgnoreCase(validGroup, group))
                 .findAny()
                 .isPresent();
 
         if (isValidGroup) {
             List<String> validGroups = groupNames.stream()
-                    .filter(validGroup -> validGroup.toLowerCase().startsWith(group.toLowerCase()))
+                    .filter(validGroup -> Utility.startsWithIgnoreCase(validGroup, group))
                     .collect(Collectors.toList());
             // get all labels that contain search query
             // fade out labels which do not match
@@ -262,7 +264,7 @@ public class LabelPickerUILogic {
                         }
                         if (!label.getGroup().isPresent() ||
                                 !validGroups.contains(label.getGroup().get()) ||
-                                !containsIgnoreCase(label.getName(), match)) {
+                                !Utility.containsIgnoreCase(label.getName(), match)) {
                             label.setIsFaded(true); // fade out if does not match search query
                         }
                         return label;
@@ -284,7 +286,7 @@ public class LabelPickerUILogic {
                     if (resultList.get(label.getActualName())) {
                         label.setIsSelected(true); // add tick if selected
                     }
-                    if (!match.isEmpty() && !containsIgnoreCase(label.getActualName(), match)) {
+                    if (!match.isEmpty() && !Utility.containsIgnoreCase(label.getActualName(), match)) {
                         label.setIsFaded(true); // fade out if does not match search query
                     }
                     return label;
@@ -328,7 +330,7 @@ public class LabelPickerUILogic {
 
         // try to highlight labels that begin with match first
         matches.stream()
-                .filter(label -> label.getName().startsWith(match))
+                .filter(label -> Utility.startsWithIgnoreCase(label.getName(), match))
                 .findFirst()
                 .ifPresent(label -> label.setIsHighlighted(true));
 
