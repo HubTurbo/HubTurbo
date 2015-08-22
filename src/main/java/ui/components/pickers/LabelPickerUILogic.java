@@ -55,7 +55,7 @@ public class LabelPickerUILogic {
     }
 
     private void populatePanes() {
-        if (dialog != null) dialog.populatePanes(topLabels, bottomLabels, groups);
+        if (dialog != null) dialog.populatePanes(getExistingLabels(), getNewTopLabels(), bottomLabels, groups);
     }
 
     public void toggleLabel(String name) {
@@ -349,7 +349,7 @@ public class LabelPickerUILogic {
                 .isPresent();
     }
 
-    public Optional<PickerLabel> getHighlightedLabelName() {
+    private Optional<PickerLabel> getHighlightedLabelName() {
         return bottomLabels.stream()
                 .filter(PickerLabel::isHighlighted)
                 .findAny();
@@ -359,6 +359,18 @@ public class LabelPickerUILogic {
 
     public Map<String, Boolean> getResultList() {
         return resultList;
+    }
+
+    private List<PickerLabel> getExistingLabels() {
+        return topLabels.stream()
+                .filter(label -> issue.getLabels().contains(label.getActualName()))
+                .collect(Collectors.toList());
+    }
+
+    private List<PickerLabel> getNewTopLabels() {
+        return topLabels.stream()
+                .filter(label -> !issue.getLabels().contains(label.getActualName()))
+                .collect(Collectors.toList());
     }
 
 }
