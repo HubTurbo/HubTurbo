@@ -37,7 +37,6 @@ public class ContextMenuTests extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         rightClick("#dummy/dummy_col0");
-        sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
         MenuItem readUnreadItem = contextMenu.getItems().get(0);
@@ -53,17 +52,13 @@ public class ContextMenuTests extends UITest {
 
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
-        sleep(EVENT_DELAY);
-
-        click("Mark as read");
+        click("Mark as read (E)");
         sleep(EVENT_DELAY);
         assertTrue(listPanelCell.getIssue().isCurrentlyRead());
 
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
-        sleep(EVENT_DELAY);
-
-        click("Mark as unread");
+        click("Mark as unread (U)");
         sleep(EVENT_DELAY);
         assertFalse(listPanelCell.getIssue().isCurrentlyRead());
     }
@@ -72,7 +67,7 @@ public class ContextMenuTests extends UITest {
     public void testSelectChangeLabels() {
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
-        click("Change labels");
+        click("Change labels (L)");
         sleep(DIALOG_DELAY);
 
         assertNotNull(find("#labelPickerTextField"));

@@ -36,11 +36,11 @@ public class ListPanel extends FilterPanel {
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
-    private static final String markAsReadMenuItemText = "Mark as read";
-    private static final String markAsUnreadMenuItemText = "Mark as unread";
+    private static final String markAsReadMenuItemText = "Mark as read (E)";
+    private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
 
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
-    private static final String changeLabelsMenuItemText = "Change labels";
+    private static final String changeLabelsMenuItemText = "Change labels (L)";
 
     public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(ui, model, parentPanelControl, panelIndex);
@@ -314,6 +314,7 @@ public class ListPanel extends FilterPanel {
 
             if (selectedIssue.isCurrentlyRead()) {
                 markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
+
             } else {
                 markAsReadUnreadMenuItem.setText(markAsReadMenuItemText);
             }
