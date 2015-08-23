@@ -314,7 +314,6 @@ public class ListPanel extends FilterPanel {
 
             if (selectedIssue.isCurrentlyRead()) {
                 markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
-
             } else {
                 markAsReadUnreadMenuItem.setText(markAsReadMenuItemText);
             }

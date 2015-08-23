@@ -3,6 +3,7 @@ package guitests;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
@@ -21,15 +22,24 @@ public class ContextMenuTests extends UITest {
 
     @Before
     public void setup() {
+        Platform.runLater(stage::show);
+        Platform.runLater(stage::requestFocus);
+
         FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
         filterTextField.setText("");
+        Platform.runLater(filterTextField::requestFocus);
+
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
     }
 
+    /**
+     * Tests context menu when no item is selected
+     * All menu items should be disabled
+     */
     @Test
-    public void testNoIssueSelected() {
+    public void test1() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         click("#dummy/dummy_col0_filterTextField");
@@ -37,6 +47,7 @@ public class ContextMenuTests extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         rightClick("#dummy/dummy_col0");
+        sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
         MenuItem readUnreadItem = contextMenu.getItems().get(0);
@@ -46,27 +57,37 @@ public class ContextMenuTests extends UITest {
         assertTrue(changeLabelsItem.isDisable());
     }
 
+    /**
+     * Tests selecting "Mark as read" and "Mark as unread"
+     * context menu items
+     */
     @Test
-    public void testSelectMarkAsReadUnRead() {
+    public void test2() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
 
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
         click("Mark as read (E)");
         sleep(EVENT_DELAY);
         assertTrue(listPanelCell.getIssue().isCurrentlyRead());
 
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
         click("Mark as unread (U)");
         sleep(EVENT_DELAY);
         assertFalse(listPanelCell.getIssue().isCurrentlyRead());
     }
 
+    /**
+     * Tests selecting "Change labels" context menu item
+     */
     @Test
-    public void testSelectChangeLabels() {
+    public void test3() {
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
         click("Change labels (L)");
         sleep(DIALOG_DELAY);
 
@@ -75,4 +96,5 @@ public class ContextMenuTests extends UITest {
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
     }
+
 }
