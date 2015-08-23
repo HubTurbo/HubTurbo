@@ -171,6 +171,10 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent()) {
             String boardName = response.get();
+            if (boardName.equals("")) {
+                logger.info("Did not save new board");
+                return;
+            }
             prefs.addBoard(boardName, panels);
             prefs.setLastOpenBoard(boardName);
             ui.triggerEvent(new BoardSavedEvent());

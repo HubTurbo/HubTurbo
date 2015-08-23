@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -28,7 +29,7 @@ public class GlobalConfig {
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
-    private String lastOpenBoard = "";
+    private Optional<String> lastOpenBoard;
     private Map<String, List<PanelInfo>> savedBoards = new HashMap<>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
@@ -85,11 +86,11 @@ public class GlobalConfig {
     }
     
     public void setLastOpenBoard(String board) {
-        lastOpenBoard = board;
+        lastOpenBoard = Optional.of(board);
     }
     
     public String getLastOpenBoard() {
-        return lastOpenBoard;
+        return lastOpenBoard.get();
     }
 
     public List<String> getLastOpenFilters() {
