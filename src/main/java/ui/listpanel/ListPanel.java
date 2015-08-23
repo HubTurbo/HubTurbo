@@ -39,8 +39,8 @@ public class ListPanel extends FilterPanel {
     private final String markAsReadMenuItemText = "Mark as read";
     private final String markAsUnreadMenuItemText = "Mark as unread";
 
-    private final String changeLabelsMenuItemText = "Change labels";
     private final MenuItem changeLabelsMenuItem = new MenuItem();
+    private final String changeLabelsMenuItemText = "Change labels";
 
     public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(ui, model, parentPanelControl, panelIndex);
@@ -291,6 +291,10 @@ public class ListPanel extends FilterPanel {
         return contextMenu;
     }
 
+    public ContextMenu getContextMenu() {
+        return contextMenu;
+    }
+
     private MenuItem updateChangeLabelsMenuItem() {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
@@ -348,30 +352,26 @@ public class ListPanel extends FilterPanel {
 
     private void markAsRead() {
         Optional<TurboIssue> item = listView.getSelectedItem();
-        if (!item.isPresent()) {
-            return;
+        if (item.isPresent()) {
+            TurboIssue issue = item.get();
+            LocalDateTime now = LocalDateTime.now();
+            ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
+            issue.setMarkedReadAt(Optional.of(now));
+            issue.setIsCurrentlyRead(true);
+            parentPanelControl.refresh();
+            listView.selectNextItem();
         }
-
-        TurboIssue issue = item.get();
-        LocalDateTime now = LocalDateTime.now();
-        ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-        issue.setMarkedReadAt(Optional.of(now));
-        issue.setIsCurrentlyRead(true);
-        parentPanelControl.refresh();
-        listView.selectNextItem();
     }
 
     private void markAsUnread() {
         Optional<TurboIssue> item = listView.getSelectedItem();
-        if (!item.isPresent()) {
-            return;
+        if (item.isPresent()) {
+            TurboIssue issue = item.get();
+            ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
+            issue.setMarkedReadAt(Optional.empty());
+            issue.setIsCurrentlyRead(false);
+            parentPanelControl.refresh();
         }
-
-        TurboIssue issue = item.get();
-        ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-        issue.setMarkedReadAt(Optional.empty());
-        issue.setIsCurrentlyRead(false);
-        parentPanelControl.refresh();
     }
 
     private void changeLabels() {
