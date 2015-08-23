@@ -1,8 +1,10 @@
 package ui.listpanel;
 
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
-import filter.expression.Qualifier;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
+
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -14,11 +16,9 @@ import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.expression.Qualifier;
 
 public class ListPanel extends FilterPanel {
 
@@ -154,28 +154,10 @@ public class ListPanel extends FilterPanel {
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyboardShortcuts.markAsRead) {
-                Optional<TurboIssue> item = listView.getSelectedItem();
-                if (!item.isPresent()) {
-                    return;
-                }
-                TurboIssue issue = item.get();
-                LocalDateTime now = LocalDateTime.now();
-                ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-                issue.setMarkedReadAt(Optional.of(now));
-                issue.setIsCurrentlyRead(true);
-                parentPanelControl.refresh();
-                listView.selectNextItem();
+                markAsRead();
             }
             if (event.getCode() == KeyboardShortcuts.markAsUnread) {
-                Optional<TurboIssue> item = listView.getSelectedItem();
-                if (!item.isPresent()) {
-                    return;
-                }
-                TurboIssue issue = item.get();
-                ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-                issue.setMarkedReadAt(Optional.empty());
-                issue.setIsCurrentlyRead(false);
-                parentPanelControl.refresh();
+                markAsUnread();
             }
             if (event.getCode() == KeyboardShortcuts.SHOW_DOCS) {
                 ui.getBrowserComponent().showDocs();
@@ -235,7 +217,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else {
-                    ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
+                    addRemoveLabels();
                 }
             }
             if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
@@ -285,5 +267,39 @@ public class ListPanel extends FilterPanel {
 
     public TurboIssue getSelectedIssue() {
         return listView.getSelectedItem().get();
+    }
+
+    /* Methods that perform user's actions under the context of this ListPanel */
+
+    private void markAsRead() {
+        Optional<TurboIssue> item = listView.getSelectedItem();
+        if (!item.isPresent()) {
+            return;
+        }
+
+        TurboIssue issue = item.get();
+        LocalDateTime now = LocalDateTime.now();
+        ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
+        issue.setMarkedReadAt(Optional.of(now));
+        issue.setIsCurrentlyRead(true);
+        parentPanelControl.refresh();
+        listView.selectNextItem();
+    }
+
+    private void markAsUnread() {
+        Optional<TurboIssue> item = listView.getSelectedItem();
+        if (!item.isPresent()) {
+            return;
+        }
+
+        TurboIssue issue = item.get();
+        ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
+        issue.setMarkedReadAt(Optional.empty());
+        issue.setIsCurrentlyRead(false);
+        parentPanelControl.refresh();
+    }
+
+    private void addRemoveLabels() {
+        ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
     }
 }
