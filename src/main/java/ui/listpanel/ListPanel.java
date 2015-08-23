@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -29,6 +31,16 @@ public class ListPanel extends FilterPanel {
     private IssueListView listView;
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
+
+    // Context Menu
+    private final ContextMenu contextMenu = new ContextMenu();
+
+    private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
+    private final String markAsReadMenuItemText = "Mark as read";
+    private final String markAsUnreadMenuItemText = "Mark as unread";
+
+    private final String changeLabelsMenuItemText = "Change labels";
+    private final MenuItem changeLabelsMenuItem = new MenuItem();
 
     public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
         super(ui, model, parentPanelControl, panelIndex);
@@ -107,6 +119,7 @@ public class ListPanel extends FilterPanel {
     private void setupListView() {
         setVgrow(listView, Priority.ALWAYS);
         setupKeyboardShortcuts();
+        setupContextMenu();
 
         listView.setOnItemSelected(i -> {
             TurboIssue issue = listView.getItems().get(i);
@@ -217,7 +230,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else {
-                    addRemoveLabels();
+                    changeLabels();
                 }
             }
             if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
@@ -243,6 +256,68 @@ public class ListPanel extends FilterPanel {
                 ui.switchDefaultRepo();
             }
         });
+    }
+
+    private ContextMenu setupContextMenu() {
+        markAsReadUnreadMenuItem.setOnAction(e -> {
+            String menuItemText = markAsReadUnreadMenuItem.getText();
+
+            if (menuItemText.equals(markAsReadMenuItemText)) {
+                markAsRead();
+            } else if (menuItemText.equals(markAsUnreadMenuItemText)) {
+                markAsUnread();
+            }
+        });
+
+        changeLabelsMenuItem.setText(changeLabelsMenuItemText);
+        changeLabelsMenuItem.setOnAction(e -> {
+            changeLabels();
+        });
+
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
+        contextMenu.setOnShowing(e -> {
+            updateContextMenu(contextMenu);
+        });
+
+        listView.setContextMenu(contextMenu);
+
+        return contextMenu;
+    }
+
+    private ContextMenu updateContextMenu(ContextMenu contextMenu) {
+        updateMarkAsReadUnreadMenuItem();
+        updateChangeLabelsMenuItem();
+
+        return contextMenu;
+    }
+
+    private MenuItem updateChangeLabelsMenuItem() {
+        Optional<TurboIssue> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            changeLabelsMenuItem.setDisable(false);
+        } else {
+            changeLabelsMenuItem.setDisable(true);
+        }
+
+        return changeLabelsMenuItem;
+    }
+
+    private MenuItem updateMarkAsReadUnreadMenuItem() {
+        Optional<TurboIssue> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            markAsReadUnreadMenuItem.setDisable(false);
+            TurboIssue selectedIssue = item.get();
+
+            if (selectedIssue.isCurrentlyRead()) {
+                markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
+            } else {
+                markAsReadUnreadMenuItem.setText(markAsReadMenuItemText);
+            }
+        } else {
+            markAsReadUnreadMenuItem.setDisable(true);
+        }
+
+        return markAsReadUnreadMenuItem;
     }
 
     private void setFocusToFilterBox() {
@@ -299,7 +374,7 @@ public class ListPanel extends FilterPanel {
         parentPanelControl.refresh();
     }
 
-    private void addRemoveLabels() {
+    private void changeLabels() {
         ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
     }
 }
