@@ -32,14 +32,12 @@ public class MenuControl extends MenuBar {
     private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
-    private String openBoardName = "";
 
     public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
         this.panels = panels;
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
-        openBoardName = prefs.getLastOpenBoard();
         createMenuItems();
     }
 
@@ -135,20 +133,20 @@ public class MenuControl extends MenuBar {
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
         
-        List<PanelInfo> panels = getCurrentPanels();
-        
-        if (openBoardName.equals("")) {
+        if (prefs.getLastOpenBoard().equals("")) {
             onBoardSaveAs();
-        }
-
-        if (panels.isEmpty()) {
-            logger.info("Did not save board " + openBoardName);
             return;
         }
         
-        prefs.addBoard(openBoardName, panels);
+        List<PanelInfo> panels = getCurrentPanels();
+        if (panels.isEmpty()) {
+            logger.info("Did not save board " + prefs.getLastOpenBoard());
+            return;
+        }
+        
+        prefs.addBoard(prefs.getLastOpenBoard(), panels);
         ui.triggerEvent(new BoardSavedEvent());
-        logger.info("Board " + openBoardName + " saved");
+        logger.info("Board " + prefs.getLastOpenBoard() + " saved");
     }
 
     /**
@@ -175,7 +173,6 @@ public class MenuControl extends MenuBar {
             String boardName = response.get();
             prefs.addBoard(boardName, panels);
             prefs.setLastOpenBoard(boardName);
-            openBoardName = boardName;
             ui.triggerEvent(new BoardSavedEvent());
             logger.info("New board " + boardName + " saved");
         }
@@ -190,7 +187,6 @@ public class MenuControl extends MenuBar {
         panels.closeAllPanels();
         panels.openPanels(panelInfo);
         prefs.setLastOpenBoard(boardName);
-        openBoardName = boardName;
     }
 
     /**
@@ -208,8 +204,7 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
-            if (openBoardName.equals(boardName)) {
-                openBoardName = "";
+            if (prefs.getLastOpenBoard().equals(boardName)) {
                 prefs.setLastOpenBoard("");
             }
             ui.triggerEvent(new BoardSavedEvent());
