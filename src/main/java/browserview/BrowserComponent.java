@@ -433,10 +433,11 @@ public class BrowserComponent {
 
     public void scrollPage(boolean isDownScroll) {
         String script;
-        if (isDownScroll)
+        if (isDownScroll) {
             script = "window.scrollBy(0,100)";
-        else
+        } else {
             script = "window.scrollBy(0, -100)";
+        }
         executeJavaScript(script);
     }
 

@@ -49,8 +49,9 @@ public class LabelPickerUILogic {
         repoLabels.forEach(label -> {
             // matching with exact labels so no need to worry about capitalisation
             resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
-            if (label.getGroup().isPresent() && !groups.containsKey(label.getGroup().get()))
+            if (label.getGroup().isPresent() && !groups.containsKey(label.getGroup().get())) {
                 groups.put(label.getGroup().get(), label.isExclusive());
+            }
         });
     }
 

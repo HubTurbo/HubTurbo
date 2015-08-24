@@ -43,10 +43,12 @@ public class LabelServiceFixed extends LabelService {
 
     private List<Label> addLabelsToIssue(String id, String issueId, List<Label> labels)
             throws IOException {
-        if (issueId == null)
+        if (issueId == null) {
             throw new IllegalArgumentException("Issue id cannot be null");
-        if (issueId.length() == 0)
+        }
+        if (issueId.length() == 0) {
             throw new IllegalArgumentException("Issue id cannot be empty");
+        }
 
 //        POST /repos/:owner/:repo/issues/:number/labels
 
@@ -72,12 +74,15 @@ public class LabelServiceFixed extends LabelService {
     public Label editLabel(IRepositoryIdProvider repository, Label label , String name)
             throws IOException {
         String repoId = getId(repository);
-        if (label == null)
+        if (label == null) {
             throw new IllegalArgumentException("Label cannot be null"); //$NON-NLS-1$
-        if (name == null)
+        }
+        if (name == null) {
             throw new IllegalArgumentException("Label name cannot be null"); //$NON-NLS-1$
-        if (name.length() == 0)
+        }
+        if (name.length() == 0) {
             throw new IllegalArgumentException("Label name cannot be empty"); //$NON-NLS-1$
+        }
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId);
