@@ -63,13 +63,14 @@ public class GitHubClientExtended extends GitHubClient {
         sendParams(request, params);
         final int code = request.getResponseCode();
         updateRateLimits(request);
-        if (isOk(code))
-            if (type != null)
+        if (isOk(code)) {
+            if (type != null) {
                 return parseJson(getStream(request), type);
-            else
+            } else {
                 return null;
-        if (isEmpty(code))
-            return null;
+            }
+        }
+        if (isEmpty(code)) return null;
         throw createException(getStream(request), code, request.getResponseMessage());
     }
 
@@ -85,8 +86,9 @@ public class GitHubClientExtended extends GitHubClient {
     public GitHubEventsResponse getEvent(GitHubRequest request) throws IOException {
         HttpURLConnection httpRequest = createGet(request.generateUri());
         String accept = request.getResponseContentType();
-        if (accept != null)
+        if (accept != null) {
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
+        }
         final int code = httpRequest.getResponseCode();
         updateRateLimits(httpRequest);
         if (isOk(code)) {

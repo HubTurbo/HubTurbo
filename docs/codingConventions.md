@@ -9,6 +9,6 @@ We've tweaked a few of the rules for our needs:
 - Import order matches Eclipse's default (no priority given to Google-specific package names)
 - Such `__METHOD_NAMES__` are allowed
 - Line length is increased to 120
-- `if` and `else` blocks don't need to have braces. This is useful for guard clauses and automatically-generated equals methods.
+- `if` and `else` blocks don't need to have braces. This is useful for guard clauses and automatically-generated equals methods. Although, any `if` and `else` blocks that are multi-line require braces.
 
 These changes are documented in our [CheckStyle configuration](../config/checkstyle/checkstyle.xml).
