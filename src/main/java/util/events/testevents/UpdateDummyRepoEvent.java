@@ -9,7 +9,7 @@ public class UpdateDummyRepoEvent extends Event {
     public final int itemId; // For issues and milestones
     public final String idString; // For labels and users
     public final String updateText;
-    public final String actor;
+    public final String actor; // Only for comments
 
     public enum UpdateType {NEW_ISSUE, UPDATE_ISSUE, DELETE_ISSUE,
         NEW_LABEL, DELETE_LABEL,
@@ -27,7 +27,7 @@ public class UpdateDummyRepoEvent extends Event {
      * @param itemId The id of the element to be updated or deleted, if necessary.
      * @param updateText The text to update the element with, if necessary.
      */
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String idString, String updateText,
+    private UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String idString, String updateText,
                                 String actor) {
         this.updateType = updateType;
         this.repoId = repoId;
@@ -37,40 +37,51 @@ public class UpdateDummyRepoEvent extends Event {
         this.actor = actor;
     }
 
-    // Overloaded constructors
-
-    // Hardly used, maybe to clean up entire model
-    public UpdateDummyRepoEvent(UpdateType updateType) {
-        this(updateType, null, -1, null, null, "");
+    public static UpdateDummyRepoEvent newIssue(String repoId) {
+        return new UpdateDummyRepoEvent(UpdateType.NEW_ISSUE, repoId, -1, null, null, "");
     }
 
-    // e.g. Clean repo, new issue
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId) {
-        this(updateType, repoId, -1, null, null, "");
+    public static UpdateDummyRepoEvent updateIssue(String repoId, int itemId, String updateText) {
+        return new UpdateDummyRepoEvent(UpdateType.UPDATE_ISSUE, repoId, itemId, null, updateText, "");
     }
 
-    // e.g. Delete issue, delete milestone
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId) {
-        this(updateType, repoId, itemId, null, null, "");
+    public static UpdateDummyRepoEvent deleteIssue(String repoId, int itemId) {
+        return new UpdateDummyRepoEvent(UpdateType.DELETE_ISSUE, repoId, itemId, null, null, "");
     }
 
-    // e.g. Delete label
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString) {
-        this(updateType, repoId, -1, idString, null, "");
+    public static UpdateDummyRepoEvent newLabel(String repoId) {
+        return new UpdateDummyRepoEvent(UpdateType.NEW_LABEL, repoId, -1, null, null, "");
     }
 
-    // e.g. Update issue, update milestone
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String updateText) {
-        this(updateType, repoId, itemId, null, updateText, "");
+    public static UpdateDummyRepoEvent deleteLabel(String repoId, String idString) {
+        return new UpdateDummyRepoEvent(UpdateType.DELETE_LABEL, repoId, -1, idString, null, "");
     }
 
-    // e.g. Update label
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, String idString, String updateText) {
-        this(updateType, repoId, -1, idString, updateText, "");
+    public static UpdateDummyRepoEvent newMilestone(String repoId) {
+        return new UpdateDummyRepoEvent(UpdateType.NEW_MILESTONE, repoId, -1, null, null, "");
     }
 
-    // e.g. Comment
-    public UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String updateText, String actor) {
-        this(updateType, repoId, itemId, null, updateText, actor);
+    public static UpdateDummyRepoEvent updateMilestone(String repoId, int itemId, String updateText) {
+        return new UpdateDummyRepoEvent(UpdateType.UPDATE_MILESTONE, repoId, itemId, null, updateText, "");
+    }
+
+    public static UpdateDummyRepoEvent deleteMilestone(String repoId, int itemId) {
+        return new UpdateDummyRepoEvent(UpdateType.DELETE_MILESTONE, repoId, itemId, null, null, "");
+    }
+
+    public static UpdateDummyRepoEvent newUser(String repoId) {
+        return new UpdateDummyRepoEvent(UpdateType.NEW_USER, repoId, -1, null, null, "");
+    }
+
+    public static UpdateDummyRepoEvent deleteUser(String repoId, String idString) {
+        return new UpdateDummyRepoEvent(UpdateType.DELETE_USER, repoId, -1, idString, null, "");
+    }
+
+    public static UpdateDummyRepoEvent addComment(String repoId, int itemId, String updateText, String actor) {
+        return new UpdateDummyRepoEvent(UpdateType.ADD_COMMENT, repoId, itemId, null, updateText, actor);
+    }
+
+    public static UpdateDummyRepoEvent resetRepo(String repoId) {
+        return new UpdateDummyRepoEvent(UpdateType.RESET_REPO, repoId, -1, null, null, "");
     }
 }

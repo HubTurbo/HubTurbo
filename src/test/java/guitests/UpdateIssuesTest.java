@@ -42,8 +42,7 @@ public class UpdateIssuesTest extends UITest {
         assertEquals(2, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(
-            UpdateDummyRepoEvent.UpdateType.ADD_COMMENT, "dummy/dummy", 9, "Test comment", "test-nonself"));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
@@ -52,16 +51,12 @@ public class UpdateIssuesTest extends UITest {
     }
 
     public void resetRepo() {
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.RESET_REPO, "dummy/dummy"));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.resetRepo("dummy/dummy"));
         sleep(EVENT_DELAY);
     }
 
     public void updateIssue(int issueId, String newIssueTitle) {
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(
-                UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE,
-                "dummy/dummy",
-                issueId,
-                newIssueTitle));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", issueId, newIssueTitle));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
