@@ -48,8 +48,7 @@ public class IssuePanelTests extends UITest {
         sleep(EVENT_DELAY);
         assertEquals(3, issuePanel.getSelectedIssue().getId());
         sleep(EVENT_DELAY);
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(
-                UpdateDummyRepoEvent.UpdateType.UPDATE_ISSUE, "dummy/dummy", 3, "updated issue"));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
         assertEquals(3, issuePanel.getSelectedIssue().getId());
