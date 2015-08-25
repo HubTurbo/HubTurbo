@@ -112,6 +112,7 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
 
+    public static final Set<KeyCode> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
             new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
@@ -126,7 +127,14 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
-
+    
+    private static Set<KeyCode> populateJumpToFirstIssueSet() {
+        Set <KeyCode> result = new HashSet<KeyCode>();
+        result.add(KeyCode.DIGIT1);
+        result.add(KeyCode.ENTER);
+        return result;
+    }
+    
     public static Map<String, String> getDefaultKeyboardShortcuts() {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");

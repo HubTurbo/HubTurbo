@@ -262,6 +262,11 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationPaneAction();
             }
+
+            if (KeyboardShortcuts.jumpToFirstIssueKeys.contains(event.getCode())) {
+                event.consume();
+                listView.selectFirstItem();
+            }
         });
     }
 
