@@ -1,5 +1,15 @@
 # Changelog
 
+# V3.3.0
+
+- Panels can now be given names
+- Label updates are now aggregated
+- Label picker now distinguishes existing labels and new ones
+- Fixed bug where metadata updates were not shown
+- Fixed bug where closing a panel wouldn't put focus on another panel
+- Default comment hotkey changed to <kbd>R</kbd> (was formerly <kbd>C</kbd>)
+- Adjusted coding conventions on braces
+
 # V3.2.0
 
 - Fixed bug with label picker going off-screen
