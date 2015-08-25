@@ -497,4 +497,9 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
+    public void switchToConversationTab() {
+        if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
+            driver.findElement(By.xpath("//a[@data-container-id='discussion_bucket']")).click();
+        }
+    }
 }

@@ -224,6 +224,7 @@ public class ListPanel extends FilterPanel {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
             if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().jumpToComment();
             }
             if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
@@ -234,12 +235,14 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
             if (event.getCode() == KeyboardShortcuts.SHOW_MILESTONES) {
                 if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    ui.getBrowserComponent().switchToConversationTab();
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
