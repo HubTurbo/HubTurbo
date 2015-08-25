@@ -142,6 +142,7 @@ public class PanelControl extends HBox {
         Node child = getChildren().remove(index);
         updatePanelIndices();
         ((AbstractPanel) child).close();
+        setFocusToPreviousPanel(index);
     }
 
     private void updatePanelIndices() {
@@ -191,15 +192,20 @@ public class PanelControl extends HBox {
         if (currentlySelectedPanel.isPresent()) {
             int panelIndex = currentlySelectedPanel.get();
             closePanel(panelIndex);
-            if (getChildren().size() == 0) {
-                setCurrentlySelectedPanel(Optional.empty());
-            } else {
-                int newPanelIndex = (panelIndex > getChildren().size() - 1)
-                                     ? panelIndex - 1
-                                     : panelIndex;
-                setCurrentlySelectedPanel(Optional.of(newPanelIndex));
-                getPanel(currentlySelectedPanel.get()).requestFocus();
-            }
+        }
+    }
+    
+    public void setFocusToPreviousPanel(int closedPanelIndex) {
+        if (getChildren().size() == 0) {
+            setCurrentlySelectedPanel(Optional.empty());
+        } else if (closedPanelIndex != currentlySelectedPanel.get()) {
+            return;
+        } else {
+            int newPanelIndex = (closedPanelIndex > getChildren().size() - 1)
+                                 ? closedPanelIndex - 1
+                                 : closedPanelIndex;
+            setCurrentlySelectedPanel(Optional.of(newPanelIndex));
+            getPanel(currentlySelectedPanel.get()).requestFocus();
         }
     }
 
