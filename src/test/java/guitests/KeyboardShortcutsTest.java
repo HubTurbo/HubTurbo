@@ -101,6 +101,7 @@ public class KeyboardShortcutsTest extends UITest {
         // remove focus from repo selector
         ComboBox<String> comboBox = find("#repositorySelector");
         doubleClick(comboBox);
+        assertEquals(true, comboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
         assertEquals(false, comboBox.isFocused());
         clearUiComponentFocusEventType();
