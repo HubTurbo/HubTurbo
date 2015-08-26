@@ -62,6 +62,21 @@ public class MenuControlTest extends UITest {
         click("OK");
         sleep(1000);
         assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
+        // Testing invalid board names
+        click("Boards");
+        click("Save as");
+        ((TextField) find("#boardnameinput")).setText("");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+
+        click("Boards");
+        click("Save as");
+        ((TextField) find("#boardnameinput")).setText("   ");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
 
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
