@@ -14,8 +14,7 @@ public class ScrollableListViewTests extends UITest {
     @Test
     public void scrollAndShowTest() {
         for (int i = 0; i < 40; i++) {
-            UI.events.triggerEvent(new UpdateDummyRepoEvent(
-                    UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy/dummy"));
+            UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy/dummy"));
         }
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(2000);

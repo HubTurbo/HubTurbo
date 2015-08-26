@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import prefs.PanelInfo;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
@@ -135,9 +136,9 @@ public class MenuControl extends MenuBar {
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
 
-        List<String> filterStrings = getCurrentFilterExprs();
+        List<PanelInfo> panels = getCurrentPanels();
 
-        if (filterStrings.isEmpty()) {
+        if (panels.isEmpty()) {
             logger.info("Did not save new board");
             return;
         }
@@ -150,20 +151,20 @@ public class MenuControl extends MenuBar {
         Optional<String> response = dlg.showAndWait();
 
         if (response.isPresent()) {
-            prefs.addBoard(response.get(), filterStrings);
+            prefs.addBoard(response.get(), panels);
             ui.triggerEvent(new BoardSavedEvent());
-            logger.info("New board" + response.get() + " saved, containing " + filterStrings);
+            logger.info("New board" + response.get() + " saved");
         }
     }
 
     /**
      * Called upon the Boards > Open being clicked
      */
-    private void onBoardOpen(String boardName, List<String> filters) {
+    private void onBoardOpen(String boardName, List<PanelInfo> panelInfo) {
         logger.info("Menu: Boards > Open > " + boardName);
 
         panels.closeAllPanels();
-        panels.openPanelsWithFilters(filters);
+        panels.openPanels(panelInfo);
     }
 
     /**
@@ -199,14 +200,14 @@ public class MenuControl extends MenuBar {
             open.getItems().clear();
             delete.getItems().clear();
 
-            Map<String, List<String>> boards = prefs.getAllBoards();
-
-            for (Map.Entry<String, List<String>> entry : boards.entrySet()) {
+            Map<String, List<PanelInfo>> boards = prefs.getAllBoards();
+            
+            for (Map.Entry<String, List<PanelInfo>> entry : boards.entrySet()) {
                 final String boardName = entry.getKey();
-                final List<String> filterSet = entry.getValue();
+                final List<PanelInfo> panelSet = entry.getValue();
 
                 MenuItem openItem = new MenuItem(boardName);
-                openItem.setOnAction(e1 -> onBoardOpen(boardName, filterSet));
+                openItem.setOnAction(e1 -> onBoardOpen(boardName, panelSet));
                 open.getItems().add(openItem);
 
                 MenuItem deleteItem = new MenuItem(boardName);
@@ -219,13 +220,13 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Returns the list of filter strings currently showing the user interface
+     * Returns the list of panel names and filters currently showing the user interface
      * @return
      */
-    private List<String> getCurrentFilterExprs() {
+    private List<PanelInfo> getCurrentPanels() {
         return panels.getChildren().stream().flatMap(c -> {
             if (c instanceof FilterPanel) {
-                return Stream.of(((FilterPanel) c).getCurrentFilterString());
+                return Stream.of(((FilterPanel) c).getCurrentInfo());
             } else {
                 return Stream.of();
             }

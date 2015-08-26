@@ -20,6 +20,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
@@ -394,8 +395,14 @@ public class BrowserComponent {
             // Restores browser window if it is minimized / maximized
             user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
-            user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
+            logger.info("Bringing bView to front");
+            boolean success = user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            if (!success) {
+                logger.info("Failed to bring bView to front.");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
+            user32.SetForegroundWindow(mainWindowHandle);
         }
     }
 
@@ -426,10 +433,11 @@ public class BrowserComponent {
 
     public void scrollPage(boolean isDownScroll) {
         String script;
-        if (isDownScroll)
+        if (isDownScroll) {
             script = "window.scrollBy(0,100)";
-        else
+        } else {
             script = "window.scrollBy(0, -100)";
+        }
         executeJavaScript(script);
     }
 
@@ -489,4 +497,9 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
+    public void switchToConversationTab() {
+        if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
+            driver.findElement(By.xpath("//a[@data-container-id='discussion_bucket']")).click();
+        }
+    }
 }

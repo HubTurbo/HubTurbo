@@ -2,6 +2,7 @@ package tests;
 
 import org.junit.Test;
 import prefs.GlobalConfig;
+import prefs.PanelInfo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class GlobalConfigTest {
         assertEquals(localDateTime, globalConfig.getMarkedReadAt("dummy/dummy", 1).get());
         globalConfig.clearMarkedReadAt("dummy/dummy", 1);
         assertEquals(Optional.empty(), globalConfig.getMarkedReadAt("dummy/dummy", 1));
-        ArrayList<String> emptyList = new ArrayList<>();
+        ArrayList<PanelInfo> emptyList = new ArrayList<>();
         globalConfig.addBoard("board1", emptyList);
         assertEquals(emptyList, globalConfig.getBoardPanels("board1"));
     }

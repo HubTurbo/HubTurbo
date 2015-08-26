@@ -82,12 +82,15 @@ public class KeyboardShortcuts {
     public static final KeyCode SHOW_CONTRIBUTORS = KeyCode.D;
 
     // TODO decouple manage/show labels/milestones?
-    public static final KeyCode NEW_COMMENT = KeyCode.C;
+    public static final KeyCode NEW_COMMENT = KeyCode.R;
     public static final KeyCode MANAGE_LABELS = KeyCode.L;
     public static final KeyCode MANAGE_ASSIGNEES = KeyCode.A;
     public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
 
     public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
+    
+    //ui.RepositorySelector
+    public static final KeyCode REMOVE_FOCUS = KeyCode.ESCAPE;
 
     // ui.MenuControl
     public static final KeyCombination NEW_ISSUE =
@@ -123,7 +126,7 @@ public class KeyboardShortcuts {
         assignedKeys.add(KeyCode.F5); //REFRESH
         assignedKeys.add(KeyCode.F1); //SHOW_DOCS
         assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
-        assignedKeys.add(KeyCode.C); //NEW_COMMENT
+        assignedKeys.add(KeyCode.R); //NEW_COMMENT
         assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
         assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
     }
