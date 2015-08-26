@@ -230,7 +230,7 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, or a label group. Label groups can be disambiguated by appending a `.`.*
+*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, `assignee` or a label group. Label groups can be disambiguated by appending a `.`.*
 
 Sorts a repository by the list of keys, going from left to right. Negated keys will reverse the ordering that they describe.
 
