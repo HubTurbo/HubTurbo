@@ -170,16 +170,22 @@ public class MenuControl extends MenuBar {
         Optional<String> response = dlg.showAndWait();
 
         if (response.isPresent()) {
-            String boardName = response.get();
-            if (boardName.equals("")) {
-                logger.info("Did not save new board");
-                return;
+            String boardName = response.get().trim();
+            if (isBoardNameValid(boardName)) {
+                prefs.addBoard(boardName, panels);
+                prefs.setLastOpenBoard(boardName);
+                ui.triggerEvent(new BoardSavedEvent());
+                logger.info("New board " + boardName + " saved");
             }
-            prefs.addBoard(boardName, panels);
-            prefs.setLastOpenBoard(boardName);
-            ui.triggerEvent(new BoardSavedEvent());
-            logger.info("New board " + boardName + " saved");
         }
+    }
+    
+    private boolean isBoardNameValid(String response) {
+        if (response.equals("")) {
+            logger.info("Did not save new board: Empty name");
+            return false;
+        }
+        return true;
     }
 
     /**
