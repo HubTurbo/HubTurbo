@@ -423,7 +423,9 @@ public class Qualifier implements FilterExpression {
                     Optional<String> aAssignee = a.getAssignee();
                     Optional<String> bAssignee = b.getAssignee();
 
-                    if (!aAssignee.isPresent()) {
+                    if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
+                        return 0;
+                    } if (!aAssignee.isPresent()) {
                         return 1;
                     } else if (!bAssignee.isPresent()) {
                         return -1;

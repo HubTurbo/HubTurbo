@@ -67,7 +67,7 @@ public class QualifierTests {
                 "d/d", 5, "Issue5", "d", "javascript",
                 LocalDateTime.of(2015, 1, 1, 1, 1), false);
 
-        List<TurboIssue> sampleIssues =new ArrayList<TurboIssue>();
+        List<TurboIssue> sampleIssues = new ArrayList<TurboIssue>();
         sampleIssues.add(issue1);
         sampleIssues.add(issue2);
         sampleIssues.add(issue3);
@@ -78,14 +78,17 @@ public class QualifierTests {
     }
 
     /**
-     * Tests if sort qualifier returns a valid comparator for "sort:assignee"
+     * Tests if getComparatorForSortQualifie returns a valid comparator for "sort:assignee"
+     * and null if there is no sort qualifier
      */
     @Test
     public void testSortQualifer1() {
         List<TurboIssue> issues = new ArrayList<>();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:assignee");
         Collections.sort(issues, comparator);
+
         assertTrue(issues.isEmpty());
+        assertTrue(getComparatorForSortQualifier("") == null);
     }
 
     /**
@@ -115,10 +118,41 @@ public class QualifierTests {
     }
 
     /**
-     * Tests sort qualifier with keys: repo, id and assignee
+     * Tests sort qualifier with issues with empty assignee
      */
     @Test
     public void testSortQualifer4() {
+        List<TurboIssue> issues = getSampleIssues();
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:assignee,id");
+        Comparator<TurboIssue> reverseComparator = getComparatorForSortQualifier("sort:~assignee,id");
+
+        TurboIssue issue6 = createIssueWithAssignee(
+                "b/b", 6, "Issue6", "b", "",
+                LocalDateTime.of(2013, 1, 2, 3, 4), true);
+        TurboIssue issue7 = createIssueWithAssignee(
+                "b/b", 7, "Issue7", "b", "",
+                LocalDateTime.of(2011, 4, 2, 3, 1), false);
+        issues.add(issue6);
+        issues.add(issue7);
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        String expected = "[#2 Issue2, #3 Issue3, #1 Issue1, #5 Issue5, #4 Issue4, " +
+                          "#6 Issue6, #7 Issue7]";
+        assertEquals(expected, issues.toString());
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, reverseComparator);
+        expected = "[#6 Issue6, #7 Issue7, " +
+                   "#4 Issue4, #5 Issue5, #1 Issue1, #3 Issue3, #2 Issue2]";
+        assertEquals(expected, issues.toString());
+    }
+
+    /**
+     * Tests sort qualifier with keys: repo, id and assignee
+     */
+    @Test
+    public void testSortQualifer5() {
         List<TurboIssue> issues = getSampleIssues();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:repo,id,assignee");
 
