@@ -9,6 +9,7 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -206,7 +207,7 @@ public class UI extends Application implements EventDispatcher {
             status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         notificationPaneTimer = new TickingTimer("Notification Pane Timer", NOTIFICATION_PANE_VISIBLE_PERIOD,
-                integer -> {}, this::hideNotificationPane, TimeUnit.SECONDS);
+                integer -> {}, () -> Platform.runLater(this::hideNotificationPane), TimeUnit.SECONDS);
         notificationPaneTimer.start();
     }
 
@@ -552,8 +553,8 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void showNotificationPane(Node graphic, String text, Action action) {
-        hideNotificationPane();
         Platform.runLater(() -> {
+            hideNotificationPane();
             notificationPane.setGraphic(graphic);
             notificationPane.setText(text);
             notificationPane.getActions().clear();
@@ -567,10 +568,17 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void hideNotificationPane() {
+        // must be run in a Platform.runLater
+        if (notificationPane.isShowing()) {
+            notificationPaneTimer.pause();
+            notificationPane.hide();
+        }
+    }
+
+    public void triggerNotificationPaneAction() {
         Platform.runLater(() -> {
             if (notificationPane.isShowing()) {
-                notificationPaneTimer.pause();
-                notificationPane.hide();
+                notificationPane.getActions().get(0).handle(new ActionEvent());
             }
         });
     }
