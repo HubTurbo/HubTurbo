@@ -133,20 +133,20 @@ public class MenuControl extends MenuBar {
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
         
-        if (prefs.getLastOpenBoard().equals("")) {
+        if (!prefs.getLastOpenBoard().isPresent()) {
             onBoardSaveAs();
             return;
         }
         
         List<PanelInfo> panels = getCurrentPanels();
         if (panels.isEmpty()) {
-            logger.info("Did not save board " + prefs.getLastOpenBoard());
+            logger.info("Did not save board " + prefs.getLastOpenBoard().get());
             return;
         }
         
-        prefs.addBoard(prefs.getLastOpenBoard(), panels);
+        prefs.addBoard(prefs.getLastOpenBoard().get(), panels);
         ui.triggerEvent(new BoardSavedEvent());
-        logger.info("Board " + prefs.getLastOpenBoard() + " saved");
+        logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
     }
 
     /**
@@ -208,8 +208,10 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
-            if (prefs.getLastOpenBoard().equals(boardName)) {
-                prefs.setLastOpenBoard("");
+            if (prefs.getLastOpenBoard().isPresent()) {
+                if (prefs.getLastOpenBoard().get().equals(boardName)) {
+                    prefs.clearLastOpenBoard();
+                }
             }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");

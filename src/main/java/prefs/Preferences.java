@@ -91,8 +91,12 @@ public class Preferences {
         global.setLastOpenBoard(board);
     }
     
-    public String getLastOpenBoard() {
+    public Optional<String> getLastOpenBoard() {
         return global.getLastOpenBoard();
+    }
+    
+    public void clearLastOpenBoard() {
+        global.clearLastOpenBoard();
     }
     
     public List<PanelInfo> getBoardPanels(String board) {

@@ -89,8 +89,12 @@ public class GlobalConfig {
         lastOpenBoard = Optional.of(board);
     }
     
-    public String getLastOpenBoard() {
-        return lastOpenBoard.get();
+    public Optional<String> getLastOpenBoard() {
+        return lastOpenBoard;
+    }
+    
+    public void clearLastOpenBoard() {
+        lastOpenBoard = Optional.empty();
     }
 
     public List<String> getLastOpenFilters() {
