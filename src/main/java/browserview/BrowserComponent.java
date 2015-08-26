@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +49,8 @@ public class BrowserComponent {
 
     private static final String CHROME_DRIVER_LOCATION = "browserview/";
     private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
+
+    private static final String CHROME_USER_DATA_DIR = System.getProperty("user.home") + File.separator + ".HubTurbo";
 
     private String pageContentOnLoad = "";
 
@@ -90,7 +93,13 @@ public class BrowserComponent {
             driver = createChromeDriver();
             logger.info("Successfully initialised browser component and ChromeDriver");
         });
-        login();
+
+        if (!isChromeCustomProfilePresent()) {
+            login();
+        }
+        else {
+            runBrowserOperation(() -> driver.get(GitHubURL.MAIN_PAGE, false));
+        }
     }
 
     /**
@@ -99,6 +108,34 @@ public class BrowserComponent {
     public void onAppQuit() {
         quit();
         removeChromeDriverIfNecessary();
+    }
+
+    private boolean isChromeCustomProfilePresent() {
+        File chromeCustomProfDir = new File(CHROME_USER_DATA_DIR);
+
+        if (chromeCustomProfDir.isDirectory()) {
+            String[] chromeCustomProfDirList = chromeCustomProfDir.list();
+            if (chromeCustomProfDirList != null && chromeCustomProfDirList.length > 0) {
+                return true;
+            }
+            else { // directory is empty
+                return false;
+            }
+        }
+        else { // directory does not exist yet
+            return false;
+        }
+    }
+
+    /**
+     * Reset Chrome Custom Profile directory so that all cookies are cleared
+     */
+    public void cleanChromeCustomProfile() {
+        try {
+            FileUtils.cleanDirectory(new File(CHROME_USER_DATA_DIR));
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -123,6 +160,7 @@ public class BrowserComponent {
      */
     private ChromeDriverEx createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("user-data-dir=" + CHROME_USER_DATA_DIR);
         if (USE_MOBILE_USER_AGENT) {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
