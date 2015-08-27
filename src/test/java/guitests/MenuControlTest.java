@@ -55,8 +55,8 @@ public class MenuControlTest extends UITest {
         
         // Testing board save as
         click("Boards");
-        click("Save as");
-        ((TextField) find("#bquasoardnameinput")).setText("Board 1");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
         sleep(1000);
         assertEquals(1, panelControl.getNumberOfSavedBoards());
@@ -66,7 +66,7 @@ public class MenuControlTest extends UITest {
         assertEquals(3, panelControl.getNumberOfPanels());
         
         click("Boards");
-        click("Save as");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("Board 2");
         click("OK");
         sleep(1000);
@@ -74,14 +74,14 @@ public class MenuControlTest extends UITest {
         
         // Testing invalid board names
         click("Boards");
-        click("Save as");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("");
         click("OK");
         sleep(1000);
         assertEquals(2, panelControl.getNumberOfSavedBoards());
 
         click("Boards");
-        click("Save as");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("   ");
         click("OK");
         sleep(1000);
@@ -122,7 +122,7 @@ public class MenuControlTest extends UITest {
         // Testing board save when no board is open because current board was closed
         // Expected: prompts user to save as new board
         click("Boards");
-        click("Save");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
         sleep(1000);
