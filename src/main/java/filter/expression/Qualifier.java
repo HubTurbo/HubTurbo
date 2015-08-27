@@ -425,7 +425,7 @@ public class Qualifier implements FilterExpression {
 
                     if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
                         return 0;
-                    } if (!aAssignee.isPresent()) {
+                    } else if (!aAssignee.isPresent()) {
                         return 1;
                     } else if (!bAssignee.isPresent()) {
                         return -1;
