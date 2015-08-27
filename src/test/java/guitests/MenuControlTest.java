@@ -44,6 +44,14 @@ public class MenuControlTest extends UITest {
 
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         
+        // Testing board save when no board is open nothing has been saved
+        // Expected: prompts user to save as new board
+        click("Boards");
+        click("Save");
+        push(KeyCode.ESCAPE);
+        sleep(1000);
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        
         // Testing board save as
         click("Boards");
         click("Save as");
@@ -110,7 +118,7 @@ public class MenuControlTest extends UITest {
         sleep(1000);
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         
-        // Testing board save when no board is open
+        // Testing board save when no board is open because current board was closed
         // Expected: prompts user to save as new board
         click("Boards");
         click("Save");

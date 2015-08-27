@@ -29,7 +29,7 @@ public class GlobalConfig {
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
-    private Optional<String> lastOpenBoard;
+    private Optional<String> lastOpenBoard = Optional.empty();
     private Map<String, List<PanelInfo>> savedBoards = new HashMap<>();
     private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
