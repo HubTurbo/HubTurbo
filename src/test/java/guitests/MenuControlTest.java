@@ -44,10 +44,11 @@ public class MenuControlTest extends UITest {
 
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         
-        // Testing board save when no board is open nothing has been saved
+        // Testing board save when no board is open because nothing has been saved
         // Expected: prompts user to save as new board
         click("Boards");
-        click("Save");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 1");
         push(KeyCode.ESCAPE);
         sleep(1000);
         assertEquals(0, panelControl.getNumberOfSavedBoards());
@@ -55,7 +56,7 @@ public class MenuControlTest extends UITest {
         // Testing board save as
         click("Boards");
         click("Save as");
-        ((TextField) find("#boardnameinput")).setText("Board 1");
+        ((TextField) find("#bquasoardnameinput")).setText("Board 1");
         click("OK");
         sleep(1000);
         assertEquals(1, panelControl.getNumberOfSavedBoards());
