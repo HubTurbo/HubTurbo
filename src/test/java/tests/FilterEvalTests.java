@@ -1,25 +1,29 @@
 package tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import prefs.Preferences;
 import backend.interfaces.IModel;
-import backend.resource.*;
+import backend.resource.MultiModel;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.Qualifier;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import prefs.Preferences;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class FilterEvalTests {
 
     private final IModel empty;
-    private static final String REPO = "test/test";
+    public static final String REPO = "test/test";
 
     public FilterEvalTests() {
         empty = new MultiModel(new Preferences(true));
@@ -34,7 +38,7 @@ public class FilterEvalTests {
      * Helper method for testing an issue against a filter string in the context
      * of an empty model.
      */
-    private boolean matches(String filterExpr, TurboIssue issue) {
+    public boolean matches(String filterExpr, TurboIssue issue) {
         return Qualifier.process(empty, Parser.parse(filterExpr), issue);
     }
 
@@ -442,188 +446,5 @@ public class FilterEvalTests {
 
         assertEquals(true, matches("repo:" + REPO, issue));
         assertEquals(false, matches("repo:something/else", issue));
-    }
-
-    @Test
-    public void sort() {
-        TurboIssue issue = new TurboIssue(REPO, 1, "");
-
-        // Being a meta-qualifier, this doesn't have any effect
-        assertEquals(true, matches("sort:id", issue));
-        assertEquals(true, matches("sort:id, ~repo", issue));
-        assertEquals(true, matches("sort:~id, NOT repo", issue));
-    }
-
-    @Test
-    public void repoOrdering() {
-        List<TurboIssue> issues = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            issues.add(new TurboIssue(REPO, i, ""));
-        }
-        for (int i = 5; i < 10; i++) {
-            issues.add(new TurboIssue("aaa/aaa", i, ""));
-        }
-
-        IModel model = TestUtils.singletonModel(
-            new Model(REPO, issues, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", false, false));
-
-        assertEquals(Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", true, false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-    }
-
-    @Test
-    public void updatedOrdering() {
-        List<TurboIssue> issues = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            TurboIssue issue = new TurboIssue(REPO, i, "");
-            issue.setUpdatedAt(LocalDateTime.of(2015, 6, 4 + i, 12, 0));
-            issues.add(issue);
-        }
-
-        IModel model = TestUtils.singletonModel(
-            new Model(REPO, issues, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", false, false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", true, false));
-
-        assertEquals(Arrays.asList(4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-    }
-
-    @Test
-    public void idOrdering() {
-        List<TurboIssue> issues = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            issues.add(new TurboIssue(REPO, i, ""));
-        }
-
-        IModel model = TestUtils.singletonModel(
-            new Model(REPO, issues, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", false, false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", true, false));
-
-        assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-    }
-
-    @Test
-    public void commentsOrdering() {
-        List<TurboIssue> issues = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            TurboIssue issue = new TurboIssue(REPO, i, "");
-            issue.setCommentCount(i);
-            issues.add(issue);
-        }
-
-        IModel model = TestUtils.singletonModel(
-            new Model(REPO, issues, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", false, false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", true, false));
-
-        assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-    }
-
-    @Test
-    public void labelGroupOrdering() {
-
-        // Labels and issues
-
-        TurboLabel one = new TurboLabel(REPO, "test.1");
-        TurboLabel two = new TurboLabel(REPO, "test.2");
-        TurboLabel a = new TurboLabel(REPO, "test.a");
-        TurboLabel other = new TurboLabel(REPO, "something");
-
-        List<TurboLabel> labels = new ArrayList<>();
-        labels.add(one);
-        labels.add(two);
-        labels.add(a);
-        labels.add(other);
-
-        List<TurboIssue> issues = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            issues.add(new TurboIssue(REPO, i, ""));
-        }
-
-        issues.get(0).getLabels().addAll(Arrays.asList("test.1"));
-        issues.get(1).getLabels().addAll(Arrays.asList("test.2"));
-        issues.get(2).getLabels().addAll(Arrays.asList("test.a"));
-        issues.get(3).getLabels().addAll(Arrays.asList("test.1", "test.2"));
-        issues.get(4).getLabels().addAll(Arrays.asList("test.a", "test.2"));
-        issues.get(5).getLabels().addAll(Arrays.asList("test.1", "test.2", "test.a"));
-        issues.get(6).getLabels().addAll(Arrays.asList("something"));
-        // issues.get(7) has no labels
-
-        for (int i = 0; i < 8; i++) {
-            issues.get(i).setTitle(issues.get(i).getLabels().toString());
-        }
-
-        // Construct model
-        IModel model = TestUtils.singletonModel(
-            new Model(REPO, issues, labels, new ArrayList<>(), new ArrayList<>()));
-
-        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
-
-        // lexicographical within groups, with those outside the group arranged last, by size
-        // (being last can mean either larger or smaller depending on inversion)
-
-        Collections.sort(renderedIssues,
-            Qualifier.getLabelGroupComparator(model, "test", false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getLabelGroupComparator(model, "test", true));
-
-        assertEquals(Arrays.asList(5, 4, 3, 2, 1, 0, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
     }
 }
