@@ -223,7 +223,9 @@ public class ListPanel extends FilterPanel {
             if (event.getCode() == KeyboardShortcuts.GOTO_MODIFIER) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && 
+                    !KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event) && 
+                    ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().jumpToComment();
             }
