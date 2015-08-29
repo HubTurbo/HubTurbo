@@ -1,5 +1,19 @@
 package filter.expression;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import util.Utility;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -7,15 +21,6 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-import util.Utility;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 
@@ -412,6 +417,22 @@ public class Qualifier implements FilterExpression {
                 } else {
                     comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 }
+                break;
+            case "assignee":
+                comparator = (a, b) -> {
+                    Optional<String> aAssignee = a.getAssignee();
+                    Optional<String> bAssignee = b.getAssignee();
+
+                    if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
+                        return 0;
+                    } else if (!aAssignee.isPresent()) {
+                        return 1;
+                    } else if (!bAssignee.isPresent()) {
+                        return -1;
+                    } else {
+                        return aAssignee.get().compareTo(bAssignee.get());
+                    }
+                };
                 break;
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
