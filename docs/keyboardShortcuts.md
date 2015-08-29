@@ -48,7 +48,7 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | **Action on the issue**| **Shortcut**|**Explanation**|
 | ------------- |:-------------:| -----------|
 | Load in broswer view|<kbd>Enter</kbd>|Loads the issue in the browser view, if it is not already loaded|
-| Add a **C**omment|<kbd>C</kbd>|Jump to *Add comment* box in browser view|
+| Add a Comment|<kbd>R</kbd>|Jump to *Add comment* box in browser view|
 | Edit **L**abels|<kbd>L</kbd>|Opens the pop-up window for editing labels|
 | Edit **A**ssignee|<kbd>A</kbd>|Jump to *assignees* property of the issue in the browser view|
 | Set **M**ilestone|<kbd>M</kbd>|Jump to the *milestone* property of the issue in the browser view|
