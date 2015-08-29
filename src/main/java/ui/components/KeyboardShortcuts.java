@@ -53,58 +53,76 @@ public class KeyboardShortcuts {
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static final KeyCombination BOX_TO_LIST =
+    public static final KeyCodeCombination BOX_TO_LIST =
             new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination LIST_TO_BOX =
+    public static final KeyCodeCombination LIST_TO_BOX =
             new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination MAXIMIZE_WINDOW =
+    public static final KeyCodeCombination MAXIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination MINIMIZE_WINDOW =
+    public static final KeyCodeCombination MINIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination DEFAULT_SIZE_WINDOW =
+    public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination SWITCH_DEFAULT_REPO =
+    public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
 
-    public static final KeyCode FIRST_ISSUE = KeyCode.HOME;
-    public static final KeyCode LAST_ISSUE = KeyCode.END;
+    public static final KeyCodeCombination FIRST_ISSUE =
+            new KeyCodeCombination(KeyCode.HOME);
+    public static final KeyCodeCombination LAST_ISSUE =
+            new KeyCodeCombination(KeyCode.END);
 
-    public static final KeyCode REFRESH = KeyCode.F5;
-    public static final KeyCode SHOW_DOCS = KeyCode.F1;
+    public static final KeyCodeCombination REFRESH =
+            new KeyCodeCombination(KeyCode.F5);
+    public static final KeyCodeCombination SHOW_DOCS =
+            new KeyCodeCombination(KeyCode.F1);
 
-    public static final KeyCode GOTO_MODIFIER = KeyCode.G;
-    public static final KeyCode SHOW_LABELS = KeyCode.L;
-    public static final KeyCode SHOW_ISSUES = KeyCode.I;
-    public static final KeyCode SHOW_MILESTONES = KeyCode.M;
-    public static final KeyCode SHOW_PULL_REQUESTS = KeyCode.P;
-    public static final KeyCode SHOW_HELP = KeyCode.H;
-    public static final KeyCode SHOW_KEYBOARD_SHORTCUTS = KeyCode.K;
-    public static final KeyCode SHOW_CONTRIBUTORS = KeyCode.D;
+    public static final KeyCodeCombination GOTO_MODIFIER =
+            new KeyCodeCombination(KeyCode.G);
+    public static final KeyCodeCombination SHOW_LABELS =
+            new KeyCodeCombination(KeyCode.L);
+    public static final KeyCodeCombination SHOW_ISSUES =
+            new KeyCodeCombination(KeyCode.I);
+    public static final KeyCodeCombination SHOW_MILESTONES =
+            new KeyCodeCombination(KeyCode.M);
+    public static final KeyCodeCombination SHOW_PULL_REQUESTS =
+            new KeyCodeCombination(KeyCode.P);
+    public static final KeyCodeCombination SHOW_HELP =
+            new KeyCodeCombination(KeyCode.H);
+    public static final KeyCodeCombination SHOW_KEYBOARD_SHORTCUTS =
+            new KeyCodeCombination(KeyCode.K);
+    public static final KeyCodeCombination SHOW_CONTRIBUTORS =
+            new KeyCodeCombination(KeyCode.D);
 
     // TODO decouple manage/show labels/milestones?
-    public static final KeyCode NEW_COMMENT = KeyCode.R;
-    public static final KeyCode MANAGE_LABELS = KeyCode.L;
-    public static final KeyCode MANAGE_ASSIGNEES = KeyCode.A;
-    public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
+    public static final KeyCodeCombination NEW_COMMENT =
+            new KeyCodeCombination(KeyCode.R);
+    public static final KeyCodeCombination MANAGE_LABELS =
+            new KeyCodeCombination(KeyCode.L);
+    public static final KeyCodeCombination MANAGE_ASSIGNEES =
+            new KeyCodeCombination(KeyCode.A);
+    public static final KeyCodeCombination MANAGE_MILESTONE =
+            new KeyCodeCombination(KeyCode.M);
 
-    public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
+    public static final KeyCodeCombination DOUBLE_PRESS =
+            new KeyCodeCombination(KeyCode.SPACE);
     
     //ui.RepositorySelector
-    public static final KeyCode REMOVE_FOCUS = KeyCode.ESCAPE;
+    public static final KeyCodeCombination REMOVE_FOCUS =
+            new KeyCodeCombination(KeyCode.ESCAPE);
 
     // ui.MenuControl
-    public static final KeyCombination NEW_ISSUE =
+    public static final KeyCodeCombination NEW_ISSUE =
             new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination NEW_LABEL =
+    public static final KeyCodeCombination NEW_LABEL =
             new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination NEW_MILESTONE =
+    public static final KeyCodeCombination NEW_MILESTONE =
             new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);
 
-    public static final KeyCombination CREATE_LEFT_PANEL =
+    public static final KeyCodeCombination CREATE_LEFT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-    public static final KeyCombination CREATE_RIGHT_PANEL =
+    public static final KeyCodeCombination CREATE_RIGHT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination CLOSE_PANEL =
+    public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
 
     public static Map<String, String> getDefaultKeyboardShortcuts() {

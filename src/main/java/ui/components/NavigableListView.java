@@ -153,11 +153,11 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                     onItemSelected.accept(selectedIndex.get());
                 }
             }
-            if (e.getCode() == KeyboardShortcuts.FIRST_ISSUE) {
+            if (KeyboardShortcuts.FIRST_ISSUE.match(e)) {
                 e.consume();
                 selectFirstItem();
             }
-            if (e.getCode() == KeyboardShortcuts.LAST_ISSUE) {
+            if (KeyboardShortcuts.LAST_ISSUE.match(e)) {
                 e.consume();
                 selectLastItem();
             }

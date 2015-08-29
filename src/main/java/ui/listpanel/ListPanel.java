@@ -144,10 +144,10 @@ public class ListPanel extends FilterPanel {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS) {
+            if (KeyboardShortcuts.DOUBLE_PRESS.match(event)) {
                 event.consume();
             }
-            if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
+            if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS.getCode(), event.getCode())) {
                 event.consume();
                 listView.selectFirstItem();
             }
@@ -172,39 +172,39 @@ public class ListPanel extends FilterPanel {
             if (event.getCode() == KeyboardShortcuts.markAsUnread) {
                 markAsUnread();
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_DOCS) {
+            if (KeyboardShortcuts.SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
             if (KeyboardShortcuts.LIST_TO_BOX.match(event)) {
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyboardShortcuts.DOUBLE_PRESS
-                && KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS, event.getCode())) {
+            if (KeyboardShortcuts.DOUBLE_PRESS.match(event)
+                && KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS.getCode(), event.getCode())) {
 
                 setFocusToFilterBox();
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_ISSUES) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_ISSUES.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showIssues();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_PULL_REQUESTS) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_PULL_REQUESTS.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showPullRequests();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_HELP) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_HELP.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showDocs();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showKeyboardShortcuts();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_CONTRIBUTORS) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_CONTRIBUTORS.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showContributors();
                     event.consume();
                 }
@@ -220,28 +220,27 @@ public class ListPanel extends FilterPanel {
             if (event.getCode() == KeyboardShortcuts.scrollUp || event.getCode() == KeyboardShortcuts.scrollDown) {
                 ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.scrollDown);
             }
-            if (event.getCode() == KeyboardShortcuts.GOTO_MODIFIER) {
+            if (KeyboardShortcuts.GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (event.getCode() == KeyboardShortcuts.NEW_COMMENT && 
-                    !KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event) && 
+            if (KeyboardShortcuts.NEW_COMMENT.match(event) && 
                     ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().jumpToComment();
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_LABELS) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_LABELS.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else {
                     changeLabels();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.MANAGE_ASSIGNEES && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (KeyboardShortcuts.MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
-            if (event.getCode() == KeyboardShortcuts.SHOW_MILESTONES) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER, event.getCode())) {
+            if (KeyboardShortcuts.SHOW_MILESTONES.match(event)) {
+                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().switchToConversationTab();

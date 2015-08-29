@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -239,7 +238,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Documentation");
             ui.getBrowserComponent().showDocs();
         });
-        documentationMenuItem.setAccelerator(new KeyCodeCombination(KeyboardShortcuts.SHOW_DOCS));
+        documentationMenuItem.setAccelerator(KeyboardShortcuts.SHOW_DOCS);
         return documentationMenuItem;
     }
 
@@ -249,7 +248,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Refresh");
             ui.logic.refresh();
         });
-        refreshMenuItem.setAccelerator(new KeyCodeCombination(KeyboardShortcuts.REFRESH));
+        refreshMenuItem.setAccelerator(KeyboardShortcuts.REFRESH);
         return refreshMenuItem;
     }
 
