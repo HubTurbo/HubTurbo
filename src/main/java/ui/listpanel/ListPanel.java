@@ -166,10 +166,10 @@ public class ListPanel extends FilterPanel {
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyboardShortcuts.markAsRead) {
+            if (KeyboardShortcuts.markAsRead.match(event)) {
                 markAsRead();
             }
-            if (event.getCode() == KeyboardShortcuts.markAsUnread) {
+            if (KeyboardShortcuts.markAsUnread.match(event)) {
                 markAsUnread();
             }
             if (KeyboardShortcuts.SHOW_DOCS.match(event)) {
@@ -209,16 +209,16 @@ public class ListPanel extends FilterPanel {
                     event.consume();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.scrollToTop) {
+            if (KeyboardShortcuts.scrollToTop.match(event)) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (event.getCode() == KeyboardShortcuts.scrollToBottom) {
+            if (KeyboardShortcuts.scrollToBottom.match(event)) {
                 if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
-            if (event.getCode() == KeyboardShortcuts.scrollUp || event.getCode() == KeyboardShortcuts.scrollDown) {
-                ui.getBrowserComponent().scrollPage(event.getCode() == KeyboardShortcuts.scrollDown);
+            if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
+                ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
             }
             if (KeyboardShortcuts.GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
@@ -337,8 +337,8 @@ public class ListPanel extends FilterPanel {
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyboardShortcuts.downIssue ||
-                    event.getCode() == KeyboardShortcuts.upIssue) {
+            if (KeyboardShortcuts.downIssue.match(event) ||
+                    KeyboardShortcuts.upIssue.match(event)) {
                 listView.selectFirstItem();
             }
         });

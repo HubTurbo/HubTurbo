@@ -31,25 +31,25 @@ public class KeyboardShortcuts {
     private static final Logger logger = LogManager.getLogger(KeyboardShortcuts.class.getName());
 
     private static Map<String, String> keyboardShortcuts = null;
-    private static Set<KeyCode> assignedKeys = null;
+    private static Set<KeyCodeCombination> assignedKeys = null;
 
     // customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static KeyCode markAsRead;
-    public static KeyCode markAsUnread;
+    public static KeyCodeCombination markAsRead;
+    public static KeyCodeCombination markAsUnread;
 
-    public static KeyCode scrollToTop;
-    public static KeyCode scrollToBottom;
-    public static KeyCode scrollUp;
-    public static KeyCode scrollDown;
+    public static KeyCodeCombination scrollToTop;
+    public static KeyCodeCombination scrollToBottom;
+    public static KeyCodeCombination scrollUp;
+    public static KeyCodeCombination scrollDown;
 
     //ui.issuepanel.PanelControl
-    public static KeyCode leftPanel;
-    public static KeyCode rightPanel;
+    public static KeyCodeCombination leftPanel;
+    public static KeyCodeCombination rightPanel;
 
     // ui.components.NavigableListView && ui.listpanel.ListPanel
-    public static KeyCode upIssue;
-    public static KeyCode downIssue;
+    public static KeyCodeCombination upIssue;
+    public static KeyCodeCombination downIssue;
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
@@ -141,25 +141,25 @@ public class KeyboardShortcuts {
     }
 
     private static void addNonCustomizableShortcutKeys() {
-        assignedKeys.add(KeyCode.F5); //REFRESH
-        assignedKeys.add(KeyCode.F1); //SHOW_DOCS
-        assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
-        assignedKeys.add(KeyCode.R); //NEW_COMMENT
-        assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
-        assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
+        assignedKeys.add(new KeyCodeCombination(KeyCode.F5)); //REFRESH
+        assignedKeys.add(new KeyCodeCombination(KeyCode.F1)); //SHOW_DOCS
+        assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
+        assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
+        assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
+        assignedKeys.add(new KeyCodeCombination(KeyCode.SPACE)); //DOUBLE_PRESS
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
-        markAsRead = getKeyCode("MARK_AS_READ");
-        markAsUnread = getKeyCode("MARK_AS_UNREAD");
-        scrollToTop = getKeyCode("SCROLL_TO_TOP");
-        scrollToBottom = getKeyCode("SCROLL_TO_BOTTOM");
-        scrollUp = getKeyCode("SCROLL_UP");
-        scrollDown = getKeyCode("SCROLL_DOWN");
-        leftPanel = getKeyCode("LEFT_PANEL");
-        rightPanel = getKeyCode("RIGHT_PANEL");
-        upIssue = getKeyCode("UP_ISSUE");
-        downIssue = getKeyCode("DOWN_ISSUE");
+        markAsRead = getKeyCodeCombination("MARK_AS_READ");
+        markAsUnread = getKeyCodeCombination("MARK_AS_UNREAD");
+        scrollToTop = getKeyCodeCombination("SCROLL_TO_TOP");
+        scrollToBottom = getKeyCodeCombination("SCROLL_TO_BOTTOM");
+        scrollUp = getKeyCodeCombination("SCROLL_UP");
+        scrollDown = getKeyCodeCombination("SCROLL_DOWN");
+        leftPanel = getKeyCodeCombination("LEFT_PANEL");
+        rightPanel = getKeyCodeCombination("RIGHT_PANEL");
+        upIssue = getKeyCodeCombination("UP_ISSUE");
+        downIssue = getKeyCodeCombination("DOWN_ISSUE");
     }
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
@@ -190,12 +190,13 @@ public class KeyboardShortcuts {
         prefs.setKeyboardShortcuts(keyboardShortcuts);
     }
 
-    private static KeyCode getKeyCode(String keyboardShortcut) {
-        KeyCode keyCode = KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut));
+    private static KeyCodeCombination getKeyCodeCombination(String keyboardShortcut) {
+        KeyCodeCombination keyCodeCombi = 
+                new KeyCodeCombination(KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut))); 
         if (keyboardShortcuts.containsKey(keyboardShortcut)) {
-            KeyCode userDefinedKeyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
-            if (userDefinedKeyCode != null && !assignedKeys.contains(userDefinedKeyCode)) {
-                keyCode = userDefinedKeyCode;
+            KeyCode keyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
+            if (keyCode != null && !assignedKeys.contains(new KeyCodeCombination(keyCode))) {
+                keyCodeCombi = new KeyCodeCombination(keyCode);
             } else {
                 logger.warn("Invalid key specified for " + keyboardShortcut +
                         " or it has already been used for some other shortcut. ");
@@ -228,9 +229,9 @@ public class KeyboardShortcuts {
                 System.exit(0);
             }
         }
-        logger.info("Assigning <" + keyCode + "> to " + keyboardShortcut);
-        assignedKeys.add(keyCode);
-        return keyCode;
+        logger.info("Assigning <" + keyCodeCombi + "> to " + keyboardShortcut);
+        assignedKeys.add(keyCodeCombi);
+        return keyCodeCombi;
     }
 
 }
