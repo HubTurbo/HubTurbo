@@ -34,10 +34,12 @@ public class IssueServiceExtended extends IssueService{
 
     private GitHubResponse getIssueResponse(String repoId, String issueNumber)
             throws IOException {
-        if (issueNumber == null)
+        if (issueNumber == null) {
             throw new IllegalArgumentException("Issue number cannot be null"); //$NON-NLS-1$
-        if (issueNumber.length() == 0)
+        }
+        if (issueNumber.length() == 0) {
             throw new IllegalArgumentException("Issue number cannot be empty"); //$NON-NLS-1$
+        }
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId);
@@ -72,15 +74,17 @@ public class IssueServiceExtended extends IssueService{
     }
 
     public Issue editIssue(IRepositoryIdProvider repository, Issue issue, String dateModified) throws IOException {
-        if (issue == null)
+        if (issue == null) {
             throw new IllegalArgumentException("Issue cannot be null"); //$NON-NLS-1$
+        }
 
         HttpURLConnection connection = createIssuePostConnection(repository, issue.getNumber());
         connection.setRequestProperty("If-Unmodified-Since", dateModified);
         Map<Object, Object> params = createIssueMap(issue, false);
         String state = issue.getState();
-        if (state != null)
+        if (state != null) {
             params.put(FILTER_STATE, state);
+        }
         return ghClient.sendJson(connection, params, Issue.class);
     }
 

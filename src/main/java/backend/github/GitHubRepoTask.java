@@ -21,7 +21,7 @@ public abstract class GitHubRepoTask<R> extends RepoTask<R> {
         public Result(List<TR> items, String eTag, Date lastCheckTime) {
             this.items = items;
             this.eTag = eTag;
-            this.lastCheckTime = lastCheckTime;
+            this.lastCheckTime = new Date(lastCheckTime.getTime());
         }
 
         public Result(List<TR> items, String eTag) {

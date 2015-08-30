@@ -47,4 +47,8 @@ public class GitHubURL {
     public static boolean isUrlIssue(String url) {
         return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)([/commits,/files]*)");
     }
+    
+    public static boolean isPullRequestLoaded(String url)  {
+        return (url.endsWith("/commits") || url.endsWith("/files"));
+    }
 }

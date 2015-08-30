@@ -4,25 +4,25 @@ import java.time.LocalDateTime;
 
 public class RepoViewRecord implements Comparable<RepoViewRecord>{
 
-    private String repository;
+    private final String repository;
+    private final LocalDateTime timestamp;
 
     public String getRepository() {
         return repository;
     }
 
-    private LocalDateTime timestamp;
-
     public LocalDateTime getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime lastViewedTimestamp) {
-        this.timestamp = lastViewedTimestamp;
     }
 
     public RepoViewRecord(String repository) {
         this.repository = repository;
         this.timestamp = LocalDateTime.now();
+    }
+
+    public RepoViewRecord(String repository, LocalDateTime timestamp) {
+        this.repository = repository;
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -41,18 +41,23 @@ public class RepoViewRecord implements Comparable<RepoViewRecord>{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         RepoViewRecord other = (RepoViewRecord) obj;
         if (repository == null) {
-            if (other.repository != null)
+            if (other.repository != null) {
                 return false;
-        } else if (!repository.equals(other.repository))
+            }
+        } else if (!repository.equals(other.repository)) {
             return false;
+        }
         return true;
     }
 

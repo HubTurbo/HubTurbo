@@ -46,7 +46,7 @@ public class StoreTests {
         assertEquals(10, dummy1.getIssues().size());
 
         // Spawn new issue
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy1/dummy1"));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
 
         dummy1 = testIO.openRepository("dummy1/dummy1").get();
         assertEquals(11, dummy1.getIssues().size());
@@ -65,7 +65,7 @@ public class StoreTests {
         assertEquals(10, dummy1.getIssues().size());
 
         // Spawn new issue (to be stored in JSON)
-        UI.events.triggerEvent(new UpdateDummyRepoEvent(UpdateDummyRepoEvent.UpdateType.NEW_ISSUE, "dummy1/dummy1"));
+        UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
         // Trigger store
         dummy1 = testIO.updateModel(dummy1).get();
         assertEquals(11, dummy1.getIssues().size());

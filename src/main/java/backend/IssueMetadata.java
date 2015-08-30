@@ -13,6 +13,8 @@ public class IssueMetadata {
     private final List<Comment> comments;
     private final LocalDateTime nonSelfUpdatedAt;
     private final int nonSelfCommentCount;
+
+    // If isUpdated is true, nonSelfUpdatedAt will be used to sort/filter instead of updatedAt in TurboIssue
     private final boolean isUpdated;
     private final String ETag;
 
@@ -33,6 +35,16 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.isUpdated = other.isUpdated;
+        this.ETag = other.ETag;
+    }
+
+    // Copy constructor used in reconciliation
+    public IssueMetadata(IssueMetadata other, boolean isUpdated) {
+        this.events = new ArrayList<>(other.events);
+        this.comments = new ArrayList<>(other.comments);
+        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.isUpdated = isUpdated;
         this.ETag = other.ETag;
     }
 

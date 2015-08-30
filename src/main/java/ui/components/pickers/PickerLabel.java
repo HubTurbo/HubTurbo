@@ -78,4 +78,14 @@ public class PickerLabel extends TurboLabel {
     public void setIsFaded(boolean isFaded) {
         this.isFaded = isFaded;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

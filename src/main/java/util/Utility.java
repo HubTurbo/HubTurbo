@@ -1,9 +1,15 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,18 +29,6 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.UIManager;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-
 public class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
@@ -50,33 +44,49 @@ public class Utility {
             && repositoryId.generateId().equals(repoId);
     }
 
-    public static Optional<String> readFile(String filename) {
-        try {
-            return Optional.of(new String(Files.readAllBytes(new File(filename).toPath())));
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
+    public static Optional<String> readFile(String fileName) {
+        boolean validPath = !(fileName == null || fileName.isEmpty());
+        if (validPath) {
+            try {
+                return Optional.of(new String(Files.readAllBytes(new File(fileName).toPath()), "UTF-8"));
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+            }
         }
         return Optional.empty();
     }
 
+    /**
+     * Returns true on JSON corruption.
+     * TODO remove JSON-specific parts
+     * @param fileName
+     * @param content
+     * @param issueCount
+     * @return
+     */
     public static boolean writeFile(String fileName, String content, int issueCount) {
-        try {
-            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-            writer.println(content);
-            writer.close();
+        boolean validPath = !(fileName == null || fileName.isEmpty());
+        if (validPath) {
+            try {
+                PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+                writer.println(content);
+                writer.close();
 
-            long sizeAfterWrite = Files.size(Paths.get(fileName));
-            return processFileGrowth(sizeAfterWrite, issueCount, fileName);
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
-            return true;
+                long sizeAfterWrite = Files.size(Paths.get(fileName));
+                return processFileGrowth(sizeAfterWrite, issueCount, fileName);
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+                return true;
+            }
         }
+        return false;
     }
 
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.
-        if (sizeAfterWrite > ((long) issueCount * 2000)) {
+        if ((issueCount > 0) &&
+                (sizeAfterWrite > ((long) issueCount * 2000))) {
             UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
                             + "Now proceeding to delete the file and redownload the repository to prevent "
@@ -122,6 +132,10 @@ public class Utility {
 
     public static String stripQuotes(String s) {
         return s.replaceAll("^\"|\"$", "");
+    }
+
+    public static String removeAllWhiteSpaces(String s) {
+        return s.replaceAll("\\s", "");
     }
 
     public static int safeLongToInt(long l) {
@@ -235,4 +249,13 @@ public class Utility {
         }
         return Optional.empty();
     }
+
+    public static boolean containsIgnoreCase(String source, String query) {
+        return source.toLowerCase().contains(query.toLowerCase());
+    }
+
+    public static boolean startsWithIgnoreCase(String source, String query) {
+        return source.toLowerCase().startsWith(query.toLowerCase());
+    }
+
 }

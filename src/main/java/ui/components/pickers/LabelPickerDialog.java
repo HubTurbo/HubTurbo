@@ -37,13 +37,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         textField = createTextField();
         bottomBox = createBottomBox();
 
-        setupKeyEvents();
+        setupEvents(stage);
         uiLogic = new LabelPickerUILogic(issue, repoLabels, this);
 
         vBox.getChildren().addAll(titleLabel, topPane, textField, bottomBox);
         getDialogPane().setContent(vBox);
 
         Platform.runLater(textField::requestFocus);
+    }
+
+    private void setupEvents(Stage stage) {
+        setupKeyEvents();
+
+        showingProperty().addListener(e -> {
+            positionDialog(stage);
+        });
     }
 
     private void setupKeyEvents() {
@@ -68,20 +76,24 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void ______POPULATION______() {}
 
-    protected void populatePanes(
-            List<PickerLabel> topLabels, List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
-        populateTopPane(topLabels);
+    protected void populatePanes(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels,
+            List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
+        populateTopPane(existingLabels, newTopLabels);
         populateBottomBox(bottomLabels, groups);
     }
 
-    private void populateTopPane(List<PickerLabel> topLabels) {
+    private void populateTopPane(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels) {
         topPane.getChildren().clear();
-        if (topLabels.size() == 0) {
+        if (existingLabels.size() == 0 && newTopLabels.size() == 0) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
         } else {
-            topLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            existingLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            if (newTopLabels.size() > 0) {
+                topPane.getChildren().add(new Label("|"));
+                newTopLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
+            }
         }
     }
 
@@ -132,6 +144,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL); // TODO change to NONE for multiple dialogs
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
+    }
+
+    public void positionDialog(Stage stage) {
+        if (!Double.isNaN(getHeight())) {
+            setX(stage.getX() + stage.getScene().getX());
+            setY(stage.getY() +
+                 stage.getScene().getY() +
+                 (stage.getScene().getHeight() - getHeight()) / 2);
+        }
     }
 
     private void createButtons() {

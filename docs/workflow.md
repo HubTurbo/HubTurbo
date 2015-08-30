@@ -14,8 +14,8 @@ First,
 Fixing issues:
 
 1. Select an issue to handle. For your first issue, select an issue labelled `difficulty.beginner`. Optionally, you may discuss the issue using the issue tracker to see if your intended solution is suitable. 
-2. Create a branch off the [`master`](https://github.com/HubTurbo/HubTurbo) branch. The branch should be named "IssueX", where `X` is the number of the issue. e.g. `Issue123`
-3. Implement your changes in the created branch. Run tests locally and ensure that there are no failures or style violations (use the `test` and `check` tasks in Gradle). 
+2. Create a branch off the current `master` named "X-short-description", where `X` is the issue number. For example, `2342-remove-println` for an issue named `Remove all unnecessary println statements`.
+3. Implement your changes in the created branch. Run tests locally and ensure that there are no failures or style violations (use the `test` and `check` tasks in Gradle).
 4. Push your changes to your fork.
 5. Create a pull request against the [`master`](https://github.com/HubTurbo/HubTurbo) branch of the main repo.
     - The name of the PR should be in the format "TITLE #X", where `TITLE` is the title of the issue you selected, and `X` is its number. e.g. `Sorting order is incorrect #123`

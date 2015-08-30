@@ -59,23 +59,22 @@ public class DateRange {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         DateRange other = (DateRange) obj;
         if (end == null) {
-            if (other.end != null)
+            if (other.end != null) {
                 return false;
-        } else if (!end.equals(other.end))
+            }
+        } else if (!end.equals(other.end)) {
             return false;
+        }
         if (start == null) {
-            if (other.start != null)
-                return false;
-        } else if (!start.equals(other.start))
+            if (other.start != null) return false;
+        } else if (!start.equals(other.start)) {
             return false;
+        }
         return strictly == other.strictly;
     }
 
@@ -91,14 +90,12 @@ public class DateRange {
                 return ">=" + start;
             }
         } else if (start == null) {
-            assert end != null;
             if (strictly) {
                 return "<" + end;
             } else {
                 return "<=" + end;
             }
         } else {
-            assert start != null && end != null;
             return start + " .. " + end;
         }
     }

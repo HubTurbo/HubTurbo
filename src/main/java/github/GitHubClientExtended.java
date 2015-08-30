@@ -2,6 +2,8 @@ package github;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -62,13 +64,14 @@ public class GitHubClientExtended extends GitHubClient {
         sendParams(request, params);
         final int code = request.getResponseCode();
         updateRateLimits(request);
-        if (isOk(code))
-            if (type != null)
+        if (isOk(code)) {
+            if (type != null) {
                 return parseJson(getStream(request), type);
-            else
+            } else {
                 return null;
-        if (isEmpty(code))
-            return null;
+            }
+        }
+        if (isEmpty(code)) return null;
         throw createException(getStream(request), code, request.getResponseMessage());
     }
 
@@ -87,9 +90,9 @@ public class GitHubClientExtended extends GitHubClient {
         // Headers for the request
         httpRequest.setRequestProperty("If-None-Match", "\"" + currentETag + "\"");
         String accept = request.getResponseContentType();
-        if (accept != null)
+        if (accept != null) {
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
-
+        }
         // We send the request here.
         final int code = httpRequest.getResponseCode();
 
@@ -111,10 +114,10 @@ public class GitHubClientExtended extends GitHubClient {
             return new GitHubEventsResponse(ghResponse, reqIS3, updatedEtag);
         } else if (isNotModified(code)) { // 304 Not Modified
             GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
-            return new GitHubEventsResponse(ghResponse, null, currentETag);
+            return new GitHubEventsResponse(ghResponse, new NullInputStream(0), currentETag);
         } else if (isEmpty(code)) {
             GitHubResponse ghResponse = new GitHubResponse(httpRequest, null);
-            return new GitHubEventsResponse(ghResponse, null, "");
+            return new GitHubEventsResponse(ghResponse, new NullInputStream(0), "");
         } else {
             throw createException(getStream(httpRequest), code, httpRequest.getResponseMessage());
         }

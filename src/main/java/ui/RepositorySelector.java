@@ -3,7 +3,9 @@ package ui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import ui.components.KeyboardShortcuts;
 import util.Utility;
 
 import java.util.List;
@@ -35,8 +37,26 @@ public class RepositorySelector extends HBox {
         comboBox.setFocusTraversable(false);
         comboBox.setEditable(true);
         comboBox.valueProperty().addListener((observable, old, newVal) -> {
-            if (Utility.isWellFormedRepoId(newVal) && !changesDisabled) {
-                onValueChangeCallback.accept(newVal);
+            if (newVal == null) {
+                return;
+            }
+
+            String repoId = Utility.removeAllWhiteSpaces(newVal);
+            if (!repoId.equals(newVal)) {
+                comboBox.setValue(repoId);
+                return;
+            }
+
+            if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
+                onValueChangeCallback.accept(repoId);
+            }
+        });
+
+        //remove focus from the repo selector
+        comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+            event.consume();
+            if (event.getCode() == KeyboardShortcuts.REMOVE_FOCUS) {
+                getParent().requestFocus();
             }
         });
     }
@@ -50,7 +70,7 @@ public class RepositorySelector extends HBox {
         comboBox.getItems().addAll(ui.logic.getStoredRepos());
         comboBox.getItems().sort(String.CASE_INSENSITIVE_ORDER);
     }
-    
+
     public List<String> getContents() {
         return comboBox.getItems();
     }

@@ -145,7 +145,7 @@ public class ChromeDriverTest extends UITest {
         clearKeyCode();
 
         // jump to comments
-        push(KeyCode.C);
+        push(KeyCode.R);
         sleep(EVENT_DELAY);
         assertEquals(true, jumpToComment);
         jumpToComment = false;

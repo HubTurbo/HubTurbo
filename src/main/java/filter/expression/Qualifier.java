@@ -1,5 +1,19 @@
 package filter.expression;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import util.Utility;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -7,15 +21,6 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-import util.Utility;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 
@@ -25,13 +30,13 @@ public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier("", "");
 
-    public static final String[] KEYWORDS = new String[] {
+    public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
         "assignees", "author", "body", "closed", "comments", "created", "creator",
         "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
         "title", "type", "unmerged", "unread", "updated", "user"
-    };
+    ));
 
     private final String name;
 
@@ -324,12 +329,15 @@ public class Qualifier implements FilterExpression {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Qualifier other = (Qualifier) obj;
         return content.equals(other.content) &&
                 date.equals(other.date) &&
@@ -409,6 +417,22 @@ public class Qualifier implements FilterExpression {
                 } else {
                     comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 }
+                break;
+            case "assignee":
+                comparator = (a, b) -> {
+                    Optional<String> aAssignee = a.getAssignee();
+                    Optional<String> bAssignee = b.getAssignee();
+
+                    if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
+                        return 0;
+                    } else if (!aAssignee.isPresent()) {
+                        return 1;
+                    } else if (!bAssignee.isPresent()) {
+                        return -1;
+                    } else {
+                        return aAssignee.get().compareTo(bAssignee.get());
+                    }
+                };
                 break;
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
@@ -623,20 +647,20 @@ public class Qualifier implements FilterExpression {
 
         String group = "";
         if (tokens.getGroup().isPresent()) {
-            group = tokens.getGroup().get().toLowerCase();
+            group = tokens.getGroup().get();
         }
-        String labelName = tokens.getName().toLowerCase();
+        String labelName = tokens.getName();
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
             if (label.getGroup().isPresent()) {
                 if (labelName.isEmpty()) {
                     // Check the group
-                    if (label.getGroup().get().toLowerCase().contains(group)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)) {
                        return true;
                     }
                 } else {
-                    if (label.getGroup().get().toLowerCase().contains(group)
-                        && label.getName().toLowerCase().contains(labelName)) {
+                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)
+                        && Utility.containsIgnoreCase(label.getName(), labelName)) {
                        return true;
                     }
                 }
@@ -644,7 +668,7 @@ public class Qualifier implements FilterExpression {
                 // Check only the label name
                 if (!group.isEmpty()) {
                     return false;
-                } else if (!labelName.isEmpty() && label.getName().toLowerCase().contains(labelName)) {
+                } else if (!labelName.isEmpty() && Utility.containsIgnoreCase(label.getName(), labelName)) {
                     return true;
                 }
             }
