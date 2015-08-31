@@ -64,7 +64,7 @@ public class MenuControlTest extends UITest {
 
         click("View");
         click("Refresh");
-        push(KeyboardShortcuts.REFRESH);
+        push(KeyboardShortcuts.REFRESH.getCode());
         assertEquals(true, modelUpdatedEventTriggered);
         modelUpdatedEventTriggered = false;
     }
