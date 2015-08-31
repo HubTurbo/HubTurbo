@@ -1,10 +1,8 @@
 package ui.listpanel;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-
+import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import filter.expression.Qualifier;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyEvent;
@@ -18,15 +16,18 @@ import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
-import filter.expression.Qualifier;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
 
 public class ListPanel extends FilterPanel {
 
     private final IModel model;
     private final UI ui;
     private int issueCount;
+    private Optional<String> currentFilterText = Optional.empty();
 
     private IssueListView listView;
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
@@ -144,11 +145,14 @@ public class ListPanel extends FilterPanel {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (KeyboardShortcuts.DOUBLE_PRESS.match(event)) {
-                event.consume();
+            if (!KeyboardShortcuts.DOUBLE_PRESS.match(event)) {
+                currentFilterText = Optional.of(getCurrentFilterString());
             }
             if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS.getCode(), event.getCode())) {
                 event.consume();
+                if (currentFilterText.isPresent()) {
+                    filterTextField.setText(currentFilterText.get());
+                }
                 listView.selectFirstItem();
             }
             if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
