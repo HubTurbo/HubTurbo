@@ -258,6 +258,9 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
             }
+            if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
+                ui.triggerNotificationPaneAction();
+            }
         });
     }
 
