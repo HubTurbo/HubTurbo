@@ -180,7 +180,7 @@ public class Logic {
                     lastNonSelfUpdate = comment.getCreatedAt();
                     isUpdatedByOthers = true;
                 } else if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                        && comment.getCreatedAt().after(lastNonSelfUpdate)){
+                        && comment.getCreatedAt().after(lastSelfUpdate)){
                     lastSelfUpdate = comment.getCreatedAt();
                     isUpdatedBySelf = true;
                 }
