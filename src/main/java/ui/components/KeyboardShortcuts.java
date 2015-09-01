@@ -94,6 +94,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
+    public static final Set<KeyCodeCombination> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =
@@ -112,7 +113,6 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
 
-    public static final Set<KeyCode> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
             new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
@@ -128,10 +128,10 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
     
-    private static Set<KeyCode> populateJumpToFirstIssueSet() {
-        Set <KeyCode> result = new HashSet<KeyCode>();
-        result.add(KeyCode.DIGIT1);
-        result.add(KeyCode.ENTER);
+    private static Set<KeyCodeCombination> populateJumpToFirstIssueSet() {
+        Set <KeyCodeCombination> result = new HashSet<KeyCodeCombination>();
+        result.add(new KeyCodeCombination(KeyCode.DIGIT1));
+        result.add(new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN));
         return result;
     }
     

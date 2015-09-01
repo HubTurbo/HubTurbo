@@ -69,7 +69,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
         push(KeyCode.ESCAPE);
-        push(KeyCode.ENTER);
+        press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
         sleep(1000);
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
@@ -130,24 +130,22 @@ public class KeyboardShortcutsTest extends UITest {
         int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(issueIdExpected, selectedIssueId);
-        push(getKeyCode("UP_ISSUE")); // required since focus has changed to
-                                      // next issue
+        push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
-
+        
         // mark as read an issue at the bottom
         push(KeyCode.END);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at bottom issue
         assertEquals(1, selectedIssueId);
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
-
+        
         // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
         assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
-        // testing corner case for mark as read where there is only one issue
-        // displayed
+        // testing corner case for mark as read where there is only one issue displayed
         click("#dummy/dummy_col1_filterTextField");
         type("id");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
@@ -159,9 +157,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(5, selectedIssueId);
         
         // minimize window
-        press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run
-                                                                                             // this
-                                                                                             // last
+        press(KeyCode.CONTROL).press(KeyCode.N).release(KeyCode.N).release(KeyCode.CONTROL); // run this last
         assertEquals(true, stage.isIconified());
 
     }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -262,10 +263,11 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationPaneAction();
             }
-
-            if (KeyboardShortcuts.jumpToFirstIssueKeys.contains(event.getCode())) {
-                event.consume();
-                listView.selectFirstItem();
+            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+                if (key.match(event)) {
+                    event.consume();
+                    listView.selectFirstItem();
+                }
             }
         });
     }
