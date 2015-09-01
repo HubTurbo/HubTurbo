@@ -13,8 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final int DIALOG_DELAY = 1500;
-    public static final int EVENT_DELAY = 1000;
+    private static final int EVENT_DELAY = 1000;
 
     @Test
     public void showLabelPickerTest() {
@@ -30,7 +29,7 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
+        sleep(EVENT_DELAY);
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
@@ -48,8 +47,10 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
+        sleep(EVENT_DELAY);
 
+        TextField labelPickerTextField = find("#labelPickerTextField");
+        click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
@@ -57,10 +58,49 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(DIALOG_DELAY);
+        sleep(EVENT_DELAY);
 
+        labelPickerTextField = find("#labelPickerTextField");
+        click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+    }
+
+    @Test
+    public void undoLabelChangeTest() {
+        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(EVENT_DELAY);
+
+        TextField labelPickerTextField = find("#labelPickerTextField");
+        click(labelPickerTextField);
+        type("2 ");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(0, listPanelCell.getIssueLabels().size());
+
+        click("Undo");
+        sleep(EVENT_DELAY);
+        assertEquals(1, listPanelCell.getIssueLabels().size());
+
+        Platform.runLater(stage::hide);
+        UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
+        sleep(EVENT_DELAY);
+
+        labelPickerTextField = find("#labelPickerTextField");
+        click(labelPickerTextField);
+        type("2 ");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(0, listPanelCell.getIssueLabels().size());
+
+        click("#dummy/dummy_col0_9");
+        press(KeyCode.CONTROL).press(KeyCode.Z).release(KeyCode.Z).release(KeyCode.CONTROL);
         sleep(EVENT_DELAY);
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }

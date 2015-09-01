@@ -55,7 +55,7 @@ public class RepositorySelector extends HBox {
         //remove focus from the repo selector
         comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
             event.consume();
-            if (event.getCode() == KeyboardShortcuts.REMOVE_FOCUS) {
+            if (KeyboardShortcuts.REMOVE_FOCUS.match(event)) {
                 getParent().requestFocus();
             }
         });

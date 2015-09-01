@@ -50,16 +50,16 @@ public class KeyboardShortcutsTest extends UITest {
         clearUiComponentFocusEventType();
 
         // jump from filter box to first issue
-        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
 
         // jump from issue list to filter box
-        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
 
-        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
 
         // jump to last issue
         push(KeyCode.END);
@@ -83,7 +83,7 @@ public class KeyboardShortcutsTest extends UITest {
         clearSelectedIssueId();
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        push(DOUBLE_PRESS).push(DOUBLE_PRESS);
+        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
 
         push(getKeyCode("RIGHT_PANEL"));
         assertEquals(0, panelIndex);
