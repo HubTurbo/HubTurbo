@@ -425,19 +425,39 @@ public class FilterEvalTests {
         issue.setUpdatedAt(now.minusDays(2));
 
         assertEquals(false, matches("updated:<24", issue));
+        assertEquals(false, matches("updatedByOthers:<24", issue));
+        assertEquals(false, matches("updatedBySelf:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
+        assertEquals(matches("updatedByOthers:<24", issue),
+                matches("updatedByOthers:<24", issue));
+        assertEquals(matches("updatedBySelf:<24", issue),
+                matches("updatedBySelf:<24", issue));
         assertEquals(true, matches("updated:>24", issue));
+        assertEquals(true, matches("updatedByOthers:>24", issue));
+        assertEquals(true, matches("updatedBySelf:>24", issue));
         assertEquals(false, matches("updated:nondate", issue));
+        assertEquals(false, matches("updatedByOthers:nondate", issue));
+        assertEquals(false, matches("updatedBySelf:nondate", issue));
 
         issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(1));
 
         assertEquals(true, matches("updated:<26", issue));
+        assertEquals(true, matches("updatedByOthers:<26", issue));
+        assertEquals(true, matches("updatedBySelf:<26", issue));
         assertEquals(matches("updated:<26", issue),
             matches("updated:26", issue));
+        assertEquals(matches("updatedByOthers:<26", issue),
+                matches("updatedByOthers:26", issue));
+        assertEquals(matches("updatedBySelf:<26", issue),
+                matches("updatedBySelf:26", issue));
         assertEquals(false, matches("updated:>26", issue));
+        assertEquals(false, matches("updatedByOthers:>26", issue));
+        assertEquals(false, matches("updatedBySelf:>26", issue));
         assertEquals(false, matches("updated:nondate", issue));
+        assertEquals(false, matches("updatedBySelf:nondate", issue));
+        assertEquals(false, matches("updatedByOthers:nondate", issue));
     }
 
     @Test

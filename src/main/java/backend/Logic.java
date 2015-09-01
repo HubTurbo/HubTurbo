@@ -168,7 +168,7 @@ public class Logic {
                         && event.getDate().after(lastNonSelfUpdate)) {
                     lastNonSelfUpdate = event.getDate();
                     isUpdatedByOthers = true;
-                } else if(event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                } else if (event.getActor().getLogin().equalsIgnoreCase(currentUser)
                         && event.getDate().after(lastSelfUpdate)){
                     lastSelfUpdate = event.getDate();
                     isUpdatedBySelf = true;
@@ -179,7 +179,7 @@ public class Logic {
                         && comment.getCreatedAt().after(lastNonSelfUpdate)) {
                     lastNonSelfUpdate = comment.getCreatedAt();
                     isUpdatedByOthers = true;
-                } else if(comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                } else if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)
                         && comment.getCreatedAt().after(lastNonSelfUpdate)){
                     lastSelfUpdate = comment.getCreatedAt();
                     isUpdatedBySelf = true;
@@ -206,7 +206,7 @@ public class Logic {
                     result++;
                 }
             }
-        } else if(issueType == IssueType.SELF_UPDATED){
+        } else if (issueType == IssueType.SELF_UPDATED){
             for (Comment comment : comments) {
                 if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
                     result++;

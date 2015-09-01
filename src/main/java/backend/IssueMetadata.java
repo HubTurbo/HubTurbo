@@ -117,21 +117,29 @@ public class IssueMetadata {
         return nonSelfUpdatedAt;
     }
 
-    public LocalDateTime getSelfUpdatedAt() { return selfUpdatedAt; }
+    public LocalDateTime getSelfUpdatedAt() {
+        return selfUpdatedAt;
+    }
 
     public int getNonSelfCommentCount() {
         return nonSelfCommentCount;
     }
 
-    public int getSelfCommentCount() { return selfCommentCount; }
+    public int getSelfCommentCount() {
+        return selfCommentCount;
+    }
 
     public boolean isUpdated() {
         return isUpdated;
     }
 
-    public boolean isUpdatedByOthers() { return isUpdatedByOthers; }
+    public boolean isUpdatedByOthers() {
+        return isUpdatedByOthers;
+    }
 
-    public boolean isUpdatedBySelf() { return isUpdatedBySelf; }
+    public boolean isUpdatedBySelf() {
+        return isUpdatedBySelf;
+    }
 
     @Override
     public String toString() {

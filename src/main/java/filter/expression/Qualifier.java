@@ -539,7 +539,8 @@ public class Qualifier implements FilterExpression {
 
         int hoursSinceUpdate = Integer.MIN_VALUE;
 
-        // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt and getSelfUpdatedAt
+        //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
+        //and getSelfUpdatedAt
         switch (updatedKind){
             case SELF_UPDATED:
                 if (issue.getMetadata().isUpdatedBySelf()) {
