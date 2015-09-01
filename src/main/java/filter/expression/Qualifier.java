@@ -28,6 +28,10 @@ public class Qualifier implements FilterExpression {
     public static final String REPO = "repo";
     public static final String SORT = "sort";
 
+    private enum IssueType{
+        SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
+    }
+
     public static final Qualifier EMPTY = new Qualifier("", "");
 
     public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
@@ -35,7 +39,8 @@ public class Qualifier implements FilterExpression {
         "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
-        "title", "type", "unmerged", "unread", "updated", "user"
+        "title", "type", "unmerged", "unread", "updated", "updated%", "updatedByOthers",
+        "updatedBySelf", "user"
     ));
 
     private final String name;
@@ -195,7 +200,12 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-            return satisfiesUpdatedHours(issue);
+            return satisfiesUpdatedHours(issue, IssueType.ALL_UPDATED);
+        case "updatedByOthers":
+        case "updated%":
+            return satisfiesUpdatedHours(issue, IssueType.OTHER_UPDATED);
+        case "updatedBySelf":
+            return satisfiesUpdatedHours(issue, IssueType.SELF_UPDATED);
         case "repo":
             return satisfiesRepo(issue);
         default:
@@ -516,7 +526,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue) {
+    private boolean satisfiesUpdatedHours(TurboIssue issue, IssueType updatedKind) {
         NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
@@ -527,17 +537,30 @@ public class Qualifier implements FilterExpression {
             return false;
         }
 
-        int hoursSinceUpdate;
+        int hoursSinceUpdate = Integer.MIN_VALUE;
 
-        if (issue.getMetadata().isUpdated()) {
-            // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
-            hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
-                    .until(getCurrentTime(), ChronoUnit.HOURS));
-        } else {
-            // First time being filtered (haven't gotten metadata from source yet).
-            hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt and getSelfUpdatedAt
+        switch (updatedKind){
+            case SELF_UPDATED:
+                if (issue.getMetadata().isUpdatedBySelf()) {
+                    // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
+                    hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getSelfUpdatedAt()
+                            .until(getCurrentTime(), ChronoUnit.HOURS));
+                }
+                break;
+            case OTHER_UPDATED:
+            case ALL_UPDATED:
+                if (issue.getMetadata().isUpdatedByOthers()) {
+                    // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
+                    hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
+                            .until(getCurrentTime(), ChronoUnit.HOURS));
+                }
         }
 
+        // First time being filtered (haven't gotten metadata from source yet).
+        if (hoursSinceUpdate == Integer.MIN_VALUE) {
+            hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        }
         return updatedRange.encloses(hoursSinceUpdate);
     }
 

@@ -29,6 +29,9 @@ import static util.Futures.withResult;
 public class Logic {
 
     private static final Logger logger = HTLog.get(Logic.class);
+    private enum IssueType {
+        SELF_UPDATED, OTHER_UPDATED
+    }
 
     private final MultiModel models;
     private final UIManager uiManager;
@@ -157,32 +160,57 @@ public class Logic {
         for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
             IssueMetadata currentMetadata = entry.getValue();
             Date lastNonSelfUpdate = new Date(0);
+            Date lastSelfUpdate = new Date(0);
+            boolean isUpdatedByOthers = false;
+            boolean isUpdatedBySelf = false;
             for (TurboIssueEvent event : currentMetadata.getEvents()) {
                 if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
                         && event.getDate().after(lastNonSelfUpdate)) {
                     lastNonSelfUpdate = event.getDate();
+                    isUpdatedByOthers = true;
+                } else if(event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                        && event.getDate().after(lastSelfUpdate)){
+                    lastSelfUpdate = event.getDate();
+                    isUpdatedBySelf = true;
                 }
             }
             for (Comment comment : currentMetadata.getComments()) {
                 if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
                         && comment.getCreatedAt().after(lastNonSelfUpdate)) {
                     lastNonSelfUpdate = comment.getCreatedAt();
+                    isUpdatedByOthers = true;
+                } else if(comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                        && comment.getCreatedAt().after(lastNonSelfUpdate)){
+                    lastSelfUpdate = comment.getCreatedAt();
+                    isUpdatedBySelf = true;
                 }
             }
 
             entry.setValue(new IssueMetadata(currentMetadata,
                     LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
-                    calculateNonSelfCommentCount(currentMetadata.getComments(), currentUser)
+                    LocalDateTime.ofInstant(lastSelfUpdate.toInstant(), ZoneId.systemDefault()),
+                    calculateCommentCount(currentMetadata.getComments(), currentUser, IssueType.OTHER_UPDATED),
+                    calculateCommentCount(currentMetadata.getComments(), currentUser, IssueType.SELF_UPDATED),
+                    isUpdatedByOthers,
+                    isUpdatedBySelf
             ));
         }
         return metadata;
     }
 
-    private int calculateNonSelfCommentCount(List<Comment> comments, String currentUser) {
+    private int calculateCommentCount(List<Comment> comments, String currentUser, IssueType issueType) {
         int result = 0;
-        for (Comment comment : comments) {
-            if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
-                result++;
+        if (issueType == IssueType.OTHER_UPDATED) {
+            for (Comment comment : comments) {
+                if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
+                    result++;
+                }
+            }
+        } else if(issueType == IssueType.SELF_UPDATED){
+            for (Comment comment : comments) {
+                if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
+                    result++;
+                }
             }
         }
         return result;

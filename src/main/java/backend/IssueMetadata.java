@@ -12,18 +12,26 @@ public class IssueMetadata {
     private final List<TurboIssueEvent> events;
     private final List<Comment> comments;
     private final LocalDateTime nonSelfUpdatedAt;
+    private final LocalDateTime selfUpdatedAt;
     private final int nonSelfCommentCount;
+    private final int selfCommentCount;
 
     // If isUpdated is true, nonSelfUpdatedAt will be used to sort/filter instead of updatedAt in TurboIssue
     private final boolean isUpdated;
+    private final boolean isUpdatedBySelf;
+    private final boolean isUpdatedByOthers;
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
         events = new ArrayList<>();
         comments = new ArrayList<>();
         nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
+        selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         nonSelfCommentCount = 0;
+        selfCommentCount = 0;
         isUpdated = false;
+        isUpdatedByOthers = false;
+        isUpdatedBySelf = false;
     }
 
     // Copy constructor used in TurboIssue
@@ -31,8 +39,12 @@ public class IssueMetadata {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.selfCommentCount = other.selfCommentCount;
         this.isUpdated = other.isUpdated;
+        this.isUpdatedByOthers = other.isUpdatedByOthers;
+        this.isUpdatedBySelf = other.isUpdatedBySelf;
     }
 
     // Copy constructor used in reconciliation
@@ -40,8 +52,12 @@ public class IssueMetadata {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
+        this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.selfCommentCount  = other.selfCommentCount;
         this.isUpdated = isUpdated;
+        this.isUpdatedByOthers = other.isUpdatedByOthers;
+        this.isUpdatedBySelf = other.isUpdatedBySelf;
     }
 
     // Constructor used in DownloadMetadataTask
@@ -49,17 +65,27 @@ public class IssueMetadata {
         this.events = events;
         this.comments = comments;
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
+        this.selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
+        this.selfCommentCount = 0; // Not calculated yet
         this.isUpdated = false;
+        this.isUpdatedByOthers = false;
+        this.isUpdatedBySelf = false;
     }
 
     // Constructor used in Logic
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, int nonSelfCommentCount) {
+    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, LocalDateTime selfUpdatedAt,
+                         int nonSelfCommentCount, int selfCommentCount,
+                         boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
-        this.nonSelfCommentCount = nonSelfCommentCount; // Calculated just prior to calling
+        this.selfUpdatedAt = selfUpdatedAt;
+        this.nonSelfCommentCount = nonSelfCommentCount; // Calculated just prior to calling this constructor
+        this.selfCommentCount = selfCommentCount; //Calculated just prior to calling this constructor
         this.isUpdated = true;
+        this.isUpdatedByOthers = isUpdatedByOthers; //Calculated prior to calling this constructor
+        this.isUpdatedBySelf = isUpdatedBySelf; // Calculated prior to calling this constructor
     }
 
     // Constructor used in MultiModel
@@ -67,8 +93,12 @@ public class IssueMetadata {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
+        this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
+        this.selfCommentCount = other.selfCommentCount;
         this.isUpdated = other.isUpdated;
+        this.isUpdatedBySelf = other.isUpdatedBySelf;
+        this.isUpdatedByOthers = other.isUpdatedByOthers;
     }
 
     public String summarise() {
@@ -87,13 +117,21 @@ public class IssueMetadata {
         return nonSelfUpdatedAt;
     }
 
+    public LocalDateTime getSelfUpdatedAt() { return selfUpdatedAt; }
+
     public int getNonSelfCommentCount() {
         return nonSelfCommentCount;
     }
 
+    public int getSelfCommentCount() { return selfCommentCount; }
+
     public boolean isUpdated() {
         return isUpdated;
     }
+
+    public boolean isUpdatedByOthers() { return isUpdatedByOthers; }
+
+    public boolean isUpdatedBySelf() { return isUpdatedBySelf; }
 
     @Override
     public String toString() {
