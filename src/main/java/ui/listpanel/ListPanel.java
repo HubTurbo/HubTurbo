@@ -22,11 +22,6 @@ import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-
 public class ListPanel extends FilterPanel {
 
     private final IModel model;
