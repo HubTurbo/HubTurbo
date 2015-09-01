@@ -208,6 +208,7 @@ public class UI extends Application implements EventDispatcher {
     private void initUI(Stage stage) {
         repoSelector = createRepoSelector();
         apiBox = new Label("-/-");
+        apiBox.setId("apiBox");
 
         mainStage = stage;
         stage.setMaximized(false);
