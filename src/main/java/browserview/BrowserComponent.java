@@ -1,25 +1,14 @@
 package browserview;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
-
 import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
@@ -27,9 +16,9 @@ import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
+import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -39,6 +28,7 @@ public class BrowserComponent {
 
     private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
+    private static final String CHROMEDRIVER_VERSION = "2-18";
     private static final boolean USE_MOBILE_USER_AGENT = false;
     private boolean isTestChromeDriver;
 
@@ -336,21 +326,21 @@ public class BrowserComponent {
 
     public static String determineChromeDriverBinaryName() {
         if (PlatformSpecific.isOnMac()) {
-            logger.info("Using chrome driver binary: chromedriver_2-16");
-            return "chromedriver_2-16";
+            logger.info("Using chrome driver binary: chromedriver_" + CHROMEDRIVER_VERSION);
+            return "chromedriver_" + CHROMEDRIVER_VERSION;
         } else if (PlatformSpecific.isOnWindows()) {
-            logger.info("Using chrome driver binary: chromedriver_2-16.exe");
-            return "chromedriver_2-16.exe";
+            logger.info("Using chrome driver binary: chromedriver_" + CHROMEDRIVER_VERSION + ".exe");
+            return "chromedriver_" + CHROMEDRIVER_VERSION + ".exe";
         } else if (PlatformSpecific.isOn32BitsLinux()) {
-            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
-            return "chromedriver_linux_2-16";
+            logger.info("Using chrome driver binary: chromedriver_linux_" + CHROMEDRIVER_VERSION);
+            return "chromedriver_linux_" + CHROMEDRIVER_VERSION;
         } else if (PlatformSpecific.isOn64BitsLinux()) {
-            logger.info("Using chrome driver binary: chromedriver_linux_x86_64_2-16");
-            return "chromedriver_linux_x86_64_2-16";
+            logger.info("Using chrome driver binary: chromedriver_linux_x86_64_" + CHROMEDRIVER_VERSION);
+            return "chromedriver_linux_x86_64_" + CHROMEDRIVER_VERSION;
         } else {
             logger.error("Unable to determine platform for chrome driver");
-            logger.info("Using chrome driver binary: chromedriver_linux_2-16");
-            return "chromedriver_linux_2-16";
+            logger.info("Using chrome driver binary: chromedriver_linux_" + CHROMEDRIVER_VERSION);
+            return "chromedriver_linux_" + CHROMEDRIVER_VERSION;
         }
     }
 
