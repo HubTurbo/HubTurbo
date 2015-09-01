@@ -31,6 +31,13 @@ public class DummyRepoState {
     private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
     private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
 
+    // We store issueMetadata separately from issues so that metadata of issues returned by getUpdatedIssues/getIssues
+    // is empty. This is the case when interfacing with GitHub. (and then metadata gets retrieved separately from
+    // getEvents and getComments).
+    private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
+    // We keep track of issues that user has not gotten metadata from.
+    private HashSet<Integer> updatedMetadata = new HashSet<>();
+
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
 
@@ -94,13 +101,14 @@ public class DummyRepoState {
         ownComment.setCreatedAt(new Date());
         ownComment.setUser(new User().setLogin("test"));
         Comment[] ownComments = { ownComment };
-        issues.get(9).setMetadata(new IssueMetadata(
+        issues.get(9).setCommentCount(1);
+        issues.get(9).setUpdatedAt(LocalDateTime.now());
+        issueMetadata.put(9, new IssueMetadata(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(ownComments)),
                 ""
         ));
-        issues.get(9).setCommentCount(1);
-        issues.get(9).setUpdatedAt(LocalDateTime.now());
+        updatedMetadata.add(9);
 
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
@@ -113,13 +121,14 @@ public class DummyRepoState {
         dummyComment2.setUser(new User().setLogin("User 2"));
         dummyComment3.setUser(new User().setLogin("User 3"));
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
-        issues.get(10).setMetadata(new IssueMetadata(
-                new ArrayList<>(),
-                new ArrayList<Comment>(Arrays.asList(dummyComments)),
-                ""
-        ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
+        issueMetadata.put(10, new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(dummyComments)),
+                ""
+        ));
+        updatedMetadata.add(10);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -214,22 +223,30 @@ public class DummyRepoState {
         return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
     }
 
-    protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId) {
-        TurboIssue issueToGet = issues.get(issueId);
-        if (issueToGet != null) {
-            // Don't care about the ETag, just give a different ETag each time.
-            return new ImmutablePair<>(issueToGet.getMetadata().getEvents(), UUID.randomUUID().toString());
+    protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId, String currentETag) {
+        if (updatedMetadata.contains(issueId)) {
+            IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+
+            // If updatedMetadata contains issue, its metaadata must also exist in the metadataOfIssue hashmap
+            assert metadataOfIssue != null;
+
+            // Remove issue from updatedMetadata so that next time metadata is retrievd, the same ETag
+            // will not be sent again unless more updates will have been introduced.
+            updatedMetadata.remove(issueId);
+
+            // Finally, return events as a proper array.
+            return new ImmutablePair<>(metadataOfIssue.getEvents(), UUID.randomUUID().toString());
         }
-        // Fail silently
-        return new ImmutablePair<>(new ArrayList<>(), "");
+        return new ImmutablePair<>(new ArrayList<>(), currentETag);
     }
 
     protected List<Comment> getComments(int issueId) {
-        TurboIssue issueToGet = issues.get(issueId);
-        if (issueToGet != null) {
-            return issueToGet.getMetadata().getComments();
+        IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+
+        if (metadataOfIssue != null) {
+            return metadataOfIssue.getComments();
         }
-        // Fail silently
+        // If not in the metadata hashmap yet, there are currently no comments for given issue.
         return new ArrayList<>();
     }
 
@@ -285,7 +302,6 @@ public class DummyRepoState {
                 IssueEventType.Renamed,
                 new Date()));
         List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
-        updatedIssue.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
         updatedIssue.setUpdatedAt(LocalDateTime.now());
 
         // Add to list of updated issues, and replace issueToUpdate in main issues store.
@@ -354,7 +370,6 @@ public class DummyRepoState {
                         new Date()).setLabelName(labelName))
         );
         List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
-        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Actually setting label is done after updating issue events
@@ -381,7 +396,6 @@ public class DummyRepoState {
         toAdd.setUser(new User().setLogin(author));
         commentsOfIssue.add(toAdd);
 
-        toComment.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
         toComment.setUpdatedAt(LocalDateTime.now());
         toComment.setCommentCount(toComment.getCommentCount() + 1);
 
