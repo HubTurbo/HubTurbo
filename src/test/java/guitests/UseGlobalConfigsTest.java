@@ -50,7 +50,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Make a new board
         click("Boards");
-        click("Save");
+        click("Save as");
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
         ((TextField) find("#boardnameinput")).setText("Empty Board");
@@ -99,7 +99,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Make a new board
         click("Boards");
-        click("Save");
+        click("Save as");
         ((TextField) find("#boardnameinput")).setText("Dummy Board");
         click("OK");
 
