@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
@@ -19,6 +20,7 @@ public class UpdateIssuesTest extends UITest {
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
+        Label apiBox = find("#apiBox");
         resetRepo();
 
         click("#dummy/dummy_col0_filterTextField");
@@ -30,6 +32,7 @@ public class UpdateIssuesTest extends UITest {
 
         // Updated view should contain Issue 10, which was commented on recently (as part of default test dataset)
         // Issue 9 was also commented on recently, but by the current HT user, so it is not shown.
+        assertEquals(3496, getApiCount(apiBox.getText())); // 2 calls for Issue 10, 2 calls for Issue 9
         assertEquals(1, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
@@ -39,6 +42,7 @@ public class UpdateIssuesTest extends UITest {
         sleep(EVENT_DELAY);
 
         // Updated view should now contain Issue 5.1 and Issue 10.
+        assertEquals(3494, getApiCount(apiBox.getText())); // 2 calls for Issue 5
         assertEquals(2, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
@@ -47,7 +51,13 @@ public class UpdateIssuesTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
+        assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
         assertEquals(3, countIssuesShown());
+
+        click("#dummy/dummy_col0_filterTextField");
+        push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+        assertEquals(3492, getApiCount(apiBox.getText())); // No change to issues, so no additional API quota spent
     }
 
     public void resetRepo() {
@@ -66,5 +76,9 @@ public class UpdateIssuesTest extends UITest {
         FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         return (int) countIssues.get();
+    }
+
+    private int getApiCount(String apiBoxText) {
+        return Integer.parseInt(apiBoxText.substring(0, apiBoxText.indexOf("/")));
     }
 }
