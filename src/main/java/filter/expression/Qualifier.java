@@ -25,6 +25,7 @@ import filter.QualifierApplicationException;
 public class Qualifier implements FilterExpression {
 
     public static final String UPDATED = "updated";
+    public static final String UPDATED_OTHERS = "updatedByOthers";
     public static final String REPO = "repo";
     public static final String SORT = "sort";
 
@@ -39,7 +40,7 @@ public class Qualifier implements FilterExpression {
         "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
-        "title", "type", "unmerged", "unread", "updated", "updated%", "updatedByOthers",
+        "title", "type", "unmerged", "unread", "updated", "updatedByOthers",
         "updatedBySelf", "user"
     ));
 
@@ -202,7 +203,6 @@ public class Qualifier implements FilterExpression {
         case "updated":
             return satisfiesUpdatedHours(issue, IssueType.ALL_UPDATED);
         case "updatedByOthers":
-        case "updated%":
             return satisfiesUpdatedHours(issue, IssueType.OTHER_UPDATED);
         case "updatedBySelf":
             return satisfiesUpdatedHours(issue, IssueType.SELF_UPDATED);
@@ -550,10 +550,16 @@ public class Qualifier implements FilterExpression {
                 }
                 break;
             case OTHER_UPDATED:
-            case ALL_UPDATED:
                 if (issue.getMetadata().isUpdatedByOthers()) {
                     // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
                     hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
+                            .until(getCurrentTime(), ChronoUnit.HOURS));
+                }
+                break;
+            case ALL_UPDATED:
+                if (issue.getMetadata().isUpdated()) {
+                    // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
+                    hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt()
                             .until(getCurrentTime(), ChronoUnit.HOURS));
                 }
         }

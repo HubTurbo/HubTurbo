@@ -3,6 +3,7 @@ package ui.listpanel;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
@@ -59,7 +60,9 @@ public class ListPanel extends FilterPanel {
      * @return true if the issue has changed, false otherwise
      */
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+        List<String> filterQualifierNames = currentFilterExpression.getQualifierNames();
+        if ((filterQualifierNames.contains(Qualifier.UPDATED) ||
+                filterQualifierNames.contains(Qualifier.UPDATED_OTHERS)) && hasMetadata) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
