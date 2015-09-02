@@ -1,12 +1,14 @@
 package guitests;
 
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
+
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.PanelControl;
 import util.events.ModelUpdatedEventHandler;
-
 import static org.junit.Assert.assertEquals;
 
 public class MenuControlTest extends UITest {
@@ -15,6 +17,7 @@ public class MenuControlTest extends UITest {
 
     @Test
     public void menuControlTest() {
+        
         modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         PanelControl panelControl = (PanelControl) find("#dummy/dummy_col0").getParent();
@@ -39,32 +42,95 @@ public class MenuControlTest extends UITest {
         click("Close");
         assertEquals(2, panelControl.getNumberOfPanels());
 
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board save when no board is open because nothing has been saved
+        // Expected: prompts user to save as new board
         click("Boards");
-        click("Save");
-        type("1");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 1");
+        push(KeyCode.ESCAPE);
+        sleep(1000);
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board save as
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
+        sleep(1000);
         assertEquals(1, panelControl.getNumberOfSavedBoards());
+        assertEquals(2, panelControl.getNumberOfPanels());
 
+        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        assertEquals(3, panelControl.getNumberOfPanels());
+        
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 2");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
+        // Testing invalid board names
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("   ");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+
+        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         assertEquals(0, panelControl.getNumberOfPanels());
-
-        click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN);
-        push(KeyCode.RIGHT);
-        push(KeyCode.ENTER);
-        assertEquals(2, panelControl.getNumberOfPanels());
-
+        
+        // Testing board open
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER); // Opening Board "1"
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfPanels());
+        
+        // Testing board save
+        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
+        click("Boards");
+        push(KeyCode.DOWN);
         push(KeyCode.ENTER);
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board delete
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER); // Deleting current board (Board 1): no board is set as open
         click("OK");
-        assertEquals(0, panelControl.getNumberOfSavedBoards());
-
+        sleep(1000);
+        assertEquals(1, panelControl.getNumberOfSavedBoards());
+        
+        // Testing board save when no board is open because current board was closed
+        // Expected: prompts user to save as new board
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        ((TextField) find("#boardnameinput")).setText("Board 1");
+        click("OK");
+        sleep(1000);
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        
         click("View");
         click("Refresh");
-        push(KeyboardShortcuts.REFRESH);
+        push(KeyboardShortcuts.REFRESH.getCode());
         assertEquals(true, modelUpdatedEventTriggered);
         modelUpdatedEventTriggered = false;
     }

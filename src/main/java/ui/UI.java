@@ -4,14 +4,14 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
-
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
-
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -24,10 +24,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
@@ -62,6 +62,7 @@ public class UI extends Application implements EventDispatcher {
     private static HWND mainWindowHandle;
 
     private static final int REFRESH_PERIOD = 60;
+    private static final int NOTIFICATION_PANE_VISIBLE_PERIOD = 5;
 
     // Application-level state
 
@@ -73,6 +74,7 @@ public class UI extends Application implements EventDispatcher {
     public EventBus eventBus;
     private HashMap<String, String> commandLineArgs;
     private TickingTimer refreshTimer;
+    private TickingTimer notificationPaneTimer;
     public GUIController guiController;
 
     // Main UI elements
@@ -84,6 +86,7 @@ public class UI extends Application implements EventDispatcher {
     private RepositorySelector repoSelector;
     private LabelPicker labelPicker;
     private Label apiBox;
+    private NotificationPane notificationPane;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -203,6 +206,9 @@ public class UI extends Application implements EventDispatcher {
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
+        notificationPaneTimer = new TickingTimer("Notification Pane Timer", NOTIFICATION_PANE_VISIBLE_PERIOD,
+                integer -> {}, () -> Platform.runLater(this::hideNotificationPane), TimeUnit.SECONDS);
+        notificationPaneTimer.start();
     }
 
     private void initUI(Stage stage) {
@@ -215,7 +221,7 @@ public class UI extends Application implements EventDispatcher {
         panels = new PanelControl(this, prefs);
         guiController = new GUIController(this, panels, apiBox);
 
-        Scene scene = new Scene(createRoot());
+        Scene scene = new Scene(createRootNode());
         setupMainStage(scene);
 
         loadFonts();
@@ -340,7 +346,7 @@ public class UI extends Application implements EventDispatcher {
         return new HashMap<>(params.getNamed());
     }
 
-    private Parent createRoot() {
+    private Parent createRootNode() {
 
         VBox top = new VBox();
 
@@ -366,7 +372,9 @@ public class UI extends Application implements EventDispatcher {
         root.setCenter(panelsScrollPane);
         root.setBottom((HTStatusBar) status);
 
-        return root;
+        notificationPane = new NotificationPane(root);
+
+        return notificationPane;
     }
 
     /**
@@ -542,6 +550,37 @@ public class UI extends Application implements EventDispatcher {
 
     public HWND getMainWindowHandle() {
         return mainWindowHandle;
+    }
+
+    public void showNotificationPane(Node graphic, String text, Action action) {
+        Platform.runLater(() -> {
+            hideNotificationPane();
+            notificationPane.setGraphic(graphic);
+            notificationPane.setText(text);
+            notificationPane.getActions().clear();
+            notificationPane.getActions().add(action);
+            notificationPane.show();
+            notificationPaneTimer.restart();
+            if (notificationPaneTimer.isPaused()) {
+                notificationPaneTimer.resume();
+            }
+        });
+    }
+
+    public void hideNotificationPane() {
+        // must be run in a Platform.runLater
+        if (notificationPane.isShowing()) {
+            notificationPaneTimer.pause();
+            notificationPane.hide();
+        }
+    }
+
+    public void triggerNotificationPaneAction() {
+        Platform.runLater(() -> {
+            if (notificationPane.isShowing()) {
+                notificationPane.getActions().get(0).handle(new ActionEvent());
+            }
+        });
     }
 
 }
