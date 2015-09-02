@@ -17,6 +17,7 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -270,6 +271,20 @@ public class MenuControl extends MenuBar {
                 return Stream.of();
             }
         }).collect(Collectors.toList());
+    }
+    
+    public void switchBoard() {
+        if (prefs.getLastOpenBoard().isPresent()) {
+            List<String> boardNames = new ArrayList<>(prefs.getAllBoards().keySet());
+            int index = boardNames.indexOf(prefs.getLastOpenBoard().get());
+            if (index == boardNames.size()-1) {
+                index = 0;
+            } else {
+                index++;
+            }
+            
+            onBoardOpen(boardNames.get(index), prefs.getBoardPanels(boardNames.get(index)));
+        }
     }
 
     private MenuItem createDocumentationMenuItem() {
