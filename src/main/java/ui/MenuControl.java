@@ -274,10 +274,10 @@ public class MenuControl extends MenuBar {
     }
     
     public void switchBoard() {
-        if (prefs.getLastOpenBoard().isPresent()) {
+        if (prefs.getLastOpenBoard().isPresent() && prefs.getAllBoards().size() > 1) {
             List<String> boardNames = new ArrayList<>(prefs.getAllBoards().keySet());
             int index = boardNames.indexOf(prefs.getLastOpenBoard().get());
-            if (index == boardNames.size()-1) {
+            if (index == boardNames.size() - 1) {
                 index = 0;
             } else {
                 index++;

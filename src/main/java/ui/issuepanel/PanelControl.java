@@ -273,4 +273,8 @@ public class PanelControl extends HBox {
     public int getNumberOfSavedBoards() {
         return prefs.getAllBoards().size();
     }
+    
+    public Preferences getPreferences() {
+        return prefs;
+    }
 }
