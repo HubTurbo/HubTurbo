@@ -9,9 +9,7 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -27,10 +25,10 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.Action;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
+import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
@@ -62,7 +60,6 @@ public class UI extends Application implements EventDispatcher {
     private static HWND mainWindowHandle;
 
     private static final int REFRESH_PERIOD = 60;
-    private static final int NOTIFICATION_PANE_VISIBLE_PERIOD = 5;
 
     // Application-level state
 
@@ -74,8 +71,9 @@ public class UI extends Application implements EventDispatcher {
     public EventBus eventBus;
     private HashMap<String, String> commandLineArgs;
     private TickingTimer refreshTimer;
-    private TickingTimer notificationPaneTimer;
     public GUIController guiController;
+    private NotificationController notificationController;
+
 
     // Main UI elements
 
@@ -206,9 +204,6 @@ public class UI extends Application implements EventDispatcher {
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
-        notificationPaneTimer = new TickingTimer("Notification Pane Timer", NOTIFICATION_PANE_VISIBLE_PERIOD,
-                integer -> {}, () -> Platform.runLater(this::hideNotificationPane), TimeUnit.SECONDS);
-        notificationPaneTimer.start();
     }
 
     private void initUI(Stage stage) {
@@ -223,6 +218,8 @@ public class UI extends Application implements EventDispatcher {
 
         Scene scene = new Scene(createRootNode());
         setupMainStage(scene);
+        notificationController = new NotificationController(notificationPane);
+        notificationPane.setId("notificationPane");
 
         loadFonts();
         String css = initCSS();
@@ -555,35 +552,12 @@ public class UI extends Application implements EventDispatcher {
         return mainWindowHandle;
     }
 
-    public void showNotificationPane(Node graphic, String text, Action action) {
-        Platform.runLater(() -> {
-            hideNotificationPane();
-            notificationPane.setGraphic(graphic);
-            notificationPane.setText(text);
-            notificationPane.getActions().clear();
-            notificationPane.getActions().add(action);
-            notificationPane.show();
-            notificationPaneTimer.restart();
-            if (notificationPaneTimer.isPaused()) {
-                notificationPaneTimer.resume();
-            }
-        });
+    public void showNotification(Notification notification) {
+        notificationController.showNotification(notification);
     }
 
-    public void hideNotificationPane() {
-        // must be run in a Platform.runLater
-        if (notificationPane.isShowing()) {
-            notificationPaneTimer.pause();
-            notificationPane.hide();
-        }
-    }
-
-    public void triggerNotificationPaneAction() {
-        Platform.runLater(() -> {
-            if (notificationPane.isShowing()) {
-                notificationPane.getActions().get(0).handle(new ActionEvent());
-            }
-        });
+    public void triggerNotificationAction() {
+        notificationController.triggerNotificationAction();
     }
 
 }

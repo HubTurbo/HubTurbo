@@ -272,7 +272,7 @@ public class ListPanel extends FilterPanel {
                 ui.switchDefaultRepo();
             }
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
-                ui.triggerNotificationPaneAction();
+                ui.triggerNotificationAction();
             }
             for (KeyCodeCombination key:KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS) {
                 if (key.match(event)) {
