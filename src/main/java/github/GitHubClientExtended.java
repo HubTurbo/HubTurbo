@@ -10,16 +10,20 @@ import java.util.Map;
 
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
+import util.HTLog;
 import util.IOUtilities;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class GitHubClientExtended extends GitHubClient {
+    private static final Logger logger = HTLog.get(GitHubClientExtended.class);
+
     public static final int NO_UPDATE_RESPONSE_CODE = 304;
     protected static final int CONNECTION_TIMEOUT = 30000;
 
@@ -155,24 +159,28 @@ public class GitHubClientExtended extends GitHubClient {
     }
 
     /**
-     * Gets response from API call for header-only request
+     * Gets a pair of HTTP connection and corresponding response from a header-only API call
      *
-     * @param request
-     * @return response
+     * @param request for the API call
+     * @return a pair of HTTP connection and response for the API call
      * @throws IOException
      */
-    public GitHubResponse head(GitHubRequest request) throws IOException {
+    public ImmutablePair<HttpURLConnection, GitHubResponse> head(GitHubRequest request) throws IOException {
         HttpURLConnection httpRequest = createHead(request.generateUri());
         String accept = request.getResponseContentType();
         if (accept != null) {
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
         }
+        logger.info(String.format("Requesting: %s %s",
+                        httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
 
         final int code = httpRequest.getResponseCode();
         updateRateLimits(httpRequest);
 
-        if (isOk(code) || isEmpty(code)) {
-            return new GitHubResponse(httpRequest, null);
+        logger.info(String.format("%s responded with %d %s",
+                        httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
+        if (isOk(code) || code == HttpURLConnection.HTTP_NOT_MODIFIED || isEmpty(code)) {
+            return new ImmutablePair<>(httpRequest, new GitHubResponse(httpRequest, null));
         }
 
         throw createException(getStream(httpRequest), code,
