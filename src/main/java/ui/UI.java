@@ -68,7 +68,7 @@ public class UI extends Application implements EventDispatcher {
 
     public UIManager uiManager;
     public Logic logic;
-    public Preferences prefs;
+    public static Preferences prefs;
     public static StatusUI status;
     public static EventDispatcher events;
     public EventBus eventBus;
