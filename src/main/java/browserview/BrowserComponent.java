@@ -360,7 +360,7 @@ public class BrowserComponent {
      */
     private void initialiseJNA() {
         if (PlatformSpecific.isOnWindows()) {
-            browserWindowHandle = user32.FindWindow(null, "data:, - Google Chrome");
+            browserWindowHandle = user32.FindWindow(null, "New Tab - Google Chrome");
         }
     }
 
