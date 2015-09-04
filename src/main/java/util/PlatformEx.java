@@ -40,21 +40,20 @@ public class PlatformEx {
     }
 
     /**
-     * Synchronous version of Platform.runLater, like SwingUtilities.invokeAndWait.
-     * Caveat: will execute immediately when invoked from the JavaFX application thread
-     * instead of being queued up for execution.
-     * @param action
+     * Blocks until the JavaFX event queue becomes empty.
      */
-    public static void runAndWait(Runnable action) {
-        if (action == null) {
-            throw new NullPointerException("runAndWait cannot accept a null action");
-        }
+    public static void waitOnFxThread() {
+        runLaterAndWait(() -> {});
+    }
 
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-            return;
-        }
-
+    /**
+     * Runs an action on the JavaFX Application Thread and blocks until it completes.
+     * Similar to {@link #runAndWait(Runnable) runAndWait}, but always enqueues the
+     * action, eschewing checking the current thread.
+     * @param action The action to run on the JavaFX Application Thread
+     */
+    public static void runLaterAndWait(Runnable action) {
+        assert action != null : "Non-null action required";
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {
             action.run();
@@ -62,8 +61,21 @@ public class PlatformEx {
         });
         try {
             latch.await();
-        } catch (InterruptedException e) {
-            logger.error(e.getLocalizedMessage(), e);
+        } catch (InterruptedException ignored) {}
+    }
+
+    /**
+     * Synchronous version of Platform.runLater, like SwingUtilities.invokeAndWait.
+     * Caveat: will execute immediately when invoked from the JavaFX application thread
+     * instead of being queued up for execution.
+     * @param action The action to execute on the JavaFX Application Thread.
+     */
+    public static void runAndWait(Runnable action) {
+        assert action != null : "Non-null action required";
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+            return;
         }
+        runLaterAndWait(action);
     }
 }

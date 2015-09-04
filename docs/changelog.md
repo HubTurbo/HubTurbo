@@ -1,5 +1,14 @@
 # Changelog
 
+# V3.4.0
+
+- Changes to labels via the label picker can now be undone
+- Panels can now be sorted by assignee
+- Boards can now be saved without having to specify a name if there already is one
+- <kbd>Esc</kbd> removes focus from the repo selection dropdown
+- Fixed hotkey conflict between <kbd>R</kbd> and <kbd>Ctrl</kbd> + <kbd>R</kbd>
+- Fixed bug where label ordering caused issues not to matched
+
 # V3.3.0
 
 - Panels can now be given names
