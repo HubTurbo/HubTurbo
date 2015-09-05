@@ -17,7 +17,6 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -274,12 +273,9 @@ public class MenuControl extends MenuBar {
     }
     
     public void switchBoard() {
-        if (prefs.getLastOpenBoard().isPresent() && prefs.getAllBoards().size() > 1) {
-            List<String> boardNames = new ArrayList<>(prefs.getAllBoards().keySet());
-            int lastBoard = boardNames.indexOf(prefs.getLastOpenBoard().get());
-            int index = (lastBoard + 1) % boardNames.size();
-            
-            onBoardOpen(boardNames.get(index), prefs.getBoardPanels(boardNames.get(index)));
+        Optional<String> name = prefs.switchBoard();
+        if (name.isPresent()) {
+            onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
         }
     }
 
