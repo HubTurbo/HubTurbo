@@ -29,4 +29,12 @@ Fixing issues:
 If you need any clarification on the workflow, you may also post in the [mailing list](https://groups.google.com/forum/#!forum/hubturbo-contributors).
 
 ## Workflow for developers
-Similar to above, but you'll be pushing to the main repo. You can also create new issues, label issues, and review code from others.
+Similar to above, except for following differences:
+
+1. You'll be pushing to the main repo. 
+2. You can also create new issues, label issues, and review code from others.
+3. When creating a PR, also assing a reviewer for it. Choose another core developer as the reviewer. Try to pick one who is likely to know the code touched by the PR well.
+2. When your PR is marked as `status.toMerge` by the reviewer, you should merge the PR yourself. 
+   * Merging should be done locally, not using GitHub. 
+   * Format for the merge commit: `[issue number] issue name` e.g. `[324] keyboard shortcut for creating an issue`
+   * Ensure all tests are passing before you push the merge commit to the repo.
