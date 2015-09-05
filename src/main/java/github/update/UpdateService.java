@@ -103,7 +103,7 @@ public class UpdateService<T> extends GitHubService {
                 // The assumption is that updates are cheap and we can do them as frequently as needed.
             } else {
                 updatedETags = combineETags(etags.get().getLeft());
-                if (updatedETags.equals(lastETags)){
+                if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
                     logger.info("Nothing to update");
                 } else {
                     result = new ArrayList<>(getPagedItems(resourceDesc,
