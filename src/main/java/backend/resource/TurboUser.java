@@ -1,8 +1,10 @@
 package backend.resource;
 
-import backend.resource.serialization.SerializableUser;
 import javafx.scene.image.Image;
+
 import org.eclipse.egit.github.core.User;
+
+import backend.resource.serialization.SerializableUser;
 
 @SuppressWarnings("unused")
 public class TurboUser {
@@ -90,9 +92,9 @@ public class TurboUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TurboUser that = (TurboUser) o;
-        return loginName.equals(that.loginName) &&
-                realName.equals(that.realName) &&
-                avatarURL.equals(that.avatarURL);
+        return (loginName == that.loginName || (loginName != null && loginName.equals(that.loginName))) &&
+               (realName == that.realName || (realName != null && realName.equals(that.realName))) &&
+               (avatarURL == that.avatarURL || (avatarURL != null && avatarURL.equals(that.avatarURL)));
     }
 
     @Override

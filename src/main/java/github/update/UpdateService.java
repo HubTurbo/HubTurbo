@@ -116,10 +116,10 @@ public class UpdateService<T> extends GitHubService {
 
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
+            return result;
         }
 
         updatedItems = result;
-
         return result;
     }
 
@@ -128,8 +128,8 @@ public class UpdateService<T> extends GitHubService {
      * @param etags
      * @return string of combined etags
      */
-    private Optional<String> combineETags(List<String> etags) {
-        return Optional.of(Utility.join(etags, ">"));
+    private static Optional<String> combineETags(List<String> etags) {
+        return Optional.of(Utility.join(etags, "#"));
     }
 
     /**
