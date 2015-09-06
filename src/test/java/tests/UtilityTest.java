@@ -1,7 +1,18 @@
 package tests;
 
-import org.junit.Test;
-import util.Utility;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static util.Utility.dateToLocalDateTime;
+import static util.Utility.formatDateISO8601;
+import static util.Utility.localDateTimeToDate;
+import static util.Utility.localDateTimeToLong;
+import static util.Utility.parseHTTPLastModifiedDate;
+import static util.Utility.parseVersionNumber;
+import static util.Utility.replaceNull;
+import static util.Utility.safeLongToInt;
+import static util.Utility.snakeCaseToCamelCase;
+import static util.Utility.stripQuotes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,8 +21,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
-import static util.Utility.*;
+import org.junit.Test;
+
+import util.Utility;
 
 public class UtilityTest {
 
@@ -30,7 +42,7 @@ public class UtilityTest {
             fail();
         } catch (IllegalArgumentException ignored) {}
 
-        a = (long) Integer.MIN_VALUE - 30L;
+        a = Integer.MIN_VALUE - 30L;
         try {
             safeLongToInt(a);
             fail();
@@ -91,4 +103,13 @@ public class UtilityTest {
         assertTrue(Utility.startsWithIgnoreCase("1A2B3C", "1a2B"));
     }
 
+    @Test
+    public void testReplaceNull() {
+        assertEquals("123", replaceNull("123", ""));
+        assertEquals("", replaceNull(null, ""));
+
+        Object obj = new Object();
+        assertEquals(obj, replaceNull(obj, new Object()));
+        assertEquals(obj, replaceNull(null, obj));
+    }
 }

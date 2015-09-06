@@ -1,15 +1,8 @@
 package github.update;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import github.GitHubClientExtended;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.eclipse.egit.github.core.service.GitHubService;
-import util.Utility;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -18,8 +11,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.NoSuchPageException;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.service.GitHubService;
+
+import util.Utility;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
@@ -34,10 +36,10 @@ public class UpdateService<T> extends GitHubService {
 
     private final GitHubClientExtended client;
     private final String apiSuffix;
-    private final String lastETag;
+    private final String lastETags;
 
     // Auxillary results of calling getUpdatedItems
-    private Optional<String> updatedETag = Optional.empty();
+    private Optional<String> updatedETags = Optional.empty();
     private Date updatedCheckTime = new Date();
 
     // Cached results of calling getUpdatedItems
@@ -48,13 +50,13 @@ public class UpdateService<T> extends GitHubService {
      * @param apiSuffix the API URI for the type of item; defined by subclasses
      * @param lastETag the last-known ETag for these items; may be null
      */
-    public UpdateService(GitHubClientExtended client, String apiSuffix, String lastETag){
+    public UpdateService(GitHubClientExtended client, String apiSuffix, String lastETags){
         assert client != null;
         assert apiSuffix != null && !apiSuffix.isEmpty();
 
         this.client = client;
         this.apiSuffix = apiSuffix;
-        this.lastETag = lastETag;
+        this.lastETags = lastETags;
     }
 
     /**
@@ -89,42 +91,76 @@ public class UpdateService<T> extends GitHubService {
 
         String resourceDesc = repoId.generateId() + apiSuffix;
 
-        logger.info(String.format("Updating %s with ETag %s", resourceDesc, lastETag));
+        logger.info(String.format("Updating %s with ETag %s", resourceDesc, lastETags));
         try {
-
             PagedRequest<T> request = createUpdatedRequest(repoId);
-            HttpURLConnection connection = createUpdatedConnection(request);
-            int responseCode = connection.getResponseCode();
+            Optional<ImmutablePair<List<String>, HttpURLConnection>> etags = getPagedEtags(request, client);
 
-            if (client.isError(responseCode)) {
-                logger.warn(String.format("%s: error getting updated items (%d)",
-                    getClass().getSimpleName(), responseCode));
+            if (!etags.isPresent()) {
+                logger.warn(String.format("%s: error getting updated items", getClass().getSimpleName()));
 
                 // Respond as if we succeeded and there were no updates.
                 // The assumption is that updates are cheap and we can do them as frequently as needed.
-
             } else {
-                logger.info(String.format("%s: %d", resourceDesc, responseCode));
-                if (responseCode == GitHubClientExtended.NO_UPDATE_RESPONSE_CODE){
+                updatedETags = combineETags(etags.get().getLeft());
+                if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
                     logger.info("Nothing to update");
                 } else {
                     result = new ArrayList<>(getPagedItems(resourceDesc,
                         new PageIterator<>(request, client)));
-                    updatedETag = Optional.of(
-                        Utility.stripQuotes(connection.getHeaderField("ETag")));
-                    logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETag));
+                    logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETags));
                 }
-            }
 
-            updateCheckTime(connection);
+                updateCheckTime(etags.get().getRight());
+            }
 
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
+            return result;
         }
 
         updatedItems = result;
-
         return result;
+    }
+
+    /**
+     * Combine ETags for multiple page into 1 string
+     * @param etags
+     * @return string of combined etags
+     */
+    private static Optional<String> combineETags(List<String> etags) {
+        return Optional.of(Utility.join(etags, "#"));
+    }
+
+    /**
+     * Gets a list of ETags for all pages returned from an API request and
+     * also return the connection used to get the ETags so that their last check time
+     * can be recorded elsewhere
+     * @param request
+     * @param client
+     * @return a Optional list of ETags for all pages returned from an API request and
+     *         corresponding HTTP connection or an empty Optional if an error occurs
+     */
+    private Optional<ImmutablePair<List<String>, HttpURLConnection>> getPagedEtags(
+            GitHubRequest request, GitHubClientExtended client) {
+
+        PageHeaderIterator iter = new PageHeaderIterator(request, client, "ETag");
+        List<String> etags = new ArrayList<>();
+        HttpURLConnection connection = null;
+
+        while (iter.hasNext()) {
+            try {
+                etags.add(Utility.stripQuotes(iter.next()));
+                if (connection == null) {
+                    connection = iter.getLastConnection();
+                }
+            } catch (NoSuchPageException e) {
+                logger.error("No such page exception at " + iter.getRequest().generateUri());
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(new ImmutablePair<>(etags, connection));
     }
 
     /**
@@ -155,11 +191,11 @@ public class UpdateService<T> extends GitHubService {
      * In the event of failure, will be whatever the last provided ETag was.
      * @return ETag for updated items
      */
-    public String getUpdatedETag() {
-        if (updatedETag.isPresent()) {
-            return updatedETag.get();
+    public String getUpdatedETags() {
+        if (updatedETags.isPresent()) {
+            return updatedETags.get();
         } else {
-            return lastETag;
+            return lastETags;
         }
     }
 
@@ -175,15 +211,5 @@ public class UpdateService<T> extends GitHubService {
     private void updateCheckTime(HttpURLConnection connection) {
         String date = connection.getHeaderField("Date");
         updatedCheckTime = Utility.parseHTTPLastModifiedDate(date);
-    }
-
-    private HttpURLConnection createUpdatedConnection(GitHubRequest request) throws IOException{
-        HttpURLConnection connection = client.createConnection(request);
-        if (lastETag != null && !lastETag.isEmpty()) {
-            assert !lastETag.startsWith("\"");
-            assert !lastETag.endsWith("\"");
-            connection.setRequestProperty("If-None-Match", "\"" + lastETag + "\"");
-        }
-        return connection;
     }
 }

@@ -1,15 +1,9 @@
 package util;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,10 +18,24 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.swing.UIManager;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 public class Utility {
 
@@ -136,6 +144,20 @@ public class Utility {
 
     public static String removeAllWhiteSpaces(String s) {
         return s.replaceAll("\\s", "");
+    }
+
+    public static String join(List<String> list, String delimiter) {
+        return list.stream().collect(Collectors.joining(delimiter));
+    }
+
+    /**
+     * Returns a replacement object if obj is null
+     * @param obj
+     * @param replacement
+     * @return a replacement value if obj is null
+     */
+    public static <T> T replaceNull(T obj, T replacement) {
+        return obj == null ? replacement : obj;
     }
 
     public static int safeLongToInt(long l) {
