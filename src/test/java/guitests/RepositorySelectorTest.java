@@ -10,9 +10,11 @@ import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.UI;
+import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -96,6 +98,15 @@ public class RepositorySelectorTest extends UITest {
         push(KeyCode.ENTER);
         assertEquals(4, comboBox.getItems().size());
         assertEquals("dummy4/dummy4", primaryRepo);
+
+        // we check if delete repo works
+        click("Repos");
+        push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(3, comboBox.getItems().size());
 
         // exit program
         click("File");

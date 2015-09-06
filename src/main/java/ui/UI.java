@@ -143,10 +143,10 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
 
         triggerEvent(new BoardSavedEvent()); // Initializes boards
 
@@ -192,7 +192,7 @@ public class UI extends Application implements EventDispatcher {
         if (isTestMode()) {
             registerTestEvents();
         }
-        registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
+        registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
@@ -484,6 +484,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
+        triggerEvent(new OpenReposChangedEvent());
     }
     
     public void switchDefaultRepo(){
@@ -502,6 +503,8 @@ public class UI extends Application implements EventDispatcher {
                 }
             }
         }
+
+        triggerEvent(new OpenReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {

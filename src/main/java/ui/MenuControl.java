@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -17,9 +18,11 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,12 +54,15 @@ public class MenuControl extends MenuBar {
         Menu boards = new Menu("Boards");
         boards.getItems().addAll(createBoardsMenu());
 
+        Menu repos = new Menu("Repos");
+        repos.getItems().addAll(createReposMenu());
+
         Menu view = new Menu("View");
         view.getItems().addAll(
                 createRefreshMenuItem(),
                 createDocumentationMenuItem());
 
-        getMenus().addAll(file, newMenu, panels, boards, view);
+        getMenus().addAll(file, newMenu, panels, boards, repos, view);
     }
 
     private Menu createFileMenu() {
@@ -322,6 +328,43 @@ public class MenuControl extends MenuBar {
         newMilestoneMenuItem.setAccelerator(KeyboardShortcuts.NEW_MILESTONE);
 
         return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
+    }
+
+    private MenuItem[] createReposMenu() {
+        Menu remove = new Menu("Remove");
+
+        ui.registerEvent((OpenReposChangedEventHandler) e -> {
+            Platform.runLater(() -> updateRepoRemoveList(remove));
+        });
+
+        return new MenuItem[] { remove };
+    }
+
+    private void updateRepoRemoveList(Menu remove) {
+        remove.getItems().clear();
+
+        HashSet<String> currentlyUsedRepo = getCurrentlyUsedRepo();
+
+        for (String repoId : ui.logic.getStoredRepos()) {
+            if (!currentlyUsedRepo.contains(repoId)) {
+                MenuItem removeItem = new MenuItem(repoId);
+                removeItem.setOnAction(e1 -> onRepoRemove(repoId));
+                remove.getItems().add(removeItem);
+            }
+        }
+    }
+
+    private HashSet<String> getCurrentlyUsedRepo() {
+        HashSet<String> currentlyUsedRepos = new HashSet<>();
+        String defaultRepo = ui.logic.getDefaultRepo();
+        currentlyUsedRepos.add(defaultRepo);
+        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+
+        return currentlyUsedRepos;
+    }
+
+    private void onRepoRemove(String repoId) {
+        ui.logic.removeRepository(repoId).thenRun(() -> ui.triggerEvent(new OpenReposChangedEvent()));
     }
 
     public void scrollTo(int panelIndex, int numOfPanels){
