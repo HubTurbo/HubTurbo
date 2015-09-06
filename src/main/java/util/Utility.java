@@ -150,6 +150,16 @@ public class Utility {
         return list.stream().collect(Collectors.joining(delimiter));
     }
 
+    /**
+     * Returns a replacement object if obj is null
+     * @param obj
+     * @param replacement
+     * @return a replacement value if obj is null
+     */
+    public static <T> T replaceNull(T obj, T replacement) {
+        return obj == null ? replacement : obj;
+    }
+
     public static int safeLongToInt(long l) {
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
             throw new IllegalArgumentException
