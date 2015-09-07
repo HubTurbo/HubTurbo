@@ -560,7 +560,7 @@ public class Qualifier implements FilterExpression {
                 }
         }
 
-        if(dateOfUpdate != null){
+        if (dateOfUpdate != null){
             int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
             return updatedRange.encloses(hoursSinceUpdate);
         } else {

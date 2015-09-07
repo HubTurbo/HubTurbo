@@ -94,7 +94,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
-    public static final Set<KeyCodeCombination> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
+    public static final Set<KeyCodeCombination> JUMP_TO_FIRST_ISSUE_KEYS = populateJumpToFirstIssueSet();
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =

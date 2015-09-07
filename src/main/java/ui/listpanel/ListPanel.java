@@ -275,7 +275,7 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationPaneAction();
             }
-            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+            for (KeyCodeCombination key:KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS) {
                 if (key.match(event)) {
                     event.consume();
                     listView.selectFirstItem();

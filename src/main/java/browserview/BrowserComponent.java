@@ -88,8 +88,7 @@ public class BrowserComponent {
 
         if (!isChromeCustomProfilePresent()) {
             login();
-        }
-        else {
+        } else {
             runBrowserOperation(() -> driver.get(GitHubURL.MAIN_PAGE, false));
         }
     }
@@ -109,12 +108,10 @@ public class BrowserComponent {
             String[] chromeCustomProfDirList = chromeCustomProfDir.list();
             if (chromeCustomProfDirList != null && chromeCustomProfDirList.length > 0) {
                 return true;
-            }
-            else { // directory is empty
+            } else { // directory is empty
                 return false;
             }
-        }
-        else { // directory does not exist yet
+        } else { // directory does not exist yet
             return false;
         }
     }
