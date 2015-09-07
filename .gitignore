@@ -129,10 +129,10 @@ credentials.txt
 session-config.json
 local-config.json
 hubturbo-log.log
-chromedriver_2-16
-chromedriver_linux_2-16
-chromedriver_linux_x86_64_2-16
-chromedriver_2-16.exe
+chromedriver_2-18
+chromedriver_linux_2-18
+chromedriver_linux_x86_64_2-18
+chromedriver_2-18.exe
 .hubturbocache/
 settings/
 store/

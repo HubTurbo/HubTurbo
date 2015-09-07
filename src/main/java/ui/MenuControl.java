@@ -66,13 +66,13 @@ public class MenuControl extends MenuBar {
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
             prefs.setLastLoginCredentials("", "");
-            ui.quit();
+            ui.quit(true);
         });
         
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(e -> {
             logger.info("Quitting HT");
-            ui.quit();
+            ui.quit(false);
         });
         
         file.getItems().addAll(logout, quit);
@@ -128,12 +128,31 @@ public class MenuControl extends MenuBar {
         cols.getItems().addAll(createRight, createLeft, closePanel);
         return cols;
     }
-
-    /**
-     * Called upon the Boards > Save being clicked
-     */
+    
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
+        
+        if (!prefs.getLastOpenBoard().isPresent()) {
+            onBoardSaveAs();
+            return;
+        }
+        
+        List<PanelInfo> panels = getCurrentPanels();
+        if (panels.isEmpty()) {
+            logger.info("Did not save board " + prefs.getLastOpenBoard().get());
+            return;
+        }
+        
+        prefs.addBoard(prefs.getLastOpenBoard().get(), panels);
+        ui.triggerEvent(new BoardSavedEvent());
+        logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
+    }
+
+    /**
+     * Called upon the Boards > Save as being clicked
+     */
+    private void onBoardSaveAs() {
+        logger.info("Menu: Boards > Save as");
 
         List<PanelInfo> panels = getCurrentPanels();
 
@@ -150,10 +169,22 @@ public class MenuControl extends MenuBar {
         Optional<String> response = dlg.showAndWait();
 
         if (response.isPresent()) {
-            prefs.addBoard(response.get(), panels);
-            ui.triggerEvent(new BoardSavedEvent());
-            logger.info("New board" + response.get() + " saved");
+            String boardName = response.get().trim();
+            if (isBoardNameValid(boardName)) {
+                prefs.addBoard(boardName, panels);
+                prefs.setLastOpenBoard(boardName);
+                ui.triggerEvent(new BoardSavedEvent());
+                logger.info("New board " + boardName + " saved");
+            }
         }
+    }
+    
+    private boolean isBoardNameValid(String response) {
+        if (response.equals("")) {
+            logger.info("Did not save new board: Empty name");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -164,6 +195,7 @@ public class MenuControl extends MenuBar {
 
         panels.closeAllPanels();
         panels.openPanels(panelInfo);
+        prefs.setLastOpenBoard(boardName);
     }
 
     /**
@@ -181,6 +213,11 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
+            if (prefs.getLastOpenBoard().isPresent()) {
+                if (prefs.getLastOpenBoard().get().equals(boardName)) {
+                    prefs.clearLastOpenBoard();
+                }
+            }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");
         } else {
@@ -189,6 +226,9 @@ public class MenuControl extends MenuBar {
     }
 
     private MenuItem[] createBoardsMenu() {
+        MenuItem saveAs = new MenuItem("Save as");
+        saveAs.setOnAction(e -> onBoardSaveAs());
+        
         MenuItem save = new MenuItem("Save");
         save.setOnAction(e -> onBoardSave());
 
@@ -215,7 +255,7 @@ public class MenuControl extends MenuBar {
             }
         });
 
-        return new MenuItem[] {save, open, delete};
+        return new MenuItem[] {save, saveAs, open, delete};
     }
 
     /**

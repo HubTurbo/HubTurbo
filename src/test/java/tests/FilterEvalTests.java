@@ -1,25 +1,23 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import backend.IssueMetadata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import prefs.Preferences;
 import backend.interfaces.IModel;
-import backend.resource.MultiModel;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
+import backend.resource.*;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.Qualifier;
+import prefs.Preferences;
 
 public class FilterEvalTests {
 
@@ -158,6 +156,24 @@ public class FilterEvalTests {
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
+
+        // Ensures that an issue isn't rejected by a qualifier just because it has some label
+        // that the qualifier doesn't express, i.e. it should only be rejected if it does not
+        // have any label that the qualifier expresses. See Qualifier#labelsSatisfy for details.
+
+        label = TurboLabel.exclusive(REPO, "type", "bug");
+        TurboLabel label2 = new TurboLabel(REPO, "something");
+        issue = new TurboIssue(REPO, 1, "");
+        issue.addLabel(label2);
+        issue.addLabel(label);
+
+        model = TestUtils.singletonModel(new Model(new Model(REPO,
+            new ArrayList<>(Arrays.asList(issue)),
+            new ArrayList<>(Arrays.asList(label, label2)),
+            new ArrayList<>(),
+            new ArrayList<>())));
+
+        assertEquals(true, Qualifier.process(model, Parser.parse("label:t."), issue));
 
         // Label without a group
 
@@ -499,5 +515,32 @@ public class FilterEvalTests {
 
         assertEquals(true, matches("repo:" + REPO, issue));
         assertEquals(false, matches("repo:something/else", issue));
+    }
+
+    @Test
+    public void filterLabelMatching() {
+        // Without group
+        assertFalse(Qualifier.labelMatches("pri", "priority.high"));
+        assertTrue(Qualifier.labelMatches("hi", "p.high"));
+
+        // With group
+        assertTrue(Qualifier.labelMatches("ior.hi", "priority.high"));
+        assertTrue(Qualifier.labelMatches("ior.ig", "priority.high"));
+        assertTrue(Qualifier.labelMatches("pri.hi", "priority.high"));
+        assertTrue(Qualifier.labelMatches("p.hi", "p.high"));
+
+        // Case
+        assertTrue(Qualifier.labelMatches("p.hi", "P.high"));
+        assertTrue(Qualifier.labelMatches("p.hi", "PRIORITY.high"));
+        assertTrue(Qualifier.labelMatches("PRIO.hi", "PRIORITY.high"));
+
+        // Disambiguation
+        assertTrue(Qualifier.labelMatches("p.", "p.high"));
+        assertTrue(Qualifier.labelMatches(".hi", ".high"));
+
+        // Non-matches
+        assertFalse(Qualifier.labelMatches("pri.hi", "p.high"));
+        assertFalse(Qualifier.labelMatches("pi.hi", "p.high"));
+        assertFalse(Qualifier.labelMatches(".", "p.high"));
     }
 }
