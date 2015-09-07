@@ -142,17 +142,9 @@ public class IssueMetadata {
     private static int calculateCommentCount(List<Comment> comments, String currentUser, UpdatedKind updatedKind) {
         int result = 0;
         if (updatedKind == UpdatedKind.OTHER_UPDATED) {
-            for (Comment comment : comments) {
-                if (!isCommentBySelf(currentUser, comment)) {
-                    result++;
-                }
-            }
+            return (int)(comments.stream().filter(c -> !isCommentBySelf(currentUser, c)).count());
         } else if (updatedKind == UpdatedKind.SELF_UPDATED){
-            for (Comment comment : comments) {
-                if (isCommentBySelf(currentUser, comment)) {
-                    result++;
-                }
-            }
+            return (int)(comments.stream().filter(c -> isCommentBySelf(currentUser, c)).count());
         }
         return result;
     }
