@@ -108,6 +108,8 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`is`](#is)
 - [`created`](#created)
 - [`updated`](#updated)
+- [`updatedByOthers`](#updatedByOthers)
+- [`updatedBySelf`](#updatedBySelf)
 - [`repo`](#repo)
 - [`sort`](#sort)
 
@@ -221,6 +223,18 @@ Matches issues which were created on a given date, or within a given date range.
 *Expects a number or  number range*
 
 Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`.
+
+### updatedByOthers
+
+*Expects a number or  number range*
+
+Matches issues which were updated in the given number of hours by users other than the logged in user. For example, `updated:<24` would match issues updated in the last day by other users. If a number `n` is given, it is implicitly translated to `<n`.
+
+### updatedBySelf
+
+*Expects a number or  number range*
+
+Matches issues which were updated in the given number of hours by the logged in user. For example, `updated:<24` would match issues updated in the last day by the logged in user. If a number `n` is given, it is implicitly translated to `<n`.
 
 ### repo
 
