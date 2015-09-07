@@ -38,7 +38,7 @@ public class UpdateIssuesTest extends UITest {
         sleep(EVENT_DELAY);
 
         // Updated view should now contain Issue 5.1 and Issue 10.
-        assertEquals(2, countIssuesShown());
+        assertEquals(3, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));

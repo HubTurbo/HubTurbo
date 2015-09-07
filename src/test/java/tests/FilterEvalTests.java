@@ -434,19 +434,41 @@ public class FilterEvalTests {
     }
 
     @Test
-    public void updatedByOther(){
+    public void updatedBySelfAndOther(){
         LocalDateTime now = LocalDateTime.now();
         Qualifier.setCurrentTime(now);
-        TurboIssue issueUpdatedByOther = new TurboIssue(REPO, 1, "");
-        IssueMetadata updatedByOtherMetadata = new IssueMetadata(issueUpdatedByOther.getMetadata(), now.minusHours(4),
-                null, 2, 2, true, false); //UpdatedByOther true with updated time 4 hours ago.
-        issueUpdatedByOther.setMetadata(updatedByOtherMetadata);
-        assertEquals(false, matches("updatedByOthers:<2", issueUpdatedByOther));
-        assertEquals(false, matches("updatedByOthers:<1", issueUpdatedByOther));
-        assertEquals(false, matches("updatedByOthers:nondate", issueUpdatedByOther));
-        assertEquals(true, matches("updatedByOthers:>2", issueUpdatedByOther));
-        assertEquals(false, matches("updatedBySelf:>24", issueUpdatedByOther));
-        assertEquals(true, matches("updatedByOthers:<5", issueUpdatedByOther));
+        TurboIssue issueUpdated = new TurboIssue(REPO, 1, "");
+        IssueMetadata updatedByOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, true, false); //UpdatedByOther true with updated time 4 hours ago.
+        issueUpdated.setMetadata(updatedByOtherMetadata);
+        assertEquals(false, matches("updatedByOthers:<2", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<2", issueUpdated));
+        assertEquals(true, matches("updatedByOthers:<5", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<5", issueUpdated));
+
+        IssueMetadata updatedBySelfAndOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, true, true); //UpdatedByOther and UpdatedBySelf true with updated time 4 hours ago.
+        issueUpdated.setMetadata(updatedBySelfAndOtherMetadata);
+        assertEquals(false, matches("updatedByOthers:<2", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<2", issueUpdated));
+        assertEquals(true, matches("updatedByOthers:<5", issueUpdated));
+        assertEquals(true, matches("updatedBySelf:<5", issueUpdated));
+
+        IssueMetadata updatedBySelfMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, false, true); //UpdatedBySelf true with updated time 4 hours ago.
+        issueUpdated.setMetadata(updatedBySelfMetadata);
+        assertEquals(false, matches("updatedByOthers:<2", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<2", issueUpdated));
+        assertEquals(false, matches("updatedByOthers:<5", issueUpdated));
+        assertEquals(true, matches("updatedBySelf:<5", issueUpdated));
+
+        IssueMetadata updatedByNoneMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, false, false); //UpdatedBySelf and UpdatedByOthers both false.
+        issueUpdated.setMetadata(updatedByNoneMetadata);
+        assertEquals(false, matches("updatedByOthers:<2", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<2", issueUpdated));
+        assertEquals(false, matches("updatedByOthers:<5", issueUpdated));
+        assertEquals(false, matches("updatedBySelf:<5", issueUpdated));
     }
 
     @Test
@@ -461,7 +483,6 @@ public class FilterEvalTests {
         assertEquals(false, matches("updatedBySelf:<24", issueUpdatedBySelf));
         assertEquals(false, matches("updatedBySelf:nondate", issueUpdatedBySelf));
         assertEquals(true, matches("updatedBySelf:>24", issueUpdatedBySelf));
-        assertEquals(false, matches("updatedByOthers:>24", issueUpdatedBySelf));
         assertEquals(true, matches("updatedBySelf:>40", issueUpdatedBySelf));
     }
 
@@ -474,39 +495,20 @@ public class FilterEvalTests {
         issue.setUpdatedAt(now.minusDays(2));
 
         assertEquals(false, matches("updated:<24", issue));
-        assertEquals(false, matches("updatedByOthers:<24", issue));
-        assertEquals(false, matches("updatedBySelf:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
-        assertEquals(matches("updatedByOthers:<24", issue),
-                matches("updatedByOthers:<24", issue));
-        assertEquals(matches("updatedBySelf:<24", issue),
-                matches("updatedBySelf:<24", issue));
+        System.out.println(issue.getUpdatedAt());
         assertEquals(true, matches("updated:>24", issue));
-        assertEquals(true, matches("updatedByOthers:>24", issue));
-        assertEquals(true, matches("updatedBySelf:>24", issue));
         assertEquals(false, matches("updated:nondate", issue));
-        assertEquals(false, matches("updatedByOthers:nondate", issue));
-        assertEquals(false, matches("updatedBySelf:nondate", issue));
 
         issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(1));
 
         assertEquals(true, matches("updated:<26", issue));
-        assertEquals(true, matches("updatedByOthers:<26", issue));
-        assertEquals(true, matches("updatedBySelf:<26", issue));
         assertEquals(matches("updated:<26", issue),
             matches("updated:26", issue));
-        assertEquals(matches("updatedByOthers:<26", issue),
-                matches("updatedByOthers:26", issue));
-        assertEquals(matches("updatedBySelf:<26", issue),
-                matches("updatedBySelf:26", issue));
         assertEquals(false, matches("updated:>26", issue));
-        assertEquals(false, matches("updatedByOthers:>26", issue));
-        assertEquals(false, matches("updatedBySelf:>26", issue));
         assertEquals(false, matches("updated:nondate", issue));
-        assertEquals(false, matches("updatedBySelf:nondate", issue));
-        assertEquals(false, matches("updatedByOthers:nondate", issue));
     }
 
     @Test

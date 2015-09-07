@@ -538,8 +538,7 @@ public class Qualifier implements FilterExpression {
             return false;
         }
 
-        int hoursSinceUpdate = Integer.MIN_VALUE;
-        LocalDateTime dateOfUpdate = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
+        LocalDateTime dateOfUpdate = null;
 
         //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
         //and getSelfUpdatedAt
@@ -555,18 +554,18 @@ public class Qualifier implements FilterExpression {
                 }
                 break;
             case ALL_UPDATED:
-                if (issue.getMetadata().isUpdated()) {
+                // The or condition for dateOfUpdate is for first time check
+                if (issue.getMetadata().isUpdated() || dateOfUpdate == null) {
                     dateOfUpdate = issue.getUpdatedAt();
                 }
         }
 
-        // First time being filtered (haven't gotten metadata from source yet).
-        if (hoursSinceUpdate == Integer.MIN_VALUE) {
-            dateOfUpdate = issue.getUpdatedAt();
+        if(dateOfUpdate != null){
+            int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+            return updatedRange.encloses(hoursSinceUpdate);
+        } else {
+            return false;
         }
-
-        hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
-        return updatedRange.encloses(hoursSinceUpdate);
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
