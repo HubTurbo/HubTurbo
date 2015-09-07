@@ -1,16 +1,27 @@
 package backend.github;
 
-import backend.UserCredentials;
-import backend.interfaces.Repo;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import github.GitHubClientExtended;
 import github.IssueServiceExtended;
 import github.LabelServiceFixed;
 import github.TurboIssueEvent;
-import github.update.*;
+import github.update.IssueUpdateService;
+import github.update.LabelUpdateService;
+import github.update.MilestoneUpdateService;
+import github.update.UpdateService;
+import github.update.UserUpdateService;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
@@ -18,21 +29,24 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.NoSuchPageException;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import backend.UserCredentials;
+import backend.interfaces.Repo;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
 public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -71,7 +85,7 @@ public class GitHubRepo implements Repo {
         List<TurboIssue> items = updatedItems.stream()
             .map(i -> new TurboIssue(repoId, i))
             .collect(Collectors.toList());
-        return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETag(),
+        return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETags(),
             issueUpdateService.getUpdatedCheckTime());
     }
 
@@ -100,7 +114,7 @@ public class GitHubRepo implements Repo {
             .map(i -> resourceConstructor.apply(repoId, i))
             .collect(Collectors.toList());
         return new ImmutablePair<>(items,
-            updateService.getUpdatedETag());
+            updateService.getUpdatedETags());
     }
 
     @Override
@@ -195,6 +209,7 @@ public class GitHubRepo implements Repo {
         return elements;
     }
 
+    @Override
     public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
         try {
             return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId)
@@ -205,6 +220,7 @@ public class GitHubRepo implements Repo {
         }
     }
 
+    @Override
     public List<Comment> getComments(String repoId, int issueId) {
         try {
             return issueService.getComments(RepositoryId.createFromId(repoId), issueId);
