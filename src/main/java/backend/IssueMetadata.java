@@ -4,8 +4,10 @@ import github.TurboIssueEvent;
 import org.eclipse.egit.github.core.Comment;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class IssueMetadata {
@@ -16,10 +18,13 @@ public class IssueMetadata {
     private final int nonSelfCommentCount;
     private final int selfCommentCount;
 
-    // If isUpdated is true, nonSelfUpdatedAt will be used to sort/filter instead of updatedAt in TurboIssue
-    private final boolean isUpdated;
-    private final boolean isUpdatedBySelf;
-    private final boolean isUpdatedByOthers;
+    private final boolean isUpdated; //for any update
+    private final boolean isUpdatedBySelf; // for update by self
+    private final boolean isUpdatedByOthers; // for update by others
+
+    private enum UpdatedKind {
+        SELF_UPDATED, OTHER_UPDATED
+    }
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
@@ -74,18 +79,86 @@ public class IssueMetadata {
     }
 
     // Constructor used in Logic
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, LocalDateTime selfUpdatedAt,
-                         int nonSelfCommentCount, int selfCommentCount,
-                         boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
-        this.events = new ArrayList<>(other.events);
-        this.comments = new ArrayList<>(other.comments);
-        this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
-        this.selfUpdatedAt = selfUpdatedAt;
-        this.nonSelfCommentCount = nonSelfCommentCount;
-        this.selfCommentCount = selfCommentCount;
+    public IssueMetadata(IssueMetadata existingMetadata, String currentUser) {
+        Date lastNonSelfUpdate = new Date(0);
+        Date lastSelfUpdate = new Date(0);
+        boolean isUpdatedByOthers = false;
+        boolean isUpdatedBySelf = false;
+        for (TurboIssueEvent event : existingMetadata.getEvents()) {
+            if (isNewEventByOther(currentUser, event, lastNonSelfUpdate)) {
+                lastNonSelfUpdate = event.getDate();
+                isUpdatedByOthers = true;
+            }
+            if (isNewEventBySelf(currentUser, event, lastSelfUpdate)){
+                lastSelfUpdate = event.getDate();
+                isUpdatedBySelf = true;
+            }
+        }
+        for (Comment comment : existingMetadata.getComments()) {
+            if (isNewCommentByOther(currentUser, comment, lastNonSelfUpdate)) {
+                lastNonSelfUpdate = comment.getCreatedAt();
+                isUpdatedByOthers = true;
+            }
+            if (isNewCommentBySelf(currentUser, comment, lastSelfUpdate)){
+                lastSelfUpdate = comment.getCreatedAt();
+                isUpdatedBySelf = true;
+            }
+        }
+
+        this.events = new ArrayList<>(existingMetadata.events);
+        this.comments = new ArrayList<>(existingMetadata.comments);
+        this.nonSelfUpdatedAt = LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault());
+        this.selfUpdatedAt = LocalDateTime.ofInstant(lastSelfUpdate.toInstant(), ZoneId.systemDefault());
+        this.nonSelfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
+                UpdatedKind.OTHER_UPDATED);
+        this.selfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
+                UpdatedKind.SELF_UPDATED);
         this.isUpdated = true;
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
+
+    }
+
+    private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
+        return !comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                && comment.getCreatedAt().after(lastNonSelfUpdate);
+    }
+
+    private static boolean isNewCommentBySelf(String currentUser, Comment comment, Date lastSelfUpdate){
+        return comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                && comment.getCreatedAt().after(lastSelfUpdate);
+    }
+
+    private static boolean isNewEventBySelf(String currentUser, TurboIssueEvent event, Date lastSelfUpdate){
+        return event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                && event.getDate().after(lastSelfUpdate);
+    }
+
+    private static boolean isNewEventByOther(String currentUser, TurboIssueEvent event, Date lastNonSelfUpdate){
+        return !event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                && event.getDate().after(lastNonSelfUpdate);
+    }
+
+    private static int calculateCommentCount(List<Comment> comments, String currentUser, UpdatedKind updatedKind) {
+        int result = 0;
+        if (updatedKind == UpdatedKind.OTHER_UPDATED) {
+            for (Comment comment : comments) {
+                if (!isCommentBySelf(currentUser, comment)) {
+                    result++;
+                }
+            }
+        } else if (updatedKind == UpdatedKind.SELF_UPDATED){
+            for (Comment comment : comments) {
+                if (isCommentBySelf(currentUser, comment)) {
+                    result++;
+                }
+            }
+        }
+        return result;
+    }
+
+    private static boolean isCommentBySelf(String currentUser, Comment comment){
+        return comment.getUser().getLogin().equalsIgnoreCase(currentUser);
     }
 
     // Constructor used in MultiModel
@@ -99,6 +172,21 @@ public class IssueMetadata {
         this.isUpdated = other.isUpdated;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
+    }
+
+    //Constructor used in FilterEvalTests
+    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, LocalDateTime selfUpdatedAt,
+                         int nonSelfCommentCount, int selfCommentCount,
+                         boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
+        this.events = new ArrayList<>(other.events);
+        this.comments = new ArrayList<>(other.comments);
+        this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
+        this.selfUpdatedAt = selfUpdatedAt;
+        this.nonSelfCommentCount = nonSelfCommentCount;
+        this.selfCommentCount = selfCommentCount;
+        this.isUpdated = true;
+        this.isUpdatedBySelf = isUpdatedBySelf;
+        this.isUpdatedByOthers = isUpdatedByOthers;
     }
 
     public String summarise() {

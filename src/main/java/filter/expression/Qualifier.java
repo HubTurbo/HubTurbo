@@ -540,10 +540,6 @@ public class Qualifier implements FilterExpression {
 
         int hoursSinceUpdate = Integer.MIN_VALUE;
         LocalDateTime dateOfUpdate = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
-        // First time being filtered (haven't gotten metadata from source yet).
-        if (hoursSinceUpdate == Integer.MIN_VALUE) {
-            dateOfUpdate = issue.getUpdatedAt();
-        }
 
         //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
         //and getSelfUpdatedAt
@@ -562,6 +558,11 @@ public class Qualifier implements FilterExpression {
                 if (issue.getMetadata().isUpdated()) {
                     dateOfUpdate = issue.getUpdatedAt();
                 }
+        }
+
+        // First time being filtered (haven't gotten metadata from source yet).
+        if (hoursSinceUpdate == Integer.MIN_VALUE) {
+            dateOfUpdate = issue.getUpdatedAt();
         }
 
         hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
