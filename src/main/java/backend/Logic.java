@@ -29,7 +29,7 @@ import static util.Futures.withResult;
 public class Logic {
 
     private static final Logger logger = HTLog.get(Logic.class);
-    private enum IssueType {
+    private enum UpdatedKind {
         SELF_UPDATED, OTHER_UPDATED
     }
 
@@ -137,7 +137,7 @@ public class Logic {
 
         String currentUser = prefs.getLastLoginUsername();
 
-        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processNonSelfUpdate)
+        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
             .thenApply(metadata -> {
                 String updatedMessage = "Received metadata from " + repoId + "!";
                 UI.status.displayMessage(updatedMessage);
@@ -152,7 +152,7 @@ public class Logic {
     }
 
     // Adds update times to the metadata map
-    private Map<Integer, IssueMetadata> processNonSelfUpdate(Map<Integer, IssueMetadata> metadata) {
+    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
         String currentUser = prefs.getLastLoginUsername();
 
         // Iterates through each entry in the metadata set, and looks for the comment/event with
@@ -164,23 +164,21 @@ public class Logic {
             boolean isUpdatedByOthers = false;
             boolean isUpdatedBySelf = false;
             for (TurboIssueEvent event : currentMetadata.getEvents()) {
-                if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                        && event.getDate().after(lastNonSelfUpdate)) {
+                if (isNewEventByOther(currentUser, event, lastNonSelfUpdate)) {
                     lastNonSelfUpdate = event.getDate();
                     isUpdatedByOthers = true;
-                } else if (event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                        && event.getDate().after(lastSelfUpdate)){
+                }
+                if (isNewEventBySelf(currentUser, event, lastSelfUpdate)){
                     lastSelfUpdate = event.getDate();
                     isUpdatedBySelf = true;
                 }
             }
             for (Comment comment : currentMetadata.getComments()) {
-                if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                        && comment.getCreatedAt().after(lastNonSelfUpdate)) {
+                if (isNewCommentByOther(currentUser, comment, lastNonSelfUpdate)) {
                     lastNonSelfUpdate = comment.getCreatedAt();
                     isUpdatedByOthers = true;
-                } else if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                        && comment.getCreatedAt().after(lastSelfUpdate)){
+                }
+                if (isNewCommentBySelf(currentUser, comment, lastSelfUpdate)){
                     lastSelfUpdate = comment.getCreatedAt();
                     isUpdatedBySelf = true;
                 }
@@ -189,8 +187,8 @@ public class Logic {
             entry.setValue(new IssueMetadata(currentMetadata,
                     LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
                     LocalDateTime.ofInstant(lastSelfUpdate.toInstant(), ZoneId.systemDefault()),
-                    calculateCommentCount(currentMetadata.getComments(), currentUser, IssueType.OTHER_UPDATED),
-                    calculateCommentCount(currentMetadata.getComments(), currentUser, IssueType.SELF_UPDATED),
+                    calculateCommentCount(currentMetadata.getComments(), currentUser, UpdatedKind.OTHER_UPDATED),
+                    calculateCommentCount(currentMetadata.getComments(), currentUser, UpdatedKind.SELF_UPDATED),
                     isUpdatedByOthers,
                     isUpdatedBySelf
             ));
@@ -198,22 +196,46 @@ public class Logic {
         return metadata;
     }
 
-    private int calculateCommentCount(List<Comment> comments, String currentUser, IssueType issueType) {
+    private boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
+        return !comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                && comment.getCreatedAt().after(lastNonSelfUpdate);
+    }
+
+    private boolean isNewCommentBySelf(String currentUser, Comment comment, Date lastSelfUpdate){
+        return comment.getUser().getLogin().equalsIgnoreCase(currentUser)
+                && comment.getCreatedAt().after(lastSelfUpdate);
+    }
+
+    private boolean isNewEventBySelf(String currentUser, TurboIssueEvent event, Date lastSelfUpdate){
+        return event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                && event.getDate().after(lastSelfUpdate);
+    }
+
+    private boolean isNewEventByOther(String currentUser, TurboIssueEvent event, Date lastNonSelfUpdate){
+        return !event.getActor().getLogin().equalsIgnoreCase(currentUser)
+                && event.getDate().after(lastNonSelfUpdate);
+    }
+
+    private int calculateCommentCount(List<Comment> comments, String currentUser, UpdatedKind updatedKind) {
         int result = 0;
-        if (issueType == IssueType.OTHER_UPDATED) {
+        if (updatedKind == UpdatedKind.OTHER_UPDATED) {
             for (Comment comment : comments) {
-                if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
+                if (!isCommentBySelf(currentUser, comment)) {
                     result++;
                 }
             }
-        } else if (issueType == IssueType.SELF_UPDATED){
+        } else if (updatedKind == UpdatedKind.SELF_UPDATED){
             for (Comment comment : comments) {
-                if (comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
+                if (isCommentBySelf(currentUser, comment)) {
                     result++;
                 }
             }
         }
         return result;
+    }
+
+    private boolean isCommentBySelf(String currentUser, Comment comment){
+        return comment.getUser().getLogin().equalsIgnoreCase(currentUser);
     }
 
     public Set<String> getOpenRepositories() {

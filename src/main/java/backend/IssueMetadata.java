@@ -81,11 +81,11 @@ public class IssueMetadata {
         this.comments = new ArrayList<>(other.comments);
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
         this.selfUpdatedAt = selfUpdatedAt;
-        this.nonSelfCommentCount = nonSelfCommentCount; // Calculated just prior to calling this constructor
-        this.selfCommentCount = selfCommentCount; //Calculated just prior to calling this constructor
+        this.nonSelfCommentCount = nonSelfCommentCount;
+        this.selfCommentCount = selfCommentCount;
         this.isUpdated = true;
-        this.isUpdatedByOthers = isUpdatedByOthers; //Calculated prior to calling this constructor
-        this.isUpdatedBySelf = isUpdatedBySelf; // Calculated prior to calling this constructor
+        this.isUpdatedByOthers = isUpdatedByOthers;
+        this.isUpdatedBySelf = isUpdatedBySelf;
     }
 
     // Constructor used in MultiModel

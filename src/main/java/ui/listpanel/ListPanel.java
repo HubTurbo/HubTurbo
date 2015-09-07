@@ -61,8 +61,7 @@ public class ListPanel extends FilterPanel {
      */
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
         List<String> filterQualifierNames = currentFilterExpression.getQualifierNames();
-        if ((filterQualifierNames.contains(Qualifier.UPDATED) ||
-                filterQualifierNames.contains(Qualifier.UPDATED_OTHERS)) && hasMetadata) {
+        if (hasMetadata && containsUpdatedQualifier(filterQualifierNames)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
@@ -71,6 +70,12 @@ public class ListPanel extends FilterPanel {
             return issueCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(issueCommentCounts.get(issue.getId()) - issue.getCommentCount()) > 0;
         }
+    }
+
+    private static boolean containsUpdatedQualifier(List<String> filterQualifierNames){
+        // omitting self-updated issues since we only care about updated comments from other users.
+        return (filterQualifierNames.contains(Qualifier.UPDATED) ||
+                filterQualifierNames.contains(Qualifier.UPDATED_OTHERS));
     }
 
     /**

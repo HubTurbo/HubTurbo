@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import backend.IssueMetadata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -414,6 +415,38 @@ public class FilterEvalTests {
         assertEquals(true, matches("created:>2014-12-1", issue));
         assertEquals(true, matches("created:2014-12-2", issue));
         assertEquals(false, matches("created:nondate", issue));
+    }
+
+    @Test
+    public void updatedByOther(){
+        LocalDateTime now = LocalDateTime.now();
+        Qualifier.setCurrentTime(now);
+        TurboIssue issueUpdatedByOther = new TurboIssue(REPO, 1, "");
+        IssueMetadata updatedByOtherMetadata = new IssueMetadata(issueUpdatedByOther.getMetadata(), now.minusHours(4),
+                null, 2, 2, true, false); //UpdatedByOther true with updated time 4 hours ago.
+        issueUpdatedByOther.setMetadata(updatedByOtherMetadata);
+        assertEquals(false, matches("updatedByOthers:<2", issueUpdatedByOther));
+        assertEquals(false, matches("updatedByOthers:<1", issueUpdatedByOther));
+        assertEquals(false, matches("updatedByOthers:nondate", issueUpdatedByOther));
+        assertEquals(true, matches("updatedByOthers:>2", issueUpdatedByOther));
+        assertEquals(false, matches("updatedBySelf:>24", issueUpdatedByOther));
+        assertEquals(true, matches("updatedByOthers:<5", issueUpdatedByOther));
+    }
+
+    @Test
+    public void updatedBySelf(){
+        LocalDateTime now = LocalDateTime.now();
+        Qualifier.setCurrentTime(now);
+        TurboIssue issueUpdatedBySelf = new TurboIssue(REPO, 1, "");
+        IssueMetadata updatedBySelfMetadata = new IssueMetadata(issueUpdatedBySelf.getMetadata(), null,
+                now.minusDays(2), 2, 2, false, true); //UpdatedByOther true with updated time 4 hours ago.
+        issueUpdatedBySelf.setMetadata(updatedBySelfMetadata);
+        assertEquals(false, matches("updatedBySelf:<24", issueUpdatedBySelf));
+        assertEquals(false, matches("updatedBySelf:<24", issueUpdatedBySelf));
+        assertEquals(false, matches("updatedBySelf:nondate", issueUpdatedBySelf));
+        assertEquals(true, matches("updatedBySelf:>24", issueUpdatedBySelf));
+        assertEquals(false, matches("updatedByOthers:>24", issueUpdatedBySelf));
+        assertEquals(true, matches("updatedBySelf:>40", issueUpdatedBySelf));
     }
 
     @Test
