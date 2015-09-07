@@ -30,7 +30,7 @@ public class UpdateIssuesTest extends UITest {
 
         // Updated view should contain Issue 10, which was commented on recently (as part of default test dataset)
         // Issue 9 was also commented on recently, but by the current HT user, so it is not shown.
-        assertEquals(1, countIssuesShown());
+        assertEquals(2, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1");
