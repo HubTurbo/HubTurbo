@@ -28,7 +28,7 @@ public class UpdateIssuesTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("24");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
 
         // Updated view should contain Issue 10, which was commented on recently (as part of default test dataset)
         // Issue 9 was also commented on recently, but by the current HT user, so it is not shown.
@@ -39,7 +39,7 @@ public class UpdateIssuesTest extends UITest {
         updateIssue(5, "Issue 5.1");
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
 
         // Updated view should now contain Issue 5.1 and Issue 10.
         assertEquals(3494, getApiCount(apiBox.getText())); // 2 calls for Issue 5
@@ -50,25 +50,25 @@ public class UpdateIssuesTest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent());
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
         assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
         assertEquals(3, countIssuesShown());
 
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
         assertEquals(3492, getApiCount(apiBox.getText())); // No change to issues, so no additional API quota spent
     }
 
     public void resetRepo() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.resetRepo("dummy/dummy"));
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
     }
 
     public void updateIssue(int issueId, String newIssueTitle) {
         UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", issueId, newIssueTitle));
         UI.events.triggerEvent(new UILogicRefreshEvent());
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
     }
 
     @SuppressWarnings("unchecked")
