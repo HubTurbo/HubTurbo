@@ -81,7 +81,7 @@ public class GUIController {
         ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(updatedModel.getIssues());
 
         // Populated in processPanel calls.
-        HashMap<String, HashMap<Integer, String>> toUpdate = new HashMap<>();
+        HashMap<String, List<TurboIssue>> toUpdate = new HashMap<>();
 
         panelControl.getChildren().forEach(child -> {
             if (child instanceof FilterPanel) {
@@ -106,7 +106,7 @@ public class GUIController {
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
         ObservableList<TurboIssue> allModelIssues = FXCollections.observableArrayList(multiModel.getIssues());
-        HashMap<String, HashMap<Integer, String>> toUpdate = new HashMap<>();
+        HashMap<String, List<TurboIssue>> toUpdate = new HashMap<>();
 
         // This is not triggered by a (metadata) update, so we pass false into the call.
         processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
@@ -133,7 +133,7 @@ public class GUIController {
     public void processPanel(FilterPanel panelToProcess,
                              IModel updatedModel,
                              ObservableList<TurboIssue> allModelIssues,
-                             HashMap<String, HashMap<Integer, String>> toUpdate,
+                             HashMap<String, List<TurboIssue>> toUpdate,
                              boolean isMetadataUpdate) {
 
         // Extract the filter expression and the meta qualifiers within it. The expression is used for
@@ -248,28 +248,35 @@ public class GUIController {
     /**
      * Mutates the issuesToUpdate HashMap by adding all issues in filteredAndSortedIssues.
      *
-     * The usage of HashMap and HashSet ensures that there will be no duplicate metadata requests sent,
+     * The usage of the HashMap updateTally ensures that there will be no duplicate metadata requests sent,
      * hence reducing the number of API calls made.
      *
      * @param filteredAndSortedIssues Issues to populate the HashMap.
      * @param issuesToUpdate The HashMap to be populated.
      */
     private static void populateUpdateList(TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues,
-                                           HashMap<String, HashMap<Integer, String>> issuesToUpdate) {
+                                           HashMap<String, List<TurboIssue>> issuesToUpdate) {
+        HashMap<String, HashMap<Integer, TurboIssue>> updateTally = new HashMap<>();
 
+        // We store the issues temporarily in updateTally first.
         for (TurboIssue issueToUpdate : filteredAndSortedIssues) {
             // Retrieve to check if the HashSet representing the issue's repo already exists.
-            HashMap<Integer, String> issuesInRepo = issuesToUpdate.get(issueToUpdate.getRepoId());
+            HashMap<Integer, TurboIssue> issuesInRepo = updateTally.get(issueToUpdate.getRepoId());
             if (issuesInRepo != null) {
                 // If yes, just add the issue.
-                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getETag());
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate);
             } else {
                 // If no, initialize the HashSet first, then add the issue.
                 issuesInRepo = new HashMap<>();
-                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getETag());
-                issuesToUpdate.put(issueToUpdate.getRepoId(), issuesInRepo);
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate);
+                updateTally.put(issueToUpdate.getRepoId(), issuesInRepo);
             }
         }
+
+        // Then do another pass through updateTally to load them into issuesToUpdate
+        updateTally.forEach((repoId, issuesToUpdateInRepo) -> {
+            issuesToUpdate.put(repoId, new ArrayList<>(issuesToUpdateInRepo.values()));
+        });
     }
 
 
@@ -278,9 +285,9 @@ public class GUIController {
      *
      * @param toUpdate The HashMap containing issues for which to get metadata.
      */
-    private void dispatchMetadataRequests(HashMap<String, HashMap<Integer, String>> toUpdate) {
+    private void dispatchMetadataRequests(HashMap<String, List<TurboIssue>> toUpdate) {
         toUpdate.forEach((repoId, issues) ->
-            ui.logic.getIssueMetadata(repoId, new HashMap<>(issues))
+            ui.logic.getIssueMetadata(repoId, issues)
         );
     }
 

@@ -3,6 +3,7 @@ package backend.github;
 import backend.IssueMetadata;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
+import backend.resource.TurboIssue;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
@@ -20,20 +21,23 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
     private static final Logger logger = HTLog.get(DownloadMetadataTask.class);
 
     private final String repoId;
-    private final Map<Integer, String> issueIdETags;
+    private final List<TurboIssue> issuesToUpdate;
 
     public DownloadMetadataTask(TaskRunner taskRunner, Repo repo, String repoId,
-                                Map<Integer, String> issueIdETags) {
+                                List<TurboIssue> issuesToUpdate) {
         super(taskRunner, repo);
         this.repoId = repoId;
-        this.issueIdETags = issueIdETags;
+        this.issuesToUpdate = issuesToUpdate;
     }
 
     @Override
     public void run() {
         Map<Integer, IssueMetadata> result = new HashMap<>();
 
-        issueIdETags.forEach((id, currentETag) -> {
+        issuesToUpdate.forEach(issue -> {
+            String currentETag = issue.getMetadata().getETag();
+            int id = issue.getId();
+
             ImmutablePair<List<TurboIssueEvent>, String> changes = repo.getUpdatedEvents(repoId, id, currentETag);
 
             List<TurboIssueEvent> events = changes.getLeft();
