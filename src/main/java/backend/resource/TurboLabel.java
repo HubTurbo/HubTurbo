@@ -90,6 +90,10 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return getDelimiter(actualName).isPresent() && getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER);
     }
 
+    public boolean hasGroup() {
+        return getGroup().isPresent();
+    }
+
     public Optional<String> getGroup() {
         if (getDelimiter(actualName).isPresent()) {
             String delimiter = getDelimiter(actualName).get();

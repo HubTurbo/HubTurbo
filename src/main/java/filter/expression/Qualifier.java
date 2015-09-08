@@ -639,38 +639,50 @@ public class Qualifier implements FilterExpression {
         return authorSatisfies(issue) || assigneeSatisfies(model, issue);
     }
 
+    public static boolean labelMatches(String input, String candidate) {
+
+        // Make use of TurboLabel constructor to parse the input, avoiding duplication
+        TurboLabel inputLabel = new TurboLabel("", input.toLowerCase());
+        TurboLabel candidateLabel = new TurboLabel("", candidate.toLowerCase());
+
+        String group = "";
+        if (inputLabel.hasGroup()) {
+            group = inputLabel.getGroup().get();
+        }
+        String labelName = inputLabel.getName();
+
+        if (candidateLabel.hasGroup()) {
+            if (labelName.isEmpty()) {
+                // Check the group
+                if (candidateLabel.getGroup().get().contains(group)) {
+                    return true;
+                }
+            } else {
+                if (candidateLabel.getGroup().get().contains(group)
+                    && candidateLabel.getName().contains(labelName)) {
+                    return true;
+                }
+            }
+        } else {
+            // Check only the label name
+            if (group.isEmpty() && !labelName.isEmpty() && candidateLabel.getName().contains(labelName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean labelsSatisfy(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
 
-        // Make use of TurboLabel constructor to parse the string, to avoid duplication
-        TurboLabel tokens = new TurboLabel("", content.get().toLowerCase());
-
-        String group = "";
-        if (tokens.getGroup().isPresent()) {
-            group = tokens.getGroup().get();
-        }
-        String labelName = tokens.getName();
+        // A qualifier matches an issue if the issue is associated with some subset of the
+        // labels that the qualifier expresses. It should only reject an issue if the issue
+        // does not contain any labels it expresses, and not if the issue contains some label
+        // it does not express.
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
-            if (label.getGroup().isPresent()) {
-                if (labelName.isEmpty()) {
-                    // Check the group
-                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)) {
-                       return true;
-                    }
-                } else {
-                    if (Utility.containsIgnoreCase(label.getGroup().get(), group)
-                        && Utility.containsIgnoreCase(label.getName(), labelName)) {
-                       return true;
-                    }
-                }
-            } else {
-                // Check only the label name
-                if (!group.isEmpty()) {
-                    return false;
-                } else if (!labelName.isEmpty() && Utility.containsIgnoreCase(label.getName(), labelName)) {
-                    return true;
-                }
+            if (labelMatches(content.get(), label.getActualName())) {
+                return true;
             }
         }
         return false;

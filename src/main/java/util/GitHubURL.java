@@ -1,7 +1,10 @@
 package util;
 
+import backend.resource.TurboIssue;
+
 public class GitHubURL {
 
+    public static final String MAIN_PAGE = "https://github.com";
     public static final String LOGIN_PAGE = "https://github.com/login";
     public static final String DOCS_PAGE =
             "https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md";
@@ -51,4 +54,10 @@ public class GitHubURL {
     public static boolean isPullRequestLoaded(String url)  {
         return (url.endsWith("/commits") || url.endsWith("/files"));
     }
+
+    public static boolean isOnSpecificIssuePage(TurboIssue issue, String url) {
+        return url.startsWith(getPathForPullRequest(issue.getRepoId(), issue.getId())) ||
+                url.startsWith(getPathForIssue(issue.getRepoId(), issue.getId()));
+    }
+
 }

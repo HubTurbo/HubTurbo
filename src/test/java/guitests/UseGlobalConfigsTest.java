@@ -7,16 +7,15 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
-import prefs.Preferences;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import prefs.PanelInfo;
+import prefs.Preferences;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
@@ -42,15 +41,15 @@ public class UseGlobalConfigsTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(8000);
-        ComboBox<String> repositorySelector = find("#repositorySelector");
-        assertEquals(repositorySelector.getValue(), "dummy/dummy");
+        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
+        waitForValue(repositorySelector);
+        assertEquals("dummy/dummy", repositorySelector.getValue());
         
         press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
 
         // Make a new board
         click("Boards");
-        click("Save");
+        click("Save as");
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
         ((TextField) find("#boardnameinput")).setText("Empty Board");
@@ -64,7 +63,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Load dummy2/dummy2 too
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        sleep(2000);
+        waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
         click("#dummy/dummy_col1_filterTextField");
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
@@ -94,12 +93,10 @@ public class UseGlobalConfigsTest extends UITest {
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Open issues", renameTextField3.getText());
         push(KeyCode.ENTER);
-        
-        sleep(8000);
 
         // Make a new board
         click("Boards");
-        click("Save");
+        click("Save as");
         ((TextField) find("#boardnameinput")).setText("Dummy Board");
         click("OK");
 

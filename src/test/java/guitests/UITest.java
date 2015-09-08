@@ -2,13 +2,19 @@ package guitests;
 
 import backend.interfaces.RepoStore;
 import com.google.common.util.concurrent.SettableFuture;
+
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
 import javafx.stage.Stage;
 import org.junit.Before;
 import org.loadui.testfx.GuiTest;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
+import org.loadui.testfx.exceptions.NoNodesVisibleException;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
 import ui.UI;
+import util.PlatformEx;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,5 +90,44 @@ public class UITest extends GuiTest {
     @Override
     protected Parent getRootNode() {
         return stage.getScene().getRoot();
+    }
+
+    public void waitUntilNodeAppears(Node node) {
+        waitUntil(node, Node::isVisible);
+    }
+
+    public void waitUntilNodeDisappears(Node node) {
+        waitUntil(node, n -> !n.isVisible());
+    }
+
+    public void waitUntilNodeAppears(String selector) {
+        while (!existsQuiet(selector)) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
+    public void waitUntilNodeDisappears(String selector) {
+        while (existsQuiet(selector)) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
+    public <T extends Node> T findOrWaitFor(String selector) {
+        waitUntilNodeAppears(selector);
+        return find(selector);
+    }
+
+    private boolean existsQuiet(String selector) {
+        try {
+            return exists(selector);
+        } catch (NoNodesFoundException | NoNodesVisibleException e) {
+            return false;
+        }
+    }
+
+    public <T> void waitForValue(ComboBoxBase<T> comboBoxBase) {
+        waitUntil(comboBoxBase, c -> c.getValue() != null);
     }
 }

@@ -31,6 +31,7 @@ These key sequences (one key followed by the other) are used to load (in the bro
 | ------------- |:-------------:| ------------|
 | Next panel (Forward)|<kbd>F</kbd>|Focus moves to the next panel on the right of the current panel. If there are no more panels on the right, goes back to the leftmost panel|
 | Next panel (Backward)|<kbd>D</kbd>|Similar to above, but moves focus in the reverse direction|
+| First issue of issue list|<kbd>Ctrl</kbd> + <kbd>↓</kbd> / <kbd>1</kbd>| Jumps to the first issue in issue list|
 | Issue list *to* filter box|<kbd>Ctrl</kbd> + <kbd>↑</kbd> / <kbd>Space</kbd> <kbd>Space</kbd>|Focus moves from the issue list to filter box of the same panel|
 | Filter box *to* issue list|<kbd>Ctrl</kbd> + <kbd>↓</kbd> / <kbd>Space</kbd> <kbd>Space</kbd>|Focus moves from the filter box to issue box of the same panel|
 | Out of filter box (while editing filter)|<kbd>ESC</kbd> then <kbd>ESC</kbd>|First <kbd>ESC</kbd> restores previous filter and selects the filter text. The second <kbd>ESC</kbd> moves focus out of filter box|

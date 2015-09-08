@@ -78,15 +78,31 @@ public class PlatformSpecificTests {
         assertNotNull(chromeDriverBinaryName);
 
         if (PlatformSpecific.isOnMac()) {
-            assertEquals("chromedriver_2-16", chromeDriverBinaryName);
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
+                    !chromeDriverBinaryName.contains("exe") &&
+                    !chromeDriverBinaryName.contains("linux") &&
+                    !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOnWindows()) {
-            assertEquals("chromedriver_2-16.exe", chromeDriverBinaryName);
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
+                    chromeDriverBinaryName.contains("exe") &&
+                    !chromeDriverBinaryName.contains("linux") &&
+                    !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOn32BitsLinux()) {
-            assertEquals("chromedriver_linux_2-16", chromeDriverBinaryName);
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
+                    !chromeDriverBinaryName.contains("exe") &&
+                    chromeDriverBinaryName.contains("linux") &&
+                    !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOn64BitsLinux()) {
-            assertEquals("chromedriver_linux_x86_64_2-16", chromeDriverBinaryName);
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
+                    !chromeDriverBinaryName.contains("exe") &&
+                    chromeDriverBinaryName.contains("linux") &&
+                    chromeDriverBinaryName.contains("x86_64"));
         } else {
-            assertEquals("chromedriver_linux_2-16", chromeDriverBinaryName);
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
+                    !chromeDriverBinaryName.contains("exe") &&
+                    chromeDriverBinaryName.contains("linux") &&
+                    !chromeDriverBinaryName.contains("x86_64"));
         }
     }
+
 }

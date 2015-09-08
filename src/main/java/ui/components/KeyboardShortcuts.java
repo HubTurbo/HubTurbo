@@ -31,82 +31,112 @@ public class KeyboardShortcuts {
     private static final Logger logger = LogManager.getLogger(KeyboardShortcuts.class.getName());
 
     private static Map<String, String> keyboardShortcuts = null;
-    private static Set<KeyCode> assignedKeys = null;
+    private static Set<KeyCodeCombination> assignedKeys = null;
 
     // customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static KeyCode markAsRead;
-    public static KeyCode markAsUnread;
+    public static KeyCodeCombination markAsRead;
+    public static KeyCodeCombination markAsUnread;
 
-    public static KeyCode scrollToTop;
-    public static KeyCode scrollToBottom;
-    public static KeyCode scrollUp;
-    public static KeyCode scrollDown;
+    public static KeyCodeCombination scrollToTop;
+    public static KeyCodeCombination scrollToBottom;
+    public static KeyCodeCombination scrollUp;
+    public static KeyCodeCombination scrollDown;
 
     //ui.issuepanel.PanelControl
-    public static KeyCode leftPanel;
-    public static KeyCode rightPanel;
+    public static KeyCodeCombination leftPanel;
+    public static KeyCodeCombination rightPanel;
 
     // ui.components.NavigableListView && ui.listpanel.ListPanel
-    public static KeyCode upIssue;
-    public static KeyCode downIssue;
+    public static KeyCodeCombination upIssue;
+    public static KeyCodeCombination downIssue;
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static final KeyCombination BOX_TO_LIST =
+    public static final KeyCodeCombination BOX_TO_LIST =
             new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination LIST_TO_BOX =
+    public static final KeyCodeCombination LIST_TO_BOX =
             new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination MAXIMIZE_WINDOW =
+    public static final KeyCodeCombination MAXIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination MINIMIZE_WINDOW =
+    public static final KeyCodeCombination MINIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination DEFAULT_SIZE_WINDOW =
+    public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination SWITCH_DEFAULT_REPO =
+    public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination SWITCH_BOARD = 
+            new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+    public static final KeyCombination UNDO_LABEL_CHANGES =
+                new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 
-    public static final KeyCode FIRST_ISSUE = KeyCode.HOME;
-    public static final KeyCode LAST_ISSUE = KeyCode.END;
+    public static final KeyCodeCombination FIRST_ISSUE =
+            new KeyCodeCombination(KeyCode.HOME);
+    public static final KeyCodeCombination LAST_ISSUE =
+            new KeyCodeCombination(KeyCode.END);
 
-    public static final KeyCode REFRESH = KeyCode.F5;
-    public static final KeyCode SHOW_DOCS = KeyCode.F1;
+    public static final KeyCodeCombination REFRESH =
+            new KeyCodeCombination(KeyCode.F5);
+    public static final KeyCodeCombination SHOW_DOCS =
+            new KeyCodeCombination(KeyCode.F1);
 
-    public static final KeyCode GOTO_MODIFIER = KeyCode.G;
-    public static final KeyCode SHOW_LABELS = KeyCode.L;
-    public static final KeyCode SHOW_ISSUES = KeyCode.I;
-    public static final KeyCode SHOW_MILESTONES = KeyCode.M;
-    public static final KeyCode SHOW_PULL_REQUESTS = KeyCode.P;
-    public static final KeyCode SHOW_HELP = KeyCode.H;
-    public static final KeyCode SHOW_KEYBOARD_SHORTCUTS = KeyCode.K;
-    public static final KeyCode SHOW_CONTRIBUTORS = KeyCode.D;
+    public static final KeyCodeCombination GOTO_MODIFIER =
+            new KeyCodeCombination(KeyCode.G);
+    public static final KeyCodeCombination SHOW_LABELS =
+            new KeyCodeCombination(KeyCode.L);
+    public static final KeyCodeCombination SHOW_ISSUES =
+            new KeyCodeCombination(KeyCode.I);
+    public static final KeyCodeCombination SHOW_MILESTONES =
+            new KeyCodeCombination(KeyCode.M);
+    public static final KeyCodeCombination SHOW_PULL_REQUESTS =
+            new KeyCodeCombination(KeyCode.P);
+    public static final KeyCodeCombination SHOW_HELP =
+            new KeyCodeCombination(KeyCode.H);
+    public static final KeyCodeCombination SHOW_KEYBOARD_SHORTCUTS =
+            new KeyCodeCombination(KeyCode.K);
+    public static final KeyCodeCombination SHOW_CONTRIBUTORS =
+            new KeyCodeCombination(KeyCode.D);
+    public static final Set<KeyCodeCombination> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
 
     // TODO decouple manage/show labels/milestones?
-    public static final KeyCode NEW_COMMENT = KeyCode.R;
-    public static final KeyCode MANAGE_LABELS = KeyCode.L;
-    public static final KeyCode MANAGE_ASSIGNEES = KeyCode.A;
-    public static final KeyCode MANAGE_MILESTONE = KeyCode.M;
+    public static final KeyCodeCombination NEW_COMMENT =
+            new KeyCodeCombination(KeyCode.R);
+    public static final KeyCodeCombination MANAGE_LABELS =
+            new KeyCodeCombination(KeyCode.L);
+    public static final KeyCodeCombination MANAGE_ASSIGNEES =
+            new KeyCodeCombination(KeyCode.A);
+    public static final KeyCodeCombination MANAGE_MILESTONE =
+            new KeyCodeCombination(KeyCode.M);
 
-    public static final KeyCode DOUBLE_PRESS = KeyCode.SPACE;
+    public static final KeyCodeCombination DOUBLE_PRESS =
+            new KeyCodeCombination(KeyCode.SPACE);
     
     //ui.RepositorySelector
-    public static final KeyCode REMOVE_FOCUS = KeyCode.ESCAPE;
+    public static final KeyCodeCombination REMOVE_FOCUS =
+            new KeyCodeCombination(KeyCode.ESCAPE);
 
     // ui.MenuControl
-    public static final KeyCombination NEW_ISSUE =
+    public static final KeyCodeCombination NEW_ISSUE =
             new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination NEW_LABEL =
+    public static final KeyCodeCombination NEW_LABEL =
             new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination NEW_MILESTONE =
+    public static final KeyCodeCombination NEW_MILESTONE =
             new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);
 
-    public static final KeyCombination CREATE_LEFT_PANEL =
+    public static final KeyCodeCombination CREATE_LEFT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-    public static final KeyCombination CREATE_RIGHT_PANEL =
+    public static final KeyCodeCombination CREATE_RIGHT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination CLOSE_PANEL =
+    public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
-
+    
+    private static Set<KeyCodeCombination> populateJumpToFirstIssueSet() {
+        Set <KeyCodeCombination> result = new HashSet<KeyCodeCombination>();
+        result.add(new KeyCodeCombination(KeyCode.DIGIT1));
+        result.add(new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN));
+        return result;
+    }
+    
     public static Map<String, String> getDefaultKeyboardShortcuts() {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
@@ -123,25 +153,25 @@ public class KeyboardShortcuts {
     }
 
     private static void addNonCustomizableShortcutKeys() {
-        assignedKeys.add(KeyCode.F5); //REFRESH
-        assignedKeys.add(KeyCode.F1); //SHOW_DOCS
-        assignedKeys.add(KeyCode.G); //GOTO_MODIFIER
-        assignedKeys.add(KeyCode.R); //NEW_COMMENT
-        assignedKeys.add(KeyCode.A); //MANAGE_ASSIGNEES
-        assignedKeys.add(KeyCode.SPACE); //DOUBLE_PRESS
+        assignedKeys.add(new KeyCodeCombination(KeyCode.F5)); //REFRESH
+        assignedKeys.add(new KeyCodeCombination(KeyCode.F1)); //SHOW_DOCS
+        assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
+        assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
+        assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
+        assignedKeys.add(new KeyCodeCombination(KeyCode.SPACE)); //DOUBLE_PRESS
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
-        markAsRead = getKeyCode("MARK_AS_READ");
-        markAsUnread = getKeyCode("MARK_AS_UNREAD");
-        scrollToTop = getKeyCode("SCROLL_TO_TOP");
-        scrollToBottom = getKeyCode("SCROLL_TO_BOTTOM");
-        scrollUp = getKeyCode("SCROLL_UP");
-        scrollDown = getKeyCode("SCROLL_DOWN");
-        leftPanel = getKeyCode("LEFT_PANEL");
-        rightPanel = getKeyCode("RIGHT_PANEL");
-        upIssue = getKeyCode("UP_ISSUE");
-        downIssue = getKeyCode("DOWN_ISSUE");
+        markAsRead = getKeyCodeCombination("MARK_AS_READ");
+        markAsUnread = getKeyCodeCombination("MARK_AS_UNREAD");
+        scrollToTop = getKeyCodeCombination("SCROLL_TO_TOP");
+        scrollToBottom = getKeyCodeCombination("SCROLL_TO_BOTTOM");
+        scrollUp = getKeyCodeCombination("SCROLL_UP");
+        scrollDown = getKeyCodeCombination("SCROLL_DOWN");
+        leftPanel = getKeyCodeCombination("LEFT_PANEL");
+        rightPanel = getKeyCodeCombination("RIGHT_PANEL");
+        upIssue = getKeyCodeCombination("UP_ISSUE");
+        downIssue = getKeyCodeCombination("DOWN_ISSUE");
     }
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
@@ -172,12 +202,13 @@ public class KeyboardShortcuts {
         prefs.setKeyboardShortcuts(keyboardShortcuts);
     }
 
-    private static KeyCode getKeyCode(String keyboardShortcut) {
-        KeyCode keyCode = KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut));
+    private static KeyCodeCombination getKeyCodeCombination(String keyboardShortcut) {
+        KeyCodeCombination keyCodeCombi = 
+                new KeyCodeCombination(KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut))); 
         if (keyboardShortcuts.containsKey(keyboardShortcut)) {
-            KeyCode userDefinedKeyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
-            if (userDefinedKeyCode != null && !assignedKeys.contains(userDefinedKeyCode)) {
-                keyCode = userDefinedKeyCode;
+            KeyCode keyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
+            if (keyCode != null && !assignedKeys.contains(new KeyCodeCombination(keyCode))) {
+                keyCodeCombi = new KeyCodeCombination(keyCode);
             } else {
                 logger.warn("Invalid key specified for " + keyboardShortcut +
                         " or it has already been used for some other shortcut. ");
@@ -210,9 +241,9 @@ public class KeyboardShortcuts {
                 System.exit(0);
             }
         }
-        logger.info("Assigning <" + keyCode + "> to " + keyboardShortcut);
-        assignedKeys.add(keyCode);
-        return keyCode;
+        logger.info("Assigning <" + keyCodeCombi + "> to " + keyboardShortcut);
+        assignedKeys.add(keyCodeCombi);
+        return keyCodeCombi;
     }
 
 }

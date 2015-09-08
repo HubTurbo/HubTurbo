@@ -1,16 +1,5 @@
 package github;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.apache.commons.io.input.NullInputStream;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-import util.IOUtilities;
-import util.Utility;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,9 +8,28 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.Map;
 
+import org.apache.commons.io.input.NullInputStream;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+
+import util.HTLog;
+import util.IOUtilities;
+import util.Utility;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class GitHubClientExtended extends GitHubClient {
+    private static final Logger logger = HTLog.get(GitHubClientExtended.class);
+
     public static final int NO_UPDATE_RESPONSE_CODE = 304;
     protected static final int CONNECTION_TIMEOUT = 30000;
+
+    // Request method for HEAD API call
+    protected static final String METHOD_HEAD = "HEAD";
 
     public GitHubClientExtended() {
     }
@@ -46,6 +54,17 @@ public class GitHubClientExtended extends GitHubClient {
      */
     public HttpURLConnection createConnection(GitHubRequest request) throws IOException {
         return createGet(request.generateUri());
+    }
+
+    /**
+     * Creates a HEAD request connection to the URI
+     *
+     * @param uri
+     * @return connection
+     * @throws IOException
+     */
+    protected HttpURLConnection createHead(String uri) throws IOException {
+        return createConnection(uri, METHOD_HEAD);
     }
 
     /**
@@ -152,6 +171,35 @@ public class GitHubClientExtended extends GitHubClient {
     }
 
     /**
+     * Gets a pair of HTTP connection and corresponding response from a header-only API call
+     *
+     * @param request for the API call
+     * @return a pair of HTTP connection and response for the API call
+     * @throws IOException
+     */
+    public ImmutablePair<HttpURLConnection, GitHubResponse> head(GitHubRequest request) throws IOException {
+        HttpURLConnection httpRequest = createHead(request.generateUri());
+        String accept = request.getResponseContentType();
+        if (accept != null) {
+            httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
+        }
+        logger.info(String.format("Requesting: %s %s",
+                        httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
+
+        final int code = httpRequest.getResponseCode();
+        updateRateLimits(httpRequest);
+
+        logger.info(String.format("%s responded with %d %s",
+                        httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
+        if (isOk(code) || code == HttpURLConnection.HTTP_NOT_MODIFIED || isEmpty(code)) {
+            return new ImmutablePair<>(httpRequest, new GitHubResponse(httpRequest, null));
+        }
+
+        throw createException(getStream(httpRequest), code,
+                httpRequest.getResponseMessage());
+    }
+
+    /**
      * Overridden to make public.
      */
     @Override
@@ -197,6 +245,7 @@ public class GitHubClientExtended extends GitHubClient {
      * @param code
      * @return
      */
+    @Override
     public boolean isOk(final int code) {
         return super.isOk(code);
     }
@@ -208,6 +257,7 @@ public class GitHubClientExtended extends GitHubClient {
      * @param params
      * @throws IOException
      */
+    @Override
     public void sendParams(HttpURLConnection request, Object params) throws IOException {
         super.sendParams(request, params);
     }
