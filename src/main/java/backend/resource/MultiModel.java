@@ -69,7 +69,7 @@ public class MultiModel implements IModel {
             if (metadata.containsKey(issue.getId())) {
                 IssueMetadata toBeInserted = metadata.get(issue.getId());
                 // Only set new metadata if ETag is different
-                if (!toBeInserted.getIssueETag().equals(issue.getMetadata().getIssueETag())) {
+                if (!toBeInserted.getETag().equals(issue.getMetadata().getETag())) {
                     LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
                             issue.getCreatedAt(), currentUser, issue.getCreator());
                     issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));

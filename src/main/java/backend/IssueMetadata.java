@@ -102,7 +102,7 @@ public class IssueMetadata {
         return isUpdated;
     }
 
-    public String getIssueETag() {
+    public String getETag() {
         return ETag;
     }
 

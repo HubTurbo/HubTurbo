@@ -262,11 +262,11 @@ public class GUIController {
             HashMap<Integer, String> issuesInRepo = issuesToUpdate.get(issueToUpdate.getRepoId());
             if (issuesInRepo != null) {
                 // If yes, just add the issue.
-                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getIssueETag());
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getETag());
             } else {
                 // If no, initialize the HashSet first, then add the issue.
                 issuesInRepo = new HashMap<>();
-                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getIssueETag());
+                issuesInRepo.put(issueToUpdate.getId(), issueToUpdate.getMetadata().getETag());
                 issuesToUpdate.put(issueToUpdate.getRepoId(), issuesInRepo);
             }
         }
