@@ -5,6 +5,7 @@ import backend.interfaces.IModel;
 import prefs.Preferences;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -201,15 +202,15 @@ public class MultiModel implements IModel {
         for (Model model : newModels) {
             assert models.containsKey(model.getRepoId());
             Model existingModel = models.get(model.getRepoId());
-            if (existingModel.getIssues().equals(model.getIssues())) return;
+            if (existingModel.getIssues().equals(model.getIssues())) continue;
             for (int i = 1; i <= model.getIssues().size(); i++) {
-                if (existingModel.getIssueById(i).equals(model.getIssueById(i))) return;
+                if (existingModel.getIssueById(i).equals(model.getIssueById(i)) || 
+                    !wasNotJustMarkedAsRead(model.getIssueById(i).get())) continue;
                 // TODO O(n^2), optimise by preprocessing into a map or sorting
                 assert model.getIssueById(i).isPresent();
                 /** If the issue was marked read after the last update, but update came in later
                  * due to network latency, ensure the issue retains its read state
                 **/
-                if (!wasNotJustMarkedAsRead(model.getIssueById(i).get())) return;
                 model.getIssueById(i).get().setIsCurrentlyRead(false);
             }
         }
@@ -219,10 +220,9 @@ public class MultiModel implements IModel {
         if (!issue.isCurrentlyRead() || !issue.getMarkedReadAt().isPresent()) return false;
         LocalDateTime markedReadAt = issue.getMarkedReadAt().get();
         LocalDateTime updatedAt = issue.getUpdatedAt();
-        if (updatedAt.isAfter(markedReadAt)) {
-            return true;
-        } else if (updatedAt.isBefore(markedReadAt) &&
-                   (markedReadAt.toEpochSecond(null) - updatedAt.toEpochSecond(null) < 3L)) {
+        if (updatedAt.isBefore(markedReadAt) && (updatedAt.until(markedReadAt, ChronoUnit.SECONDS) < 3L)) {
+            return false;
+        } else if (updatedAt.isAfter(markedReadAt)) {
             return true;
         } else {
             return false;
