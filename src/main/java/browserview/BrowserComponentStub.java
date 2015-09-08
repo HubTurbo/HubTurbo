@@ -13,6 +13,9 @@ public class BrowserComponentStub extends BrowserComponent {
     public void onAppQuit() {}
 
     @Override
+    public void cleanChromeCustomProfile() {}
+
+    @Override
     public void focus(WinDef.HWND mainWindowHandle) {}
 
     @Override

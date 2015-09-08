@@ -25,6 +25,7 @@
         <Or>
             <Field name="events" />
             <Field name="status" />
+            <Field name="prefs" />
         </Or>
         <Bug pattern="MS_CANNOT_BE_FINAL" />
     </Match>

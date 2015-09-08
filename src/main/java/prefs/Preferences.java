@@ -3,6 +3,7 @@ package prefs;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,6 +94,18 @@ public class Preferences {
     
     public Optional<String> getLastOpenBoard() {
         return global.getLastOpenBoard();
+    }
+    
+    public Optional<String> switchBoard() {
+        if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
+            List<String> boardNames = new ArrayList<>(getAllBoards().keySet());
+            int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
+            int index = (lastBoard + 1) % boardNames.size();
+            
+            setLastOpenBoard(boardNames.get(index));
+        }
+        
+        return getLastOpenBoard();
     }
     
     public void clearLastOpenBoard() {

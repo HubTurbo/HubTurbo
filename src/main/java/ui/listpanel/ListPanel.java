@@ -5,6 +5,7 @@ import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -167,6 +168,9 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
             }
+            if (KeyboardShortcuts.SWITCH_BOARD.match(event)) {
+                ui.getMenuControl().switchBoard();
+            }
         });
 
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -260,11 +264,20 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
+            if (KeyboardShortcuts.SWITCH_BOARD.match(event)) {
+                ui.getMenuControl().switchBoard();
+            }
             if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
             }
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationPaneAction();
+            }
+            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+                if (key.match(event)) {
+                    event.consume();
+                    listView.selectFirstItem();
+                }
             }
         });
     }

@@ -59,7 +59,20 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
 
+        // jump to first issue using number key(1) or ENTER
+        push(KeyCode.ESCAPE);
+        push(KeyCode.DIGIT1);
+        sleep(1000);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
         push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
+        assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
+        clearUiComponentFocusEventType();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
+        sleep(1000);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
 
         // jump to last issue
         push(KeyCode.END);
@@ -117,7 +130,7 @@ public class KeyboardShortcutsTest extends UITest {
         int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(issueIdExpected, selectedIssueId);
-        push(getKeyCode("UP_ISSUE")); //required since focus has changed to next issue
+        push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
         
         // mark as read an issue at the bottom
@@ -131,7 +144,7 @@ public class KeyboardShortcutsTest extends UITest {
         push(getKeyCode("MARK_AS_UNREAD"));
         assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
         clearSelectedIssueId();
-        
+
         // testing corner case for mark as read where there is only one issue displayed
         click("#dummy/dummy_col1_filterTextField");
         type("id");

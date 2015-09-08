@@ -65,6 +65,8 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination SWITCH_BOARD = 
+            new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination UNDO_LABEL_CHANGES =
                 new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 
@@ -94,6 +96,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
+    public static final Set<KeyCodeCombination> jumpToFirstIssueKeys = populateJumpToFirstIssueSet();
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =
@@ -126,7 +129,14 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
-
+    
+    private static Set<KeyCodeCombination> populateJumpToFirstIssueSet() {
+        Set <KeyCodeCombination> result = new HashSet<KeyCodeCombination>();
+        result.add(new KeyCodeCombination(KeyCode.DIGIT1));
+        result.add(new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN));
+        return result;
+    }
+    
     public static Map<String, String> getDefaultKeyboardShortcuts() {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");

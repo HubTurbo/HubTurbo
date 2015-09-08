@@ -1,8 +1,11 @@
 package backend.resource;
 
-import backend.resource.serialization.SerializableUser;
+import static util.Utility.replaceNull;
 import javafx.scene.image.Image;
+
 import org.eclipse.egit.github.core.User;
+
+import backend.resource.serialization.SerializableUser;
 
 @SuppressWarnings("unused")
 public class TurboUser {
@@ -27,31 +30,31 @@ public class TurboUser {
      * Default constructor.
      */
     public TurboUser(String repoId, String loginName) {
-        this.loginName = loginName;
+        this.loginName = replaceNull(loginName, "");
         this.realName = "";
         this.avatarURL = "";
-        this.repoId = repoId;
+        this.repoId = replaceNull(repoId, "");
     }
 
     public TurboUser(String repoId, String loginName, String realName) {
-        this.loginName = loginName;
-        this.realName = realName;
+        this.loginName = replaceNull(loginName, "");
+        this.realName = replaceNull(realName, "");
         this.avatarURL = "";
-        this.repoId = repoId;
+        this.repoId = replaceNull(repoId, "");
     }
 
     public TurboUser(String repoId, User user) {
-        this.loginName = user.getLogin();
-        this.realName = user.getName();
-        this.avatarURL = user.getAvatarUrl();
-        this.repoId = repoId;
+        this.loginName = replaceNull(user.getLogin(), "");
+        this.realName = replaceNull(user.getName(), "");
+        this.avatarURL = replaceNull(user.getAvatarUrl(), "");
+        this.repoId = replaceNull(repoId, "");
     }
 
     public TurboUser(String repoId, SerializableUser user) {
-        this.loginName = user.getLoginName();
-        this.realName = user.getRealName();
-        this.avatarURL = user.getAvatarURL();
-        this.repoId = repoId;
+        this.loginName = replaceNull(user.getLoginName(), "");
+        this.realName = replaceNull(user.getRealName(), "");
+        this.avatarURL = replaceNull(user.getAvatarURL(), "");
+        this.repoId = replaceNull(repoId, "");
     }
 
     private void ______METHODS______() {
@@ -91,8 +94,8 @@ public class TurboUser {
         if (o == null || getClass() != o.getClass()) return false;
         TurboUser that = (TurboUser) o;
         return loginName.equals(that.loginName) &&
-                realName.equals(that.realName) &&
-                avatarURL.equals(that.avatarURL);
+               realName.equals(that.realName) &&
+               avatarURL.equals(that.avatarURL);
     }
 
     @Override

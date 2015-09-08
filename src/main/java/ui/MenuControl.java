@@ -66,13 +66,13 @@ public class MenuControl extends MenuBar {
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
             prefs.setLastLoginCredentials("", "");
-            ui.quit();
+            ui.quit(true);
         });
         
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(e -> {
             logger.info("Quitting HT");
-            ui.quit();
+            ui.quit(false);
         });
         
         file.getItems().addAll(logout, quit);
@@ -270,6 +270,13 @@ public class MenuControl extends MenuBar {
                 return Stream.of();
             }
         }).collect(Collectors.toList());
+    }
+    
+    public void switchBoard() {
+        Optional<String> name = prefs.switchBoard();
+        if (name.isPresent()) {
+            onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
+        }
     }
 
     private MenuItem createDocumentationMenuItem() {
