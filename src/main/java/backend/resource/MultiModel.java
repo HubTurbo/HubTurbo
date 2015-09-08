@@ -207,13 +207,32 @@ public class MultiModel implements IModel {
                     // TODO O(n^2), optimise by preprocessing into a map or sorting
                     if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
                         assert model.getIssueById(i).isPresent();
-                        // It's no longer currently read, but it retains its updated time.
-                        // No changes to preferences.
-                        model.getIssueById(i).get().setIsCurrentlyRead(false);
+                        /** If the issue was marked read after the last update, but update came in later
+                         * due to network latency, ensure the issue retains its read state
+                        **/
+                        if (updateReadAtState(model.getIssueById(i))) {
+                            model.getIssueById(i).get().setIsCurrentlyRead(false);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private boolean updateReadAtState(Optional<TurboIssue> issue) {
+        if (issue.get().isCurrentlyRead()) {
+            LocalDateTime markedReadAt = issue.get().getMarkedReadAt().get();
+            LocalDateTime updatedAt = issue.get().getUpdatedAt();
+            if (updatedAt.isAfter(markedReadAt)) {
+                return true;
+            } else if (updatedAt.isBefore(markedReadAt) &&
+                       (markedReadAt.getSecond() - updatedAt.getSecond() < 3)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     private void ______BOILERPLATE______() {
