@@ -201,38 +201,32 @@ public class MultiModel implements IModel {
         for (Model model : newModels) {
             assert models.containsKey(model.getRepoId());
             Model existingModel = models.get(model.getRepoId());
-            if (!existingModel.getIssues().equals(model.getIssues())) {
-                // Find issues that have changed and update preferences with them
-                for (int i = 1; i <= model.getIssues().size(); i++) {
-                    // TODO O(n^2), optimise by preprocessing into a map or sorting
-                    if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
-                        assert model.getIssueById(i).isPresent();
-                        /** If the issue was marked read after the last update, but update came in later
-                         * due to network latency, ensure the issue retains its read state
-                        **/
-                        if (updateReadAtState(model.getIssueById(i))) {
-                            model.getIssueById(i).get().setIsCurrentlyRead(false);
-                        }
-                    }
-                }
+            if (existingModel.getIssues().equals(model.getIssues())) return;
+            for (int i = 1; i <= model.getIssues().size(); i++) {
+                if (existingModel.getIssueById(i).equals(model.getIssueById(i))) return;
+                // TODO O(n^2), optimise by preprocessing into a map or sorting
+                assert model.getIssueById(i).isPresent();
+                /** If the issue was marked read after the last update, but update came in later
+                 * due to network latency, ensure the issue retains its read state
+                **/
+                if (!wasNotJustMarkedAsRead(model.getIssueById(i).get())) return;
+                model.getIssueById(i).get().setIsCurrentlyRead(false);
             }
         }
     }
 
-    private boolean updateReadAtState(Optional<TurboIssue> issue) {
-        if (issue.get().isCurrentlyRead()) {
-            LocalDateTime markedReadAt = issue.get().getMarkedReadAt().get();
-            LocalDateTime updatedAt = issue.get().getUpdatedAt();
-            if (updatedAt.isAfter(markedReadAt)) {
-                return true;
-            } else if (updatedAt.isBefore(markedReadAt) &&
-                       (markedReadAt.getSecond() - updatedAt.getSecond() < 3)) {
-                return true;
-            } else {
-                return false;
-            }
+    private boolean wasNotJustMarkedAsRead(TurboIssue issue) {
+        if (!issue.isCurrentlyRead() || !issue.getMarkedReadAt().isPresent()) return false;
+        LocalDateTime markedReadAt = issue.getMarkedReadAt().get();
+        LocalDateTime updatedAt = issue.getUpdatedAt();
+        if (updatedAt.isAfter(markedReadAt)) {
+            return true;
+        } else if (updatedAt.isBefore(markedReadAt) &&
+                   (markedReadAt.toEpochSecond(null) - updatedAt.toEpochSecond(null) < 3L)) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     private void ______BOILERPLATE______() {
