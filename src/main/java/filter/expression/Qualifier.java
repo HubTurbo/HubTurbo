@@ -41,8 +41,8 @@ public class Qualifier implements FilterExpression {
         "date", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
-        "title", "type", "unmerged", "unread", "updated", "updatedByOthers",
-        "updatedBySelf", "user"
+        "title", "type", "unmerged", "unread", "updated", "updated-others",
+        "updated-self", "user"
     ));
 
     private final String name;
@@ -203,9 +203,9 @@ public class Qualifier implements FilterExpression {
             return satisfiesCreationDate(issue);
         case "updated":
             return satisfiesUpdatedHours(issue, UpdatedKind.ALL_UPDATED);
-        case "updatedByOthers":
+        case "updated-others":
             return satisfiesUpdatedHours(issue, UpdatedKind.OTHER_UPDATED);
-        case "updatedBySelf":
+        case "updated-self":
             return satisfiesUpdatedHours(issue, UpdatedKind.SELF_UPDATED);
         case "repo":
             return satisfiesRepo(issue);
@@ -555,16 +555,14 @@ public class Qualifier implements FilterExpression {
                 break;
             case ALL_UPDATED:
                 // The or condition for dateOfUpdate is for first time check
-                if (issue.getMetadata().isUpdated() || dateOfUpdate == null) {
-                    dateOfUpdate = issue.getUpdatedAt();
-                }
+                dateOfUpdate = issue.getUpdatedAt();
         }
 
-        if (dateOfUpdate != null){
+        if (dateOfUpdate == null) {
+            return false;
+        } else {
             int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
             return updatedRange.encloses(hoursSinceUpdate);
-        } else {
-            return false;
         }
     }
 

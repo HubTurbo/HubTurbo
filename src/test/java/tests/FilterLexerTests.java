@@ -37,8 +37,8 @@ public class FilterLexerTests {
             new Lexer("a,b").lex();
         } catch (ParseException ignored) {}
 
-        assertEquals(new Lexer("sort: a, b ").lex(), Arrays.asList(
-            new Token(TokenType.QUALIFIER, "sort:"),
+        assertEquals(new Lexer("sort-self: a, b ").lex(), Arrays.asList(
+            new Token(TokenType.QUALIFIER, "sort-self:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
             new Token(TokenType.SYMBOL, "b"),

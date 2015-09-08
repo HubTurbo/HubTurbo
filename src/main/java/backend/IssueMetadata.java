@@ -3,8 +3,8 @@ package backend;
 import github.TurboIssueEvent;
 import org.eclipse.egit.github.core.Comment;
 
+import util.Utility;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +23,7 @@ public class IssueMetadata {
     private final boolean isUpdatedByOthers; // for update by others
 
     private enum UpdatedKind {
-        SELF_UPDATED, OTHER_UPDATED
+        UPDATED_BY_SELF, UPDATED_BY_OTHER
     }
 
     // Constructor for default use when initializing TurboIssue
@@ -107,12 +107,12 @@ public class IssueMetadata {
 
         this.events = new ArrayList<>(existingMetadata.events);
         this.comments = new ArrayList<>(existingMetadata.comments);
-        this.nonSelfUpdatedAt = LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault());
-        this.selfUpdatedAt = LocalDateTime.ofInstant(lastSelfUpdate.toInstant(), ZoneId.systemDefault());
+        this.nonSelfUpdatedAt = Utility.dateToLocalDateTime(lastNonSelfUpdate);
+        this.selfUpdatedAt = Utility.dateToLocalDateTime(lastSelfUpdate);
         this.nonSelfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
-                UpdatedKind.OTHER_UPDATED);
+                UpdatedKind.UPDATED_BY_OTHER);
         this.selfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
-                UpdatedKind.SELF_UPDATED);
+                UpdatedKind.UPDATED_BY_SELF);
         this.isUpdated = true;
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
@@ -141,10 +141,10 @@ public class IssueMetadata {
 
     private static int calculateCommentCount(List<Comment> comments, String currentUser, UpdatedKind updatedKind) {
         int result = 0;
-        if (updatedKind == UpdatedKind.OTHER_UPDATED) {
-            return (int) (comments.stream().filter(c -> !isCommentBySelf(currentUser, c)).count());
-        } else if (updatedKind == UpdatedKind.SELF_UPDATED){
-            return (int) (comments.stream().filter(c -> isCommentBySelf(currentUser, c)).count());
+        if (updatedKind == UpdatedKind.UPDATED_BY_OTHER) {
+            return Utility.safeLongToInt((comments.stream().filter(c -> !isCommentBySelf(currentUser, c)).count()));
+        } else if (updatedKind == UpdatedKind.UPDATED_BY_SELF){
+            return Utility.safeLongToInt((comments.stream().filter(c -> isCommentBySelf(currentUser, c)).count()));
         }
         return result;
     }
