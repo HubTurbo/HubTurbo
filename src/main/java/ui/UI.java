@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 4;
+    private static final int VERSION_MINOR = 5;
     private static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -68,7 +68,7 @@ public class UI extends Application implements EventDispatcher {
 
     public UIManager uiManager;
     public Logic logic;
-    public Preferences prefs;
+    public static Preferences prefs;
     public static StatusUI status;
     public static EventDispatcher events;
     public EventBus eventBus;
