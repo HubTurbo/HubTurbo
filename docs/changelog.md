@@ -1,5 +1,14 @@
 # Changelog
 
+# V3.5.0
+
+- A Chrome custom profile now persists users' sessions in the browser view
+- Added hotkeys to jump directly to issues
+- Added keyboard shortcut for changing board
+- Updated chromedriver to 2-18
+- Fixed globalConfigTest failing randomly on CI
+- Fixed bug with certain resources being detected as unchanged due to not considering paged ETags
+
 # V3.4.0
 
 - Changes to labels via the label picker can now be undone
