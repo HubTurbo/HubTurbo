@@ -108,8 +108,8 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`is`](#is)
 - [`created`](#created)
 - [`updated`](#updated)
-- [`updatedByOthers`](#updatedByOthers)
-- [`updatedBySelf`](#updatedBySelf)
+- [`updated-others`](#updated-others)
+- [`updated-self`](#updated-self)
 - [`repo`](#repo)
 - [`sort`](#sort)
 
@@ -222,19 +222,19 @@ Matches issues which were created on a given date, or within a given date range.
 
 *Expects a number or  number range*
 
-Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`.
+Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`. Number ranges are written using a relational operator (.e.g `>5`, `<=10`).
 
-### updatedByOthers
-
-*Expects a number or  number range*
-
-Matches issues which were updated in the given number of hours by users other than the logged in user. For example, `updated:<24` would match issues updated in the last day by other users. If a number `n` is given, it is implicitly translated to `<n`.
-
-### updatedBySelf
+### updated-others
 
 *Expects a number or  number range*
 
-Matches issues which were updated in the given number of hours by the logged in user. For example, `updated:<24` would match issues updated in the last day by the logged in user. If a number `n` is given, it is implicitly translated to `<n`.
+Matches issues which were updated in the given number of hours by users other than the logged in user. For example, `updated:<24` would match issues updated in the last day by other users. Number ranges are written using a relational operator (.e.g `>5`, `<=10`). If a number `n` is given, it is implicitly translated to `<n`.
+
+### updated-self
+
+*Expects a number or  number range*
+
+Matches issues which were updated in the given number of hours by the logged in user. For example, `updated:<24` would match issues updated in the last day by the logged in user. Number ranges are written using a relational operator (.e.g `>5`, `<=10`). If a number `n` is given, it is implicitly translated to `<n`.
 
 ### repo
 
