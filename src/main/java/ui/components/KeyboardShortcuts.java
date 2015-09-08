@@ -65,6 +65,8 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination SWITCH_BOARD = 
+            new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
     public static final KeyCombination UNDO_LABEL_CHANGES =
                 new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 

@@ -271,6 +271,13 @@ public class MenuControl extends MenuBar {
             }
         }).collect(Collectors.toList());
     }
+    
+    public void switchBoard() {
+        Optional<String> name = prefs.switchBoard();
+        if (name.isPresent()) {
+            onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
+        }
+    }
 
     private MenuItem createDocumentationMenuItem() {
         MenuItem documentationMenuItem = new MenuItem("Documentation");
