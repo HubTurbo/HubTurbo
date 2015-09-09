@@ -177,6 +177,11 @@ public class Logic {
         return models.getDefaultRepo();
     }
 
+    public CompletableFuture<Boolean> removeRepository(String repoId) {
+        models.removeRepoModelById(repoId);
+        return repoIO.removeRepository(repoId);
+    }
+
     /**
      * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
      * metadata to display their issues, in which case the changes in the model are not presented to the user.

@@ -4,12 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -135,6 +130,19 @@ public class Qualifier implements FilterExpression {
         List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
         MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
         qualifiers.forEach(q -> callback.accept(q, info));
+    }
+
+    public static HashSet<String> getContentOfMetaQualifier(FilterExpression expr, String qualifierName) {
+        HashSet<String> contentsOfMetaQualifier = new HashSet<>();
+        List<Qualifier> panelMetaQualifiers = expr.find(Qualifier::isMetaQualifier);
+
+        panelMetaQualifiers.forEach(metaQualifier -> {
+            if (metaQualifier.getName().equals(qualifierName) && metaQualifier.getContent().isPresent()) {
+                contentsOfMetaQualifier.add(metaQualifier.getContent().get());
+            }
+        });
+
+        return contentsOfMetaQualifier;
     }
 
     private static LocalDateTime currentTime = null;
