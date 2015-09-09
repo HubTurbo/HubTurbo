@@ -379,9 +379,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            LocalDateTime now = LocalDateTime.now();
-            ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-            issue.setMarkedReadAt(Optional.of(now));
+            issue.markAsRead(ui.prefs);
+
             parentPanelControl.refresh();
             listView.selectNextItem();
         }
@@ -391,8 +390,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-            issue.setMarkedReadAt(Optional.empty());
+            issue.markAsUnread(ui.prefs);
+
             parentPanelControl.refresh();
         }
     }

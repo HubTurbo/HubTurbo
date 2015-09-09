@@ -4,6 +4,7 @@ import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import prefs.Preferences;
 import util.Utility;
 
 import java.time.LocalDateTime;
@@ -346,6 +347,17 @@ public class TurboIssue {
         }
 
         return getMarkedReadAt().get().isAfter(getUpdatedAt());
+    }
+
+    public void markAsRead(Preferences prefs) {
+        LocalDateTime now = LocalDateTime.now();
+        setMarkedReadAt(Optional.of(now));
+        prefs.setMarkedReadAt(getRepoId(), getId(), getMarkedReadAt().get());
+    }
+
+    public void markAsUnread(Preferences prefs) {
+        setMarkedReadAt(Optional.empty());
+        prefs.clearMarkedReadAt(getRepoId(), getId());
     }
 
     /**
