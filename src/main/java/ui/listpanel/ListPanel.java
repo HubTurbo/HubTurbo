@@ -1,5 +1,10 @@
 package ui.listpanel;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -17,11 +22,6 @@ import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
 
 public class ListPanel extends FilterPanel {
 
@@ -60,8 +60,9 @@ public class ListPanel extends FilterPanel {
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
+
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
@@ -273,7 +274,7 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationPaneAction();
             }
-            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+            for (KeyCodeCombination key:KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS) {
                 if (key.match(event)) {
                     event.consume();
                     listView.selectFirstItem();

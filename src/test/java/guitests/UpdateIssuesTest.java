@@ -28,9 +28,8 @@ public class UpdateIssuesTest extends UITest {
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
 
-        // Updated view should contain Issue 10, which was commented on recently (as part of default test dataset)
-        // Issue 9 was also commented on recently, but by the current HT user, so it is not shown.
-        assertEquals(1, countIssuesShown());
+        // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
+        assertEquals(2, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1");
@@ -39,7 +38,7 @@ public class UpdateIssuesTest extends UITest {
         sleep(EVENT_DELAY);
 
         // Updated view should now contain Issue 5.1 and Issue 10.
-        assertEquals(2, countIssuesShown());
+        assertEquals(3, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));

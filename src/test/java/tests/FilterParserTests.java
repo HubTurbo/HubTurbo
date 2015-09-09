@@ -358,6 +358,11 @@ public class FilterParserTests {
             "updated:<24",
             "updated:<=24",
             "updated:24",
+            "updatedByOthers:>24", // Number ranges
+            "updatedByOthers:>=24",
+            "updatedByOthers:<24",
+            "updatedByOthers:<=24",
+            "updatedByOthers:24",
             "created:<=2014-12-4", // Date operators
             "created:>=2014-12-4",
             "created:<2014-12-4",
