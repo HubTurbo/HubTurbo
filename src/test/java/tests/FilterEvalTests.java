@@ -411,12 +411,14 @@ public class FilterEvalTests {
         assertEquals(true, matches("is:unread", issue));
         assertEquals(false, matches("is:read", issue));
 
-        issue.setMarkedReadAt(Optional.of(LocalDateTime.now()));
+        issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
         assertEquals(true, matches("is:unread", issue));
         assertEquals(false, matches("is:read", issue));
 
-        issue.setIsCurrentlyRead(true);
+        issue.setUpdatedAt(LocalDateTime.of(2015, 1, 1, 1, 1));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
         assertEquals(false, matches("is:unread", issue));
         assertEquals(true, matches("is:read", issue));

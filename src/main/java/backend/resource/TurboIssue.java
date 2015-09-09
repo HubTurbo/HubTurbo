@@ -56,7 +56,6 @@ public class TurboIssue {
     private final String repoId;
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
-    private boolean isCurrentlyRead;
 
     private void ______CONSTRUCTORS______() {
     }
@@ -111,7 +110,6 @@ public class TurboIssue {
         this.metadata = new IssueMetadata(issue.metadata);
         this.repoId = issue.repoId;
         this.markedReadAt = issue.markedReadAt;
-        this.isCurrentlyRead = issue.isCurrentlyRead;
     }
 
     public TurboIssue(String repoId, Issue issue) {
@@ -142,7 +140,6 @@ public class TurboIssue {
         this.metadata = new IssueMetadata();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
-        this.isCurrentlyRead = false;
     }
 
     public TurboIssue(String repoId, SerializableIssue issue) {
@@ -163,7 +160,6 @@ public class TurboIssue {
         this.metadata = new IssueMetadata();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
-        this.isCurrentlyRead = false;
     }
 
     private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
@@ -185,7 +181,6 @@ public class TurboIssue {
 
         this.metadata = new IssueMetadata();
         this.markedReadAt = Optional.empty();
-        this.isCurrentlyRead = false;
     }
 
     /**
@@ -198,7 +193,6 @@ public class TurboIssue {
     private void transferTransientState(TurboIssue fromIssue) {
         this.metadata = new IssueMetadata(fromIssue.metadata, false);
         this.markedReadAt = fromIssue.markedReadAt;
-        this.isCurrentlyRead = fromIssue.isCurrentlyRead;
     }
 
     /**
@@ -334,17 +328,24 @@ public class TurboIssue {
     public void setMetadata(IssueMetadata metadata) {
         this.metadata = metadata;
     }
+
     public Optional<LocalDateTime> getMarkedReadAt() {
         return markedReadAt;
     }
+
     public void setMarkedReadAt(Optional<LocalDateTime> markedReadAt) {
         this.markedReadAt = markedReadAt;
     }
+
     public boolean isCurrentlyRead() {
-        return isCurrentlyRead;
-    }
-    public void setIsCurrentlyRead(boolean isCurrentlyRead) {
-        this.isCurrentlyRead = isCurrentlyRead;
+        if (!getMarkedReadAt().isPresent()) {
+            return false;
+        }
+        if (getUpdatedAt() == null) {
+            return getMarkedReadAt().get().isAfter(getCreatedAt());
+        }
+
+        return getMarkedReadAt().get().isAfter(getUpdatedAt());
     }
 
     /**
@@ -367,8 +368,7 @@ public class TurboIssue {
                 !(milestone != null ? !milestone.equals(issue.milestone) : issue.milestone != null) &&
                 !(title != null ? !title.equals(issue.title) : issue.title != null) &&
                 !(updatedAt != null ? !updatedAt.equals(issue.updatedAt) : issue.updatedAt != null) &&
-                !(markedReadAt != null ? !markedReadAt.equals(issue.markedReadAt) : issue.markedReadAt != null) &&
-                isCurrentlyRead == issue.isCurrentlyRead;
+                !(markedReadAt != null ? !markedReadAt.equals(issue.markedReadAt) : issue.markedReadAt != null);
     }
 
     @Override
@@ -377,7 +377,6 @@ public class TurboIssue {
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
         result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
         result = 31 * result + (isPullRequest ? 1 : 0);
-        result = 31 * result + (isCurrentlyRead ? 1 : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);

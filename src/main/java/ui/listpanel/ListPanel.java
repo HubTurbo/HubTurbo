@@ -382,7 +382,6 @@ public class ListPanel extends FilterPanel {
             LocalDateTime now = LocalDateTime.now();
             ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
             issue.setMarkedReadAt(Optional.of(now));
-            issue.setIsCurrentlyRead(true);
             parentPanelControl.refresh();
             listView.selectNextItem();
         }
@@ -394,7 +393,6 @@ public class ListPanel extends FilterPanel {
             TurboIssue issue = item.get();
             ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
             issue.setMarkedReadAt(Optional.empty());
-            issue.setIsCurrentlyRead(false);
             parentPanelControl.refresh();
         }
     }

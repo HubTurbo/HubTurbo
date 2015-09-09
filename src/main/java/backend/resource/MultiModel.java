@@ -200,7 +200,6 @@ public class MultiModel implements IModel {
         for (TurboIssue issue : model.getIssues()) {
             Optional<LocalDateTime> time = prefs.getMarkedReadAt(model.getRepoId(), issue.getId());
             issue.setMarkedReadAt(time);
-            issue.setIsCurrentlyRead(time.isPresent());
         }
     }
 
@@ -221,9 +220,6 @@ public class MultiModel implements IModel {
                     // TODO O(n^2), optimise by preprocessing into a map or sorting
                     if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
                         assert model.getIssueById(i).isPresent();
-                        // It's no longer currently read, but it retains its updated time.
-                        // No changes to preferences.
-                        model.getIssueById(i).get().setIsCurrentlyRead(false);
                     }
                 }
             }
