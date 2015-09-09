@@ -1,5 +1,10 @@
 # Changelog
 
+# V3.5.1
+
+- Reverted addition of Chrome custom profile
+- Repositories can now be removed
+
 # V3.5.0
 
 - A Chrome custom profile now persists users' sessions in the browser view
