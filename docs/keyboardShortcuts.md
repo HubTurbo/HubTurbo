@@ -1,4 +1,4 @@
-# Keyboard Shortcuts
+﻿# Keyboard Shortcuts
 
 ## Go to page ...
 
@@ -66,6 +66,7 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Mi**d**-sized window|<kbd>Ctrl</kbd> + <kbd>D</kbd>||
 | Refresh|<kbd>F5</kbd>|Causes HubTurbo to check for updates to the repo's issues|
 | Force Refresh|<kbd>Ctrl</kbd> + <kbd>F5</kbd>|Clears HubTurbo's cache and re-downloads all issues from the repo|
+| Switch Board|<kbd>Ctrl</kbd> + <kbd>B</kbd>|Switches currently open board to another saved board|
 
 ## Control the browser view ...
 
