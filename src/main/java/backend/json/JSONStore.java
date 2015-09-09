@@ -12,6 +12,7 @@ import util.Utility;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -54,6 +55,12 @@ public class JSONStore extends RepoStore {
             logger.error("Unable to open stored repository directory. ");
             return new ArrayList<>();
         }
+    }
+
+    public CompletableFuture<Boolean> removeStoredRepo(String repoId) {
+        CompletableFuture<Boolean> response = new CompletableFuture<>();
+        addTask(new DeleteTask(repoId, response));
+        return response;
     }
 
     private static Optional<String> getRepositoryIdFromJson(Path p) {

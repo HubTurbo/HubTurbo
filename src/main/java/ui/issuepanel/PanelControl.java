@@ -1,6 +1,8 @@
 package ui.issuepanel;
 
 import backend.interfaces.IModel;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
@@ -17,6 +19,7 @@ import util.events.PanelClickedEventHandler;
 import util.events.ShowRenamePanelEventHandler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -268,6 +271,22 @@ public class PanelControl extends HBox {
 
     public int getNumberOfPanels() {
         return getChildren().size();
+    }
+
+    public HashSet<String> getRepositoriesReferencedOnAllPanels() {
+        HashSet<String> repositoriesOnPanels = new HashSet<>();
+
+        for (int i = 0; i < getNumberOfPanels(); i++) {
+            AbstractPanel currPanel = getPanel(i);
+
+            if (currPanel instanceof FilterPanel) {
+                FilterPanel currFilterPanel = (FilterPanel) currPanel;
+                FilterExpression panelExpression = currFilterPanel.getCurrentFilterExpression();
+                repositoriesOnPanels.addAll(Qualifier.getContentOfMetaQualifier(panelExpression, Qualifier.REPO));
+            }
+        }
+
+        return repositoriesOnPanels;
     }
 
     public int getNumberOfSavedBoards() {

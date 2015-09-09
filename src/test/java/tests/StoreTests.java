@@ -15,10 +15,11 @@ import util.events.EventDispatcherStub;
 import util.events.testevents.UpdateDummyRepoEvent;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class StoreTests {
 
@@ -119,6 +120,21 @@ public class StoreTests {
         Model model = repoIO.openRepository("nonexist/nonexist").get();
         TestUtils.delay(1); // allow for file to be written
         assertEquals(10, model.getIssues().size());
+    }
+
+    @Test
+    public void testRemoveRepo() throws InterruptedException, ExecutionException {
+        RepoIO testIO = new RepoIO(true, true);
+
+        Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
+        UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
+        testIO.updateModel(dummy1).get();
+
+        assertEquals(true, Files.exists(Paths.get("store/test/dummy1-dummy1.json")));
+
+        testIO.removeRepository("dummy1/dummy1").get();
+
+        assertEquals(false, Files.exists(Paths.get("store/test/dummy1-dummy1.json")));
     }
 
     @After

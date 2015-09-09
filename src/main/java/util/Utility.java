@@ -90,6 +90,25 @@ public class Utility {
         return false;
     }
 
+    /**
+     * Returns true on failure to delete file
+     * @param fileName
+     * @return true on error in deleting file, false otherwise
+     */
+    public static boolean deleteFile(String fileName) {
+        boolean validPath = !(fileName == null || fileName.isEmpty());
+        if (validPath) {
+            try {
+                Path repoFile = Paths.get(fileName);
+                Files.delete(repoFile);
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.

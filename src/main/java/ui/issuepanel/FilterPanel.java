@@ -19,6 +19,7 @@ import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
+import util.events.OpenReposChangedEvent;
 import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
 import prefs.PanelInfo;
@@ -145,6 +146,7 @@ public abstract class FilterPanel extends AbstractPanel {
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
             parentPanelControl.closePanel(panelIndex);
+            UI.events.triggerEvent(new OpenReposChangedEvent());
         });
         
         closeArea.getChildren().add(closeButton);

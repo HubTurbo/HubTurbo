@@ -2,6 +2,8 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.interfaces.IModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,8 @@ public class MultiModel implements IModel {
     // Guaranteed to have a value throughout
     private String defaultRepo = null;
 
+    private static final Logger logger = LogManager.getLogger(MultiModel.class.getName());
+
     public MultiModel(Preferences prefs) {
         this.models = new HashMap<>();
         this.pendingRepositories = new HashSet<>();
@@ -46,6 +50,16 @@ public class MultiModel implements IModel {
 
     private synchronized MultiModel add(Model model) {
         this.models.put(model.getRepoId(), model);
+        return this;
+    }
+
+    public synchronized MultiModel removeRepoModelById(String repoId) {
+        Optional<Model> repoModelToBeDeleted = getModelById(repoId);
+        if (repoModelToBeDeleted.isPresent()) {
+            this.models.remove(repoModelToBeDeleted.get().getRepoId());
+        } else {
+            logger.error("RepoModel to be deleted does not exist.");
+        }
         return this;
     }
 

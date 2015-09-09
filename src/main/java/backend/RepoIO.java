@@ -87,6 +87,11 @@ public class RepoIO {
         }
     }
 
+    public CompletableFuture<Boolean> removeRepository(String repoId) {
+        storedRepos.remove(repoId);
+        return jsonStore.removeStoredRepo(repoId);
+    }
+
     private CompletableFuture<Model> loadRepoFromStoreAsync(String repoId) {
         return jsonStore.loadRepository(repoId)
                 .thenCompose(this::updateModel);
