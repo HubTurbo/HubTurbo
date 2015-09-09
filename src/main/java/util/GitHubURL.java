@@ -4,7 +4,6 @@ import backend.resource.TurboIssue;
 
 public class GitHubURL {
 
-    public static final String MAIN_PAGE = "https://github.com";
     public static final String LOGIN_PAGE = "https://github.com/login";
     public static final String DOCS_PAGE =
             "https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md";

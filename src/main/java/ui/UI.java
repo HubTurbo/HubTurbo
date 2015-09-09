@@ -52,7 +52,7 @@ public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
     private static final int VERSION_MINOR = 5;
-    private static final int VERSION_PATCH = 0;
+    private static final int VERSION_PATCH = 1;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -124,7 +124,7 @@ public class UI extends Application implements EventDispatcher {
                         showMainWindow(logic.loginController.getRepoId());
                         disableUI(false);
                     } else {
-                        quit(false);
+                        quit();
                     }
                     return true;
                 }).exceptionally(e -> {
@@ -182,7 +182,7 @@ public class UI extends Application implements EventDispatcher {
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
-                logger.error(throwable.getMessage(), throwable));
+            logger.error(throwable.getMessage(), throwable));
 
         commandLineArgs = initialiseCommandLineArguments();
         prefs = new Preferences(isTestMode());
@@ -268,12 +268,9 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
 
-    public void quit(boolean isLogout) {
+    public void quit() {
         if (browserComponent != null) {
             browserComponent.onAppQuit();
-            if (isLogout) { // called after quit as we delete Chrome Custom Profile after closing Chrome
-                browserComponent.cleanChromeCustomProfile();
-            }
         }
         if (!isTestMode() || isTestGlobalConfig()) {
             panels.saveSession();
@@ -316,7 +313,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
         mainStage.setScene(scene);
         mainStage.show();
-        mainStage.setOnCloseRequest(e -> quit(false));
+        mainStage.setOnCloseRequest(e -> quit());
         mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (!isFocused) {
                 return;
