@@ -12,7 +12,7 @@
 
 - The current board also will be saved when you quit the application. The same board will be loaded next time you run HubTurbo.
 
-- You can select the current board via 'Boards > Save'.
+- You can select the current board via `Boards > Save`.
 
 ## Opening a Board
 
