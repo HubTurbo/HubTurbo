@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -215,18 +216,30 @@ public class MultiModel implements IModel {
         for (Model model : newModels) {
             assert models.containsKey(model.getRepoId());
             Model existingModel = models.get(model.getRepoId());
-            if (!existingModel.getIssues().equals(model.getIssues())) {
-                // Find issues that have changed and update preferences with them
-                for (int i = 1; i <= model.getIssues().size(); i++) {
-                    // TODO O(n^2), optimise by preprocessing into a map or sorting
-                    if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
-                        assert model.getIssueById(i).isPresent();
-                        // It's no longer currently read, but it retains its updated time.
-                        // No changes to preferences.
-                        model.getIssueById(i).get().setIsCurrentlyRead(false);
-                    }
-                }
+            if (existingModel.getIssues().equals(model.getIssues())) continue;
+            for (int i = 1; i <= model.getIssues().size(); i++) {
+                if (existingModel.getIssueById(i).equals(model.getIssueById(i)) || 
+                    !wasNotJustMarkedAsRead(model.getIssueById(i).get())) continue;
+                // TODO O(n^2), optimise by preprocessing into a map or sorting
+                assert model.getIssueById(i).isPresent();
+                /** If the issue was marked read after the last update, but update came in later
+                 * due to network latency, ensure the issue retains its read state
+                **/
+                model.getIssueById(i).get().setIsCurrentlyRead(false);
             }
+        }
+    }
+
+    private boolean wasNotJustMarkedAsRead(TurboIssue issue) {
+        if (!issue.isCurrentlyRead() || !issue.getMarkedReadAt().isPresent()) return false;
+        LocalDateTime markedReadAt = issue.getMarkedReadAt().get();
+        LocalDateTime updatedAt = issue.getUpdatedAt();
+        if (updatedAt.isBefore(markedReadAt) && (updatedAt.until(markedReadAt, ChronoUnit.SECONDS) < 3L)) {
+            return false;
+        } else if (updatedAt.isAfter(markedReadAt)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
