@@ -228,13 +228,13 @@ Matches issues which were updated in the given number of hours. For example, `up
 
 *Expects a number or  number range*
 
-Matches issues which were updated in the given number of hours by users other than the logged in user. For example, `updated:<24` would match issues updated in the last day by other users. Number ranges are written using a relational operator (.e.g `>5`, `<=10`). If a number `n` is given, it is implicitly translated to `<n`.
+Like [`updated`](#updated), but considers only issues updated by others (not the logged in user).
 
 ### updated-self
 
 *Expects a number or  number range*
 
-Matches issues which were updated in the given number of hours by the logged in user. For example, `updated:<24` would match issues updated in the last day by the logged in user. Number ranges are written using a relational operator (.e.g `>5`, `<=10`). If a number `n` is given, it is implicitly translated to `<n`.
+Like [`updated`](#updated), but considers only issues updated by the logged in user.
 
 ### repo
 
