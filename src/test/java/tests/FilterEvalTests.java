@@ -447,7 +447,7 @@ public class FilterEvalTests {
         assertEquals(false, matches("updated-self:<=4", issueUpdated));
 
         IssueMetadata updatedBySelfAndOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
-                now.minusHours(4), 2, 2, true, true); //UpdatedByOther and UpdatedBySelf true with updated time 4 hours ago.
+                now.minusHours(4), 2, 2, true, true); //UpdatedByOther and UpdatedBySelf true with updated time 4 hours.
         issueUpdated.setMetadata(updatedBySelfAndOtherMetadata);
         assertEquals(false, matches("updated-others:<2", issueUpdated));
         assertEquals(false, matches("updated-self:<2", issueUpdated));
