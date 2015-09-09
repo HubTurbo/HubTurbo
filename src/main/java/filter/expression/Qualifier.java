@@ -20,10 +20,10 @@ import filter.QualifierApplicationException;
 
 public class Qualifier implements FilterExpression {
 
-    public static final String UPDATED = "updated";
-    public static final String UPDATED_OTHERS = "updatedByOthers";
     public static final String REPO = "repo";
     public static final String SORT = "sort";
+    public static final String UPDATED = "updated";
+    public static final String UPDATED_BY_OTHERS = "updated-others";
 
     private enum UpdatedKind{
         SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
@@ -153,6 +153,12 @@ public class Qualifier implements FilterExpression {
         } else {
             return currentTime;
         }
+    }
+
+    public static boolean qualifierNamesHaveUpdatedQualifier(FilterExpression expression){
+        List<String> filterQualifierNames = expression.getQualifierNames();
+        return (filterQualifierNames.contains(UPDATED) ||
+                filterQualifierNames.contains(UPDATED_BY_OTHERS));
     }
 
     /**

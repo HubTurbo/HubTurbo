@@ -61,15 +61,8 @@ public class ListPanel extends FilterPanel {
      * @return true if the issue has changed, false otherwise
      */
 
-    private static boolean qualifierNamesHaveUpdatedQualifier(List<String> filterQualifierNames){
-        // omitting self-updated issues since we only care about updated comments from other users.
-        return (filterQualifierNames.contains(Qualifier.UPDATED) ||
-                filterQualifierNames.contains(Qualifier.UPDATED_OTHERS));
-    }
-
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        List<String> filterQualifierNames = currentFilterExpression.getQualifierNames();
-        if (hasMetadata && qualifierNamesHaveUpdatedQualifier(filterQualifierNames)) {
+        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()

@@ -37,12 +37,27 @@ public class FilterLexerTests {
             new Lexer("a,b").lex();
         } catch (ParseException ignored) {}
 
-        assertEquals(new Lexer("sort-self: a, b ").lex(), Arrays.asList(
-            new Token(TokenType.QUALIFIER, "sort-self:"),
+        assertEquals(new Lexer("sort: a, b ").lex(), Arrays.asList(
+            new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
             new Token(TokenType.SYMBOL, "b"),
             new Token(TokenType.EOF, "")));
+        assertEquals(new Lexer("sort-self-other: a, b ").lex(), Arrays.asList(
+                new Token(TokenType.QUALIFIER, "sort-self-other:"),
+                new Token(TokenType.SYMBOL, "a"),
+                new Token(TokenType.COMMA, ","),
+                new Token(TokenType.SYMBOL, "b"),
+                new Token(TokenType.EOF, "")));
+        assertEquals(new Lexer("---sort-self-other: a, b ").lex(), Arrays.asList(
+                new Token(TokenType.NOT, "-"),
+                new Token(TokenType.NOT, "-"),
+                new Token(TokenType.NOT, "-"),
+                new Token(TokenType.QUALIFIER, "sort-self-other:"),
+                new Token(TokenType.SYMBOL, "a"),
+                new Token(TokenType.COMMA, ","),
+                new Token(TokenType.SYMBOL, "b"),
+                new Token(TokenType.EOF, "")));
         assertEquals(new Lexer("sort: a , - b").lex(), Arrays.asList(
             new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),

@@ -18,7 +18,6 @@ public class IssueMetadata {
     private final int nonSelfCommentCount;
     private final int selfCommentCount;
 
-    private final boolean isUpdated; //for any update
     private final boolean isUpdatedBySelf; // for update by self
     private final boolean isUpdatedByOthers; // for update by others
 
@@ -34,7 +33,6 @@ public class IssueMetadata {
         selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         nonSelfCommentCount = 0;
         selfCommentCount = 0;
-        isUpdated = false;
         isUpdatedByOthers = false;
         isUpdatedBySelf = false;
     }
@@ -47,7 +45,6 @@ public class IssueMetadata {
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount = other.selfCommentCount;
-        this.isUpdated = other.isUpdated;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
     }
@@ -60,7 +57,6 @@ public class IssueMetadata {
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount  = other.selfCommentCount;
-        this.isUpdated = isUpdated;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
     }
@@ -73,7 +69,6 @@ public class IssueMetadata {
         this.selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
         this.selfCommentCount = 0; // Not calculated yet
-        this.isUpdated = false;
         this.isUpdatedByOthers = false;
         this.isUpdatedBySelf = false;
     }
@@ -113,7 +108,6 @@ public class IssueMetadata {
                 UpdatedKind.UPDATED_BY_OTHER);
         this.selfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
                 UpdatedKind.UPDATED_BY_SELF);
-        this.isUpdated = true;
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
 
@@ -161,7 +155,6 @@ public class IssueMetadata {
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount = other.selfCommentCount;
-        this.isUpdated = other.isUpdated;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
     }
@@ -176,7 +169,6 @@ public class IssueMetadata {
         this.selfUpdatedAt = selfUpdatedAt;
         this.nonSelfCommentCount = nonSelfCommentCount;
         this.selfCommentCount = selfCommentCount;
-        this.isUpdated = true;
         this.isUpdatedBySelf = isUpdatedBySelf;
         this.isUpdatedByOthers = isUpdatedByOthers;
     }
@@ -207,10 +199,6 @@ public class IssueMetadata {
 
     public int getSelfCommentCount() {
         return selfCommentCount;
-    }
-
-    public boolean isUpdated() {
-        return isUpdated;
     }
 
     public boolean isUpdatedByOthers() {
