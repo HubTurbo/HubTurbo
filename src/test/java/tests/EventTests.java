@@ -1,9 +1,11 @@
 package tests;
 
 import com.google.common.eventbus.EventBus;
+import com.thoughtworks.selenium.webdriven.commands.Open;
 import org.junit.Test;
 import util.events.*;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -60,4 +62,33 @@ public class EventTests {
     private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
     private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
     private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
+
+    @Test
+    public void testSuperclassHandlerOnSubclassEvent() {
+        EventBus eventsSuperSub = new EventBus();
+
+        final EventHandler superclassHandlerSucceed = (OpenReposChangedEventHandler) e -> assertTrue(true);
+        final EventHandler subclassHandlerSucceed = (RepoOpenedEventHandler) e -> assertTrue(true);
+        final EventHandler subclassHandlerFail =
+                (RepoOpenedEventHandler) e -> fail("RepoOpenedEventHandler failed");
+
+        // Dispatch superclass event, ensure subclass handler doesn't fire
+        eventsSuperSub.register(superclassHandlerSucceed);
+        eventsSuperSub.register(subclassHandlerFail);
+
+        OpenReposChangedEvent superclassEvent = new OpenReposChangedEvent();
+
+        eventsSuperSub.post(superclassEvent);
+
+        eventsSuperSub.unregister(superclassHandlerSucceed);
+        eventsSuperSub.unregister(subclassHandlerFail);
+
+        // Dispatch subclass event, ensure both handler fire
+        eventsSuperSub.register(superclassHandlerSucceed);
+        eventsSuperSub.register(subclassHandlerSucceed);
+
+        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("");
+
+        eventsSuperSub.post(subclassEvent);
+    }
 }

@@ -124,7 +124,7 @@ public class UI extends Application implements EventDispatcher {
                         showMainWindow(logic.loginController.getRepoId());
                         disableUI(false);
                     } else {
-                        quit(false);
+                        quit();
                     }
                     return true;
                 }).exceptionally(e -> {
@@ -143,10 +143,10 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
+        triggerEvent(new PrimaryRepoChangedEvent(repoId));
 
         triggerEvent(new BoardSavedEvent()); // Initializes boards
 
@@ -182,7 +182,7 @@ public class UI extends Application implements EventDispatcher {
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
-                logger.error(throwable.getMessage(), throwable));
+            logger.error(throwable.getMessage(), throwable));
 
         commandLineArgs = initialiseCommandLineArguments();
         prefs = new Preferences(isTestMode());
@@ -192,7 +192,7 @@ public class UI extends Application implements EventDispatcher {
         if (isTestMode()) {
             registerTestEvents();
         }
-        registerEvent((RepoOpenedEventHandler) e -> onRepoOpened());
+        registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
@@ -268,12 +268,9 @@ public class UI extends Application implements EventDispatcher {
         return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
 
-    public void quit(boolean isLogout) {
+    public void quit() {
         if (browserComponent != null) {
             browserComponent.onAppQuit();
-            if (isLogout) { // called after quit as we delete Chrome Custom Profile after closing Chrome
-                browserComponent.cleanChromeCustomProfile();
-            }
         }
         if (!isTestMode() || isTestGlobalConfig()) {
             panels.saveSession();
@@ -316,7 +313,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
         mainStage.setScene(scene);
         mainStage.show();
-        mainStage.setOnCloseRequest(e -> quit(false));
+        mainStage.setOnCloseRequest(e -> quit());
         mainStage.focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (!isFocused) {
                 return;
@@ -484,6 +481,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
+        triggerEvent(new OpenReposChangedEvent());
     }
     
     public void switchDefaultRepo(){
@@ -502,6 +500,8 @@ public class UI extends Application implements EventDispatcher {
                 }
             }
         }
+
+        triggerEvent(new OpenReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {
