@@ -72,13 +72,13 @@ public class MenuControl extends MenuBar {
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
             prefs.setLastLoginCredentials("", "");
-            ui.quit(true);
+            ui.quit();
         });
         
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(e -> {
             logger.info("Quitting HT");
-            ui.quit(false);
+            ui.quit();
         });
         
         file.getItems().addAll(logout, quit);
