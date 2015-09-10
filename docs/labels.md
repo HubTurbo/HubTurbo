@@ -38,3 +38,5 @@ There is support for label groups, typing `p.l` highlights `priority.low` and so
 ![](images/labels/groups.png?raw=true)
 
 Finally, press `Confirm` or <kbd>Enter</kbd> to accept the label selection or press `Cancel` or <kbd>Escape</kbd> to cancel and close the Label Picker. 
+
+Label changes are not sent to GitHub immediately to allow the user a short window of time to undo the changes. The `Undo` button on the notification reverts the label changes and pressing <kbd>Ctrl</kbd>+<kbd>z</kbd> will do the same. 

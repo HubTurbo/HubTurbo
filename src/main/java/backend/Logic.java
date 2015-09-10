@@ -224,21 +224,25 @@ public class Logic {
      *
      * @param issue The issue whose labels are to be replaced
      * @param labels The labels to be applied to the given issue
-     * @return The list of labels on the issue after the request is received by GitHub
+     * @param originalLabels The original labels to be applied to the UI in case of failure
+     * @return A boolean indicating the result of the label replacement from GitHub
      */
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
-
-        return repoIO.replaceIssueLabels(issue, labels).handle((resultLabels, ex) -> {
-            if (ex == null) {
-                issue.setLabels(labels);
-                updateUIAndShow();
-                return true;
-            } else {
-                return false;
-            }
+    public CompletableFuture<Boolean> replaceIssueLabelsRepo
+            (TurboIssue issue, List<String> labels, List<String> originalLabels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Sending labels " + labels + " for " + issue + " to GitHub"));
+        return repoIO.replaceIssueLabels(issue, labels)
+                .thenApply(e -> true)
+                .exceptionally(e -> {
+                    replaceIssueLabelsUI(issue, originalLabels);
+                    logger.error(e.getLocalizedMessage(), e);
+                    return false;
         });
     }
 
-}
+    public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
+        issue.setLabels(labels);
+        updateUIAndShow();
+    }
 
+}
