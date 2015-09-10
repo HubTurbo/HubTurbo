@@ -126,7 +126,8 @@ public class TurboIssue {
         this.description = issue.getBody() == null
             ? ""
             : issue.getBody();
-        this.updatedAt = replaceNull(Utility.dateToLocalDateTime(issue.getUpdatedAt()), this.createdAt);
+        this.updatedAt = issue.getUpdatedAt() != null ?
+                Utility.dateToLocalDateTime(issue.getUpdatedAt()) : this.createdAt;
         this.commentCount = issue.getComments();
         this.isOpen = issue.getState().equals(STATE_OPEN);
         this.assignee = issue.getAssignee() == null

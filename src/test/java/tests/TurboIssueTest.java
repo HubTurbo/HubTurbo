@@ -41,17 +41,10 @@ public class TurboIssueTest {
      */
     @Test
     public void testReadState() {
-        TurboIssue issue = new TurboIssue(REPO, 1, "", "",
-                LocalDateTime.of(2011, 1, 1, 1, 1, 1), false);
+        TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, false);
 
         // An issue is not read if it doesn't record any markedReadAt time
         assertFalse(issue.isCurrentlyRead());
-
-        // An issue is read if it has no updatedAt time
-        // and its markedAsRead time is after its createdAt time
-        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
-        issue.setUpdatedAt(null);
-        assertTrue(issue.isCurrentlyRead());
 
         // An issue is not read if its markedAsRead time is before its updatedAt time
         issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
@@ -59,7 +52,8 @@ public class TurboIssueTest {
         assertFalse(issue.isCurrentlyRead());
 
         // An issue is marked as read if its markedAsRead time is after its updated Time
-        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 3, 6, 12, 15)));
+        issue.setUpdatedAt(LocalDateTime.of(2015, 1, 1, 1, 1));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
         assertTrue(issue.isCurrentlyRead());
     }
 
