@@ -125,6 +125,8 @@ public class ListPanel extends FilterPanel {
         setupContextMenu();
 
         listView.setOnItemSelected(i -> {
+            updateContextMenu(contextMenu);
+
             TurboIssue issue = listView.getItems().get(i);
             ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
@@ -300,10 +302,7 @@ public class ListPanel extends FilterPanel {
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
-        contextMenu.setOnShowing(e -> {
-            updateContextMenu(contextMenu);
-        });
-
+        contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
         return contextMenu;

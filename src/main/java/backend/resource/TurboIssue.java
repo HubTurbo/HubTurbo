@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import prefs.Preferences;
 import util.Utility;
+import static util.Utility.replaceNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class TurboIssue {
         this.isPullRequest = issue.isPullRequest;
 
         this.description = issue.description;
-        this.updatedAt = issue.updatedAt;
+        this.updatedAt = replaceNull(issue.updatedAt, this.createdAt);
         this.commentCount = issue.commentCount;
         this.isOpen = issue.isOpen;
         this.assignee = issue.assignee;
@@ -125,7 +126,7 @@ public class TurboIssue {
         this.description = issue.getBody() == null
             ? ""
             : issue.getBody();
-        this.updatedAt = Utility.dateToLocalDateTime(issue.getUpdatedAt());
+        this.updatedAt = replaceNull(Utility.dateToLocalDateTime(issue.getUpdatedAt()), this.createdAt);
         this.commentCount = issue.getComments();
         this.isOpen = issue.getState().equals(STATE_OPEN);
         this.assignee = issue.getAssignee() == null
@@ -151,7 +152,7 @@ public class TurboIssue {
 
         this.title = issue.getTitle();
         this.description = issue.getDescription();
-        this.updatedAt = issue.getUpdatedAt();
+        this.updatedAt = replaceNull(issue.getUpdatedAt(), this.createdAt);
         this.commentCount = issue.getCommentCount();
         this.isOpen = issue.isOpen();
         this.assignee = issue.getAssignee();
@@ -173,7 +174,7 @@ public class TurboIssue {
     private void mutableFieldDefaults() {
         this.title = "";
         this.description = "";
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = replaceNull(this.createdAt, LocalDateTime.now());
         this.commentCount = 0;
         this.isOpen = true;
         this.assignee = Optional.empty();
@@ -279,7 +280,7 @@ public class TurboIssue {
         return updatedAt;
     }
     public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+        this.updatedAt = replaceNull(updatedAt, this.createdAt);
     }
     public int getCommentCount() {
         return commentCount;
@@ -341,9 +342,6 @@ public class TurboIssue {
     public boolean isCurrentlyRead() {
         if (!getMarkedReadAt().isPresent()) {
             return false;
-        }
-        if (getUpdatedAt() == null) {
-            return getMarkedReadAt().get().isAfter(getCreatedAt());
         }
 
         return getMarkedReadAt().get().isAfter(getUpdatedAt());
