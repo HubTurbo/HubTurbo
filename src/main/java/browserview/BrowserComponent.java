@@ -1,10 +1,8 @@
 package browserview;
 
-import java.io.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import org.apache.commons.io.FileUtils;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -12,16 +10,15 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
-
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinUser;
-
 import ui.UI;
 import util.GitHubURL;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
+
+import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * An abstraction for the functions of the Selenium web driver.
@@ -41,8 +38,6 @@ public class BrowserComponent {
 
     private static final String CHROME_DRIVER_LOCATION = "browserview/";
     private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
-
-    private static final String CHROME_USER_DATA_DIR = System.getProperty("user.home") + File.separator + ".HubTurbo";
 
     private String pageContentOnLoad = "";
 
@@ -85,13 +80,7 @@ public class BrowserComponent {
             driver = createChromeDriver();
             logger.info("Successfully initialised browser component and ChromeDriver");
         });
-
-        if (!isChromeCustomProfilePresent()) {
-            login();
-        }
-        else {
-            runBrowserOperation(() -> driver.get(GitHubURL.MAIN_PAGE, false));
-        }
+        login();
     }
 
     /**
@@ -100,34 +89,6 @@ public class BrowserComponent {
     public void onAppQuit() {
         quit();
         removeChromeDriverIfNecessary();
-    }
-
-    private boolean isChromeCustomProfilePresent() {
-        File chromeCustomProfDir = new File(CHROME_USER_DATA_DIR);
-
-        if (chromeCustomProfDir.isDirectory()) {
-            String[] chromeCustomProfDirList = chromeCustomProfDir.list();
-            if (chromeCustomProfDirList != null && chromeCustomProfDirList.length > 0) {
-                return true;
-            }
-            else { // directory is empty
-                return false;
-            }
-        }
-        else { // directory does not exist yet
-            return false;
-        }
-    }
-
-    /**
-     * Reset Chrome Custom Profile directory so that all cookies are cleared
-     */
-    public void cleanChromeCustomProfile() {
-        try {
-            FileUtils.cleanDirectory(new File(CHROME_USER_DATA_DIR));
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
-        }
     }
 
     /**
@@ -152,7 +113,6 @@ public class BrowserComponent {
      */
     private ChromeDriverEx createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-data-dir=" + CHROME_USER_DATA_DIR);
         if (USE_MOBILE_USER_AGENT) {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }

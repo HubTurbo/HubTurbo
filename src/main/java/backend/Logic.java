@@ -3,10 +3,8 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
-import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
 import prefs.Preferences;
 import ui.UI;
 import util.Futures;
@@ -15,9 +13,6 @@ import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +130,7 @@ public class Logic {
 
         String currentUser = prefs.getLastLoginUsername();
 
-        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processNonSelfUpdate)
+        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
             .thenApply(metadata -> {
                 String updatedMessage = "Received metadata from " + repoId + "!";
                 UI.status.displayMessage(updatedMessage);
@@ -150,43 +145,17 @@ public class Logic {
     }
 
     // Adds update times to the metadata map
-    private Map<Integer, IssueMetadata> processNonSelfUpdate(Map<Integer, IssueMetadata> metadata) {
+    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
         String currentUser = prefs.getLastLoginUsername();
 
         // Iterates through each entry in the metadata set, and looks for the comment/event with
         // the latest time created.
         for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
             IssueMetadata currentMetadata = entry.getValue();
-            Date lastNonSelfUpdate = new Date(0);
-            for (TurboIssueEvent event : currentMetadata.getEvents()) {
-                if (!event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                        && event.getDate().after(lastNonSelfUpdate)) {
-                    lastNonSelfUpdate = event.getDate();
-                }
-            }
-            for (Comment comment : currentMetadata.getComments()) {
-                if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                        && comment.getCreatedAt().after(lastNonSelfUpdate)) {
-                    lastNonSelfUpdate = comment.getCreatedAt();
-                }
-            }
 
-            entry.setValue(new IssueMetadata(currentMetadata,
-                    LocalDateTime.ofInstant(lastNonSelfUpdate.toInstant(), ZoneId.systemDefault()),
-                    calculateNonSelfCommentCount(currentMetadata.getComments(), currentUser)
-            ));
+            entry.setValue(new IssueMetadata(currentMetadata, currentUser));
         }
         return metadata;
-    }
-
-    private int calculateNonSelfCommentCount(List<Comment> comments, String currentUser) {
-        int result = 0;
-        for (Comment comment : comments) {
-            if (!comment.getUser().getLogin().equalsIgnoreCase(currentUser)) {
-                result++;
-            }
-        }
-        return result;
     }
 
     public Set<String> getOpenRepositories() {
@@ -207,6 +176,11 @@ public class Logic {
 
     public String getDefaultRepo() {
         return models.getDefaultRepo();
+    }
+
+    public CompletableFuture<Boolean> removeRepository(String repoId) {
+        models.removeRepoModelById(repoId);
+        return repoIO.removeRepository(repoId);
     }
 
     /**
@@ -251,21 +225,25 @@ public class Logic {
      *
      * @param issue The issue whose labels are to be replaced
      * @param labels The labels to be applied to the given issue
-     * @return The list of labels on the issue after the request is received by GitHub
+     * @param originalLabels The original labels to be applied to the UI in case of failure
+     * @return A boolean indicating the result of the label replacement from GitHub
      */
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue));
-
-        return repoIO.replaceIssueLabels(issue, labels).handle((resultLabels, ex) -> {
-            if (ex == null) {
-                issue.setLabels(labels);
-                updateUIAndShow();
-                return true;
-            } else {
-                return false;
-            }
+    public CompletableFuture<Boolean> replaceIssueLabelsRepo
+            (TurboIssue issue, List<String> labels, List<String> originalLabels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Sending labels " + labels + " for " + issue + " to GitHub"));
+        return repoIO.replaceIssueLabels(issue, labels)
+                .thenApply(e -> true)
+                .exceptionally(e -> {
+                    replaceIssueLabelsUI(issue, originalLabels);
+                    logger.error(e.getLocalizedMessage(), e);
+                    return false;
         });
     }
 
-}
+    public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
+        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
+        issue.setLabels(labels);
+        updateUIAndShow();
+    }
 
+}

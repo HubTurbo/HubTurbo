@@ -112,6 +112,8 @@ public class GUIController {
         processPanel(changedPanel, multiModel, allModelIssues, toUpdate, false);
 
         dispatchMetadataRequests(toUpdate);
+
+        UI.events.triggerEvent(new OpenReposChangedEvent());
     }
 
     /**

@@ -43,6 +43,10 @@ public abstract class RepoStore {
         return Utility.readFile(getRepoPath(repoId).orElse(""));
     }
 
+    public static boolean delete(String repoId) {
+        return Utility.deleteFile(getRepoPath(repoId).orElse(""));
+    }
+
     /**
      * Returns true on success.
      * @return

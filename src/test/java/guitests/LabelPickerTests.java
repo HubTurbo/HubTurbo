@@ -3,24 +3,23 @@ package guitests;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import org.controlsfx.control.NotificationPane;
 import org.junit.Test;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanelCell;
+import util.PlatformEx;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final int EVENT_DELAY = 1000;
-
     @Test
     public void showLabelPickerTest() {
         FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
         click(filterTextField);
         type("hello");
-        sleep(EVENT_DELAY);
         assertEquals("hello", filterTextField.getText());
         filterTextField.setText("");
 
@@ -29,15 +28,14 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("#labelPickerTextField");
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
         type("world");
-        sleep(EVENT_DELAY);
         assertEquals("world", labelPickerTextField.getText());
         push(KeyCode.ESCAPE);
-        sleep(EVENT_DELAY);
+        waitUntilNodeDisappears("#labelPickerTextField");
     }
 
     @Test
@@ -47,24 +45,31 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("#labelPickerTextField");
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        waitUntilNodeDisappears("#labelPickerTextField");
         assertEquals(0, listPanelCell.getIssueLabels().size());
+
+        // sleep long enough for label changes to be made permanent
+        NotificationPane notificationPane = find("#notificationPane");
+        while (notificationPane.isShowing()) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("#labelPickerTextField");
 
         labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        waitUntilNodeDisappears("#labelPickerTextField");
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
@@ -75,33 +80,41 @@ public class LabelPickerTests extends UITest {
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("#labelPickerTextField");
 
         TextField labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        waitUntilNodeDisappears("#labelPickerTextField");
         assertEquals(0, listPanelCell.getIssueLabels().size());
 
         click("Undo");
-        sleep(EVENT_DELAY);
+        // sleep long enough for undo
+        NotificationPane notificationPane = find("#notificationPane");
+        while (notificationPane.isShowing()) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
         assertEquals(1, listPanelCell.getIssueLabels().size());
 
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(listPanelCell.getIssue()));
-        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("#labelPickerTextField");
 
         labelPickerTextField = find("#labelPickerTextField");
         click(labelPickerTextField);
         type("2 ");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        waitUntilNodeDisappears("#labelPickerTextField");
         assertEquals(0, listPanelCell.getIssueLabels().size());
 
         click("#dummy/dummy_col0_9");
         press(KeyCode.CONTROL).press(KeyCode.Z).release(KeyCode.Z).release(KeyCode.CONTROL);
-        sleep(EVENT_DELAY);
+        while (notificationPane.isShowing()) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 

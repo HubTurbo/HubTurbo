@@ -1,5 +1,10 @@
 package ui.listpanel;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -17,11 +22,6 @@ import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
 
 public class ListPanel extends FilterPanel {
 
@@ -60,8 +60,9 @@ public class ListPanel extends FilterPanel {
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
+
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
@@ -124,6 +125,8 @@ public class ListPanel extends FilterPanel {
         setupContextMenu();
 
         listView.setOnItemSelected(i -> {
+            updateContextMenu(contextMenu);
+
             TurboIssue issue = listView.getItems().get(i);
             ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
@@ -271,9 +274,9 @@ public class ListPanel extends FilterPanel {
                 ui.switchDefaultRepo();
             }
             if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
-                ui.triggerNotificationPaneAction();
+                ui.triggerNotificationAction();
             }
-            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+            for (KeyCodeCombination key:KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS) {
                 if (key.match(event)) {
                     event.consume();
                     listView.selectFirstItem();
@@ -299,10 +302,7 @@ public class ListPanel extends FilterPanel {
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
-        contextMenu.setOnShowing(e -> {
-            updateContextMenu(contextMenu);
-        });
-
+        contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
         return contextMenu;
@@ -378,10 +378,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            LocalDateTime now = LocalDateTime.now();
-            ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-            issue.setMarkedReadAt(Optional.of(now));
-            issue.setIsCurrentlyRead(true);
+            issue.markAsRead(ui.prefs);
+
             parentPanelControl.refresh();
             listView.selectNextItem();
         }
@@ -391,9 +389,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-            issue.setMarkedReadAt(Optional.empty());
-            issue.setIsCurrentlyRead(false);
+            issue.markAsUnread(ui.prefs);
+
             parentPanelControl.refresh();
         }
     }
