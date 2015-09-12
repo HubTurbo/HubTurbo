@@ -50,5 +50,19 @@ public class SortTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("-date");
         push(KeyCode.ENTER);
+        // Issue state (open)
+        doubleClick("#dummy/dummy_col0_filterTextField");
+        doubleClick("#dummy/dummy_col0_filterTextField");
+        type("sort");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("status");
+        push(KeyCode.ENTER);
+        // Issue state (closed)
+        doubleClick("#dummy/dummy_col0_filterTextField");
+        doubleClick("#dummy/dummy_col0_filterTextField");
+        type("sort");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("-status");
+        push(KeyCode.ENTER);
     }
 }
