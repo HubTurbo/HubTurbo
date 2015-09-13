@@ -158,11 +158,11 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
             }
             if (FIRST_ISSUE.match(e)) {
                 e.consume();
-                selectFirstItem();
+                selectnthItem(1);
             }
             if (LAST_ISSUE.match(e)) {
                 e.consume();
-                selectLastItem();
+                selectnthItem(getItems().size() - 1);
             }
         });
     }
@@ -188,21 +188,12 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         onItemSelected = callback;
     }
 
-    public void selectFirstItem() {
+    public void selectnthItem(int n) {
         requestFocus();
-        if (getItems().size() == 0) return;
-        getSelectionModel().clearAndSelect(0);
-        scrollAndShow(0);
-        selectedIndex = Optional.of(0);
-        onItemSelected.accept(selectedIndex.get());
-    }
-
-    public void selectLastItem() {
-        requestFocus();
-        if (getItems().size() == 0) return;
-        getSelectionModel().clearAndSelect(getItems().size() - 1);
-        scrollAndShow(getItems().size() - 1);
-        selectedIndex = Optional.of(getItems().size() - 1);
+        if (getItems().size() < n) return;
+        getSelectionModel().clearAndSelect(n - 1);
+        scrollAndShow(n - 1);
+        selectedIndex = Optional.of(n - 1);
         onItemSelected.accept(selectedIndex.get());
     }
     

@@ -61,7 +61,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // jump to first issue using number key(1) or ENTER
         push(KeyCode.ESCAPE);
-        push(KeyCode.DIGIT1);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT1).release(KeyCode.CONTROL).release(KeyCode.DIGIT1);
         sleep(1000);
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
@@ -69,9 +69,44 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
         push(KeyCode.ESCAPE);
-        press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT2).release(KeyCode.CONTROL).release(KeyCode.DIGIT2);
         sleep(1000);
-        assertEquals(10, selectedIssueId);
+        assertEquals(9, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT3).release(KeyCode.CONTROL).release(KeyCode.DIGIT3);
+        sleep(1000);
+        assertEquals(8, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT4).release(KeyCode.CONTROL).release(KeyCode.DIGIT4);
+        sleep(1000);
+        assertEquals(7, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT5).release(KeyCode.CONTROL).release(KeyCode.DIGIT5);
+        sleep(1000);
+        assertEquals(6, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT6).release(KeyCode.CONTROL).release(KeyCode.DIGIT6);
+        sleep(1000);
+        assertEquals(5, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT7).release(KeyCode.CONTROL).release(KeyCode.DIGIT7);
+        sleep(1000);
+        assertEquals(4, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT8).release(KeyCode.CONTROL).release(KeyCode.DIGIT8);
+        sleep(1000);
+        assertEquals(3, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT9).release(KeyCode.CONTROL).release(KeyCode.DIGIT9);
+        sleep(1000);
+        assertEquals(2, selectedIssueId);
         clearSelectedIssueId();
 
         // jump to last issue
