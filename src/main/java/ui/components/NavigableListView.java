@@ -4,6 +4,9 @@ import javafx.scene.input.KeyCode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static ui.components.KeyboardShortcuts.FIRST_ISSUE;
+import static ui.components.KeyboardShortcuts.LAST_ISSUE;
+
 import java.util.Optional;
 import java.util.function.IntConsumer;
 
@@ -153,11 +156,11 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                     onItemSelected.accept(selectedIndex.get());
                 }
             }
-            if (KeyboardShortcuts.FIRST_ISSUE.match(e)) {
+            if (FIRST_ISSUE.match(e)) {
                 e.consume();
                 selectFirstItem();
             }
-            if (KeyboardShortcuts.LAST_ISSUE.match(e)) {
+            if (LAST_ISSUE.match(e)) {
                 e.consume();
                 selectLastItem();
             }

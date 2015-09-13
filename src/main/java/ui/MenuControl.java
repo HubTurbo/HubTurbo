@@ -13,10 +13,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import prefs.PanelInfo;
-import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
+
+import static ui.components.KeyboardShortcuts.NEW_ISSUE;
+import static ui.components.KeyboardShortcuts.NEW_LABEL;
+import static ui.components.KeyboardShortcuts.NEW_MILESTONE;
+import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
+import static ui.components.KeyboardShortcuts.SHOW_DOCS;
+import static ui.components.KeyboardShortcuts.REFRESH;
 
 import java.util.HashSet;
 import java.util.List;
@@ -96,7 +104,7 @@ public class MenuControl extends MenuBar {
             panels.createNewPanelAtStart();
             setHvalue(panelsScrollPane.getHmin());
         });
-        createLeft.setAccelerator(KeyboardShortcuts.CREATE_LEFT_PANEL);
+        createLeft.setAccelerator(CREATE_LEFT_PANEL);
 
         MenuItem createRight = new MenuItem("Create");
         createRight.setOnAction(e -> {
@@ -122,14 +130,14 @@ public class MenuControl extends MenuBar {
             };
             panels.widthProperty().addListener(listener);
         });
-        createRight.setAccelerator(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        createRight.setAccelerator(CREATE_RIGHT_PANEL);
 
         MenuItem closePanel = new MenuItem("Close");
         closePanel.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
             panels.closeCurrentPanel();
         });
-        closePanel.setAccelerator(KeyboardShortcuts.CLOSE_PANEL);
+        closePanel.setAccelerator(CLOSE_PANEL);
 
         cols.getItems().addAll(createRight, createLeft, closePanel);
         return cols;
@@ -291,7 +299,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Documentation");
             ui.getBrowserComponent().showDocs();
         });
-        documentationMenuItem.setAccelerator(KeyboardShortcuts.SHOW_DOCS);
+        documentationMenuItem.setAccelerator(SHOW_DOCS);
         return documentationMenuItem;
     }
 
@@ -301,7 +309,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Refresh");
             ui.logic.refresh();
         });
-        refreshMenuItem.setAccelerator(KeyboardShortcuts.REFRESH);
+        refreshMenuItem.setAccelerator(REFRESH);
         return refreshMenuItem;
     }
 
@@ -311,21 +319,21 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: New > Issue");
             ui.triggerEvent(new IssueCreatedEvent());
         });
-        newIssueMenuItem.setAccelerator(KeyboardShortcuts.NEW_ISSUE);
+        newIssueMenuItem.setAccelerator(NEW_ISSUE);
 
         MenuItem newLabelMenuItem = new MenuItem("Label");
         newLabelMenuItem.setOnAction(e -> {
             logger.info("Menu: New > Label");
             ui.triggerEvent(new LabelCreatedEvent());
         });
-        newLabelMenuItem.setAccelerator(KeyboardShortcuts.NEW_LABEL);
+        newLabelMenuItem.setAccelerator(NEW_LABEL);
 
         MenuItem newMilestoneMenuItem = new MenuItem("Milestone");
         newMilestoneMenuItem.setOnAction(e -> {
             logger.info("Menu: New > Milestone");
             ui.triggerEvent(new MilestoneCreatedEvent());
         });
-        newMilestoneMenuItem.setAccelerator(KeyboardShortcuts.NEW_MILESTONE);
+        newMilestoneMenuItem.setAccelerator(NEW_MILESTONE);
 
         return new MenuItem[] { newIssueMenuItem, newLabelMenuItem, newMilestoneMenuItem };
     }
