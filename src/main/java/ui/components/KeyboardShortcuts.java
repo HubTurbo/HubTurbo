@@ -132,7 +132,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
     
     private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
-        Map<Integer, KeyCodeCombination> result = Collections.unmodifiableMap(new HashMap<>());
+        Map<Integer, KeyCodeCombination> result = new HashMap<>();
         result.put(1, new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN));
         result.put(2, new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN));
         result.put(3, new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN));
@@ -142,7 +142,7 @@ public class KeyboardShortcuts {
         result.put(7, new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.CONTROL_DOWN));
         result.put(8, new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.CONTROL_DOWN));
         result.put(9, new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN));
-        return result;
+        return Collections.unmodifiableMap(result);
     }
     
     public static Map<String, String> getDefaultKeyboardShortcuts() {
