@@ -296,7 +296,7 @@ public class ListPanel extends FilterPanel {
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
             }
-            for (Map.Entry<Integer, KeyCodeCombination> entry:JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
                 if (entry.getValue().match(event)){
                     event.consume();
                     listView.selectNthItem(entry.getKey());
