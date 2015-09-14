@@ -31,7 +31,7 @@ public interface Repo {
     ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag);
     ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag);
 
-    List<TurboIssueEvent> getEvents(String repoId, int issueId);
+    ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId, int issueId, String eTag);
     List<Comment> getComments(String repoId, int issueId);
 
     boolean isRepositoryValid(String repoId);

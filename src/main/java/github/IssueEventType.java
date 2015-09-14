@@ -6,6 +6,7 @@ public enum IssueEventType {
     Closed,
     Reopened,
     Subscribed,
+    Unsubscribed,
     Merged,
     Referenced,
     Mentioned,

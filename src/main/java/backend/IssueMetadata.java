@@ -25,52 +25,66 @@ public class IssueMetadata {
         UPDATED_BY_SELF, UPDATED_BY_OTHER
     }
 
+    private final String eTag; // Only modified in the DownloadMetadataTask constructor
+
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
         events = new ArrayList<>();
         comments = new ArrayList<>();
+
         nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
         nonSelfCommentCount = 0;
         selfCommentCount = 0;
         isUpdatedByOthers = false;
         isUpdatedBySelf = false;
+
+        eTag = "";
     }
 
     // Copy constructor used in TurboIssue
     public IssueMetadata(IssueMetadata other) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
+
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount = other.selfCommentCount;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
+
+        this.eTag = other.eTag;
     }
 
     // Copy constructor used in reconciliation
     public IssueMetadata(IssueMetadata other, boolean isUpdated) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
+
         this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount  = other.selfCommentCount;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
+
+        this.eTag = other.eTag;
     }
 
     // Constructor used in DownloadMetadataTask
-    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments) {
+    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments, String eTag) {
         this.events = events;
         this.comments = comments;
+
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
         this.selfCommentCount = 0; // Not calculated yet
         this.isUpdatedByOthers = false;
         this.isUpdatedBySelf = false;
+
+        this.eTag = eTag;
     }
 
     // Constructor used in Logic
@@ -111,6 +125,7 @@ public class IssueMetadata {
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
 
+        this.eTag = existingMetadata.eTag;
     }
 
     private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
@@ -151,12 +166,15 @@ public class IssueMetadata {
     public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
+
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
         this.selfUpdatedAt = other.selfUpdatedAt;
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
         this.selfCommentCount = other.selfCommentCount;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
+
+        this.eTag = other.eTag;
     }
 
     //Constructor used in FilterEvalTests
@@ -165,12 +183,15 @@ public class IssueMetadata {
                          boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
+
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
         this.selfUpdatedAt = selfUpdatedAt;
         this.nonSelfCommentCount = nonSelfCommentCount;
         this.selfCommentCount = selfCommentCount;
         this.isUpdatedBySelf = isUpdatedBySelf;
         this.isUpdatedByOthers = isUpdatedByOthers;
+
+        this.eTag = "";
     }
 
     public String summarise() {
@@ -207,6 +228,10 @@ public class IssueMetadata {
 
     public boolean isUpdatedBySelf() {
         return isUpdatedBySelf;
+    }
+
+    public String getETag() {
+        return eTag;
     }
 
     @Override

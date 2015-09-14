@@ -23,6 +23,9 @@ public class DummyRepo implements Repo {
 
     private final HashMap<String, DummyRepoState> repoStates = new HashMap<>();
 
+    // Only decreases after API retrievals
+    private int apiQuota = 3500;
+
     public DummyRepo() {
         if (UI.events == null) {
             // UI isn't initialised
@@ -137,12 +140,18 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
-        return getRepoState(repoId).getEvents(issueId);
+    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents
+            (String repoId, int issueId, String currentETag) {
+        ImmutablePair<List<TurboIssueEvent>, String> result = getRepoState(repoId).getEvents(issueId, currentETag);
+
+        if (!result.getRight().equals(currentETag) || currentETag.length() == 0) apiQuota--;
+
+        return result;
     }
 
     @Override
     public List<Comment> getComments(String repoId, int issueId) {
+        apiQuota--;
         return getRepoState(repoId).getComments(issueId);
     }
 
@@ -157,12 +166,14 @@ public class DummyRepo implements Repo {
     }
 
     /**
-     * Presents reasonable defaults to the user.
+     * Presents reasonable default for reset time, as well as the API quota, to the user.
+     * The API quota only decreases when retrieving metadata from an issue updated since last retrieval.
      *
-     * @return 3500 remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
+     * @return Remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
      */
     @Override
     public ImmutablePair<Integer, Long> getRateLimitResetTime() {
-        return new ImmutablePair<>(3500, new Date().getTime() + 2700000);
+        return new ImmutablePair<>(apiQuota, new Date().getTime() + 2700000);
     }
+
 }

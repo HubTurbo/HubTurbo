@@ -242,6 +242,10 @@ public class TurboIssueEvent {
                 return conditionallyBold(bold, new Text(
                     String.format("%s subscribed to receive notifications for this issue %s.",
                         actorName, time)));
+            case Unsubscribed:
+                return conditionallyBold(bold, new Text(
+                    String.format("%s unsubscribed from notifications for this issue %s.",
+                        actorName, time)));
             case Mentioned:
                 return conditionallyBold(bold, new Text(
                     String.format("%s was mentioned %s.", actorName, time)));

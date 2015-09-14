@@ -31,11 +31,12 @@ public class GitHubEventsResponse {
 
     private GitHubResponse response;
     private ArrayList<TurboIssueEvent> turboIssueEvents;
+    private String updatedETag;
 
-    public GitHubEventsResponse(GitHubResponse response, InputStream jsonBody) {
+    public GitHubEventsResponse(GitHubResponse response, InputStream jsonBody, String updatedETag) {
         this.response = response;
         this.turboIssueEvents = new ArrayList<>();
-        parseEventParameters(jsonBody);
+        this.updatedETag = updatedETag;
     }
 
     @SuppressWarnings("unchecked")
@@ -97,6 +98,7 @@ public class GitHubEventsResponse {
                     // No need to do anything
                     break;
                 case Subscribed:
+                case Unsubscribed:
                 case Merged:
                 case HeadRefDeleted:
                 case HeadRefRestored:
@@ -114,5 +116,9 @@ public class GitHubEventsResponse {
 
     public ArrayList<TurboIssueEvent> getTurboIssueEvents() {
         return turboIssueEvents;
+    }
+
+    public String getUpdatedETag() {
+        return updatedETag;
     }
 }
