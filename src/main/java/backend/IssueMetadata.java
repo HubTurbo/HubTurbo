@@ -25,7 +25,7 @@ public class IssueMetadata {
         UPDATED_BY_SELF, UPDATED_BY_OTHER
     }
 
-    private final String ETag; // Only modified in the DownloadMetadataTask constructor
+    private final String eTag; // Only modified in the DownloadMetadataTask constructor
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
@@ -39,7 +39,7 @@ public class IssueMetadata {
         isUpdatedByOthers = false;
         isUpdatedBySelf = false;
 
-        ETag = "";
+        eTag = "";
     }
 
     // Copy constructor used in TurboIssue
@@ -54,7 +54,7 @@ public class IssueMetadata {
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
 
-        this.ETag = other.ETag;
+        this.eTag = other.eTag;
     }
 
     // Copy constructor used in reconciliation
@@ -69,11 +69,11 @@ public class IssueMetadata {
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
 
-        this.ETag = other.ETag;
+        this.eTag = other.eTag;
     }
 
     // Constructor used in DownloadMetadataTask
-    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments, String ETag) {
+    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments, String eTag) {
         this.events = events;
         this.comments = comments;
 
@@ -84,7 +84,7 @@ public class IssueMetadata {
         this.isUpdatedByOthers = false;
         this.isUpdatedBySelf = false;
 
-        this.ETag = ETag;
+        this.eTag = eTag;
     }
 
     // Constructor used in Logic
@@ -125,7 +125,7 @@ public class IssueMetadata {
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
 
-        this.ETag = existingMetadata.ETag;
+        this.eTag = existingMetadata.eTag;
     }
 
     private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
@@ -174,7 +174,7 @@ public class IssueMetadata {
         this.isUpdatedBySelf = other.isUpdatedBySelf;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
 
-        this.ETag = other.ETag;
+        this.eTag = other.eTag;
     }
 
     //Constructor used in FilterEvalTests
@@ -191,7 +191,7 @@ public class IssueMetadata {
         this.isUpdatedBySelf = isUpdatedBySelf;
         this.isUpdatedByOthers = isUpdatedByOthers;
 
-        this.ETag= "";
+        this.eTag = "";
     }
 
     public String summarise() {
@@ -231,7 +231,7 @@ public class IssueMetadata {
     }
 
     public String getETag() {
-        return ETag;
+        return eTag;
     }
 
     @Override
