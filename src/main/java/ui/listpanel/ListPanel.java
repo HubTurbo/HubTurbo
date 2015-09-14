@@ -2,6 +2,7 @@ package ui.listpanel;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import backend.interfaces.IModel;
@@ -9,6 +10,7 @@ import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -294,10 +296,10 @@ public class ListPanel extends FilterPanel {
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
             }
-            for (Integer nKey:JUMP_TO_NTH_ISSUE_KEYS.keySet()) {
-                if (JUMP_TO_NTH_ISSUE_KEYS.get(nKey).match(event)){
+            for (Map.Entry<Integer, KeyCodeCombination> entry:JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
                     event.consume();
-                    listView.selectNthItem(nKey);
+                    listView.selectNthItem(entry.getKey());
                     break;
                 }
             }
