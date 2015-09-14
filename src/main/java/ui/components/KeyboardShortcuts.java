@@ -10,6 +10,7 @@ import prefs.Preferences;
 import util.DialogMessage;
 
 import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -96,7 +97,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
-    public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpTonthIssueMap();
+    public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =
@@ -130,8 +131,8 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
     
-    private static Map<Integer, KeyCodeCombination> populateJumpTonthIssueMap() {
-        Map <Integer, KeyCodeCombination> result = new HashMap<>();
+    private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
+        Map<Integer, KeyCodeCombination> result = Collections.unmodifiableMap(new HashMap<>());
         result.put(1, new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN));
         result.put(2, new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN));
         result.put(3, new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN));

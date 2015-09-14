@@ -158,11 +158,11 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
             }
             if (FIRST_ISSUE.match(e)) {
                 e.consume();
-                selectnthItem(1);
+                selectNthItem(1);
             }
             if (LAST_ISSUE.match(e)) {
                 e.consume();
-                selectnthItem(getItems().size() - 1);
+                selectNthItem(getItems().size());
             }
         });
     }
@@ -188,9 +188,14 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         onItemSelected = callback;
     }
 
-    public void selectnthItem(int n) {
+    /**
+     * Selects the nth item in the navigable list.
+     * @param n - Nth item, indexing is 1-based (1st item would correspond to n = 1)
+     */
+
+    public void selectNthItem(int n) {
         requestFocus();
-        if (getItems().size() < n) return;
+        assert(getItems().size() < n);
         getSelectionModel().clearAndSelect(n - 1);
         scrollAndShow(n - 1);
         selectedIndex = Optional.of(n - 1);

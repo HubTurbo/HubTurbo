@@ -166,7 +166,7 @@ public class ListPanel extends FilterPanel {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (BOX_TO_LIST.match(event)) {
                 event.consume();
-                listView.selectnthItem(1);
+                listView.selectNthItem(1);
             }
             if (!DOUBLE_PRESS.match(event)) {
                 currentFilterText = Optional.of(getCurrentFilterString());
@@ -176,7 +176,7 @@ public class ListPanel extends FilterPanel {
                 if (currentFilterText.isPresent()) {
                     filterTextField.setText(currentFilterText.get());
                 }
-                listView.selectnthItem(1);
+                listView.selectNthItem(1);
             }
             if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
@@ -297,7 +297,8 @@ public class ListPanel extends FilterPanel {
             for (Integer nKey:JUMP_TO_NTH_ISSUE_KEYS.keySet()) {
                 if (JUMP_TO_NTH_ISSUE_KEYS.get(nKey).match(event)){
                     event.consume();
-                    listView.selectnthItem(nKey);
+                    listView.selectNthItem(nKey);
+                    break;
                 }
             }
         });
@@ -376,7 +377,7 @@ public class ListPanel extends FilterPanel {
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
-                listView.selectnthItem(1);
+                listView.selectNthItem(1);
             }
         });
     }
