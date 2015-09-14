@@ -114,6 +114,9 @@ public class MenuControlTest extends UITest {
         push(KeyCode.ENTER); // Opening Board "2"
         PlatformEx.waitOnFxThread();
         assertEquals(3, panelControl.getNumberOfPanels());
+
+        // Testing First Panel selected
+        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
         
         // Testing board open keyboard shortcut
         press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);

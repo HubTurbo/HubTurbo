@@ -44,7 +44,7 @@ public class PanelControl extends HBox {
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
-        ui.registerEvent((ShowRenamePanelEventHandler) e -> 
+        ui.registerEvent((ShowRenamePanelEventHandler) e ->
                 ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
 
         setupKeyEvents();
@@ -56,6 +56,7 @@ public class PanelControl extends HBox {
     public void init(GUIController guiController) {
         this.guiController = guiController;
         restorePanels();
+        selectFirstPanel();
     }
 
     public void updateModel(IModel newModel) {
@@ -114,6 +115,10 @@ public class PanelControl extends HBox {
         setCurrentlySelectedPanel(Optional.of(index));
         ui.showMainStage();
         return panel;
+    }
+
+    public void selectFirstPanel() {
+        setCurrentlySelectedPanel(Optional.of(0));
     }
 
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
