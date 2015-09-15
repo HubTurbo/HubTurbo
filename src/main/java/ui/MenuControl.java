@@ -188,6 +188,7 @@ public class MenuControl extends MenuBar {
                 prefs.setLastOpenBoard(boardName);
                 ui.triggerEvent(new BoardSavedEvent());
                 logger.info("New board " + boardName + " saved");
+                ui.updateTitle();
             }
         }
     }
@@ -208,8 +209,9 @@ public class MenuControl extends MenuBar {
 
         panels.closeAllPanels();
         panels.openPanels(panelInfo);
-        prefs.setLastOpenBoard(boardName);
         panels.selectFirstPanel();
+        prefs.setLastOpenBoard(boardName);
+        ui.updateTitle();
     }
 
     /**
@@ -234,6 +236,7 @@ public class MenuControl extends MenuBar {
             }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");
+            ui.updateTitle();
         } else {
             logger.info(boardName + " was not deleted");
         }

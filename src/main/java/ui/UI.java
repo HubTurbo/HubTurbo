@@ -268,7 +268,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void setupMainStage(Scene scene) {
-        mainStage.setTitle("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
+        updateTitle();
         mainStage.setScene(scene);
         mainStage.show();
         mainStage.setOnCloseRequest(e -> quit());
@@ -515,5 +515,12 @@ public class UI extends Application implements EventDispatcher {
     public void triggerNotificationAction() {
         notificationController.triggerNotificationAction();
     }
-
+    
+    public void updateTitle() {
+        String openBoard = prefs.getLastOpenBoard().orElse("none");
+        String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+                + " (%s)", openBoard);
+        mainStage.setTitle(title);
+    }
+    
 }
