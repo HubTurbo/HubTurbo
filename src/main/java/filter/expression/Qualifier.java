@@ -462,6 +462,9 @@ public class Qualifier implements FilterExpression {
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
                 break;
+            case "status":
+                comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
+                break;
             default:
                 // Doesn't match anything; assume it's a label group
                 isLabelGroup = true;

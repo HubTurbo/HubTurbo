@@ -1,15 +1,15 @@
 package backend.github;
 
+import backend.UserCredentials;
+import backend.interfaces.Repo;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
+import github.*;
+import github.update.*;
+
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import github.GitHubClientExtended;
-import github.IssueServiceExtended;
-import github.LabelServiceFixed;
-import github.TurboIssueEvent;
-import github.update.IssueUpdateService;
-import github.update.LabelUpdateService;
-import github.update.MilestoneUpdateService;
-import github.update.UpdateService;
-import github.update.UserUpdateService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -41,12 +41,7 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
-import backend.UserCredentials;
-import backend.interfaces.Repo;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
+
 public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
@@ -210,13 +205,16 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public List<TurboIssueEvent> getEvents(String repoId, int issueId) {
+    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId,
+                                                                         int issueId,
+                                                                         String currentETag) {
         try {
-            return issueService.getIssueEvents(RepositoryId.createFromId(repoId), issueId)
-                .getTurboIssueEvents();
+            GitHubEventsResponse eventsResponse = issueService.getIssueEvents(
+                    RepositoryId.createFromId(repoId), issueId, currentETag);
+            return new ImmutablePair<>(eventsResponse.getTurboIssueEvents(), eventsResponse.getUpdatedETag());
         } catch (IOException e) {
             HTLog.error(logger, e);
-            return new ArrayList<>();
+            return new ImmutablePair<>(new ArrayList<>(), currentETag);
         }
     }
 

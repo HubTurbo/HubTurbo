@@ -31,6 +31,13 @@ public class DummyRepoState {
     private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
     private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
 
+    // We store issueMetadata separately from issues so that metadata of issues returned by getUpdatedIssues/getIssues
+    // is empty. This is the case when interfacing with GitHub. (and then metadata gets retrieved separately from
+    // getEvents and getComments).
+    private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
+    // We keep track of issues that user has not gotten metadata from.
+    private HashSet<Integer> updatedMetadata = new HashSet<>();
+
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
 
@@ -94,12 +101,14 @@ public class DummyRepoState {
         ownComment.setCreatedAt(new Date());
         ownComment.setUser(new User().setLogin("test"));
         Comment[] ownComments = { ownComment };
-        issues.get(9).setMetadata(new IssueMetadata(
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(ownComments))
-        ));
         issues.get(9).setCommentCount(1);
         issues.get(9).setUpdatedAt(LocalDateTime.now());
+        issueMetadata.put(9, new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(ownComments)),
+                ""
+        ));
+        updatedMetadata.add(9);
 
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
@@ -112,12 +121,14 @@ public class DummyRepoState {
         dummyComment2.setUser(new User().setLogin("User 2"));
         dummyComment3.setUser(new User().setLogin("User 3"));
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
-        issues.get(10).setMetadata(new IssueMetadata(
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(dummyComments))
-        ));
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
+        issueMetadata.put(10, new IssueMetadata(
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(dummyComments)),
+                ""
+        ));
+        updatedMetadata.add(10);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -212,21 +223,30 @@ public class DummyRepoState {
         return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
     }
 
-    protected List<TurboIssueEvent> getEvents(int issueId) {
-        TurboIssue issueToGet = issues.get(issueId);
-        if (issueToGet != null) {
-            return issueToGet.getMetadata().getEvents();
+    protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId, String currentETag) {
+        if (updatedMetadata.contains(issueId)) {
+            IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+
+            // If updatedMetadata contains issue, its metaadata must also exist in the metadataOfIssue hashmap
+            assert metadataOfIssue != null;
+
+            // Remove issue from updatedMetadata so that next time metadata is retrievd, the same ETag
+            // will not be sent again unless more updates will have been introduced.
+            updatedMetadata.remove(issueId);
+
+            // Finally, return events as a proper array.
+            return new ImmutablePair<>(metadataOfIssue.getEvents(), UUID.randomUUID().toString());
         }
-        // Fail silently
-        return new ArrayList<>();
+        return new ImmutablePair<>(new ArrayList<>(), currentETag);
     }
 
     protected List<Comment> getComments(int issueId) {
-        TurboIssue issueToGet = issues.get(issueId);
-        if (issueToGet != null) {
-            return issueToGet.getMetadata().getComments();
+        IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+
+        if (metadataOfIssue != null) {
+            return metadataOfIssue.getComments();
         }
-        // Fail silently
+        // If not in the metadata hashmap yet, there are currently no comments for given issue.
         return new ArrayList<>();
     }
 
@@ -255,41 +275,24 @@ public class DummyRepoState {
         updatedUsers.put(toAdd.getLoginName(), toAdd);
     }
 
-    // Only updating of issues and milestones is possible. Labels and users are immutable.
-    protected TurboIssue updateIssue(int itemId, String updateText) {
-        TurboIssue issueToUpdate = issues.get(itemId);
+    public TurboIssue updateIssue(int issueId, String updateText) {
+        // Get copies of issue itself and its metadata
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toRename = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
 
-        if (issueToUpdate != null) {
-            return renameIssue(issueToUpdate, updateText);
-        }
-        return null;
-    }
-
-    private TurboIssue renameIssue(TurboIssue issueToUpdate, String updateText) {
-        // Not allowed to mutate issueToUpdate itself as it introduces immediate changes in the GUI.
-        TurboIssue updatedIssue = new TurboIssue(issueToUpdate);
-
-        updatedIssue.setTitle(updateText);
-
-        // Add renamed event to events list of issue
-        List<TurboIssueEvent> eventsOfIssue = updatedIssue.getMetadata().getEvents();
-        // Not deep copy as the same TurboIssueEvent objects of issueToUpdate are the TurboIssueEvents
-        // of updatedIssue. Might create problems later if eventsOfIssue are to be mutable after downloading
-        // from repo (which should not be the case).
-        // (but this approach works if the metadata of the issue is not modified, which is the current case)
-        // TODO make TurboIssueEvent immutable
+        // Mutate the copies
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                 IssueEventType.Renamed,
                 new Date()));
-        List<Comment> commentsOfIssue = updatedIssue.getMetadata().getComments();
-        updatedIssue.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
-        updatedIssue.setUpdatedAt(LocalDateTime.now());
+        toRename.setTitle(updateText);
+        toRename.setUpdatedAt(LocalDateTime.now());
 
-        // Add to list of updated issues, and replace issueToUpdate in main issues store.
-        updatedIssues.put(updatedIssue.getId(), updatedIssue);
-        issues.put(updatedIssue.getId(), updatedIssue);
+        // Replace originals with copies, and queue them up to be retrieved
+        markUpdatedIssue(toRename, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), ""));
 
-        return issueToUpdate;
+        return toRename;
     }
 
     protected TurboMilestone updateMilestone(int itemId, String updateText) {
@@ -334,11 +337,13 @@ public class DummyRepoState {
     }
 
     protected List<Label> setLabels(int issueId, List<String> labels) {
-        TurboIssue toSet = new TurboIssue(issues.get(issueId));
+        // Get copies of issue itself and its metadata
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toSet = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
 
-        // Update issue events
-        List<TurboIssueEvent> eventsOfIssue = toSet.getMetadata().getEvents();
-        // TODO change to expression lambdas
+        // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
         labelsOfIssue.forEach(labelName ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
@@ -350,43 +355,72 @@ public class DummyRepoState {
                         IssueEventType.Labeled,
                         new Date()).setLabelName(labelName))
         );
-        List<Comment> commentsOfIssue = toSet.getMetadata().getComments();
-        toSet.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
+        toSet.setLabels(labels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
-        // Actually setting label is done after updating issue events
-        toSet.setLabels(labels);
-
-        // Then update the relevant state arrays to reflect changes in UI
-        issues.put(issueId, toSet);
-        updatedIssues.put(issueId, toSet);
+        // Replace originals with copies, and queue them up to be retrieved
+        markUpdatedIssue(toSet, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), ""));
 
         return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {
-        // Copy constructor used so that changes in the GUI are not introduced immediately
-        TurboIssue toComment = new TurboIssue(issues.get(issueId));
+        // Get copies of issue itself and its metadata
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toComment = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<Comment> commentsOfIssue = metadataOfIssue.getComments();
 
-        List<TurboIssueEvent> eventsOfIssue = toComment.getMetadata().getEvents();
-
-        // Again, to prevent immediate changes, we create a new arraylist from comments
-        List<Comment> commentsOfIssue = new ArrayList<>(toComment.getMetadata().getComments());
+        // Mutate the copies
         Comment toAdd = new Comment();
         toAdd.setBody(commentText);
         toAdd.setCreatedAt(new Date());
         toAdd.setUser(new User().setLogin(author));
         commentsOfIssue.add(toAdd);
-
-        toComment.setMetadata(new IssueMetadata(eventsOfIssue, commentsOfIssue));
         toComment.setUpdatedAt(LocalDateTime.now());
         toComment.setCommentCount(toComment.getCommentCount() + 1);
 
-        // Add to list of updated issues, and replace issueToUpdate in main issues store.
-        updatedIssues.put(toComment.getId(), toComment);
-        issues.put(toComment.getId(), toComment);
+        // Replace originals with copies, and queue them up to be retrieved
+        markUpdatedIssue(toComment, new IssueMetadata(metadataOfIssue.getEvents(), commentsOfIssue, ""));
 
         return toComment;
+    }
+
+    /**
+     * Auxiliary method to retrieve a copy of the issue with the given ID, as well as a copy of its metadata.
+     * The copying process ensures that changes to the issue database does not instantly propagate to the UI.
+     *
+     * @param issueId The ID of the issue to mutate
+     * @return Copy of the given issue and its metadata
+     */
+    private ImmutablePair<TurboIssue, IssueMetadata> produceMutables(int issueId) {
+        TurboIssue toMutate = new TurboIssue(issues.get(issueId));
+
+        IssueMetadata metadataOfIssue = issueMetadata.get(toMutate.getId());
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue != null ?
+                metadataOfIssue.getEvents() :
+                new ArrayList<>();
+        List<Comment> commentsOfIssue = metadataOfIssue != null ?
+                metadataOfIssue.getComments() :
+                new ArrayList<>();
+
+        return new ImmutablePair<>(toMutate, new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
+    }
+
+    /**
+     * Auxiliary method that replaces original issue/metadata with the mutated copies after updating the issue.
+     * Simulates the event of an user action causing the ETag of the issue to change.
+     *
+     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
+     */
+    private void markUpdatedIssue(TurboIssue toMark, IssueMetadata toInsert) {
+        int issueId = toMark.getId();
+
+        issues.put(issueId, toMark);
+        updatedIssues.put(issueId, toMark);
+        issueMetadata.put(issueId, toInsert);
+        updatedMetadata.add(issueId);
     }
 
 }
