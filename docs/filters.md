@@ -244,7 +244,15 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, `assignee` or a label group. Label groups can be disambiguated by appending a `.`.*
+*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of*
+- `comments` : shows issues with most comments first
+- `repo` : sorts issues by repo. This will only work if issues from more than one repo are loaded.
+- `updated` (or `date`) : shows issues according to their updated time in ascending order
+- `id` : shows issues in ascending order of ids
+- `assignee` : shows issues by assignees in alphabetical order
+- `priority` :issues within the group by name (high, low, etc.) in alphabetical order
+- `status` : shows `open` issues first followed by `closed` issues
+- label group : Label groups can be disambiguated by appending a `.`.
 
 Sorts a repository by the list of keys, going from left to right. Negated keys will reverse the ordering that they describe.
 
