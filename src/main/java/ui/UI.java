@@ -69,7 +69,6 @@ public class UI extends Application implements EventDispatcher {
     public static StatusUI status;
     public static EventDispatcher events;
     public EventBus eventBus;
-    private HashMap<String, String> commandLineArgs;
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
@@ -95,7 +94,7 @@ public class UI extends Application implements EventDispatcher {
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
-        login(isBypassLogin());
+        login(TestController.isBypassLogin());
     }
 
     private void login(boolean isBypassLogin) {
@@ -148,8 +147,8 @@ public class UI extends Application implements EventDispatcher {
 
         triggerEvent(new BoardSavedEvent()); // Initializes boards
 
-        if (isTestMode()) {
-            if (isTestChromeDriver()) {
+        if (TestController.isTestMode()) {
+            if (TestController.isTestChromeDriver()) {
                 browserComponent = new BrowserComponent(this, true);
                 browserComponent.initialise();
             } else {
@@ -182,12 +181,12 @@ public class UI extends Application implements EventDispatcher {
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
             logger.error(throwable.getMessage(), throwable));
 
-        commandLineArgs = initialiseCommandLineArguments();
-        prefs = new Preferences(isTestMode());
+        TestController.setUI(this, getParameters());
+        prefs = new Preferences(TestController.isTestMode());
         KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
-        if (isTestMode()) {
+        if (TestController.isTestMode()) {
             registerTestEvents();
         }
         registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
@@ -199,7 +198,7 @@ public class UI extends Application implements EventDispatcher {
     private void initApplicationState() {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
-        logic = new Logic(uiManager, prefs, isTestMode(), isTestJSONEnabled());
+        logic = new Logic(uiManager, prefs, TestController.isTestMode(), TestController.isTestJSONEnabled());
         clearCacheIfNecessary();
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
@@ -227,54 +226,15 @@ public class UI extends Application implements EventDispatcher {
         applyCSS(css, scene);
     }
 
-    // Test mode should only be run as a test task (Gradle / JUnit), as quit()
-    // leaves the JVM alive during test mode (which is cleaned up by Gradle).
-    // Manually feeding --test=true into the command line arguments will leave the JVM
-    // running after the HT window has been closed, and thus will require the
-    // process to be closed manually afterwards (Force Quit / End Process).
-    public boolean isTestMode() {
-        return commandLineArgs.getOrDefault("test", "false").equalsIgnoreCase("true") ||
-                isBypassLogin() ||
-                isTestJSONEnabled() ||
-                isTestChromeDriver() ||
-                isTestGlobalConfig() ||
-                isCloseOnQuit();
-    }
-
-    // Public for use in LoginDialog
-    public boolean isTestGlobalConfig() {
-        return commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
-    }
-
-    // When --bypasslogin=true is passed as an argument, the username and password
-    // are empty strings.
-    private boolean isBypassLogin() {
-        return commandLineArgs.getOrDefault("bypasslogin", "false").equalsIgnoreCase("true");
-    }
-
-    private boolean isTestJSONEnabled() {
-        return commandLineArgs.getOrDefault("testjson", "false").equalsIgnoreCase("true");
-    }
-
-    private boolean isTestChromeDriver() {
-        return commandLineArgs.getOrDefault("testchromedriver", "false").equalsIgnoreCase("true");
-    }
-
-    // Used for test mode to shutdown jvm on quit (not used for ci/tests because that will cause
-    // tests to fail).
-    private boolean isCloseOnQuit() {
-        return commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
-    }
-
     public void quit() {
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
-        if (!isTestMode() || isTestGlobalConfig()) {
+        if (!TestController.isTestMode() || TestController.isTestGlobalConfig()) {
             panels.saveSession();
             prefs.saveGlobalConfig();
         }
-        if (!isTestMode() || isCloseOnQuit()) {
+        if (!TestController.isTestMode() || TestController.isCloseOnQuit()) {
             Platform.exit();
             System.exit(0);
         }
@@ -337,11 +297,6 @@ public class UI extends Application implements EventDispatcher {
         if (PlatformSpecific.isOnWindows()) {
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
         }
-    }
-
-    private HashMap<String, String> initialiseCommandLineArguments() {
-        Parameters params = getParameters();
-        return new HashMap<>(params.getNamed());
     }
 
     private Parent createRootNode() {
@@ -466,7 +421,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public HashMap<String, String> getCommandLineArgs() {
-        return commandLineArgs;
+        return TestController.getCommandLineArgs();
     }
 
     private RepositorySelector createRepoSelector() {

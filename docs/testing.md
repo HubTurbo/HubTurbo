@@ -18,6 +18,10 @@ Most GUI Tests extend [`UITest`](../src/test/java/guitests/UITest.java) which in
 - Override `launchApp` to define your own program arguments for the test
 - Override `setupMethod` to add any pre-test configuration/setup before the stage is launched
 
+**Interacting with the `UI`**
+
+The [`TestController`](../src/main/java/ui/TestController.java) class allows tests to call the `UI` instance through `TestController.getUI()`. 
+
 **Interacting with the `Stage`**
 
 Subclasses of the JavaFX [`Node`](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/Node.html) can be referenced via their id (similar to a HTML id attribute). A `Node`'s id is set using `setId("<id>")`, and it can then be selected using `find("#<id>")`, and interacted with using `click("#<id>")`.

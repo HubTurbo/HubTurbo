@@ -364,4 +364,37 @@ public class SortQualifierTests {
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
     }
+    
+    @Test
+    public void statusOrdering() {
+        List<TurboIssue> issues = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            TurboIssue issue = new TurboIssue(FilterEvalTests.REPO, i, "");
+            if (i < 4) {
+                issue.setOpen(true);
+            } else {
+                issue.setOpen(false);
+            }
+            issues.add(issue);
+        }
+        IModel model = TestUtils.singletonModel(
+                new Model(FilterEvalTests.REPO, issues,
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+
+        List<TurboIssue> renderedIssues = new ArrayList<>(issues);
+
+        Collections.sort(renderedIssues,
+                Qualifier.getSortComparator(model, "status", false, false));
+        
+        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
+                .map(TurboIssue::getId)
+                .collect(Collectors.toList()));
+        
+        Collections.sort(renderedIssues,
+                Qualifier.getSortComparator(model, "status", true, false));
+        
+        assertEquals(Arrays.asList(4, 5, 6, 7, 0, 1, 2, 3), renderedIssues.stream()
+                .map(TurboIssue::getId)
+                .collect(Collectors.toList()));
+    }
 }
