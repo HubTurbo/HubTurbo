@@ -1,5 +1,18 @@
 # Changelog
 
+# V3.6.0
+
+- Label picker changes are now delayed and can be undone
+- Issues can be sorted by status
+- Issues can be filtered more precisely by self/non-self updates
+- Open repositories can be closed
+- The title bar now shows the name of the currently-open board
+- Issue metadata ETags are now saved, optimising quota use
+- Fixed bug where issues would become unread after a self update
+- Fixed bug where unread issues would appear as read
+- Fixed bug where the first panel did not always have focus on startup
+- Additional testing infrastructure
+
 # V3.5.1
 
 - Reverted addition of Chrome custom profile
