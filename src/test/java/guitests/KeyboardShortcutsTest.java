@@ -85,7 +85,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(7, selectedIssueId);
         clearSelectedIssueId();
         push(KeyCode.ESCAPE);
-        press(KeyCode.CONTROL).press(KeyCode.DIGIT5)..release(KeyCode.CONTROL).release(KeyCode.DIGIT5);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT5).release(KeyCode.CONTROL).release(KeyCode.DIGIT5);
         PlatformEx.waitOnFxThread();
         assertEquals(6, selectedIssueId);
         clearSelectedIssueId();
@@ -105,7 +105,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(3, selectedIssueId);
         clearSelectedIssueId();
         push(KeyCode.ESCAPE);
-        press(KeyCode.CONTROL).press(KeyCode.DIGIT9)release(KeyCode.CONTROL).release(KeyCode.DIGIT9).;
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT9).release(KeyCode.CONTROL).release(KeyCode.DIGIT9);
         PlatformEx.waitOnFxThread();
         assertEquals(2, selectedIssueId);
         clearSelectedIssueId();
