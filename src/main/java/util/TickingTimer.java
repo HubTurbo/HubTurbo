@@ -153,4 +153,9 @@ public class TickingTimer {
         }
         logger.info("Successfully stopped TickingTimer " + name);
     }
+
+    public boolean isStarted() {
+        return started;
+    }
+
 }
