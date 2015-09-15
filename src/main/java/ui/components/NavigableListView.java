@@ -195,7 +195,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     public void selectNthItem(int n) {
         requestFocus();
-        assert(getItems().size() >= n);
+        assert n <= getItems().size() && n > 0;
         getSelectionModel().clearAndSelect(n - 1);
         scrollAndShow(n - 1);
         selectedIndex = Optional.of(n - 1);
