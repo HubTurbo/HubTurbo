@@ -108,6 +108,8 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`is`](#is)
 - [`created`](#created)
 - [`updated`](#updated)
+- [`updated-others`](#updated-others)
+- [`updated-self`](#updated-self)
 - [`repo`](#repo)
 - [`sort`](#sort)
 
@@ -220,7 +222,19 @@ Matches issues which were created on a given date, or within a given date range.
 
 *Expects a number or  number range*
 
-Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`.
+Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`. Number ranges are written using a relational operator (.e.g `>5`, `<=10`).
+
+### updated-others
+
+*Expects a number or  number range*
+
+Like [`updated`](#updated), but considers only issues updated by others (not the logged in user).
+
+### updated-self
+
+*Expects a number or  number range*
+
+Like [`updated`](#updated), but considers only issues updated by the logged in user.
 
 ### repo
 
@@ -230,7 +244,7 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, `assignee` or a label group. Label groups can be disambiguated by appending a `.`.*
+*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, `assignee`, `status`(`open` or `closed`) or a label group. Label groups can be disambiguated by appending a `.`.*
 
 Sorts a repository by the list of keys, going from left to right. Negated keys will reverse the ordering that they describe.
 

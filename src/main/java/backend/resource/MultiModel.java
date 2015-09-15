@@ -72,7 +72,6 @@ public class MultiModel implements IModel {
     }
 
     public synchronized MultiModel replace(List<Model> newModels) {
-        preprocessUpdatedIssues(newModels);
         this.models.clear();
         newModels.forEach(this::add);
         return this;
@@ -82,9 +81,12 @@ public class MultiModel implements IModel {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
                 IssueMetadata toBeInserted = metadata.get(issue.getId());
-                LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
-                        issue.getCreatedAt(), currentUser, issue.getCreator());
-                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
+                // Only set new metadata if ETag is different
+                if (!toBeInserted.getETag().equals(issue.getMetadata().getETag())) {
+                    LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
+                            issue.getCreatedAt(), currentUser, issue.getCreator());
+                    issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
+                }
             }
         });
     }
@@ -200,33 +202,6 @@ public class MultiModel implements IModel {
         for (TurboIssue issue : model.getIssues()) {
             Optional<LocalDateTime> time = prefs.getMarkedReadAt(model.getRepoId(), issue.getId());
             issue.setMarkedReadAt(time);
-            issue.setIsCurrentlyRead(time.isPresent());
-        }
-    }
-
-    /**
-     * Called on existing models that are updated.
-     * Mutates TurboIssues with meta-information.
-     * @param newModels
-     */
-    private void preprocessUpdatedIssues(List<Model> newModels) {
-        // Updates preferences with the results of issues that have been updated after a refresh.
-        // This makes read issues show up again.
-        for (Model model : newModels) {
-            assert models.containsKey(model.getRepoId());
-            Model existingModel = models.get(model.getRepoId());
-            if (!existingModel.getIssues().equals(model.getIssues())) {
-                // Find issues that have changed and update preferences with them
-                for (int i = 1; i <= model.getIssues().size(); i++) {
-                    // TODO O(n^2), optimise by preprocessing into a map or sorting
-                    if (!existingModel.getIssueById(i).equals(model.getIssueById(i))) {
-                        assert model.getIssueById(i).isPresent();
-                        // It's no longer currently read, but it retains its updated time.
-                        // No changes to preferences.
-                        model.getIssueById(i).get().setIsCurrentlyRead(false);
-                    }
-                }
-            }
         }
     }
 

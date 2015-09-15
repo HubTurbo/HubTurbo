@@ -5,8 +5,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import ui.components.KeyboardShortcuts;
 import util.Utility;
+
+import static ui.components.KeyboardShortcuts.REMOVE_FOCUS;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,7 +56,7 @@ public class RepositorySelector extends HBox {
         //remove focus from the repo selector
         comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
             event.consume();
-            if (KeyboardShortcuts.REMOVE_FOCUS.match(event)) {
+            if (REMOVE_FOCUS.match(event)) {
                 getParent().requestFocus();
             }
         });

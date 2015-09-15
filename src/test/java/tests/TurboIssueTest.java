@@ -6,12 +6,17 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TurboIssueTest {
+    private static String REPO = "testrepo/testrepo";
 
     @Test
     public void turboIssueTest() {
@@ -29,6 +34,27 @@ public class TurboIssueTest {
         assertEquals("test_user", turboIssue.getCreator());
         assertEquals(true, turboIssue.isOpen());
         assertEquals("test label", turboIssue.getLabels().get(0));
+    }
+
+    /**
+     * Tests TurboIssue's isCurrentRead method
+     */
+    @Test
+    public void testReadState() {
+        TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, false);
+
+        // An issue is not read if it doesn't record any markedReadAt time
+        assertFalse(issue.isCurrentlyRead());
+
+        // An issue is not read if its markedAsRead time is before its updatedAt time
+        issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
+        assertFalse(issue.isCurrentlyRead());
+
+        // An issue is marked as read if its markedAsRead time is after its updated Time
+        issue.setUpdatedAt(LocalDateTime.of(2015, 1, 1, 1, 1));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
+        assertTrue(issue.isCurrentlyRead());
     }
 
 }

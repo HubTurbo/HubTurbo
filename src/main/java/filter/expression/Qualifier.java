@@ -2,6 +2,7 @@ package filter.expression;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -19,18 +20,24 @@ import filter.QualifierApplicationException;
 
 public class Qualifier implements FilterExpression {
 
-    public static final String UPDATED = "updated";
     public static final String REPO = "repo";
     public static final String SORT = "sort";
+    public static final String UPDATED = "updated";
+    public static final String UPDATED_BY_OTHERS = "updated-others";
+
+    private enum UpdatedKind{
+        SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
+    }
 
     public static final Qualifier EMPTY = new Qualifier("", "");
 
     public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
         "assignees", "author", "body", "closed", "comments", "created", "creator",
-        "date", "nonSelfUpdate", "desc", "description", "has", "id", "in", "involves",
+        "date", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
-        "no", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
-        "title", "type", "unmerged", "unread", "updated", "user"
+        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
+        "title", "type", "unmerged", "unread", "updated", "updated-others",
+        "updated-self", "user"
     ));
 
     private final String name;
@@ -148,6 +155,12 @@ public class Qualifier implements FilterExpression {
         }
     }
 
+    public static boolean qualifierNamesHaveUpdatedQualifier(FilterExpression expression){
+        List<String> filterQualifierNames = expression.getQualifierNames();
+        return (filterQualifierNames.contains(UPDATED) ||
+                filterQualifierNames.contains(UPDATED_BY_OTHERS));
+    }
+
     /**
      * For testing. Stubs the current time so time-related qualifiers work properly.
      */
@@ -203,7 +216,11 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case "updated":
-            return satisfiesUpdatedHours(issue);
+            return satisfiesUpdatedHours(issue, UpdatedKind.ALL_UPDATED);
+        case "updated-others":
+            return satisfiesUpdatedHours(issue, UpdatedKind.OTHER_UPDATED);
+        case "updated-self":
+            return satisfiesUpdatedHours(issue, UpdatedKind.SELF_UPDATED);
         case "repo":
             return satisfiesRepo(issue);
         default:
@@ -445,6 +462,9 @@ public class Qualifier implements FilterExpression {
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
                 break;
+            case "status":
+                comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
+                break;
             default:
                 // Doesn't match anything; assume it's a label group
                 isLabelGroup = true;
@@ -524,7 +544,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue) {
+    private boolean satisfiesUpdatedHours(TurboIssue issue, UpdatedKind updatedKind) {
         NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
@@ -535,18 +555,32 @@ public class Qualifier implements FilterExpression {
             return false;
         }
 
-        int hoursSinceUpdate;
+        LocalDateTime dateOfUpdate = null;
 
-        if (issue.getMetadata().isUpdated()) {
-            // Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt.
-            hoursSinceUpdate = Utility.safeLongToInt(issue.getMetadata().getNonSelfUpdatedAt()
-                    .until(getCurrentTime(), ChronoUnit.HOURS));
-        } else {
-            // First time being filtered (haven't gotten metadata from source yet).
-            hoursSinceUpdate = Utility.safeLongToInt(issue.getUpdatedAt().until(getCurrentTime(), ChronoUnit.HOURS));
+        //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
+        //and getSelfUpdatedAt
+        switch (updatedKind){
+            case SELF_UPDATED:
+                if (issue.getMetadata().isUpdatedBySelf()) {
+                    dateOfUpdate = issue.getMetadata().getSelfUpdatedAt();
+                }
+                break;
+            case OTHER_UPDATED:
+                if (issue.getMetadata().isUpdatedByOthers()) {
+                    dateOfUpdate = issue.getMetadata().getNonSelfUpdatedAt();
+                }
+                break;
+            case ALL_UPDATED:
+                // The or condition for dateOfUpdate is for first time check
+                dateOfUpdate = issue.getUpdatedAt();
         }
 
-        return updatedRange.encloses(hoursSinceUpdate);
+        if (dateOfUpdate == null) {
+            return false;
+        } else {
+            int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+            return updatedRange.encloses(hoursSinceUpdate);
+        }
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {

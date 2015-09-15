@@ -140,13 +140,17 @@ public class IssueServiceExtended extends IssueService{
     }
 
     /**
-     * Retrieves a list of all issue events.
-     * @param user
-     * @param repository
+     * Retrieves a list of issue events together with the new ETag if the events are updated,
+     * and an empty list with the current ETag if there are no new events.
+     *
+     * @param repository The repository from which to retrieve the issue
+     * @param issueId The numeric ID of the issue
+     * @param eTag The eTag to be added to the request header
      * @return list of issue events
      * @throws IOException
      */
-    public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId) throws IOException {
+    public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId, String eTag)
+            throws IOException {
         GitHubRequest request = createRequest();
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repository.generateId());
@@ -155,7 +159,7 @@ public class IssueServiceExtended extends IssueService{
         uri.append(SEGMENT_EVENTS);
         request.setUri(uri);
         request.setType(IssueEvent[].class);
-        GitHubEventsResponse response = ghClient.getEvent(request);
+        GitHubEventsResponse response = ghClient.getEvent(request, eTag);
         return response;
     }
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import backend.IssueMetadata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -410,12 +411,14 @@ public class FilterEvalTests {
         assertEquals(true, matches("is:unread", issue));
         assertEquals(false, matches("is:read", issue));
 
-        issue.setMarkedReadAt(Optional.of(LocalDateTime.now()));
+        issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
         assertEquals(true, matches("is:unread", issue));
         assertEquals(false, matches("is:read", issue));
 
-        issue.setIsCurrentlyRead(true);
+        issue.setUpdatedAt(LocalDateTime.of(2015, 1, 1, 1, 1));
+        issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
         assertEquals(false, matches("is:unread", issue));
         assertEquals(true, matches("is:read", issue));
@@ -433,6 +436,44 @@ public class FilterEvalTests {
     }
 
     @Test
+    public void updatedBySelfAndOther(){
+        LocalDateTime now = LocalDateTime.now();
+        Qualifier.setCurrentTime(now);
+        TurboIssue issueUpdated = new TurboIssue(REPO, 1, "");
+        IssueMetadata updatedByOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, true, false); //UpdatedByOther true with updated time 4 hours ago.
+        issueUpdated.setMetadata(updatedByOtherMetadata);
+        assertEquals(false, matches("updated-others:<2", issueUpdated));
+        assertEquals(false, matches("updated-self:<2", issueUpdated));
+        assertEquals(true, matches("updated-others:<=4", issueUpdated));
+        assertEquals(false, matches("updated-self:<=4", issueUpdated));
+
+        IssueMetadata updatedBySelfAndOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, true, true); //UpdatedByOther and UpdatedBySelf true with updated time 4 hours.
+        issueUpdated.setMetadata(updatedBySelfAndOtherMetadata);
+        assertEquals(false, matches("updated-others:<2", issueUpdated));
+        assertEquals(false, matches("updated-self:<2", issueUpdated));
+        assertEquals(true, matches("updated-others:<=4", issueUpdated));
+        assertEquals(true, matches("updated-self:<=4", issueUpdated));
+
+        IssueMetadata updatedBySelfMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, false, true); //UpdatedBySelf true with updated time 4 hours ago.
+        issueUpdated.setMetadata(updatedBySelfMetadata);
+        assertEquals(false, matches("updated-others:<2", issueUpdated));
+        assertEquals(false, matches("updated-self:<2", issueUpdated));
+        assertEquals(false, matches("updated-others:<=4", issueUpdated));
+        assertEquals(true, matches("updated-self:<=4", issueUpdated));
+
+        IssueMetadata updatedByNoneMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
+                now.minusHours(4), 2, 2, false, false); //UpdatedBySelf and UpdatedByOthers both false.
+        issueUpdated.setMetadata(updatedByNoneMetadata);
+        assertEquals(false, matches("updated-others:<2", issueUpdated));
+        assertEquals(false, matches("updated-self:<2", issueUpdated));
+        assertEquals(false, matches("updated-others:<=4", issueUpdated));
+        assertEquals(false, matches("updated-self:<=4", issueUpdated));
+    }
+
+    @Test
     public void updated() {
         LocalDateTime now = LocalDateTime.now();
         Qualifier.setCurrentTime(now);
@@ -443,6 +484,7 @@ public class FilterEvalTests {
         assertEquals(false, matches("updated:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
+        System.out.println(issue.getUpdatedAt());
         assertEquals(true, matches("updated:>24", issue));
         assertEquals(false, matches("updated:nondate", issue));
 

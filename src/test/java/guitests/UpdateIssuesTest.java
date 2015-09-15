@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
@@ -15,10 +16,9 @@ import static org.junit.Assert.assertEquals;
 
 public class UpdateIssuesTest extends UITest {
 
-    private static final int EVENT_DELAY = 500;
-
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
+        Label apiBox = find("#apiBox");
         resetRepo();
 
         click("#dummy/dummy_col0_filterTextField");
@@ -26,39 +26,45 @@ public class UpdateIssuesTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("24");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
 
-        // Updated view should contain Issue 10, which was commented on recently (as part of default test dataset)
-        // Issue 9 was also commented on recently, but by the current HT user, so it is not shown.
-        assertEquals(1, countIssuesShown());
+        // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
+        assertEquals(2, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1");
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
 
-        // Updated view should now contain Issue 5.1 and Issue 10.
-        assertEquals(2, countIssuesShown());
+        // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
+        assertEquals(3494, getApiCount(apiBox.getText())); // 2 calls for Issue 5
+        assertEquals(3, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
+        assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
         assertEquals(3, countIssuesShown());
+
+        click("#dummy/dummy_col0_filterTextField");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(3492, getApiCount(apiBox.getText())); // No change to issues, so no additional API quota spent
     }
 
     public void resetRepo() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.resetRepo("dummy/dummy"));
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
     }
 
     public void updateIssue(int issueId, String newIssueTitle) {
         UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", issueId, newIssueTitle));
         UI.events.triggerEvent(new UILogicRefreshEvent());
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
     }
 
     @SuppressWarnings("unchecked")
@@ -66,5 +72,9 @@ public class UpdateIssuesTest extends UITest {
         FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         return (int) countIssues.get();
+    }
+
+    private int getApiCount(String apiBoxText) {
+        return Integer.parseInt(apiBoxText.substring(0, apiBoxText.indexOf("/")));
     }
 }

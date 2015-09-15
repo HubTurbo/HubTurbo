@@ -1,5 +1,9 @@
 package ui.listpanel;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
+
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -8,9 +12,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
+import ui.TestController;
 import ui.UI;
-import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
+import ui.components.IssueListView;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.KeyPress;
@@ -18,11 +23,27 @@ import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-
+import static ui.components.KeyboardShortcuts.BOX_TO_LIST;
+import static ui.components.KeyboardShortcuts.LIST_TO_BOX;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
+import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
+import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
+import static ui.components.KeyboardShortcuts.GOTO_MODIFIER;
+import static ui.components.KeyboardShortcuts.SHOW_DOCS;
+import static ui.components.KeyboardShortcuts.SHOW_CONTRIBUTORS;
+import static ui.components.KeyboardShortcuts.SHOW_HELP;
+import static ui.components.KeyboardShortcuts.SHOW_ISSUES;
+import static ui.components.KeyboardShortcuts.SHOW_LABELS;
+import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
+import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
+import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS;
+import static ui.components.KeyboardShortcuts.NEW_COMMENT;
+import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
+import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 public class ListPanel extends FilterPanel {
 
     private final IModel model;
@@ -60,8 +81,9 @@ public class ListPanel extends FilterPanel {
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
+
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (currentFilterExpression.getQualifierNames().contains(Qualifier.UPDATED) && hasMetadata) {
+        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
@@ -124,6 +146,8 @@ public class ListPanel extends FilterPanel {
         setupContextMenu();
 
         listView.setOnItemSelected(i -> {
+            updateContextMenu(contextMenu);
+
             TurboIssue issue = listView.getItems().get(i);
             ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
@@ -142,33 +166,33 @@ public class ListPanel extends FilterPanel {
 
     private void setupKeyboardShortcuts() {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (KeyboardShortcuts.BOX_TO_LIST.match(event)) {
+            if (BOX_TO_LIST.match(event)) {
                 event.consume();
                 listView.selectFirstItem();
             }
-            if (!KeyboardShortcuts.DOUBLE_PRESS.match(event)) {
+            if (!DOUBLE_PRESS.match(event)) {
                 currentFilterText = Optional.of(getCurrentFilterString());
             }
-            if (KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS.getCode(), event.getCode())) {
+            if (KeyPress.isDoublePress(DOUBLE_PRESS.getCode(), event.getCode())) {
                 event.consume();
                 if (currentFilterText.isPresent()) {
                     filterTextField.setText(currentFilterText.get());
                 }
                 listView.selectFirstItem();
             }
-            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
+            if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
+            if (MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
+            if (DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
-            if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
+            if (SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
             }
-            if (KeyboardShortcuts.SWITCH_BOARD.match(event)) {
+            if (SWITCH_BOARD.match(event)) {
                 ui.getMenuControl().switchBoard();
             }
         });
@@ -180,39 +204,38 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.markAsUnread.match(event)) {
                 markAsUnread();
             }
-            if (KeyboardShortcuts.SHOW_DOCS.match(event)) {
+            if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (KeyboardShortcuts.LIST_TO_BOX.match(event)) {
+            if (LIST_TO_BOX.match(event)) {
                 setFocusToFilterBox();
             }
-            if (KeyboardShortcuts.DOUBLE_PRESS.match(event)
-                && KeyPress.isDoublePress(KeyboardShortcuts.DOUBLE_PRESS.getCode(), event.getCode())) {
-
+            if (DOUBLE_PRESS.match(event)
+                && KeyPress.isDoublePress(DOUBLE_PRESS.getCode(), event.getCode())) {
                 setFocusToFilterBox();
             }
-            if (KeyboardShortcuts.SHOW_ISSUES.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_ISSUES.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showIssues();
                 }
             }
-            if (KeyboardShortcuts.SHOW_PULL_REQUESTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_PULL_REQUESTS.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showPullRequests();
                 }
             }
-            if (KeyboardShortcuts.SHOW_HELP.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_HELP.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showDocs();
                 }
             }
-            if (KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_KEYBOARD_SHORTCUTS.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showKeyboardShortcuts();
                 }
             }
-            if (KeyboardShortcuts.SHOW_CONTRIBUTORS.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_CONTRIBUTORS.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showContributors();
                     event.consume();
                 }
@@ -221,59 +244,59 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (KeyboardShortcuts.scrollToBottom.match(event)) {
-                if (!KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
+                if (!MINIMIZE_WINDOW.match(event)) {
                     ui.getBrowserComponent().scrollToBottom();
                 }
             }
             if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
                 ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
             }
-            if (KeyboardShortcuts.GOTO_MODIFIER.match(event)) {
+            if (GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (KeyboardShortcuts.NEW_COMMENT.match(event) && 
+            if (NEW_COMMENT.match(event) && 
                     ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().jumpToComment();
             }
-            if (KeyboardShortcuts.SHOW_LABELS.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_LABELS.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().newLabel();
                 } else {
                     changeLabels();
                 }
             }
-            if (KeyboardShortcuts.MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToConversationTab();
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
-            if (KeyboardShortcuts.SHOW_MILESTONES.match(event)) {
-                if (KeyPress.isValidKeyCombination(KeyboardShortcuts.GOTO_MODIFIER.getCode(), event.getCode())) {
+            if (SHOW_MILESTONES.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
                     ui.getBrowserComponent().switchToConversationTab();
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
-            if (KeyboardShortcuts.MAXIMIZE_WINDOW.match(event)) {
+            if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
             }
-            if (KeyboardShortcuts.MINIMIZE_WINDOW.match(event)) {
+            if (MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
             }
-            if (KeyboardShortcuts.DEFAULT_SIZE_WINDOW.match(event)) {
+            if (DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
             }
-            if (KeyboardShortcuts.SWITCH_BOARD.match(event)) {
+            if (SWITCH_BOARD.match(event)) {
                 ui.getMenuControl().switchBoard();
             }
-            if (KeyboardShortcuts.SWITCH_DEFAULT_REPO.match(event)) {
+            if (SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
             }
-            if (KeyboardShortcuts.UNDO_LABEL_CHANGES.match(event)) {
-                ui.triggerNotificationPaneAction();
+            if (UNDO_LABEL_CHANGES.match(event)) {
+                ui.triggerNotificationAction();
             }
-            for (KeyCodeCombination key:KeyboardShortcuts.jumpToFirstIssueKeys) {
+            for (KeyCodeCombination key : JUMP_TO_FIRST_ISSUE_KEYS) {
                 if (key.match(event)) {
                     event.consume();
                     listView.selectFirstItem();
@@ -299,10 +322,7 @@ public class ListPanel extends FilterPanel {
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
-        contextMenu.setOnShowing(e -> {
-            updateContextMenu(contextMenu);
-        });
-
+        contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
         return contextMenu;
@@ -349,7 +369,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void setFocusToFilterBox() {
-        if (ui.isTestMode()) {
+        if (TestController.isTestMode()) {
             ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
         }
         filterTextField.requestFocus();
@@ -357,8 +377,7 @@ public class ListPanel extends FilterPanel {
         filterTextField.positionCaret(filterTextField.getLength());
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.downIssue.match(event) ||
-                    KeyboardShortcuts.upIssue.match(event)) {
+            if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
                 listView.selectFirstItem();
             }
         });
@@ -378,10 +397,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            LocalDateTime now = LocalDateTime.now();
-            ui.prefs.setMarkedReadAt(issue.getRepoId(), issue.getId(), now);
-            issue.setMarkedReadAt(Optional.of(now));
-            issue.setIsCurrentlyRead(true);
+            issue.markAsRead(ui.prefs);
+
             parentPanelControl.refresh();
             listView.selectNextItem();
         }
@@ -391,9 +408,8 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            ui.prefs.clearMarkedReadAt(issue.getRepoId(), issue.getId());
-            issue.setMarkedReadAt(Optional.empty());
-            issue.setIsCurrentlyRead(false);
+            issue.markAsUnread(ui.prefs);
+
             parentPanelControl.refresh();
         }
     }

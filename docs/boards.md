@@ -12,7 +12,7 @@
 
 - The current board also will be saved when you quit the application. The same board will be loaded next time you run HubTurbo.
 
-- You can select the current board via 'Boards > Save'.
+- You can select the current board via `Boards > Save`.
 
 ## Opening a Board
 
@@ -21,3 +21,7 @@
 ## Deleting a Board
 
 - Select the board you want to remove under `Boards > Delete`.
+
+## Switching the board
+
+- Push <kbd>Ctrl</kbd> + <kbd>B</kbd> to quickly switch the currently open board to another saved board.

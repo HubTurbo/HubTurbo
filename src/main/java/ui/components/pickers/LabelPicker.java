@@ -5,12 +5,9 @@ import backend.resource.TurboLabel;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
-import org.controlsfx.control.action.Action;
 import ui.UI;
+import ui.components.Notification;
 import util.DialogMessage;
 import util.GitHubURL;
 import util.events.ShowLabelPickerEventHandler;
@@ -38,8 +35,6 @@ public class LabelPicker {
     private void showLabelPicker(TurboIssue issue) {
         // get all labels from issue's repo
         List<TurboLabel> allLabels = ui.logic.getRepo(issue.getRepoId()).getLabels();
-        // get original labels for undo
-        List<String> originalLabels = issue.getLabels();
         // create new LabelPickerDialog
         LabelPickerDialog labelPickerDialog = new LabelPickerDialog(issue, allLabels, stage);
         // show LabelPickerDialog and wait for result
@@ -47,22 +42,25 @@ public class LabelPicker {
         stage.show(); // ensures stage is showing after label picker is closed (mostly for tests)
         // if result is present (user did not cancel) then replace issue labels with result
         if (result.isPresent()) {
-            ui.logic.replaceIssueLabels(issue, result.get().stream().sorted().collect(Collectors.toList()))
-                    .thenApply(success -> postReplaceLabelActions(success, issue, originalLabels));
+            replaceLabels(issue, result.get().stream().sorted().collect(Collectors.toList()));
         }
     }
 
-    public boolean postReplaceLabelActions(Boolean success, TurboIssue issue, List<String> originalLabels) {
+    private void replaceLabels(TurboIssue issue, List<String> labels) {
+        List<String> originalLabels = issue.getLabels();
+        ui.logic.replaceIssueLabelsUI(issue, labels);
+        Notification undoNotification = new Notification(createInfoOcticon(),
+                "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
+                "Undo",
+                () -> ui.logic.replaceIssueLabelsRepo(issue, labels, originalLabels)
+                        .thenApply(success -> postReplaceLabelActions(success, issue)),
+                () -> ui.logic.replaceIssueLabelsUI(issue, originalLabels));
+        ui.showNotification(undoNotification);
+    }
+
+    private boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {
         if (success) {
             refreshIssuePage(issue);
-            ui.showNotificationPane(createInfoOcticon(),
-                    "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
-                    new Action("Undo", actionEvent ->
-                            ui.logic.replaceIssueLabels(issue, originalLabels)
-                                    .thenRun(() -> {
-                                        refreshIssuePage(issue);
-                                        Platform.runLater(ui::hideNotificationPane);
-                                    })));
         } else {
             // if not, show error dialog
             Platform.runLater(() -> DialogMessage.showErrorDialog(
