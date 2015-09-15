@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
+import ui.TestController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
@@ -370,7 +371,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void setFocusToFilterBox() {
-        if (ui.isTestMode()) {
+        if (TestController.isTestMode()) {
             ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
         }
         filterTextField.requestFocus();
