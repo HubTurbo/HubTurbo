@@ -3,7 +3,6 @@ package github;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.io.input.NullInputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IssueEvent;
@@ -16,8 +15,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
 
@@ -29,28 +28,31 @@ public class GitHubEventsResponse {
 
     private static final Logger logger = LogManager.getLogger(GitHubEventsResponse.class.getName());
 
-    private GitHubResponse response;
-    private ArrayList<TurboIssueEvent> turboIssueEvents;
-    private String updatedETag;
+    private final GitHubResponse response;
+    private final List<TurboIssueEvent> turboIssueEvents;
+    private final String updatedETag;
 
     public GitHubEventsResponse(GitHubResponse response, InputStream jsonBody, String updatedETag) {
         this.response = response;
-        this.turboIssueEvents = new ArrayList<>();
+        this.turboIssueEvents = parseEventParameters(jsonBody);
         this.updatedETag = updatedETag;
     }
 
     @SuppressWarnings("unchecked")
-    private void parseEventParameters(InputStream jsonBody) {
+    private List<TurboIssueEvent> parseEventParameters(InputStream jsonBody) {
+        ArrayList<TurboIssueEvent> eventsInJson = new ArrayList<>();
+
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, Object>[]>(){}.getType();
         BufferedReader reader;
+
         try {
             reader = new BufferedReader(new InputStreamReader(jsonBody, CHARSET_UTF8));
 
             Map<String, Object>[] eventsWithParameters = gson.fromJson(reader, type);
 
             if (eventsWithParameters == null) {
-                return;
+                return eventsInJson;
             }
 
             IssueEvent[] issueEvents = (IssueEvent[]) response.getBody();
@@ -107,14 +109,15 @@ public class GitHubEventsResponse {
                 default:
                     // Not yet implemented, or no events triggered
                 }
-                turboIssueEvents.add(event);
+                eventsInJson.add(event);
             }
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
+        return eventsInJson;
     }
 
-    public ArrayList<TurboIssueEvent> getTurboIssueEvents() {
+    public List<TurboIssueEvent> getTurboIssueEvents() {
         return turboIssueEvents;
     }
 
