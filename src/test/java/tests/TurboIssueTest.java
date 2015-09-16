@@ -16,7 +16,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TurboIssueTest {
-    private static String REPO = "testrepo/testrepo";
+
+    private static final String REPO = "testrepo/testrepo";
 
     @Test
     public void turboIssueTest() {
