@@ -1,9 +1,11 @@
 package github;
 
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.PullRequestService;
+import util.HTLog;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 public class PullRequestServiceEx extends PullRequestService {
+    private static final Logger logger = HTLog.get(PullRequestServiceEx.class);
+
     /**
      * Gets a pull request's review comments
      *
@@ -48,6 +52,13 @@ public class PullRequestServiceEx extends PullRequestService {
      */
     private List<ReviewComment> getReviewComments(String repoId, String pullRequestNumber)
             throws IOException {
+        if (pullRequestNumber == null)
+            throw new IllegalArgumentException("Pull request number cannot be null");
+        if (pullRequestNumber.length() == 0)
+            throw new IllegalArgumentException("Pull request number cannot be empty");
+
+        logger.info("Getting review comments for PR" + pullRequestNumber + " " + repoId);
+
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId);
         uri.append(SEGMENT_PULLS);
@@ -58,8 +69,6 @@ public class PullRequestServiceEx extends PullRequestService {
         request.setUri(uri);
         request.setType(new TypeToken<List<ReviewComment>>() {
         }.getType());
-
-        System.out.println(request.getUri());
 
         return getAll(request);
     }
