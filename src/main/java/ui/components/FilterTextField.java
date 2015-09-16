@@ -34,10 +34,6 @@ public class FilterTextField extends TextField {
     public FilterTextField(String initialText, int position) {
         super(initialText);
         previousText = initialText;
-        Platform.runLater(() -> {
-            requestFocus();
-            positionCaret(position);
-        });
         setup();
     }
 
