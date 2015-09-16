@@ -2,6 +2,7 @@ package ui.listpanel;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import backend.interfaces.IModel;
@@ -40,7 +41,7 @@ import static ui.components.KeyboardShortcuts.SHOW_LABELS;
 import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
 import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
 import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS;
+import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
 import static ui.components.KeyboardShortcuts.NEW_COMMENT;
 import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
 import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
@@ -168,7 +169,7 @@ public class ListPanel extends FilterPanel {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (BOX_TO_LIST.match(event)) {
                 event.consume();
-                listView.selectFirstItem();
+                listView.selectNthItem(1);
             }
             if (!DOUBLE_PRESS.match(event)) {
                 currentFilterText = Optional.of(getCurrentFilterString());
@@ -178,7 +179,7 @@ public class ListPanel extends FilterPanel {
                 if (currentFilterText.isPresent()) {
                     filterTextField.setText(currentFilterText.get());
                 }
-                listView.selectFirstItem();
+                listView.selectNthItem(1);
             }
             if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
@@ -296,10 +297,11 @@ public class ListPanel extends FilterPanel {
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
             }
-            for (KeyCodeCombination key : JUMP_TO_FIRST_ISSUE_KEYS) {
-                if (key.match(event)) {
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
                     event.consume();
-                    listView.selectFirstItem();
+                    listView.selectNthItem(entry.getKey());
+                    break;
                 }
             }
         });
@@ -378,7 +380,7 @@ public class ListPanel extends FilterPanel {
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
-                listView.selectFirstItem();
+                listView.selectNthItem(1);
             }
         });
     }
