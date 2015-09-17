@@ -49,7 +49,7 @@ public class UpdateIssuesTest extends UITest {
         click(filterField);
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
+        assertEquals(3492, getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
         click("#dummy/dummy_col0_filterTextField");
@@ -57,7 +57,30 @@ public class UpdateIssuesTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals(3492, getApiCount(apiBox.getText())); // No change to issues, so no additional API quota spent
 
-        updateIssue(8, "Issue 8.1");
+        UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 6, "Test comment", "test"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        filterField.selectAll();
+        push(KeyCode.BACK_SPACE);
+        type("updated-self");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("2");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+
+        assertEquals(2, countIssuesShown());
+
+        UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 8, "Test comment", "test-nonself"));
+        UI.events.triggerEvent(new UILogicRefreshEvent());
+        filterField.selectAll();
+        push(KeyCode.BACK_SPACE);
+        type("updated");
+        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        type("24");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+
+        assertEquals(5, countIssuesShown());
+
         filterField.selectAll();
         push(KeyCode.BACK_SPACE);
         type("updated-others");
@@ -67,16 +90,6 @@ public class UpdateIssuesTest extends UITest {
         PlatformEx.waitOnFxThread();
 
         assertEquals(4, countIssuesShown());
-
-        filterField.selectAll();
-        push(KeyCode.BACK_SPACE);
-        type("updated-self");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("24");
-        push(KeyCode.ENTER);
-        PlatformEx.waitOnFxThread();
-
-        assertEquals(1, countIssuesShown());
     }
 
     public void resetRepo() {
