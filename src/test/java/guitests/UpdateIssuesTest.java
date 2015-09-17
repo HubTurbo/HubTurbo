@@ -49,7 +49,7 @@ public class UpdateIssuesTest extends UITest {
         click(filterField);
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        assertEquals(3492, getApiCount(apiBox.getText()));
+        assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
         assertEquals(3, countIssuesShown());
 
         click("#dummy/dummy_col0_filterTextField");
