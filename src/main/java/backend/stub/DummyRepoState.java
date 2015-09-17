@@ -36,7 +36,8 @@ public class DummyRepoState {
     // getEvents and getComments).
     private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
     // We keep track of issues that user has not gotten metadata from.
-    private HashSet<Integer> updatedMetadata = new HashSet<>();
+    private HashSet<Integer> updatedEvents = new HashSet<>();
+    private HashSet<Integer> updatedComments = new HashSet<>();
 
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
@@ -106,9 +107,9 @@ public class DummyRepoState {
         issueMetadata.put(9, new IssueMetadata(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(ownComments)),
-                ""
+                "", ""
         ));
-        updatedMetadata.add(9);
+        updatedEvents.add(9);
 
         // Then put down three comments for issue 10
         Comment dummyComment1 = new Comment();
@@ -126,9 +127,9 @@ public class DummyRepoState {
         issueMetadata.put(10, new IssueMetadata(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(dummyComments)),
-                ""
+                "", ""
         ));
-        updatedMetadata.add(10);
+        updatedEvents.add(10);
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -224,15 +225,15 @@ public class DummyRepoState {
     }
 
     protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId, String currentETag) {
-        if (updatedMetadata.contains(issueId)) {
+        if (updatedEvents.contains(issueId)) {
             IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
 
-            // If updatedMetadata contains issue, its metaadata must also exist in the metadataOfIssue hashmap
+            // If updatedEvents contains issue, its metadata must also exist in the metadataOfIssue hashmap
             assert metadataOfIssue != null;
 
-            // Remove issue from updatedMetadata so that next time metadata is retrievd, the same ETag
+            // Remove issue from updatedEvents so that next time metadata is retrieved, the same ETag
             // will not be sent again unless more updates will have been introduced.
-            updatedMetadata.remove(issueId);
+            updatedEvents.remove(issueId);
 
             // Finally, return events as a proper array.
             return new ImmutablePair<>(metadataOfIssue.getEvents(), UUID.randomUUID().toString());
@@ -241,12 +242,19 @@ public class DummyRepoState {
     }
 
     protected List<Comment> getComments(int issueId) {
-        IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+        if (updatedComments.contains(issueId)) {
+            IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
 
-        if (metadataOfIssue != null) {
-            return metadataOfIssue.getComments();
+            // If updatedEvents contains issue, its metadata must also exist in the metadataOfIssue hashmap
+            assert metadataOfIssue != null;
+
+            // Remove issue from updatedEvents so that next time metadata is retrieved, the same ETag
+            // will not be sent again unless more updates will have been introduced.
+            updatedComments.remove(issueId);
+
+            // Finally, return events as a proper array.
+            return new ArrayList<>(metadataOfIssue.getComments());
         }
-        // If not in the metadata hashmap yet, there are currently no comments for given issue.
         return new ArrayList<>();
     }
 
@@ -290,7 +298,7 @@ public class DummyRepoState {
         toRename.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedIssue(toRename, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), ""));
+        markUpdatedEvents(toRename, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return toRename;
     }
@@ -359,7 +367,7 @@ public class DummyRepoState {
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedIssue(toSet, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), ""));
+        markUpdatedEvents(toSet, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
@@ -381,7 +389,7 @@ public class DummyRepoState {
         toComment.setCommentCount(toComment.getCommentCount() + 1);
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedIssue(toComment, new IssueMetadata(metadataOfIssue.getEvents(), commentsOfIssue, ""));
+        markUpdatedComments(toComment, new IssueMetadata(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }
@@ -404,23 +412,39 @@ public class DummyRepoState {
                 metadataOfIssue.getComments() :
                 new ArrayList<>();
 
-        return new ImmutablePair<>(toMutate, new IssueMetadata(eventsOfIssue, commentsOfIssue, ""));
+        return new ImmutablePair<>(toMutate, new IssueMetadata(eventsOfIssue, commentsOfIssue, "", ""));
     }
 
     /**
-     * Auxiliary method that replaces original issue/metadata with the mutated copies after updating the issue.
-     * Simulates the event of an user action causing the ETag of the issue to change.
+     * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
+     * Simulates the event of an user action causing the ETag of the issue events to change.
      *
      * @param toMark The mutated copy of the issue, to replace the original issue
      * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
      */
-    private void markUpdatedIssue(TurboIssue toMark, IssueMetadata toInsert) {
+    private void markUpdatedEvents(TurboIssue toMark, IssueMetadata toInsert) {
         int issueId = toMark.getId();
 
         issues.put(issueId, toMark);
         updatedIssues.put(issueId, toMark);
         issueMetadata.put(issueId, toInsert);
-        updatedMetadata.add(issueId);
+        updatedEvents.add(issueId);
+    }
+
+    /**
+     * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
+     * Simulates the event of an user action causing the ETag of the issue comments to change.
+     *
+     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
+     */
+    private void markUpdatedComments(TurboIssue toMark, IssueMetadata toInsert) {
+        int issueId = toMark.getId();
+
+        issues.put(issueId, toMark);
+        updatedIssues.put(issueId, toMark);
+        issueMetadata.put(issueId, toInsert);
+        updatedComments.add(issueId);
     }
 
 }

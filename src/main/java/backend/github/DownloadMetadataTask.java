@@ -35,7 +35,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
         Map<Integer, IssueMetadata> result = new HashMap<>();
 
         issuesToUpdate.forEach(issue -> {
-            String currentETag = issue.getMetadata().getETag();
+            String currentETag = issue.getMetadata().getEventsETag();
             int id = issue.getId();
 
             ImmutablePair<List<TurboIssueEvent>, String> changes = repo.getUpdatedEvents(repoId, id, currentETag);
@@ -46,7 +46,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
             List<Comment> comments = new ArrayList<>();
             if (!updatedETag.equals(currentETag)) comments = repo.getComments(repoId, id);
 
-            IssueMetadata metadata = new IssueMetadata(events, comments, updatedETag);
+            IssueMetadata metadata = new IssueMetadata(events, comments, updatedETag, updatedETag);
             result.put(id, metadata);
         });
 
