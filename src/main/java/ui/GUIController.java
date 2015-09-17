@@ -147,7 +147,7 @@ public class GUIController {
         // First we request all necessary repos. The opened repos will come in subsequent ModelUpdatedEvents.
         openAllReposInExpression(panelMetaQualifiers);
 
-        boolean hasUpdatedQualifier = updatedQualifierExists(panelMetaQualifiers);
+        boolean hasUpdatedQualifier = Qualifier.updatedQualifierExists(panelMetaQualifiers);
 
         // Issues are filtered and sorted here. isMetadataUpdate and hasUpdatedQualifier are used to determine
         // whether to use an implicit non-self-update sorting order.
@@ -291,20 +291,6 @@ public class GUIController {
         toUpdate.forEach((repoId, issues) ->
             ui.logic.getIssueMetadata(repoId, issues)
         );
-    }
-
-    /**
-     * Auxiliary method to search for the UPDATED qualifier in a given FilterExpression's meta qualifier list.
-     *
-     * @param panelMetaQualifiers The meta qualifiers from which to search for UPDATED qualifiers.
-     * @return Whether the given meta qualifiers contain an UPDATED qualifier.
-     */
-    private static boolean updatedQualifierExists(List<Qualifier> panelMetaQualifiers) {
-        for (Qualifier metaQualifier : panelMetaQualifiers) {
-            // Only take into account the first updated qualifier
-            if (metaQualifier.getName().equals("updated")) return true;
-        }
-        return false;
     }
 
     private void updateAPIBox(UpdateRateLimitsEvent e) {
