@@ -1,5 +1,10 @@
 # Changelog
 
+# V3.6.1
+
+- Fixed bug where issue event metadata was not being downloaded
+- Fixed bug with locale-specific dates
+
 # V3.6.0
 
 - Label picker changes are now delayed and can be undone
