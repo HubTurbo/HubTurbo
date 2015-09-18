@@ -159,7 +159,7 @@ public class Qualifier implements FilterExpression {
     public static boolean qualifierNamesHaveUpdatedQualifier(FilterExpression expression){
         List<String> filterQualifierNames = expression.getQualifierNames();
         return (filterQualifierNames.contains(UPDATED) ||
-                filterQualifierNames.contains(UPDATED_BY_OTHERS));
+                filterQualifierNames.contains(UPDATED_BY_OTHERS) || filterQualifierNames.contains(UPDATED_BY_SELF));
     }
 
     /**
@@ -409,7 +409,9 @@ public class Qualifier implements FilterExpression {
         case "sort":
         case "in":
         case "repo":
+        case "updated-others":
         case "updated":
+        case "updated-self":
             return true;
         default:
             return false;
