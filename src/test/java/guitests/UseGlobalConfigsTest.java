@@ -18,6 +18,7 @@ import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.UI;
 import ui.components.FilterTextField;
+import ui.components.KeyboardShortcuts;
 import ui.components.PanelNameTextField;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
@@ -36,16 +37,19 @@ public class UseGlobalConfigsTest extends UITest {
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
-        type("dummy").push(KeyCode.TAB);
-        type("dummy").push(KeyCode.TAB);
-        type("test").push(KeyCode.TAB);
+        type("dummy");
+        pushKeys(KeyCode.TAB);
+        type("dummy");
+        pushKeys(KeyCode.TAB);
+        type("test");
+        pushKeys(KeyCode.TAB);
         type("test");
         click("Sign in");
         ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
         
-        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+        pushKeys(KeyboardShortcuts.MAXIMIZE_WINDOW);
 
         // Make a new board
         click("Boards");
@@ -59,40 +63,38 @@ public class UseGlobalConfigsTest extends UITest {
         type("Renamed panel");
         PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Renamed panel", renameTextField1.getText());
-        push(KeyCode.ENTER);
+        pushKeys(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
         waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
         click("#dummy/dummy_col1_filterTextField");
         type("repo");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("dummy2/dummy2");
-        push(KeyCode.ENTER);
+        pushKeys(KeyCode.ENTER);
 
         click("#dummy/dummy_col1_renameButton");
         type("Dummy 2 panel");
         PanelNameTextField renameTextField2 = find("#dummy/dummy_col1_renameTextField");
         assertEquals("Dummy 2 panel", renameTextField2.getText());
-        push(KeyCode.ENTER);
-        
-        // Creating panel to the left
-        press(KeyCode.SHIFT).press(KeyCode.CONTROL).press(KeyCode.P);
-        release(KeyCode.P).release(KeyCode.CONTROL).release(KeyCode.SHIFT);
-        
+        pushKeys(KeyCode.ENTER);
+
+        pushKeys(KeyboardShortcuts.CREATE_LEFT_PANEL);
+
         FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
         click(filterTextField3);
         type("is");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
+        pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("open");
         assertEquals("is:open", filterTextField3.getText());
-        push(KeyCode.ENTER);
+        pushKeys(KeyCode.ENTER);
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Open issues");
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Open issues", renameTextField3.getText());
-        push(KeyCode.ENTER);
+        pushKeys(KeyCode.ENTER);
 
         // Make a new board
         click("Boards");
