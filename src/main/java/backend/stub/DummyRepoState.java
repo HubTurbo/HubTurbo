@@ -242,17 +242,9 @@ public class DummyRepoState {
     }
 
     protected List<Comment> getComments(int issueId) {
-        if (updatedComments.contains(issueId)) {
-            IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
-
-            // If updatedEvents contains issue, its metadata must also exist in the metadataOfIssue hashmap
-            assert metadataOfIssue != null;
-
-            // Remove issue from updatedEvents so that next time metadata is retrieved, the same ETag
-            // will not be sent again unless more updates will have been introduced.
-            updatedComments.remove(issueId);
-
-            // Finally, return events as a proper array.
+        // TODO after implementing support for comments ETags on GitHubClientExtended, change logic to getEvents'.
+        IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
+        if (metadataOfIssue != null) {
             return new ArrayList<>(metadataOfIssue.getComments());
         }
         return new ArrayList<>();

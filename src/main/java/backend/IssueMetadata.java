@@ -170,8 +170,13 @@ public class IssueMetadata {
     }
 
     // Constructor used in MultiModel
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt) {
-        this.events = new ArrayList<>(other.events);
+    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt,
+                         List<TurboIssueEvent> currEvents, String currEventsETag) {
+        if (currEventsETag.equals(other.eventsETag)) {
+            events = new ArrayList<>(currEvents);
+        } else {
+            events = new ArrayList<>(other.events);
+        }
         this.comments = new ArrayList<>(other.comments);
 
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
