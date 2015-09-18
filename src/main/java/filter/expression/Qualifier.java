@@ -24,6 +24,7 @@ public class Qualifier implements FilterExpression {
     public static final String SORT = "sort";
     public static final String UPDATED = "updated";
     public static final String UPDATED_BY_OTHERS = "updated-others";
+    public static final String UPDATED_BY_SELF = "updated-self";
 
     private enum UpdatedKind{
         SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
@@ -158,7 +159,23 @@ public class Qualifier implements FilterExpression {
     public static boolean qualifierNamesHaveUpdatedQualifier(FilterExpression expression){
         List<String> filterQualifierNames = expression.getQualifierNames();
         return (filterQualifierNames.contains(UPDATED) ||
-                filterQualifierNames.contains(UPDATED_BY_OTHERS));
+                filterQualifierNames.contains(UPDATED_BY_OTHERS) || filterQualifierNames.contains(UPDATED_BY_SELF));
+    }
+
+    /**
+     * Auxiliary method to search for the UPDATED qualifier in a given FilterExpression's meta qualifier list.
+     * Method called in GUIController.java
+     * @param panelMetaQualifiers The meta qualifiers from which to search for UPDATED qualifiers.
+     * @return Whether the given meta qualifiers contain an UPDATED qualifier.
+     */
+    public static boolean updatedQualifierExists(List<Qualifier> panelMetaQualifiers) {
+        for (Qualifier metaQualifier : panelMetaQualifiers) {
+            // Only take into account the first updated qualifier
+            String metaQualifierName = metaQualifier.getName();
+            if (metaQualifierName.equals(UPDATED) || metaQualifierName.equals(UPDATED_BY_OTHERS) ||
+                    metaQualifierName.equals(UPDATED_BY_SELF)) return true;
+        }
+        return false;
     }
 
     /**
@@ -392,7 +409,9 @@ public class Qualifier implements FilterExpression {
         case "sort":
         case "in":
         case "repo":
+        case "updated-others":
         case "updated":
+        case "updated-self":
             return true;
         default:
             return false;
