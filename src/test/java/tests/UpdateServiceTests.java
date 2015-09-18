@@ -1,37 +1,30 @@
 package tests;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import github.GitHubClientEx;
 import github.update.MilestoneUpdateService;
 import github.update.PageHeaderIterator;
 import github.update.UpdateService;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.PagedRequest;
+import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.junit.Test;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class UpdateServiceTests {
     /**
      * Tests that head request to nonexistent repo throws an exception
      * @throws IOException
      */
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = IOException.class)
     public void testHeadRequest() throws IOException {
         GitHubClientEx client = new GitHubClientEx();
 
@@ -47,7 +40,7 @@ public class UpdateServiceTests {
         client.head(request);
     }
 
-    @Test(expected = NoSuchPageException.class)
+    @Test(expected = Exception.class)
     public void testHeaderIterator() {
         GitHubClientEx client = new GitHubClientEx();
 
