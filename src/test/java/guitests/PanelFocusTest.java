@@ -17,7 +17,9 @@ import static org.junit.Assert.assertEquals;
 public class PanelFocusTest extends UITest {
 
     @Override
-    public void launchApp() { FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true"); }
+    public void launchApp() {
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
+    }
 
     @Override
     public void setupMethod() {
