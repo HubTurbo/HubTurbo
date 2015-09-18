@@ -2,7 +2,7 @@ package github.update;
 
 
 import com.google.gson.reflect.TypeToken;
-import github.GitHubClientExtended;
+import github.GitHubClientEx;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PagedRequest;
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COLLABORATORS;
 
-public class UserUpdateService extends UpdateService<User>{
+public class UserUpdateService extends UpdateService<User> {
 
-    public UserUpdateService(GitHubClientExtended client, String collabsETag){
+    public UserUpdateService(GitHubClientEx client, String collabsETag){
         super(client, SEGMENT_COLLABORATORS, collabsETag);
     }
 

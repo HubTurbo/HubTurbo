@@ -1,7 +1,7 @@
 package github.update;
 
 import com.google.gson.reflect.TypeToken;
-import github.GitHubClientExtended;
+import github.GitHubClientEx;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.PagedRequest;
@@ -14,11 +14,11 @@ import java.util.Map;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ISSUES;
 
-public class IssueUpdateService extends UpdateService<Issue>{
+public class IssueUpdateService extends UpdateService<Issue> {
 
     private final Date lastIssueCheckTime;
 
-    public IssueUpdateService(GitHubClientExtended client, String issuesETag, Date lastIssueCheckTime){
+    public IssueUpdateService(GitHubClientEx client, String issuesETag, Date lastIssueCheckTime){
         super(client, SEGMENT_ISSUES, issuesETag);
         this.lastIssueCheckTime = new Date(lastIssueCheckTime.getTime());
     }

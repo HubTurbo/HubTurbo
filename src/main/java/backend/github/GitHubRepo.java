@@ -46,10 +46,10 @@ public class GitHubRepo implements Repo {
 
     private static final Logger logger = HTLog.get(GitHubRepo.class);
 
-    private final GitHubClientExtended client = new GitHubClientExtended();
-    private final IssueServiceExtended issueService = new IssueServiceExtended(client);
+    private final GitHubClientEx client = new GitHubClientEx();
+    private final IssueServiceEx issueService = new IssueServiceEx(client);
     private final CollaboratorService collaboratorService = new CollaboratorService(client);
-    private final LabelServiceFixed labelService = new LabelServiceFixed(client);
+    private final LabelServiceEx labelService = new LabelServiceEx(client);
     private final MilestoneService milestoneService = new MilestoneService(client);
 
     public GitHubRepo() {
@@ -100,7 +100,7 @@ public class GitHubRepo implements Repo {
     }
 
     private <TR, R, S extends UpdateService<R>> ImmutablePair<List<TR>, String> getUpdatedResource(
-        String repoId, String eTag, BiFunction<GitHubClientExtended, String, S> constructService,
+        String repoId, String eTag, BiFunction<GitHubClientEx, String, S> constructService,
         BiFunction<String, R, TR> resourceConstructor) {
 
         S updateService = constructService.apply(client, eTag);

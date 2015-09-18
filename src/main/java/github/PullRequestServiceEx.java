@@ -52,10 +52,12 @@ public class PullRequestServiceEx extends PullRequestService {
      */
     private List<ReviewComment> getReviewComments(String repoId, String pullRequestNumber)
             throws IOException {
-        if (pullRequestNumber == null)
+        if (pullRequestNumber == null) {
             throw new IllegalArgumentException("Pull request number cannot be null");
-        if (pullRequestNumber.length() == 0)
+        }
+        if (pullRequestNumber.length() == 0) {
             throw new IllegalArgumentException("Pull request number cannot be empty");
+        }
 
         logger.info("Getting review comments for PR" + pullRequestNumber + " " + repoId);
 

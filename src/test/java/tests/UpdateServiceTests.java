@@ -4,7 +4,8 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import github.GitHubClientExtended;
+
+import github.GitHubClientEx;
 import github.update.MilestoneUpdateService;
 import github.update.PageHeaderIterator;
 import github.update.UpdateService;
@@ -32,7 +33,7 @@ public class UpdateServiceTests {
      */
     @Test(expected = FileNotFoundException.class)
     public void testHeadRequest() throws IOException {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
 
         PagedRequest<Milestone> request = new PagedRequest<>();
         Map<String, String> params = new HashMap<>();
@@ -48,7 +49,7 @@ public class UpdateServiceTests {
 
     @Test(expected = NoSuchPageException.class)
     public void testHeaderIterator() {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
 
         Map<String, String> params = new HashMap<>();
         params.put("state", "all");
@@ -87,7 +88,7 @@ public class UpdateServiceTests {
 
     @Test
     public void testGetUpdatedItems() {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
         MilestoneUpdateService service = new MilestoneUpdateService(client, "abcd");
 
         assertTrue(service.getUpdatedItems(RepositoryId.create("name", "nonexistentrepo")).isEmpty());
