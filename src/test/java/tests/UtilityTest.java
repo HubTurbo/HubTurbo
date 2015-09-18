@@ -55,13 +55,26 @@ public class UtilityTest {
     }
 
     @Test
-    public void dateManipulationTest() {
+    public void parseHTTPLastModifiedDateTest() {
         Calendar testDate = Calendar.getInstance();
         testDate.set(1994, Calendar.NOVEMBER, 15, 12, 45, 26);
         testDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         assertEquals(testDate.getTime().toString(),
-                parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
+            parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
+
+        try {
+            assertEquals(testDate.getTime().toString(),
+                parseHTTPLastModifiedDate("some non-date string").toString());
+            fail();
+        } catch (IllegalArgumentException ignored) {}
+    }
+
+    @Test
+    public void dateManipulationTest() {
+        Calendar testDate = Calendar.getInstance();
+        testDate.set(1994, Calendar.NOVEMBER, 15, 12, 45, 26);
+        testDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         assertEquals("1994-11-15T12:45Z", formatDateISO8601(testDate.getTime()));
 
