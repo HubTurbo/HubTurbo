@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 import com.google.common.util.concurrent.SettableFuture;
 
 import backend.interfaces.RepoStore;
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBoxBase;
@@ -189,6 +189,13 @@ public class UITest extends GuiTest {
 
     public void waitUntilNodeDisappears(String selector) {
         while (existsQuiet(selector)) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
+    public <T extends Node> void waitUntil(String selector, Predicate<T> condition) {
+        while (!condition.test(find(selector))) {
             PlatformEx.waitOnFxThread();
             sleep(100);
         }

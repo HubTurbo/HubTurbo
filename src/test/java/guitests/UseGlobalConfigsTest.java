@@ -54,6 +54,7 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save as");
+
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
         ((TextField) find("#boardnameinput")).setText("Empty Board");
@@ -63,6 +64,13 @@ public class UseGlobalConfigsTest extends UITest {
         type("Renamed panel");
         PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
         assertEquals("Renamed panel", renameTextField1.getText());
+        pushKeys(KeyCode.ENTER);
+
+        waitUntilNodeAppears("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        type("is");
+        pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
+        type("issue");
         pushKeys(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
@@ -81,6 +89,7 @@ public class UseGlobalConfigsTest extends UITest {
         pushKeys(KeyCode.ENTER);
 
         pushKeys(KeyboardShortcuts.CREATE_LEFT_PANEL);
+        waitUntil("#dummy/dummy_col0_filterTextField", f -> ((FilterTextField) f).getText().isEmpty());
 
         FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
         click(filterTextField3);
@@ -99,6 +108,8 @@ public class UseGlobalConfigsTest extends UITest {
         // Make a new board
         click("Boards");
         click("Save as");
+
+        // Text field cannot be populated by typing on the CI, use setText instead
         ((TextField) find("#boardnameinput")).setText("Dummy Board");
         click("OK");
 
@@ -131,7 +142,7 @@ public class UseGlobalConfigsTest extends UITest {
         List<PanelInfo> dummyBoard = boards.get("Dummy Board");
         assertEquals(3, dummyBoard.size());
         assertEquals("is:open", dummyBoard.get(0).getPanelFilter());
-        assertEquals("", dummyBoard.get(1).getPanelFilter());
+        assertEquals("is:issue", dummyBoard.get(1).getPanelFilter());
         assertEquals("repo:dummy2/dummy2", dummyBoard.get(2).getPanelFilter());
         assertEquals("Open issues", dummyBoard.get(0).getPanelName());
         assertEquals("Renamed panel", dummyBoard.get(1).getPanelName());
@@ -142,7 +153,7 @@ public class UseGlobalConfigsTest extends UITest {
         List<String> lastOpenPanelNames = testPref.getPanelNames();
         
         assertEquals("is:open", lastOpenFilters.get(0));
-        assertEquals("", lastOpenFilters.get(1));
+        assertEquals("is:issue", lastOpenFilters.get(1));
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(2));
 
         assertEquals("Open issues", lastOpenPanelNames.get(0));
