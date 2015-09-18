@@ -81,12 +81,14 @@ public class MultiModel implements IModel {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
                 IssueMetadata toBeInserted = metadata.get(issue.getId());
-                // Only set new metadata if ETag is different
-                if (!toBeInserted.getETag().equals(issue.getMetadata().getETag())) {
-                    LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
-                            issue.getCreatedAt(), currentUser, issue.getCreator());
-                    issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt));
-                }
+
+                // ETag comparison is based on IssueMetadata constructor for more granularity, so that we can choose
+                // to not replace events while still replacing comments in the case of same ETag.
+                // TODO move ETag comparison here when comments ETag implementation is complete.
+                LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
+                        issue.getCreatedAt(), currentUser, issue.getCreator());
+                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt,
+                        issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
             }
         });
     }

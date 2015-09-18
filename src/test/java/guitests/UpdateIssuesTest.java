@@ -30,30 +30,31 @@ public class UpdateIssuesTest extends UITest {
 
         // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
         assertEquals(2, countIssuesShown());
+        assertEquals(3496, getApiCount(apiBox.getText())); // 4 calls for issues 9 and 10.
 
         // After updating, issue with ID 5 should have title Issue 5.1
-        updateIssue(5, "Issue 5.1");
+        updateIssue(5, "Issue 5.1"); // 2 calls for issue 5, 1 for issue 9, 1 for issue 10 when refreshing UI.
         click("#dummy/dummy_col0_filterTextField");
-        push(KeyCode.ENTER);
+        push(KeyCode.ENTER); // 1 call for issue 5, 1 for issue 9, 1 for issue 10.
         PlatformEx.waitOnFxThread();
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
-        assertEquals(3494, getApiCount(apiBox.getText())); // 2 calls for Issue 5
+        assertEquals(3489, getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
-        UI.events.triggerEvent(new UILogicRefreshEvent());
+        UI.events.triggerEvent(new UILogicRefreshEvent()); // 1 call for issues 5, 9, 10.
         click("#dummy/dummy_col0_filterTextField");
-        push(KeyCode.ENTER);
+        push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         PlatformEx.waitOnFxThread();
-        assertEquals(3492, getApiCount(apiBox.getText())); // 2 calls for Issue 9
+        assertEquals(3483, getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
         click("#dummy/dummy_col0_filterTextField");
-        push(KeyCode.ENTER);
+        push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         PlatformEx.waitOnFxThread();
-        assertEquals(3492, getApiCount(apiBox.getText())); // No change to issues, so no additional API quota spent
+        assertEquals(3480, getApiCount(apiBox.getText()));
     }
 
     public void resetRepo() {

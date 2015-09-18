@@ -25,7 +25,8 @@ public class IssueMetadata {
         UPDATED_BY_SELF, UPDATED_BY_OTHER
     }
 
-    private final String eTag; // Only modified in the DownloadMetadataTask constructor
+    private final String eventsETag; // Only modified in the DownloadMetadataTask constructor
+    private final String commentsETag;
 
     // Constructor for default use when initializing TurboIssue
     public IssueMetadata() {
@@ -39,7 +40,8 @@ public class IssueMetadata {
         isUpdatedByOthers = false;
         isUpdatedBySelf = false;
 
-        eTag = "";
+        eventsETag = "";
+        commentsETag = "";
     }
 
     // Copy constructor used in TurboIssue
@@ -54,7 +56,8 @@ public class IssueMetadata {
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
 
-        this.eTag = other.eTag;
+        this.eventsETag = other.eventsETag;
+        this.commentsETag = other.commentsETag;
     }
 
     // Copy constructor used in reconciliation
@@ -69,11 +72,13 @@ public class IssueMetadata {
         this.isUpdatedByOthers = other.isUpdatedByOthers;
         this.isUpdatedBySelf = other.isUpdatedBySelf;
 
-        this.eTag = other.eTag;
+        this.eventsETag = other.eventsETag;
+        this.commentsETag = other.commentsETag;
     }
 
     // Constructor used in DownloadMetadataTask
-    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments, String eTag) {
+    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
+                         String eventsETag, String commentsETag) {
         this.events = events;
         this.comments = comments;
 
@@ -84,7 +89,8 @@ public class IssueMetadata {
         this.isUpdatedByOthers = false;
         this.isUpdatedBySelf = false;
 
-        this.eTag = eTag;
+        this.eventsETag = eventsETag;
+        this.commentsETag = commentsETag;
     }
 
     // Constructor used in Logic
@@ -125,7 +131,8 @@ public class IssueMetadata {
         this.isUpdatedByOthers = isUpdatedByOthers;
         this.isUpdatedBySelf = isUpdatedBySelf;
 
-        this.eTag = existingMetadata.eTag;
+        this.eventsETag = existingMetadata.eventsETag;
+        this.commentsETag = existingMetadata.commentsETag;
     }
 
     private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
@@ -163,8 +170,13 @@ public class IssueMetadata {
     }
 
     // Constructor used in MultiModel
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt) {
-        this.events = new ArrayList<>(other.events);
+    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt,
+                         List<TurboIssueEvent> currEvents, String currEventsETag) {
+        if (currEventsETag.equals(other.eventsETag)) {
+            events = new ArrayList<>(currEvents);
+        } else {
+            events = new ArrayList<>(other.events);
+        }
         this.comments = new ArrayList<>(other.comments);
 
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
@@ -174,7 +186,8 @@ public class IssueMetadata {
         this.isUpdatedBySelf = other.isUpdatedBySelf;
         this.isUpdatedByOthers = other.isUpdatedByOthers;
 
-        this.eTag = other.eTag;
+        this.eventsETag = other.eventsETag;
+        this.commentsETag = other.commentsETag;
     }
 
     //Constructor used in FilterEvalTests
@@ -191,7 +204,8 @@ public class IssueMetadata {
         this.isUpdatedBySelf = isUpdatedBySelf;
         this.isUpdatedByOthers = isUpdatedByOthers;
 
-        this.eTag = "";
+        this.eventsETag = "";
+        this.commentsETag = "";
     }
 
     public String summarise() {
@@ -230,8 +244,12 @@ public class IssueMetadata {
         return isUpdatedBySelf;
     }
 
-    public String getETag() {
-        return eTag;
+    public String getEventsETag() {
+        return eventsETag;
+    }
+
+    public String getCommentsETag() {
+        return commentsETag;
     }
 
     @Override
