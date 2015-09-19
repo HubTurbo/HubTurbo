@@ -470,6 +470,10 @@ public class UI extends Application implements EventDispatcher {
         return menuBar;
     }
     
+    public PanelControl getPanelControl() {
+        return panels;
+    }
+    
     /**
      * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
      */
@@ -521,6 +525,22 @@ public class UI extends Application implements EventDispatcher {
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
                 + " (%s)", openBoard);
         mainStage.setTitle(title);
+    }
+    
+    public String getTitle() {
+        return mainStage.getTitle();
+    }
+    
+    public int getVersionMajor() {
+        return VERSION_MAJOR;
+    }
+    
+    public int getVersionMinor() {
+        return VERSION_MINOR;
+    }
+    
+    public int getVersionPatch() {
+        return VERSION_PATCH;
     }
     
 }

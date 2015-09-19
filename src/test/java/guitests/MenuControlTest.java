@@ -1,16 +1,17 @@
 package guitests;
 
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
 
 import ui.UI;
+import ui.TestController;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.PanelControl;
 import prefs.Preferences;
 import util.PlatformEx;
 import util.events.ModelUpdatedEventHandler;
+import util.Utility;
 import static org.junit.Assert.assertEquals;
 
 public class MenuControlTest extends UITest {
@@ -20,10 +21,15 @@ public class MenuControlTest extends UITest {
     @Test
     public void menuControlTest() {
         
+        UI ui = TestController.getUI();
+        PanelControl panelControl = ui.getPanelControl();
+        Preferences testPref = UI.prefs;
+        
+        String uiTitle = ("HubTurbo "
+                + Utility.version(ui.getVersionMajor(), ui.getVersionMinor(), ui.getVersionPatch())
+                + " (%s)");
         modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
-        PanelControl panelControl = (PanelControl) find("#dummy/dummy_col0").getParent();
-        Preferences testPref = UI.prefs;
         
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         assertEquals(0, panelControl.getNumberOfPanels());
@@ -48,11 +54,13 @@ public class MenuControlTest extends UITest {
 
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         
+        assertEquals(ui.getTitle(), String.format(uiTitle, "none"));
+        
         // Testing board save when no board is open because nothing has been saved
         // Expected: prompts user to save as new board
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 1");
+        type("Board 1");
         push(KeyCode.ESCAPE);
         PlatformEx.waitOnFxThread();
         assertEquals(0, panelControl.getNumberOfSavedBoards());
@@ -65,11 +73,12 @@ public class MenuControlTest extends UITest {
         // Testing board save as
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 1");
-        click("OK");
+        type("Board 1");
+        click("Save");
         PlatformEx.waitOnFxThread();
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(2, panelControl.getNumberOfPanels());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
         // Testing board open keyboard shortcut when there is only one saved board
         // Expected: nothing happens
@@ -82,25 +91,28 @@ public class MenuControlTest extends UITest {
         
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 2");
-        click("OK");
+        type("Board 2");
+        click("Save");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
         
         // Testing invalid board names
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("");
-        click("OK");
+        push(KeyCode.BACK_SPACE);
+        click("Save");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("   ");
-        click("OK");
+        type("   ");
+        click("Save");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
 
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
@@ -114,6 +126,7 @@ public class MenuControlTest extends UITest {
         push(KeyCode.ENTER); // Opening Board "2"
         PlatformEx.waitOnFxThread();
         assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
 
         // Testing First Panel selected
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
@@ -122,6 +135,7 @@ public class MenuControlTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
         assertEquals(true, testPref.getLastOpenBoard().isPresent());
         assertEquals("Board 1", testPref.getLastOpenBoard().get());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
         // Testing board save
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
@@ -140,6 +154,7 @@ public class MenuControlTest extends UITest {
         click("OK");
         PlatformEx.waitOnFxThread();
         assertEquals(1, panelControl.getNumberOfSavedBoards());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "none"));
         
         // Testing board open keyboard shortcut when there are saved boards but none is open
         // Expected: nothing happens
@@ -150,10 +165,11 @@ public class MenuControlTest extends UITest {
         // Expected: prompts user to save as new board
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 1");
-        click("OK");
+        type("Board 1");
+        click("Save");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
         click("View");
         click("Refresh");
