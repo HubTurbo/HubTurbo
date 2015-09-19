@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.io.Files.getFileExtension;
@@ -117,6 +118,14 @@ public class UITest extends GuiTest {
     public <T extends Node> T findOrWaitFor(String selector) {
         waitUntilNodeAppears(selector);
         return find(selector);
+    }
+
+    public <T extends Node> Optional<T> findQuiet(String selectorOrText) {
+        try {
+            return Optional.of(find(selectorOrText));
+        } catch (NoNodesFoundException | NoNodesVisibleException e) {
+            return Optional.empty();
+        }
     }
 
     private boolean existsQuiet(String selector) {
