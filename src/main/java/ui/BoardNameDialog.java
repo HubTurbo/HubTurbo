@@ -2,7 +2,6 @@ package ui;
 
 import java.util.Optional;
 
-import ui.MenuControl;
 import prefs.Preferences;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -21,19 +20,18 @@ import javafx.stage.Stage;
 
 public class BoardNameDialog extends Dialog<String> {
     
-    MenuControl menuControl;
     Preferences prefs;
     TextField nameField;
     Text prompt;
     Text errorText;
-    Button submitButton;
-    GridPane grid;
+    ButtonType submitButtonType;
     
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
     private static final int BOARD_MAX_NAME_LENGTH = 20;
     private static final String ERROR_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
+    private static final String ERROR_LONG_NAME = "Error: board name cannot exceed 20 letters.";
 
     public BoardNameDialog(Preferences prefs, Stage mainStage) {
         this.prefs = prefs; // for checking against existing boards
@@ -50,11 +48,11 @@ public class BoardNameDialog extends Dialog<String> {
     }
     
     private void createButtons() {
-        ButtonType confirmButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+        submitButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
         
         setResultConverter(submit -> {
-            if (submit == confirmButtonType) {
+            if (submit == submitButtonType) {
                 return nameField.getText();
             }
             return null;
@@ -73,12 +71,19 @@ public class BoardNameDialog extends Dialog<String> {
         
         nameField = new TextField(DEFAULT_NAME);
         nameField.setPrefWidth(300);
+        Platform.runLater(() -> {
+            nameField.requestFocus();
+        });
         
         nameArea.getChildren().addAll(prompt, nameField);
         grid.add(nameArea, 0, 0);
         
         errorText = new Text("");
         grid.add(errorText, 0, 1);
+        
+        if (isBoardNameDuplicate(DEFAULT_NAME)) {
+            errorText.setText(ERROR_DUPLICATE_NAME);
+        }
         
         getDialogPane().setContent(grid);
     }
@@ -87,6 +92,14 @@ public class BoardNameDialog extends Dialog<String> {
         nameField.textProperty().addListener(c -> {
             if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
                 nameField.setText(previousText);
+                errorText.setText(ERROR_LONG_NAME);
+            } else if (isBoardNameEmpty(nameField.getText())) {
+                errorText.setText(ERROR_EMPTY_NAME);
+                // TODO disable button
+            } else if (isBoardNameDuplicate(nameField.getText())) {
+                errorText.setText(ERROR_DUPLICATE_NAME);
+            } else {
+                errorText.setText("");
             }
             previousText = nameField.getText();
         });
@@ -94,17 +107,17 @@ public class BoardNameDialog extends Dialog<String> {
     }
     
     private boolean isBoardNameEmpty(String newName) {
-        if (newName.equals("")) {
-            return false;
+        if (newName.trim().equals("")) {
+            return true;
         }
-        return true;
+        return false;
     }
     
     private boolean isBoardNameDuplicate(String newName) {
         if (prefs.getAllBoards().containsKey(newName)) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     
     private static void setupGridPane(GridPane grid) {

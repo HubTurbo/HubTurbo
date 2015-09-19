@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import prefs.PanelInfo;
-import ui.BoardNameDialog;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
