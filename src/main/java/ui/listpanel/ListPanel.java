@@ -84,7 +84,7 @@ public class ListPanel extends FilterPanel {
      */
 
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
+        if (hasMetadata && Qualifier.hasUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
