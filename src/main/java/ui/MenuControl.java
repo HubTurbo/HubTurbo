@@ -8,11 +8,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.stage.Stage;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import prefs.PanelInfo;
+import ui.BoardNameDialog;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
@@ -41,12 +43,14 @@ public class MenuControl extends MenuBar {
     private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
+    private final Stage mainStage;
 
-    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
+    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs, Stage mainStage) {
         this.panels = panels;
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
+        this.mainStage = mainStage;
         createMenuItems();
     }
 
@@ -174,12 +178,9 @@ public class MenuControl extends MenuBar {
             return;
         }
 
-        TextInputDialog dlg = new TextInputDialog("");
-        dlg.getEditor().setId("boardnameinput");
-        dlg.setTitle("Board Name");
-        dlg.getDialogPane().setContentText("What should this board be called?");
-        dlg.getDialogPane().setHeaderText("Please name this board");
+        BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
+        mainStage.show();
 
         if (response.isPresent()) {
             String boardName = response.get().trim();

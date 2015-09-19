@@ -309,7 +309,7 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
-        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
+        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
         HBox repoSelectorBar = new HBox();
