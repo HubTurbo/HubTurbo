@@ -2,7 +2,8 @@ package github.update;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-import github.GitHubClientExtended;
+
+import github.GitHubClientEx;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,7 +35,7 @@ import util.Utility;
 public class UpdateService<T> extends GitHubService {
     private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 
-    private final GitHubClientExtended client;
+    private final GitHubClientEx client;
     private final String apiSuffix;
     private final String lastETags;
 
@@ -50,7 +51,7 @@ public class UpdateService<T> extends GitHubService {
      * @param apiSuffix the API URI for the type of item; defined by subclasses
      * @param lastETag the last-known ETag for these items; may be null
      */
-    public UpdateService(GitHubClientExtended client, String apiSuffix, String lastETags){
+    public UpdateService(GitHubClientEx client, String apiSuffix, String lastETags){
         assert client != null;
         assert apiSuffix != null && !apiSuffix.isEmpty();
 
@@ -142,7 +143,7 @@ public class UpdateService<T> extends GitHubService {
      *         corresponding HTTP connection or an empty Optional if an error occurs
      */
     private Optional<ImmutablePair<List<String>, HttpURLConnection>> getPagedEtags(
-            GitHubRequest request, GitHubClientExtended client) {
+            GitHubRequest request, GitHubClientEx client) {
 
         PageHeaderIterator iter = new PageHeaderIterator(request, client, "ETag");
         List<String> etags = new ArrayList<>();
