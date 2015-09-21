@@ -13,6 +13,7 @@ import util.events.testevents.UpdateDummyRepoEvent;
 
 public class MetadataUpdateTest extends UITest {
 
+    @Test
     public void testUpdatedTriggersMetadata() {
         resetRepo();
 
@@ -23,40 +24,6 @@ public class MetadataUpdateTest extends UITest {
         TestUtils.awaitCondition(() ->
             findQuiet("1 comments since, involving test.").isPresent());
         assertTrue(findQuiet("2 comments since, involving User 1, User 2.").isPresent());
-    }
-
-    @Test
-    public void testUpdatedOthersTriggersMetadata() {
-
-        // updated-others doesn't work without metadata, so do everything we did in updated first
-        testUpdatedTriggersMetadata();
-
-        // Put a non-self comment on issue 10
-        UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 10, "Test comment", "test-nonself"));
-
-        updated24("updated-others");
-        ensureMetadataDownloadIsTriggered();
-        ensureMetadataIsReceived();
-
-        TestUtils.awaitCondition(() ->
-            findQuiet("3 comments since, involving User 1, User 2, test-nonself.").isPresent());
-    }
-
-    @Test
-    public void testUpdatedSelfTriggersMetadata() {
-
-        // updated-self doesn't work without metadata, so do everything we did in updated first
-        testUpdatedTriggersMetadata();
-
-        // Put a self comment on issue 9
-        UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test"));
-
-        updated24("updated-self");
-        ensureMetadataDownloadIsTriggered();
-        ensureMetadataIsReceived();
-
-        TestUtils.awaitCondition(() ->
-            findQuiet("2 comments since, involving test.").isPresent());
     }
 
     private void ensureMetadataDownloadIsTriggered() {
