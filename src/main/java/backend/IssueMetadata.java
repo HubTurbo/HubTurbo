@@ -72,8 +72,8 @@ public class IssueMetadata {
     // Constructor used in DownloadMetadataTask
     public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
                          String eventsETag, String commentsETag) {
-        this.events = events;
-        this.comments = comments;
+        this.events = new ArrayList<>(events);
+        this.comments = new ArrayList<>(comments);
 
         this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
         this.nonSelfCommentCount = 0; // Not calculated yet
@@ -159,7 +159,7 @@ public class IssueMetadata {
         this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
         this.nonSelfCommentCount  = other.nonSelfCommentCount;
 
-        this.eventsETag = other.eventsETag;
+        this.eventsETag = currEventsETag;
         this.commentsETag = other.commentsETag;
         this.isLatest = other.isLatest;
     }
