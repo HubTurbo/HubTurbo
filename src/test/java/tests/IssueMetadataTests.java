@@ -1,6 +1,6 @@
 package tests;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -24,7 +24,7 @@ public class IssueMetadataTests {
         List<TurboIssueEvent> events = stubEvents();
         List<Comment> comments = stubComments();
 
-        IssueMetadata metadata = new IssueMetadata(events, comments, "", "");
+        IssueMetadata metadata = IssueMetadata.intermediate(events, comments, "", "");
         assertEquals(3, metadata.getEvents().size());
         assertEquals(3, metadata.getComments().size());
 
@@ -43,7 +43,7 @@ public class IssueMetadataTests {
 
     @Test
     public void empty() {
-        IssueMetadata empty = new IssueMetadata();
+        IssueMetadata empty = IssueMetadata.empty();
         assertEquals(new ArrayList<TurboIssueEvent>(), empty.getEvents());
         assertEquals(new ArrayList<Comment>(), empty.getComments());
         assertEquals(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)), empty.getNonSelfUpdatedAt());
@@ -55,14 +55,15 @@ public class IssueMetadataTests {
 
     @Test
     public void invalidation() {
-        IssueMetadata empty = new IssueMetadata();
-        IssueMetadata trueMetadata = new IssueMetadata(empty, true);
-        assertEquals(true, trueMetadata.isLatest());
+        IssueMetadata metadata = IssueMetadata.intermediate(stubEvents(), stubComments(), "events", "comments")
+            .full("test");
+        IssueMetadata trueMetadata = metadata.invalidate();
+        assertEquals(false, trueMetadata.isLatest());
     }
 
     @Test
     public void intermediate() {
-        IssueMetadata metadata = new IssueMetadata(stubEvents(), stubComments(), "events", "comments");
+        IssueMetadata metadata = IssueMetadata.intermediate(stubEvents(), stubComments(), "events", "comments");
         assertEquals(3, metadata.getEvents().size());
         assertEquals(3, metadata.getComments().size());
         assertEquals("events", metadata.getEventsETag());
@@ -75,28 +76,25 @@ public class IssueMetadataTests {
 
     @Test
     public void computed() {
-        IssueMetadata original = new IssueMetadata(stubEvents(), stubComments(), "events", "comments");
+        IssueMetadata original = IssueMetadata.intermediate(stubEvents(), stubComments(), "events", "comments");
 
         // Computed properties are empty
         assertEquals(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)), original.getNonSelfUpdatedAt());
         assertEquals(0, original.getNonSelfCommentCount());
 
         // They are no longer empty
-        IssueMetadata computed = new IssueMetadata(original, "test");
+        IssueMetadata computed = original.full("test");
         assertEquals(Utility.dateToLocalDateTime(now), computed.getNonSelfUpdatedAt());
         assertEquals(2, computed.getNonSelfCommentCount());
     }
 
     @Test
     public void update() {
-//        public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt,
-//            List<TurboIssueEvent> currEvents, String currEventsETag) {
-
         List<TurboIssueEvent> originalEvents = stubEvents();
         List<Comment> originalComments = stubComments();
 
-        IssueMetadata original = new IssueMetadata(originalEvents, originalComments, "events", "comments");
-        IssueMetadata derived = new IssueMetadata(original, "test");
+        IssueMetadata original =  IssueMetadata.intermediate(originalEvents, originalComments, "events", "comments");
+        IssueMetadata derived = original.full("test");
 
         assertEquals(originalEvents, derived.getEvents());
         assertEquals(originalComments, derived.getComments());
@@ -111,15 +109,15 @@ public class IssueMetadataTests {
 
         // Failed update
         List<TurboIssueEvent> newEvents = stubEvents();
-        IssueMetadata updated = new IssueMetadata(derived, rightNow, newEvents, "events2");
+        IssueMetadata updated = derived.reconcile(rightNow, newEvents, "events2");
 
         assertEquals(originalEvents, updated.getEvents());
         assertEquals(originalComments, updated.getComments());
-        assertEquals("events2", updated.getEventsETag());
+        assertEquals("events", updated.getEventsETag());
         assertEquals("comments", updated.getCommentsETag());
 
         // Successful update
-        updated = new IssueMetadata(derived, rightNow, newEvents, "events");
+        updated = derived.reconcile(rightNow, newEvents, "events");
 
         assertEquals(newEvents, updated.getEvents());
         assertEquals(originalComments, updated.getComments());
