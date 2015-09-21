@@ -163,7 +163,6 @@ public class KeyboardShortcuts {
         assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
         assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
         assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
-        assignedKeys.add(new KeyCodeCombination(KeyCode.SPACE)); //DOUBLE_PRESS
     }
 
     private static void getKeyboardShortcutsFromHashMap() {
