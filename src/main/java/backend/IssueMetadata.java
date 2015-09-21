@@ -11,15 +11,25 @@ import java.util.Date;
 import java.util.List;
 
 public class IssueMetadata {
+
     private final List<TurboIssueEvent> events;
     private final List<Comment> comments;
+
+    // This field expresses whether this metadata is known to be the latest
+    // at the time of instantiation. It is like a dirty flag which is
+    // invalidated when the issue that this metadata is for is updated.
+
+    private final boolean isLatest;
+
+    // Properties computed from events and comments on instantiation, so we
+    // don't have to recompute on querying.
+
     private final LocalDateTime nonSelfUpdatedAt;
     private final LocalDateTime selfUpdatedAt;
     private final int nonSelfCommentCount;
     private final int selfCommentCount;
-
-    private final boolean isUpdatedBySelf; // for update by self
-    private final boolean isUpdatedByOthers; // for update by others
+    private final boolean isUpdatedBySelf;
+    private final boolean isUpdatedByOthers;
 
     private enum UpdatedKind {
         UPDATED_BY_SELF, UPDATED_BY_OTHER
@@ -42,6 +52,7 @@ public class IssueMetadata {
 
         eventsETag = "";
         commentsETag = "";
+        isLatest = false;
     }
 
     // Copy constructor used in TurboIssue
@@ -58,10 +69,11 @@ public class IssueMetadata {
 
         this.eventsETag = other.eventsETag;
         this.commentsETag = other.commentsETag;
+        this.isLatest = other.isLatest;
     }
 
     // Copy constructor used in reconciliation
-    public IssueMetadata(IssueMetadata other, boolean isUpdated) {
+    public IssueMetadata(IssueMetadata other, boolean isLatest) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
 
@@ -74,6 +86,7 @@ public class IssueMetadata {
 
         this.eventsETag = other.eventsETag;
         this.commentsETag = other.commentsETag;
+        this.isLatest = isLatest;
     }
 
     // Constructor used in DownloadMetadataTask
@@ -91,6 +104,7 @@ public class IssueMetadata {
 
         this.eventsETag = eventsETag;
         this.commentsETag = commentsETag;
+        this.isLatest = false;
     }
 
     // Constructor used in Logic
@@ -133,6 +147,7 @@ public class IssueMetadata {
 
         this.eventsETag = existingMetadata.eventsETag;
         this.commentsETag = existingMetadata.commentsETag;
+        this.isLatest = true;
     }
 
     private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
@@ -188,12 +203,14 @@ public class IssueMetadata {
 
         this.eventsETag = other.eventsETag;
         this.commentsETag = other.commentsETag;
+        this.isLatest = other.isLatest;
     }
 
     //Constructor used in FilterEvalTests
     public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, LocalDateTime selfUpdatedAt,
                          int nonSelfCommentCount, int selfCommentCount,
-                         boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
+                         boolean isUpdatedByOthers, boolean isUpdatedBySelf,
+                         boolean isLatest) {
         this.events = new ArrayList<>(other.events);
         this.comments = new ArrayList<>(other.comments);
 
@@ -206,6 +223,7 @@ public class IssueMetadata {
 
         this.eventsETag = "";
         this.commentsETag = "";
+        this.isLatest = isLatest;
     }
 
     public String summarise() {
@@ -218,6 +236,10 @@ public class IssueMetadata {
 
     public List<Comment> getComments() {
         return new ArrayList<>(comments);
+    }
+
+    public boolean isLatest() {
+        return isLatest;
     }
 
     public LocalDateTime getNonSelfUpdatedAt() {
