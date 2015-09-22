@@ -1,5 +1,12 @@
 # Changelog
 
+# V3.7.0
+
+- <kbd>Ctrl</kbd> + <kbd>1</kbd> .. <kbd>9</kbd> will jump to the nth issue
+- <kbd>Ctrl</kbd> + <kbd>Enter</kbd> and <kbd>Ctrl</kbd> + <kbd>F</kbd> will move focus to the panel and filter field respectively; <kbd>Space</kbd> <kbd>Space</kbd> is no longer the default hotkey for this
+- Fixed bugs with panel focus
+- Infrastructure for supporting updates to review comments
+
 # V3.6.1
 
 - Fixed bug where issue event metadata was not being downloaded
