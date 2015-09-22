@@ -43,7 +43,7 @@ public class IssuePanelTests extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("date");
         push(KeyCode.ENTER);
-        push(KeyCode.SPACE).push(KeyCode.SPACE);
+        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
         assertEquals(3, issuePanel.getSelectedIssue().getId());
