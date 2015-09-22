@@ -60,10 +60,7 @@ public abstract class FilterPanel extends AbstractPanel {
         this.ui = ui;
         
         getChildren().addAll(createPanelMenuBar(), createFilterBox());
-        this.setOnMouseClicked(e-> {
-            ui.triggerEvent(new PanelClickedEvent(panelIndex));
-            requestFocus();
-        });
+        setUpEventHandler();
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (isFocused) {
                 getStyleClass().add("panel-focused");
@@ -72,6 +69,13 @@ public abstract class FilterPanel extends AbstractPanel {
             }
         });
         
+    }
+
+    private void setUpEventHandler() {
+        this.setOnMouseClicked(e-> {
+            ui.triggerEvent(new PanelClickedEvent(this.panelIndex));
+            requestFocus();
+        });
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -290,5 +294,4 @@ public abstract class FilterPanel extends AbstractPanel {
     public void close() {
         ui.unregisterEvent(onModelUpdate);
     }
-
 }

@@ -38,8 +38,9 @@ public class KeyboardShortcutsTest extends UITest {
         // mid-sized window
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
         assertEquals(false, stage.getMinWidth() > 500);
-        
-        // jump from filter box to first issue
+
+        // jump from panel focus to first issue
+        // - This is because on startup focus is on panel and not on filter box
         press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
@@ -48,6 +49,12 @@ public class KeyboardShortcutsTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.F).release(KeyCode.F).release(KeyCode.CONTROL);
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
+
+        // jump from filter box to first issue
+        // - To ensure shortcut works from filter box, too
+        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
+        assertEquals(10, selectedIssueId);
+        clearSelectedIssueId();
 
         // jump to first issue using number key(1) or ENTER
         push(KeyCode.ESCAPE);

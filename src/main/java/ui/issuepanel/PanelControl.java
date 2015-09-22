@@ -5,6 +5,7 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import prefs.Preferences;
@@ -29,6 +30,7 @@ public class PanelControl extends HBox {
 
     private final UI ui;
     private final Preferences prefs;
+    private ScrollPane panelsScrollPane;
     private IModel model;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
@@ -53,8 +55,9 @@ public class PanelControl extends HBox {
     /**
      * Called on login.
      */
-    public void init(GUIController guiController) {
+    public void init(GUIController guiController, ScrollPane panelsScrollPane) {
         this.guiController = guiController;
+        this.panelsScrollPane = panelsScrollPane;
         restorePanels();
         selectFirstPanel();
     }
@@ -119,6 +122,8 @@ public class PanelControl extends HBox {
 
     public void selectFirstPanel() {
         setCurrentlySelectedPanel(Optional.of(0));
+        scrollToPanel(0);
+        getPanel(0).requestFocus();
     }
 
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
@@ -166,11 +171,11 @@ public class PanelControl extends HBox {
     }
 
     public void createNewPanelAtStart() {
-        addPanelAt(0);
+        addPanelAt(0).filterTextField.requestFocus();
     }
 
     public void createNewPanelAtEnd() {
-        addPanel();
+        addPanel().filterTextField.requestFocus();
     }
 
     public void swapPanels(int panelIndex, int panelIndex2) {
@@ -263,11 +268,11 @@ public class PanelControl extends HBox {
             }
         }
         ui.triggerEvent(new PanelClickedEvent(currentlySelectedPanel.get()));
-        scrollandShowPanel(currentlySelectedPanel.get(), getChildren().size());
+        scrollToCurrentlySelectedPanel();
     }
 
-    private void scrollandShowPanel(int selectedPanelIndex, int numOfPanels) {
-        ui.getMenuControl().scrollTo(selectedPanelIndex, numOfPanels);
+    public void scrollToCurrentlySelectedPanel() {
+        scrollToPanel(currentlySelectedPanel.get());
     }
 
     public GUIController getGUIController() {
@@ -296,5 +301,13 @@ public class PanelControl extends HBox {
 
     public int getNumberOfSavedBoards() {
         return prefs.getAllBoards().size();
+    }
+
+    public void scrollToPanel(int panelIndex){
+        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getNumberOfPanels() - 1));
+    }
+
+    private void setHvalue(double val) {
+        panelsScrollPane.setHvalue(val);
     }
 }
