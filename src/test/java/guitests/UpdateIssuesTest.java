@@ -3,6 +3,8 @@ package guitests;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
+import org.loadui.testfx.utils.TestUtils;
+
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
@@ -29,7 +31,7 @@ public class UpdateIssuesTest extends UITest {
         PlatformEx.waitOnFxThread();
 
         // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
-        assertEquals(2, countIssuesShown());
+        TestUtils.awaitCondition(() -> 2 == countIssuesShown());
         assertEquals(3496, getApiCount(apiBox.getText())); // 4 calls for issues 9 and 10.
 
         // After updating, issue with ID 5 should have title Issue 5.1
@@ -39,7 +41,7 @@ public class UpdateIssuesTest extends UITest {
         PlatformEx.waitOnFxThread();
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
-        assertEquals(3489, getApiCount(apiBox.getText()));
+        TestUtils.awaitCondition(() -> 3489 == getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
         // Then have a non-self comment for Issue 9.
@@ -48,13 +50,13 @@ public class UpdateIssuesTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         PlatformEx.waitOnFxThread();
-        assertEquals(3483, getApiCount(apiBox.getText()));
+        TestUtils.awaitCondition(() -> 3483 == getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
         click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         PlatformEx.waitOnFxThread();
-        assertEquals(3480, getApiCount(apiBox.getText()));
+        TestUtils.awaitCondition(() -> 3480 == getApiCount(apiBox.getText()));
     }
 
     public void resetRepo() {

@@ -13,13 +13,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RepositoryServiceExtended extends RepositoryService{
-    private static final Logger logger = LogManager.getLogger(RepositoryServiceExtended.class.getName());
+public class RepositoryServiceEx extends RepositoryService{
+    private static final Logger logger = LogManager.getLogger(RepositoryServiceEx.class.getName());
 
-    private GitHubClientExtended ghClient;
+    private GitHubClientEx ghClient;
     private OrganizationService orgService;
 
-    public RepositoryServiceExtended(GitHubClientExtended ghClient){
+    public RepositoryServiceEx(GitHubClientEx ghClient){
         this.ghClient = ghClient;
         orgService = new OrganizationService(this.ghClient);
     }

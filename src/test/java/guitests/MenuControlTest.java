@@ -117,6 +117,8 @@ public class MenuControlTest extends UITest {
 
         // Testing First Panel selected
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT1).release(KeyCode.DIGIT1).release(KeyCode.CONTROL);
+        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
         
         // Testing board open keyboard shortcut
         press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);

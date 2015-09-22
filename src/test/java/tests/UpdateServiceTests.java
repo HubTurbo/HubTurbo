@@ -1,38 +1,32 @@
 package tests;
 
+import github.GitHubClientEx;
+import github.update.MilestoneUpdateService;
+import github.update.PageHeaderIterator;
+import github.update.UpdateService;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.PagedRequest;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+
 import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import github.GitHubClientExtended;
-import github.update.MilestoneUpdateService;
-import github.update.PageHeaderIterator;
-import github.update.UpdateService;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.junit.Test;
 
 public class UpdateServiceTests {
     /**
      * Tests that head request to nonexistent repo throws an exception
      * @throws IOException
      */
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = IOException.class)
     public void testHeadRequest() throws IOException {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
 
         PagedRequest<Milestone> request = new PagedRequest<>();
         Map<String, String> params = new HashMap<>();
@@ -46,9 +40,9 @@ public class UpdateServiceTests {
         client.head(request);
     }
 
-    @Test(expected = NoSuchPageException.class)
+    @Test(expected = Exception.class)
     public void testHeaderIterator() {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
 
         Map<String, String> params = new HashMap<>();
         params.put("state", "all");
@@ -87,7 +81,7 @@ public class UpdateServiceTests {
 
     @Test
     public void testGetUpdatedItems() {
-        GitHubClientExtended client = new GitHubClientExtended();
+        GitHubClientEx client = new GitHubClientEx();
         MilestoneUpdateService service = new MilestoneUpdateService(client, "abcd");
 
         assertTrue(service.getUpdatedItems(RepositoryId.create("name", "nonexistentrepo")).isEmpty());
