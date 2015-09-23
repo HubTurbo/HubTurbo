@@ -104,7 +104,7 @@ public class DummyRepoState {
         Comment[] ownComments = { ownComment };
         issues.get(9).setCommentCount(1);
         issues.get(9).setUpdatedAt(LocalDateTime.now());
-        issueMetadata.put(9, new IssueMetadata(
+        issueMetadata.put(9, IssueMetadata.intermediate(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(ownComments)),
                 "", ""
@@ -124,7 +124,7 @@ public class DummyRepoState {
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
-        issueMetadata.put(10, new IssueMetadata(
+        issueMetadata.put(10, IssueMetadata.intermediate(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(dummyComments)),
                 "", ""
@@ -290,7 +290,7 @@ public class DummyRepoState {
         toRename.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedEvents(toRename, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+        markUpdatedEvents(toRename, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return toRename;
     }
@@ -359,7 +359,7 @@ public class DummyRepoState {
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedEvents(toSet, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+        markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return labels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
@@ -381,7 +381,8 @@ public class DummyRepoState {
         toComment.setCommentCount(toComment.getCommentCount() + 1);
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedComments(toComment, new IssueMetadata(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
+        markUpdatedComments(toComment,
+            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }
@@ -404,7 +405,7 @@ public class DummyRepoState {
                 metadataOfIssue.getComments() :
                 new ArrayList<>();
 
-        return new ImmutablePair<>(toMutate, new IssueMetadata(eventsOfIssue, commentsOfIssue, "", ""));
+        return new ImmutablePair<>(toMutate, IssueMetadata.intermediate(eventsOfIssue, commentsOfIssue, "", ""));
     }
 
     /**

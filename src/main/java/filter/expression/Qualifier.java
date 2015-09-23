@@ -22,12 +22,6 @@ public class Qualifier implements FilterExpression {
     public static final String REPO = "repo";
     public static final String SORT = "sort";
     private static final String UPDATED = "updated";
-    private static final String UPDATED_BY_OTHERS = "updated-others";
-    private static final String UPDATED_BY_SELF = "updated-self";
-
-    private enum UpdatedKind {
-        SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
-    }
 
     public static final Qualifier EMPTY = new Qualifier("", "");
 
@@ -36,8 +30,7 @@ public class Qualifier implements FilterExpression {
         "date", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",
-        "title", "type", "unmerged", "unread", UPDATED, UPDATED_BY_OTHERS,
-        UPDATED_BY_SELF, "user"
+        "title", "type", "unmerged", "unread", UPDATED, "user"
     ));
 
     private final String name;
@@ -210,11 +203,7 @@ public class Qualifier implements FilterExpression {
         case "created":
             return satisfiesCreationDate(issue);
         case UPDATED:
-            return satisfiesUpdatedHours(issue, UpdatedKind.ALL_UPDATED);
-        case UPDATED_BY_OTHERS:
-            return satisfiesUpdatedHours(issue, UpdatedKind.OTHER_UPDATED);
-        case UPDATED_BY_SELF:
-            return satisfiesUpdatedHours(issue, UpdatedKind.SELF_UPDATED);
+            return satisfiesUpdatedHours(issue);
         case REPO:
             return satisfiesRepo(issue);
         default:
@@ -395,8 +384,6 @@ public class Qualifier implements FilterExpression {
     public static boolean isUpdatedQualifier(Qualifier q) {
         switch (q.getName()) {
             case UPDATED:
-            case UPDATED_BY_SELF:
-            case UPDATED_BY_OTHERS:
                 return true;
             default:
                 return false;
@@ -558,7 +545,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue, UpdatedKind updatedKind) {
+    private boolean satisfiesUpdatedHours(TurboIssue issue) {
         NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
@@ -569,32 +556,9 @@ public class Qualifier implements FilterExpression {
             return false;
         }
 
-        LocalDateTime dateOfUpdate = null;
-
-        //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
-        //and getSelfUpdatedAt
-        switch (updatedKind){
-            case SELF_UPDATED:
-                if (issue.getMetadata().isUpdatedBySelf()) {
-                    dateOfUpdate = issue.getMetadata().getSelfUpdatedAt();
-                }
-                break;
-            case OTHER_UPDATED:
-                if (issue.getMetadata().isUpdatedByOthers()) {
-                    dateOfUpdate = issue.getMetadata().getNonSelfUpdatedAt();
-                }
-                break;
-            case ALL_UPDATED:
-                // The or condition for dateOfUpdate is for first time check
-                dateOfUpdate = issue.getUpdatedAt();
-        }
-
-        if (dateOfUpdate == null) {
-            return false;
-        } else {
-            int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
-            return updatedRange.encloses(hoursSinceUpdate);
-        }
+        LocalDateTime dateOfUpdate = issue.getUpdatedAt();
+        int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+        return updatedRange.encloses(hoursSinceUpdate);
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
