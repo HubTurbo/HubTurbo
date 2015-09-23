@@ -11,201 +11,160 @@ import java.util.Date;
 import java.util.List;
 
 public class IssueMetadata {
+
     private final List<TurboIssueEvent> events;
     private final List<Comment> comments;
+
+    // This field expresses whether this metadata is known to be the latest
+    // at the time of instantiation. It is like a dirty flag which is
+    // invalidated when the issue that this metadata is for is updated.
+
+    private final boolean isLatest;
+
+    // Properties computed from events and comments on instantiation, so we
+    // don't have to recompute on querying.
+
+    private final String user;
     private final LocalDateTime nonSelfUpdatedAt;
-    private final LocalDateTime selfUpdatedAt;
     private final int nonSelfCommentCount;
-    private final int selfCommentCount;
-
-    private final boolean isUpdatedBySelf; // for update by self
-    private final boolean isUpdatedByOthers; // for update by others
-
-    private enum UpdatedKind {
-        UPDATED_BY_SELF, UPDATED_BY_OTHER
-    }
 
     private final String eventsETag; // Only modified in the DownloadMetadataTask constructor
     private final String commentsETag;
 
-    // Constructor for default use when initializing TurboIssue
-    public IssueMetadata() {
-        events = new ArrayList<>();
-        comments = new ArrayList<>();
-
-        nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
-        selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
-        nonSelfCommentCount = 0;
-        selfCommentCount = 0;
-        isUpdatedByOthers = false;
-        isUpdatedBySelf = false;
-
-        eventsETag = "";
-        commentsETag = "";
+    /**
+     * Factory method for the empty metadata instance. This is used as the default for
+     * new issues.
+     */
+    public static IssueMetadata empty() {
+        return new IssueMetadata(new ArrayList<>(), new ArrayList<>(), false, "", "");
     }
 
-    // Copy constructor used in TurboIssue
-    public IssueMetadata(IssueMetadata other) {
-        this.events = new ArrayList<>(other.events);
-        this.comments = new ArrayList<>(other.comments);
-
-        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
-        this.selfUpdatedAt = other.selfUpdatedAt;
-        this.nonSelfCommentCount  = other.nonSelfCommentCount;
-        this.selfCommentCount = other.selfCommentCount;
-        this.isUpdatedByOthers = other.isUpdatedByOthers;
-        this.isUpdatedBySelf = other.isUpdatedBySelf;
-
-        this.eventsETag = other.eventsETag;
-        this.commentsETag = other.commentsETag;
+    /**
+     * Invalidates a metadata instance. This occurs after issue updates are reconciled; in
+     * that case we assume the metadata is no longer the latest.
+     */
+    public IssueMetadata invalidate() {
+        return new IssueMetadata(events, comments, false, eventsETag, commentsETag, user);
     }
 
-    // Copy constructor used in reconciliation
-    public IssueMetadata(IssueMetadata other, boolean isUpdated) {
-        this.events = new ArrayList<>(other.events);
-        this.comments = new ArrayList<>(other.comments);
-
-        this.nonSelfUpdatedAt = other.nonSelfUpdatedAt;
-        this.selfUpdatedAt = other.selfUpdatedAt;
-        this.nonSelfCommentCount  = other.nonSelfCommentCount;
-        this.selfCommentCount  = other.selfCommentCount;
-        this.isUpdatedByOthers = other.isUpdatedByOthers;
-        this.isUpdatedBySelf = other.isUpdatedBySelf;
-
-        this.eventsETag = other.eventsETag;
-        this.commentsETag = other.commentsETag;
+    /**
+     * Constructs an intermediate metadata instance. Intermediate metadata does not have
+     * computed properties filled in; the name of the current user is required for that.
+     * Intermediate instances are constructed immediately upon download. The current user
+     * is filled in later.
+     */
+    public static IssueMetadata intermediate(List<TurboIssueEvent> events, List<Comment> comments,
+                                             String eventsETag, String commentsETag) {
+        return new IssueMetadata(events, comments, false, eventsETag, commentsETag);
     }
 
-    // Constructor used in DownloadMetadataTask
-    public IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
-                         String eventsETag, String commentsETag) {
-        this.events = events;
-        this.comments = comments;
+    /**
+     * Fills in the current user for an intermediate metadata instance, computing properties
+     * and turning it into a full metadata instance.
+     * May also be used to change the perspective of a full metadata instance, but that's
+     * not very interesting.
+     */
+    public IssueMetadata full(String currentUser) {
+        return new IssueMetadata(events, comments, true, eventsETag, commentsETag, currentUser);
+    }
 
-        this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
-        this.selfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0)); // Not calculated yet
-        this.nonSelfCommentCount = 0; // Not calculated yet
-        this.selfCommentCount = 0; // Not calculated yet
-        this.isUpdatedByOthers = false;
-        this.isUpdatedBySelf = false;
+    /**
+     * Reconciles a newly-updated metadata instance against older data.
+     */
+    public IssueMetadata reconcile(LocalDateTime nonSelfUpdatedAt,
+                                   List<TurboIssueEvent> existingEvents, String existingETag) {
+        List<TurboIssueEvent> newEvents;
+        if (existingETag.equals(eventsETag)) {
+            newEvents = new ArrayList<>(existingEvents);
+        } else {
+            newEvents = new ArrayList<>(events);
+        }
+        return new IssueMetadata(newEvents, comments, isLatest, eventsETag, commentsETag, nonSelfUpdatedAt, user);
+    }
 
+    /**
+     * Intermediate metadata constructor (no user provided, empty computed properties)
+     */
+    private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
+                          boolean isLatest, String eventsETag, String commentsETag) {
+        this.events = new ArrayList<>(events);
+        this.comments = new ArrayList<>(comments);
+        this.isLatest = isLatest;
         this.eventsETag = eventsETag;
         this.commentsETag = commentsETag;
+
+        this.user = "";
+        this.nonSelfUpdatedAt = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
+        this.nonSelfCommentCount = 0;
     }
 
-    // Constructor used in Logic
-    public IssueMetadata(IssueMetadata existingMetadata, String currentUser) {
-        Date lastNonSelfUpdate = new Date(0);
-        Date lastSelfUpdate = new Date(0);
-        boolean isUpdatedByOthers = false;
-        boolean isUpdatedBySelf = false;
-        for (TurboIssueEvent event : existingMetadata.getEvents()) {
-            if (isNewEventByOther(currentUser, event, lastNonSelfUpdate)) {
-                lastNonSelfUpdate = event.getDate();
-                isUpdatedByOthers = true;
-            }
-            if (isNewEventBySelf(currentUser, event, lastSelfUpdate)){
-                lastSelfUpdate = event.getDate();
-                isUpdatedBySelf = true;
+    /**
+     * Full metadata constructor (user provided, computed properties present)
+     */
+    private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
+                          boolean isLatest, String eventsETag, String commentsETag,
+                          String user) {
+        this(events, comments, isLatest, eventsETag, commentsETag,
+            computeNonSelfUpdatedAt(events, comments, user), user);
+    }
+
+    /**
+     * Full metadata constructor with nonSelfUpdateTime left out
+     */
+    private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
+                          boolean isLatest, String eventsETag, String commentsETag,
+                          LocalDateTime nonSelfUpdatedAt, String user) {
+        this.events = new ArrayList<>(events);
+        this.comments = new ArrayList<>(comments);
+        this.isLatest = isLatest;
+        this.eventsETag = eventsETag;
+        this.commentsETag = commentsETag;
+
+        this.user = user;
+        this.nonSelfUpdatedAt = nonSelfUpdatedAt;
+        this.nonSelfCommentCount = countCommentsByOthers(comments, user);
+    }
+
+    private static LocalDateTime computeNonSelfUpdatedAt(List<TurboIssueEvent> events, List<Comment> comments,
+                                                         String user) {
+        Date result = new Date(0);
+        for (TurboIssueEvent event : events) {
+            if (isEventByOthers(event, user) && event.getDate().after(result)) {
+                result = event.getDate();
             }
         }
-        for (Comment comment : existingMetadata.getComments()) {
-            if (isNewCommentByOther(currentUser, comment, lastNonSelfUpdate)) {
-                lastNonSelfUpdate = comment.getCreatedAt();
-                isUpdatedByOthers = true;
-            }
-            if (isNewCommentBySelf(currentUser, comment, lastSelfUpdate)){
-                lastSelfUpdate = comment.getCreatedAt();
-                isUpdatedBySelf = true;
+        for (Comment comment : comments) {
+            if (isCommentByOthers(comment, user) && comment.getCreatedAt().after(result)) {
+                result = comment.getCreatedAt();
             }
         }
-
-        this.events = new ArrayList<>(existingMetadata.events);
-        this.comments = new ArrayList<>(existingMetadata.comments);
-        this.nonSelfUpdatedAt = Utility.dateToLocalDateTime(lastNonSelfUpdate);
-        this.selfUpdatedAt = Utility.dateToLocalDateTime(lastSelfUpdate);
-        this.nonSelfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
-                UpdatedKind.UPDATED_BY_OTHER);
-        this.selfCommentCount = calculateCommentCount(existingMetadata.getComments(), currentUser,
-                UpdatedKind.UPDATED_BY_SELF);
-        this.isUpdatedByOthers = isUpdatedByOthers;
-        this.isUpdatedBySelf = isUpdatedBySelf;
-
-        this.eventsETag = existingMetadata.eventsETag;
-        this.commentsETag = existingMetadata.commentsETag;
+        return Utility.dateToLocalDateTime(result);
     }
 
-    private static boolean isNewCommentByOther(String currentUser, Comment comment, Date lastNonSelfUpdate){
-        return !comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                && comment.getCreatedAt().after(lastNonSelfUpdate);
+    private static boolean isCommentBySelf(Comment comment, String user) {
+        return comment.getUser().getLogin().equalsIgnoreCase(user);
     }
 
-    private static boolean isNewCommentBySelf(String currentUser, Comment comment, Date lastSelfUpdate){
-        return comment.getUser().getLogin().equalsIgnoreCase(currentUser)
-                && comment.getCreatedAt().after(lastSelfUpdate);
+    private static boolean isCommentByOthers(Comment comment, String user) {
+        return !isCommentBySelf(comment, user);
     }
 
-    private static boolean isNewEventBySelf(String currentUser, TurboIssueEvent event, Date lastSelfUpdate){
-        return event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                && event.getDate().after(lastSelfUpdate);
+    private static int countCommentsBySelf(List<Comment> comments, String user) {
+        return Utility.safeLongToInt((comments.stream()
+            .filter(c -> isCommentBySelf(c, user))
+            .count()));
     }
 
-    private static boolean isNewEventByOther(String currentUser, TurboIssueEvent event, Date lastNonSelfUpdate){
-        return !event.getActor().getLogin().equalsIgnoreCase(currentUser)
-                && event.getDate().after(lastNonSelfUpdate);
+    private static boolean isEventBySelf(TurboIssueEvent event, String user) {
+        return event.getActor().getLogin().equalsIgnoreCase(user);
     }
 
-    private static int calculateCommentCount(List<Comment> comments, String currentUser, UpdatedKind updatedKind) {
-        int result = 0;
-        if (updatedKind == UpdatedKind.UPDATED_BY_OTHER) {
-            return Utility.safeLongToInt((comments.stream().filter(c -> !isCommentBySelf(currentUser, c)).count()));
-        } else if (updatedKind == UpdatedKind.UPDATED_BY_SELF){
-            return Utility.safeLongToInt((comments.stream().filter(c -> isCommentBySelf(currentUser, c)).count()));
-        }
-        return result;
+    private static boolean isEventByOthers(TurboIssueEvent event, String user) {
+        return !isEventBySelf(event, user);
     }
 
-    private static boolean isCommentBySelf(String currentUser, Comment comment){
-        return comment.getUser().getLogin().equalsIgnoreCase(currentUser);
-    }
-
-    // Constructor used in MultiModel
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt,
-                         List<TurboIssueEvent> currEvents, String currEventsETag) {
-        if (currEventsETag.equals(other.eventsETag)) {
-            events = new ArrayList<>(currEvents);
-        } else {
-            events = new ArrayList<>(other.events);
-        }
-        this.comments = new ArrayList<>(other.comments);
-
-        this.nonSelfUpdatedAt = nonSelfUpdatedAt; // After creation date reconciliation
-        this.selfUpdatedAt = other.selfUpdatedAt;
-        this.nonSelfCommentCount  = other.nonSelfCommentCount;
-        this.selfCommentCount = other.selfCommentCount;
-        this.isUpdatedBySelf = other.isUpdatedBySelf;
-        this.isUpdatedByOthers = other.isUpdatedByOthers;
-
-        this.eventsETag = other.eventsETag;
-        this.commentsETag = other.commentsETag;
-    }
-
-    //Constructor used in FilterEvalTests
-    public IssueMetadata(IssueMetadata other, LocalDateTime nonSelfUpdatedAt, LocalDateTime selfUpdatedAt,
-                         int nonSelfCommentCount, int selfCommentCount,
-                         boolean isUpdatedByOthers, boolean isUpdatedBySelf) {
-        this.events = new ArrayList<>(other.events);
-        this.comments = new ArrayList<>(other.comments);
-
-        this.nonSelfUpdatedAt = nonSelfUpdatedAt; // Calculated just prior to calling this constructor
-        this.selfUpdatedAt = selfUpdatedAt;
-        this.nonSelfCommentCount = nonSelfCommentCount;
-        this.selfCommentCount = selfCommentCount;
-        this.isUpdatedBySelf = isUpdatedBySelf;
-        this.isUpdatedByOthers = isUpdatedByOthers;
-
-        this.eventsETag = "";
-        this.commentsETag = "";
+    private static int countCommentsByOthers(List<Comment> comments, String user) {
+        return comments.size() - countCommentsBySelf(comments, user);
     }
 
     public String summarise() {
@@ -220,28 +179,16 @@ public class IssueMetadata {
         return new ArrayList<>(comments);
     }
 
+    public boolean isLatest() {
+        return isLatest;
+    }
+
     public LocalDateTime getNonSelfUpdatedAt() {
         return nonSelfUpdatedAt;
     }
 
-    public LocalDateTime getSelfUpdatedAt() {
-        return selfUpdatedAt;
-    }
-
     public int getNonSelfCommentCount() {
         return nonSelfCommentCount;
-    }
-
-    public int getSelfCommentCount() {
-        return selfCommentCount;
-    }
-
-    public boolean isUpdatedByOthers() {
-        return isUpdatedByOthers;
-    }
-
-    public boolean isUpdatedBySelf() {
-        return isUpdatedBySelf;
     }
 
     public String getEventsETag() {

@@ -46,7 +46,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
 
             List<Comment> comments = repo.getComments(repoId, id);
 
-            IssueMetadata metadata = new IssueMetadata(events, comments, updatedEventsETag, currCommentsETag);
+            IssueMetadata metadata = IssueMetadata.intermediate(events, comments, updatedEventsETag, currCommentsETag);
             result.put(id, metadata);
         });
 

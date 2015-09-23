@@ -109,7 +109,7 @@ public class TurboIssue {
         this.labels = new ArrayList<>(issue.labels);
         this.milestone = issue.milestone;
 
-        this.metadata = new IssueMetadata(issue.metadata);
+        this.metadata = issue.metadata;
         this.repoId = issue.repoId;
         this.markedReadAt = issue.markedReadAt;
     }
@@ -140,7 +140,7 @@ public class TurboIssue {
             ? Optional.empty()
             : Optional.of(issue.getMilestone().getNumber());
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
     }
@@ -160,7 +160,7 @@ public class TurboIssue {
         this.labels = issue.getLabels();
         this.milestone = issue.getMilestone();
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
     }
@@ -182,7 +182,7 @@ public class TurboIssue {
         this.labels = new ArrayList<>();
         this.milestone = Optional.empty();
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.markedReadAt = Optional.empty();
     }
 
@@ -194,7 +194,7 @@ public class TurboIssue {
      * @param fromIssue
      */
     private void transferTransientState(TurboIssue fromIssue) {
-        this.metadata = new IssueMetadata(fromIssue.metadata, false);
+        this.metadata = fromIssue.metadata.invalidate();
         this.markedReadAt = fromIssue.markedReadAt;
     }
 

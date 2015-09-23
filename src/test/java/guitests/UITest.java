@@ -1,31 +1,46 @@
 package guitests;
 
-import backend.interfaces.RepoStore;
-import com.google.common.util.concurrent.SettableFuture;
+import static com.google.common.io.Files.getFileExtension;
 
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.stage.Stage;
-import org.junit.Before;
-import org.loadui.testfx.GuiTest;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
-import org.loadui.testfx.exceptions.NoNodesVisibleException;
-import org.loadui.testfx.utils.FXTestUtils;
-import prefs.Preferences;
-import ui.UI;
-import util.PlatformEx;
-
+import java.awt.Robot;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
-import static com.google.common.io.Files.getFileExtension;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
+import org.loadui.testfx.FXScreenController;
+import org.loadui.testfx.GuiTest;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
+import org.loadui.testfx.exceptions.NoNodesVisibleException;
+import org.loadui.testfx.utils.FXTestUtils;
+
+import com.google.common.util.concurrent.SettableFuture;
+
+import backend.interfaces.RepoStore;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.stage.Stage;
+import prefs.Preferences;
+import ui.UI;
+import util.PlatformEx;
 
 public class UITest extends GuiTest {
+
+    private static final Logger logger = LogManager.getLogger(UITest.class.getName());
 
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
 
@@ -39,6 +54,15 @@ public class UITest extends GuiTest {
             super.start(primaryStage);
             STAGE_FUTURE.set(primaryStage);
         }
+    }
+
+    private final Robot robot;
+    private final FXScreenController screenController;
+
+    public UITest() {
+        super();
+        screenController = getScreenController();
+        robot = getRobot();
     }
 
     public void setupMethod() {
@@ -93,6 +117,61 @@ public class UITest extends GuiTest {
         return stage.getScene().getRoot();
     }
 
+    private FXScreenController getScreenController() {
+        try {
+            return (FXScreenController) FieldUtils.readField(this, "controller", true);
+        } catch (IllegalAccessException e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return null;
+        }
+    }
+
+    private Robot getRobot() {
+        try {
+            return (Robot) FieldUtils.readField(screenController, "robot", true);
+        } catch (IllegalAccessException e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void pressNoWait(KeyCode key) {
+        robot.keyPress(key.impl_getCode());
+    }
+
+    @SuppressWarnings("deprecation")
+    private void releaseNoWait(KeyCode key) {
+        robot.keyRelease(key.impl_getCode());
+    }
+
+    public void pushKeys(KeyCodeCombination combination) {
+        List<KeyCode> keys = new ArrayList<>();
+        if (combination.getAlt() == KeyCombination.ModifierValue.DOWN) {
+            keys.add(KeyCode.ALT);
+        }
+        if (combination.getShift() == KeyCombination.ModifierValue.DOWN) {
+            keys.add(KeyCode.SHIFT);
+        }
+        if (combination.getControl() == KeyCombination.ModifierValue.DOWN) {
+            keys.add(KeyCode.CONTROL);
+        }
+        keys.add(combination.getCode());
+        pushKeys(keys);
+    }
+
+    public void pushKeys(KeyCode... keys) {
+        pushKeys(Arrays.asList(keys));
+    }
+
+    private void pushKeys(List<KeyCode> keys) {
+        keys.forEach(this::pressNoWait);
+        for (int i = keys.size() - 1; i >= 0; i--) {
+            releaseNoWait(keys.get(i));
+        }
+        PlatformEx.waitOnFxThread();
+    }
+
     public void waitUntilNodeAppears(Node node) {
         waitUntil(node, Node::isVisible);
     }
@@ -110,6 +189,13 @@ public class UITest extends GuiTest {
 
     public void waitUntilNodeDisappears(String selector) {
         while (existsQuiet(selector)) {
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
+    public <T extends Node> void waitUntil(String selector, Predicate<T> condition) {
+        while (!condition.test(find(selector))) {
             PlatformEx.waitOnFxThread();
             sleep(100);
         }

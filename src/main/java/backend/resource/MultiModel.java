@@ -87,8 +87,8 @@ public class MultiModel implements IModel {
                 // TODO move ETag comparison here when comments ETag implementation is complete.
                 LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
                         issue.getCreatedAt(), currentUser, issue.getCreator());
-                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt,
-                        issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
+                issue.setMetadata(toBeInserted.reconcile(nonSelfUpdatedAt,
+                    issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
             }
         });
     }
