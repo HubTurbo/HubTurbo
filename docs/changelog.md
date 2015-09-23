@@ -1,5 +1,11 @@
 # Changelog
 
+# V3.7.1
+
+- Temporarily removed `updated-self` and `updated-others`
+- Fixed bug where adding labels quickly caused undo not to work properly
+- Improvements to testing infrastructure
+
 # V3.7.0
 
 - <kbd>Ctrl</kbd> + <kbd>1</kbd> .. <kbd>9</kbd> will jump to the nth issue

@@ -50,7 +50,7 @@ public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
     private static final int VERSION_MINOR = 7;
-    private static final int VERSION_PATCH = 0;
+    private static final int VERSION_PATCH = 1;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
