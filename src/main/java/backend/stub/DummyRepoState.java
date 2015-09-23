@@ -139,7 +139,7 @@ public class DummyRepoState {
         if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
-            new ArrayList<>(updatedIssues.values()), currETag, lastCheckTime);
+            deepCopyIssues(updatedIssues), currETag, lastCheckTime);
 
         updatedIssues = new TreeMap<>();
         return toReturn;
@@ -150,7 +150,7 @@ public class DummyRepoState {
         if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboLabel>, String> toReturn
-            = new ImmutablePair<>(new ArrayList<>(updatedLabels.values()), currETag);
+            = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
 
         updatedLabels = new TreeMap<>();
         return toReturn;
@@ -161,7 +161,7 @@ public class DummyRepoState {
         if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboMilestone>, String> toReturn
-            = new ImmutablePair<>(new ArrayList<>(updatedMilestones.values()), currETag);
+            = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
 
         updatedMilestones = new TreeMap<>();
         return toReturn;
@@ -172,26 +172,26 @@ public class DummyRepoState {
         if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboUser>, String> toReturn
-            = new ImmutablePair<>(new ArrayList<>(updatedUsers.values()), currETag);
+            = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
 
         updatedUsers = new TreeMap<>();
         return toReturn;
     }
 
     protected List<TurboIssue> getIssues() {
-        return new ArrayList<>(issues.values());
+        return deepCopyIssues(issues);
     }
 
     protected List<TurboLabel> getLabels() {
-        return new ArrayList<>(labels.values());
+        return deepCopyLabels(labels);
     }
 
     protected List<TurboMilestone> getMilestones() {
-        return new ArrayList<>(milestones.values());
+        return deepCopyMilestones(milestones);
     }
 
     protected List<TurboUser> getCollaborators() {
-        return new ArrayList<>(users.values());
+        return deepCopyUsers(users);
     }
 
     private TurboIssue makeDummyIssue() {
@@ -439,4 +439,59 @@ public class DummyRepoState {
         updatedComments.add(issueId);
     }
 
+    /**
+     * Copies the TreeMap of issues by creating a List containing copies of state-stored issues. Prevents
+     * external mutation of the issue objects from propagating to the repo state.
+     *
+     * @param issuesToCopy A TreeMap containing state-stored issues to copy from.
+     * @return A list containing copies of given issues.
+     */
+    private List<TurboIssue> deepCopyIssues(TreeMap<Integer, TurboIssue> issuesToCopy) {
+        ArrayList<TurboIssue> copiedIssues = new ArrayList<>();
+        issuesToCopy.values().forEach(issue -> copiedIssues.add(new TurboIssue(issue)));
+
+        return copiedIssues;
+    }
+
+    /**
+     * Copies the TreeMap of labels by creating a List containing copies of state-stored labels. Prevents
+     * external mutation of the label objects from propagating to the repo state.
+     *
+     * @param labelsToCopy A TreeMap containing state-stored labels to copy from.
+     * @return A list containing copies of given labels.
+     */
+    private List<TurboLabel> deepCopyLabels(TreeMap<String, TurboLabel> labelsToCopy) {
+        ArrayList<TurboLabel> copiedLabels = new ArrayList<>();
+        labelsToCopy.values().forEach(label -> copiedLabels.add(new TurboLabel(label)));
+
+        return copiedLabels;
+    }
+
+    /**
+     * Copies the TreeMap of milestones by creating a List containing copies of state-stored milestones. Prevents
+     * external mutation of the milestone objects from propagating to the repo state.
+     *
+     * @param milestonesToCopy A TreeMap containing state-stored milestones to copy from.
+     * @return A list containing copies of given milestones.
+     */
+    private List<TurboMilestone> deepCopyMilestones(TreeMap<Integer, TurboMilestone> milestonesToCopy) {
+        ArrayList<TurboMilestone> copiedMilestones = new ArrayList<>();
+        milestonesToCopy.values().forEach(milestone -> copiedMilestones.add(new TurboMilestone(milestone)));
+
+        return copiedMilestones;
+    }
+
+    /**
+     * Copies the TreeMap of users by creating a List containing copies of state-stored users. Prevents
+     * external mutation of the user objects from propagating to the repo state.
+     *
+     * @param usersToCopy A TreeMap containing state-stored users to copy from.
+     * @return A list containing copies of given users.
+     */
+    private List<TurboUser> deepCopyUsers(TreeMap<String, TurboUser> usersToCopy) {
+        ArrayList<TurboUser> copiedUsers = new ArrayList<>();
+        usersToCopy.values().forEach(user -> copiedUsers.add(new TurboUser(user)));
+
+        return copiedUsers;
+    }
 }

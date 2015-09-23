@@ -36,6 +36,16 @@ public class TurboUser {
         this.repoId = replaceNull(repoId, "");
     }
 
+    /**
+     * Copy constructor
+     */
+    public TurboUser(TurboUser user) {
+        this.loginName = user.getLoginName();
+        this.realName = user.getRealName();
+        this.avatarURL = user.getAvatarURL();
+        this.repoId = user.getRepoId();
+    }
+
     public TurboUser(String repoId, String loginName, String realName) {
         this.loginName = replaceNull(loginName, "");
         this.realName = replaceNull(realName, "");
