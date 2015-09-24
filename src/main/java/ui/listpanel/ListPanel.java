@@ -165,7 +165,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void setupKeyboardShortcuts() {
-        filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        filterTextField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (JUMP_TO_FIRST_ISSUE.match(event)) {
                 event.consume();
                 listView.selectNthItem(1);
@@ -187,7 +187,7 @@ public class ListPanel extends FilterPanel {
             }
         });
 
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.markAsRead.match(event)) {
                 markAsRead();
             }

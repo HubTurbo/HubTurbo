@@ -236,7 +236,7 @@ public class PanelControl extends HBox {
         return 40 + AbstractPanel.PANEL_WIDTH;
     }
     private void setupKeyEvents() {
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
