@@ -8,39 +8,25 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.*;
 import github.update.*;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
-
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 public class GitHubRepo implements Repo {
 
@@ -48,6 +34,7 @@ public class GitHubRepo implements Repo {
 
     private final GitHubClientEx client = new GitHubClientEx();
     private final IssueServiceEx issueService = new IssueServiceEx(client);
+    private final PullRequestServiceEx pullRequestService = new PullRequestServiceEx();
     private final CollaboratorService collaboratorService = new CollaboratorService(client);
     private final LabelServiceEx labelService = new LabelServiceEx(client);
     private final MilestoneService milestoneService = new MilestoneService(client);
@@ -222,6 +209,26 @@ public class GitHubRepo implements Repo {
     public List<Comment> getComments(String repoId, int issueId) {
         try {
             return issueService.getComments(RepositoryId.createFromId(repoId), issueId);
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
+        try {
+            return pullRequestService.getReviewComments(RepositoryId.createFromId(repoId),
+                                                        pullRequestId);
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            return new ArrayList<>();
+        }
+    }
+
+    public List<CommitComment> getCommitComments(String repoId, int pullRequestId) {
+        try {
+            return pullRequestService.getComments(RepositoryId.createFromId(repoId),
+                                                  pullRequestId);
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();
