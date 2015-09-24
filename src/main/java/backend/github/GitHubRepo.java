@@ -215,6 +215,7 @@ public class GitHubRepo implements Repo {
         }
     }
 
+    @Override
     public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
         try {
             return pullRequestService.getReviewComments(RepositoryId.createFromId(repoId),
@@ -225,6 +226,7 @@ public class GitHubRepo implements Repo {
         }
     }
 
+    @Override
     public List<CommitComment> getCommitComments(String repoId, int pullRequestId) {
         try {
             return pullRequestService.getComments(RepositoryId.createFromId(repoId),
@@ -233,6 +235,26 @@ public class GitHubRepo implements Repo {
             HTLog.error(logger, e);
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Get all types of comments for an issue. Review comments and commit comments
+     * are only relevant if the issue is a also pull request
+     * @param repoId
+     * @param issue
+     * @return list of comments for an issue
+     */
+    @Override
+    public List<Comment> getAllComments(String repoId, TurboIssue issue) {
+        List<Comment> result = new ArrayList<>();
+
+        result.addAll(getComments(repoId, issue.getId()));
+        if (issue.isPullRequest()) {
+            result.addAll(getReviewComments(repoId, issue.getId()));
+            result.addAll(getCommitComments(repoId, issue.getId()));
+        }
+
+        return result;
     }
 
     @Override

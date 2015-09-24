@@ -6,15 +6,18 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import github.ReviewComment;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Label;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -153,6 +156,21 @@ public class DummyRepo implements Repo {
     public List<Comment> getComments(String repoId, int issueId) {
         apiQuota--;
         return getRepoState(repoId).getComments(issueId);
+    }
+
+    @Override
+    public List<Comment> getAllComments(String repoId, TurboIssue issue) {
+        return getComments(repoId, issue.getId());
+    }
+
+    @Override
+    public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<CommitComment> getCommitComments(String repoId, int pullRequestId) {
+        return new ArrayList<>();
     }
 
     @Override
