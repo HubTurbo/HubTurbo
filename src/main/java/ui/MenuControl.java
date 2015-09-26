@@ -170,20 +170,21 @@ public class MenuControl extends MenuBar {
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
 
-        List<PanelInfo> panels = getCurrentPanels();
+        List<PanelInfo> panelList = getCurrentPanels();
 
-        if (panels.isEmpty()) {
+        if (panelList.isEmpty()) {
             logger.info("Did not save new board");
             return;
         }
 
         BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
-        mainStage.show();
-
+        ui.showMainStage();
+        this.panels.selectFirstPanel();
+        
         if (response.isPresent()) {
             String boardName = response.get().trim();
-            prefs.addBoard(boardName, panels);
+            prefs.addBoard(boardName, panelList);
             prefs.setLastOpenBoard(boardName);
             ui.triggerEvent(new BoardSavedEvent());
             logger.info("New board " + boardName + " saved");

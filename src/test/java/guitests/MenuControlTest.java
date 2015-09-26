@@ -2,6 +2,7 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 import org.junit.Test;
 
@@ -76,8 +77,8 @@ public class MenuControlTest extends UITest {
         // Testing board save as
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        type("Board 1");
-        click("Save");
+        ((TextField) find("#boardnameinput")).setText("Board 1");
+        click("OK");
         PlatformEx.waitOnFxThread();
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(2, panelControl.getNumberOfPanels());
@@ -94,8 +95,8 @@ public class MenuControlTest extends UITest {
         
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        type("Board 2");
-        click("Save");
+        ((TextField) find("#boardnameinput")).setText("Board 2");
+        click("OK");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
@@ -104,22 +105,22 @@ public class MenuControlTest extends UITest {
         // Expected: save button disabled
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        push(KeyCode.BACK_SPACE);
-        Button saveButton1 = (Button) find("Save");
+        ((TextField) find("#boardnameinput")).setText("");
+        Button saveButton1 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton1.isDisabled());
         push(KeyCode.ESCAPE);
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        type("   ");
-        Button saveButton2 = (Button) find("Save");
+        ((TextField) find("#boardnameinput")).setText("   ");
+        Button saveButton2 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton2.isDisabled());
         click("Cancel");
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
-        type(" none   ");
-        Button saveButton3 = (Button) find("Save");
+        ((TextField) find("#boardnameinput")).setText("   none  ");
+        Button saveButton3 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton3.isDisabled());
         push(KeyCode.ESCAPE);
 
@@ -176,8 +177,8 @@ public class MenuControlTest extends UITest {
         // Expected: prompts user to save as new board
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.ENTER);
-        type("Board 1");
-        click("Save");
+        ((TextField) find("#boardnameinput")).setText("Board 1");
+        click("OK");
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));

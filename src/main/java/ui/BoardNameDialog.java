@@ -19,21 +19,19 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.ValidationSupport;
 
 public class BoardNameDialog extends Dialog<String> {
     
     private Preferences prefs;
     private TextField nameField;
     private Text prompt;
+    private Text errorText;
     private Button submitButton;
     private static Set<String> invalidNames;
-    private ValidationSupport validationSupport = new ValidationSupport();
     
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
-    private static final int BOARD_MAX_NAME_LENGTH = 10;
+    private static final int BOARD_MAX_NAME_LENGTH = 100;
     private static final String ERROR_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
     private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
@@ -45,7 +43,6 @@ public class BoardNameDialog extends Dialog<String> {
         setupGrid();
         createButtons();
         addListener();
-        addValidation();
         initializeInvalidNames();
     }
     
@@ -62,9 +59,10 @@ public class BoardNameDialog extends Dialog<String> {
     }
     
     private void createButtons() {
-        ButtonType submitButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType submitButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
         submitButton = (Button) getDialogPane().lookupButton(submitButtonType);
+        submitButton.setId("boardsavebutton");
         
         setResultConverter(submit -> {
             if (submit == submitButtonType) {
@@ -90,48 +88,38 @@ public class BoardNameDialog extends Dialog<String> {
         Platform.runLater(() -> {
             nameField.requestFocus();
         });
+        nameField.setId("boardnameinput");
         
         nameArea.getChildren().addAll(prompt, nameField);
         grid.add(nameArea, 0, 0);
         
+        errorText = new Text("");
+        grid.add(errorText, 0, 1);
+        
         getDialogPane().setContent(grid);
-    }
-    
-    private void addValidation() {
-        validationSupport.registerValidator(nameField, (c, newVal) -> {
-            boolean isEmpty = isBoardNameEmpty(nameField.getText().trim());
-            return ValidationResult.fromErrorIf(nameField, ERROR_EMPTY_NAME, isEmpty);
-        });
-        
-        validationSupport.registerValidator(nameField, (c, newVal) -> {
-            boolean isDuplicate = isBoardNameDuplicate(nameField.getText().trim());
-            return ValidationResult.fromErrorIf(nameField, ERROR_DUPLICATE_NAME, isDuplicate);
-        });
-        
-        validationSupport.registerValidator(nameField, (c, newVal) -> {
-            boolean isInvalid = isBoardNameInvalid(nameField.getText().trim());
-            return ValidationResult.fromErrorIf(nameField, ERROR_INVALID_NAME, isInvalid);
-        });
-        
-        validationSupport.registerValidator(nameField, (c, newVal) -> {
-            boolean isInvalid = (nameField.getText().length() > BOARD_MAX_NAME_LENGTH);
-            return ValidationResult.fromErrorIf
-                    (nameField, String.format(ERROR_LONG_NAME, BOARD_MAX_NAME_LENGTH), isInvalid);
-        });
     }
     
     private void addListener() {
         nameField.textProperty().addListener(c -> {
+            String newName = nameField.getText().trim();
             if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
                 nameField.setText(previousText);
-            }
-            previousText = nameField.getText();
-            
-            if (isBoardNameInvalid(nameField.getText().trim()) || isBoardNameEmpty(nameField.getText().trim())) {
+                errorText.setText(ERROR_LONG_NAME);
+                submitButton.setDisable(false);
+            } else if (isBoardNameInvalid(newName)) {
+                errorText.setText(ERROR_INVALID_NAME);
                 submitButton.setDisable(true);
+            } else if (isBoardNameEmpty(newName)) {
+                errorText.setText(ERROR_EMPTY_NAME);
+                submitButton.setDisable(true);
+            } else if (isBoardNameDuplicate(newName)) {
+                errorText.setText(ERROR_DUPLICATE_NAME);
+                submitButton.setDisable(false);
             } else {
+                errorText.setText("");
                 submitButton.setDisable(false);
             }
+            previousText = nameField.getText();
         });
     }
     

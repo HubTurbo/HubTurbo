@@ -57,8 +57,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
-        type("Empty Board");
-        click("Save");
+        ((TextField) find("#boardnameinput")).setText("Empty Board");
         click("OK");
         
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
