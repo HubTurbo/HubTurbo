@@ -1,6 +1,7 @@
 package guitests;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Button;
 
 import org.junit.Test;
 
@@ -80,7 +81,7 @@ public class MenuControlTest extends UITest {
         assertEquals(2, panelControl.getNumberOfPanels());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
-        // Testing board open keyboard shortcut when there is only one saved board
+        // Testing board switch keyboard shortcut when there is only one saved board
         // Expected: nothing happens
         press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
         assertEquals(true, testPref.getLastOpenBoard().isPresent());
@@ -98,21 +99,27 @@ public class MenuControlTest extends UITest {
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
         
         // Testing invalid board names
+        // Expected: save button disabled
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         push(KeyCode.BACK_SPACE);
-        click("Save");
-        PlatformEx.waitOnFxThread();
-        assertEquals(2, panelControl.getNumberOfSavedBoards());
-        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
+        Button saveButton1 = (Button) find("Save");
+        assertEquals(true, saveButton1.isDisabled());
+        push(KeyCode.ESCAPE);
 
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         type("   ");
-        click("Save");
-        PlatformEx.waitOnFxThread();
-        assertEquals(2, panelControl.getNumberOfSavedBoards());
-        assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
+        Button saveButton2 = (Button) find("Save");
+        assertEquals(true, saveButton2.isDisabled());
+        click("Cancel");
+
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        type(" none   ");
+        Button saveButton3 = (Button) find("Save");
+        assertEquals(true, saveButton3.isDisabled());
+        push(KeyCode.ESCAPE);
 
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
         press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);

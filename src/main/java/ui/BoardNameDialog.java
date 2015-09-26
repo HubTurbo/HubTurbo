@@ -1,6 +1,6 @@
 package ui;
 
-import java.util.Optional;
+import java.util.ArrayList;
 
 import prefs.Preferences;
 import javafx.application.Platform;
@@ -24,21 +24,26 @@ public class BoardNameDialog extends Dialog<String> {
     TextField nameField;
     Text prompt;
     Text errorText;
-    ButtonType submitButtonType;
+    Button submitButton;
+
+    private ArrayList<String> invalidNames = new ArrayList<>(); 
     
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
-    private static final int BOARD_MAX_NAME_LENGTH = 20;
+    private static final int BOARD_MAX_NAME_LENGTH = 100;
     private static final String ERROR_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
-    private static final String ERROR_LONG_NAME = "Error: board name cannot exceed 20 letters.";
+    private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
+    private static final String ERROR_INVALID_NAME = "Error: invalid name.";
 
     public BoardNameDialog(Preferences prefs, Stage mainStage) {
-        this.prefs = prefs; // for checking against existing boards
+        this.prefs = prefs;
         initializeDialog(mainStage);
         setupGrid();
         createButtons();
         addListener();
+        
+        invalidNames.add("none"); // TODO possibly extend the list in the future
     }
     
     private void initializeDialog(Stage mainStage) {
@@ -48,8 +53,9 @@ public class BoardNameDialog extends Dialog<String> {
     }
     
     private void createButtons() {
-        submitButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType submitButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
+        submitButton = (Button) getDialogPane().lookupButton(submitButtonType);
         
         setResultConverter(submit -> {
             if (submit == submitButtonType) {
@@ -57,6 +63,7 @@ public class BoardNameDialog extends Dialog<String> {
             }
             return null;
         });
+        
     }
     
     protected void setupGrid() {
@@ -90,24 +97,35 @@ public class BoardNameDialog extends Dialog<String> {
     
     public void addListener() {
         nameField.textProperty().addListener(c -> {
+            String newName = nameField.getText().trim();
             if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
                 nameField.setText(previousText);
-                errorText.setText(ERROR_LONG_NAME);
-            } else if (isBoardNameEmpty(nameField.getText())) {
+                errorText.setText(String.format(ERROR_LONG_NAME, BOARD_MAX_NAME_LENGTH));
+                submitButton.setDisable(false);
+            } else if (isBoardNameInvalid(newName)) {
+                errorText.setText(ERROR_INVALID_NAME);
+                submitButton.setDisable(true);
+            } else if (isBoardNameEmpty(newName)) {
                 errorText.setText(ERROR_EMPTY_NAME);
-                // TODO disable button
-            } else if (isBoardNameDuplicate(nameField.getText())) {
+                submitButton.setDisable(true);
+            } else if (isBoardNameDuplicate(newName)) {
                 errorText.setText(ERROR_DUPLICATE_NAME);
+                submitButton.setDisable(false);
             } else {
                 errorText.setText("");
+                submitButton.setDisable(false);
             }
             previousText = nameField.getText();
         });
         
     }
     
+    private boolean isBoardNameInvalid(String newName) {
+        return invalidNames.contains(newName);
+    }
+    
     private boolean isBoardNameEmpty(String newName) {
-        if (newName.trim().equals("")) {
+        if (newName.equals("")) {
             return true;
         }
         return false;
@@ -122,8 +140,8 @@ public class BoardNameDialog extends Dialog<String> {
     
     private static void setupGridPane(GridPane grid) {
         grid.setAlignment(Pos.CENTER);
-        grid.setHgap(7);
-        grid.setVgap(10);
+        grid.setHgap(5);
+        grid.setVgap(5);
         grid.setPadding(new Insets(25));
         grid.setPrefSize(360, 60);
         grid.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
