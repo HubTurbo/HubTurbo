@@ -1,6 +1,8 @@
 package ui;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 
 import prefs.Preferences;
 import javafx.application.Platform;
@@ -17,20 +19,21 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 
 public class BoardNameDialog extends Dialog<String> {
     
-    Preferences prefs;
-    TextField nameField;
-    Text prompt;
-    Text errorText;
-    Button submitButton;
-
-    private ArrayList<String> invalidNames = new ArrayList<>(); 
+    private Preferences prefs;
+    private TextField nameField;
+    private Text prompt;
+    private Button submitButton;
+    private static Set<String> invalidNames;
+    private ValidationSupport validationSupport = new ValidationSupport();
     
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
-    private static final int BOARD_MAX_NAME_LENGTH = 100;
+    private static final int BOARD_MAX_NAME_LENGTH = 10;
     private static final String ERROR_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
     private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
@@ -42,8 +45,14 @@ public class BoardNameDialog extends Dialog<String> {
         setupGrid();
         createButtons();
         addListener();
-        
-        invalidNames.add("none"); // TODO possibly extend the list in the future
+        addValidation();
+        initializeInvalidNames();
+    }
+    
+    private static void initializeInvalidNames() {
+        Set<String> invalids = new HashSet<String>();
+        invalids.add("none"); // TODO possibly extend the set in the future
+        invalidNames = Collections.unmodifiableSet(invalids);
     }
     
     private void initializeDialog(Stage mainStage) {
@@ -85,39 +94,45 @@ public class BoardNameDialog extends Dialog<String> {
         nameArea.getChildren().addAll(prompt, nameField);
         grid.add(nameArea, 0, 0);
         
-        errorText = new Text("");
-        grid.add(errorText, 0, 1);
-        
-        if (isBoardNameDuplicate(DEFAULT_NAME)) {
-            errorText.setText(ERROR_DUPLICATE_NAME);
-        }
-        
         getDialogPane().setContent(grid);
     }
     
-    public void addListener() {
-        nameField.textProperty().addListener(c -> {
-            String newName = nameField.getText().trim();
-            if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
-                nameField.setText(previousText);
-                errorText.setText(String.format(ERROR_LONG_NAME, BOARD_MAX_NAME_LENGTH));
-                submitButton.setDisable(false);
-            } else if (isBoardNameInvalid(newName)) {
-                errorText.setText(ERROR_INVALID_NAME);
-                submitButton.setDisable(true);
-            } else if (isBoardNameEmpty(newName)) {
-                errorText.setText(ERROR_EMPTY_NAME);
-                submitButton.setDisable(true);
-            } else if (isBoardNameDuplicate(newName)) {
-                errorText.setText(ERROR_DUPLICATE_NAME);
-                submitButton.setDisable(false);
-            } else {
-                errorText.setText("");
-                submitButton.setDisable(false);
-            }
-            previousText = nameField.getText();
+    private void addValidation() {
+        validationSupport.registerValidator(nameField, (c, newVal) -> {
+            boolean isEmpty = isBoardNameEmpty(nameField.getText().trim());
+            return ValidationResult.fromErrorIf(nameField, ERROR_EMPTY_NAME, isEmpty);
         });
         
+        validationSupport.registerValidator(nameField, (c, newVal) -> {
+            boolean isDuplicate = isBoardNameDuplicate(nameField.getText().trim());
+            return ValidationResult.fromErrorIf(nameField, ERROR_DUPLICATE_NAME, isDuplicate);
+        });
+        
+        validationSupport.registerValidator(nameField, (c, newVal) -> {
+            boolean isInvalid = isBoardNameInvalid(nameField.getText().trim());
+            return ValidationResult.fromErrorIf(nameField, ERROR_INVALID_NAME, isInvalid);
+        });
+        
+        validationSupport.registerValidator(nameField, (c, newVal) -> {
+            boolean isInvalid = (nameField.getText().length() > BOARD_MAX_NAME_LENGTH);
+            return ValidationResult.fromErrorIf
+                    (nameField, String.format(ERROR_LONG_NAME, BOARD_MAX_NAME_LENGTH), isInvalid);
+        });
+    }
+    
+    private void addListener() {
+        nameField.textProperty().addListener(c -> {
+            if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
+                nameField.setText(previousText);
+            }
+            previousText = nameField.getText();
+            
+            if (isBoardNameInvalid(nameField.getText().trim()) || isBoardNameEmpty(nameField.getText().trim())) {
+                submitButton.setDisable(true);
+            } else {
+                submitButton.setDisable(false);
+            }
+        });
     }
     
     private boolean isBoardNameInvalid(String newName) {
@@ -125,17 +140,11 @@ public class BoardNameDialog extends Dialog<String> {
     }
     
     private boolean isBoardNameEmpty(String newName) {
-        if (newName.equals("")) {
-            return true;
-        }
-        return false;
+        return newName.isEmpty();
     }
     
     private boolean isBoardNameDuplicate(String newName) {
-        if (prefs.getAllBoards().containsKey(newName)) {
-            return true;
-        }
-        return false;
+        return prefs.getAllBoards().containsKey(newName);
     }
     
     private static void setupGridPane(GridPane grid) {

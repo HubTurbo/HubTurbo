@@ -48,9 +48,9 @@ import java.util.concurrent.TimeUnit;
 
 public class UI extends Application implements EventDispatcher {
 
-    private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 7;
-    private static final int VERSION_PATCH = 1;
+    public static final int VERSION_MAJOR = 3;
+    public static final int VERSION_MINOR = 7;
+    public static final int VERSION_PATCH = 1;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -528,18 +528,6 @@ public class UI extends Application implements EventDispatcher {
     
     public String getTitle() {
         return mainStage.getTitle();
-    }
-    
-    public int getVersionMajor() {
-        return VERSION_MAJOR;
-    }
-    
-    public int getVersionMinor() {
-        return VERSION_MINOR;
-    }
-    
-    public int getVersionPatch() {
-        return VERSION_PATCH;
     }
     
 }

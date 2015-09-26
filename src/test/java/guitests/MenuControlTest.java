@@ -26,9 +26,11 @@ public class MenuControlTest extends UITest {
         PanelControl panelControl = ui.getPanelControl();
         Preferences testPref = UI.prefs;
         
-        String uiTitle = ("HubTurbo "
-                + Utility.version(ui.getVersionMajor(), ui.getVersionMinor(), ui.getVersionPatch())
-                + " (%s)");
+        int vMajor = ui.VERSION_MAJOR;
+        int vMinor = ui.VERSION_MINOR;
+        int vPatch = ui.VERSION_PATCH;
+        
+        String uiTitle = ("HubTurbo " + Utility.version(vMajor, vMinor, vPatch) + " (%s)");
         modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         
