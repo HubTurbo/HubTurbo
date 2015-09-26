@@ -2,7 +2,6 @@ package filter.expression;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -22,12 +21,7 @@ public class Qualifier implements FilterExpression {
 
     public static final String REPO = "repo";
     public static final String SORT = "sort";
-    public static final String UPDATED = "updated";
-    public static final String UPDATED_BY_OTHERS = "updated-others";
-
-    private enum UpdatedKind{
-        SELF_UPDATED, OTHER_UPDATED, ALL_UPDATED
-    }
+    private static final String UPDATED = "updated";
 
     public static final Qualifier EMPTY = new Qualifier("", "");
 
@@ -35,9 +29,8 @@ public class Qualifier implements FilterExpression {
         "assignees", "author", "body", "closed", "comments", "created", "creator",
         "date", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
-        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", "repo", "sort", "state", "status",
-        "title", "type", "unmerged", "unread", "updated", "updated-others",
-        "updated-self", "user"
+        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",
+        "title", "type", "unmerged", "unread", UPDATED, "user"
     ));
 
     private final String name;
@@ -155,12 +148,6 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    public static boolean qualifierNamesHaveUpdatedQualifier(FilterExpression expression){
-        List<String> filterQualifierNames = expression.getQualifierNames();
-        return (filterQualifierNames.contains(UPDATED) ||
-                filterQualifierNames.contains(UPDATED_BY_OTHERS));
-    }
-
     /**
      * For testing. Stubs the current time so time-related qualifiers work properly.
      */
@@ -215,13 +202,9 @@ public class Qualifier implements FilterExpression {
             return satisfiesIsConditions(issue);
         case "created":
             return satisfiesCreationDate(issue);
-        case "updated":
-            return satisfiesUpdatedHours(issue, UpdatedKind.ALL_UPDATED);
-        case "updated-others":
-            return satisfiesUpdatedHours(issue, UpdatedKind.OTHER_UPDATED);
-        case "updated-self":
-            return satisfiesUpdatedHours(issue, UpdatedKind.SELF_UPDATED);
-        case "repo":
+        case UPDATED:
+            return satisfiesUpdatedHours(issue);
+        case REPO:
             return satisfiesRepo(issue);
         default:
             return false;
@@ -380,7 +363,7 @@ public class Qualifier implements FilterExpression {
     private static boolean shouldBeStripped(Qualifier q) {
         switch (q.getName()) {
             case "in":
-            case "sort":
+            case SORT:
                 return true;
             default:
                 return false;
@@ -389,14 +372,32 @@ public class Qualifier implements FilterExpression {
 
     public static boolean isMetaQualifier(Qualifier q) {
         switch (q.getName()) {
-        case "sort":
+        case SORT:
         case "in":
-        case "repo":
-        case "updated":
+        case REPO:
             return true;
         default:
-            return false;
+            return isUpdatedQualifier(q);
         }
+    }
+
+    public static boolean isUpdatedQualifier(Qualifier q) {
+        switch (q.getName()) {
+            case UPDATED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static boolean hasUpdatedQualifier(List<Qualifier> metaQualifiers) {
+        return metaQualifiers.stream()
+            .filter(Qualifier::isUpdatedQualifier)
+            .findAny().isPresent();
+    }
+
+    public static boolean hasUpdatedQualifier(FilterExpression expr) {
+        return !expr.find(Qualifier::isUpdatedQualifier).isEmpty();
     }
 
     public Comparator<TurboIssue> getCompoundSortComparator(IModel model, boolean isSortableByNonSelfUpdates) {
@@ -431,7 +432,7 @@ public class Qualifier implements FilterExpression {
             case "repo":
                 comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
                 break;
-            case "updated":
+            case UPDATED:
             case "date":
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 break;
@@ -544,7 +545,7 @@ public class Qualifier implements FilterExpression {
         return false;
     }
 
-    private boolean satisfiesUpdatedHours(TurboIssue issue, UpdatedKind updatedKind) {
+    private boolean satisfiesUpdatedHours(TurboIssue issue) {
         NumberRange updatedRange;
 
         if (numberRange.isPresent()) {
@@ -555,32 +556,9 @@ public class Qualifier implements FilterExpression {
             return false;
         }
 
-        LocalDateTime dateOfUpdate = null;
-
-        //Second time being filtered, we now have metadata from source, so we can use getNonSelfUpdatedAt
-        //and getSelfUpdatedAt
-        switch (updatedKind){
-            case SELF_UPDATED:
-                if (issue.getMetadata().isUpdatedBySelf()) {
-                    dateOfUpdate = issue.getMetadata().getSelfUpdatedAt();
-                }
-                break;
-            case OTHER_UPDATED:
-                if (issue.getMetadata().isUpdatedByOthers()) {
-                    dateOfUpdate = issue.getMetadata().getNonSelfUpdatedAt();
-                }
-                break;
-            case ALL_UPDATED:
-                // The or condition for dateOfUpdate is for first time check
-                dateOfUpdate = issue.getUpdatedAt();
-        }
-
-        if (dateOfUpdate == null) {
-            return false;
-        } else {
-            int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
-            return updatedRange.encloses(hoursSinceUpdate);
-        }
+        LocalDateTime dateOfUpdate = issue.getUpdatedAt();
+        int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+        return updatedRange.encloses(hoursSinceUpdate);
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {

@@ -9,6 +9,7 @@ import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.UI;
 import ui.components.StatusUIStub;
+import util.events.EventDispatcherStub;
 
 import java.util.concurrent.ExecutionException;
 
@@ -23,7 +24,9 @@ public class WrongLastViewedTest extends UITest {
 
     @Override
     public void setupMethod() {
-        UI.status = new StatusUIStub(); // to avoid NPE
+        UI.status = new StatusUIStub();
+        UI.events = new EventDispatcherStub();
+
         // setup test json with last viewed repo "test/test"
         // but we create a repo json file for "test2/test2" instead and see if it gets loaded
         ConfigFileHandler configFileHandler =

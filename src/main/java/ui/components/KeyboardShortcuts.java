@@ -10,6 +10,7 @@ import prefs.Preferences;
 import util.DialogMessage;
 
 import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -53,10 +54,10 @@ public class KeyboardShortcuts {
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static final KeyCodeCombination BOX_TO_LIST =
-            new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    public static final KeyCodeCombination LIST_TO_BOX =
-            new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination JUMP_TO_FIRST_ISSUE =
+            new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination JUMP_TO_FILTER_BOX =
+            new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination MAXIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination MINIMIZE_WINDOW =
@@ -96,7 +97,7 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
-    public static final Set<KeyCodeCombination> JUMP_TO_FIRST_ISSUE_KEYS = populateJumpToFirstIssueSet();
+    public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =
@@ -107,9 +108,6 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination MANAGE_MILESTONE =
             new KeyCodeCombination(KeyCode.M);
-
-    public static final KeyCodeCombination DOUBLE_PRESS =
-            new KeyCodeCombination(KeyCode.SPACE);
     
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
@@ -130,11 +128,18 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
     
-    private static Set<KeyCodeCombination> populateJumpToFirstIssueSet() {
-        Set <KeyCodeCombination> result = new HashSet<KeyCodeCombination>();
-        result.add(new KeyCodeCombination(KeyCode.DIGIT1));
-        result.add(new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN));
-        return result;
+    private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
+        Map<Integer, KeyCodeCombination> result = new HashMap<>();
+        result.put(1, new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN));
+        result.put(2, new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN));
+        result.put(3, new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN));
+        result.put(4, new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.CONTROL_DOWN));
+        result.put(5, new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.CONTROL_DOWN));
+        result.put(6, new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.CONTROL_DOWN));
+        result.put(7, new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.CONTROL_DOWN));
+        result.put(8, new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.CONTROL_DOWN));
+        result.put(9, new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN));
+        return Collections.unmodifiableMap(result);
     }
     
     public static Map<String, String> getDefaultKeyboardShortcuts() {
@@ -158,7 +163,6 @@ public class KeyboardShortcuts {
         assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
         assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
         assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
-        assignedKeys.add(new KeyCodeCombination(KeyCode.SPACE)); //DOUBLE_PRESS
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

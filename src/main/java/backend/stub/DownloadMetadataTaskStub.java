@@ -15,4 +15,14 @@ public class DownloadMetadataTaskStub extends DownloadMetadataTask {
                                     List<TurboIssue> issuesToUpdate) {
         super(taskRunner, repo, repoId, issuesToUpdate);
     }
+
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            assert false;
+        }
+        super.run();
+    }
 }

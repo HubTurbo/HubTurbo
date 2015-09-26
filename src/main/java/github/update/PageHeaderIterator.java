@@ -1,7 +1,8 @@
 package github.update;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.PARAM_PAGE;
-import github.GitHubClientExtended;
+
+import github.GitHubClientEx;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -29,14 +30,14 @@ public class PageHeaderIterator implements Iterable<String>, Iterator<String> {
     private static final Logger logger = HTLog.get(PageHeaderIterator.class);
 
     private final GitHubRequest request;
-    private final GitHubClientExtended client;
+    private final GitHubClientEx client;
     private final String headerField;
 
     private int nextPage; // Current page number
     private String next; // Next uri to be fetched
     private HttpURLConnection lastConnection;
 
-    public PageHeaderIterator(GitHubRequest request, GitHubClientExtended client,
+    public PageHeaderIterator(GitHubRequest request, GitHubClientEx client,
                               String headerField) {
         this.request = request;
         this.client = client;

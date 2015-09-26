@@ -12,13 +12,13 @@ import java.util.Map;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
-public class IssueServiceExtended extends IssueService{
-    private GitHubClientExtended ghClient;
+public class IssueServiceEx extends IssueService{
+    private GitHubClientEx ghClient;
 
     public static final String ISSUE_DATE = "date";
     public static final String ISSUE_CONTENTS = "issue";
 
-    public IssueServiceExtended(GitHubClientExtended client){
+    public IssueServiceEx(GitHubClientEx client){
         super(client);
         this.ghClient = client;
     }

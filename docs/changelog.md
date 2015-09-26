@@ -1,5 +1,36 @@
 # Changelog
 
+# V3.7.1
+
+- Temporarily removed `updated-self` and `updated-others`
+- Fixed bug where adding labels quickly caused undo not to work properly
+- Improvements to testing infrastructure
+
+# V3.7.0
+
+- <kbd>Ctrl</kbd> + <kbd>1</kbd> .. <kbd>9</kbd> will jump to the nth issue
+- <kbd>Ctrl</kbd> + <kbd>Enter</kbd> and <kbd>Ctrl</kbd> + <kbd>F</kbd> will move focus to the panel and filter field respectively; <kbd>Space</kbd> <kbd>Space</kbd> is no longer the default hotkey for this
+- Fixed bugs with panel focus
+- Infrastructure for supporting updates to review comments
+
+# V3.6.1
+
+- Fixed bug where issue event metadata was not being downloaded
+- Fixed bug with locale-specific dates
+
+# V3.6.0
+
+- Label picker changes are now delayed and can be undone
+- Issues can be sorted by status
+- Issues can be filtered more precisely by self/non-self updates
+- Open repositories can be closed
+- The title bar now shows the name of the currently-open board
+- Issue metadata ETags are now saved, optimising quota use
+- Fixed bug where issues would become unread after a self update
+- Fixed bug where unread issues would appear as read
+- Fixed bug where the first panel did not always have focus on startup
+- Additional testing infrastructure
+
 # V3.5.1
 
 - Reverted addition of Chrome custom profile

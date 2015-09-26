@@ -12,13 +12,13 @@ import java.util.List;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 
-public class LabelServiceFixed extends LabelService {
+public class LabelServiceEx extends LabelService {
 
-    public LabelServiceFixed() {
+    public LabelServiceEx() {
         super();
     }
 
-    public LabelServiceFixed(GitHubClient client) {
+    public LabelServiceEx(GitHubClient client) {
         super(client);
     }
 

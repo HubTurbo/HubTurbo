@@ -85,7 +85,7 @@ public class ListPanelCard extends VBox {
 
         getChildren().addAll(issueTitle, issueDetails);
 
-        if (parentPanel.getCurrentFilterExpression().getQualifierNames().contains(Qualifier.UPDATED)) {
+        if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
                 getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
         }
@@ -164,7 +164,7 @@ public class ListPanelCard extends VBox {
     }
 
     private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
-        List<Qualifier> filters = currentFilterExpression.find(q -> q.getName().equals("updated"));
+        List<Qualifier> filters = currentFilterExpression.find(Qualifier::isUpdatedQualifier);
         assert filters.size() > 0 : "Problem with isUpdateFilter";
 
         // Return the first of the updated qualifiers, if there are multiple

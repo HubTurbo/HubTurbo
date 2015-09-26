@@ -8,12 +8,12 @@ import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
+import util.PlatformEx;
 import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
 import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
 
 public class KeyboardShortcutsTest extends UITest {
 
@@ -39,39 +39,71 @@ public class KeyboardShortcutsTest extends UITest {
         press(KeyCode.CONTROL).press(KeyCode.D).release(KeyCode.D).release(KeyCode.CONTROL);
         assertEquals(false, stage.getMinWidth() > 500);
 
-        // jump from filter box to first issue
-        press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
+        // jump from panel focus to first issue
+        // - This is because on startup focus is on panel and not on filter box
+        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
 
         // jump from issue list to filter box
-        press(KeyCode.CONTROL).press(KeyCode.UP).release(KeyCode.UP).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.F).release(KeyCode.F).release(KeyCode.CONTROL);
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
 
         // jump from filter box to first issue
-        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
+        // - To ensure shortcut works from filter box, too
+        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
-
-        // jump from issue list to filter box
-        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
-        assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
-        clearUiComponentFocusEventType();
 
         // jump to first issue using number key(1) or ENTER
         push(KeyCode.ESCAPE);
-        push(KeyCode.DIGIT1);
-        sleep(1000);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT1).release(KeyCode.DIGIT1).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
         assertEquals(10, selectedIssueId);
         clearSelectedIssueId();
-        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
+        press(KeyCode.CONTROL).press(KeyCode.F).release(KeyCode.F).release(KeyCode.CONTROL);
         assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
         clearUiComponentFocusEventType();
         push(KeyCode.ESCAPE);
-        press(KeyCode.CONTROL).press(KeyCode.DOWN).release(KeyCode.DOWN).release(KeyCode.CONTROL);
-        sleep(1000);
-        assertEquals(10, selectedIssueId);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT2).release(KeyCode.DIGIT2).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(9, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT3).release(KeyCode.DIGIT3).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(8, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT4).release(KeyCode.DIGIT4).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(7, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT5).release(KeyCode.DIGIT5).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(6, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT6).release(KeyCode.DIGIT6).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(5, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT7).release(KeyCode.DIGIT7).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(4, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT8).release(KeyCode.DIGIT8).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(3, selectedIssueId);
+        clearSelectedIssueId();
+        push(KeyCode.ESCAPE);
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT9).release(KeyCode.DIGIT9).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(2, selectedIssueId);
         clearSelectedIssueId();
 
         // jump to last issue
@@ -96,7 +128,7 @@ public class KeyboardShortcutsTest extends UITest {
         clearSelectedIssueId();
 
         press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        push(DOUBLE_PRESS.getCode()).push(DOUBLE_PRESS.getCode());
+        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
 
         push(getKeyCode("RIGHT_PANEL"));
         assertEquals(0, panelIndex);

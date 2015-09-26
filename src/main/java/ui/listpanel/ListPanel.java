@@ -2,6 +2,7 @@ package ui.listpanel;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import backend.interfaces.IModel;
@@ -23,8 +24,8 @@ import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
 import util.events.testevents.UIComponentFocusEvent;
 
-import static ui.components.KeyboardShortcuts.BOX_TO_LIST;
-import static ui.components.KeyboardShortcuts.LIST_TO_BOX;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
@@ -40,16 +41,15 @@ import static ui.components.KeyboardShortcuts.SHOW_LABELS;
 import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
 import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
 import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE_KEYS;
+import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
 import static ui.components.KeyboardShortcuts.NEW_COMMENT;
 import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
-import static ui.components.KeyboardShortcuts.DOUBLE_PRESS;
+
 public class ListPanel extends FilterPanel {
 
     private final IModel model;
     private final UI ui;
     private int issueCount;
-    private Optional<String> currentFilterText = Optional.empty();
 
     private IssueListView listView;
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
@@ -83,7 +83,7 @@ public class ListPanel extends FilterPanel {
      */
 
     private boolean issueHasNewComments(TurboIssue issue, boolean hasMetadata) {
-        if (hasMetadata && Qualifier.qualifierNamesHaveUpdatedQualifier(currentFilterExpression)) {
+        if (hasMetadata && Qualifier.hasUpdatedQualifier(currentFilterExpression)) {
             return issueNonSelfCommentCounts.containsKey(issue.getId()) &&
                     Math.abs(
                             issueNonSelfCommentCounts.get(issue.getId()) - issue.getMetadata().getNonSelfCommentCount()
@@ -166,19 +166,9 @@ public class ListPanel extends FilterPanel {
 
     private void setupKeyboardShortcuts() {
         filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (BOX_TO_LIST.match(event)) {
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
                 event.consume();
-                listView.selectFirstItem();
-            }
-            if (!DOUBLE_PRESS.match(event)) {
-                currentFilterText = Optional.of(getCurrentFilterString());
-            }
-            if (KeyPress.isDoublePress(DOUBLE_PRESS.getCode(), event.getCode())) {
-                event.consume();
-                if (currentFilterText.isPresent()) {
-                    filterTextField.setText(currentFilterText.get());
-                }
-                listView.selectFirstItem();
+                listView.selectNthItem(1);
             }
             if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
@@ -207,12 +197,11 @@ public class ListPanel extends FilterPanel {
             if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (LIST_TO_BOX.match(event)) {
+            if (JUMP_TO_FILTER_BOX.match(event)) {
                 setFocusToFilterBox();
             }
-            if (DOUBLE_PRESS.match(event)
-                && KeyPress.isDoublePress(DOUBLE_PRESS.getCode(), event.getCode())) {
-                setFocusToFilterBox();
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+                listView.selectNthItem(1);
             }
             if (SHOW_ISSUES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -296,10 +285,11 @@ public class ListPanel extends FilterPanel {
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
             }
-            for (KeyCodeCombination key : JUMP_TO_FIRST_ISSUE_KEYS) {
-                if (key.match(event)) {
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
                     event.consume();
-                    listView.selectFirstItem();
+                    listView.selectNthItem(entry.getKey());
+                    break;
                 }
             }
         });
@@ -378,7 +368,7 @@ public class ListPanel extends FilterPanel {
 
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
-                listView.selectFirstItem();
+                listView.selectNthItem(1);
             }
         });
     }

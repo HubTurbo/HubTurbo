@@ -17,10 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -190,17 +187,16 @@ public class Utility {
     public static Date parseHTTPLastModifiedDate(String dateString) {
         assert dateString != null;
         try {
-            return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(dateString);
+            return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US).parse(dateString);
         } catch (ParseException e) {
-            assert false : "Error in date format string!";
+            logger.error(e.getLocalizedMessage(), e);
+            throw new IllegalArgumentException("Could not parse date " + dateString);
         }
-        // Should not happen
-        return null;
     }
 
     public static String formatDateISO8601(Date date){
         assert date != null;
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         return df.format(date);
     }
