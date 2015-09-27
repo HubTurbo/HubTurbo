@@ -34,6 +34,7 @@ These key sequences (one key followed by the other) are used to load (in the bro
 | Filter box|<kbd>Ctrl</kbd> + <kbd>F</kbd>|Focus moves to the filter box of the selected panel|
 | Issue list|<kbd>Ctrl</kbd> + <kbd>Enter</kbd>|Focus moves to issue list of the selected panel|
 | Out of filter box (while editing filter)|<kbd>ESC</kbd> then <kbd>ESC</kbd>|First <kbd>ESC</kbd> restores previous filter and selects the filter text. The second <kbd>ESC</kbd> moves focus out of filter box|
+|n<sup>th<sup> issue (from <sup>1<sup> to <sup>9<sup>)| <kbd>Ctrl</kbd> + <kbd>n</kbd>| If the focus is on the issue list, jumps to nth issue, where n is the issue number from 1 (at the top of the list) to 9|
 | n<sup>th</sup> issue *to* first issue|<kbd>Home</kbd>|If the focus is already in the issue list, jumps to the first issue of that list|
 | n<sup>th</sup> issue *to* last issue|<kbd>End</kbd>|If the focus is already in the issue list, jumps to the last issue of that list|
 | Previous issue |<kbd>T</kbd> / <kbd>↑</kbd>|Go to the previous in the panel and loads it in browser view|
