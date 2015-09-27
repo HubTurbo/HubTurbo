@@ -54,10 +54,10 @@ public class KeyboardShortcuts {
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
-    public static final KeyCodeCombination BOX_TO_LIST =
-            new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
-    public static final KeyCodeCombination LIST_TO_BOX =
-            new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination JUMP_TO_FIRST_ISSUE =
+            new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+    public static final KeyCodeCombination JUMP_TO_FILTER_BOX =
+            new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination MAXIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
     public static final KeyCodeCombination MINIMIZE_WINDOW =
@@ -108,9 +108,6 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination MANAGE_MILESTONE =
             new KeyCodeCombination(KeyCode.M);
-
-    public static final KeyCodeCombination DOUBLE_PRESS =
-            new KeyCodeCombination(KeyCode.SPACE);
     
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
@@ -166,7 +163,6 @@ public class KeyboardShortcuts {
         assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
         assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
         assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
-        assignedKeys.add(new KeyCodeCombination(KeyCode.SPACE)); //DOUBLE_PRESS
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

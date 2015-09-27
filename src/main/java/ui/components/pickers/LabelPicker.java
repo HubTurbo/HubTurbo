@@ -47,15 +47,17 @@ public class LabelPicker {
     }
 
     private void replaceLabels(TurboIssue issue, List<String> labels) {
-        List<String> originalLabels = issue.getLabels();
-        ui.logic.replaceIssueLabelsUI(issue, labels);
-        Notification undoNotification = new Notification(createInfoOcticon(),
-                "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
-                "Undo",
-                () -> ui.logic.replaceIssueLabelsRepo(issue, labels, originalLabels)
-                        .thenApply(success -> postReplaceLabelActions(success, issue)),
-                () -> ui.logic.replaceIssueLabelsUI(issue, originalLabels));
-        ui.showNotification(undoNotification);
+        List<String> originalLabels = issue.getLabels().stream().sorted().collect(Collectors.toList());
+        if (!labels.equals(originalLabels)) {
+            ui.logic.replaceIssueLabelsUI(issue, labels);
+            Notification undoNotification = new Notification(createInfoOcticon(),
+                    "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
+                    "Undo",
+                    () -> ui.logic.replaceIssueLabelsRepo(issue, labels, originalLabels)
+                            .thenApply(success -> postReplaceLabelActions(success, issue)),
+                    () -> ui.logic.replaceIssueLabelsUI(issue, originalLabels));
+            ui.showNotification(undoNotification);
+        }
     }
 
     private boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {

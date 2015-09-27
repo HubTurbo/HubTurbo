@@ -49,8 +49,8 @@ import java.util.concurrent.TimeUnit;
 public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 6;
-    private static final int VERSION_PATCH = 0;
+    private static final int VERSION_MINOR = 7;
+    private static final int VERSION_PATCH = 1;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -83,6 +83,7 @@ public class UI extends Application implements EventDispatcher {
     private RepositorySelector repoSelector;
     private LabelPicker labelPicker;
     private Label apiBox;
+    private ScrollPane panelsScrollPane;
     private NotificationPane notificationPane;
 
     public static void main(String[] args) {
@@ -160,7 +161,7 @@ public class UI extends Application implements EventDispatcher {
         }
 
         setExpandedWidth(false);
-        panels.init(guiController);
+        panels.init(guiController, panelsScrollPane);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
@@ -303,7 +304,7 @@ public class UI extends Application implements EventDispatcher {
 
         VBox top = new VBox();
 
-        ScrollPane panelsScrollPane = new ScrollPane(panels);
+        panelsScrollPane = new ScrollPane(panels);
         panelsScrollPane.getStyleClass().add("transparent-bg");
         panelsScrollPane.setFitToHeight(true);
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
@@ -459,9 +460,7 @@ public class UI extends Application implements EventDispatcher {
 
     private void ensureSelectedPanelHasFocus() {
         if (panels.getCurrentlySelectedPanel().isPresent()) {
-            getMenuControl().scrollTo(
-                panels.getCurrentlySelectedPanel().get(),
-                panels.getChildren().size());
+            panels.scrollToCurrentlySelectedPanel();
             panels.getPanel(panels.getCurrentlySelectedPanel().get()).requestFocus();
         }
     }
@@ -501,7 +500,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void minimizeWindow() {
         mainStage.setIconified(true);
-        menuBar.scrollTo(panels.getCurrentlySelectedPanel().get(), panels.getChildren().size());
+        panels.scrollToCurrentlySelectedPanel();
     }
 
     public HWND getMainWindowHandle() {

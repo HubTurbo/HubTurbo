@@ -22,8 +22,8 @@ import util.Utility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class GitHubClientExtended extends GitHubClient {
-    private static final Logger logger = HTLog.get(GitHubClientExtended.class);
+public class GitHubClientEx extends GitHubClient {
+    private static final Logger logger = HTLog.get(GitHubClientEx.class);
 
     public static final int NO_UPDATE_RESPONSE_CODE = 304;
     protected static final int CONNECTION_TIMEOUT = 30000;
@@ -31,7 +31,7 @@ public class GitHubClientExtended extends GitHubClient {
     // Request method for HEAD API call
     protected static final String METHOD_HEAD = "HEAD";
 
-    public GitHubClientExtended() {
+    public GitHubClientEx() {
     }
 
     /**

@@ -50,6 +50,15 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return new TurboLabel(repoId, joinWith(group, name, true));
     }
 
+    /**
+     * Copy constructor
+     */
+    public TurboLabel(TurboLabel label) {
+        this.actualName = label.getActualName();
+        this.colour = label.getColour();
+        this.repoId = label.getRepoId();
+    }
+
     public TurboLabel(String repoId, Label label) {
         this.actualName = label.getName();
         this.colour = label.getColor();

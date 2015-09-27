@@ -153,7 +153,7 @@ public class Logic {
         for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
             IssueMetadata currentMetadata = entry.getValue();
 
-            entry.setValue(new IssueMetadata(currentMetadata, currentUser));
+            entry.setValue(currentMetadata.full(currentUser));
         }
         return metadata;
     }

@@ -101,7 +101,7 @@ public class MenuControl extends MenuBar {
         createLeft.setOnAction(e -> {
             logger.info("Menu: Panels > Create (Left)");
             panels.createNewPanelAtStart();
-            setHvalue(panelsScrollPane.getHmin());
+            panels.scrollToCurrentlySelectedPanel();
         });
         createLeft.setAccelerator(CREATE_LEFT_PANEL);
 
@@ -119,7 +119,7 @@ public class MenuControl extends MenuBar {
                             ScrollBar scrollBar = (ScrollBar) child;
                             if (scrollBar.getOrientation() == Orientation.HORIZONTAL
                                     && scrollBar.visibleProperty().get()) {
-                                setHvalue(panelsScrollPane.getHmax());
+                                panels.scrollToCurrentlySelectedPanel();
                                 break;
                             }
                         }
@@ -376,13 +376,5 @@ public class MenuControl extends MenuBar {
 
     private void onRepoRemove(String repoId) {
         ui.logic.removeRepository(repoId).thenRun(() -> ui.triggerEvent(new OpenReposChangedEvent()));
-    }
-
-    public void scrollTo(int panelIndex, int numOfPanels){
-        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (numOfPanels - 1));
-    }
-
-    private void setHvalue(double val) {
-        panelsScrollPane.setHvalue(val);
     }
 }
