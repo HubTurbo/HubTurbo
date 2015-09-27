@@ -1,5 +1,13 @@
 package ui.issuepanel;
 
+import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
+import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
+import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -14,19 +22,25 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
+import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
+import ui.components.IssueListView;
+import ui.components.KeyboardShortcuts;
 import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.OpenReposChangedEvent;
 import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
+import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +63,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Label renameButton;
     protected PanelNameTextField renameTextField;
     protected FilterTextField filterTextField;
+    protected IssueListView listView;
     
     private String panelName = "Panel";
     private UI ui;
@@ -68,7 +83,55 @@ public abstract class FilterPanel extends AbstractPanel {
                 getStyleClass().remove("panel-focused");
             }
         });
-        
+        setupKeyboardShortcuts();
+    }
+
+    private void setupKeyboardShortcuts() {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (MAXIMIZE_WINDOW.match(event)) {
+                ui.maximizeWindow();
+            }
+            if (MINIMIZE_WINDOW.match(event)) {
+                ui.minimizeWindow();
+            }
+            if (DEFAULT_SIZE_WINDOW.match(event)) {
+                ui.setDefaultWidth();
+            }
+            if (SWITCH_DEFAULT_REPO.match(event)) {
+                ui.switchDefaultRepo();
+            }
+            if (SWITCH_BOARD.match(event)) {
+                ui.getMenuControl().switchBoard();
+            }
+            if (JUMP_TO_FILTER_BOX.match(event)) {
+                setFocusToFilterBox();
+            }
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+                listView.selectNthItem(1);
+            }
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
+                    event.consume();
+                    listView.selectNthItem(entry.getKey());
+                    break;
+                }
+            }
+        });
+    }
+    
+    private void setFocusToFilterBox() {
+        if (TestController.isTestMode()) {
+            ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
+        }
+        filterTextField.requestFocus();
+        filterTextField.setText(filterTextField.getText().trim());
+        filterTextField.positionCaret(filterTextField.getLength());
+
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
+                listView.selectNthItem(1);
+            }
+        });
     }
 
     private void setUpEventHandler() {
