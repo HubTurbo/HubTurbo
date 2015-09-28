@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
@@ -105,6 +106,11 @@ public class DummyRepo implements Repo {
     public ImmutableTriple<List<TurboIssue>, String, Date>
         getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
         return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
+    }
+
+    @Override
+    public List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime) {
+        return new ArrayList<>();
     }
 
     @Override

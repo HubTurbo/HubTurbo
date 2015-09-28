@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 
 import java.io.IOException;
 import java.util.Date;
@@ -29,6 +30,7 @@ public interface Repo {
     // Returns tuples in order to be maximally generic
     ImmutableTriple<List<TurboIssue>, String, Date>
         getUpdatedIssues(String repoId, String eTag, Date lastCheckTime);
+    List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime);
     ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag);
     ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag);
     ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag);

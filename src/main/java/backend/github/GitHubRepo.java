@@ -72,6 +72,12 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
+    public List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime) {
+        PullRequestUpdateService updateService = new PullRequestUpdateService(client, eTag, lastCheckTime);
+        return updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
+    }
+
+    @Override
     public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
         return getUpdatedResource(repoId, eTag, LabelUpdateService::new, TurboLabel::new);
     }
