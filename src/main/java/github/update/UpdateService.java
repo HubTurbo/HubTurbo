@@ -33,16 +33,16 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 public class UpdateService<T> extends GitHubService {
     private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 
-    private final GitHubClientEx client;
-    private final String apiSuffix;
-    private final String lastETags;
+    protected final GitHubClientEx client;
+    protected final String apiSuffix;
+    protected final String lastETags;
 
     // Auxillary results of calling getUpdatedItems
-    private Optional<String> updatedETags = Optional.empty();
-    private Date updatedCheckTime = new Date();
+    protected Optional<String> updatedETags = Optional.empty();
+    protected Date updatedCheckTime = new Date();
 
     // Cached results of calling getUpdatedItems
-    private ArrayList<T> updatedItems = null;
+    protected ArrayList<T> updatedItems = null;
 
     /**
      * @param client an authenticated GitHubClient
@@ -75,11 +75,11 @@ public class UpdateService<T> extends GitHubService {
     }
 
     /**
-     * Retrieves the requested items from GitHub. Sets the auxillary fields.
+     * Retrieves the requested items from GitHub
      * @param repoId the repository to get the items from
      * @return a list of requested items
      */
-    public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
+    public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId) {
 
         // Return cached results if available
         if (updatedItems != null)  {
@@ -96,10 +96,9 @@ public class UpdateService<T> extends GitHubService {
             Optional<ImmutablePair<List<String>, HttpURLConnection>> etags = getPagedEtags(request, client);
 
             if (!etags.isPresent()) {
+                /* Respond as if we succeeded and there were no updates.
+                   The assumption is that updates are cheap and we can do them as frequently as needed. */
                 logger.warn(String.format("%s: error getting updated items", getClass().getSimpleName()));
-
-                // Respond as if we succeeded and there were no updates.
-                // The assumption is that updates are cheap and we can do them as frequently as needed.
             } else {
                 updatedETags = combineETags(etags.get().getLeft());
                 if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
@@ -168,7 +167,7 @@ public class UpdateService<T> extends GitHubService {
      * @return a list of items
      * @throws IOException
      */
-    private List<T> getPagedItems(String resourceDesc, PageIterator<T> iterator) throws IOException {
+    protected List<T> getPagedItems(String resourceDesc, PageIterator<T> iterator) throws IOException {
         List<T> elements = new ArrayList<>();
         int length = 0;
         int page = 0;
