@@ -1,5 +1,10 @@
 # Changelog
 
+# V3.8.0
+
+- Fixed unresponsive <kbd>Ctrl</kbd> keybindings
+- Fixed a bug where I/O errors could go unreported
+
 # V3.7.1
 
 - Temporarily removed `updated-self` and `updated-others`
