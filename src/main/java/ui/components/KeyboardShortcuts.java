@@ -48,9 +48,9 @@ public class KeyboardShortcuts {
     public static KeyCodeCombination leftPanel;
     public static KeyCodeCombination rightPanel;
 
-    // ui.components.NavigableListView && ui.listpanel.ListPanel
-    public static KeyCodeCombination upIssue;
-    public static KeyCodeCombination downIssue;
+    // ui.components.NavigableListView
+    static KeyCodeCombination upIssue;
+    static KeyCodeCombination downIssue;
 
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
