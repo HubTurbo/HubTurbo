@@ -2,8 +2,6 @@ package ui.issuepanel;
 
 import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
-import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
@@ -22,13 +20,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
-import ui.components.IssueListView;
 import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.OpenReposChangedEvent;
@@ -39,7 +35,6 @@ import prefs.PanelInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -62,7 +57,6 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Label renameButton;
     protected PanelNameTextField renameTextField;
     protected FilterTextField filterTextField;
-    protected IssueListView listView;
     
     private String panelName = "Panel";
     private UI ui;
@@ -99,15 +93,6 @@ public abstract class FilterPanel extends AbstractPanel {
                 ui.getMenuControl().switchBoard();
             } else if (JUMP_TO_FILTER_BOX.match(event)) {
                 setFocusToFilterBox();
-            } else if (JUMP_TO_FIRST_ISSUE.match(event)) {
-                listView.selectNthItem(1);
-            }
-            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
-                if (entry.getValue().match(event)){
-                    event.consume();
-                    listView.selectNthItem(entry.getKey());
-                    break;
-                }
             }
         });
     }

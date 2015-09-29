@@ -1,6 +1,8 @@
 package ui.listpanel;
 
 import static ui.components.KeyboardShortcuts.GOTO_MODIFIER;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
+import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
 import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.NEW_COMMENT;
@@ -16,10 +18,12 @@ import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.UI;
@@ -40,6 +44,7 @@ public class ListPanel extends FilterPanel {
     private final UI ui;
     private int issueCount;
 
+    private IssueListView listView;
     private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
@@ -153,6 +158,19 @@ public class ListPanel extends FilterPanel {
     }
 
     private void setupKeyboardShortcuts() {
+        filterTextField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+                listView.selectNthItem(1);
+            }
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
+                    event.consume();
+                    listView.selectNthItem(entry.getKey());
+                    break;
+                }
+            }
+        });
+        
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (KeyboardShortcuts.markAsRead.match(event)) {
                 markAsRead();
@@ -229,6 +247,16 @@ public class ListPanel extends FilterPanel {
             }
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
+            }
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+                listView.selectNthItem(1);
+            }
+            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
+                if (entry.getValue().match(event)){
+                    event.consume();
+                    listView.selectNthItem(entry.getKey());
+                    break;
+                }
             }
         });
     }
