@@ -158,7 +158,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void setupKeyboardShortcuts() {        
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.markAsRead.match(event)) {
                 markAsRead();
             }
