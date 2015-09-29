@@ -29,7 +29,6 @@ import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
 import ui.components.IssueListView;
-import ui.components.KeyboardShortcuts;
 import ui.components.PanelNameTextField;
 import util.events.ModelUpdatedEventHandler;
 import util.events.OpenReposChangedEvent;
@@ -90,23 +89,17 @@ public abstract class FilterPanel extends AbstractPanel {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (MAXIMIZE_WINDOW.match(event)) {
                 ui.maximizeWindow();
-            }
-            if (MINIMIZE_WINDOW.match(event)) {
+            } else if (MINIMIZE_WINDOW.match(event)) {
                 ui.minimizeWindow();
-            }
-            if (DEFAULT_SIZE_WINDOW.match(event)) {
+            } else if (DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
-            }
-            if (SWITCH_DEFAULT_REPO.match(event)) {
+            } else if (SWITCH_DEFAULT_REPO.match(event)) {
                 ui.switchDefaultRepo();
-            }
-            if (SWITCH_BOARD.match(event)) {
+            } else if (SWITCH_BOARD.match(event)) {
                 ui.getMenuControl().switchBoard();
-            }
-            if (JUMP_TO_FILTER_BOX.match(event)) {
+            } else if (JUMP_TO_FILTER_BOX.match(event)) {
                 setFocusToFilterBox();
-            }
-            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+            } else if (JUMP_TO_FIRST_ISSUE.match(event)) {
                 listView.selectNthItem(1);
             }
             for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
@@ -126,12 +119,6 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.requestFocus();
         filterTextField.setText(filterTextField.getText().trim());
         filterTextField.positionCaret(filterTextField.getLength());
-
-        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
-                listView.selectNthItem(1);
-            }
-        });
     }
 
     private void setUpEventHandler() {
