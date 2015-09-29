@@ -157,20 +157,7 @@ public class ListPanel extends FilterPanel {
         });
     }
 
-    private void setupKeyboardShortcuts() {
-        filterTextField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (JUMP_TO_FIRST_ISSUE.match(event)) {
-                listView.selectNthItem(1);
-            }
-            for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
-                if (entry.getValue().match(event)){
-                    event.consume();
-                    listView.selectNthItem(entry.getKey());
-                    break;
-                }
-            }
-        });
-        
+    private void setupKeyboardShortcuts() {        
         addEventHandler(KeyEvent.KEY_RELEASED, event -> {
             if (KeyboardShortcuts.markAsRead.match(event)) {
                 markAsRead();
