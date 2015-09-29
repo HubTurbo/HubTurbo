@@ -4,9 +4,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,8 +71,11 @@ public class Utility {
         boolean validPath = !(fileName == null || fileName.isEmpty());
         if (validPath) {
             try {
-                PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-                writer.println(content);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName), "UTF-8"
+                ));
+                writer.write(content);
+                writer.newLine();
                 writer.close();
 
                 long sizeAfterWrite = Files.size(Paths.get(fileName));
@@ -141,10 +142,13 @@ public class Utility {
             Path corruptedFile = Paths.get(fileName);
             if (Files.exists(corruptedFile)) {
                 String corruptedFileData = readFile(fileName).get();
-                PrintWriter writer = new PrintWriter(fileName + "-err", "UTF-8");
-                writer.println(new GsonBuilder().setPrettyPrinting().create().toJson(
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName + "-err"), "UTF-8"
+                ));
+                writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(
                         new JsonParser().parse(corruptedFileData)
                 ));
+                writer.newLine();
                 writer.close();
 
                 Files.delete(corruptedFile);
