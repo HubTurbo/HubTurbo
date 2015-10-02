@@ -281,13 +281,18 @@ public class TurboIssue {
             return newIssue;
         }
 
-        newIssue.setUpdatedAt(Utility.dateToLocalDateTime(pullRequest.getUpdatedAt()));
+        LocalDateTime pullRequestUpdatedAt = Utility.dateToLocalDateTime(pullRequest.getUpdatedAt());
+        if (pullRequestUpdatedAt.isBefore(newIssue.getUpdatedAt())) {
+            return newIssue;
+        }
+
+        newIssue.setUpdatedAt(pullRequestUpdatedAt);
         return newIssue;
     }
 
-    private static Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
+    public static Optional<Integer> findIssueWithId(List<TurboIssue> issues, int id) {
         int i = 0;
-        for (TurboIssue issue : existing) {
+        for (TurboIssue issue : issues) {
             if (issue.getId() == id) {
                 return Optional.of(i);
             }
