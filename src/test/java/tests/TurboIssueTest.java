@@ -91,11 +91,14 @@ public class TurboIssueTest {
         PullRequest pr2 = createPullRequestWithUpdatedAt(2, LocalDateTime.of(2015, 2, 18, 2, 9));
         PullRequest pr3 = new PullRequest();
         pr3.setNumber(3);
+        PullRequest pr5 = new PullRequest();
+        pr5.setNumber(5);
 
         List<PullRequest> pullRequests = new ArrayList<>();
         pullRequests.add(pr1);
         pullRequests.add(pr2);
         pullRequests.add(pr3);
+        pullRequests.add(pr5);
         Collections.shuffle(pullRequests);
 
         List<TurboIssue> newIssues = TurboIssue.combineWithPullRequests(issues, pullRequests);

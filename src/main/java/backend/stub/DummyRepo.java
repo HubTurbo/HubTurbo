@@ -166,7 +166,10 @@ public class DummyRepo implements Repo {
 
     @Override
     public List<Comment> getAllComments(String repoId, TurboIssue issue) {
-        return getComments(repoId, issue.getId());
+        List<Comment> result = getComments(repoId, issue.getId());
+        result.addAll(getReviewComments(repoId, issue.getId()));
+        result.addAll(getCommitComments(repoId, issue.getId()));
+        return result;
     }
 
     @Override
