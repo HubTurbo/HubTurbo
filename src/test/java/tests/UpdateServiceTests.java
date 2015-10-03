@@ -3,6 +3,7 @@ package tests;
 import github.GitHubClientEx;
 import github.update.MilestoneUpdateService;
 import github.update.PageHeaderIterator;
+import github.update.PullRequestUpdateService;
 import github.update.UpdateService;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -40,8 +41,8 @@ public class UpdateServiceTests {
         client.head(request);
     }
 
-    @Test(expected = Exception.class)
-    public void testHeaderIterator() {
+    @Test(expected = NoSuchElementException.class)
+    public void testHeaderIterator() throws NoSuchElementException {
         GitHubClientEx client = new GitHubClientEx();
 
         Map<String, String> params = new HashMap<>();
@@ -84,6 +85,16 @@ public class UpdateServiceTests {
         GitHubClientEx client = new GitHubClientEx();
         MilestoneUpdateService service = new MilestoneUpdateService(client, "abcd");
 
+        assertTrue(service.getUpdatedItems(RepositoryId.create("name", "nonexistentrepo")).isEmpty());
+    }
+
+    /**
+     * Tests if PullRequestUpdateService returns an empty list if the repo is invalid
+     */
+    @Test
+    public void testGetUpdatedPullRequests() {
+        GitHubClientEx client = new GitHubClientEx();
+        PullRequestUpdateService service = new PullRequestUpdateService(client, "", new Date());
         assertTrue(service.getUpdatedItems(RepositoryId.create("name", "nonexistentrepo")).isEmpty());
     }
 }
