@@ -61,7 +61,7 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination MAXIMIZE_WINDOW =
             new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination MINIMIZE_WINDOW =
-            new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
+            new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
@@ -121,11 +121,11 @@ public class KeyboardShortcuts {
 
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
-            new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN);
+            new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination NEW_LABEL =
-            new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN);
+            new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination NEW_MILESTONE =
-            new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN);
+            new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     public static final KeyCodeCombination CREATE_LEFT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
