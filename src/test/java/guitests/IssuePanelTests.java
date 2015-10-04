@@ -48,12 +48,14 @@ public class IssuePanelTests extends UITest {
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
-        assertEquals(3, issuePanel.getSelectedIssue().getId());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        assertEquals(3, issuePanel.getSelectedIssue().getId());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
     }
 
     @Test

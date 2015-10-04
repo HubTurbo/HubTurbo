@@ -318,8 +318,8 @@ public class ListPanel extends FilterPanel {
         return issueCount;
     }
 
-    public TurboIssue getSelectedIssue() {
-        return listView.getSelectedItem().get();
+    public Optional<TurboIssue> getSelectedIssue() {
+        return listView.getSelectedItem();
     }
 
     /* Methods that perform user's actions under the context of this ListPanel */
@@ -346,6 +346,8 @@ public class ListPanel extends FilterPanel {
     }
 
     private void changeLabels() {
-        ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
+        if (getSelectedIssue().isPresent()) {
+            ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue().get()));
+        }
     }
 }

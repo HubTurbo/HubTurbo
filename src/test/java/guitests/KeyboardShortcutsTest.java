@@ -193,18 +193,21 @@ public class KeyboardShortcutsTest extends UITest {
         push(getKeyCode("MARK_AS_READ"));
         assertEquals(issueIdExpected, selectedIssueId);
         push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
-        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(true, issuePanel.getSelectedIssue().get().isCurrentlyRead());
         
         // mark as read an issue at the bottom
         push(KeyCode.END);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at bottom issue
         assertEquals(1, selectedIssueId);
-        assertEquals(true, issuePanel.getSelectedIssue().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(true, issuePanel.getSelectedIssue().get().isCurrentlyRead());
         
         // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
-        assertEquals(false, issuePanel.getSelectedIssue().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(false, issuePanel.getSelectedIssue().get().isCurrentlyRead());
         clearSelectedIssueId();
 
         // testing corner case for mark as read where there is only one issue displayed
