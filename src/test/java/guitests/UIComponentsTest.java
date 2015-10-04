@@ -3,14 +3,30 @@ package guitests;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
+import ui.components.FilterTextField;
 import util.events.UpdateProgressEvent;
+
+import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
 
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
-    public void filterTextFieldTest() {
+    public void keywordCompletionTest() {
+        doubleClick("#dummy/dummy_col0_filterTextField");
         click("#dummy/dummy_col0_filterTextField");
+        push(KeyCode.BACK_SPACE);
+        type("ass");
+        push(KeyCode.TAB);
+        FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
+        assertEquals("assignee", filterTextField.getText());
+    }
+
+    @Test
+    public void filterTextFieldTest() {
+        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        push(KeyCode.BACK_SPACE);
         type("is");
         push(KeyCode.ESCAPE);
         press(KeyCode.SHIFT).press(KeyCode.DIGIT9).release(KeyCode.DIGIT9).release(KeyCode.SHIFT);
