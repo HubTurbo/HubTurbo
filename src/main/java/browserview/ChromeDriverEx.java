@@ -109,6 +109,16 @@ public class ChromeDriverEx {
         throw new NoSuchElementException();
     }
 
+    public void scrollToTop() {
+        String script = "window.scrollTo(0, 0)";
+        executeScript(script);
+    }
+
+    public void scrollToBottom() {
+        String script = "window.scrollTo(0, document.body.scrollHeight)";
+        executeScript(script);
+    }
+
     public Object executeScript(String script) {
         if (isTestChromeDriver) {
             UI.events.triggerEvent(new ExecuteScriptEvent(script));
