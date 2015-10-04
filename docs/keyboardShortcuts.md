@@ -67,6 +67,7 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Refresh|<kbd>F5</kbd>|Causes HubTurbo to check for updates to the repo's issues|
 | Force Refresh|<kbd>Ctrl</kbd> + <kbd>F5</kbd>|Clears HubTurbo's cache and re-downloads all issues from the repo|
 | Switch Board|<kbd>Ctrl</kbd> + <kbd>B</kbd>|Switches currently open board to another saved board|
+| Switch Default Repo|<kbd>Ctrl</kbd> + <kbd>R</kbd>|Switches currently default repo to another saved repo|
 
 ## Control the browser view ...
 
