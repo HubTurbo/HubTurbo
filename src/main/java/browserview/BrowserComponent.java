@@ -204,12 +204,11 @@ public class BrowserComponent {
         if (isPullRequest) {
             logger.info("Showing pull request #" + id);
             runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
-            runBrowserOperation(() -> driver.scrollToBottom());
         } else {
             logger.info("Showing issue #" + id);
             runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
-            runBrowserOperation(() -> driver.scrollToBottom());
         }
+        runBrowserOperation(() -> scrollToBottom());
     }
 
     public void jumpToComment(){
