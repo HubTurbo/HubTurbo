@@ -232,17 +232,6 @@ public class GitHubRepo implements Repo {
         }
     }
 
-    @Override
-    public List<CommitComment> getCommitComments(String repoId, int pullRequestId) {
-        try {
-            return pullRequestService.getComments(RepositoryId.createFromId(repoId),
-                                                  pullRequestId);
-        } catch (IOException e) {
-            HTLog.error(logger, e);
-            return new ArrayList<>();
-        }
-    }
-
     /**
      * Get all types of comments for an issue. Review comments and commit comments
      * are only relevant if the issue is a also pull request
@@ -257,7 +246,6 @@ public class GitHubRepo implements Repo {
         result.addAll(getComments(repoId, issue.getId()));
         if (issue.isPullRequest()) {
             result.addAll(getReviewComments(repoId, issue.getId()));
-            result.addAll(getCommitComments(repoId, issue.getId()));
         }
 
         return result;

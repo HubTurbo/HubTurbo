@@ -11,7 +11,6 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 import ui.UI;
@@ -168,17 +167,11 @@ public class DummyRepo implements Repo {
     public List<Comment> getAllComments(String repoId, TurboIssue issue) {
         List<Comment> result = getComments(repoId, issue.getId());
         result.addAll(getReviewComments(repoId, issue.getId()));
-        result.addAll(getCommitComments(repoId, issue.getId()));
         return result;
     }
 
     @Override
     public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<CommitComment> getCommitComments(String repoId, int pullRequestId) {
         return new ArrayList<>();
     }
 

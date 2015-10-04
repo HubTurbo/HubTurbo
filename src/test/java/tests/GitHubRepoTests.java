@@ -20,15 +20,6 @@ public class GitHubRepoTests {
     }
 
     /**
-     * GitHubRepo.getCommitComments should return an empty list if the requested repository is invalid
-     */
-    @Test
-    public void testGetCommitCommentsForInvalidRepo() {
-        GitHubRepo repo = new GitHubRepo();
-        assertEquals(new ArrayList<>(), repo.getCommitComments("owner/nonexistentrepo", 1));
-    }
-
-    /**
      * GitHubRepo.getAllComments should return an empty list if the requested repository is invalid
      */
     @Test
