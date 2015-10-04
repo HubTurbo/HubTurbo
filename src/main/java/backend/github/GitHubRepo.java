@@ -72,8 +72,8 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime) {
-        PullRequestUpdateService updateService = new PullRequestUpdateService(client, eTag, lastCheckTime);
+    public List<PullRequest> getUpdatedPullRequests(String repoId, Date lastCheckTime) {
+        PullRequestUpdateService updateService = new PullRequestUpdateService(client, lastCheckTime);
         return updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
     }
 

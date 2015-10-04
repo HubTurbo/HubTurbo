@@ -28,7 +28,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
         ImmutableTriple<List<TurboIssue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId(),
             model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
         List<PullRequest> updatedPullRequests = repo.getUpdatedPullRequests(
-                model.getRepoId(), "", model.getUpdateSignature().lastCheckTime);
+                model.getRepoId(), model.getUpdateSignature().lastCheckTime);
 
         List<TurboIssue> existing = model.getIssues();
         List<TurboIssue> updatedIssues = changes.left;

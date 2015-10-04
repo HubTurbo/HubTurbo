@@ -29,7 +29,7 @@ public interface Repo {
     // Returns tuples in order to be maximally generic
     ImmutableTriple<List<TurboIssue>, String, Date>
         getUpdatedIssues(String repoId, String eTag, Date lastCheckTime);
-    List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime);
+    List<PullRequest> getUpdatedPullRequests(String repoId, Date lastCheckTime);
     ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag);
     ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag);
     ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag);

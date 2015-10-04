@@ -20,8 +20,8 @@ public class PullRequestUpdateService extends UpdateService<PullRequest> {
 
     private final Date lastIssueCheckTime;
 
-    public PullRequestUpdateService(GitHubClientEx client, String etags, Date lastIssueCheckTime) {
-        super(client, SEGMENT_PULLS, etags);
+    public PullRequestUpdateService(GitHubClientEx client, Date lastIssueCheckTime) {
+        super(client, SEGMENT_PULLS, "");
         this.lastIssueCheckTime = new Date(lastIssueCheckTime.getTime());
     }
 

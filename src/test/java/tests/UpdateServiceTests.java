@@ -94,7 +94,7 @@ public class UpdateServiceTests {
     @Test
     public void testGetUpdatedPullRequests() {
         GitHubClientEx client = new GitHubClientEx();
-        PullRequestUpdateService service = new PullRequestUpdateService(client, "", new Date());
+        PullRequestUpdateService service = new PullRequestUpdateService(client, new Date());
         assertTrue(service.getUpdatedItems(RepositoryId.create("name", "nonexistentrepo")).isEmpty());
     }
 }

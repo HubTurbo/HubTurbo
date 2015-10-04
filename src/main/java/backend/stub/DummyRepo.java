@@ -108,7 +108,7 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public List<PullRequest> getUpdatedPullRequests(String repoId, String eTag, Date lastCheckTime) {
+    public List<PullRequest> getUpdatedPullRequests(String repoId, Date lastCheckTime) {
         return new ArrayList<>();
     }
 
