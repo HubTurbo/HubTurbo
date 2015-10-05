@@ -13,7 +13,10 @@ import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
+
 import static org.junit.Assert.assertEquals;
+
+import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
 public class KeyboardShortcutsTest extends UITest {
 
@@ -144,14 +147,39 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // remove focus from repo selector
-        ComboBox<String> comboBox = find("#repositorySelector");
-        doubleClick(comboBox);
-        assertEquals(true, comboBox.isFocused());
+        ComboBox<String> repoSelectorComboBox = find("#repositorySelector");
+        doubleClick(repoSelectorComboBox);
+        assertEquals(true, repoSelectorComboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
-        assertEquals(false, comboBox.isFocused());
+        assertEquals(false, repoSelectorComboBox.isFocused());
         clearUiComponentFocusEventType();
         
+        // switch default repo tests
+        assertEquals(1, repoSelectorComboBox.getItems().size());
+        // setup - add a new repo
+        doubleClick(repoSelectorComboBox);
+        doubleClick();
+        type("dummy1/dummy1");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(2, repoSelectorComboBox.getItems().size());
+        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        // test shortcut on repo dropdown
+        doubleClick(repoSelectorComboBox);
+        pushKeys(SWITCH_DEFAULT_REPO);
+        PlatformEx.waitOnFxThread();
+        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
+        // test shortcut when focus is on panel
+        PlatformEx.waitOnFxThread();
         click("#dummy/dummy_col1_1");
+        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        // test shortcut when focus is on issue list
+        press(KeyCode.CONTROL).press(KeyCode.DIGIT1).release(KeyCode.DIGIT1).release(KeyCode.CONTROL);
+        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
 
         // mark as read
         ListPanel issuePanel = find("#dummy/dummy_col1");

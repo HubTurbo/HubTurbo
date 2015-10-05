@@ -34,6 +34,7 @@ These key sequences (one key followed by the other) are used to load (in the bro
 | Filter box|<kbd>Ctrl</kbd> + <kbd>F</kbd>|Focus moves to the filter box of the selected panel|
 | Issue list|<kbd>Ctrl</kbd> + <kbd>Enter</kbd>|Focus moves to issue list of the selected panel|
 | Out of filter box (while editing filter)|<kbd>ESC</kbd> then <kbd>ESC</kbd>|First <kbd>ESC</kbd> restores previous filter and selects the filter text. The second <kbd>ESC</kbd> moves focus out of filter box|
+|n<sup>th</sup> issue (from *1* to *9*)| <kbd>Ctrl</kbd> + <kbd>1</kbd> to <kbd>9</kbd> | If the focus is already on the issue list, jumps to n<sup>th</sup> issue, where n is the issue number ranging from 1 (at the top of the list) to 9|
 | n<sup>th</sup> issue *to* first issue|<kbd>Home</kbd>|If the focus is already in the issue list, jumps to the first issue of that list|
 | n<sup>th</sup> issue *to* last issue|<kbd>End</kbd>|If the focus is already in the issue list, jumps to the last issue of that list|
 | Previous issue |<kbd>T</kbd> / <kbd>↑</kbd>|Go to the previous in the panel and loads it in browser view|
@@ -66,6 +67,7 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Refresh|<kbd>F5</kbd>|Causes HubTurbo to check for updates to the repo's issues|
 | Force Refresh|<kbd>Ctrl</kbd> + <kbd>F5</kbd>|Clears HubTurbo's cache and re-downloads all issues from the repo|
 | Switch Board|<kbd>Ctrl</kbd> + <kbd>B</kbd>|Switches currently open board to another saved board|
+| Switch Default Repo|<kbd>Ctrl</kbd> + <kbd>R</kbd>|Switches currently default repo to another saved repo|
 
 ## Control the browser view ...
 

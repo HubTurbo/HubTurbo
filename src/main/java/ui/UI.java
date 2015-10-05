@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -46,11 +47,14 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
+
+
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 7;
-    public static final int VERSION_PATCH = 1;
+    public static final int VERSION_MINOR = 8;
+    public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -180,7 +184,7 @@ public class UI extends Application implements EventDispatcher {
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
-            logger.error(throwable.getMessage(), throwable));
+                logger.error(throwable.getMessage(), throwable));
 
         TestController.setUI(this, getParameters());
         prefs = new Preferences(TestController.isTestMode());
@@ -219,6 +223,7 @@ public class UI extends Application implements EventDispatcher {
 
         Scene scene = new Scene(createRootNode());
         setupMainStage(scene);
+        setupGlobalKeyboardShortcuts(scene);
         notificationController = new NotificationController(notificationPane);
         notificationPane.setId("notificationPane");
 
@@ -292,6 +297,14 @@ public class UI extends Application implements EventDispatcher {
             });
         });
         mainStage.hide();
+    }
+
+    private void setupGlobalKeyboardShortcuts(Scene scene) {
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (SWITCH_DEFAULT_REPO.match(event)) {
+                switchDefaultRepo();
+            }
+        });
     }
 
     private static void getMainWindowHandle(String windowTitle) {
