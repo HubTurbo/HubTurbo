@@ -2,11 +2,13 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 import prefs.Preferences;
+import util.HTLog;
 import util.Utility;
-import static util.Utility.replaceNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,11 +16,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static util.Utility.replaceNull;
+
 /**
  * The guidelines in this class apply to all TurboResources.
  */
 @SuppressWarnings("unused")
 public class TurboIssue {
+    private static final Logger logger = HTLog.get(TurboIssue.class);
 
     public static final String STATE_CLOSED = "closed";
     public static final String STATE_OPEN = "open";
@@ -236,9 +241,58 @@ public class TurboIssue {
         return existing;
     }
 
-    private static Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
+    /**
+     * Updates data for issues with corresponding pull requests. Original list of
+     * issues and original issue instances are not mutated
+     * @param issues
+     * @param pullRequests
+     * @return a new list of issues
+     */
+    public static List<TurboIssue> combineWithPullRequests(List<TurboIssue> issues,
+                                                           List<PullRequest> pullRequests) {
+        issues = new ArrayList<>(issues);
+
+        for (PullRequest pullRequest : pullRequests) {
+            int id = pullRequest.getNumber();
+
+            Optional<Integer> corresponding = findIssueWithId(issues, id);
+            if (corresponding.isPresent()) {
+                TurboIssue issue = issues.get(corresponding.get());
+                issues.set(corresponding.get(), issue.combineWithPullRequest(pullRequest));
+            } else {
+                String errorMsg = "No corresponding issue for pull request " + pullRequest;
+                logger.error(errorMsg);
+            }
+        }
+
+        return issues;
+    }
+
+    /**
+     * Combines data from a corresponding pull request with data in this issue
+     * This method returns a new combined issue and does not mutate this issue
+     * @param pullRequest
+     * @return new new combined issue
+     */
+    public TurboIssue combineWithPullRequest(PullRequest pullRequest) {
+        TurboIssue newIssue = new TurboIssue(this);
+
+        if (pullRequest.getUpdatedAt() == null) {
+            return newIssue;
+        }
+
+        LocalDateTime pullRequestUpdatedAt = Utility.dateToLocalDateTime(pullRequest.getUpdatedAt());
+        if (pullRequestUpdatedAt.isBefore(newIssue.getUpdatedAt())) {
+            return newIssue;
+        }
+
+        newIssue.setUpdatedAt(pullRequestUpdatedAt);
+        return newIssue;
+    }
+
+    public static Optional<Integer> findIssueWithId(List<TurboIssue> issues, int id) {
         int i = 0;
-        for (TurboIssue issue : existing) {
+        for (TurboIssue issue : issues) {
             if (issue.getId() == id) {
                 return Optional.of(i);
             }
