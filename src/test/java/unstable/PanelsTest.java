@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
