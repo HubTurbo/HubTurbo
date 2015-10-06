@@ -97,22 +97,24 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
+
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
+
     public static final KeyCodeCombination PR_FILES_CHANGED =
             new KeyCodeCombination(KeyCode.F);
     public static final KeyCodeCombination PR_COMMITS =
             new KeyCodeCombination(KeyCode.C);
-
-    // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =
             new KeyCodeCombination(KeyCode.R);
+
+    // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination MANAGE_LABELS =
-            new KeyCodeCombination(KeyCode.L);
+        new KeyCodeCombination(KeyCode.L);
     public static final KeyCodeCombination MANAGE_ASSIGNEES =
-            new KeyCodeCombination(KeyCode.A);
+        new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination MANAGE_MILESTONE =
-            new KeyCodeCombination(KeyCode.M);
-    
+        new KeyCodeCombination(KeyCode.M);
+
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
@@ -162,11 +164,11 @@ public class KeyboardShortcuts {
     }
 
     private static void addNonCustomizableShortcutKeys() {
-        assignedKeys.add(new KeyCodeCombination(KeyCode.F5)); //REFRESH
-        assignedKeys.add(new KeyCodeCombination(KeyCode.F1)); //SHOW_DOCS
-        assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
-        assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
-        assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
+        assignedKeys.add(REFRESH);
+        assignedKeys.add(SHOW_DOCS);
+        assignedKeys.add(GOTO_MODIFIER);
+        assignedKeys.add(NEW_COMMENT);
+        assignedKeys.add(MANAGE_ASSIGNEES);
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

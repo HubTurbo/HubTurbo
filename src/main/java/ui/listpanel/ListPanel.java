@@ -1,23 +1,6 @@
 package ui.listpanel;
 
-import static ui.components.KeyboardShortcuts.GOTO_MODIFIER;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
-import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
-import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
-import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.NEW_COMMENT;
-import static ui.components.KeyboardShortcuts.SHOW_CONTRIBUTORS;
-import static ui.components.KeyboardShortcuts.SHOW_DOCS;
-import static ui.components.KeyboardShortcuts.SHOW_HELP;
-import static ui.components.KeyboardShortcuts.SHOW_ISSUES;
-import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
-import static ui.components.KeyboardShortcuts.SHOW_LABELS;
-import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
-import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
-import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
-import static ui.components.KeyboardShortcuts.PR_FILES_CHANGED;
-import static ui.components.KeyboardShortcuts.PR_COMMITS;
-
+import static ui.components.KeyboardShortcuts.*;
 import static util.GithubURLPageElements.DISCUSSION_TAB;
 import static util.GithubURLPageElements.COMMITS_TAB;
 import static util.GithubURLPageElements.FILES_TAB;
@@ -204,9 +187,7 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (KeyboardShortcuts.scrollToBottom.match(event)) {
-                if (!MINIMIZE_WINDOW.match(event)) {
-                    ui.getBrowserComponent().scrollToBottom();
-                }
+                ui.getBrowserComponent().scrollToBottom();
             }
             if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
                 ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
