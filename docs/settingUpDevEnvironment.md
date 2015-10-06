@@ -77,21 +77,14 @@ Given a fresh clone of the repository:
     - On Windows Gradle may take up significant memory while running. Close the window when you are done to release it.
 - The jar will then be available in `build/libs/HubTurbo-x.x.x-all.jar`. Simply double-click that file to run.
 
-Gradle Tasks:
-
-- `build` - Assembles and tests the project (includes building the `jar` file)
-- `check` - Runs all checks, including `CheckStyle`
-- `shadowJar` - Builds the full `jar` for running HubTurbo
-- `test` - Runs all tests
-
-If errors occur, trying running `clean` before the task (e.g. `./gradlew clean test`). 
+More details on Gradle usage [here](workflow.md).
 
 ## Start contributing
 
 If you have not used HubTurbo before, the [User Guide](userGuide.md) has lots of detail on how to use HubTurbo. Be sure to give it a quick read and try out HubTrubo features first.
 
 After that, check out the documentation on [design](design.md) and [decision rationales and guidelines](designRationalesAndGuidelines.md) 
-for an overview of the codebase, and why it's the way it is. Read about the [development process](process.md) and [how we test our code](testing.md) once you are ready to contribute.
+for an overview of the codebase, and why it's the way it is. Read about the [development process](process.md), and how we [develop](workflow.md) and [test](testing.md) code once you are ready to contribute.
 
 ## Troubleshooting
 

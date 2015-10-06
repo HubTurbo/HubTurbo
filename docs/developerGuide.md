@@ -3,6 +3,7 @@
 For contributors:
 - [Setting up dev environment](settingUpDevEnvironment.md)
 - [Development process](process.md)
+- [Workflow](workflow.md)
 - [Testing](testing.md)
 - [Design](design.md)
 - [Decision rationales and guidelines](designRationalesAndGuidelines.md)
