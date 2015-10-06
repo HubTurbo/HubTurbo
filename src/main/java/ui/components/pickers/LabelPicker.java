@@ -61,10 +61,8 @@ public class LabelPicker {
     }
 
     private boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {
-        if (success) {
-            refreshIssuePage(issue);
-        } else {
-            // if not, show error dialog
+        if (!success) {
+            // if not successful, show error dialog
             Platform.runLater(() -> DialogMessage.showErrorDialog(
                     "GitHub Write Error",
                     String.format(
@@ -76,13 +74,6 @@ public class LabelPicker {
             ));
         }
         return success;
-    }
-
-    private void refreshIssuePage(TurboIssue issue) {
-        // if label replacement is successful, force refresh issue page only if already on that issue page
-        if (GitHubURL.isOnSpecificIssuePage(issue, ui.getBrowserComponent().getCurrentUrl())) {
-            ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), true);
-        }
     }
 
     private Label createInfoOcticon() {

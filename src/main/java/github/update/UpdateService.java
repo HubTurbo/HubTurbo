@@ -1,17 +1,6 @@
 package github.update;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
 import github.GitHubClientEx;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,8 +10,17 @@ import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.GitHubService;
-
 import util.Utility;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
@@ -35,21 +33,21 @@ import util.Utility;
 public class UpdateService<T> extends GitHubService {
     private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 
-    private final GitHubClientEx client;
-    private final String apiSuffix;
-    private final String lastETags;
+    protected final GitHubClientEx client;
+    protected final String apiSuffix;
+    protected final String lastETags;
 
     // Auxillary results of calling getUpdatedItems
-    private Optional<String> updatedETags = Optional.empty();
-    private Date updatedCheckTime = new Date();
+    protected Optional<String> updatedETags = Optional.empty();
+    protected Date updatedCheckTime = new Date();
 
     // Cached results of calling getUpdatedItems
-    private ArrayList<T> updatedItems = null;
+    protected ArrayList<T> updatedItems = null;
 
     /**
      * @param client an authenticated GitHubClient
      * @param apiSuffix the API URI for the type of item; defined by subclasses
-     * @param lastETag the last-known ETag for these items; may be null
+     * @param lastETags the last-known ETag for these items; may be null
      */
     public UpdateService(GitHubClientEx client, String apiSuffix, String lastETags){
         assert client != null;
@@ -77,11 +75,11 @@ public class UpdateService<T> extends GitHubService {
     }
 
     /**
-     * Retrieves the requested items from GitHub. Sets the auxillary fields.
+     * Retrieves the requested items from GitHub
      * @param repoId the repository to get the items from
      * @return a list of requested items
      */
-    public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId){
+    public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId) {
 
         // Return cached results if available
         if (updatedItems != null)  {
@@ -98,10 +96,9 @@ public class UpdateService<T> extends GitHubService {
             Optional<ImmutablePair<List<String>, HttpURLConnection>> etags = getPagedEtags(request, client);
 
             if (!etags.isPresent()) {
+                /* Respond as if we succeeded and there were no updates.
+                   The assumption is that updates are cheap and we can do them as frequently as needed. */
                 logger.warn(String.format("%s: error getting updated items", getClass().getSimpleName()));
-
-                // Respond as if we succeeded and there were no updates.
-                // The assumption is that updates are cheap and we can do them as frequently as needed.
             } else {
                 updatedETags = combineETags(etags.get().getLeft());
                 if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
@@ -170,7 +167,7 @@ public class UpdateService<T> extends GitHubService {
      * @return a list of items
      * @throws IOException
      */
-    private List<T> getPagedItems(String resourceDesc, PageIterator<T> iterator) throws IOException {
+    protected List<T> getPagedItems(String resourceDesc, PageIterator<T> iterator) throws IOException {
         List<T> elements = new ArrayList<>();
         int length = 0;
         int page = 0;

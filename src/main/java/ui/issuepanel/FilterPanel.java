@@ -5,7 +5,6 @@ import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
@@ -87,8 +86,6 @@ public abstract class FilterPanel extends AbstractPanel {
                 ui.minimizeWindow();
             } else if (DEFAULT_SIZE_WINDOW.match(event)) {
                 ui.setDefaultWidth();
-            } else if (SWITCH_DEFAULT_REPO.match(event)) {
-                ui.switchDefaultRepo();
             } else if (SWITCH_BOARD.match(event)) {
                 ui.getMenuControl().switchBoard();
             } else if (JUMP_TO_FILTER_BOX.match(event)) {

@@ -6,15 +6,18 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import github.ReviewComment;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +108,11 @@ public class DummyRepo implements Repo {
     }
 
     @Override
+    public List<PullRequest> getUpdatedPullRequests(String repoId, Date lastCheckTime) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
         return getRepoState(repoId).getUpdatedLabels(eTag);
     }
@@ -153,6 +161,18 @@ public class DummyRepo implements Repo {
     public List<Comment> getComments(String repoId, int issueId) {
         apiQuota--;
         return getRepoState(repoId).getComments(issueId);
+    }
+
+    @Override
+    public List<Comment> getAllComments(String repoId, TurboIssue issue) {
+        List<Comment> result = getComments(repoId, issue.getId());
+        result.addAll(getReviewComments(repoId, issue.getId()));
+        return result;
+    }
+
+    @Override
+    public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
+        return new ArrayList<>();
     }
 
     @Override

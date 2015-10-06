@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import util.HTLog;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
             List<TurboIssueEvent> events = changes.getLeft();
             String updatedEventsETag = changes.getRight();
 
-            List<Comment> comments = repo.getComments(repoId, id);
+            List<Comment> comments = repo.getAllComments(repoId, issue);
 
             IssueMetadata metadata = IssueMetadata.intermediate(events, comments, updatedEventsETag, currCommentsETag);
             result.put(id, metadata);
