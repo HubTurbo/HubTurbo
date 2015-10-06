@@ -208,6 +208,7 @@ public class BrowserComponent {
             logger.info("Showing issue #" + id);
             runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
         }
+        runBrowserOperation(() -> scrollToBottom());
     }
 
     public void jumpToComment(){
