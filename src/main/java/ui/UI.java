@@ -53,7 +53,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 8;
+    private static final int VERSION_MINOR = 9;
     private static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
