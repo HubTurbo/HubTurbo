@@ -238,6 +238,7 @@ Matches issues of the given repository. If omitted, will match issues of the def
 - `assignee` : sorts issues by assignees (in alphabetical order of assignees' names)
 - `priority` : sorts issues within the group by name (high, low, etc.) (in alphabetical order)
 - `status` : sorts issues by status (`open` issues followed by `closed` issues)
+- `milestone` : sorts issues by their milestones (milestones with latest due date are shown first)
 - label group : sorts issues by the label group specified (in alphabetical order).Label groups can be disambiguated by appending a `.`. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (Will show issues with `high` priority first, followed by `low` priority issues and then followed by `medium` priority)
 
 Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
