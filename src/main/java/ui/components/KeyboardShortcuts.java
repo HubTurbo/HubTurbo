@@ -98,6 +98,10 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
+    public static final KeyCodeCombination PR_FILES_CHANGED =
+            new KeyCodeCombination(KeyCode.F);
+    public static final KeyCodeCombination PR_COMMITS =
+            new KeyCodeCombination(KeyCode.C);
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination NEW_COMMENT =

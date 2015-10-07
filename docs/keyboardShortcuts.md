@@ -14,6 +14,9 @@ These key sequences (one key followed by the other) are used to load (in the bro
 | **D**evelopers page|<kbd>G</kbd> <kbd>D</kbd>|Loads the *contributors* page |
 | **K**eyboard Shortcuts|<kbd>G</kbd> <kbd>K</kbd>|Loads the HubTurbo *keyboard shortcuts* page(i.e. this page) |
 | **H**elp page|<kbd>G</kbd> <kbd>H</kbd> <br> or <kbd>F1</kbd>|Loads the HubTurbo help page (i.e. the user guide) |
+| Conversation Tab (Only for PR's)|<kbd>G</kbd> <kbd>R</kbd>|Loads the Coversation tab for the PR|
+| **C**ommits Tab (Only for PR's)|<kbd>G</kbd> <kbd>C</kbd>|Loads the Commits tab for the PR|
+| **F**iles Changed Tab (Only for PR's)|<kbd>G</kbd> <kbd>F</kbd>|Loads the Files changed tab for the PR|
 
 ## Create new ...
 

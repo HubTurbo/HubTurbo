@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
+import util.GithubURLPageElements;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
@@ -216,7 +217,7 @@ public class BrowserComponent {
             UI.events.triggerEvent(new JumpToCommentEvent());
         }
         try {
-            WebElement comment = driver.findElementById("new_comment_field");
+            WebElement comment = driver.findElementById(GithubURLPageElements.NEW_COMMENT);
             comment.click();
             bringToTop();
         } catch (Exception e) {
@@ -297,9 +298,9 @@ public class BrowserComponent {
         runBrowserOperation(() -> {
             driver.get(GitHubURL.LOGIN_PAGE, false);
             try {
-                WebElement searchBox = driver.findElement(By.name("login"));
+                WebElement searchBox = driver.findElement(By.name(GithubURLPageElements.LOGIN_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.username);
-                searchBox = driver.findElement(By.name("password"));
+                searchBox = driver.findElement(By.name(GithubURLPageElements.PASSWORD_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.password);
                 searchBox.submit();
             } catch (Exception e) {
@@ -413,21 +414,21 @@ public class BrowserComponent {
     }
 
     public void scrollToTop() {
-        String script = "window.scrollTo(0, 0)";
+        String script = GithubURLPageElements.SCROLL_TO_TOP;
         executeJavaScript(script);
     }
 
     public void scrollToBottom() {
-        String script = "window.scrollTo(0, document.body.scrollHeight)";
+        String script = GithubURLPageElements.SCROLL_TO_BOTTOM;
         executeJavaScript(script);
     }
 
     public void scrollPage(boolean isDownScroll) {
         String script;
         if (isDownScroll) {
-            script = "window.scrollBy(0,100)";
+            script = GithubURLPageElements.SCROLL_DOWN;
         } else {
-            script = "window.scrollBy(0, -100)";
+            script = GithubURLPageElements.SCROLL_UP;
         }
         executeJavaScript(script);
     }
@@ -438,7 +439,7 @@ public class BrowserComponent {
         }
         WebElement body;
         try {
-            body = driver.findElementByTagName("body");
+            body = driver.findElementByTagName(GithubURLPageElements.BODY);
             body.sendKeys(keyCode);
         } catch (Exception e) {
             logger.error("No such element");
@@ -488,9 +489,9 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
-    public void switchToConversationTab() {
+    public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            driver.findElement(By.xpath("//a[@data-container-id='discussion_bucket']")).click();
+            driver.findElement(By.xpath("//a[@data-container-id='" + tabName + "_bucket']")).click();
         }
     }
 }
