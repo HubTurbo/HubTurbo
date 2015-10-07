@@ -18,6 +18,10 @@ import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
 import static ui.components.KeyboardShortcuts.PR_FILES_CHANGED;
 import static ui.components.KeyboardShortcuts.PR_COMMITS;
 
+import static util.GithubURLPageElements.DISCUSSION_TAB;
+import static util.GithubURLPageElements.COMMITS_TAB;
+import static util.GithubURLPageElements.FILES_TAB;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -212,22 +216,22 @@ public class ListPanel extends FilterPanel {
             }
             if (NEW_COMMENT.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab("discussion");
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToTab("discussion");
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     ui.getBrowserComponent().jumpToComment();
                 }
             }
             if (PR_FILES_CHANGED.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab("files");
+                    ui.getBrowserComponent().switchToTab(FILES_TAB);
                     event.consume();
 
                 }
             }
             if (PR_COMMITS.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab("commits");
+                    ui.getBrowserComponent().switchToTab(COMMITS_TAB);
                     event.consume();
                 }
             }
@@ -239,14 +243,14 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToTab("discussion");
+                ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToTab("discussion");
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
