@@ -93,7 +93,7 @@ public class ChromeDriverTest extends UITest {
         // scroll down
         push(KeyCode.K);
         sleep(EVENT_DELAY);
-        assertEquals("window.scrollBy(0,100)", script);
+        assertEquals("window.scrollBy(0, 100)", script);
         clearScript();
 
         // go to labels page

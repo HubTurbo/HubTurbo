@@ -15,7 +15,7 @@ public class GithubURLPageElements {
     //Javascript
     public static final String SCROLL_TO_TOP = "window.scrollTo(0, 0)";
     public static final String SCROLL_TO_BOTTOM = "window.scrollTo(0, document.body.scrollHeight)";
-    public static final String SCROLL_UP = "window.scrollBy(0,-100)";
-    public static final String SCROLL_DOWN = "window.scrollBy(0,100)";
+    public static final String SCROLL_UP = "window.scrollBy(0, -100)";
+    public static final String SCROLL_DOWN = "window.scrollBy(0, 100)";
     
 }
