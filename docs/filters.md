@@ -244,8 +244,6 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
-
 *Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`. Here are the available sort criteria:*
 - `comments` : sorts issues by number of comments (in descending order)
 - `repo` : sorts issues by repo. Only applicable if the panel is showing issues from more than one repo
@@ -255,6 +253,8 @@ Sorts a repository by the list of criteria, going from left to right. Negated cr
 - `priority` : sorts issues within the group by name (high, low, etc.) (in alphabetical order)
 - `status` : sorts issues by status (`open` issues followed by `closed` issues)
 - label group : sorts issues by the label group specified (in alphabetical order).Label groups can be disambiguated by appending a `.`. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (Will show issues with `high` priority first, followed by `low` priority issues and then followed by `medium` priority)
+
+Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
 
 ## Additional features
 
