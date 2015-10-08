@@ -246,7 +246,7 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
 
-*Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert the default sort order. Here are the available sort criteria:*
+*Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`. Here are the available sort criteria:*
 - `comments` : sorts issues by number of comments (in descending order)
 - `repo` : sorts issues by repo. Only applicable if the panel is showing issues from more than one repo
 - `updated` (or `date`) : sorts issues by their updated time (latest updated issues are shown first)
