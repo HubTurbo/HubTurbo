@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
