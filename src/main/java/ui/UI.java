@@ -176,7 +176,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     protected void registerTestEvents() {
-        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(() -> logic.refresh(false)));
     }
 
     private void initPreApplicationState() {
@@ -206,7 +206,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, TestController.isTestMode(), TestController.isTestJSONEnabled());
         clearCacheIfNecessary();
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+            status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
     }
 
@@ -290,7 +290,7 @@ public class UI extends Application implements EventDispatcher {
                     boolean shouldRefresh = browserComponent.hasBviewChanged();
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
-                        logic.refresh();
+                        logic.refresh(isNotificationPaneShowing());
                         refreshTimer.restart();
                     }
                 }
@@ -527,12 +527,21 @@ public class UI extends Application implements EventDispatcher {
     public void triggerNotificationAction() {
         notificationController.triggerNotificationAction();
     }
+
+    public void triggerNotificationTimeoutAction() {
+        // must be run in a Platform.runLater or from the UI thread
+        notificationController.triggerTimeoutAction();
+    }
     
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
                 + " (%s)", openBoard);
         mainStage.setTitle(title);
+    }
+
+    public boolean isNotificationPaneShowing() {
+        return notificationPane.isShowing();
     }
     
 }

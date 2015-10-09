@@ -68,17 +68,22 @@ public class Logic {
         return repoIO.isRepositoryValid(repoId);
     }
 
-    public void refresh() {
+    public void refresh(boolean isNotificationPaneShowing) {
+        // TODO fix refresh to take into account the possible pending actions associated with the notification pane
+        if (isNotificationPaneShowing) {
+            logger.info("Notification Pane is currently showing, not going to refresh. ");
+            return;
+        }
         String message = "Refreshing " + models.toModels().stream()
-            .map(Model::getRepoId)
-            .collect(Collectors.joining(", "));
+                .map(Model::getRepoId)
+                .collect(Collectors.joining(", "));
 
         logger.info(message);
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-            .map(repoIO::updateModel)
-            .collect(Collectors.toList()))
+                .map(repoIO::updateModel)
+                .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::updateUI)
                 .thenCompose(n -> getRateLimitResetTime())
