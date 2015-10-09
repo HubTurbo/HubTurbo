@@ -93,7 +93,13 @@ allprojects {
         unstableTestsRuntime.extendsFrom testRuntime
     }
 
+    task generateUnstableTestResources(type: Copy) {
+        from 'src/test/resources/guitests'
+        into 'build/resources/test/unstable'
+    }
+
     task unstableTests(type: Test) {
+        dependsOn generateUnstableTestResources
         testClassesDir = sourceSets.unstableTests.output.classesDir
         classpath = sourceSets.unstableTests.runtimeClasspath
     }
