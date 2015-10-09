@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
