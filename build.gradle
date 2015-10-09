@@ -99,6 +99,7 @@ allprojects {
     }
 
     task unstableTests(type: Test) {
+        forkEvery = 1
         dependsOn generateUnstableTestResources
         testClassesDir = sourceSets.unstableTests.output.classesDir
         classpath = sourceSets.unstableTests.runtimeClasspath
