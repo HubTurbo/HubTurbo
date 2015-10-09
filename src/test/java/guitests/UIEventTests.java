@@ -4,7 +4,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
-import util.PlatformEx;
+import ui.components.KeyboardShortcuts;
 import util.events.IssueCreatedEventHandler;
 import util.events.LabelCreatedEventHandler;
 import util.events.MilestoneCreatedEventHandler;
@@ -12,9 +12,8 @@ import util.events.PanelClickedEventHandler;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
-
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.*;
 
 public class UIEventTests extends UITest {
 
@@ -41,7 +40,7 @@ public class UIEventTests extends UITest {
         click("Issue");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
-        press(KeyCode.CONTROL).press(KeyCode.I).release(KeyCode.I).release(KeyCode.CONTROL);
+        press(NEW_ISSUE);
         assertEquals(1, eventTestCount);
     }
 
@@ -53,7 +52,7 @@ public class UIEventTests extends UITest {
         click("Label");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
-        press(KeyCode.CONTROL).press(KeyCode.L).release(KeyCode.L).release(KeyCode.CONTROL);
+        press(NEW_LABEL);
         assertEquals(1, eventTestCount);
     }
 
@@ -65,7 +64,7 @@ public class UIEventTests extends UITest {
         click("Milestone");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
-        press(KeyCode.CONTROL).press(KeyCode.M).release(KeyCode.M).release(KeyCode.CONTROL);
+        press(NEW_MILESTONE);
         assertEquals(1, eventTestCount);
     }
 
@@ -82,8 +81,7 @@ public class UIEventTests extends UITest {
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.increaseEventTestCount());
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.getEventRepoId(e));
         resetEventTestCount();
-        pushKeys(SWITCH_DEFAULT_REPO);
-        PlatformEx.waitOnFxThread();
+        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
 
@@ -95,9 +93,9 @@ public class UIEventTests extends UITest {
         push(KeyCode.ENTER);
         click("#dummy/dummy_col0_filterTextField");
         resetEventTestCount();
-        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals(1, eventTestCount);
-        press(KeyCode.CONTROL).press(KeyCode.R).release(KeyCode.R).release(KeyCode.CONTROL);
+        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals("dummy3/dummy3", defaultRepoId);
     }
 }

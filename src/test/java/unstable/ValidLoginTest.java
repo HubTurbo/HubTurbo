@@ -26,8 +26,7 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        sleep(2000);
-        ComboBox<String> repositorySelector = find("#repositorySelector");
+        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
         assertEquals("test/test", repositorySelector.getValue());
     }
 }

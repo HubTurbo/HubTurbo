@@ -1,6 +1,8 @@
 package guitests;
 
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
+
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
@@ -43,15 +45,17 @@ public class IssuePanelTests extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("date");
         push(KeyCode.ENTER);
-        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
+        press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
-        assertEquals(3, issuePanel.getSelectedIssue().getId());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        assertEquals(3, issuePanel.getSelectedIssue().getId());
+        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
+        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
     }
 
     @Test

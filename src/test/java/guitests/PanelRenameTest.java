@@ -15,6 +15,8 @@ import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
 public class PanelRenameTest extends UITest {
 
@@ -33,8 +35,7 @@ public class PanelRenameTest extends UITest {
         
         // Test for saving panel name
         
-        // maximize
-        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+        press(MAXIMIZE_WINDOW);
         sleep(EVENT_DELAY);
 
         // Testing case where rename is canceled with ESC
@@ -47,7 +48,7 @@ public class PanelRenameTest extends UITest {
         assertEquals("Panel", panelNameText0.getText());
         sleep(EVENT_DELAY);
         
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         
         // Testing case where a name with whitespaces at either end is submitted
         // Expected: new name accepted with whitespaces removed
@@ -58,9 +59,9 @@ public class PanelRenameTest extends UITest {
         Text panelNameText1 = find("#dummy/dummy_col1_nameText");
         assertEquals("Renamed panel", panelNameText1.getText());
         sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
+
+        press(CREATE_RIGHT_PANEL);
+
         // Testing case where empty name is submitted
         // Expected: new name not accepted
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(2)));
@@ -71,7 +72,7 @@ public class PanelRenameTest extends UITest {
         assertEquals("Panel", panelNameText2.getText());
         sleep(EVENT_DELAY);
         
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         
         // Testing boundary case where a name shorter than maximum allowed length is submitted
         // Expected: new name accepted
@@ -85,7 +86,7 @@ public class PanelRenameTest extends UITest {
         assertEquals(randomName3, panelNameText3.getText());
         sleep(EVENT_DELAY);
         
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         
         // Testing boundary case where a name exactly at maximum allowed length is submitted
         // Expected: new name accepted
@@ -98,9 +99,9 @@ public class PanelRenameTest extends UITest {
         Text panelNameText4 = find("#dummy/dummy_col4_nameText");
         assertEquals(randomName4, panelNameText4.getText());
         sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
+
+        press(CREATE_RIGHT_PANEL);
+
         // Testing boundary case where a name longer than maximum allowed length is submitted
         // Expected: new name not accepted
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
@@ -113,8 +114,7 @@ public class PanelRenameTest extends UITest {
         assertEquals("Panel", panelNameText5.getText());
         sleep(EVENT_DELAY);
         
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         
         // Testing typing more characters when textfield is full
         // Expected: new name accepted with additional characters not added
@@ -132,7 +132,7 @@ public class PanelRenameTest extends UITest {
         assertEquals(randomName6, panelNameText6.getText());
         sleep(EVENT_DELAY);
         
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(7)));
         sleep(EVENT_DELAY);
