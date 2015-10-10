@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.stage.Stage;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,12 +35,14 @@ public class MenuControl extends MenuBar {
     private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
+    private final Stage mainStage;
 
-    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
+    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs, Stage mainStage) {
         this.panels = panels;
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
+        this.mainStage = mainStage;
         createMenuItems();
     }
 
@@ -160,38 +163,26 @@ public class MenuControl extends MenuBar {
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
 
-        List<PanelInfo> panels = getCurrentPanels();
+        List<PanelInfo> panelList = getCurrentPanels();
 
-        if (panels.isEmpty()) {
+        if (panelList.isEmpty()) {
             logger.info("Did not save new board");
             return;
         }
 
-        TextInputDialog dlg = new TextInputDialog("");
-        dlg.getEditor().setId("boardnameinput");
-        dlg.setTitle("Board Name");
-        dlg.getDialogPane().setContentText("What should this board be called?");
-        dlg.getDialogPane().setHeaderText("Please name this board");
+        BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
-
+        ui.showMainStage();
+        this.panels.selectFirstPanel();
+        
         if (response.isPresent()) {
             String boardName = response.get().trim();
-            if (isBoardNameValid(boardName)) {
-                prefs.addBoard(boardName, panels);
-                prefs.setLastOpenBoard(boardName);
-                ui.triggerEvent(new BoardSavedEvent());
-                logger.info("New board " + boardName + " saved");
-                ui.updateTitle();
-            }
+            prefs.addBoard(boardName, panelList);
+            prefs.setLastOpenBoard(boardName);
+            ui.triggerEvent(new BoardSavedEvent());
+            logger.info("New board " + boardName + " saved");
+            ui.updateTitle();
         }
-    }
-    
-    private boolean isBoardNameValid(String response) {
-        if (response.equals("")) {
-            logger.info("Did not save new board: Empty name");
-            return false;
-        }
-        return true;
     }
 
     /**

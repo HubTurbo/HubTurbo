@@ -54,9 +54,9 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
 public class UI extends Application implements EventDispatcher {
 
-    private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 9;
-    private static final int VERSION_PATCH = 0;
+    public static final int VERSION_MAJOR = 3;
+    public static final int VERSION_MINOR = 9;
+    public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -326,7 +326,7 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
-        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
+        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
         HBox repoSelectorBar = new HBox();
@@ -500,6 +500,10 @@ public class UI extends Application implements EventDispatcher {
         return menuBar;
     }
     
+    public PanelControl getPanelControl() {
+        return panels;
+    }
+    
     /**
      * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
      */
@@ -560,6 +564,10 @@ public class UI extends Application implements EventDispatcher {
 
     public boolean isNotificationPaneShowing() {
         return notificationPane.isShowing();
+    }
+    
+    public String getTitle() {
+        return mainStage.getTitle();
     }
     
 }

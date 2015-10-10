@@ -3,9 +3,11 @@ package unstable;
 import guitests.UITest;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
 import org.loadui.testfx.utils.TestUtils;
 
+import ui.TestController;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
@@ -73,7 +75,8 @@ public class UpdateIssuesTest extends UITest {
 
     @SuppressWarnings("unchecked")
     public int countIssuesShown() throws InterruptedException, ExecutionException {
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<Integer>(((ListPanel) 
+                TestController.getUI().getPanelControl().getPanel(0))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         return (int) countIssues.get();
     }
