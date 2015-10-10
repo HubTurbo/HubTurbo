@@ -44,7 +44,9 @@ import util.events.testevents.UILogicRefreshEventHandler;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
@@ -194,7 +196,8 @@ public class UI extends Application implements EventDispatcher {
         if (TestController.isTestMode()) {
             registerTestEvents();
         }
-        registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UnusedStoredReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UsedReposChangedEventHandler) e -> removeUnusedModelsAndUpdate());
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
@@ -344,6 +347,21 @@ public class UI extends Application implements EventDispatcher {
         return notificationPane;
     }
 
+    public Set<String> getCurrentlyUsedRepos() {
+        Set<String> currentlyUsedRepos = new HashSet<>();
+        String defaultRepo = logic.getDefaultRepo();
+        currentlyUsedRepos.add(defaultRepo);
+        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+
+        return currentlyUsedRepos;
+    }
+
+    public void removeUnusedModelsAndUpdate() {
+        logic.removeUnusedModels(getCurrentlyUsedRepos());
+
+        triggerEvent(new UnusedStoredReposChangedEvent());
+    }
+
     /**
      * Sets the dimensions of the stage to the maximum usable size
      * of the desktop, or to the screen size if this fails.
@@ -448,7 +466,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UsedReposChangedEvent());
     }
     
     public void switchDefaultRepo(){
@@ -468,7 +486,7 @@ public class UI extends Application implements EventDispatcher {
             }
         }
 
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {

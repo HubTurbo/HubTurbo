@@ -113,7 +113,7 @@ public class GUIController {
 
         dispatchMetadataRequests(toUpdate);
 
-        UI.events.triggerEvent(new OpenReposChangedEvent());
+        UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
     /**
