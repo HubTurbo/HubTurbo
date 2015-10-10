@@ -5,6 +5,8 @@ import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
 
+import org.loadui.testfx.utils.TestUtils;
+import ui.TestController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
@@ -169,10 +171,9 @@ public class KeyboardShortcutsTest extends UITest {
         // test shortcut on repo dropdown
         doubleClick(repoSelectorComboBox);
         pushKeys(SWITCH_DEFAULT_REPO);
-        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("#dummy/dummy_col1_1");
         assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
         // test shortcut when focus is on panel
-        PlatformEx.waitOnFxThread();
         click("#dummy/dummy_col1_1");
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();

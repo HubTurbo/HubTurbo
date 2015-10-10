@@ -183,9 +183,14 @@ public class Logic {
         return models.getDefaultRepo();
     }
 
-    public CompletableFuture<Boolean> removeRepository(String repoId) {
-        models.removeRepoModelById(repoId);
+    public CompletableFuture<Boolean> removeStoredRepository(String repoId) {
         return repoIO.removeRepository(repoId);
+    }
+
+    public void removeUnusedModels(Set<String> reposInUse) {
+        models.toModels().stream().map(Model::getRepoId).
+                filter(repoId -> !reposInUse.contains(repoId)).
+                forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
     }
 
     /**

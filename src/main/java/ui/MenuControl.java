@@ -17,10 +17,10 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -205,6 +205,8 @@ public class MenuControl extends MenuBar {
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
         ui.updateTitle();
+
+        ui.triggerEvent(new UsedReposChangedEvent());
     }
 
     /**
@@ -341,7 +343,7 @@ public class MenuControl extends MenuBar {
     private MenuItem[] createReposMenu() {
         Menu remove = new Menu("Remove");
 
-        ui.registerEvent((OpenReposChangedEventHandler) e -> {
+        ui.registerEvent((UnusedStoredReposChangedEventHandler) e -> {
             Platform.runLater(() -> updateRepoRemoveList(remove));
         });
 
@@ -351,27 +353,18 @@ public class MenuControl extends MenuBar {
     private void updateRepoRemoveList(Menu remove) {
         remove.getItems().clear();
 
-        HashSet<String> currentlyUsedRepo = getCurrentlyUsedRepo();
+        Set<String> currentlyUsedRepos = ui.getCurrentlyUsedRepos();
+        Set<String> removableRepos = ui.logic.getStoredRepos();
+        removableRepos.removeAll(currentlyUsedRepos);
 
-        for (String repoId : ui.logic.getStoredRepos()) {
-            if (!currentlyUsedRepo.contains(repoId)) {
-                MenuItem removeItem = new MenuItem(repoId);
-                removeItem.setOnAction(e1 -> onRepoRemove(repoId));
-                remove.getItems().add(removeItem);
-            }
+        for (String repoId : removableRepos) {
+            MenuItem removeItem = new MenuItem(repoId);
+            removeItem.setOnAction(e1 -> onRepoRemove(repoId));
+            remove.getItems().add(removeItem);
         }
     }
 
-    private HashSet<String> getCurrentlyUsedRepo() {
-        HashSet<String> currentlyUsedRepos = new HashSet<>();
-        String defaultRepo = ui.logic.getDefaultRepo();
-        currentlyUsedRepos.add(defaultRepo);
-        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
-
-        return currentlyUsedRepos;
-    }
-
     private void onRepoRemove(String repoId) {
-        ui.logic.removeRepository(repoId).thenRun(() -> ui.triggerEvent(new OpenReposChangedEvent()));
+        ui.logic.removeStoredRepository(repoId).thenRun(() -> ui.triggerEvent(new UnusedStoredReposChangedEvent()));
     }
 }

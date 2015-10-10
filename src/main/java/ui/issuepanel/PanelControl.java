@@ -14,10 +14,7 @@ import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
-import util.events.IssueSelectedEventHandler;
-import util.events.PanelClickedEvent;
-import util.events.PanelClickedEventHandler;
-import util.events.ShowRenamePanelEventHandler;
+import util.events.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -161,6 +158,8 @@ public class PanelControl extends HBox {
         updatePanelIndices();
         ((AbstractPanel) child).close();
         updateFocus(index);
+
+        UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
     private void updatePanelIndices() {
