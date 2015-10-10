@@ -85,6 +85,9 @@ allprojects {
             java.srcDir 'src/test/java/unstable'
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
+
+            ext.guiTestResources = "${sourceSets.test.resources.getSrcDirs()[0]}/guitests"
+            ext.unstableTestResources = "${sourceSets.test.output.resourcesDir}/unstable"
         }
     }
 
@@ -93,7 +96,14 @@ allprojects {
         unstableTestsRuntime.extendsFrom testRuntime
     }
 
+    task generateUnstableTestResources(type: Copy) {
+        from sourceSets.unstableTests.ext.guiTestResources
+        into sourceSets.unstableTests.ext.unstableTestResources
+    }
+
     task unstableTests(type: Test) {
+        forkEvery = 1
+        dependsOn generateUnstableTestResources
         testClassesDir = sourceSets.unstableTests.output.classesDir
         classpath = sourceSets.unstableTests.runtimeClasspath
     }
