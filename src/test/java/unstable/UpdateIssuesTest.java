@@ -75,7 +75,7 @@ public class UpdateIssuesTest extends UITest {
 
     @SuppressWarnings("unchecked")
     public int countIssuesShown() throws InterruptedException, ExecutionException {
-        FutureTask countIssues = new FutureTask(((ListPanel) 
+        FutureTask<Integer> countIssues = new FutureTask<Integer>(((ListPanel) 
                 TestController.getUI().getPanelControl().getPanel(0))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
         return (int) countIssues.get();
