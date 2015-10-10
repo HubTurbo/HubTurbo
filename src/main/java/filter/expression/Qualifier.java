@@ -26,7 +26,7 @@ public class Qualifier implements FilterExpression {
     public static final Qualifier EMPTY = new Qualifier("", "");
 
     public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
-        "assignees", "author", "body", "closed", "comments", "created", "creator",
+        "assignee", "author", "body", "closed", "comments", "created", "creator",
         "date", "desc", "description", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",

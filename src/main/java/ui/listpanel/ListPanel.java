@@ -1,20 +1,9 @@
 package ui.listpanel;
 
-import static ui.components.KeyboardShortcuts.GOTO_MODIFIER;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
-import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
-import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
-import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.NEW_COMMENT;
-import static ui.components.KeyboardShortcuts.SHOW_CONTRIBUTORS;
-import static ui.components.KeyboardShortcuts.SHOW_DOCS;
-import static ui.components.KeyboardShortcuts.SHOW_HELP;
-import static ui.components.KeyboardShortcuts.SHOW_ISSUES;
-import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
-import static ui.components.KeyboardShortcuts.SHOW_LABELS;
-import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
-import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
-import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
+import static ui.components.KeyboardShortcuts.*;
+import static util.GithubURLPageElements.DISCUSSION_TAB;
+import static util.GithubURLPageElements.COMMITS_TAB;
+import static util.GithubURLPageElements.FILES_TAB;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -198,9 +187,7 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (KeyboardShortcuts.scrollToBottom.match(event)) {
-                if (!MINIMIZE_WINDOW.match(event)) {
-                    ui.getBrowserComponent().scrollToBottom();
-                }
+                ui.getBrowserComponent().scrollToBottom();
             }
             if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
                 ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
@@ -208,10 +195,26 @@ public class ListPanel extends FilterPanel {
             if (GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (NEW_COMMENT.match(event) && 
-                    ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToConversationTab();
-                ui.getBrowserComponent().jumpToComment();
+            if (NEW_COMMENT.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    ui.getBrowserComponent().jumpToComment();
+                }
+            }
+            if (PR_FILES_CHANGED.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    ui.getBrowserComponent().switchToTab(FILES_TAB);
+                    event.consume();
+
+                }
+            }
+            if (PR_COMMITS.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    ui.getBrowserComponent().switchToTab(COMMITS_TAB);
+                    event.consume();
+                }
             }
             if (SHOW_LABELS.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -221,14 +224,14 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToConversationTab();
+                ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToConversationTab();
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
@@ -315,8 +318,8 @@ public class ListPanel extends FilterPanel {
         return issueCount;
     }
 
-    public TurboIssue getSelectedIssue() {
-        return listView.getSelectedItem().get();
+    public Optional<TurboIssue> getSelectedIssue() {
+        return listView.getSelectedItem();
     }
 
     /* Methods that perform user's actions under the context of this ListPanel */
@@ -343,6 +346,8 @@ public class ListPanel extends FilterPanel {
     }
 
     private void changeLabels() {
-        ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
+        if (getSelectedIssue().isPresent()) {
+            ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue().get()));
+        }
     }
 }

@@ -1,7 +1,10 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
@@ -27,10 +30,9 @@ public class PanelsTest extends UITest {
 
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());
 
-        // maximize
-        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+        press(MAXIMIZE_WINDOW);
 
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         type("repo");
         press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
         type("dummy2/dummy2");
@@ -61,7 +63,7 @@ public class PanelsTest extends UITest {
         doubleClick();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
         click("#dummy2/dummy2_col1");
     }

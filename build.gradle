@@ -5,7 +5,6 @@
  * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
  */
 
-// Plugins
 plugins {
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "com.github.johnrengelman.shadow" version "1.2.1"
@@ -28,7 +27,7 @@ allprojects {
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.8.0'
+    version = '3.9.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -76,28 +75,31 @@ allprojects {
 
     test {
         forkEvery = 1
+        if (System.env.'CI') {
+            exclude 'unstable'
+        }
+    }
 
-        // uncomment to disable gui tests
-//        exclude 'guitests'
+    sourceSets {
+        unstableTests {
+            java.srcDir 'src/test/java/unstable'
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
+
+    configurations {
+        unstableTestsCompile.extendsFrom testCompile
+        unstableTestsRuntime.extendsFrom testRuntime
+    }
+
+    task unstableTests(type: Test) {
+        testClassesDir = sourceSets.unstableTests.output.classesDir
+        classpath = sourceSets.unstableTests.runtimeClasspath
     }
 
     jacoco {
         toolVersion = "0.7.5.201505241946"
-    }
-
-    jacocoTestReport {
-        dependsOn test
-        sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
-        classDirectories =  project.files(sourceSets.main.output)
-        afterEvaluate {
-            classDirectories = files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: 'tests/**')
-            })
-        }
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
     }
 
     jar {
@@ -158,5 +160,5 @@ tasks.coveralls {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4' //version required
+    gradleVersion = '2.4'
 }

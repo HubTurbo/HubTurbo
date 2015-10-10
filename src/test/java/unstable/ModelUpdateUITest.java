@@ -1,6 +1,8 @@
-package guitests;
+package unstable;
 
 import org.junit.Test;
+
+import guitests.UITest;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;

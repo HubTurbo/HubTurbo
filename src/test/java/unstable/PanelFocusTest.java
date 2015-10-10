@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.*;
 
 public class PanelFocusTest extends UITest {
 
@@ -72,9 +74,9 @@ public class PanelFocusTest extends UITest {
         assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
 
         // More shortcut checks to ensure the focus is always correct
-        press(KeyCode.CONTROL).press(KeyCode.F).release(KeyCode.F).release(KeyCode.CONTROL);
+        press(JUMP_TO_FILTER_BOX);
         assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
-        press(KeyCode.CONTROL).press(KeyCode.ENTER).release(KeyCode.ENTER).release(KeyCode.CONTROL);
+        press(JUMP_TO_FIRST_ISSUE);
         assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
         push(KeyCode.F);
         assertEquals(2, (int) panelControl.getCurrentlySelectedPanel().get());
@@ -87,7 +89,7 @@ public class PanelFocusTest extends UITest {
         // test that upon creating panel on the right, focus is on the last panel
         // - this includes testing double space as the last panel might be
         //   colour focused but the real JavaFX focus is on first panel
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         PlatformEx.waitOnFxThread();
         assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
                 panelControl.getNumberOfPanels() - 1);
@@ -98,8 +100,7 @@ public class PanelFocusTest extends UITest {
 
         // test that upon creating panel on the left, focus is on the first panel
         // - same consideration as above
-        press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).
-                release(KeyCode.P).release(KeyCode.SHIFT).release(KeyCode.CONTROL);
+        press(CREATE_LEFT_PANEL);
         PlatformEx.waitOnFxThread();
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
         type("  ");
@@ -120,12 +121,12 @@ public class PanelFocusTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         PlatformEx.waitOnFxThread();
         assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
                 panelControl.getNumberOfPanels() - 1);
         // 3. Open board
-        press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
+        press(SWITCH_BOARD);
         PlatformEx.waitOnFxThread();
 
         // Check that first panel is on focus

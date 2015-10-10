@@ -12,20 +12,11 @@ import javafx.stage.Stage;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import prefs.Preferences;
 import prefs.PanelInfo;
+import prefs.Preferences;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
-
-import static ui.components.KeyboardShortcuts.NEW_ISSUE;
-import static ui.components.KeyboardShortcuts.NEW_LABEL;
-import static ui.components.KeyboardShortcuts.NEW_MILESTONE;
-import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
-import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
-import static ui.components.KeyboardShortcuts.SHOW_DOCS;
-import static ui.components.KeyboardShortcuts.REFRESH;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static ui.components.KeyboardShortcuts.*;
 
 public class MenuControl extends MenuBar {
 
@@ -301,7 +294,11 @@ public class MenuControl extends MenuBar {
         MenuItem refreshMenuItem = new MenuItem("Refresh");
         refreshMenuItem.setOnAction((e) -> {
             logger.info("Menu: View > Refresh");
-            ui.logic.refresh();
+            if (ui.isNotificationPaneShowing()) {
+                // we trigger the notification timeout action first before refreshing
+                ui.triggerNotificationTimeoutAction();
+            }
+            ui.logic.refresh(false);
         });
         refreshMenuItem.setAccelerator(REFRESH);
         return refreshMenuItem;

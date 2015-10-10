@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -12,6 +13,7 @@ import util.PlatformEx;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
 
 public class LabelPickerTests extends UITest {
 
@@ -110,7 +112,7 @@ public class LabelPickerTests extends UITest {
         assertEquals(0, listPanelCell.getIssueLabels().size());
 
         click("#dummy/dummy_col0_9");
-        press(KeyCode.CONTROL).press(KeyCode.Z).release(KeyCode.Z).release(KeyCode.CONTROL);
+        press(UNDO_LABEL_CHANGES);
         while (notificationPane.isShowing()) {
             PlatformEx.waitOnFxThread();
             sleep(100);

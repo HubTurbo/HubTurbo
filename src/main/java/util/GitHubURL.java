@@ -49,7 +49,7 @@ public class GitHubURL {
     }
     
     public static boolean isPullRequestLoaded(String url)  {
-        return (url.endsWith("/commits") || url.endsWith("/files"));
+        return url.matches("https://github.com/([^/]+)/([^/]+)/pull/([0-9]+)(/|/commits|/files)?");
     }
 
 }

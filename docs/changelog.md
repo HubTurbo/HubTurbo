@@ -1,5 +1,11 @@
 # Changelog
 
+# V3.9.0
+
+- Review comments are now taken into account by the `updated` qualifier
+- The browser view will scroll to the bottom on loading an issue
+- Fixed bug with hotkey for switching repository
+
 # V3.8.0
 
 - Fixed unresponsive <kbd>Ctrl</kbd> keybindings

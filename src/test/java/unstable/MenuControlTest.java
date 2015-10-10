@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -15,6 +16,7 @@ import util.PlatformEx;
 import util.events.ModelUpdatedEventHandler;
 import util.Utility;
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.*;
 
 public class MenuControlTest extends UITest {
 
@@ -35,12 +37,11 @@ public class MenuControlTest extends UITest {
         modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         
-        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
+        press(CLOSE_PANEL);
         assertEquals(0, panelControl.getNumberOfPanels());
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         assertEquals(1, panelControl.getNumberOfPanels());
-        press(KeyCode.CONTROL).press(KeyCode.SHIFT).press(KeyCode.P).release(KeyCode.P)
-            .release(KeyCode.SHIFT).release(KeyCode.CONTROL);
+        press(CREATE_LEFT_PANEL);
         assertEquals(2, panelControl.getNumberOfPanels());
 
         click("Panels");
@@ -71,7 +72,7 @@ public class MenuControlTest extends UITest {
         
         // Testing board open keyboard shortcut when no board is saved
         // Expected: nothing happens
-        press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
+        pushKeys(SWITCH_BOARD);
         assertEquals(false, testPref.getLastOpenBoard().isPresent());
         
         // Testing board save as
@@ -86,11 +87,11 @@ public class MenuControlTest extends UITest {
         
         // Testing board switch keyboard shortcut when there is only one saved board
         // Expected: nothing happens
-        press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
+        press(SWITCH_BOARD);
         assertEquals(true, testPref.getLastOpenBoard().isPresent());
         assertEquals("Board 1", testPref.getLastOpenBoard().get());
 
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        press(CREATE_RIGHT_PANEL);
         assertEquals(3, panelControl.getNumberOfPanels());
         
         click("Boards");
@@ -124,11 +125,11 @@ public class MenuControlTest extends UITest {
         assertEquals(true, saveButton3.isDisabled());
         push(KeyCode.ESCAPE);
 
-        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
-        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
-        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
+        press(CLOSE_PANEL);
+        press(CLOSE_PANEL);
+        press(CLOSE_PANEL);
         assertEquals(0, panelControl.getNumberOfPanels());
-        
+
         // Testing board open
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
@@ -140,17 +141,17 @@ public class MenuControlTest extends UITest {
 
         // Testing First Panel selected
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
-        press(KeyCode.CONTROL).press(KeyCode.DIGIT1).release(KeyCode.DIGIT1).release(KeyCode.CONTROL);
+        press(KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS.get(1));
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
         
         // Testing board open keyboard shortcut
-        press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
+        press(SWITCH_BOARD);
         assertEquals(true, testPref.getLastOpenBoard().isPresent());
         assertEquals("Board 1", testPref.getLastOpenBoard().get());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
         // Testing board save
-        press(KeyCode.CONTROL).press(KeyCode.W).release(KeyCode.W).release(KeyCode.CONTROL);
+        press(CLOSE_PANEL);
         click("Boards");
         push(KeyCode.DOWN);
         push(KeyCode.ENTER);
@@ -170,7 +171,7 @@ public class MenuControlTest extends UITest {
         
         // Testing board open keyboard shortcut when there are saved boards but none is open
         // Expected: nothing happens
-        press(KeyCode.CONTROL).press(KeyCode.B).release(KeyCode.B).release(KeyCode.CONTROL);
+        pushKeys(SWITCH_BOARD);
         assertEquals(false, testPref.getLastOpenBoard().isPresent());
         
         // Testing board save when no board is open because current board was closed
