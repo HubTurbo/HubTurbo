@@ -60,8 +60,6 @@ public class GUIController {
     private void modelUpdated(ModelUpdatedEvent e) {
         panelControl.updateModel(e.model); // Updates model, to be used to display issue labels.
 
-        System.out.println(e.issuesToShow);
-
         panelControl.getChildren().stream()
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
