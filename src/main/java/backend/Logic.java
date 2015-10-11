@@ -85,7 +85,7 @@ public class Logic {
                 .map(repoIO::updateModel)
                 .collect(Collectors.toList()))
                 .thenApply(models::replace)
-                .thenRun(this::updateUI)
+                .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateRemainingRate)
                 .exceptionally(Futures::log);
@@ -104,8 +104,8 @@ public class Logic {
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we call updateUI even when the repo is already open.
-            if (isPrimaryRepository) updateUI();
+            // Thus we refresh panels even when the repo is already open.
+            if (isPrimaryRepository) refreshUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -117,7 +117,7 @@ public class Logic {
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
                         .thenApply(models::addPending)
-                        .thenRun(this::updateUI)
+                        .thenRun(this::refreshUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
                         .thenCompose(n -> getRateLimitResetTime())
                         .thenApply(this::updateRemainingRate)
@@ -209,13 +209,13 @@ public class Logic {
                     replaceIssueLabelsUI(issue, originalLabels);
                     logger.error(e.getLocalizedMessage(), e);
                     return false;
-        });
+                });
     }
 
     public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
         logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
         issue.setLabels(labels);
-        updateUIAndShow();
+        refreshUI();
     }
 
     /**
