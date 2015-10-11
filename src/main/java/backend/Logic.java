@@ -3,6 +3,8 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
@@ -13,9 +15,7 @@ import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -127,28 +127,6 @@ public class Logic {
         });
     }
 
-    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<TurboIssue> issues) {
-        String message = "Getting metadata for " + repoId + "...";
-        logger.info("Getting metadata for issues "
-                + issues.stream().map(TurboIssue::getId).map(Object::toString).collect(Collectors.joining(", ")));
-        UI.status.displayMessage(message);
-
-        String currentUser = prefs.getLastLoginUsername();
-
-        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
-            .thenApply(metadata -> {
-                String updatedMessage = "Received metadata from " + repoId + "!";
-                UI.status.displayMessage(updatedMessage);
-                models.insertMetadata(repoId, metadata, currentUser);
-                return metadata;
-            })
-            .thenApply(Futures.tap(this::updateUIAndShow))
-            .thenCompose(n -> getRateLimitResetTime())
-            .thenApply(this::updateRemainingRate)
-            .thenApply(rateLimits -> true)
-            .exceptionally(withResult(false));
-    }
-
     // Adds update times to the metadata map
     private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
         String currentUser = prefs.getLastLoginUsername();
@@ -191,22 +169,6 @@ public class Logic {
         models.toModels().stream().map(Model::getRepoId).
                 filter(repoId -> !reposInUse.contains(repoId)).
                 forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
-    }
-
-    /**
-     * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
-     * metadata to display their issues, in which case the changes in the model are not presented to the user.
-     */
-    private void updateUI() {
-        uiManager.update(models, false);
-    }
-
-    /**
-     * Carries the current model in Logic to the GUI and immediately presents it to the user. Does not trigger
-     * further metadata updates.
-     */
-    private void updateUIAndShow() {
-        uiManager.update(models, true);
     }
 
     private ImmutablePair<Integer, Long> updateRemainingRate
@@ -256,4 +218,195 @@ public class Logic {
         updateUIAndShow();
     }
 
+    /**
+     * Determines data to be sent to the GUI to refresh the entire GUI with the current model in Logic,
+     * and then sends the data to the GUI.
+     */
+    private void refreshUI() {
+        filterSortRefresh(getAllUIFilters());
+    }
+
+    /**
+     * Given a list of filter expressions, dispatch metadata update if needed and then process them to return
+     * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
+     * from the repository source.
+     *
+     * @param filterTexts Filter expressions to process
+     */
+    public void filterSortRefresh(List<FilterExpression> filterTexts) {
+        // Open specified repos
+        openRepositoriesInFilters(filterTexts);
+
+        // First filter, for issues requiring a metadata update.
+        Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterTexts);
+
+        if (toUpdate.size() > 0) {
+            // If there are issues requiring metadata update, we dispatch the metadata requests...
+            ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
+            toUpdate.forEach((repoId, issues) -> {
+                metadataRetrievalTasks.add(getIssueMetadata(repoId, issues));
+            });
+            // ...and then wait for all of them to complete.
+            CompletableFuture<Void> allCompletables = CompletableFuture.allOf(
+                    metadataRetrievalTasks.toArray(new CompletableFuture[metadataRetrievalTasks.size()]));
+            allCompletables
+                    .thenCompose(n -> getRateLimitResetTime())
+                    .thenApply(this::updateRemainingRate)
+                    .thenRun(() -> updateUI(filterAndSort(filterTexts))); // Then filter the second time.
+        } else {
+            // If no issues requiring metadata update, just run the filter and sort.
+            updateUI(filterAndSort(filterTexts));
+        }
+    }
+
+    /**
+     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
+     *
+     * @param filterTexts Filter expressions to process.
+     */
+    private void openRepositoriesInFilters(List<FilterExpression> filterTexts) {
+        HashSet<String> reposToOpen = new HashSet<>();
+
+        filterTexts.forEach(filterText -> {
+            filterText.find(Qualifier::isMetaQualifier).stream()
+                    .filter(metaQualifier ->
+                            metaQualifier.getName().equals(Qualifier.REPO) && metaQualifier.getContent().isPresent())
+                    .forEach(repoQualifier ->
+                            reposToOpen.add(repoQualifier.getContent().get()));
+        });
+
+        reposToOpen.forEach(this::openRepositoryFromFilter);
+    }
+
+    /**
+     * Given a list of filter expressions, determine issues within the model that require a metadata update.
+     *
+     * @param filterTexts Filter expressions to process for metadata requests.
+     * @return Repo IDs and the corresponding issues in the repo requiring a metadata update.
+     */
+    private Map<String, List<TurboIssue>> tallyMetadataUpdate(List<FilterExpression> filterTexts) {
+        HashMap<String, List<TurboIssue>> toUpdate = new HashMap<>();
+
+        List<TurboIssue> allModelIssues = models.getIssues();
+
+        filterTexts.stream().filter(Qualifier::hasUpdatedQualifier).forEach(filterText -> {
+            List<TurboIssue> issuesInPanel = allModelIssues.stream()
+                    .filter(issue -> Qualifier.process(models, filterText, issue))
+                    .collect(Collectors.toList());
+
+            issuesInPanel.forEach(issue -> {
+                List<TurboIssue> issuesInRepo = toUpdate.get(issue.getRepoId());
+                if (issuesInRepo != null) {
+                    // If eixsts, just add the issue
+                    issuesInRepo.add(issue);
+                } else {
+                    // If not exists, create first then add
+                    issuesInRepo = new ArrayList<>();
+                    issuesInRepo.add(issue);
+                    toUpdate.put(issue.getRepoId(), issuesInRepo);
+                }
+            });
+        });
+
+        return toUpdate;
+    }
+
+    /**
+     * Retrieves metadata for given issues from the repository source, and then processes them for non-self
+     * update timings.
+     *
+     * @param repoId The repository containing issues to retrieve metadata for.
+     * @param issues Issues sharing the same repository requiring a metadata update.
+     * @return True if metadata retrieval was a success, false otherwise.
+     */
+    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<TurboIssue> issues) {
+        String message = "Getting metadata for " + repoId + "...";
+        logger.info("Getting metadata for issues "
+                + issues.stream().map(TurboIssue::getId).map(Object::toString).collect(Collectors.joining(", ")));
+        UI.status.displayMessage(message);
+
+        String currentUser = prefs.getLastLoginUsername();
+
+        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
+                .thenApply(metadata -> {
+                    String updatedMessage = "Received metadata from " + repoId + "!";
+                    UI.status.displayMessage(updatedMessage);
+                    models.insertMetadata(repoId, metadata, currentUser);
+                    return true;
+                })
+                .exceptionally(withResult(false));
+    }
+
+    /**
+     * Filters and sorts issues within the model according to the given filter expressions.
+     *
+     * @param filterTexts Filter expressions to process.
+     * @return Filter expressions and their corresponding issues after filtering and sorting.
+     */
+    private Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>>
+                                        filterAndSort(List<FilterExpression> filterTexts) {
+        Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> filteredAndSorted = new HashMap<>();
+
+        List<TurboIssue> allModelIssues = models.getIssues();
+
+        filterTexts.forEach(filterText -> {
+            ImmutablePair<List<TurboIssue>, Boolean> filterAndSortedExpression = filteredAndSorted.get(filterText);
+
+            if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
+                List<Qualifier> metaQualifiers = filterText.find(Qualifier::isMetaQualifier);
+                boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(metaQualifiers);
+
+                List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
+                        .filter(issue -> Qualifier.process(models, filterText, issue))
+                        .sorted(determineComparator(metaQualifiers, hasUpdatedQualifier))
+                        .collect(Collectors.toList());
+
+                filteredAndSorted.put(filterText, new ImmutablePair<>(filteredAndSortedIssues, hasUpdatedQualifier));
+            }
+        });
+
+        return filteredAndSorted;
+    }
+
+    /**
+     * Produces a suitable comparator based on the given data.
+     *
+     * @param panelMetaQualifiers The given meta qualifiers, from which Sort qualifiers will be processed.
+     * @param hasUpdatedQualifier Determines the behaviour of the sort key "nonSelfUpdate".
+     * @return The comparator to use.
+     */
+    private Comparator<TurboIssue> determineComparator(List<Qualifier> panelMetaQualifiers,
+                                                       boolean hasUpdatedQualifier) {
+        for (Qualifier metaQualifier : panelMetaQualifiers) {
+            // Only take into account the first sort qualifier found
+            if (metaQualifier.getName().equals("sort")) {
+                return metaQualifier.getCompoundSortComparator(models, hasUpdatedQualifier);
+            }
+        }
+
+        // No sort qualifier, look for updated qualifier
+        if (hasUpdatedQualifier) {
+            return Qualifier.getSortComparator(models, "nonSelfUpdate", true, true);
+        }
+
+        // No sort or updated, return sort by descending ID, which is the default.
+        return Qualifier.getSortComparator(models, "id", true, false);
+    }
+
+    /**
+     * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
+     * metadata to display their issues, in which case the changes in the model are not presented to the user.
+     */
+    private void updateUI(Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> issuesToShow) {
+        uiManager.update(models, issuesToShow);
+    }
+
+    /**
+     * Retrieves all filter expressions in active panels from the UI.
+     *
+     * @return Filter expressions in the UI.
+     */
+    private List<FilterExpression> getAllUIFilters() {
+        return uiManager.getAllFilters();
+    }
 }
