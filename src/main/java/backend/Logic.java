@@ -61,7 +61,7 @@ public class Logic {
         });
 
         // Pass the currently-empty model to the UI
-        uiManager.updateNow(models);
+        uiManager.updateEmpty(models);
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
