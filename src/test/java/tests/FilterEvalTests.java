@@ -3,11 +3,13 @@ package tests;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import filter.expression.FilterExpression;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -130,6 +132,218 @@ public class FilterEvalTests {
         } catch (ParseException ignored) {
         }
         assertEquals(false, matches("milestone:what", issue));
+
+        // milestone aliases
+        // - sorting of milestone is by due date
+        // - test different offset
+
+        // test: overdue open milestone with no open issues would not be current milestone
+        TurboMilestone msCurrMin3 = new TurboMilestone(REPO, 10, "V0.1");
+        msCurrMin3.setOpen(true);
+        msCurrMin3.setOpenIssues(0);
+        msCurrMin3.setDueDate(Optional.of(LocalDate.now().minusMonths(2)));
+        TurboIssue iCurrMin3 = new TurboIssue(REPO, 2, "curr-3");
+        iCurrMin3.setMilestone(msCurrMin3);
+        iCurrMin3.setOpen(false);
+
+        // test: sort by due date is correct
+        TurboMilestone msCurrMin2 = new TurboMilestone(REPO, 9, "V0.2");
+        msCurrMin2.setOpen(false);
+        msCurrMin2.setDueDate(Optional.of(LocalDate.now().minusMonths(1)));
+        TurboIssue iCurrMin2 = new TurboIssue(REPO, 3, "curr-2");
+        iCurrMin2.setMilestone(msCurrMin2);
+
+        // test: future closed milestone will not be current milestone
+        TurboMilestone msCurrMin1 = new TurboMilestone(REPO, 8, "V0.3");
+        msCurrMin1.setOpen(false);
+        msCurrMin1.setDueDate(Optional.of(LocalDate.now().plusDays(1)));
+        TurboIssue iCurrMin1 = new TurboIssue(REPO, 4, "curr-1");
+        iCurrMin1.setMilestone(msCurrMin1);
+
+        // test: earliest future open milestone with 0 open issues will
+        // be current milestone
+        TurboMilestone msCurr = new TurboMilestone(REPO, 7, "V0.5");
+        msCurr.setOpen(true);
+        msCurr.setOpenIssues(0);
+        msCurr.setDueDate(Optional.of(LocalDate.now().plusMonths(1)));
+        TurboIssue iCurr = new TurboIssue(REPO, 5, "curr");
+        iCurr.setMilestone(msCurr);
+        iCurr.setOpen(false);
+
+        // test: sort by due date is correct, even if in the future but
+        // closed
+        TurboMilestone msCurrPlus1 = new TurboMilestone(REPO, 6, "V0.7");
+        msCurrPlus1.setOpen(false);
+        msCurrPlus1.setDueDate(Optional.of(LocalDate.now().plusMonths(2)));
+        TurboIssue iCurrPlus1 = new TurboIssue(REPO, 6, "curr+1");
+        iCurrPlus1.setMilestone(msCurrPlus1);
+
+        // test: sort by due date is correct
+        TurboMilestone msCurrPlus2 = new TurboMilestone(REPO, 5, "V0.8");
+        msCurrPlus2.setOpen(true);
+        msCurrPlus2.setDueDate(Optional.of(LocalDate.now().plusMonths(3)));
+        TurboIssue iCurrPlus2 = new TurboIssue(REPO, 7, "curr+2");
+        iCurrPlus2.setMilestone(msCurrPlus2);
+
+        // test: milestone with no due date should come last
+        TurboMilestone msCurrPlus3 = new TurboMilestone(REPO, 4, "V0.9");
+        msCurrPlus3.setDueDate(Optional.empty());
+        TurboIssue iCurrPlus3 = new TurboIssue(REPO, 8, "curr+3");
+        iCurrPlus3.setMilestone(msCurrPlus3);
+
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
+                        iCurr, iCurrPlus1, iCurrPlus2, iCurrPlus3)),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(msCurrMin3, msCurrMin2, msCurrMin1,
+                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3)),
+                new ArrayList<>()));
+
+        FilterExpression noMilestoneAlias;
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        // test: negation alias
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("-milestone:curr"));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        // test: no milestone in model should return qualifier false
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
+                        iCurr, iCurrPlus1, iCurrPlus2, iCurrPlus3)),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
     }
 
     @Test

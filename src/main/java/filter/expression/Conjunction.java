@@ -8,6 +8,7 @@ import filter.QualifierApplicationException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -104,5 +105,18 @@ public class Conjunction implements FilterExpression {
         result.addAll(left);
         result.addAll(right);
         return result;
+    }
+
+    @Override
+    public FilterExpression map(Function<Qualifier, Qualifier> func) {
+        FilterExpression left = this.left.map(func);
+        FilterExpression right = this.right.map(func);
+        if (left == Qualifier.EMPTY) {
+            return right;
+        } else if (right == Qualifier.EMPTY) {
+            return left;
+        } else {
+            return new Conjunction(left, right);
+        }
     }
 }
