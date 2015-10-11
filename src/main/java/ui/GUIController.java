@@ -291,6 +291,11 @@ public class GUIController {
         toUpdate.forEach((repoId, issues) ->
             ui.logic.getIssueMetadata(repoId, issues)
         );
+    public List<FilterExpression> getAllFilters() {
+        return panelControl.getChildren().stream()
+                .filter(child -> child instanceof FilterPanel)
+                .map(child -> ((FilterPanel) child).getCurrentFilterExpression())
+                .collect(Collectors.toList());
     }
 
     private void updateAPIBox(UpdateRateLimitsEvent e) {

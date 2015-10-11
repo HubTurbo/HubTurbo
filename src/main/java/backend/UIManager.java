@@ -1,6 +1,7 @@
 package backend;
 
 import backend.resource.MultiModel;
+import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.UI;
@@ -26,6 +27,10 @@ public class UIManager {
 
     public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
         ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.left, rateLimits.right));
+    }
+
+    public List<FilterExpression> getAllFilters() {
+        return ui.guiController.getAllFilters();
     }
 }
 
