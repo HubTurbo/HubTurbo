@@ -353,6 +353,22 @@ public class MenuControl extends MenuBar {
             removeItem.setOnAction(e1 -> onRepoRemove(repoId));
             remove.getItems().add(removeItem);
         }
+
+        remove.getItems().add(new SeparatorMenuItem());
+        MenuItem nonRemovableMsg = new MenuItem("[Non-Removable - In Use]");
+        nonRemovableMsg.setDisable(true);
+        remove.getItems().add(nonRemovableMsg);
+
+        // Supposedly, we would like the menu not to close when the disabled MenuItem-s
+        // below are clicked. But this is a JDK bug; we can use CustomMenuItem.setHideOnClick(false)
+        // if we want to. The bug is that it only works for ContextMenu and not Menu (which
+        // we are using).
+        for (String usedRepoId : currentlyUsedRepos) {
+            MenuItem disabledRemoveItem = new MenuItem(usedRepoId);
+            disabledRemoveItem.setDisable(true);
+            remove.getItems().add(disabledRemoveItem);
+        }
+
     }
 
     private void onRepoRemove(String repoId) {
