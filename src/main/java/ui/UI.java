@@ -44,7 +44,9 @@ import util.events.testevents.UILogicRefreshEventHandler;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
@@ -52,9 +54,9 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
 public class UI extends Application implements EventDispatcher {
 
-    private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 9;
-    private static final int VERSION_PATCH = 0;
+    public static final int VERSION_MAJOR = 3;
+    public static final int VERSION_MINOR = 9;
+    public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -176,7 +178,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     protected void registerTestEvents() {
-        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(() -> logic.refresh(false)));
     }
 
     private void initPreApplicationState() {
@@ -194,7 +196,8 @@ public class UI extends Application implements EventDispatcher {
         if (TestController.isTestMode()) {
             registerTestEvents();
         }
-        registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UnusedStoredReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UsedReposChangedEventHandler) e -> removeUnusedModelsAndUpdate());
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
@@ -206,7 +209,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, TestController.isTestMode(), TestController.isTestJSONEnabled());
         clearCacheIfNecessary();
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+            status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
     }
 
@@ -290,7 +293,7 @@ public class UI extends Application implements EventDispatcher {
                     boolean shouldRefresh = browserComponent.hasBviewChanged();
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
-                        logic.refresh();
+                        logic.refresh(isNotificationPaneShowing());
                         refreshTimer.restart();
                     }
                 }
@@ -323,7 +326,7 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
-        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
+        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
         HBox repoSelectorBar = new HBox();
@@ -342,6 +345,21 @@ public class UI extends Application implements EventDispatcher {
         notificationPane = new NotificationPane(root);
 
         return notificationPane;
+    }
+
+    public Set<String> getCurrentlyUsedRepos() {
+        Set<String> currentlyUsedRepos = new HashSet<>();
+        String defaultRepo = logic.getDefaultRepo();
+        currentlyUsedRepos.add(defaultRepo);
+        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+
+        return currentlyUsedRepos;
+    }
+
+    public void removeUnusedModelsAndUpdate() {
+        logic.removeUnusedModels(getCurrentlyUsedRepos());
+
+        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     /**
@@ -448,7 +466,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UsedReposChangedEvent());
     }
     
     public void switchDefaultRepo(){
@@ -468,7 +486,7 @@ public class UI extends Application implements EventDispatcher {
             }
         }
 
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {
@@ -480,6 +498,10 @@ public class UI extends Application implements EventDispatcher {
 
     public MenuControl getMenuControl() {
         return menuBar;
+    }
+    
+    public PanelControl getPanelControl() {
+        return panels;
     }
     
     /**
@@ -527,12 +549,25 @@ public class UI extends Application implements EventDispatcher {
     public void triggerNotificationAction() {
         notificationController.triggerNotificationAction();
     }
+
+    public void triggerNotificationTimeoutAction() {
+        // must be run in a Platform.runLater or from the UI thread
+        notificationController.triggerTimeoutAction();
+    }
     
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
                 + " (%s)", openBoard);
         mainStage.setTitle(title);
+    }
+
+    public boolean isNotificationPaneShowing() {
+        return notificationPane.isShowing();
+    }
+    
+    public String getTitle() {
+        return mainStage.getTitle();
     }
     
 }

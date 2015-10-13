@@ -68,17 +68,22 @@ public class Logic {
         return repoIO.isRepositoryValid(repoId);
     }
 
-    public void refresh() {
+    public void refresh(boolean isNotificationPaneShowing) {
+        // TODO fix refresh to take into account the possible pending actions associated with the notification pane
+        if (isNotificationPaneShowing) {
+            logger.info("Notification Pane is currently showing, not going to refresh. ");
+            return;
+        }
         String message = "Refreshing " + models.toModels().stream()
-            .map(Model::getRepoId)
-            .collect(Collectors.joining(", "));
+                .map(Model::getRepoId)
+                .collect(Collectors.joining(", "));
 
         logger.info(message);
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-            .map(repoIO::updateModel)
-            .collect(Collectors.toList()))
+                .map(repoIO::updateModel)
+                .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::updateUI)
                 .thenCompose(n -> getRateLimitResetTime())
@@ -178,9 +183,14 @@ public class Logic {
         return models.getDefaultRepo();
     }
 
-    public CompletableFuture<Boolean> removeRepository(String repoId) {
-        models.removeRepoModelById(repoId);
+    public CompletableFuture<Boolean> removeStoredRepository(String repoId) {
         return repoIO.removeRepository(repoId);
+    }
+
+    public void removeUnusedModels(Set<String> reposInUse) {
+        models.toModels().stream().map(Model::getRepoId).
+                filter(repoId -> !reposInUse.contains(repoId)).
+                forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
     }
 
     /**

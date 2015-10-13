@@ -53,7 +53,7 @@
 
     <Match>
         <Or>
-            <Class name="guitests.SavedLoginTest"/>
+            <Class name="unstable.SavedLoginTest"/>
             <Class name="guitests.WrongLastViewedTest"/>
         </Or>
         <Method name="setupMethod" />

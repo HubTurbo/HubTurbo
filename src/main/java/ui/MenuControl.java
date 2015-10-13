@@ -8,30 +8,24 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.stage.Stage;
 import javafx.stage.Modality;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import prefs.Preferences;
 import prefs.PanelInfo;
+import prefs.Preferences;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.events.*;
 
-import static ui.components.KeyboardShortcuts.NEW_ISSUE;
-import static ui.components.KeyboardShortcuts.NEW_LABEL;
-import static ui.components.KeyboardShortcuts.NEW_MILESTONE;
-import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
-import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
-import static ui.components.KeyboardShortcuts.SHOW_DOCS;
-import static ui.components.KeyboardShortcuts.REFRESH;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static ui.components.KeyboardShortcuts.*;
 
 public class MenuControl extends MenuBar {
 
@@ -41,12 +35,14 @@ public class MenuControl extends MenuBar {
     private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
+    private final Stage mainStage;
 
-    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs) {
+    public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs, Stage mainStage) {
         this.panels = panels;
         this.prefs = prefs;
         this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
+        this.mainStage = mainStage;
         createMenuItems();
     }
 
@@ -167,38 +163,26 @@ public class MenuControl extends MenuBar {
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
 
-        List<PanelInfo> panels = getCurrentPanels();
+        List<PanelInfo> panelList = getCurrentPanels();
 
-        if (panels.isEmpty()) {
+        if (panelList.isEmpty()) {
             logger.info("Did not save new board");
             return;
         }
 
-        TextInputDialog dlg = new TextInputDialog("");
-        dlg.getEditor().setId("boardnameinput");
-        dlg.setTitle("Board Name");
-        dlg.getDialogPane().setContentText("What should this board be called?");
-        dlg.getDialogPane().setHeaderText("Please name this board");
+        BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
-
+        ui.showMainStage();
+        this.panels.selectFirstPanel();
+        
         if (response.isPresent()) {
             String boardName = response.get().trim();
-            if (isBoardNameValid(boardName)) {
-                prefs.addBoard(boardName, panels);
-                prefs.setLastOpenBoard(boardName);
-                ui.triggerEvent(new BoardSavedEvent());
-                logger.info("New board " + boardName + " saved");
-                ui.updateTitle();
-            }
+            prefs.addBoard(boardName, panelList);
+            prefs.setLastOpenBoard(boardName);
+            ui.triggerEvent(new BoardSavedEvent());
+            logger.info("New board " + boardName + " saved");
+            ui.updateTitle();
         }
-    }
-    
-    private boolean isBoardNameValid(String response) {
-        if (response.equals("")) {
-            logger.info("Did not save new board: Empty name");
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -212,6 +196,8 @@ public class MenuControl extends MenuBar {
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
         ui.updateTitle();
+
+        ui.triggerEvent(new UsedReposChangedEvent());
     }
 
     /**
@@ -310,7 +296,11 @@ public class MenuControl extends MenuBar {
         MenuItem refreshMenuItem = new MenuItem("Refresh");
         refreshMenuItem.setOnAction((e) -> {
             logger.info("Menu: View > Refresh");
-            ui.logic.refresh();
+            if (ui.isNotificationPaneShowing()) {
+                // we trigger the notification timeout action first before refreshing
+                ui.triggerNotificationTimeoutAction();
+            }
+            ui.logic.refresh(false);
         });
         refreshMenuItem.setAccelerator(REFRESH);
         return refreshMenuItem;
@@ -344,7 +334,7 @@ public class MenuControl extends MenuBar {
     private MenuItem[] createReposMenu() {
         Menu remove = new Menu("Remove");
 
-        ui.registerEvent((OpenReposChangedEventHandler) e -> {
+        ui.registerEvent((UnusedStoredReposChangedEventHandler) e -> {
             Platform.runLater(() -> updateRepoRemoveList(remove));
         });
 
@@ -354,27 +344,34 @@ public class MenuControl extends MenuBar {
     private void updateRepoRemoveList(Menu remove) {
         remove.getItems().clear();
 
-        HashSet<String> currentlyUsedRepo = getCurrentlyUsedRepo();
+        Set<String> currentlyUsedRepos = ui.getCurrentlyUsedRepos();
+        Set<String> removableRepos = ui.logic.getStoredRepos();
+        removableRepos.removeAll(currentlyUsedRepos);
 
-        for (String repoId : ui.logic.getStoredRepos()) {
-            if (!currentlyUsedRepo.contains(repoId)) {
-                MenuItem removeItem = new MenuItem(repoId);
-                removeItem.setOnAction(e1 -> onRepoRemove(repoId));
-                remove.getItems().add(removeItem);
-            }
+        for (String repoId : removableRepos) {
+            MenuItem removeItem = new MenuItem(repoId);
+            removeItem.setOnAction(e1 -> onRepoRemove(repoId));
+            remove.getItems().add(removeItem);
         }
-    }
 
-    private HashSet<String> getCurrentlyUsedRepo() {
-        HashSet<String> currentlyUsedRepos = new HashSet<>();
-        String defaultRepo = ui.logic.getDefaultRepo();
-        currentlyUsedRepos.add(defaultRepo);
-        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+        remove.getItems().add(new SeparatorMenuItem());
+        MenuItem nonRemovableMsg = new MenuItem("[Non-Removable - In Use]");
+        nonRemovableMsg.setDisable(true);
+        remove.getItems().add(nonRemovableMsg);
 
-        return currentlyUsedRepos;
+        // Supposedly, we would like the menu not to close when the disabled MenuItem-s
+        // below are clicked. But this is a JDK bug; we can use CustomMenuItem.setHideOnClick(false)
+        // if we want to. The bug is that it only works for ContextMenu and not Menu (which
+        // we are using).
+        for (String usedRepoId : currentlyUsedRepos) {
+            MenuItem disabledRemoveItem = new MenuItem(usedRepoId);
+            disabledRemoveItem.setDisable(true);
+            remove.getItems().add(disabledRemoveItem);
+        }
+
     }
 
     private void onRepoRemove(String repoId) {
-        ui.logic.removeRepository(repoId).thenRun(() -> ui.triggerEvent(new OpenReposChangedEvent()));
+        ui.logic.removeStoredRepository(repoId).thenRun(() -> ui.triggerEvent(new UnusedStoredReposChangedEvent()));
     }
 }

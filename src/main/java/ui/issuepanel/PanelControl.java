@@ -14,10 +14,7 @@ import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
-import util.events.IssueSelectedEventHandler;
-import util.events.PanelClickedEvent;
-import util.events.PanelClickedEventHandler;
-import util.events.ShowRenamePanelEventHandler;
+import util.events.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -161,6 +158,8 @@ public class PanelControl extends HBox {
         updatePanelIndices();
         ((AbstractPanel) child).close();
         updateFocus(index);
+
+        UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
     private void updatePanelIndices() {
@@ -236,8 +235,8 @@ public class PanelControl extends HBox {
         return 40 + AbstractPanel.PANEL_WIDTH;
     }
     private void setupKeyEvents() {
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if ((KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event))) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }

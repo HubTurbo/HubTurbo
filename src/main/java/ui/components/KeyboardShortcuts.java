@@ -55,21 +55,21 @@ public class KeyboardShortcuts {
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
     public static final KeyCodeCombination JUMP_TO_FIRST_ISSUE =
-            new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.ENTER, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination JUMP_TO_FILTER_BOX =
-            new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination MAXIMIZE_WINDOW =
-            new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination MINIMIZE_WINDOW =
-            new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
-            new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
-            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_BOARD = 
-            new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
-    public static final KeyCombination UNDO_LABEL_CHANGES =
-                new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN);
+    public static final KeyCodeCombination UNDO_LABEL_CHANGES =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
 
     public static final KeyCodeCombination FIRST_ISSUE =
             new KeyCodeCombination(KeyCode.HOME);
@@ -97,48 +97,54 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
+
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
-    // TODO decouple manage/show labels/milestones?
+    public static final KeyCodeCombination PR_FILES_CHANGED =
+            new KeyCodeCombination(KeyCode.F);
+    public static final KeyCodeCombination PR_COMMITS =
+            new KeyCodeCombination(KeyCode.C);
     public static final KeyCodeCombination NEW_COMMENT =
             new KeyCodeCombination(KeyCode.R);
+
+    // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination MANAGE_LABELS =
-            new KeyCodeCombination(KeyCode.L);
+        new KeyCodeCombination(KeyCode.L);
     public static final KeyCodeCombination MANAGE_ASSIGNEES =
-            new KeyCodeCombination(KeyCode.A);
+        new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination MANAGE_MILESTONE =
-            new KeyCodeCombination(KeyCode.M);
-    
+        new KeyCodeCombination(KeyCode.M);
+
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
 
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
-            new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination NEW_LABEL =
-            new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination NEW_MILESTONE =
-            new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     public static final KeyCodeCombination CREATE_LEFT_PANEL =
-            new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+            new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination CREATE_RIGHT_PANEL =
-            new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
-            new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
     
     private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
         Map<Integer, KeyCodeCombination> result = new HashMap<>();
-        result.put(1, new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN));
-        result.put(2, new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN));
-        result.put(3, new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.CONTROL_DOWN));
-        result.put(4, new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.CONTROL_DOWN));
-        result.put(5, new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.CONTROL_DOWN));
-        result.put(6, new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.CONTROL_DOWN));
-        result.put(7, new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.CONTROL_DOWN));
-        result.put(8, new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.CONTROL_DOWN));
-        result.put(9, new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN));
+        result.put(1, new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN));
+        result.put(2, new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN));
+        result.put(3, new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN));
+        result.put(4, new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.SHORTCUT_DOWN));
+        result.put(5, new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.SHORTCUT_DOWN));
+        result.put(6, new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.SHORTCUT_DOWN));
+        result.put(7, new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.SHORTCUT_DOWN));
+        result.put(8, new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.SHORTCUT_DOWN));
+        result.put(9, new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.SHORTCUT_DOWN));
         return Collections.unmodifiableMap(result);
     }
     
@@ -158,11 +164,11 @@ public class KeyboardShortcuts {
     }
 
     private static void addNonCustomizableShortcutKeys() {
-        assignedKeys.add(new KeyCodeCombination(KeyCode.F5)); //REFRESH
-        assignedKeys.add(new KeyCodeCombination(KeyCode.F1)); //SHOW_DOCS
-        assignedKeys.add(new KeyCodeCombination(KeyCode.G)); //GOTO_MODIFIER
-        assignedKeys.add(new KeyCodeCombination(KeyCode.R)); //NEW_COMMENT
-        assignedKeys.add(new KeyCodeCombination(KeyCode.A)); //MANAGE_ASSIGNEES
+        assignedKeys.add(REFRESH);
+        assignedKeys.add(SHOW_DOCS);
+        assignedKeys.add(GOTO_MODIFIER);
+        assignedKeys.add(NEW_COMMENT);
+        assignedKeys.add(MANAGE_ASSIGNEES);
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

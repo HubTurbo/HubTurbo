@@ -37,6 +37,7 @@ import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
 import util.PlatformEx;
+import util.PlatformSpecific;
 
 public class UITest extends GuiTest {
 
@@ -136,16 +137,19 @@ public class UITest extends GuiTest {
     }
 
     @SuppressWarnings("deprecation")
+    private int getCode(KeyCode key) {
+        return key.impl_getCode();
+    }
+
     private void pressNoWait(KeyCode key) {
-        robot.keyPress(key.impl_getCode());
+        robot.keyPress(getCode(key));
     }
 
-    @SuppressWarnings("deprecation")
     private void releaseNoWait(KeyCode key) {
-        robot.keyRelease(key.impl_getCode());
+        robot.keyRelease(getCode(key));
     }
 
-    public void pushKeys(KeyCodeCombination combination) {
+    private List<KeyCode> getKeyCodes(KeyCodeCombination combination) {
         List<KeyCode> keys = new ArrayList<>();
         if (combination.getAlt() == KeyCombination.ModifierValue.DOWN) {
             keys.add(KeyCode.ALT);
@@ -153,11 +157,27 @@ public class UITest extends GuiTest {
         if (combination.getShift() == KeyCombination.ModifierValue.DOWN) {
             keys.add(KeyCode.SHIFT);
         }
+        if (combination.getMeta() == KeyCombination.ModifierValue.DOWN) {
+            keys.add(KeyCode.META);
+        }
         if (combination.getControl() == KeyCombination.ModifierValue.DOWN) {
             keys.add(KeyCode.CONTROL);
         }
+        if (combination.getShortcut() == KeyCombination.ModifierValue.DOWN) {
+            // Fix bug with internal method not having a proper code for SHORTCUT.
+            // Dispatch manually based on platform.
+            if (PlatformSpecific.isOnMac()) {
+                keys.add(KeyCode.META);
+            } else {
+                keys.add(KeyCode.CONTROL);
+            }
+        }
         keys.add(combination.getCode());
-        pushKeys(keys);
+        return keys;
+    }
+
+    public void pushKeys(KeyCodeCombination combination) {
+        pushKeys(getKeyCodes(combination));
     }
 
     public void pushKeys(KeyCode... keys) {
@@ -168,6 +188,18 @@ public class UITest extends GuiTest {
         keys.forEach(this::pressNoWait);
         for (int i = keys.size() - 1; i >= 0; i--) {
             releaseNoWait(keys.get(i));
+        }
+        PlatformEx.waitOnFxThread();
+    }
+
+    public void press(KeyCodeCombination combination) {
+        press(getKeyCodes(combination));
+    }
+
+    private void press(List<KeyCode> keys) {
+        keys.forEach(this::press);
+        for (int i = keys.size() - 1; i >= 0; i--) {
+            release(keys.get(i));
         }
         PlatformEx.waitOnFxThread();
     }

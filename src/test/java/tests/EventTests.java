@@ -1,7 +1,6 @@
 package tests;
 
 import com.google.common.eventbus.EventBus;
-import com.thoughtworks.selenium.webdriven.commands.Open;
 import org.junit.Test;
 import util.events.*;
 
@@ -67,7 +66,7 @@ public class EventTests {
     public void testSuperclassHandlerOnSubclassEvent() {
         EventBus eventsSuperSub = new EventBus();
 
-        final EventHandler superclassHandlerSucceed = (OpenReposChangedEventHandler) e -> assertTrue(true);
+        final EventHandler superclassHandlerSucceed = (UnusedStoredReposChangedEventHandler) e -> assertTrue(true);
         final EventHandler subclassHandlerSucceed = (RepoOpenedEventHandler) e -> assertTrue(true);
         final EventHandler subclassHandlerFail =
                 (RepoOpenedEventHandler) e -> fail("RepoOpenedEventHandler failed");
@@ -76,7 +75,7 @@ public class EventTests {
         eventsSuperSub.register(superclassHandlerSucceed);
         eventsSuperSub.register(subclassHandlerFail);
 
-        OpenReposChangedEvent superclassEvent = new OpenReposChangedEvent();
+        UnusedStoredReposChangedEvent superclassEvent = new UnusedStoredReposChangedEvent();
 
         eventsSuperSub.post(superclassEvent);
 

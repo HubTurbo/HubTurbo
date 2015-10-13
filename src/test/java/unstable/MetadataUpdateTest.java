@@ -1,10 +1,11 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.loadui.testfx.utils.TestUtils;
 
+import guitests.UITest;
 import javafx.scene.input.KeyCode;
 import ui.UI;
 import ui.components.FilterTextField;

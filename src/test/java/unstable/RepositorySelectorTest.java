@@ -1,5 +1,6 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -99,16 +100,39 @@ public class RepositorySelectorTest extends UITest {
         assertEquals(4, comboBox.getItems().size());
         assertEquals("dummy4/dummy4", primaryRepo);
 
-        // we check if delete repo works
+        // we check if deleting used repo does not remove it
         click("Repos");
         push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
         push(KeyCode.DOWN);
+        push(KeyCode.DOWN);
+        push(KeyCode.DOWN); // first used repo
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(4, comboBox.getItems().size());
+
+        // we check if delete repo works
+        click("Boards"); // trigger clicking "Repos"
+        click("Repos");
+        push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(3, comboBox.getItems().size());
+
+        // we check again if deleting used repo does not remove it
+        click("Repos");
+        push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.DOWN);
+        push(KeyCode.DOWN);
+        push(KeyCode.DOWN); // second used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(3, comboBox.getItems().size());
 
         // exit program
+        click("Boards"); // trigger clicking "Quit"
         click("File");
         click("Quit");
 

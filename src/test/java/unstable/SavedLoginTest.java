@@ -1,6 +1,7 @@
-package guitests;
+package unstable;
 
 import backend.RepoIO;
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;

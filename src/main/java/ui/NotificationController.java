@@ -41,7 +41,7 @@ public class NotificationController {
         });
     }
 
-    private void triggerTimeoutAction() {
+    void triggerTimeoutAction() {
         // must be run in a Platform.runLater or from the UI thread
         determineAndRunTimeoutAction();
         hideNotification();

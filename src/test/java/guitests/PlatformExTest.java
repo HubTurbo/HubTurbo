@@ -30,7 +30,6 @@ public class PlatformExTest extends UITest {
     public void waitOnFxThreadTest() {
         AtomicInteger result = new AtomicInteger(0);
         Platform.runLater(result::incrementAndGet);
-        assertEquals(0, result.get());
         PlatformEx.waitOnFxThread();
         assertEquals(1, result.get());
     }
