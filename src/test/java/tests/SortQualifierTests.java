@@ -1,27 +1,74 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
-
 import backend.interfaces.IModel;
-import backend.resource.Model;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+import backend.resource.*;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import org.junit.Test;
+import prefs.Preferences;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SortQualifierTests {
+    private class ModelStub extends MultiModel {
+        List<TurboIssue> issues;
+        List<TurboMilestone> milestones = createSampleMilestone();
+
+        public ModelStub(Preferences prefs, List<TurboIssue> issues) {
+            super(prefs);
+            this.issues = issues;
+
+            issues.get(0).setMilestone(milestones.get(0));
+            issues.get(1).setMilestone(milestones.get(1));
+            issues.get(2).setMilestone(milestones.get(2));
+            issues.get(3).setMilestone(milestones.get(3));
+        }
+
+        @Override
+        public synchronized List<TurboIssue> getIssues() {
+            return issues;
+        }
+
+        @Override
+        public synchronized List<TurboMilestone> getMilestones() {
+            return milestones;
+        }
+
+        @Override
+        public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
+            if (!issue.getMilestone().isPresent()) {
+                return Optional.empty();
+            }
+
+            Integer id = issue.getMilestone().get();
+
+            for (TurboMilestone milestone : getMilestones()) {
+                if (milestone.getId() == id) {
+                    return Optional.of(milestone);
+                }
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return super.equals(o);
+        }
+    }
+
+    ModelStub testModel = new ModelStub(null, getSampleIssues());
 
     private List<Qualifier> getMetaQualifiers(FilterExpression filterExpression) {
         return filterExpression.find(Qualifier::isMetaQualifier);
@@ -39,7 +86,7 @@ public class SortQualifierTests {
 
         for (Qualifier metaQualifier : metaQualifiers) {
             if (metaQualifier.getName().equals("sort")) {
-                return metaQualifier.getCompoundSortComparator(null, false);
+                return metaQualifier.getCompoundSortComparator(testModel, false);
             }
         }
 
@@ -83,6 +130,24 @@ public class SortQualifierTests {
         return sampleIssues;
     }
 
+    private List<TurboMilestone> createSampleMilestone() {
+        TurboMilestone milestone1 = new TurboMilestone("testrepo/testrepo", 1, "V1");
+        milestone1.setDueDate(Optional.of(LocalDate.of(2015, 1, 10)));
+        TurboMilestone milestone2 = new TurboMilestone("testrepo/testrepo", 2, "V2");
+        milestone2.setDueDate(Optional.of(LocalDate.of(2015, 1, 30)));
+        TurboMilestone milestone3 = new TurboMilestone("testrepo/testrepo", 3, "V3");
+        milestone3.setDueDate(Optional.of(LocalDate.of(2015, 2, 14)));
+        TurboMilestone milestone4 = new TurboMilestone("testrepo/testrepo", 4, "V4");
+
+        List<TurboMilestone> sampleMilestones = new ArrayList<>();
+        sampleMilestones.add(milestone1);
+        sampleMilestones.add(milestone2);
+        sampleMilestones.add(milestone3);
+        sampleMilestones.add(milestone4);
+
+        return sampleMilestones;
+    }
+
     /**
      * Tests if getComparatorForSortQualifie returns a valid comparator for "sort:assignee"
      * and null if there is no sort qualifier
@@ -102,12 +167,14 @@ public class SortQualifierTests {
      */
     @Test
     public void testSortQualifer2() {
-        List<TurboIssue> issues = getSampleIssues();
+        List<TurboIssue> issues = testModel.getIssues();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:assignee");
 
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
-        assertEquals("[#2 Issue2, #3 Issue3, #1 Issue1, #5 Issue5, #4 Issue4]", issues.toString());
+        List<Integer> expected = Arrays.asList(2, 3, 1, 5, 4);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
     }
 
     /**
@@ -115,12 +182,14 @@ public class SortQualifierTests {
      */
     @Test
     public void testSortQualifer3() {
-        List<TurboIssue> issues = getSampleIssues();
+        List<TurboIssue> issues = testModel.getIssues();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:~assignee");
 
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
-        assertEquals("[#4 Issue4, #5 Issue5, #1 Issue1, #3 Issue3, #2 Issue2]", issues.toString());
+        List<Integer> expected = Arrays.asList(4, 5, 1, 3, 2);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
     }
 
     /**
@@ -128,7 +197,7 @@ public class SortQualifierTests {
      */
     @Test
     public void testSortQualifer4() {
-        List<TurboIssue> issues = getSampleIssues();
+        List<TurboIssue> issues = testModel.getIssues();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:assignee,id");
         Comparator<TurboIssue> reverseComparator = getComparatorForSortQualifier("sort:~assignee,id");
 
@@ -143,15 +212,15 @@ public class SortQualifierTests {
 
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
-        String expected = "[#2 Issue2, #3 Issue3, #1 Issue1, #5 Issue5, #4 Issue4, " +
-                          "#6 Issue6, #7 Issue7]";
-        assertEquals(expected, issues.toString());
+        List<Integer> expected = Arrays.asList(2, 3, 1, 5, 4, 6, 7);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
 
         Collections.shuffle(issues);
         Collections.sort(issues, reverseComparator);
-        expected = "[#6 Issue6, #7 Issue7, " +
-                   "#4 Issue4, #5 Issue5, #1 Issue1, #3 Issue3, #2 Issue2]";
-        assertEquals(expected, issues.toString());
+        expected = Arrays.asList(6, 7, 4, 5, 1, 3, 2);
+        actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
     }
 
     /**
@@ -159,7 +228,7 @@ public class SortQualifierTests {
      */
     @Test
     public void testSortQualifer5() {
-        List<TurboIssue> issues = getSampleIssues();
+        List<TurboIssue> issues = testModel.getIssues();
         Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:repo,id,assignee");
 
         TurboIssue issue6 = createIssueWithAssignee(
@@ -173,8 +242,54 @@ public class SortQualifierTests {
 
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
+
         assertEquals("[#2 Issue2, #3 Issue3, #1 Issue1, #3 Issue6, #3 Issue7, #5 Issue5, #4 Issue4]",
                      issues.toString());
+    }
+
+    /**
+     * Tests sort qualifier with milestone key. Milestones with due date are sorted from
+     * latest * to earliest, then comes milestones without due date and no milestone
+     */
+    @Test
+    public void testSortMilestone1() {
+        List<TurboIssue> issues = testModel.getIssues();
+        TurboIssue issue6 = new TurboIssue("testrepo/testrepo", 6, "Issue6");
+        TurboIssue issue7 = new TurboIssue("testrepo/testrepo", 7, "Issue7");
+        issue7.setMilestone(testModel.getMilestones().get(3));
+        issues.add(issue6);
+        issues.add(issue7);
+
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:milestone,id");
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+
+
+        List<Integer> expected = Arrays.asList(3, 2, 1, 4, 7, 5, 6);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
+   /**
+    * Tests sort qualifier with inverse milestone key.
+    */
+    @Test
+    public void testSortMilestone2() {
+        List<TurboIssue> issues = testModel.getIssues();
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:~milestone,id");
+        TurboIssue issue6 = new TurboIssue("testrepo/testrepo", 6, "Issue6");
+        TurboIssue issue7 = new TurboIssue("testrepo/testrepo", 7, "Issue7");
+        issue7.setMilestone(testModel.getMilestones().get(3));
+        issues.add(issue6);
+        issues.add(issue7);
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+
+        List<Integer> expected = Arrays.asList(5, 6, 4, 7, 1, 2, 3);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
     }
 
     @Test
