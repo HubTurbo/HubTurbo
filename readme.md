@@ -6,7 +6,9 @@ Are you a GitHub power user? Enhance your GitHub Issue Tracker experience with t
 
 ![](https://github.com/HubTurbo/HubTurbo/blob/release/docs/images/gettingStarted/bothViewsScreenshot.png?raw=true)
 
-To **start using HubTurbo**, check out our [User Guide](https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md).
+To **install HubTurbo**, visit our [Getting Started Guide] (https://github.com/HubTurbo/HubTurbo/blob/release/docs/gettingStarted.md).
+
+To **know more about using HubTurbo**, check out our [User Guide](https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md).
 
 To **contribute to HubTurbo as a developer**, check out our [Developer Guide](docs/developerGuide.md).
 
