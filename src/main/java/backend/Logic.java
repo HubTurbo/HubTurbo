@@ -231,14 +231,14 @@ public class Logic {
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
      *
-     * @param filterTexts Filter expressions to process
+     * @param filterExprs Filter expressions to process
      */
-    public void filterSortRefresh(List<FilterExpression> filterTexts) {
+    public void filterSortRefresh(List<FilterExpression> filterExprs) {
         // Open specified repos
-        openRepositoriesInFilters(filterTexts);
+        openRepositoriesInFilters(filterExprs);
 
         // First filter, for issues requiring a metadata update.
-        Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterTexts);
+        Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
         if (toUpdate.size() > 0) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
@@ -252,22 +252,22 @@ public class Logic {
             allCompletables
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
-                    .thenRun(() -> updateUI(filterAndSort(filterTexts))); // Then filter the second time.
+                    .thenRun(() -> updateUI(filterAndSort(filterExprs))); // Then filter the second time.
         } else {
             // If no issues requiring metadata update, just run the filter and sort.
-            updateUI(filterAndSort(filterTexts));
+            updateUI(filterAndSort(filterExprs));
         }
     }
 
     /**
      * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
      *
-     * @param filterTexts Filter expressions to process.
+     * @param filterExprs Filter expressions to process.
      */
-    private void openRepositoriesInFilters(List<FilterExpression> filterTexts) {
+    private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
         HashSet<String> reposToOpen = new HashSet<>();
 
-        filterTexts.forEach(filterText -> {
+        filterExprs.forEach(filterText -> {
             filterText.find(Qualifier::isMetaQualifier).stream()
                     .filter(metaQualifier ->
                             metaQualifier.getName().equals(Qualifier.REPO) && metaQualifier.getContent().isPresent())
@@ -281,15 +281,15 @@ public class Logic {
     /**
      * Given a list of filter expressions, determine issues within the model that require a metadata update.
      *
-     * @param filterTexts Filter expressions to process for metadata requests.
+     * @param filterExprs Filter expressions to process for metadata requests.
      * @return Repo IDs and the corresponding issues in the repo requiring a metadata update.
      */
-    private Map<String, List<TurboIssue>> tallyMetadataUpdate(List<FilterExpression> filterTexts) {
+    private Map<String, List<TurboIssue>> tallyMetadataUpdate(List<FilterExpression> filterExprs) {
         HashMap<String, List<TurboIssue>> toUpdate = new HashMap<>();
 
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        filterTexts.stream().filter(Qualifier::hasUpdatedQualifier).forEach(filterText -> {
+        filterExprs.stream().filter(Qualifier::hasUpdatedQualifier).forEach(filterText -> {
             List<TurboIssue> issuesInPanel = allModelIssues.stream()
                     .filter(issue -> Qualifier.process(models, filterText, issue))
                     .collect(Collectors.toList());
@@ -340,20 +340,20 @@ public class Logic {
     /**
      * Filters and sorts issues within the model according to the given filter expressions.
      *
-     * @param filterTexts Filter expressions to process.
+     * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering and sorting.
      */
     private Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>>
-                                        filterAndSort(List<FilterExpression> filterTexts) {
+                                        filterAndSort(List<FilterExpression> filterExprs) {
         Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> filteredAndSorted = new HashMap<>();
 
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        filterTexts.forEach(filterText -> {
+        filterExprs.forEach(filterText -> {
             ImmutablePair<List<TurboIssue>, Boolean> filterAndSortedExpression = filteredAndSorted.get(filterText);
 
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
-                List<Qualifier> metaQualifiers = filterText.find(Qualifier::isMetaQualifier);
+                //List<Qualifier> metaQualifiers = filterText.find(Qualifier::isMetaQualifier);
                 boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(metaQualifiers);
 
                 List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
