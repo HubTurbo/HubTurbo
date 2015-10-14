@@ -1,5 +1,18 @@
 # Changelog
 
+# V3.10.0
+
+- Issues can now be sorted by milestone
+- Keyboard shortcuts are now consistent with OS X conventions (using <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>)
+- Board names are now validated
+- Added a means of navigating PR tabs without leaving the panel view
+- Label positions in the label picker are now stable when typing
+- Fixed bug with label picker undo window which could lead to inconsistent model state
+- Fixed bug where repo list wasn't updated when a repo was added
+- Fixed bug where API requests for pull requests were unauthenticated
+- Unstable tests are no longer run on Travis
+- Improved documentation for `sort`
+
 # V3.9.0
 
 - Review comments are now taken into account by the `updated` qualifier

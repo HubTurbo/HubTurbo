@@ -1,14 +1,5 @@
 package filter.expression;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import util.Utility;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -16,6 +7,15 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+import util.Utility;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Qualifier implements FilterExpression {
 
@@ -457,6 +457,33 @@ public class Qualifier implements FilterExpression {
                         return -1;
                     } else {
                         return aAssignee.get().compareTo(bAssignee.get());
+                    }
+                };
+                break;
+            case "milestone":
+                comparator = (a, b) -> {
+                    Optional<TurboMilestone> aMilestone = model.getMilestoneOfIssue(a);
+                    Optional<TurboMilestone> bMilestone = model.getMilestoneOfIssue(b);
+
+                    if (!aMilestone.isPresent() && !bMilestone.isPresent()) {
+                        return 0;
+                    } else if (!aMilestone.isPresent()) {
+                        return 1;
+                    } else if (!bMilestone.isPresent()) {
+                        return -1;
+                    } else {
+                        Optional<LocalDate> aDueDate = aMilestone.get().getDueDate();
+                        Optional<LocalDate> bDueDate = bMilestone.get().getDueDate();
+
+                        if (!aDueDate.isPresent() && !bDueDate.isPresent()) {
+                            return 0;
+                        } else if (!aDueDate.isPresent()) {
+                            return 1;
+                        } else if (!bDueDate.isPresent()) {
+                            return -1;
+                        } else {
+                            return -aDueDate.get().compareTo(bDueDate.get());
+                        }
                     }
                 };
                 break;
