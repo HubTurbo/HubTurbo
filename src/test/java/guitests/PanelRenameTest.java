@@ -9,7 +9,10 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import ui.TestController;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import ui.components.PanelNameTextField;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
@@ -32,6 +35,8 @@ public class PanelRenameTest extends UITest {
     public void panelRenameTest() {
         
         Random rand = new Random();
+        UI ui = TestController.getUI();
+        PanelControl panels = ui.getPanelControl();
         
         // Test for saving panel name
         
@@ -44,7 +49,8 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         type("Renamed panel");
         push(KeyCode.ESCAPE);
-        Text panelNameText0 = find("#dummy/dummy_col0_nameText");
+        FilterPanel panel0 = (FilterPanel) panels.getPanel(0);
+        Text panelNameText0 = panel0.getNameText();
         assertEquals("Panel", panelNameText0.getText());
         sleep(EVENT_DELAY);
         
@@ -56,7 +62,8 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         type("   Renamed panel  ");
         push(KeyCode.ENTER);
-        Text panelNameText1 = find("#dummy/dummy_col1_nameText");
+        FilterPanel panel1 = (FilterPanel) panels.getPanel(1);
+        Text panelNameText1 = panel1.getNameText();
         assertEquals("Renamed panel", panelNameText1.getText());
         sleep(EVENT_DELAY);
 
@@ -68,7 +75,8 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
-        Text panelNameText2 = find("#dummy/dummy_col2_nameText");
+        FilterPanel panel2 = (FilterPanel) panels.getPanel(2);
+        Text panelNameText2 = panel2.getNameText();
         assertEquals("Panel", panelNameText2.getText());
         sleep(EVENT_DELAY);
         
@@ -82,7 +90,8 @@ public class PanelRenameTest extends UITest {
         PanelNameTextField renameTextField3 = find("#dummy/dummy_col3_renameTextField");
         renameTextField3.setText(randomName3);
         push(KeyCode.ENTER);
-        Text panelNameText3 = find("#dummy/dummy_col3_nameText");
+        FilterPanel panel3 = (FilterPanel) panels.getPanel(3);
+        Text panelNameText3 = panel3.getNameText();
         assertEquals(randomName3, panelNameText3.getText());
         sleep(EVENT_DELAY);
         
@@ -96,7 +105,8 @@ public class PanelRenameTest extends UITest {
         PanelNameTextField renameTextField4 = find("#dummy/dummy_col4_renameTextField");
         renameTextField4.setText(randomName4);
         push(KeyCode.ENTER);
-        Text panelNameText4 = find("#dummy/dummy_col4_nameText");
+        FilterPanel panel4 = (FilterPanel) panels.getPanel(4);
+        Text panelNameText4 = panel4.getNameText();
         assertEquals(randomName4, panelNameText4.getText());
         sleep(EVENT_DELAY);
 
@@ -110,7 +120,8 @@ public class PanelRenameTest extends UITest {
         PanelNameTextField renameTextField5 = find("#dummy/dummy_col5_renameTextField");
         renameTextField5.setText(randomName5);
         push(KeyCode.ENTER);
-        Text panelNameText5 = find("#dummy/dummy_col5_nameText");
+        FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
+        Text panelNameText5 = panel5.getNameText();
         assertEquals("Panel", panelNameText5.getText());
         sleep(EVENT_DELAY);
         
@@ -128,7 +139,8 @@ public class PanelRenameTest extends UITest {
         renameTextField6.positionCaret(randomCaret6);
         type("characters that will not be added");
         push(KeyCode.ENTER);
-        Text panelNameText6 = find("#dummy/dummy_col6_nameText");
+        FilterPanel panel6 = (FilterPanel) panels.getPanel(6);
+        Text panelNameText6 = panel6.getNameText();
         assertEquals(randomName6, panelNameText6.getText());
         sleep(EVENT_DELAY);
         
@@ -148,7 +160,8 @@ public class PanelRenameTest extends UITest {
         push(KeyCode.ENTER);
         String expected = (randomName7.substring(0, randomCaret7) + 
                 randomString.substring(0, 4) + randomName7.substring(randomCaret7, randomName7.length()));
-        Text panelNameText7 = find("#dummy/dummy_col7_nameText");
+        FilterPanel panel7 = (FilterPanel) panels.getPanel(7);
+        Text panelNameText7 = panel7.getNameText();
         assertEquals(expected, panelNameText7.getText());
         sleep(EVENT_DELAY);
         
