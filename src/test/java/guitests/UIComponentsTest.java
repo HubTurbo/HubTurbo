@@ -9,7 +9,8 @@ import util.events.UpdateProgressEvent;
 import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
-
+    
+    private UtilMethods util = new UtilMethods();
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
@@ -25,20 +26,8 @@ public class UIComponentsTest extends UITest {
     @Test
     public void filterTextFieldTest() {
         doubleClick("#dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
         push(KeyCode.BACK_SPACE);
-        type("is");
-        push(KeyCode.ESCAPE);
-        press(KeyCode.SHIFT).press(KeyCode.DIGIT9).release(KeyCode.DIGIT9).release(KeyCode.SHIFT);
-        type("is");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        push(KeyCode.LEFT);
-        push(KeyCode.TAB);
-        push(KeyCode.RIGHT);
-        type("open OR is");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("closed");
-        press(KeyCode.SHIFT).press(KeyCode.DIGIT0).release(KeyCode.DIGIT0).release(KeyCode.SHIFT);
+        util.typeString("(is:open OR is:closed)");
         push(KeyCode.ENTER);
     }
 

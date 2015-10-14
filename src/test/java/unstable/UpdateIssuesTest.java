@@ -1,6 +1,7 @@
 package unstable;
 
 import guitests.UITest;
+import guitests.UtilMethods;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.FutureTask;
 import static org.junit.Assert.assertEquals;
 
 public class UpdateIssuesTest extends UITest {
+    private UtilMethods util = new UtilMethods();
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
@@ -27,9 +29,7 @@ public class UpdateIssuesTest extends UITest {
         resetRepo();
 
         click("#dummy/dummy_col0_filterTextField");
-        type("updated");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("24");
+        util.typeString("updated:24");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 

@@ -6,56 +6,40 @@ import org.junit.Test;
 public class SortTest extends UITest {
 
     // TODO check that issue list is sorted correctly
-
+    private UtilMethods util = new UtilMethods();
     @Test
     public void sortTest () {
         click("#dummy/dummy_col0_filterTextField");
         // Ascending ID
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("id");
+        util.typeString("sort:id");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Descending ID (default)
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-id");
+        util.typeString("sort:-id");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Comment count
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("comments");
+        util.typeString("sort:comments");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Repo ID (e.g. dummy2/dummy)
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("repo");
+        util.typeString("sort:repo");
         push(KeyCode.ENTER);
+        doubleClick("#dummy/dummy_col0_filterTextField");
         // Updated time (ascending)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("updated");
+        util.typeString("sort:updated");
         push(KeyCode.ENTER);
+        doubleClick("#dummy/dummy_col0_filterTextField");
         // Updated time (descending)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-date");
+        util.typeString("sort:-date");
         push(KeyCode.ENTER);
+        doubleClick("#dummy/dummy_col0_filterTextField");
         // Issue state (open)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("status");
+        util.typeString("sort:status");
         push(KeyCode.ENTER);
-        // Issue state (closed)
         doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-status");
+        // Issue state (closed)
+        util.typeString("sort:-status");
         push(KeyCode.ENTER);
     }
 }

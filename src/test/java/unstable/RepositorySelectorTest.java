@@ -1,12 +1,15 @@
 package unstable;
 
 import guitests.UITest;
+import guitests.UtilMethods;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
@@ -24,6 +27,7 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 public class RepositorySelectorTest extends UITest {
 
     private static String primaryRepo;
+    private UtilMethods util = new UtilMethods();
 
     protected static class RepositorySelectorTestUI extends UI {
         public RepositorySelectorTestUI() {
@@ -76,9 +80,7 @@ public class RepositorySelectorTest extends UITest {
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
         click("#dummy/dummy_col0_filterTextField");
-        type("repo");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("dummy2/dummy2");
+        util.typeString("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
         assertEquals(2, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
