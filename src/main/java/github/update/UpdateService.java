@@ -80,44 +80,50 @@ public class UpdateService<T> extends GitHubService {
      * @return a list of requested items
      */
     public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId) {
-
         // Return cached results if available
         if (updatedItems != null)  {
             return updatedItems;
         }
 
         ArrayList<T> result = new ArrayList<>();
-
         String resourceDesc = repoId.generateId() + apiSuffix;
 
         logger.info(String.format("Updating %s with ETag %s", resourceDesc, lastETags));
         try {
-            PagedRequest<T> request = createUpdatedRequest(repoId);
-            Optional<ImmutablePair<List<String>, HttpURLConnection>> etags = getPagedEtags(request, client);
+            PagedRequest<T> headerRequest = createUpdatedRequest(repoId);
+            Optional<ImmutablePair<List<String>, HttpURLConnection>> etags = getPagedEtags(headerRequest, client);
 
             if (!etags.isPresent()) {
                 /* Respond as if we succeeded and there were no updates.
                    The assumption is that updates are cheap and we can do them as frequently as needed. */
                 logger.warn(String.format("%s: error getting updated items", getClass().getSimpleName()));
             } else {
-                updatedETags = combineETags(etags.get().getLeft());
-                if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
-                    logger.info("Nothing to update");
-                } else {
-                    result = new ArrayList<>(getPagedItems(resourceDesc,
-                        new PageIterator<>(request, client)));
-                    logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETags));
-                }
-
+                Optional<String> updatedETags = combineETags(etags.get().getLeft());
+                result = downloadUpdatedItems(repoId, resourceDesc, updatedETags);
                 updateCheckTime(etags.get().getRight());
             }
-
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
             return result;
         }
 
         updatedItems = result;
+        return result;
+    }
+
+    private ArrayList<T> downloadUpdatedItems(IRepositoryIdProvider repoId,
+                                              String resourceDesc,
+                                              Optional<String> updatedETags) throws IOException {
+        ArrayList<T> result = new ArrayList<>();
+
+        if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
+            logger.info("Nothing to update");
+        } else {
+            PagedRequest<T> request = createUpdatedRequest(repoId);
+            result = new ArrayList<>(getPagedItems(resourceDesc, new PageIterator<>(request, client)));
+            logger.info(String.format("New ETag for %s: %s", resourceDesc, updatedETags));
+        }
+
         return result;
     }
 
