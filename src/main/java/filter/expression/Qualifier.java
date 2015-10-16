@@ -1,21 +1,22 @@
 package filter.expression;
 
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
-import util.Utility;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import backend.resource.*;
+import util.Utility;
+import backend.interfaces.IModel;
+import filter.MetaQualifierInfo;
+import filter.QualifierApplicationException;
+
 
 public class Qualifier implements FilterExpression {
 
@@ -93,6 +94,47 @@ public class Qualifier implements FilterExpression {
         this.sortKeys = new ArrayList<>(keys);
     }
 
+    public static FilterExpression replaceMilestoneAliases(IModel model, FilterExpression expr) {
+        List<String> repoIds = getContentOfMetaQualifier(expr, REPO).stream()
+                .map(repoId -> repoId.toLowerCase())
+                .collect(Collectors.toList());
+
+        if (repoIds.isEmpty()) {
+            repoIds.add(model.getDefaultRepo().toLowerCase());
+        }
+
+        List<TurboMilestone> allMilestones = model.getMilestones().stream()
+                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                .sorted((a, b) -> {
+                    if (!a.getDueDate().isPresent() && !b.getDueDate().isPresent()) {
+                        return 0;
+                    } else if (!a.getDueDate().isPresent()) {
+                        return 1;
+                    } else if (!b.getDueDate().isPresent()) {
+                        return -1;
+                    } else {
+                        return getMilestoneDueDateComparator().compare(a, b);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
+
+        if (!currentMilestoneIndex.isPresent()) {
+            return expr;
+        }
+
+        expr = expr.map(q -> {
+            if (Qualifier.isMilestoneQualifier(q)) {
+                return q.convertMilestoneAliasQualifier(allMilestones, currentMilestoneIndex.get());
+            } else {
+                return q;
+            }
+        });
+
+        return expr;
+    }
+
     /**
      * Helper function for testing a filter expression against an issue.
      * Ensures that meta-qualifiers are taken care of.
@@ -106,7 +148,7 @@ public class Qualifier implements FilterExpression {
         boolean containsRepoQualifier = metaQualifiers.stream()
                 .map(Qualifier::getName)
                 .collect(Collectors.toList())
-            .contains("repo");
+                .contains("repo");
 
         if (!containsRepoQualifier) {
             exprWithNormalQualifiers = new Conjunction(
@@ -115,6 +157,29 @@ public class Qualifier implements FilterExpression {
         }
 
         return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
+    }
+
+    private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> allMilestones) {
+        if (allMilestones.isEmpty()) {
+            return Optional.empty();
+        }
+
+        int currentIndex = 0;
+
+        for (TurboMilestone checker : allMilestones) {
+            boolean overdue = checker.getDueDate().isPresent() &&
+                    checker.getDueDate().get().isBefore(LocalDate.now());
+            boolean relevant = !(overdue && (checker.getOpenIssues() == 0));
+
+            if (checker.isOpen() && relevant) {
+                return Optional.of(currentIndex);
+            }
+
+            currentIndex++;
+        }
+
+        // if no open milestone, set current as last milestone
+        return Optional.of(allMilestones.size() - 1);
     }
 
     public static void processMetaQualifierEffects(FilterExpression expr,
@@ -287,6 +352,11 @@ public class Qualifier implements FilterExpression {
         }
     }
 
+    @Override
+    public FilterExpression map(Function<Qualifier, Qualifier> func) {
+        return func.apply(this);
+    }
+
     /**
      * This method is used to serialise qualifiers. Thus whatever form returned
      * should be syntactically valid.
@@ -378,6 +448,15 @@ public class Qualifier implements FilterExpression {
             return true;
         default:
             return isUpdatedQualifier(q);
+        }
+    }
+
+    public static boolean isMilestoneQualifier(Qualifier q) {
+        switch (q.getName()) {
+            case "milestone":
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -482,7 +561,8 @@ public class Qualifier implements FilterExpression {
                         } else if (!bDueDate.isPresent()) {
                             return -1;
                         } else {
-                            return -aDueDate.get().compareTo(bDueDate.get());
+                            return -(getMilestoneDueDateComparator()
+                                    .compare(aMilestone.get(), bMilestone.get()));
                         }
                     }
                 };
@@ -796,7 +876,7 @@ public class Qualifier implements FilterExpression {
 
         // Find milestones containing partial title
         List<TurboMilestone> milestones = model.getMilestones().stream()
-            .filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
+                .filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (milestones.isEmpty()) {
@@ -829,7 +909,7 @@ public class Qualifier implements FilterExpression {
 
         // Find labels containing the label name
         List<TurboLabel> labels = model.getLabels().stream()
-           .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
+                .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (labels.isEmpty()) {
@@ -924,5 +1004,56 @@ public class Qualifier implements FilterExpression {
 
     public String getName() {
         return name;
+    }
+
+    private Qualifier convertMilestoneAliasQualifier(List<TurboMilestone> allMilestones, int currentIndex) {
+        if (!content.isPresent()) {
+            return Qualifier.EMPTY;
+        }
+
+        String contents = content.get();
+        String alias = contents;
+
+        Pattern aliasPattern = Pattern.compile("(curr(?:ent)?)(?:(\\+|-)(\\d+))?$");
+        Matcher aliasMatcher = aliasPattern.matcher(alias);
+        int offset = 0;
+
+        if (!aliasMatcher.find()) {
+            return this;
+        }
+
+        if (aliasMatcher.group(2) != null && aliasMatcher.group(3) != null) {
+            offset = Integer.parseInt(aliasMatcher.group(3));
+            if (aliasMatcher.group(2).equals("+")) {
+                currentIndex += offset;
+            } else {
+                currentIndex -= offset;
+            }
+        }
+
+        // clamp
+        if (currentIndex >= allMilestones.size()) {
+            currentIndex = allMilestones.size() - 1;
+        } else if (currentIndex < 0) {
+            currentIndex = 0;
+        }
+
+        contents = allMilestones.get(currentIndex).getTitle().toLowerCase();
+
+        return new Qualifier(name, contents);
+    }
+
+    /**
+     * Condition: milestone must have due dates
+     */
+    public static Comparator<TurboMilestone> getMilestoneDueDateComparator() {
+        return (a, b) -> {
+            assert(a.getDueDate().isPresent());
+            assert(b.getDueDate().isPresent());
+            LocalDate aDueDate = a.getDueDate().get();
+            LocalDate bDueDate = b.getDueDate().get();
+
+            return (aDueDate.compareTo(bDueDate));
+        };
     }
 }

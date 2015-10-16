@@ -149,6 +149,8 @@ public class GUIController {
 
         boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(panelMetaQualifiers);
 
+        panelExpression = Qualifier.replaceMilestoneAliases(updatedModel, panelExpression);
+
         // Issues are filtered and sorted here. isMetadataUpdate and hasUpdatedQualifier are used to determine
         // whether to use an implicit non-self-update sorting order.
         TransformationList<TurboIssue, TurboIssue> filteredAndSortedIssues =

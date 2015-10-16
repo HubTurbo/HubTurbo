@@ -6,6 +6,7 @@ import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface FilterExpression {
@@ -45,4 +46,8 @@ public interface FilterExpression {
     // Gets references to all qualifiers in a syntax tree matching a given predicate.
 
     List<Qualifier> find(Predicate<Qualifier> pred);
+
+    // Apply the given function to the syntax tree, returning a new FilterExpression.
+
+    FilterExpression map(Function<Qualifier, Qualifier> func);
 }
