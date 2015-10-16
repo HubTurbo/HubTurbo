@@ -266,17 +266,10 @@ public class Logic {
      * @param filterExprs Filter expressions to process.
      */
     private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
-        HashSet<String> reposToOpen = new HashSet<>();
-
-        filterExprs.forEach(filterText -> {
-            filterText.find(Qualifier::isMetaQualifier).stream()
-                    .filter(metaQualifier ->
-                            metaQualifier.getName().equals(Qualifier.REPO) && metaQualifier.getContent().isPresent())
-                    .forEach(repoQualifier ->
-                            reposToOpen.add(repoQualifier.getContent().get()));
-        });
-
-        reposToOpen.forEach(this::openRepositoryFromFilter);
+        filterExprs.stream()
+                .flatMap(filterExpr -> Qualifier.getContentOfMetaQualifier(filterExpr, Qualifier.REPO).stream())
+                .distinct()
+                .forEach(this::openRepositoryFromFilter);
     }
 
     /**
@@ -286,30 +279,14 @@ public class Logic {
      * @return Repo IDs and the corresponding issues in the repo requiring a metadata update.
      */
     private Map<String, List<TurboIssue>> tallyMetadataUpdate(List<FilterExpression> filterExprs) {
-        HashMap<String, List<TurboIssue>> toUpdate = new HashMap<>();
-
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        filterExprs.stream().filter(Qualifier::hasUpdatedQualifier).forEach(filterText -> {
-            List<TurboIssue> issuesInPanel = allModelIssues.stream()
-                    .filter(issue -> Qualifier.process(models, filterText, issue))
-                    .collect(Collectors.toList());
-
-            issuesInPanel.forEach(issue -> {
-                List<TurboIssue> issuesInRepo = toUpdate.get(issue.getRepoId());
-                if (issuesInRepo != null) {
-                    // If eixsts, just add the issue
-                    issuesInRepo.add(issue);
-                } else {
-                    // If not exists, create first then add
-                    issuesInRepo = new ArrayList<>();
-                    issuesInRepo.add(issue);
-                    toUpdate.put(issue.getRepoId(), issuesInRepo);
-                }
-            });
-        });
-
-        return toUpdate;
+        return filterExprs.stream()
+                .filter(Qualifier::hasUpdatedQualifier)
+                .flatMap(filterExpr -> allModelIssues.stream()
+                        .filter(issue -> Qualifier.process(models, filterExpr, issue)))
+                .distinct()
+                .collect(Collectors.groupingBy(TurboIssue::getRepoId));
     }
 
     /**
@@ -350,16 +327,15 @@ public class Logic {
 
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        filterExprs.forEach(filterText -> {
-            ImmutablePair<List<TurboIssue>, Boolean> filterAndSortedExpression = filteredAndSorted.get(filterText);
+        filterExprs.forEach(filterExpr -> {
+            List<TurboIssue> filterAndSortedExpression = filteredAndSorted.get(filterExpr);
 
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
-                //List<Qualifier> metaQualifiers = filterText.find(Qualifier::isMetaQualifier);
-                boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(metaQualifiers);
+                boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
                 List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterText, issue))
-                        .sorted(determineComparator(metaQualifiers, hasUpdatedQualifier))
+                        .filter(issue -> Qualifier.process(models, filterExpr, issue))
+                        .sorted(determineComparator(filterExpr, hasUpdatedQualifier))
                         .collect(Collectors.toList());
 
                 filteredAndSorted.put(filterText, new ImmutablePair<>(filteredAndSortedIssues, hasUpdatedQualifier));
@@ -370,15 +346,15 @@ public class Logic {
     }
 
     /**
-     * Produces a suitable comparator based on the given data.
+     * Produces a suitable comparator based on the given filter expression.
      *
-     * @param panelMetaQualifiers The given meta qualifiers, from which Sort qualifiers will be processed.
+     * @param filterExpr The given filter expression.
      * @param hasUpdatedQualifier Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The comparator to use.
      */
-    private Comparator<TurboIssue> determineComparator(List<Qualifier> panelMetaQualifiers,
+    private Comparator<TurboIssue> determineComparator(FilterExpression filterExpr,
                                                        boolean hasUpdatedQualifier) {
-        for (Qualifier metaQualifier : panelMetaQualifiers) {
+        for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
             // Only take into account the first sort qualifier found
             if (metaQualifier.getName().equals("sort")) {
                 return metaQualifier.getCompoundSortComparator(models, hasUpdatedQualifier);
