@@ -99,13 +99,13 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Refreshes the list of issue cards shown to the user.
-     *
-     * @param hasMetadata Indicates the comment count hashmap to be used.
+     * Refreshes the list of issue cards shown to the user depending on the currently active filter expression
+     * in the panel.
      */
     @Override
-    public void refreshItems(boolean hasMetadata) {
-        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
+    public void refreshItems() {
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
 
         // Set the cell factory every time - this forces the list view to update
         listView.setCellFactory(list ->
@@ -140,9 +140,8 @@ public class ListPanel extends FilterPanel {
             // (if it was there before)
             issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
-            // We assume we already have metadata, so we pass true to avoid refreshItems from trying to get
-            // metadata after clicking.
-            refreshItems(true);
+
+            refreshItems();
         });
     }
 

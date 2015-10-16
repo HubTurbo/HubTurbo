@@ -319,9 +319,9 @@ public abstract class FilterPanel extends AbstractPanel {
         this.issuesToDisplay = FXCollections.observableArrayList(transformedIssueList);
     }
 
-    public void updatePanel(List<TurboIssue> filteredAndSortedIssues, boolean isMetadataUpdate) {
+    public void updatePanel(List<TurboIssue> filteredAndSortedIssues) {
         setIssueList(filteredAndSortedIssues);
-        refreshItems(isMetadataUpdate);
+        refreshItems();
     }
 
     @Override

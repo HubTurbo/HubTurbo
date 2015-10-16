@@ -321,11 +321,10 @@ public class Logic {
      * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering and sorting.
      */
-    private Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>>
-                                        filterAndSort(List<FilterExpression> filterExprs) {
-        Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> filteredAndSorted = new HashMap<>();
-
+    private Map<FilterExpression, List<TurboIssue>> filterAndSort(List<FilterExpression> filterExprs) {
         List<TurboIssue> allModelIssues = models.getIssues();
+
+        Map<FilterExpression, List<TurboIssue>> filteredAndSorted = new HashMap<>();
 
         filterExprs.forEach(filterExpr -> {
             List<TurboIssue> filterAndSortedExpression = filteredAndSorted.get(filterExpr);
@@ -338,7 +337,7 @@ public class Logic {
                         .sorted(determineComparator(filterExpr, hasUpdatedQualifier))
                         .collect(Collectors.toList());
 
-                filteredAndSorted.put(filterText, new ImmutablePair<>(filteredAndSortedIssues, hasUpdatedQualifier));
+                filteredAndSorted.put(filterExpr, filteredAndSortedIssues);
             }
         });
 
@@ -374,7 +373,7 @@ public class Logic {
      * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
      * metadata to display their issues, in which case the changes in the model are not presented to the user.
      */
-    private void updateUI(Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> issuesToShow) {
+    private void updateUI(Map<FilterExpression, List<TurboIssue>> issuesToShow) {
         uiManager.update(models, issuesToShow);
     }
 

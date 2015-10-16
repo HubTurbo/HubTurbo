@@ -23,7 +23,7 @@ public class UIManager {
     }
 
     public void update(MultiModel models,
-                       Map<FilterExpression, ImmutablePair<List<TurboIssue>, Boolean>> issuesToShow) {
+                       Map<FilterExpression, List<TurboIssue>> issuesToShow) {
         Platform.runLater(() ->
                 ui.triggerEvent(new ModelUpdatedEvent(models, issuesToShow)));
     }

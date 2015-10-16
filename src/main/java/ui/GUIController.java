@@ -64,12 +64,10 @@ public class GUIController {
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
                     // Search for the corresponding entry in e.issuesToShow.
-                    ImmutablePair<List<TurboIssue>, Boolean> filterResult =
+                    List<TurboIssue> filterResult =
                             e.issuesToShow.get(((FilterPanel) child).getCurrentFilterExpression());
 
-                    if (filterResult != null) {
-                        ((FilterPanel) child).updatePanel(filterResult.getLeft(), filterResult.getRight());
-                    }
+                    if (filterResult != null) ((FilterPanel) child).updatePanel(filterResult);
                 });
     }
 
