@@ -247,9 +247,10 @@ public class Logic {
                 metadataRetrievalTasks.add(getIssueMetadata(repoId, issues));
             });
             // ...and then wait for all of them to complete.
-            CompletableFuture<Void> allCompletables = CompletableFuture.allOf(
-                    metadataRetrievalTasks.toArray(new CompletableFuture[metadataRetrievalTasks.size()]));
-            allCompletables
+            Futures.sequence(metadataRetrievalTasks)
+                    .thenAccept(results -> logger.info("Metadata retrieval successful for "
+                            + results.stream().filter(result -> result).count() + "/"
+                            + results.size() + " repos"))
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
                     .thenRun(() -> updateUI(filterAndSort(filterExprs))); // Then filter the second time.
