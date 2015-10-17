@@ -98,7 +98,7 @@ public class UpdateService<T> extends GitHubService {
                    The assumption is that updates are cheap and we can do them as frequently as needed. */
                 logger.warn(String.format("%s: error getting updated items", getClass().getSimpleName()));
             } else {
-                Optional<String> updatedETags = combineETags(etags.get().getLeft());
+                updatedETags = combineETags(etags.get().getLeft());
                 result = downloadUpdatedItems(repoId, resourceDesc, updatedETags);
                 updateCheckTime(etags.get().getRight());
             }
