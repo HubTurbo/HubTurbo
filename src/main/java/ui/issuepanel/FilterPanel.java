@@ -265,7 +265,7 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    public void filterByString(String filterString) {
+    public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);
     }
 
