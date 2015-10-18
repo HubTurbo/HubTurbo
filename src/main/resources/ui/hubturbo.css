@@ -159,6 +159,13 @@
     -fx-background-color: transparent;
 }
 
+.issue-cell-closed{
+    -fx-background-color: #d5fdd5;
+}
+.issue-cell-closed:selected {
+    -fx-background-color: -fx-selection-bar;
+}
+
 /*Scrollbar styling*/
 /* The main scrollbar **track** CSS class  */
 .scroll-bar:horizontal .track,
