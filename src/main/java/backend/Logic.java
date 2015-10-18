@@ -253,16 +253,16 @@ public class Logic {
                 + issues.stream().map(TurboIssue::getId).map(Object::toString).collect(Collectors.joining(", ")));
         UI.status.displayMessage(message);
 
-        String currentUser = prefs.getLastLoginUsername();
-
         return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
-                .thenApply(metadata -> {
-                    String updatedMessage = "Received metadata from " + repoId + "!";
-                    UI.status.displayMessage(updatedMessage);
-                    models.insertMetadata(repoId, metadata, currentUser);
-                    return true;
-                })
+                .thenApply(metadata -> insertMetadata(metadata, repoId, prefs.getLastLoginUsername()))
                 .exceptionally(withResult(false));
+    }
+
+    private boolean insertMetadata(Map<Integer, IssueMetadata> metadata, String repoId, String currentUser) {
+        String updatedMessage = "Received metadata from " + repoId + "!";
+        UI.status.displayMessage(updatedMessage);
+        models.insertMetadata(repoId, metadata, currentUser);
+        return true;
     }
 
     /**
