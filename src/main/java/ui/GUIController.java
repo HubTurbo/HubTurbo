@@ -81,11 +81,7 @@ public class GUIController {
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
-        List<FilterExpression> panelExpression = new ArrayList<>();
-        panelExpression.add(changedPanel.getCurrentFilterExpression());
-
-        ui.logic.filterSortRefresh(panelExpression);
-
+        ui.logic.refreshPanel(changedPanel.getCurrentFilterExpression());
         UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
