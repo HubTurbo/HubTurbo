@@ -16,6 +16,7 @@ branches:
   only:
     - master
     - release
+    - test-nondeterminism
 
 before_install:
     - "export DISPLAY=:99.0"
