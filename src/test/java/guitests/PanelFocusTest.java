@@ -1,24 +1,23 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
+import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.issuepanel.PanelControl;
-import util.PlatformEx;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.*;
 
 public class PanelFocusTest extends UITest {
 
@@ -28,9 +27,9 @@ public class PanelFocusTest extends UITest {
     }
 
     @Override
-    public void setupMethod() {
+    public void beforeStageStarts() {
         ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
 
         PanelInfo test1 = new PanelInfo();
@@ -64,21 +63,26 @@ public class PanelFocusTest extends UITest {
         assertEquals(3, panelControl.getPanelCount());
 
         // check that focus is on first panel
-        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() ->
+            0 == panelControl.getCurrentlySelectedPanel().get());
 
         // Check that pressing F will go to second panel
         // This checks that no filter text field is in focus and panel
         // shortcut works at startup
-        push(KeyCode.F);
-        assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
+        pushKeys(KeyCode.F);
+        awaitCondition(() ->
+            1 == panelControl.getCurrentlySelectedPanel().get());
 
         // More shortcut checks to ensure the focus is always correct
-        press(JUMP_TO_FILTER_BOX);
-        assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
-        press(JUMP_TO_FIRST_ISSUE);
-        assertEquals(1, (int) panelControl.getCurrentlySelectedPanel().get());
-        push(KeyCode.F);
-        assertEquals(2, (int) panelControl.getCurrentlySelectedPanel().get());
+        pushKeys(JUMP_TO_FILTER_BOX);
+        awaitCondition(() ->
+            1 == panelControl.getCurrentlySelectedPanel().get());
+        pushKeys(JUMP_TO_FIRST_ISSUE);
+        awaitCondition(() ->
+            1 == panelControl.getCurrentlySelectedPanel().get());
+        pushKeys(KeyCode.F);
+        awaitCondition(() ->
+            2 == panelControl.getCurrentlySelectedPanel().get());
 
 
         /**
@@ -88,23 +92,20 @@ public class PanelFocusTest extends UITest {
         // test that upon creating panel on the right, focus is on the last panel
         // - this includes testing double space as the last panel might be
         //   colour focused but the real JavaFX focus is on first panel
-        press(CREATE_RIGHT_PANEL);
-        PlatformEx.waitOnFxThread();
-        assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getPanelCount() - 1);
+        pushKeys(CREATE_RIGHT_PANEL);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
+            panelControl.getPanelCount() - 1);
+
         type("  ");
-        PlatformEx.waitOnFxThread();
-        assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getPanelCount() - 1);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
+            panelControl.getPanelCount() - 1);
 
         // test that upon creating panel on the left, focus is on the first panel
         // - same consideration as above
-        press(CREATE_LEFT_PANEL);
-        PlatformEx.waitOnFxThread();
-        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
+        pushKeys(CREATE_LEFT_PANEL);
+        awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
         type("  ");
-        PlatformEx.waitOnFxThread();
-        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
 
         /**
          * Testing First Panel is shown (i.e. scrollbar is set to left end)
@@ -114,25 +115,24 @@ public class PanelFocusTest extends UITest {
         // Setup:
         // 1. Save a board
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        pushKeys(KeyCode.DOWN);
+        pushKeys(KeyCode.DOWN);
+        pushKeys(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
-        PlatformEx.waitOnFxThread();
-        assertEquals(1, panelControl.getNumberOfSavedBoards());
+        awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left
-        press(CREATE_RIGHT_PANEL);
-        PlatformEx.waitOnFxThread();
-        assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getPanelCount() - 1);
+        pushKeys(CREATE_RIGHT_PANEL);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
+            panelControl.getPanelCount() - 1);
         // 3. Open board
-        press(SWITCH_BOARD);
-        PlatformEx.waitOnFxThread();
+        pushKeys(SWITCH_BOARD);
 
         // Check that first panel is on focus
-        assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
         // Check that first panel is shown by checking scrollbar position
         ScrollPane panelsScrollPaneReflection =
-                (ScrollPane) FieldUtils.readField(panelControl, "panelsScrollPane", true);
+            (ScrollPane) FieldUtils.readField(panelControl, "panelsScrollPane", true);
         assertEquals(0, panelsScrollPaneReflection.getHvalue(), 0.001);
     }
 }

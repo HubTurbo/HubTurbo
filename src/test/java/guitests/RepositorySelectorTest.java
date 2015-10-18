@@ -1,14 +1,18 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
-import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+
+import java.io.File;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
+import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
@@ -16,12 +20,6 @@ import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
-
-import java.io.File;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.loadui.testfx.Assertions.assertNodeExists;
 
 public class RepositorySelectorTest extends UITest {
 
@@ -50,11 +48,11 @@ public class RepositorySelectorTest extends UITest {
     }
 
     @Override
-    public void setupMethod() {
+    public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
         ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("dummy/dummy");
@@ -65,14 +63,16 @@ public class RepositorySelectorTest extends UITest {
     public void repositorySelectorTest() {
         // check if test json is present
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) {
+        boolean testConfigExists = testConfig.exists() && testConfig.isFile();
+        if (!testConfigExists) {
             fail();
         }
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
         assertNodeExists("#repoOwnerField");
-        type("dummy").push(KeyCode.TAB).type("dummy").push(KeyCode.ENTER);
+        type("dummy").push(KeyCode.TAB);
+        type("dummy").push(KeyCode.ENTER);
         ComboBox<String> comboBox = find("#repositorySelector");
         assertEquals(1, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -148,5 +148,4 @@ public class RepositorySelectorTest extends UITest {
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());
     }
-
 }

@@ -1,32 +1,8 @@
 package guitests;
 
-import backend.interfaces.RepoStore;
-import com.google.common.util.concurrent.SettableFuture;
-import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseButton;
-import javafx.stage.Stage;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.loadui.testfx.FXScreenController;
-import org.loadui.testfx.GuiTest;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
-import org.loadui.testfx.exceptions.NoNodesVisibleException;
-import org.loadui.testfx.utils.FXTestUtils;
-import prefs.Preferences;
-import ui.UI;
-import util.PlatformEx;
-import util.PlatformSpecific;
+import static com.google.common.io.Files.getFileExtension;
 
-import java.awt.*;
+import java.awt.Robot;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +14,33 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
-import static com.google.common.io.Files.getFileExtension;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.loadui.testfx.FXScreenController;
+import org.loadui.testfx.GuiTest;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
+import org.loadui.testfx.exceptions.NoNodesVisibleException;
+import org.loadui.testfx.utils.FXTestUtils;
+
+import com.google.common.util.concurrent.SettableFuture;
+
+import backend.interfaces.RepoStore;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Stage;
+import prefs.Preferences;
+import ui.UI;
+import util.PlatformEx;
+import util.PlatformSpecific;
 
 public class UITest extends GuiTest {
 
@@ -92,7 +94,7 @@ public class UITest extends GuiTest {
         return Collections.unmodifiableMap(specialChars);
     }
 
-    public void setupMethod() {
+    public void beforeStageStarts() {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
 
@@ -121,7 +123,7 @@ public class UITest extends GuiTest {
             assert testConfig.delete();
         }
         clearTestFolder();
-        setupMethod();
+        beforeStageStarts();
 
         if (stage == null) {
             launchApp();

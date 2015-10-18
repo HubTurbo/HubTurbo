@@ -1,21 +1,23 @@
-package unstable;
+package guitests;
 
-import backend.RepoIO;
-import guitests.UITest;
-import javafx.scene.control.ComboBox;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+
+import backend.RepoIO;
+import javafx.scene.control.ComboBox;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
-import ui.components.StatusUIStub;
-
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.Assert.assertEquals;
+import ui.components.StatusUI;
+import util.events.EventDispatcher;
 
 public class SavedLoginTest extends UITest {
 
@@ -25,12 +27,13 @@ public class SavedLoginTest extends UITest {
     }
 
     @Override
-    public void setupMethod() {
-        UI.status = new StatusUIStub(); // to avoid NPE
+    public void beforeStageStarts() {
+        UI.status = mock(StatusUI.class);
+        UI.events = mock(EventDispatcher.class);
         // setup test json with last viewed repo "test/test"
         // and then create the corresponding repo json file
         ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
