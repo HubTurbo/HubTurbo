@@ -6,6 +6,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 import org.junit.Test;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.utils.FXTestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -151,7 +152,34 @@ public class PanelRenameTest extends UITest {
         Text panelNameText7 = find("#dummy/dummy_col7_nameText");
         assertEquals(expected, panelNameText7.getText());
         sleep(EVENT_DELAY);
-        
+
+        // Testing whether the close button appears once rename box is opened.
+        // Expected: Close button should not appear once rename box is opened and while edits are being made.
+        //           It should appear once the rename box is closed and the edits are done.
+        press(CREATE_RIGHT_PANEL);
+        boolean isPresentBeforeEdit = exists("#dummy/dummy_col8_closeButton");
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(8)));
+        PlatformEx.waitOnFxThread();
+        boolean isPresentDuringEdit = true; //stub value, this should change to false.
+        try {
+            exists("#dummy/dummy_col8_closeButton");
+        } catch (NoNodesFoundException e){
+            isPresentDuringEdit = false;
+        }
+
+        String randomName8 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 1);
+        PanelNameTextField renameTextField8 = find("#dummy/dummy_col8_renameTextField");
+        renameTextField8.setText(randomName8);
+        push(KeyCode.ENTER);
+        boolean isPresentAfterEdit = exists("#dummy/dummy_col8_closeButton");
+        Text panelNameText8 = find("#dummy/dummy_col8_nameText");
+        assertEquals(true, isPresentBeforeEdit);
+        assertEquals(false, isPresentDuringEdit);
+        assertEquals(true, isPresentAfterEdit);
+        assertEquals(randomName8, panelNameText8.getText());
+        PlatformEx.waitOnFxThread();
+
+
         // Testing typing excessive characters when textfield is less than full
         
         // Quitting to update json

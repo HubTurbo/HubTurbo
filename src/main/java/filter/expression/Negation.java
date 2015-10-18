@@ -7,6 +7,7 @@ import filter.QualifierApplicationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Negation implements FilterExpression {
@@ -74,5 +75,15 @@ public class Negation implements FilterExpression {
         ArrayList<Qualifier> result = new ArrayList<>();
         result.addAll(expr);
         return result;
+    }
+
+    @Override
+    public FilterExpression map(Function<Qualifier, Qualifier> func) {
+        FilterExpression expr = this.expr.map(func);
+        if (expr == Qualifier.EMPTY) {
+            return Qualifier.EMPTY;
+        } else {
+            return new Negation(expr);
+        }
     }
 }
