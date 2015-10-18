@@ -129,20 +129,6 @@ public class Logic {
         });
     }
 
-    // Adds update times to the metadata map
-    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
-        String currentUser = prefs.getLastLoginUsername();
-
-        // Iterates through each entry in the metadata set, and looks for the comment/event with
-        // the latest time created.
-        for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
-            IssueMetadata currentMetadata = entry.getValue();
-
-            entry.setValue(currentMetadata.full(currentUser));
-        }
-        return metadata;
-    }
-
     public Set<String> getOpenRepositories() {
         return models.toModels().stream().map(Model::getRepoId).map(String::toLowerCase).collect(Collectors.toSet());
     }
@@ -263,6 +249,20 @@ public class Logic {
         UI.status.displayMessage(updatedMessage);
         models.insertMetadata(repoId, metadata, currentUser);
         return true;
+    }
+
+    // Adds update times to the metadata map
+    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
+        String currentUser = prefs.getLastLoginUsername();
+
+        // Iterates through each entry in the metadata set, and looks for the comment/event with
+        // the latest time created.
+        for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
+            IssueMetadata currentMetadata = entry.getValue();
+
+            entry.setValue(currentMetadata.full(currentUser));
+        }
+        return metadata;
     }
 
     /**
