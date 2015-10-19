@@ -211,7 +211,7 @@ public class TurboIssue {
 
     @Override
     public String toString() {
-        return "#" + id + " " + title;
+        return repoId + " #" + id;
     }
 
     /**

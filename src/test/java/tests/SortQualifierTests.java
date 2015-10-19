@@ -243,7 +243,7 @@ public class SortQualifierTests {
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
 
-        assertEquals("[#2 Issue2, #3 Issue3, #1 Issue1, #3 Issue6, #3 Issue7, #5 Issue5, #4 Issue4]",
+        assertEquals("[a/a #2, b/b #3, c/c #1, d/d #3, d/d #3, d/d #5, e/e #4]",
                      issues.toString());
     }
 

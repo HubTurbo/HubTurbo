@@ -235,8 +235,7 @@ public class Logic {
      */
     public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<TurboIssue> issues) {
         String message = "Getting metadata for " + repoId + "...";
-        logger.info("Getting metadata for issues "
-                + issues.stream().map(TurboIssue::getId).map(Object::toString).collect(Collectors.joining(", ")));
+        logger.info("Getting metadata for issues " + issues);
         UI.status.displayMessage(message);
 
         return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
