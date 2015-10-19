@@ -9,8 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -46,30 +48,7 @@ public class UITest extends GuiTest {
 
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
     
-    private static final HashMap<Character, KeyCode> chars; 
-    static {
-        chars = new HashMap<Character, KeyCode>();
-        chars.put('~', KeyCode.BACK_QUOTE);
-        chars.put('!', KeyCode.DIGIT1);
-        chars.put('@', KeyCode.DIGIT2);
-        chars.put('#', KeyCode.DIGIT3);
-        chars.put('$', KeyCode.DIGIT4);
-        chars.put('%', KeyCode.DIGIT5);
-        chars.put('^', KeyCode.DIGIT6);
-        chars.put('&', KeyCode.DIGIT7);
-        chars.put('*', KeyCode.DIGIT8);
-        chars.put('(', KeyCode.DIGIT9);
-        chars.put(')', KeyCode.DIGIT0);
-        chars.put('_', KeyCode.MINUS);
-        chars.put('+', KeyCode.EQUALS);
-        chars.put('{', KeyCode.OPEN_BRACKET);
-        chars.put('}', KeyCode.CLOSE_BRACKET);
-        chars.put(':', KeyCode.SEMICOLON);
-        chars.put('"', KeyCode.QUOTE);
-        chars.put('<', KeyCode.COMMA);
-        chars.put('>', KeyCode.PERIOD);
-        chars.put('?', KeyCode.SLASH);
-    }
+    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap(); 
     
     protected static class TestUI extends UI {
         public TestUI() {
@@ -90,6 +69,31 @@ public class UITest extends GuiTest {
         super();
         screenController = getScreenController();
         robot = getRobot();
+    }
+
+    private static Map<Character, KeyCode> getSpecialCharsMap() {
+        Map<Character, KeyCode> specialChars = new HashMap<Character, KeyCode>();
+        specialChars.put('~', KeyCode.BACK_QUOTE);
+        specialChars.put('!', KeyCode.DIGIT1);
+        specialChars.put('@', KeyCode.DIGIT2);
+        specialChars.put('#', KeyCode.DIGIT3);
+        specialChars.put('$', KeyCode.DIGIT4);
+        specialChars.put('%', KeyCode.DIGIT5);
+        specialChars.put('^', KeyCode.DIGIT6);
+        specialChars.put('&', KeyCode.DIGIT7);
+        specialChars.put('*', KeyCode.DIGIT8);
+        specialChars.put('(', KeyCode.DIGIT9);
+        specialChars.put(')', KeyCode.DIGIT0);
+        specialChars.put('_', KeyCode.MINUS);
+        specialChars.put('+', KeyCode.EQUALS);
+        specialChars.put('{', KeyCode.OPEN_BRACKET);
+        specialChars.put('}', KeyCode.CLOSE_BRACKET);
+        specialChars.put(':', KeyCode.SEMICOLON);
+        specialChars.put('"', KeyCode.QUOTE);
+        specialChars.put('<', KeyCode.COMMA);
+        specialChars.put('>', KeyCode.PERIOD);
+        specialChars.put('?', KeyCode.SLASH);
+        return Collections.unmodifiableMap(specialChars);
     }
 
     public void setupMethod() {
@@ -287,9 +291,9 @@ public class UITest extends GuiTest {
     @Override
     public GuiTest type(String text) {
         for (int i = 0; i < text.length(); i++) {
-            if (chars.containsKey(text.charAt(i))){
-                press(KeyCode.SHIFT).press(chars.get(text.charAt(i)))
-                .release(chars.get(text.charAt(i))).release(KeyCode.SHIFT);
+            if (specialCharsMap.containsKey(text.charAt(i))){
+                press(KeyCode.SHIFT).press(specialCharsMap.get(text.charAt(i)))
+                .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
              
             } else {
                 type(text.charAt(i));
