@@ -20,6 +20,7 @@ import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import util.GithubURLPageElements;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
@@ -148,7 +149,9 @@ public class ListPanel extends FilterPanel {
 
     private void setupKeyboardShortcuts() {        
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.markAsRead.match(event)) {
+            // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
+            // Will only work if the key for markAsRead is not the default key E.
+            if (KeyboardShortcuts.markAsRead.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
                 markAsRead();
             }
             if (KeyboardShortcuts.markAsUnread.match(event)) {
@@ -248,7 +251,30 @@ public class ListPanel extends FilterPanel {
                     break;
                 }
             }
+            if (SHOW_RELATED_ISSUE_OR_PR.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    showRelatedIssueOrPR();
+                // only for default. can remove if default key for MARK_AS_READ_CHANGES
+                } else if (KeyboardShortcuts.markAsRead.match(event)) {
+                    markAsRead();
+                }
+            }
         });
+    }
+
+    private void showRelatedIssueOrPR() {
+        if (listView.getSelectedItem().isPresent()) {
+            TurboIssue issue = listView.getSelectedItem().get();
+            Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
+                ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
+                : ui.getBrowserComponent().getPRNumberFromIssue();
+            if (relatedIssueNumber.isPresent()) {
+                ui.triggerEvent(
+                        new IssueSelectedEvent(issue.getRepoId(), 
+                           relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
+                );
+            }
+        }
     }
 
     private ContextMenu setupContextMenu() {

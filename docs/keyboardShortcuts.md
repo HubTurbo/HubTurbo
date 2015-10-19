@@ -16,6 +16,7 @@ These key sequences (one key followed by the other) are used to load various pag
 | Conversation Tab (Only for PR's)|<kbd>G</kbd> <kbd>R</kbd>|Loads the Coversation tab for the PR|
 | **C**ommits Tab (Only for PR's)|<kbd>G</kbd> <kbd>C</kbd>|Loads the Commits tab for the PR|
 | **F**iles Changed Tab (Only for PR's)|<kbd>G</kbd> <kbd>F</kbd>|Loads the Files changed tab for the PR|
+| Show referenced Issue or PR (If any)|<kbd>G</kbd> <kbd>E</kbd>|Loads the referenced PR(if any) for the Issue loaded and vice versa|
 
 ## Create new ...
 
