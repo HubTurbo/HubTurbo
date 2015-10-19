@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +45,32 @@ public class UITest extends GuiTest {
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
 
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
-
+    
+    private static final HashMap<Character, KeyCode> chars; 
+    static {
+        chars = new HashMap<Character, KeyCode>();
+        chars.put('~', KeyCode.BACK_QUOTE);
+        chars.put('!', KeyCode.DIGIT1);
+        chars.put('@', KeyCode.DIGIT2);
+        chars.put('#', KeyCode.DIGIT3);
+        chars.put('$', KeyCode.DIGIT4);
+        chars.put('%', KeyCode.DIGIT5);
+        chars.put('^', KeyCode.DIGIT6);
+        chars.put('&', KeyCode.DIGIT7);
+        chars.put('*', KeyCode.DIGIT8);
+        chars.put('(', KeyCode.DIGIT9);
+        chars.put(')', KeyCode.DIGIT0);
+        chars.put('_', KeyCode.MINUS);
+        chars.put('+', KeyCode.EQUALS);
+        chars.put('{', KeyCode.OPEN_BRACKET);
+        chars.put('}', KeyCode.CLOSE_BRACKET);
+        chars.put(':', KeyCode.SEMICOLON);
+        chars.put('"', KeyCode.QUOTE);
+        chars.put('<', KeyCode.COMMA);
+        chars.put('>', KeyCode.PERIOD);
+        chars.put('?', KeyCode.SLASH);
+    }
+    
     protected static class TestUI extends UI {
         public TestUI() {
             super();
@@ -257,4 +283,19 @@ public class UITest extends GuiTest {
     public <T> void waitForValue(ComboBoxBase<T> comboBoxBase) {
         waitUntil(comboBoxBase, c -> c.getValue() != null);
     }
+    
+    @Override
+    public GuiTest type(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (chars.containsKey(text.charAt(i))){
+                press(KeyCode.SHIFT).press(chars.get(text.charAt(i)))
+                .release(chars.get(text.charAt(i))).release(KeyCode.SHIFT);
+             
+            } else {
+                type(text.charAt(i));
+            }
+        }
+        return this;
+    }
+
 }

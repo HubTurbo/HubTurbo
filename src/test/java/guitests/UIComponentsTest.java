@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
     
-    private UtilMethods util = new UtilMethods();
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
@@ -27,7 +26,7 @@ public class UIComponentsTest extends UITest {
     public void filterTextFieldTest() {
         doubleClick("#dummy/dummy_col0_filterTextField");
         push(KeyCode.BACK_SPACE);
-        util.typeString("(is:open OR is:closed)");
+        type("(is:open OR is:closed)");
         push(KeyCode.ENTER);
     }
 

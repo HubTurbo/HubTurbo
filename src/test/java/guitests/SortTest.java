@@ -6,40 +6,39 @@ import org.junit.Test;
 public class SortTest extends UITest {
 
     // TODO check that issue list is sorted correctly
-    private UtilMethods util = new UtilMethods();
     @Test
     public void sortTest () {
         click("#dummy/dummy_col0_filterTextField");
         // Ascending ID
-        util.typeString("sort:id");
+        type("sort:id");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Descending ID (default)
-        util.typeString("sort:-id");
+        type("sort:-id");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Comment count
-        util.typeString("sort:comments");
+        type("sort:comments");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Repo ID (e.g. dummy2/dummy)
-        util.typeString("sort:repo");
+        type("sort:repo");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Updated time (ascending)
-        util.typeString("sort:updated");
+        type("sort:updated");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Updated time (descending)
-        util.typeString("sort:-date");
+        type("sort:-date");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Issue state (open)
-        util.typeString("sort:status");
+        type("sort:status");
         push(KeyCode.ENTER);
         doubleClick("#dummy/dummy_col0_filterTextField");
         // Issue state (closed)
-        util.typeString("sort:-status");
+        type("sort:-status");
         push(KeyCode.ENTER);
     }
 }

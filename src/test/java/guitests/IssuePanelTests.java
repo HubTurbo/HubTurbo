@@ -34,7 +34,6 @@ import backend.resource.TurboLabel;
 public class IssuePanelTests extends UITest {
 
     private static final int EVENT_DELAY = 1000;
-    private UtilMethods util = new UtilMethods();
 
     @Test
     public void keepSelectionTest() {
@@ -42,7 +41,7 @@ public class IssuePanelTests extends UITest {
         // the list is updated
         ListPanel issuePanel = find("#dummy/dummy_col0");
         click("#dummy/dummy_col0_filterTextField");
-        util.typeString("sort:date");
+        type("sort:date");
         push(KeyCode.ENTER);
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);

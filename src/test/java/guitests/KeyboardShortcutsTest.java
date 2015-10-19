@@ -26,7 +26,6 @@ public class KeyboardShortcutsTest extends UITest {
     private UIComponentFocusEvent.EventType uiComponentFocusEventType;
     private int selectedIssueId;
     private int panelIndex;
-    private UtilMethods util = new UtilMethods();
 
     @Test
     public void keyboardShortcutsTest() {
@@ -214,9 +213,9 @@ public class KeyboardShortcutsTest extends UITest {
 
         // testing corner case for mark as read where there is only one issue displayed
         click("#dummy/dummy_col1_filterTextField");
-        util.typeString("id:5");
+        type("id:5");
         push(KeyCode.ENTER);
-        push(KeyCode.CONTROL).push(KeyCode.ENTER);
+        press(JUMP_TO_FIRST_ISSUE);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at the only issue shown
         assertEquals(5, selectedIssueId);

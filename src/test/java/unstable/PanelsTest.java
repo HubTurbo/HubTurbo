@@ -1,7 +1,6 @@
 package unstable;
 
 import guitests.UITest;
-import guitests.UtilMethods;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
@@ -16,7 +15,6 @@ import util.events.PanelClickedEventHandler;
 
 public class PanelsTest extends UITest {
     
-    private UtilMethods util = new UtilMethods();
     private static class Bool {
         public boolean value = false;
         public void negate() {
@@ -35,7 +33,7 @@ public class PanelsTest extends UITest {
         press(MAXIMIZE_WINDOW);
 
         press(CREATE_RIGHT_PANEL);
-        util.typeString("repo:dummy2/dummy2");
+        type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
         // Drag
