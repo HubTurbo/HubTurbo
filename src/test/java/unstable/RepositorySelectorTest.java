@@ -105,7 +105,6 @@ public class RepositorySelectorTest extends UITest {
         push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
         push(KeyCode.DOWN);
-        push(KeyCode.DOWN);
         push(KeyCode.DOWN); // first used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
@@ -124,7 +123,6 @@ public class RepositorySelectorTest extends UITest {
         click("Repos");
         push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
-        push(KeyCode.DOWN);
         push(KeyCode.DOWN);
         push(KeyCode.DOWN); // second used repo
         push(KeyCode.ENTER);
