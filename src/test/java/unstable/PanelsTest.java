@@ -14,7 +14,7 @@ import ui.UI;
 import util.events.PanelClickedEventHandler;
 
 public class PanelsTest extends UITest {
-
+    
     private static class Bool {
         public boolean value = false;
         public void negate() {
@@ -33,9 +33,7 @@ public class PanelsTest extends UITest {
         press(MAXIMIZE_WINDOW);
 
         press(CREATE_RIGHT_PANEL);
-        type("repo");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("dummy2/dummy2");
+        type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
         // Drag

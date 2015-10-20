@@ -41,9 +41,7 @@ public class IssuePanelTests extends UITest {
         // the list is updated
         ListPanel issuePanel = find("#dummy/dummy_col0");
         click("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("date");
+        type("sort:date");
         push(KeyCode.ENTER);
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);

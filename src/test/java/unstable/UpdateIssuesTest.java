@@ -27,9 +27,7 @@ public class UpdateIssuesTest extends UITest {
         resetRepo();
 
         click("#dummy/dummy_col0_filterTextField");
-        type("updated");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("24");
+        type("updated:24");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 

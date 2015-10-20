@@ -4,9 +4,11 @@ import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
@@ -15,7 +17,6 @@ import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
 import java.io.File;
-import java.nio.file.NoSuchFileException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -76,9 +77,7 @@ public class RepositorySelectorTest extends UITest {
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
         click("#dummy/dummy_col0_filterTextField");
-        type("repo");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("dummy2/dummy2");
+        type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
         assertEquals(2, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
