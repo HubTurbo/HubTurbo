@@ -26,8 +26,14 @@ public class UIComponentsTest extends UITest {
     public void filterTextFieldTest() {
         doubleClick("#dummy/dummy_col0_filterTextField");
         push(KeyCode.BACK_SPACE);
-        type("(is:open OR is:closed)");
+        type("is:open OR is:closed");
         push(KeyCode.ENTER);
+        
+        FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
+        filterTextField.clear();
+        click("#dummy/dummy_col0_filterTextField");
+        type("!@#$%^&*( ) { } :?");
+        assertEquals("!@#$%^&*( ) { } :?", filterTextField.getText());
     }
 
     // TODO check that progress bar is updating
