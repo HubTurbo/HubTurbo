@@ -148,7 +148,7 @@ Matches all issues with a body (or description) containing the given string.
 
 *Expects a string*
 
-Matches all issues associated with any milestones whose names contain the given string.
+Matches all issues associated with any milestones whose names contain the given string. `current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date.
 
 ### label
 

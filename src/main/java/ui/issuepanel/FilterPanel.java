@@ -50,11 +50,14 @@ public abstract class FilterPanel extends AbstractPanel {
     protected Text nameText;
     protected HBox nameBox;
     protected HBox menuBarNameArea;
+    protected HBox menuBarCloseButton;
     protected Label renameButton;
     protected PanelNameTextField renameTextField;
     protected FilterTextField filterTextField;
     
     private String panelName = "Panel";
+    private static final int NAME_FIELD_WIDTH = PANEL_WIDTH - 15;
+    private static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 70;
     private UI ui;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
@@ -120,13 +123,13 @@ public abstract class FilterPanel extends AbstractPanel {
     
     private Node createPanelMenuBar() {
         menuBarNameArea = createNameArea();
-        HBox menuBarCloseArea = createCloseButton();
+        menuBarCloseButton = createCloseButton();
         
         panelMenuBar = new HBox();
         panelMenuBar.setSpacing(2);
         panelMenuBar.setMinWidth(PANEL_WIDTH);
         panelMenuBar.setMaxWidth(PANEL_WIDTH);
-        panelMenuBar.getChildren().addAll(menuBarNameArea, menuBarCloseArea);
+        panelMenuBar.getChildren().addAll(menuBarNameArea, menuBarCloseButton);
         panelMenuBar.setPadding(new Insets(0, 0, 8, 0));
         return panelMenuBar;
     }
@@ -139,8 +142,8 @@ public abstract class FilterPanel extends AbstractPanel {
         
         nameBox = new HBox();
         nameBox.getChildren().add(nameText);
-        nameBox.setMinWidth(330);
-        nameBox.setMaxWidth(330);
+        nameBox.setMinWidth(NAME_DISPLAY_WIDTH);
+        nameBox.setMaxWidth(NAME_DISPLAY_WIDTH);
         nameBox.setAlignment(Pos.CENTER_LEFT);
         
         nameBox.setOnMouseClicked(mouseEvent -> {
@@ -283,7 +286,10 @@ public abstract class FilterPanel extends AbstractPanel {
     public void showRenameTextField() {
         renameTextField = new PanelNameTextField(panelName, this);
         renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
+        renameTextField.setMaxWidth(NAME_FIELD_WIDTH);
+        renameTextField.setMinWidth(NAME_FIELD_WIDTH);
         menuBarNameArea.getChildren().removeAll(nameBox, renameButton);
+        panelMenuBar.getChildren().remove(menuBarCloseButton);
         menuBarNameArea.getChildren().addAll(renameTextField);
     }
     
@@ -294,6 +300,7 @@ public abstract class FilterPanel extends AbstractPanel {
     
     public void closeRenameTextField(PanelNameTextField renameTextField) {
         menuBarNameArea.getChildren().remove(renameTextField);
+        panelMenuBar.getChildren().add(menuBarCloseButton);
         menuBarNameArea.getChildren().addAll(nameBox, renameButton);
         this.requestFocus();
     }
