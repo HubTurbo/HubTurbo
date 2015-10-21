@@ -21,7 +21,7 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
 public class PanelRenameTest extends UITest {
 
-    public static final int EVENT_DELAY = 500;
+    public static final int EVENT_DELAY = 1000;
     public static final int PANEL_MAX_NAME_LENGTH = 36;
 
     @Override
