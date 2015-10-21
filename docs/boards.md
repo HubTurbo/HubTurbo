@@ -2,7 +2,7 @@
 
 ## Saving a Board
 
-- Save the current state of the panels under a new name
+- Save the current state of the panels under a new name.
 
 - You can save a board under a name via `Boards > Save as`.
 
@@ -22,6 +22,12 @@
 
 - Select the board you want to remove under `Boards > Delete`.
 
-## Switching the board
+## Switching the Board
 
 - Push <kbd>Ctrl</kbd> + <kbd>B</kbd> to quickly switch the currently open board to another saved board.
+
+##Auto-creating a Board
+
+- Auto-create standard development boards. It will be saved automatically.
+
+- You can select the board to be auto-created via `Boards > Auto-create`.
