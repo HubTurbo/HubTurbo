@@ -40,7 +40,7 @@ allprojects {
 
     project.ext {
         log4jVersion = '2.3'
-        controlsfxVersion = '8.40.10-SNAPSHOT'
+        controlsfxVersion = '8.40.10'
         gsonVersion = '2.3.1'
         guavaVersion = '18.0'
         jnaVersion = '4.1.0'
