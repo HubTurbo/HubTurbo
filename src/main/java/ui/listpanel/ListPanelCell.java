@@ -35,6 +35,9 @@ public class ListPanelCell extends ListCell<TurboIssue> {
         if (issue == null) {
             return;
         }
+        if (!issue.isOpen()){
+            getStyleClass().add("issue-cell-closed");
+        }
         this.issue = issue;
         Optional<Model> currentModel = model.getModelById(issue.getRepoId());
         assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId()
