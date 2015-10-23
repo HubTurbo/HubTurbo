@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class PanelControl extends HBox {
@@ -117,10 +119,15 @@ public class PanelControl extends HBox {
         return panel;
     }
 
+    public void selectPanel(int index) {
+        assert(index >= 0 && index < getNumberOfPanels());
+        setCurrentlySelectedPanel(Optional.of(index));
+        scrollToPanel(index);
+        getPanel(index).requestFocus();
+    }
+
     public void selectFirstPanel() {
-        setCurrentlySelectedPanel(Optional.of(0));
-        scrollToPanel(0);
-        getPanel(0).requestFocus();
+        selectPanel(0);
     }
 
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
@@ -302,11 +309,25 @@ public class PanelControl extends HBox {
         return prefs.getAllBoards().size();
     }
 
-    public void scrollToPanel(int panelIndex){
+    private void scrollToPanel(int panelIndex) {
         setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getNumberOfPanels() - 1));
     }
 
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
+    }
+
+    /**
+     * Returns the list of panel names and filters currently showing the user interface
+     * @return
+     */
+    public List<PanelInfo> getCurrentPanelInfos() {
+        return getChildren().stream().flatMap(c -> {
+            if (c instanceof FilterPanel) {
+                return Stream.of(((FilterPanel) c).getCurrentInfo());
+            } else {
+                return Stream.of();
+            }
+        }).collect(Collectors.toList());
     }
 }

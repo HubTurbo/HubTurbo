@@ -143,8 +143,8 @@ public abstract class FilterPanel extends AbstractPanel {
         
         nameBox = new HBox();
         nameBox.getChildren().add(nameText);
-        nameBox.setMinWidth(NAME_FIELD_WIDTH);
-        nameBox.setMaxWidth(NAME_FIELD_WIDTH);
+        nameBox.setMinWidth(NAME_DISPLAY_WIDTH);
+        nameBox.setMaxWidth(NAME_DISPLAY_WIDTH);
         nameBox.setAlignment(Pos.CENTER_LEFT);
         
         nameBox.setOnMouseClicked(mouseEvent -> {
@@ -266,7 +266,7 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    public void filterByString(String filterString) {
+    public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);
     }
 
@@ -287,8 +287,8 @@ public abstract class FilterPanel extends AbstractPanel {
     public void showRenameTextField() {
         renameTextField = new PanelNameTextField(panelName, this);
         renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
-        renameTextField.setMaxWidth(NAME_DISPLAY_WIDTH);
-        renameTextField.setMinWidth(NAME_DISPLAY_WIDTH);
+        renameTextField.setMaxWidth(NAME_FIELD_WIDTH);
+        renameTextField.setMinWidth(NAME_FIELD_WIDTH);
         menuBarNameArea.getChildren().removeAll(nameBox, renameButton);
         panelMenuBar.getChildren().remove(menuBarCloseButton);
         menuBarNameArea.getChildren().addAll(renameTextField);

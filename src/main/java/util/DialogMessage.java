@@ -29,4 +29,11 @@ public class DialogMessage {
 
         return result.get().equals(yesButton);
     }
+
+    public static void showInformationDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

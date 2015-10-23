@@ -1,5 +1,14 @@
 # Changelog
 
+# V3.11.0
+
+- Users can now refer to milestones with aliases
+- Removable repos are now indicated as such
+- The close button won't be shown when panels are being renamed
+- Fixed paging bug which caused missing milestones
+- Fixed bug where repos were sometimes not saved after updating
+- Improved testing support for typing strings
+
 # V3.10.0
 
 - Issues can now be sorted by milestone

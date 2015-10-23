@@ -114,18 +114,16 @@ public class MilestoneAliasTests {
             assertEquals(true, msQ.getContent().get().equalsIgnoreCase("V0.7"));
         });
 
-        // test alias out of bound will be clamped
+        // test alias out of bound will be converted to Qualifier.FALSE
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-4"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals(false, msQ.getContent().get().equalsIgnoreCase("curr-4"));
-            assertEquals(true, msQ.getContent().get().equalsIgnoreCase("V0.1"));
+            assertEquals(Qualifier.FALSE, msQ);
         });
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current+4"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals(false, msQ.getContent().get().equalsIgnoreCase("current+4"));
-            assertEquals(true, msQ.getContent().get().equalsIgnoreCase("V0.7"));
+            assertEquals(Qualifier.FALSE, msQ);
         });
 
         // test wrong alias will not be converted
