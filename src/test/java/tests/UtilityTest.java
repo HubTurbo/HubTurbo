@@ -17,9 +17,7 @@ import static util.Utility.stripQuotes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -124,5 +122,31 @@ public class UtilityTest {
         Object obj = new Object();
         assertEquals(obj, replaceNull(obj, new Object()));
         assertEquals(obj, replaceNull(null, obj));
+    }
+
+    @Test
+    public void generateNameTest() {
+        // append index '1' or greater to desired name,
+        // whichever smallest index is available
+
+        String desiredName = "test";
+
+        assertEquals(desiredName, Utility.generateName(desiredName, new ArrayList<String>()));
+        assertEquals(desiredName, Utility.generateName(desiredName,
+                Arrays.asList("not-test", "other", "even more")));
+        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+                Arrays.asList("test")));
+        assertEquals(desiredName, Utility.generateName(desiredName,
+                Arrays.asList("test1")));
+        assertEquals(desiredName + "2", Utility.generateName(desiredName,
+                Arrays.asList("test", "test1")));
+        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+                Arrays.asList("test", "test2")));
+        assertEquals(desiredName, Utility.generateName(desiredName,
+                Arrays.asList("tests")));
+        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+                Arrays.asList("test", "tests")));
+        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+                Arrays.asList("test", "test100")));
     }
 }
