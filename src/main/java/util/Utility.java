@@ -323,4 +323,9 @@ public class Utility {
 
         return availableName;
     }
+
+    // TODO: remove once #1078 is solved from all repoIds normalization
+    public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
+        return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
 }
