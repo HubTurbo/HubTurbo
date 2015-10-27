@@ -30,7 +30,7 @@ public class BoardAutoCreatorTest extends UITest {
         panelControl = ui.getPanelControl();
         testPref = UI.prefs;
 
-        List<String> boardNames = testPref.getAllBoards().keySet().stream().collect(Collectors.toList());
+        List<String> boardNames = testPref.getAllBoardNames();
         boardNames.stream().forEach(testPref::removeBoard);
     }
 
@@ -39,14 +39,7 @@ public class BoardAutoCreatorTest extends UITest {
 
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
 
-        click("Boards");
-        push(KeyCode.DOWN); // Save
-        push(KeyCode.DOWN); // Save As
-        push(KeyCode.DOWN); // Open
-        push(KeyCode.DOWN); // Delete
-        push(KeyCode.DOWN); // Auto-create
-        push(KeyCode.RIGHT); // Open Auto-create
-        push(KeyCode.ENTER); // Milestones
+        clickMenu("Boards", "Auto-create", "Milestones");
 
         PlatformEx.waitOnFxThread();
         assertNodeExists(hasText("Milestones board has been created and loaded.\n\n" +
@@ -70,6 +63,37 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelInfos.get(2).getPanelName(), "Next Milestone");
         assertEquals(panelInfos.get(3).getPanelName(), "Next Next Milestone");
         assertEquals(panelInfos.get(4).getPanelName(), "Next Next Next Milestone");
+    }
+
+
+    @Test
+    public void workAllocationBoardAutoCreationTest() {
+        assertEquals(panelControl.getNumberOfSavedBoards(), 0);
+
+        clickMenu("Boards", "Auto-create", "Work Allocation");
+
+        PlatformEx.waitOnFxThread();
+        assertNodeExists(hasText("Work Allocation board has been created and loaded.\n\n" +
+                "It is saved under the name \"Work Allocation\"."));
+        click("OK");
+
+        assertEquals(panelControl.getNumberOfPanels(), 5);
+        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
+        assertEquals(panelControl.getNumberOfSavedBoards(), 1);
+
+        List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
+
+        assertEquals(panelInfos.get(0).getPanelFilter(), "assignee:User 1 sort:milestone,status");
+        assertEquals(panelInfos.get(1).getPanelFilter(), "assignee:User 10 sort:milestone,status");
+        assertEquals(panelInfos.get(2).getPanelFilter(), "assignee:User 2 sort:milestone,status");
+        assertEquals(panelInfos.get(3).getPanelFilter(), "assignee:User 3 sort:milestone,status");
+        assertEquals(panelInfos.get(4).getPanelFilter(), "assignee:User 4 sort:milestone,status");
+
+        assertEquals(panelInfos.get(0).getPanelName(), "Work allocated to User 1");
+        assertEquals(panelInfos.get(1).getPanelName(), "Work allocated to User 10");
+        assertEquals(panelInfos.get(2).getPanelName(), "Work allocated to User 2");
+        assertEquals(panelInfos.get(3).getPanelName(), "Work allocated to User 3");
+        assertEquals(panelInfos.get(4).getPanelName(), "Work allocated to User 4");
     }
 
 }

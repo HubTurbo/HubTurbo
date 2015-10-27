@@ -94,6 +94,11 @@ public class TurboUser {
     public String getLoginName() {
         return loginName;
     }
+
+    public String getFriendlierName() {
+        return (!realName.isEmpty() ? realName : loginName);
+    }
+
     public String getAvatarURL() {
         return avatarURL;
     }

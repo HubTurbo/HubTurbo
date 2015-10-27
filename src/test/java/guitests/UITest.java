@@ -308,6 +308,17 @@ public class UITest extends GuiTest {
         }
     }
 
+    /**
+     * Automate menu traversal by clicking them in order of input parameter
+     *
+     * @param menuNames array of strings of menu item names in sequence of traversal
+     */
+    public void clickMenu(String... menuNames) {
+        for (String menuName : menuNames) {
+            click(menuName);
+        }
+    }
+
     public <T> void waitForValue(ComboBoxBase<T> comboBoxBase) {
         waitUntil(comboBoxBase, c -> c.getValue() != null);
     }
