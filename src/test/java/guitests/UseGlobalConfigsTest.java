@@ -12,11 +12,15 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import ui.components.FilterTextField;
 import ui.components.KeyboardShortcuts;
 import ui.components.PanelNameTextField;
@@ -34,6 +38,10 @@ public class UseGlobalConfigsTest extends UITest {
     @Test
     public void globalConfigTest() {
         // Override setupMethod() if you want to do stuff to the JSON beforehand
+
+        UI ui = TestController.getUI();
+        PanelControl panels = ui.getPanelControl();
+
         TextField repoOwnerField = find("#repoOwnerField");
         doubleClick(repoOwnerField);
         doubleClick(repoOwnerField);
@@ -48,7 +56,7 @@ public class UseGlobalConfigsTest extends UITest {
         ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
-        
+
         pushKeys(KeyboardShortcuts.MAXIMIZE_WINDOW);
 
         // Make a new board
@@ -59,15 +67,17 @@ public class UseGlobalConfigsTest extends UITest {
         // TODO find out why
         ((TextField) find("#boardnameinput")).setText("Empty Board");
         click("OK");
-        
+
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Renamed panel");
-        PanelNameTextField renameTextField1 = find("#dummy/dummy_col0_renameTextField");
-        assertEquals("Renamed panel", renameTextField1.getText());
+        FilterPanel filterPanel0 = (FilterPanel) panels.getPanel(0);
+        PanelNameTextField renameTextField0 = filterPanel0.getRenameTextField();
+        assertEquals("Renamed panel", renameTextField0.getText());
         pushKeys(KeyCode.ENTER);
 
-        waitUntilNodeAppears("#dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
+        FilterTextField filterTextField0 = filterPanel0.getFilterTextField();
+        waitUntilNodeAppears(filterTextField0);
+        click(filterTextField0);
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("issue");
@@ -75,34 +85,41 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Load dummy2/dummy2 too
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
-        waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
-        click("#dummy/dummy_col1_filterTextField");
+        PlatformEx.waitOnFxThread();
+        FilterPanel filterPanel1 = (FilterPanel) panels.getPanel(1);
+        FilterTextField filterTextField1 = filterPanel1.getFilterTextField();
+        waitUntilNodeAppears(filterTextField1);
+        click(filterTextField1);
         type("repo");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("dummy2/dummy2");
         pushKeys(KeyCode.ENTER);
 
-        click("#dummy/dummy_col1_renameButton");
+        Label renameButton1 = filterPanel1.getRenameButton();
+        click(renameButton1);
         type("Dummy 2 panel");
-        PanelNameTextField renameTextField2 = find("#dummy/dummy_col1_renameTextField");
-        assertEquals("Dummy 2 panel", renameTextField2.getText());
+        PanelNameTextField renameTextField1 = filterPanel1.getRenameTextField();
+        waitUntilNodeAppears(renameTextField1);
+        assertEquals("Dummy 2 panel", renameTextField1.getText());
         pushKeys(KeyCode.ENTER);
 
         pushKeys(KeyboardShortcuts.CREATE_LEFT_PANEL);
-        waitUntil("#dummy/dummy_col0_filterTextField", f -> ((FilterTextField) f).getText().isEmpty());
+        PlatformEx.waitOnFxThread();
+        sleep(500);
+        FilterPanel filterPanel2 = (FilterPanel) panels.getPanel(0);
+        FilterTextField filterTextField2 = filterPanel2.getFilterTextField();
 
-        FilterTextField filterTextField3 = find("#dummy/dummy_col0_filterTextField");
-        click(filterTextField3);
+        click(filterTextField2);
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("open");
-        assertEquals("is:open", filterTextField3.getText());
+        assertEquals("is:open", filterTextField2.getText());
         pushKeys(KeyCode.ENTER);
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Open issues");
-        PanelNameTextField renameTextField3 = find("#dummy/dummy_col0_renameTextField");
-        assertEquals("Open issues", renameTextField3.getText());
+        PanelNameTextField renameTextField2 = filterPanel2.getRenameTextField();
+        assertEquals("Open issues", renameTextField2.getText());
         pushKeys(KeyCode.ENTER);
 
         // Make a new board
@@ -123,22 +140,22 @@ public class UseGlobalConfigsTest extends UITest {
 
         // ...then check that the JSON file contents are correct.
         Preferences testPref = new Preferences(true);
-        
+
         // Credentials
         assertEquals("test", testPref.getLastLoginUsername());
         assertEquals("test", testPref.getLastLoginPassword());
-        
+
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy/dummy", lastViewedRepository.generateId());
-        
+
         // Boards
         Map<String, List<PanelInfo>> boards = testPref.getAllBoards();
         List<PanelInfo> emptyBoard = boards.get("Empty Board");
         assertEquals(1, emptyBoard.size());
         assertEquals("", emptyBoard.get(0).getPanelFilter());
         assertEquals("Panel", emptyBoard.get(0).getPanelName());
-        
+
         List<PanelInfo> dummyBoard = boards.get("Dummy Board");
         assertEquals(3, dummyBoard.size());
         assertEquals("is:open", dummyBoard.get(0).getPanelFilter());
@@ -147,11 +164,11 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("Open issues", dummyBoard.get(0).getPanelName());
         assertEquals("Renamed panel", dummyBoard.get(1).getPanelName());
         assertEquals("Dummy 2 panel", dummyBoard.get(2).getPanelName());
-        
+
         // Panels
         List<String> lastOpenFilters = testPref.getLastOpenFilters();
         List<String> lastOpenPanelNames = testPref.getPanelNames();
-        
+
         assertEquals("is:open", lastOpenFilters.get(0));
         assertEquals("is:issue", lastOpenFilters.get(1));
         assertEquals("repo:dummy2/dummy2", lastOpenFilters.get(2));
@@ -159,7 +176,7 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("Open issues", lastOpenPanelNames.get(0));
         assertEquals("Renamed panel", lastOpenPanelNames.get(1));
         assertEquals("Dummy 2 panel", lastOpenPanelNames.get(2));
-        
+
     }
 
 }
