@@ -2,8 +2,12 @@
 
 Notes:
 * The development process is a simplified version of the one used in [TEAMMATES](https://github.com/TEAMMATES/repo/blob/master/devdocs/process.md). 
-* The `master` branch always contains the latest stable code (may contain unreleased features/fixes).
-* The `release` branch always contains the latest released version.
+
+## Branches
+
+* `master` contains the latest stable code (including unreleased features/fixes)
+* `rc` contains the release candidate: the latest version which has not been released to the public
+* `release` contains the latest version released to the public
 
 ## New Contributors
 
