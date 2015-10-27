@@ -187,10 +187,14 @@ public class Logic {
         return repoIO.removeRepository(repoId);
     }
 
+    /**
+     * Recommended Pre-condition: normalize reposInUse to lower case
+     *                           - using Utility.convertSetToLowerCase()
+     */
     public void removeUnusedModels(Set<String> reposInUse) {
-        models.toModels().stream().map(Model::getRepoId).
-                filter(repoId -> !reposInUse.contains(repoId)).
-                forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
+        models.toModels().stream().map(Model::getRepoId)
+                .filter(repoId -> !reposInUse.contains(repoId.toLowerCase()))
+                .forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
     }
 
     /**

@@ -14,8 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.PanelInfo;
 import prefs.Preferences;
-import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import util.Utility;
 import util.events.*;
 
 import java.util.List;
@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static ui.components.KeyboardShortcuts.*;
 
@@ -336,9 +335,10 @@ public class MenuControl extends MenuBar {
     private void updateRepoRemoveList(Menu remove) {
         remove.getItems().clear();
 
-        Set<String> currentlyUsedRepos = ui.getCurrentlyUsedRepos();
-        Set<String> removableRepos = ui.logic.getStoredRepos();
-        removableRepos.removeAll(currentlyUsedRepos);
+        Set<String> currentlyUsedRepos = Utility.convertSetToLowerCase(ui.getCurrentlyUsedRepos());
+        Set<String> removableRepos = ui.logic.getStoredRepos()
+                .stream().filter(repoId -> !currentlyUsedRepos.contains(repoId.toLowerCase()))
+                .collect(Collectors.toSet());
 
         for (String repoId : removableRepos) {
             MenuItem removeItem = new MenuItem(repoId);
@@ -352,7 +352,7 @@ public class MenuControl extends MenuBar {
         // below are clicked. But this is a JDK bug; we can use CustomMenuItem.setHideOnClick(false)
         // if we want to. The bug is that it only works for ContextMenu and not Menu (which
         // we are using).
-        for (String usedRepoId : currentlyUsedRepos) {
+        for (String usedRepoId : ui.getCurrentlyUsedRepos()) {
             MenuItem disabledRemoveItem = new MenuItem(usedRepoId + " [in use, not removable]");
             disabledRemoveItem.setDisable(true);
             remove.getItems().add(disabledRemoveItem);

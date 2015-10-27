@@ -38,9 +38,7 @@ public class ListPanelCell extends ListCell<TurboIssue> {
         if (issue == null) {
             return;
         }
-        if (!issue.isOpen()){
-            getStyleClass().add("issue-cell-closed");
-        }
+        updateStyleToMatchStatus(issue);
         this.issue = issue;
         Optional<Model> currentModel = model.getModelById(issue.getRepoId());
         if (!currentModel.isPresent()) {
@@ -52,6 +50,20 @@ public class ListPanelCell extends ListCell<TurboIssue> {
 
         setGraphic(new ListPanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
         this.setId(issue.getRepoId() + "_col" + parentPanelIndex + "_" + issue.getId());
+    }
+
+    private void updateStyleToMatchStatus(TurboIssue issue){
+        final String closedStyle = "issue-cell-closed";
+        boolean isCurrentStyleClosed = getStyleClass().contains(closedStyle);
+        if (!issue.isOpen()){
+            if (!isCurrentStyleClosed) {
+                getStyleClass().add(closedStyle);
+            }
+        } else {
+            if (isCurrentStyleClosed) {
+                getStyleClass().remove(closedStyle);
+            }
+        }
     }
 
     public List<String> getIssueLabels() {
