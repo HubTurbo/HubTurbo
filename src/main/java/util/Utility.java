@@ -299,7 +299,7 @@ public class Utility {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
 
-    public static String generateName(String desiredName, List<String> existingNames) {
+    public static String getNameClosestToDesiredName(String desiredName, List<String> existingNames) {
         String availableName = desiredName;
 
         if (!existingNames.contains(desiredName)) {
