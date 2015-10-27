@@ -1,5 +1,14 @@
 # Changelog
 
+# V3.12.0
+
+- Milestone and work allocation boards can be automatically generated
+- Closed issues are now shown in a different colour
+- Fixed bug where saved repositories were sometimes being deleted
+- Fixed bug where panel UI would go blank when switching repo
+- Fixed bugs with panel selection in tests
+- Upgraded to ControlsFX 8.40.10
+
 # V3.11.0
 
 - Users can now refer to milestones with aliases
