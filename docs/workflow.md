@@ -11,7 +11,7 @@ Most of these tasks are accessed via Gradle, which we will assume to be the lowe
 ./gradlew clean test -i
 ```
 
-The `-i` flag enables logging. This command will run all tests, stable and unstable.
+The `-i` flag enables logging. This command will run all tests, [stable and unstable](testing.md#unstable-tests).
 
 To simulate testing in the CI environment, add `CI=true`.
 
