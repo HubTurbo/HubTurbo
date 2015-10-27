@@ -40,17 +40,23 @@ public class MultiModelTest {
 
     @Test
     public void testRemoveModel() throws ExecutionException, InterruptedException {
-        final String repoId = "dummy1/dummy1";
+        final String repoId1 = "dummy1/dummy1";
+        final String repoId2 = "dummy2/dummy2";
         MultiModel models = new MultiModel(new Preferences(true));
-        models.queuePendingRepository(repoId);
+        models.queuePendingRepository(repoId1);
+        models.queuePendingRepository(repoId2);
         RepoIO testIO = new RepoIO(true, false);
-        testIO.openRepository(repoId).thenApply(models::addPending).get();
+        testIO.openRepository(repoId1).thenApply(models::addPending).get();
+        testIO.openRepository(repoId2).thenApply(models::addPending).get();
 
-        assertEquals(true, models.getModelById(repoId).isPresent());
+        assertEquals(true, models.getModelById(repoId1).isPresent());
+        assertEquals(true, models.getModelById(repoId2).isPresent());
 
-        models.removeRepoModelById(repoId);
+        models.removeRepoModelById(repoId1);
+        assertEquals(false, models.getModelById(repoId1).isPresent());
 
-        assertEquals(false, models.getModelById(repoId).isPresent());
+        models.removeRepoModelById(repoId2.toUpperCase()); // removal in different case should work
+        assertEquals(false, models.getModelById(repoId2).isPresent());
     }
 
 }

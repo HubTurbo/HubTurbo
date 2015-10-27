@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.loadui.testfx.FXScreenController;
 import org.loadui.testfx.GuiTest;
@@ -256,6 +257,20 @@ public class UITest extends GuiTest {
         }
     }
 
+    public void waitUntilNodeAppears(Matcher<Object> matcher) {
+        while (!findQuiet(matcher).isPresent()) { // no `exists` for matcher, so using find
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
+    public void waitUntilNodeDisappears(Matcher<Object> matcher) {
+        while (findQuiet(matcher).isPresent()) { // no `exists` for matcher, so using find
+            PlatformEx.waitOnFxThread();
+            sleep(100);
+        }
+    }
+
     public <T extends Node> void waitUntil(String selector, Predicate<T> condition) {
         while (!condition.test(find(selector))) {
             PlatformEx.waitOnFxThread();
@@ -276,11 +291,31 @@ public class UITest extends GuiTest {
         }
     }
 
+    private <T extends Node> Optional<T> findQuiet(Matcher<Object> matcher) {
+        try {
+            return Optional.of(find(matcher));
+        } catch (NoNodesFoundException | NoNodesVisibleException e) {
+            return Optional.empty();
+        }
+
+    }
+
     private boolean existsQuiet(String selector) {
         try {
             return exists(selector);
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return false;
+        }
+    }
+
+    /**
+     * Automate menu traversal by clicking them in order of input parameter
+     *
+     * @param menuNames array of strings of menu item names in sequence of traversal
+     */
+    public void clickMenu(String... menuNames) {
+        for (String menuName : menuNames) {
+            click(menuName);
         }
     }
 

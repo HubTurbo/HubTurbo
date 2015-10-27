@@ -54,7 +54,13 @@ public class MultiModel implements IModel {
     }
 
     public synchronized MultiModel removeRepoModelById(String repoId) {
-        Optional<Model> repoModelToBeDeleted = getModelById(repoId);
+        Optional<String> repoIdCorrectCase = models.keySet().stream()
+                .filter(key -> key.equalsIgnoreCase(repoId)).findFirst();
+        if (!repoIdCorrectCase.isPresent()) {
+            logger.error("RepoId specified does not have a model.");
+        }
+        
+        Optional<Model> repoModelToBeDeleted = getModelById(repoIdCorrectCase.get());
         if (repoModelToBeDeleted.isPresent()) {
             this.models.remove(repoModelToBeDeleted.get().getRepoId());
         } else {

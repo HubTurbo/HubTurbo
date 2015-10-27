@@ -299,4 +299,33 @@ public class Utility {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
 
+    public static String getNameClosestToDesiredName(String desiredName, List<String> existingNames) {
+        String availableName = desiredName;
+
+        if (!existingNames.contains(desiredName)) {
+            return availableName;
+        }
+
+        List<String> existingSuffixes = existingNames.stream()
+                .filter(existing -> existing.startsWith(desiredName)
+                        && !existing.equalsIgnoreCase(desiredName))
+                .map(existing ->
+                        existing.substring(existing.indexOf(desiredName, 0) + desiredName.length()))
+                .collect(Collectors.toList());
+
+        int index = 1;
+
+        while (existingSuffixes.contains(Integer.toString(index))) {
+            index++;
+        }
+
+        availableName = desiredName + Integer.toString(index);
+
+        return availableName;
+    }
+
+    // TODO: remove once #1078 is solved from all repoIds normalization
+    public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
+        return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
 }

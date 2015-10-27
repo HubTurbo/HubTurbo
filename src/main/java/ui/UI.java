@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
@@ -55,7 +56,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 11;
+    public static final int VERSION_MINOR = 12;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -350,14 +351,17 @@ public class UI extends Application implements EventDispatcher {
     public Set<String> getCurrentlyUsedRepos() {
         Set<String> currentlyUsedRepos = new HashSet<>();
         String defaultRepo = logic.getDefaultRepo();
-        currentlyUsedRepos.add(defaultRepo);
         currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+        if (!Utility.convertSetToLowerCase(currentlyUsedRepos)
+                .contains(defaultRepo.toLowerCase())) {
+            currentlyUsedRepos.add(defaultRepo);
+        }
 
         return currentlyUsedRepos;
     }
 
     public void removeUnusedModelsAndUpdate() {
-        logic.removeUnusedModels(getCurrentlyUsedRepos());
+        logic.removeUnusedModels(Utility.convertSetToLowerCase(getCurrentlyUsedRepos()));
 
         triggerEvent(new UnusedStoredReposChangedEvent());
     }

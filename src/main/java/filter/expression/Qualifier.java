@@ -25,10 +25,11 @@ public class Qualifier implements FilterExpression {
     private static final String UPDATED = "updated";
 
     public static final Qualifier EMPTY = new Qualifier("", "");
+    public static final Qualifier FALSE = new Qualifier("false", "");
 
     public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
         "assignee", "author", "body", "closed", "comments", "created", "creator",
-        "date", "desc", "description", "has", "id", "in", "involves",
+        "date", "desc", "description", "false", "has", "id", "in", "involves",
         "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
         "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",
         "title", "type", "unmerged", "unread", UPDATED, "user"
@@ -224,12 +225,19 @@ public class Qualifier implements FilterExpression {
         return name.isEmpty() && content.isPresent() && content.get().isEmpty();
     }
 
+    public boolean isFalseQualifier() {
+        return name.equalsIgnoreCase("false") && content.isPresent() && content.get().isEmpty();
+    }
+
     @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert name != null;
 
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;
+
+        // The false qualifier is satisfied by nothing
+        if (isFalseQualifier()) return false;
 
         switch (name) {
         case "id":
@@ -282,6 +290,9 @@ public class Qualifier implements FilterExpression {
 
         // The empty qualifier should not be applied to anything
         assert !isEmptyQualifier();
+
+        // The false qualifier should not be applied to anything
+        assert !isFalseQualifier();
 
         switch (name) {
         case "title":
@@ -1031,11 +1042,9 @@ public class Qualifier implements FilterExpression {
             }
         }
 
-        // clamp
-        if (currentIndex >= allMilestones.size()) {
-            currentIndex = allMilestones.size() - 1;
-        } else if (currentIndex < 0) {
-            currentIndex = 0;
+        // if out of milestone range, don't convert alias
+        if (currentIndex >= allMilestones.size() || currentIndex < 0) {
+            return Qualifier.FALSE;
         }
 
         contents = allMilestones.get(currentIndex).getTitle().toLowerCase();

@@ -1,5 +1,6 @@
 package tests;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.*;
 
@@ -46,6 +47,16 @@ public class FilterEvalTests {
     public void invalid() {
         TurboIssue issue = new TurboIssue(REPO, 1, "title");
         assertEquals(false, matches("something:a", issue));
+    }
+
+    @Test
+    public void falseQualifier() {
+        TurboIssue issue = new TurboIssue(REPO, 1, "1");
+        TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
+
+        IModel model = TestUtils.modelWith(issue, milestone);
+
+        assertEquals(false, Qualifier.process(model, Qualifier.FALSE, issue));
     }
 
     @Test
