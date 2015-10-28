@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,7 @@ public class UI extends Application implements EventDispatcher {
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
-
+    private CountDownLatch startLatch = new CountDownLatch(1);
 
     // Main UI elements
 
@@ -162,13 +163,13 @@ public class UI extends Application implements EventDispatcher {
 
         if (TestController.isTestMode()) {
             if (TestController.isTestChromeDriver()) {
-                browserComponent = new BrowserComponent(this, true);
+                browserComponent = new BrowserComponent(this, true, startLatch);
                 browserComponent.initialise();
             } else {
-                browserComponent = new BrowserComponentStub(this);
+                browserComponent = new BrowserComponentStub(this, startLatch);
             }
         } else {
-            browserComponent = new BrowserComponent(this, false);
+            browserComponent = new BrowserComponent(this, false, startLatch);
             browserComponent.initialise();
         }
 
@@ -177,6 +178,7 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
+        startLatch.countDown();
     }
 
     private void initialisePickers() {

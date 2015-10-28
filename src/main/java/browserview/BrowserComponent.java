@@ -20,6 +20,7 @@ import util.events.testevents.SendKeysToBrowserEvent;
 import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -65,12 +66,15 @@ public class BrowserComponent {
     // at the moment.
     private Executor executor;
 
-    public BrowserComponent(UI ui, boolean isTestChromeDriver) {
+    private final CountDownLatch startLatch;
+
+    public BrowserComponent(UI ui, boolean isTestChromeDriver, CountDownLatch startLatch) {
         this.ui = ui;
         executor = Executors.newSingleThreadExecutor();
         this.isTestChromeDriver = isTestChromeDriver;
         setupJNA();
         setupChromeDriverExecutable();
+        this.startLatch = startLatch;
     }
 
     /**
@@ -122,10 +126,12 @@ public class BrowserComponent {
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
         WebDriver.Options manage = driver.manage();
         if (!isTestChromeDriver) {
+            try {
+                startLatch.await();
+            } catch (InterruptedException ignored) {}
             manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
             manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
                     (int) ui.getAvailableDimensions().getHeight()));
-            initialiseJNA();
         }
         return driver;
     }
@@ -252,8 +258,7 @@ public class BrowserComponent {
     private void resetBrowser(){
         logger.info("Relaunching chrome.");
         quit(); // if the driver hangs
-        driver = createChromeDriver();
-        login();
+        initialise();
     }
 
     /**
@@ -386,6 +391,11 @@ public class BrowserComponent {
 
     public void focus(HWND mainWindowHandle){
         if (PlatformSpecific.isOnWindows()) {
+            if (!isTestChromeDriver) {
+                while (browserWindowHandle == null) {
+                    initialiseJNA();
+                }
+            }
             // Restores browser window if it is minimized / maximized
             user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
