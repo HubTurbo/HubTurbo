@@ -71,7 +71,7 @@ allprojects {
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
-        compile files('src/main/resources/jkeymaster-1.1.jar')
+        compile fileTree(dir: 'lib', include: '*.jar')
     }
 
     test {

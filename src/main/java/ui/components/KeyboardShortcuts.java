@@ -134,7 +134,6 @@ public class KeyboardShortcuts {
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
     
-    // Global Hotkey
     public static final String GLOBAL_HOTKEY = "control alt H";
     
     private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
