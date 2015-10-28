@@ -8,9 +8,6 @@ import browserview.BrowserComponentStub;
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.Provider;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -40,6 +37,7 @@ import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
+import util.GlobalHotkey;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.TickingTimer;
@@ -57,10 +55,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.swing.KeyStroke;
-
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
-import static ui.components.KeyboardShortcuts.GLOBAL_HOTKEY;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -74,9 +69,9 @@ public class UI extends Application implements EventDispatcher {
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
+    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
 
     private static final int REFRESH_PERIOD = 60;
-    private final Provider provider = Provider.getCurrentProvider(false);
 
     // Application-level state
 
@@ -247,6 +242,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void quit() {
+        globalHotkey.quit();
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
@@ -258,8 +254,6 @@ public class UI extends Application implements EventDispatcher {
             Platform.exit();
             System.exit(0);
         }
-        provider.reset();
-        provider.stop();
     }
 
     public void onRepoOpened() {
@@ -316,14 +310,10 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void setupGlobalKeyboardShortcuts(Scene scene) {
+        globalHotkey.init();
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SWITCH_DEFAULT_REPO.match(event)) {
                 switchDefaultRepo();
-            }
-        });
-        provider.register(KeyStroke.getKeyStroke(GLOBAL_HOTKEY), new HotKeyListener() {
-            public void onHotKey(HotKey hotKey) {
-                browserComponent.focus(mainWindowHandle);
             }
         });
     }
