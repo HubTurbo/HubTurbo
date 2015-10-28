@@ -72,6 +72,8 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Force Refresh|<kbd>Ctrl</kbd> + <kbd>F5</kbd>|Clears HubTurbo's cache and re-downloads all issues from the repo|
 | Switch Board|<kbd>Ctrl</kbd> + <kbd>B</kbd>|Switches currently open board to another saved board|
 | Switch Default Repo|<kbd>Ctrl</kbd> + <kbd>R</kbd>|Switches currently default repo to another saved repo|
+| Swap to left|<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Left</kbd>|Moves currently selected panel to the left|
+| Swap to right|<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Right</kbd>|Moves currently selected panel to the right|
 
 ## Control the browser view ...
 

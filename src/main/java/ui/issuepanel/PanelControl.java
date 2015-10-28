@@ -202,10 +202,10 @@ public class PanelControl extends HBox {
     public void movePanelRight(int panelIndex) {
         if (this.getNumberOfPanels() >= 2) {
             int other = -1;
-            if (panelIndex == (this.getNumberOfPanels()-1)) {
+            if (panelIndex == (this.getNumberOfPanels() - 1)) {
                 other = 0;
             } else {
-                other = panelIndex+1;
+                other = panelIndex + 1;
             }
             if (panelIndex >= 0) {
                 swapPanels(panelIndex, other);
@@ -218,9 +218,9 @@ public class PanelControl extends HBox {
         if (this.getNumberOfPanels() >= 2) {
             int other = -1;
             if (panelIndex == 0) {
-                other = this.getNumberOfPanels()-1;
+                other = this.getNumberOfPanels() - 1;
             } else {
-                other = panelIndex-1;
+                other = panelIndex - 1;
             }
             if (panelIndex >= 0) {
                 swapPanels(panelIndex, other);

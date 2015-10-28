@@ -9,11 +9,13 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;
 
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 
 import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.PanelClickedEventHandler;
@@ -42,22 +44,17 @@ public class PanelsTest extends UITest {
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
-        // Drag
-        // TODO check whether panels are actually reordered
-
-        Label closeButton0 = ((FilterPanel) panels.getPanel(0)).getCloseButton();
-        Label closeButton1 = ((FilterPanel) panels.getPanel(1)).getCloseButton();
-        drag(closeButton1).to(closeButton0);
-
         // Click
         eventTriggered.value = false;
-        find("#dummy/dummy_col0_closeButton");
-        moveBy(-50, 0);
-        click(); // Click
+        Text name1 = ((FilterPanel) panels.getPanel(1)).getNameText();
+        click(name1);
         assertTrue(eventTriggered.value);
 
-        // Close
-        click("#dummy/dummy_col0_closeButton");
+        // Reorder panels
+        press(SWAP_PANEL_LEFT);
+
+        // Close right panel that used to be dummy_dummy_col0
+        click(((FilterPanel) panels.getPanel(1)).getCloseButton());
         try {
             find("#dummy/dummy_col0");
             fail();
