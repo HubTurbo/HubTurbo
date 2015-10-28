@@ -84,6 +84,10 @@ public class Preferences {
         return global.getAllBoards();
     }
 
+    public List<String> getAllBoardNames() {
+        return new ArrayList<>(getAllBoards().keySet());
+    }
+
     public void removeBoard(String name) {
         global.removeBoard(name);
     }
@@ -98,7 +102,7 @@ public class Preferences {
     
     public Optional<String> switchBoard() {
         if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
-            List<String> boardNames = new ArrayList<>(getAllBoards().keySet());
+            List<String> boardNames = getAllBoardNames();
             int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
             int index = (lastBoard + 1) % boardNames.size();
             

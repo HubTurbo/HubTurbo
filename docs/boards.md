@@ -31,3 +31,9 @@
 - Auto-create standard development boards. It will be saved automatically.
 
 - You can select the board to be auto-created via `Boards > Auto-create`.
+
+- The current available boards are:
+
+  - `Milestones` - listing issues for current milestone and milestones just before and after it. Useful to know what needs to be done quickly and what had just been done.
+
+  - `Work Allocation` - listing issues assigned to members in the repository. Useful to know what the developers are working on. Currently limited to max. 5 members which are randomly selected.

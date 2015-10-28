@@ -1,6 +1,18 @@
 # Testing
 
-There are two kinds of tests for HubTurbo, GUI Tests and Unit Tests. They are separated into two packages in the [`test`](../src/test/java) folder, namely [`guitests`](../src/test/java/guitests) and [`tests`](../src/test/java/tests). Currently all tests are run sequentially, with a new `JVM` started for each new test class (mainly because you can't run more than one GUI Test at once).  
+HubTurbo uses both GUI tests and unit tests to prevent regressions.
+
+They are separated into two packages: [`guitests`](../src/test/java/guitests) and [`tests`](../src/test/java/tests), respectively.
+
+Currently all tests are run sequentially, with a new `JVM` started for each new test class (mainly because you can't run more than one GUI test at once).
+
+## Unstable Tests
+
+There is a third test package for *unstable* tests: those which fail intermittently when run on Travis. These must be run locally by developers when working on new features.
+
+Tests which are not in the `unstable` package are considered *stable*, i.e. they fail infrequently enough that re-running the CI build one or twice will get everything to pass.
+
+As far as possible we try not to add new tests to this package, and work towards moving tests out of it. Discuss new candidates for the `unstable` package in your PRs.
 
 ## GUI Tests
 

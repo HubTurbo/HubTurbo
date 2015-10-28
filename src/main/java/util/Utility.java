@@ -299,7 +299,7 @@ public class Utility {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
 
-    public static String generateName(String desiredName, List<String> existingNames) {
+    public static String getNameClosestToDesiredName(String desiredName, List<String> existingNames) {
         String availableName = desiredName;
 
         if (!existingNames.contains(desiredName)) {
@@ -322,5 +322,10 @@ public class Utility {
         availableName = desiredName + Integer.toString(index);
 
         return availableName;
+    }
+
+    // TODO: remove once #1078 is solved from all repoIds normalization
+    public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
+        return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 }

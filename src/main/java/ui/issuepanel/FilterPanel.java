@@ -53,6 +53,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected HBox menuBarNameArea;
     protected HBox menuBarCloseButton;
     protected Label renameButton;
+    protected Label closeButton;
     protected PanelNameTextField renameTextField;
     protected FilterTextField filterTextField;
     
@@ -177,7 +178,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         
-        Label closeButton = new Label(CLOSE_PANEL);
+        closeButton = new Label(CLOSE_PANEL);
         closeButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_closeButton");
         closeButton.getStyleClass().add("label-button");
         closeButton.setOnMouseClicked((e) -> {
@@ -320,6 +321,26 @@ public abstract class FilterPanel extends AbstractPanel {
 
     public ObservableList<TurboIssue> getIssueList() {
         return issuesToDisplay;
+    }
+
+    public Text getNameText() {
+        return this.nameText;
+    }
+
+    public FilterTextField getFilterTextField() {
+        return this.filterTextField;
+    }
+
+    public PanelNameTextField getRenameTextField() {
+        return this.renameTextField;
+    }
+
+    public Label getRenameButton() {
+        return this.renameButton;
+    }
+
+    public Label getCloseButton() {
+        return this.closeButton;
     }
 
     public void setIssueList(List<TurboIssue> transformedIssueList) {

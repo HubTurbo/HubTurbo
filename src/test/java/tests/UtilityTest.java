@@ -131,22 +131,51 @@ public class UtilityTest {
 
         String desiredName = "test";
 
-        assertEquals(desiredName, Utility.generateName(desiredName, new ArrayList<String>()));
-        assertEquals(desiredName, Utility.generateName(desiredName,
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName, new ArrayList<String>()));
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("not-test", "other", "even more")));
-        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test")));
-        assertEquals(desiredName, Utility.generateName(desiredName,
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test1")));
-        assertEquals(desiredName + "2", Utility.generateName(desiredName,
+        assertEquals(desiredName + "2", Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test", "test1")));
-        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test", "test2")));
-        assertEquals(desiredName, Utility.generateName(desiredName,
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("tests")));
-        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test", "tests")));
-        assertEquals(desiredName + "1", Utility.generateName(desiredName,
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
                 Arrays.asList("test", "test100")));
+    }
+
+    @Test
+    public void convertSetToLowerCaseTest() {
+        final String entry1 = "Test1";
+        final String entry2 = "tesT2";
+        final String entry3 = "correct";
+        final String entry4 = "WRONG";
+        final String entry5 = "wiTH/slaSH";
+
+        Set<String> testSet = new HashSet<>(Arrays.asList(
+                entry1, entry2, entry3, entry4, entry5
+        ));
+
+        Set<String> convertedSet = Utility.convertSetToLowerCase(testSet);
+
+        assertEquals(false, convertedSet.contains(entry1));
+        assertEquals(false, convertedSet.contains(entry2));
+        assertEquals(true, convertedSet.contains(entry3));
+        assertEquals(false, convertedSet.contains(entry4));
+        assertEquals(false, convertedSet.contains(entry5));
+
+        assertEquals(true, convertedSet.contains(entry1.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry2.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry3.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry4.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry5.toLowerCase()));
+
+
     }
 }
