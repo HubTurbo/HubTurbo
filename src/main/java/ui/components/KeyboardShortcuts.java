@@ -131,6 +131,10 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination CREATE_RIGHT_PANEL =
             new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN);
+    public static final KeyCodeCombination SWAP_PANEL_LEFT =
+            new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+    public static final KeyCodeCombination SWAP_PANEL_RIGHT =
+            new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
     

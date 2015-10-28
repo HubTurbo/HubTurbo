@@ -199,6 +199,36 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, one);
     }
 
+    public void movePanelRight(int panelIndex) {
+        if (this.getNumberOfPanels() >= 2) {
+            int other = -1;
+            if (panelIndex == (this.getNumberOfPanels()-1)) {
+                other = 0;
+            } else {
+                other = panelIndex+1;
+            }
+            if (panelIndex >= 0) {
+                swapPanels(panelIndex, other);
+                this.setCurrentlySelectedPanel(Optional.of(other));
+            }
+        }
+    }
+
+    public void movePanelLeft(int panelIndex) {
+        if (this.getNumberOfPanels() >= 2) {
+            int other = -1;
+            if (panelIndex == 0) {
+                other = this.getNumberOfPanels()-1;
+            } else {
+                other = panelIndex-1;
+            }
+            if (panelIndex >= 0) {
+                swapPanels(panelIndex, other);
+                this.setCurrentlySelectedPanel(Optional.of(other));
+            }
+        }
+    }
+
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
     }
@@ -246,6 +276,17 @@ public class PanelControl extends HBox {
             if ((KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event))) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
+            }
+            if (KeyboardShortcuts.SWAP_PANEL_LEFT.match(event)) {
+                Optional<Integer> current = this.currentlySelectedPanel;
+                if (current.isPresent()) {
+                    movePanelLeft(current.get());
+                }
+            } else if (KeyboardShortcuts.SWAP_PANEL_RIGHT.match(event)) {
+                Optional<Integer> current = this.currentlySelectedPanel;
+                if (current.isPresent()) {
+                    movePanelRight(current.get());
+                }
             }
         });
     }
