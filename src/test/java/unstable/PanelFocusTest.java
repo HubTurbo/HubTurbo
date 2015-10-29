@@ -62,7 +62,7 @@ public class PanelFocusTest extends UITest {
          * to be in its own test file.
          */
         // Check that there are multiple panels on startup (for precaution)
-        assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(3, panelControl.getPanelCount());
 
         // check that focus is on first panel
         assertEquals(0, (int) panelControl.getCurrentlySelectedPanel().get());
@@ -92,11 +92,11 @@ public class PanelFocusTest extends UITest {
         press(CREATE_RIGHT_PANEL);
         PlatformEx.waitOnFxThread();
         assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getNumberOfPanels() - 1);
+                panelControl.getPanelCount() - 1);
         type("  ");
         PlatformEx.waitOnFxThread();
         assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getNumberOfPanels() - 1);
+                panelControl.getPanelCount() - 1);
 
         // test that upon creating panel on the left, focus is on the first panel
         // - same consideration as above
@@ -124,7 +124,7 @@ public class PanelFocusTest extends UITest {
         press(CREATE_RIGHT_PANEL);
         PlatformEx.waitOnFxThread();
         assertEquals((int) panelControl.getCurrentlySelectedPanel().get(),
-                panelControl.getNumberOfPanels() - 1);
+                panelControl.getPanelCount() - 1);
         // 3. Open board
         press(SWITCH_BOARD);
         PlatformEx.waitOnFxThread();

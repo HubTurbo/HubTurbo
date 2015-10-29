@@ -46,7 +46,7 @@ public class BoardAutoCreatorTest extends UITest {
                 "It is saved under the name \"Milestones\"."));
         click("OK");
 
-        assertEquals(panelControl.getNumberOfPanels(), 5);
+        assertEquals(panelControl.getPanelCount(), 5);
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
         assertEquals(panelControl.getNumberOfSavedBoards(), 1);
 
@@ -77,7 +77,7 @@ public class BoardAutoCreatorTest extends UITest {
                 "It is saved under the name \"Work Allocation\"."));
         click("OK");
 
-        assertEquals(panelControl.getNumberOfPanels(), 5);
+        assertEquals(panelControl.getPanelCount(), 5);
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
         assertEquals(panelControl.getNumberOfSavedBoards(), 1);
 

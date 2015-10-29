@@ -120,7 +120,7 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
-        assert(index >= 0 && index < getNumberOfPanels());
+        assert(index >= 0 && index < getPanelCount());
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
         getPanel(index).requestFocus();
@@ -200,33 +200,17 @@ public class PanelControl extends HBox {
     }
 
     public void movePanelRight(int panelIndex) {
-        if (this.getNumberOfPanels() >= 2) {
-            int other = -1;
-            if (panelIndex == (this.getNumberOfPanels() - 1)) {
-                other = 0;
-            } else {
-                other = panelIndex + 1;
-            }
-            if (panelIndex >= 0) {
-                swapPanels(panelIndex, other);
-                this.setCurrentlySelectedPanel(Optional.of(other));
-            }
-        }
+        if (getPanelCount() < 2 || panelIndex == (getPanelCount() - 1)) return;
+        int other = (panelIndex + 1) % getPanelCount();
+        swapPanels(panelIndex, other);
+        selectPanel(other);
     }
 
     public void movePanelLeft(int panelIndex) {
-        if (this.getNumberOfPanels() >= 2) {
-            int other = -1;
-            if (panelIndex == 0) {
-                other = this.getNumberOfPanels() - 1;
-            } else {
-                other = panelIndex - 1;
-            }
-            if (panelIndex >= 0) {
-                swapPanels(panelIndex, other);
-                this.setCurrentlySelectedPanel(Optional.of(other));
-            }
-        }
+        if (getPanelCount() < 2 || panelIndex == 0) return;
+        int other = (panelIndex - 1) % getPanelCount();
+        swapPanels(panelIndex, other);
+        selectPanel(other);
     }
 
     public Optional<Integer> getCurrentlySelectedPanel() {
@@ -278,15 +262,9 @@ public class PanelControl extends HBox {
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
             if (KeyboardShortcuts.SWAP_PANEL_LEFT.match(event)) {
-                Optional<Integer> current = this.currentlySelectedPanel;
-                if (current.isPresent()) {
-                    movePanelLeft(current.get());
-                }
+                currentlySelectedPanel.ifPresent(this::movePanelLeft);
             } else if (KeyboardShortcuts.SWAP_PANEL_RIGHT.match(event)) {
-                Optional<Integer> current = this.currentlySelectedPanel;
-                if (current.isPresent()) {
-                    movePanelRight(current.get());
-                }
+                currentlySelectedPanel.ifPresent(this::movePanelRight);
             }
         });
     }
@@ -326,14 +304,14 @@ public class PanelControl extends HBox {
         return guiController;
     }
 
-    public int getNumberOfPanels() {
+    public int getPanelCount() {
         return getChildren().size();
     }
 
     public HashSet<String> getRepositoriesReferencedOnAllPanels() {
         HashSet<String> repositoriesOnPanels = new HashSet<>();
 
-        for (int i = 0; i < getNumberOfPanels(); i++) {
+        for (int i = 0; i < getPanelCount(); i++) {
             AbstractPanel currPanel = getPanel(i);
 
             if (currPanel instanceof FilterPanel) {
@@ -351,7 +329,7 @@ public class PanelControl extends HBox {
     }
 
     private void scrollToPanel(int panelIndex) {
-        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getNumberOfPanels() - 1));
+        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getPanelCount() - 1));
     }
 
     private void setHvalue(double val) {

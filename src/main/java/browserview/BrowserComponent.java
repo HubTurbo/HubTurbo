@@ -18,6 +18,8 @@ import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -493,5 +495,18 @@ public class BrowserComponent {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
             driver.findElement(By.xpath("//a[@data-container-id='" + tabName + "_bucket']")).click();
         }
+    }
+
+    public Optional<Integer> getPRNumberFromIssue() {
+        // will only get the first PR number if multiple PR's are mentioned
+        try {
+            WebElement element = driver.findElement(By.xpath("//div[contains(@id, 'ref-pullrequest')]"));
+            return Optional.of(Integer.parseInt(element.findElement(By.xpath(".."))
+                    .findElement(By.xpath(".//h3/a/span"))
+                    .getAttribute("innerHTML").substring(1)));
+        } catch (NoSuchElementException e) {
+            logger.info("no PR mention found");
+        }
+        return Optional.empty();
     }
 }
