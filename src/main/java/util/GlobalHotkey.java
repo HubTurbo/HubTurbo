@@ -22,8 +22,12 @@ public class GlobalHotkey {
     public void init() {
         provider.register(KeyStroke.getKeyStroke(GLOBAL_HOTKEY), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
-                Platform.runLater(() -> ui.setDefaultWidth());
-                ui.getBrowserComponent().focus(ui.getMainWindowHandle());
+                if (!ui.isWindowMinimized() && ui.isWindowFocused()) {
+                    Platform.runLater(() -> ui.minimizeWindow());
+                } else {
+                    Platform.runLater(() -> ui.setDefaultWidth());
+                    ui.getBrowserComponent().focus(ui.getMainWindowHandle());
+                }
             }
         });
     }

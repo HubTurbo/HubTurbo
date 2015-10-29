@@ -581,5 +581,12 @@ public class UI extends Application implements EventDispatcher {
     public String getTitle() {
         return mainStage.getTitle();
     }
-    
+
+    public boolean isWindowMinimized() {
+        return mainStage.isIconified();
+    }
+
+    public boolean isWindowFocused() {
+        return mainStage.isFocused();
+    }
 }
