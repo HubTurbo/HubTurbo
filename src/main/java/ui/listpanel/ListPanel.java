@@ -263,18 +263,15 @@ public class ListPanel extends FilterPanel {
     }
 
     private void showRelatedIssueOrPR() {
-        if (listView.getSelectedItem().isPresent()) {
-            TurboIssue issue = listView.getSelectedItem().get();
-            Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
-                ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
-                : ui.getBrowserComponent().getPRNumberFromIssue();
-            if (relatedIssueNumber.isPresent()) {
-                ui.triggerEvent(
-                        new IssueSelectedEvent(issue.getRepoId(), 
-                           relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
-                );
-            }
-        }
+        if (!listView.getSelectedItem().isPresent()) return;
+        TurboIssue issue = listView.getSelectedItem().get();
+        Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
+            ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
+            : ui.getBrowserComponent().getPRNumberFromIssue();
+        if(!relatedIssueNumber.isPresent()) return;
+        ui.triggerEvent(
+            new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
+        );
     }
 
     private ContextMenu setupContextMenu() {
