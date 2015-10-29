@@ -268,7 +268,7 @@ public class ListPanel extends FilterPanel {
         Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
             ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
             : ui.getBrowserComponent().getPRNumberFromIssue();
-        if(!relatedIssueNumber.isPresent()) return;
+        if (!relatedIssueNumber.isPresent()) return;
         ui.triggerEvent(
             new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
         );
