@@ -1,6 +1,7 @@
 package util;
 
 import static ui.components.KeyboardShortcuts.GLOBAL_HOTKEY;
+import javafx.application.Platform;
 
 import javax.swing.KeyStroke;
 
@@ -21,6 +22,7 @@ public class GlobalHotkey {
     public void init() {
         provider.register(KeyStroke.getKeyStroke(GLOBAL_HOTKEY), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
+                Platform.runLater(() -> ui.setDefaultWidth());
                 ui.getBrowserComponent().focus(ui.getMainWindowHandle());
             }
         });
