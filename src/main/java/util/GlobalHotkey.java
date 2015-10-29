@@ -24,6 +24,7 @@ public class GlobalHotkey {
             public void onHotKey(HotKey hotKey) {
                 if (!ui.isWindowMinimized() && ui.isWindowFocused()) {
                     Platform.runLater(() -> ui.minimizeWindow());
+                    ui.getBrowserComponent().minimizeWindow();
                 } else {
                     Platform.runLater(() -> ui.setDefaultWidth());
                     ui.getBrowserComponent().focus(ui.getMainWindowHandle());
