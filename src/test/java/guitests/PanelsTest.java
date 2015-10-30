@@ -14,7 +14,6 @@ import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 
-import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.input.KeyCode;
 import ui.UI;
