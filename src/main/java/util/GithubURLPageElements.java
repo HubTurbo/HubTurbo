@@ -1,5 +1,9 @@
 package util;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class GithubURLPageElements {
     // Web Element Names
     public static final String BODY = "body";
@@ -18,4 +22,16 @@ public class GithubURLPageElements {
     public static final String SCROLL_UP = "window.scrollBy(0, -100)";
     public static final String SCROLL_DOWN = "window.scrollBy(0, 100)";
     
+    //Extract Issue Number from issue description
+    public static final Pattern ISSUE_NUMBER_PATTERN = Pattern.compile(
+        "(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\\d+)", 
+        Pattern.CASE_INSENSITIVE);
+
+    public static Optional<Integer> extractIssueNumber(String text) {
+        Matcher m = ISSUE_NUMBER_PATTERN.matcher(text);
+        if (m.find()) {
+            return Optional.of(Integer.parseInt(m.group(2)));
+        }
+        return Optional.empty();
+    }
 }
