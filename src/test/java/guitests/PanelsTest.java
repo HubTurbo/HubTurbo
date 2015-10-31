@@ -40,7 +40,7 @@ public class PanelsTest extends UITest {
 
         press(MAXIMIZE_WINDOW);
 
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
@@ -80,7 +80,7 @@ public class PanelsTest extends UITest {
         doubleClick();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
         click("#dummy2/dummy2_col1");
     }
