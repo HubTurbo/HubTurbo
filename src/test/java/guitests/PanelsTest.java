@@ -14,6 +14,7 @@ import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.input.KeyCode;
 import ui.UI;
@@ -49,11 +50,24 @@ public class PanelsTest extends UITest {
         click(name1);
         assertTrue(eventTriggered.value);
 
+        // Drag
+        // TODO find a way to actually reorder the panels, and make it compatible with swap key command
+
+        Label closeButton0 = ((FilterPanel) panels.getPanel(0)).getCloseButton();
+        Label closeButton1 = ((FilterPanel) panels.getPanel(1)).getCloseButton();
+        drag(closeButton1).to(closeButton0);
+
+        eventTriggered.value = false;
+        Text name2 = ((FilterPanel) panels.getPanel(1)).getNameText();
+        click(name2);
+        assertTrue(eventTriggered.value);
+
         // Reorder panels
         press(SWAP_PANEL_LEFT);
 
         // Close right panel that used to be dummy_dummy_col0
         click(((FilterPanel) panels.getPanel(1)).getCloseButton());
+
         try {
             find("#dummy/dummy_col0");
             fail();
