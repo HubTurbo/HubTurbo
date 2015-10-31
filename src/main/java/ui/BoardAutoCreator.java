@@ -116,7 +116,7 @@ public class BoardAutoCreator {
         FilterPanel panelAdded;
 
         for (PanelInfo panelInfo : panelData) {
-            panelAdded = panelControl.addPanelAt(panelControl.getNumberOfPanels());
+            panelAdded = panelControl.addPanelAt(panelControl.getPanelCount());
             panelAdded.setPanelName(panelInfo.getPanelName());
             panelAdded.setFilterByString(panelInfo.getPanelFilter());
         }
