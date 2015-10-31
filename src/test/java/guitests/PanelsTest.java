@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.input.KeyCode;
 import ui.UI;
+import util.PlatformEx;
 import util.events.PanelClickedEventHandler;
 
 public class PanelsTest extends UITest {
@@ -38,7 +39,7 @@ public class PanelsTest extends UITest {
 
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());
 
-        press(MAXIMIZE_WINDOW);
+        pushKeys(MAXIMIZE_WINDOW);
 
         pushKeys(CREATE_RIGHT_PANEL);
         type("repo:dummy2/dummy2");
@@ -63,7 +64,7 @@ public class PanelsTest extends UITest {
         assertTrue(eventTriggered.value);
 
         // Reorder panels
-        press(SWAP_PANEL_LEFT);
+        pushKeys(SWAP_PANEL_LEFT);
 
         // Close right panel that used to be dummy_dummy_col0
         click(((FilterPanel) panels.getPanel(1)).getCloseButton());
@@ -81,6 +82,7 @@ public class PanelsTest extends UITest {
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
         pushKeys(CREATE_RIGHT_PANEL);
+        PlatformEx.waitOnFxThread();
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
         click("#dummy2/dummy2_col1");
     }
