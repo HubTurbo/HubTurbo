@@ -120,7 +120,7 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
-        assert(index >= 0 && index < getNumberOfPanels());
+        assert(index >= 0 && index < getPanelCount());
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
         getPanel(index).requestFocus();
@@ -199,6 +199,20 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, one);
     }
 
+    public void movePanelRight(int panelIndex) {
+        if (getPanelCount() < 2 || panelIndex == (getPanelCount() - 1)) return;
+        int other = (panelIndex + 1) % getPanelCount();
+        swapPanels(panelIndex, other);
+        selectPanel(other);
+    }
+
+    public void movePanelLeft(int panelIndex) {
+        if (getPanelCount() < 2 || panelIndex == 0) return;
+        int other = (panelIndex - 1) % getPanelCount();
+        swapPanels(panelIndex, other);
+        selectPanel(other);
+    }
+
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
     }
@@ -247,6 +261,11 @@ public class PanelControl extends HBox {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
+            if (KeyboardShortcuts.SWAP_PANEL_LEFT.match(event)) {
+                currentlySelectedPanel.ifPresent(this::movePanelLeft);
+            } else if (KeyboardShortcuts.SWAP_PANEL_RIGHT.match(event)) {
+                currentlySelectedPanel.ifPresent(this::movePanelRight);
+            }
         });
     }
 
@@ -285,14 +304,14 @@ public class PanelControl extends HBox {
         return guiController;
     }
 
-    public int getNumberOfPanels() {
+    public int getPanelCount() {
         return getChildren().size();
     }
 
     public HashSet<String> getRepositoriesReferencedOnAllPanels() {
         HashSet<String> repositoriesOnPanels = new HashSet<>();
 
-        for (int i = 0; i < getNumberOfPanels(); i++) {
+        for (int i = 0; i < getPanelCount(); i++) {
             AbstractPanel currPanel = getPanel(i);
 
             if (currPanel instanceof FilterPanel) {
@@ -310,7 +329,7 @@ public class PanelControl extends HBox {
     }
 
     private void scrollToPanel(int panelIndex) {
-        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getNumberOfPanels() - 1));
+        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getPanelCount() - 1));
     }
 
     private void setHvalue(double val) {
