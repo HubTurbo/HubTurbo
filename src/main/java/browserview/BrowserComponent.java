@@ -509,4 +509,10 @@ public class BrowserComponent {
         }
         return Optional.empty();
     }
+    
+    public void minimizeWindow() {
+        if (PlatformSpecific.isOnWindows()) {
+            user32.ShowWindow(browserWindowHandle, WinUser.SW_MINIMIZE);
+        }
+    }
 }
