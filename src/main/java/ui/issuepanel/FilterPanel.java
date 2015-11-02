@@ -140,6 +140,7 @@ public abstract class FilterPanel extends AbstractPanel {
         
         nameText = new Text(panelName);
         nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
+        nameText.setWrappingWidth(NAME_DISPLAY_WIDTH);
         
         nameBox = new HBox();
         nameBox.getChildren().add(nameText);
