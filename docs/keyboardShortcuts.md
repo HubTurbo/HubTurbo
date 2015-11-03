@@ -16,6 +16,7 @@ These key sequences (one key followed by the other) are used to load various pag
 | Conversation Tab (Only for PR's)|<kbd>G</kbd> <kbd>R</kbd>|Loads the Coversation tab for the PR|
 | **C**ommits Tab (Only for PR's)|<kbd>G</kbd> <kbd>C</kbd>|Loads the Commits tab for the PR|
 | **F**iles Changed Tab (Only for PR's)|<kbd>G</kbd> <kbd>F</kbd>|Loads the Files changed tab for the PR|
+| Show referenced Issue or PR (If any)|<kbd>G</kbd> <kbd>E</kbd>|Loads the referenced PR(if any) for the Issue loaded and vice versa|
 
 ## Create new ...
 
@@ -62,8 +63,9 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 
 ## Control the panel view window ...
 
-| **Action on the browser view**| **Shortcut**|**Explanation**|
+| **Action on the panel view**| **Shortcut**|**Explanation**|
 | ------------- |:-------------:| -----------|
+| Toggle HubTurbo focus|<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>H</kbd>| Global Hotkey to toggle between HubTurbo's window states (Focused or minimized)|
 | Close|<kbd>Ctrl</kbd> + <kbd>W</kbd>| Closes the panel in focus|
 | Ma**x**imize|<kbd>Ctrl</kbd> + <kbd>X</kbd>||
 | Mi**n**imize|<kbd>Ctrl</kbd> + <kbd>M</kbd>||
@@ -72,6 +74,8 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Force Refresh|<kbd>Ctrl</kbd> + <kbd>F5</kbd>|Clears HubTurbo's cache and re-downloads all issues from the repo|
 | Switch Board|<kbd>Ctrl</kbd> + <kbd>B</kbd>|Switches currently open board to another saved board|
 | Switch Default Repo|<kbd>Ctrl</kbd> + <kbd>R</kbd>|Switches currently default repo to another saved repo|
+| Swap to left|<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Left</kbd>|Moves currently selected panel to the left|
+| Swap to right|<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Right</kbd>|Moves currently selected panel to the right|
 
 ## Control the browser view ...
 

@@ -5,16 +5,13 @@ import backend.resource.TurboMilestone;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import backend.interfaces.IModel;
 
-import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MilestoneAliasTests {
     private IModel model;
@@ -56,7 +53,7 @@ public class MilestoneAliasTests {
         msCurrPlus2.setOpen(true);
         msCurrPlus2.setDueDate(Optional.of(LocalDate.now().plusMonths(3)));
 
-        // test: milestone with no due date should come last
+        // test: milestone with no due date should not be included
         TurboMilestone msCurrPlus3 = new TurboMilestone(REPO, 4, "V0.7");
         msCurrPlus3.setDueDate(Optional.empty());
 
@@ -107,24 +104,13 @@ public class MilestoneAliasTests {
             assertEquals(false, msQ.getContent().get().equalsIgnoreCase("curr+2"));
             assertEquals(true, msQ.getContent().get().equalsIgnoreCase("V0.6"));
         });
-        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
-        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
-        milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals(false, msQ.getContent().get().equalsIgnoreCase("curr+3"));
-            assertEquals(true, msQ.getContent().get().equalsIgnoreCase("V0.7"));
-        });
+
+        // test milestone no due date not included
+        assertMilestoneAliasFalseQualifierSize1("milestone:curr+3");
 
         // test alias out of bound will be converted to Qualifier.FALSE
-        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-4"));
-        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
-        milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals(Qualifier.FALSE, msQ);
-        });
-        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current+4"));
-        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
-        milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals(Qualifier.FALSE, msQ);
-        });
+        assertMilestoneAliasFalseQualifierSize1("milestone:curr-4");
+        assertMilestoneAliasFalseQualifierSize1("milestone:current+4");
 
         // test wrong alias will not be converted
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-"));
@@ -158,11 +144,23 @@ public class MilestoneAliasTests {
             assertEquals(true, msQ.getContent().get().equalsIgnoreCase("current+4asdf"));
         });
 
+        // test disjunction and conjunction
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
+                Parser.parse("milestone:curr+2 || milestone:curr+3"));
+        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
+        assertEquals(false, milestoneQualifiers.get(0).getContent().get().equalsIgnoreCase("curr+2"));
+        assertEquals(true, milestoneQualifiers.get(0).getContent().get().equalsIgnoreCase("V0.6"));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
+                Parser.parse("milestone:curr+2 && milestone:curr+3"));
+        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
+        assertEquals(false, milestoneQualifiers.get(0).isFalseQualifier());
+
     }
 
     @Test
     public void replaceMilestoneAliasesTestNoOpenMilestone() {
-        // - expect last milestone to be set as current
+        // - expect next to last milestone (i.e. don't exist yet) to be set as current
         // - all milestones are closed and due in the future
 
         TurboMilestone msClose1 = new TurboMilestone(REPO, 1, "future1");
@@ -183,13 +181,27 @@ public class MilestoneAliasTests {
                 new ArrayList<>(Arrays.asList(msClose1, msClose2, msClose3)),
                 new ArrayList<>()));
 
+        assertMilestoneAliasFalseQualifierSize1("milestone:current");
+        assertMilestoneAliasFalseQualifierSize1("milestone:current+1");
+
         FilterExpression noMilestoneAlias;
         List<Qualifier> milestoneQualifiers;
 
-        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-1"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
             assertEquals(true, msQ.getContent().get().equalsIgnoreCase("future3"));
         });
+    }
+
+    public void assertMilestoneAliasFalseQualifierSize1(String filterText) {
+        FilterExpression noMilestoneAlias;
+        List<Qualifier> milestoneQualifiers;
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse(filterText));
+        assertEquals(noMilestoneAlias.getQualifierNames().size(), 1);
+        assertEquals(noMilestoneAlias.getQualifierNames().get(0), "false");
+        milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
+        assertEquals(milestoneQualifiers.size(), 0);
     }
 }

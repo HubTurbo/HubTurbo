@@ -36,24 +36,24 @@ public class MenuControlTest extends UITest {
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         
         press(CLOSE_PANEL);
-        assertEquals(0, panelControl.getNumberOfPanels());
+        assertEquals(0, panelControl.getPanelCount());
         press(CREATE_RIGHT_PANEL);
-        assertEquals(1, panelControl.getNumberOfPanels());
+        assertEquals(1, panelControl.getPanelCount());
         press(CREATE_LEFT_PANEL);
-        assertEquals(2, panelControl.getNumberOfPanels());
+        assertEquals(2, panelControl.getPanelCount());
 
         click("Panels");
         click("Create");
-        assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(3, panelControl.getPanelCount());
         click("Panels");
         click("Create (Left)");
-        assertEquals(4, panelControl.getNumberOfPanels());
+        assertEquals(4, panelControl.getPanelCount());
         click("Panels");
         click("Close");
-        assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(3, panelControl.getPanelCount());
         click("Panels");
         click("Close");
-        assertEquals(2, panelControl.getNumberOfPanels());
+        assertEquals(2, panelControl.getPanelCount());
 
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         
@@ -80,7 +80,7 @@ public class MenuControlTest extends UITest {
         click("OK");
         PlatformEx.waitOnFxThread();
         assertEquals(1, panelControl.getNumberOfSavedBoards());
-        assertEquals(2, panelControl.getNumberOfPanels());
+        assertEquals(2, panelControl.getPanelCount());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
         
         // Testing board switch keyboard shortcut when there is only one saved board
@@ -90,7 +90,7 @@ public class MenuControlTest extends UITest {
         assertEquals("Board 1", testPref.getLastOpenBoard().get());
 
         press(CREATE_RIGHT_PANEL);
-        assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(3, panelControl.getPanelCount());
         
         click("Boards");
         push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
@@ -126,7 +126,7 @@ public class MenuControlTest extends UITest {
         press(CLOSE_PANEL);
         press(CLOSE_PANEL);
         press(CLOSE_PANEL);
-        assertEquals(0, panelControl.getNumberOfPanels());
+        assertEquals(0, panelControl.getPanelCount());
 
         // Testing board open
         click("Boards");
@@ -134,7 +134,7 @@ public class MenuControlTest extends UITest {
         push(KeyCode.RIGHT);
         push(KeyCode.ENTER); // Opening Board "2"
         PlatformEx.waitOnFxThread();
-        assertEquals(3, panelControl.getNumberOfPanels());
+        assertEquals(3, panelControl.getPanelCount());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 2"));
 
         // Testing First Panel selected

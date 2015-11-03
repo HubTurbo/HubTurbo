@@ -20,6 +20,7 @@ import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import util.GithubURLPageElements;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
@@ -99,13 +100,13 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Refreshes the list of issue cards shown to the user.
-     *
-     * @param hasMetadata Indicates the comment count hashmap to be used.
+     * Refreshes the list of issue cards shown to the user depending on the currently active filter expression
+     * in the panel.
      */
     @Override
-    public void refreshItems(boolean hasMetadata) {
-        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
+    public void refreshItems() {
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
 
         // Set the cell factory every time - this forces the list view to update
         listView.setCellFactory(list ->
@@ -140,15 +141,16 @@ public class ListPanel extends FilterPanel {
             // (if it was there before)
             issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
-            // We assume we already have metadata, so we pass true to avoid refreshItems from trying to get
-            // metadata after clicking.
-            refreshItems(true);
+
+            refreshItems();
         });
     }
 
     private void setupKeyboardShortcuts() {        
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.markAsRead.match(event)) {
+            // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
+            // Will only work if the key for markAsRead is not the default key E.
+            if (KeyboardShortcuts.markAsRead.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
                 markAsRead();
             }
             if (KeyboardShortcuts.markAsUnread.match(event)) {
@@ -248,7 +250,27 @@ public class ListPanel extends FilterPanel {
                     break;
                 }
             }
+            if (SHOW_RELATED_ISSUE_OR_PR.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    showRelatedIssueOrPR();
+                // only for default. can remove if default key for MARK_AS_READ_CHANGES
+                } else if (KeyboardShortcuts.markAsRead.match(event)) {
+                    markAsRead();
+                }
+            }
         });
+    }
+
+    private void showRelatedIssueOrPR() {
+        if (!listView.getSelectedItem().isPresent()) return;
+        TurboIssue issue = listView.getSelectedItem().get();
+        Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
+            ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
+            : ui.getBrowserComponent().getPRNumberFromIssue();
+        if (!relatedIssueNumber.isPresent()) return;
+        ui.triggerEvent(
+            new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
+        );
     }
 
     private ContextMenu setupContextMenu() {

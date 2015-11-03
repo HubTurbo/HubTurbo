@@ -4,9 +4,11 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
+
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -23,9 +25,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
@@ -33,6 +37,7 @@ import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
+import util.GlobalHotkey;
 import util.PlatformEx;
 import util.PlatformSpecific;
 import util.TickingTimer;
@@ -52,11 +57,10 @@ import java.util.stream.Collectors;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
-
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 12;
+    public static final int VERSION_MINOR = 13;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -65,6 +69,7 @@ public class UI extends Application implements EventDispatcher {
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
+    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
 
     private static final int REFRESH_PERIOD = 60;
 
@@ -237,6 +242,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void quit() {
+        globalHotkey.quit();
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
@@ -304,6 +310,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void setupGlobalKeyboardShortcuts(Scene scene) {
+        globalHotkey.init();
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SWITCH_DEFAULT_REPO.match(event)) {
                 switchDefaultRepo();
@@ -517,6 +524,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void setDefaultWidth() {
         mainStage.setMaximized(false);
+        mainStage.setIconified(false);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(panels.getPanelWidth());
         mainStage.setMinHeight(dimensions.getHeight());
@@ -573,5 +581,12 @@ public class UI extends Application implements EventDispatcher {
     public String getTitle() {
         return mainStage.getTitle();
     }
-    
+
+    public boolean isWindowMinimized() {
+        return mainStage.isIconified();
+    }
+
+    public boolean isWindowFocused() {
+        return mainStage.isFocused();
+    }
 }
