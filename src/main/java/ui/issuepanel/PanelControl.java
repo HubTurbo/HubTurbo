@@ -99,7 +99,7 @@ public class PanelControl extends HBox {
      * For a quick refresh (without requesting updates)
      */
     public void refresh() {
-        forEach(child -> child.refreshItems(true));
+        forEach(child -> child.refreshItems());
     }
 
     private FilterPanel addPanel() {
