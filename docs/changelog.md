@@ -1,5 +1,12 @@
 # Changelog
 
+# V3.13.0
+
+- Added keyboard shortcut for swapping panels
+- Added keyboard shortcut for navigating to/from related issues/PRs
+- Fixed bug where milestone aliases wouldn't work if there was no open milestone
+- Restructuring of metadata update process
+
 # V3.12.0
 
 - Milestone and work allocation boards can be automatically generated
