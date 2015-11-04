@@ -81,7 +81,6 @@ public class PanelRenameTest extends UITest {
         // Testing whether the close button appears once rename box is opened.
         // Expected: Close button should not appear once rename box is opened and while edits are being made.
         //           It should appear once the rename box is closed and the edits are done.
-
         press(CREATE_RIGHT_PANEL);
         boolean isPresentBeforeEdit = exists("#dummy/dummy_col3_closeButton");
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));

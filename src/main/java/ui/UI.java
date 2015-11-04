@@ -526,10 +526,8 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setMaximized(false);
         mainStage.setIconified(false);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(panels.getPanelWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(panels.getPanelWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(panels.getPanelWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
@@ -537,10 +535,8 @@ public class UI extends Application implements EventDispatcher {
     public void maximizeWindow() {
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(dimensions.getWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(dimensions.getWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(dimensions.getWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
