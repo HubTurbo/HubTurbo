@@ -1,7 +1,5 @@
 package guitests;
 
-import java.util.Random;
-
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
@@ -39,7 +37,7 @@ public class PanelRenameTest extends UITest {
         PanelControl panels = ui.getPanelControl();
         
         // Test for saving panel name
-        
+
         pushKeys(MAXIMIZE_WINDOW);
         sleep(EVENT_DELAY);
 
