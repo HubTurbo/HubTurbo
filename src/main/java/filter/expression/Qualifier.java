@@ -105,18 +105,9 @@ public class Qualifier implements FilterExpression {
         }
 
         List<TurboMilestone> allMilestones = model.getMilestones().stream()
+                .filter(ms -> ms.getDueDate().isPresent())
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
-                .sorted((a, b) -> {
-                    if (!a.getDueDate().isPresent() && !b.getDueDate().isPresent()) {
-                        return 0;
-                    } else if (!a.getDueDate().isPresent()) {
-                        return 1;
-                    } else if (!b.getDueDate().isPresent()) {
-                        return -1;
-                    } else {
-                        return getMilestoneDueDateComparator().compare(a, b);
-                    }
-                })
+                .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
                 .collect(Collectors.toList());
 
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
@@ -179,8 +170,9 @@ public class Qualifier implements FilterExpression {
             currentIndex++;
         }
 
-        // if no open milestone, set current as last milestone
-        return Optional.of(allMilestones.size() - 1);
+        // if no open milestone, set current as one after last milestone
+        // - this means that no such milestone, which will return no issue
+        return Optional.of(allMilestones.size());
     }
 
     public static void processMetaQualifierEffects(FilterExpression expr,

@@ -63,8 +63,9 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 
 ## Control the panel view window ...
 
-| **Action on the browser view**| **Shortcut**|**Explanation**|
+| **Action on the panel view**| **Shortcut**|**Explanation**|
 | ------------- |:-------------:| -----------|
+| Toggle HubTurbo focus|<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>H</kbd>| Global Hotkey to toggle between HubTurbo's window states (Focused or minimized)|
 | Close|<kbd>Ctrl</kbd> + <kbd>W</kbd>| Closes the panel in focus|
 | Ma**x**imize|<kbd>Ctrl</kbd> + <kbd>X</kbd>||
 | Mi**n**imize|<kbd>Ctrl</kbd> + <kbd>M</kbd>||

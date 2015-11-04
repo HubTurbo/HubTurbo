@@ -12,7 +12,8 @@ import filter.ParseException;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import javafx.collections.transformation.TransformationList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
+    private ObservableList<TurboIssue> issuesToDisplay = null;
 
     protected HBox panelMenuBar;
     protected Text nameText;
@@ -319,6 +320,10 @@ public abstract class FilterPanel extends AbstractPanel {
         return new PanelInfo(this.panelName, filterTextField.getText());
     }
 
+    public ObservableList<TurboIssue> getIssueList() {
+        return issuesToDisplay;
+    }
+
     public Text getNameText() {
         return this.nameText;
     }
@@ -339,12 +344,13 @@ public abstract class FilterPanel extends AbstractPanel {
         return this.closeButton;
     }
 
-    public TransformationList<TurboIssue, TurboIssue> getIssueList() {
-        return transformedIssueList;
+    public void setIssueList(List<TurboIssue> transformedIssueList) {
+        this.issuesToDisplay = FXCollections.observableArrayList(transformedIssueList);
     }
 
-    public void setIssueList(TransformationList<TurboIssue, TurboIssue> transformedIssueList) {
-        this.transformedIssueList = transformedIssueList;
+    public void updatePanel(List<TurboIssue> filteredAndSortedIssues) {
+        setIssueList(filteredAndSortedIssues);
+        refreshItems();
     }
 
     @Override

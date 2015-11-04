@@ -60,7 +60,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 12;
+    public static final int VERSION_MINOR = 13;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -524,6 +524,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void setDefaultWidth() {
         mainStage.setMaximized(false);
+        mainStage.setIconified(false);
         Rectangle dimensions = getDimensions();
         mainStage.setMinWidth(panels.getPanelWidth());
         mainStage.setMinHeight(dimensions.getHeight());
@@ -580,5 +581,12 @@ public class UI extends Application implements EventDispatcher {
     public String getTitle() {
         return mainStage.getTitle();
     }
-    
+
+    public boolean isWindowMinimized() {
+        return mainStage.isIconified();
+    }
+
+    public boolean isWindowFocused() {
+        return mainStage.isFocused();
+    }
 }

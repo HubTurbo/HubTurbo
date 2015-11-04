@@ -192,6 +192,7 @@ public class KeyboardShortcutsTest extends UITest {
         int issueIdBeforeMark = selectedIssueId;
         int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
+        PlatformEx.waitOnFxThread();
         assertEquals(issueIdExpected, selectedIssueId);
         push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedIssue().isPresent());

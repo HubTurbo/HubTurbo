@@ -24,7 +24,7 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
 public class PanelRenameTest extends UITest {
 
-    public static final int EVENT_DELAY = 500;
+    public static final int EVENT_DELAY = 1000;
     public static final int PANEL_MAX_NAME_LENGTH = 36;
 
     @Override
@@ -34,14 +34,13 @@ public class PanelRenameTest extends UITest {
 
     @Test
     public void panelRenameTest() {
-        
-        Random rand = new Random();
+
         UI ui = TestController.getUI();
         PanelControl panels = ui.getPanelControl();
         
         // Test for saving panel name
         
-        press(MAXIMIZE_WINDOW);
+        pushKeys(MAXIMIZE_WINDOW);
         sleep(EVENT_DELAY);
 
         // Testing case where rename is canceled with ESC
@@ -55,7 +54,7 @@ public class PanelRenameTest extends UITest {
         assertEquals("Panel", panelNameText0.getText());
         sleep(EVENT_DELAY);
         
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
         
         // Testing case where a name with whitespaces at either end is submitted
         // Expected: new name accepted with whitespaces removed
@@ -68,7 +67,7 @@ public class PanelRenameTest extends UITest {
         assertEquals("Renamed panel", panelNameText1.getText());
         sleep(EVENT_DELAY);
 
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
 
         // Testing case where empty name is submitted
         // Expected: new name not accepted
@@ -84,6 +83,7 @@ public class PanelRenameTest extends UITest {
         // Testing whether the close button appears once rename box is opened.
         // Expected: Close button should not appear once rename box is opened and while edits are being made.
         //           It should appear once the rename box is closed and the edits are done.
+
         press(CREATE_RIGHT_PANEL);
         boolean isPresentBeforeEdit = exists("#dummy/dummy_col3_closeButton");
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
