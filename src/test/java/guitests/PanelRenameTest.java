@@ -170,7 +170,7 @@ public class PanelRenameTest extends UITest {
         // Expected: Close button should not appear once rename box is opened and while edits are being made.
         //           It should appear once the rename box is closed and the edits are done.
         pushKeys(CREATE_RIGHT_PANEL);
-        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("#dummy/dummy_col8_closeButton");
         boolean isPresentBeforeEdit = exists("#dummy/dummy_col8_closeButton");
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(8)));
         PlatformEx.waitOnFxThread();
