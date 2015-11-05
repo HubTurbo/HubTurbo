@@ -503,7 +503,7 @@ public class BrowserComponent {
             WebElement element = driver.findElement(By.xpath("//div[contains(@id, 'ref-pullrequest')]"));
             return Optional.of(Integer.parseInt(element.findElement(By.xpath(".."))
                     .findElement(By.xpath(".//h3/a/span"))
-                    .getAttribute("innerHTML").substring(1)));
+                    .getAttribute("innerHTML").trim().substring(1)));
         } catch (NoSuchElementException e) {
             logger.info("no PR mention found");
         }
