@@ -4,12 +4,15 @@ import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import filter.expression.FilterExpression;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
+import undo.actions.Action;
+import undo.actions.ChangeLabelsAction;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
@@ -185,33 +188,29 @@ public class Logic {
         return repoIO.getRateLimitResetTime();
     }
 
-    /**
-     * Dispatches a PUT request to the GitHub API to replace the given issue's labels.
-     * At the same time, immediately change the GUI to pre-empt this change.
-     *
-     * Assumes that the model object is shared among GUI and Logic.
-     *
-     * @param issue The issue whose labels are to be replaced
-     * @param labels The labels to be applied to the given issue
-     * @param originalLabels The original labels to be applied to the UI in case of failure
-     * @return A boolean indicating the result of the label replacement from GitHub
-     */
-    public CompletableFuture<Boolean> replaceIssueLabelsRepo
-            (TurboIssue issue, List<String> labels, List<String> originalLabels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Sending labels " + labels + " for " + issue + " to GitHub"));
-        return repoIO.replaceIssueLabels(issue, labels)
-                .thenApply(e -> true)
-                .exceptionally(e -> {
-                    replaceIssueLabelsUI(issue, originalLabels);
-                    logger.error(e.getLocalizedMessage(), e);
-                    return false;
-                });
+    // Applies action on issue in UI
+    @SuppressWarnings("unchecked")
+    public void actOnIssueUI(TurboIssue issue, Action action) {
+        logger.info("Applying " + action.getDescription() + " on " + issue + " in UI");
+        action.act(issue);
+        refreshUI();
     }
 
-    public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
-        issue.setLabels(labels);
-        refreshUI();
+    // Applies action on issue in GitHub, returns false if it fails
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<Boolean> actOnIssueRepo(TurboIssue issue, Action action) {
+        logger.info("Applying " + action.getDescription() + " on " + issue + " in GitHub");
+        if (action.getClass().equals(ChangeLabelsAction.class)) {
+            ChangeLabelsAction changeAction = (ChangeLabelsAction) action;
+            return repoIO.replaceIssueLabels(issue, changeAction.act(changeAction.getOriginalIssue()).getLabels())
+                            .thenApply(e -> true)
+                            .exceptionally(e -> {
+                                logger.error(e.getLocalizedMessage(), e);
+                                return false;
+                            });
+        } else {
+            return CompletableFuture.completedFuture(false);
+        }
     }
 
     /**

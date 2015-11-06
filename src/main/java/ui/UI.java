@@ -30,10 +30,10 @@ import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
-import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
+import undo.UndoController;
 import util.*;
 import util.events.*;
 import util.events.Event;
@@ -81,6 +81,7 @@ public class UI extends Application implements EventDispatcher {
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
+    public UndoController undoController;
 
 
     // Main UI elements
@@ -214,6 +215,7 @@ public class UI extends Application implements EventDispatcher {
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
+        undoController = new UndoController(logic, notificationController);
     }
 
     private void initUI(Stage stage) {
@@ -560,10 +562,6 @@ public class UI extends Application implements EventDispatcher {
 
     public HWND getMainWindowHandle() {
         return mainWindowHandle;
-    }
-
-    public void showNotification(Notification notification) {
-        notificationController.showNotification(notification);
     }
 
     public void triggerNotificationAction() {

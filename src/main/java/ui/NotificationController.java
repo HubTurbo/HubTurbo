@@ -19,10 +19,10 @@ public class NotificationController {
         this.notificationPane = notificationPane;
     }
 
-    void showNotification(Notification notification) {
+    public void showNotification(Notification notification) {
         Platform.runLater(() -> {
             if (notificationPane.isShowing()) {
-                triggerTimeoutAction();
+                hideNotification();
             }
             notificationPane.setGraphic(notification.getIcon());
             notificationPane.setText(notification.getMessage());
@@ -41,7 +41,7 @@ public class NotificationController {
         });
     }
 
-    void triggerTimeoutAction() {
+    public void triggerTimeoutAction() {
         // must be run in a Platform.runLater or from the UI thread
         determineAndRunTimeoutAction();
         hideNotification();
@@ -65,7 +65,7 @@ public class NotificationController {
         notification = Optional.empty();
     }
 
-    void triggerNotificationAction() {
+    public void triggerNotificationAction() {
         Platform.runLater(() -> {
             if (notificationPane.isShowing()) {
                 determineAndRunNotificationAction();

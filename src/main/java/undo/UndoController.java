@@ -18,16 +18,18 @@ public class UndoController {
 
     private static final String OCTICON_INFO = "\uf059";
 
-    private Logic logic;
-    private NotificationController notificationController;
+    private final Logic logic;
+    private final NotificationController notificationController;
     private Optional<Pair<TurboIssue, Action>> undoBuffer;
 
+    // Holds an undo buffer of size 1.
     public UndoController(Logic logic, NotificationController notificationController) {
         this.logic = logic;
         this.notificationController = notificationController;
         undoBuffer = Optional.empty();
     }
 
+    // Gets called when an action is undone
     public void undoCallback() {
         if (undoBuffer.isPresent()) {
             logic.actOnIssueUI(undoBuffer.get().getKey(), undoBuffer.get().getValue().invert());
@@ -35,6 +37,7 @@ public class UndoController {
         }
     }
 
+    // Gets called when an action times out
     public void timeoutCallback() {
         if (undoBuffer.isPresent()) {
             logic.actOnIssueRepo(undoBuffer.get().getKey(), undoBuffer.get().getValue()).thenApply(success ->
@@ -43,9 +46,17 @@ public class UndoController {
         }
     }
 
+    /**
+     * Adds an action to the undo buffer.
+     *
+     * If there is an existing action in the undo buffer, it reconciles both actions. If needed, it then acts on the
+     * first reconciled action (by applying it on the issue on GitHub). The second reconciled action remains in the
+     * undo buffer.
+     */
     @SuppressWarnings("unchecked")
     public void addAction(TurboIssue issue, Action action) {
         logic.actOnIssueUI(issue, action);
+        Action newAction;
         if (undoBuffer.isPresent()) {
             Pair<Action, Action> reconciledActions =
                     undoBuffer.get().getValue().reconcile(undoBuffer.get().getValue(), action);
@@ -53,15 +64,17 @@ public class UndoController {
                 logic.actOnIssueRepo(undoBuffer.get().getKey(), reconciledActions.getKey()).thenApply(success ->
                         showErrorDialogOnFailure(success, reconciledActions.getKey(), undoBuffer.get().getKey()));
             }
-            action = reconciledActions.getValue();
+            newAction = reconciledActions.getValue();
+        } else {
+            newAction = action;
         }
-        if (action.isNoOp()) {
+        if (newAction.isNoOp()) {
             undoBuffer = Optional.empty();
             notificationController.triggerTimeoutAction();
         } else {
-            undoBuffer = Optional.of(new Pair<>(issue, action));
+            undoBuffer = Optional.of(new Pair<>(issue, newAction));
             Notification notification = new Notification(createInfoOcticon(),
-                    "Undo " + action.getDescription() + " for #" + issue.getId() + ": " + issue.getTitle(),
+                    "Undo " + newAction.getDescription() + " for #" + issue.getId() + ": " + issue.getTitle(),
                     "Undo", this::timeoutCallback, this::undoCallback);
             notificationController.showNotification(notification);
         }
