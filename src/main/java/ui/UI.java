@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+import org.openqa.selenium.os.Kernel32;
 
 import prefs.Preferences;
 import ui.components.HTStatusBar;
@@ -322,7 +323,12 @@ public class UI extends Application implements EventDispatcher {
 
     private static void getMainWindowHandle(String windowTitle) {
         if (PlatformSpecific.isOnWindows()) {
+            logger.info("Getting handle to panel view");
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
+            if (mainWindowHandle == null) {
+                logger.info("failed to get handle to panel view");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
         }
     }
 

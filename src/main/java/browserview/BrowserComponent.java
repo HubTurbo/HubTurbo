@@ -3,13 +3,16 @@ package browserview;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.Message;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
+
 import ui.UI;
 import util.GitHubURL;
 import util.GithubURLPageElements;
@@ -384,9 +387,25 @@ public class BrowserComponent {
 
     private void bringToTop(){
         if (PlatformSpecific.isOnWindows()) {
-            user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
-            user32.SetForegroundWindow(browserWindowHandle);
+            logger.info(getHWNDTitle());
+            logger.info("Setting bview to foreground window");
+            boolean success = user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
+            if (!success) {
+                logger.info("Failed to restore bview");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
+            boolean result = user32.SetForegroundWindow(browserWindowHandle);
+            if (!result) {
+                logger.info("Failed to set bview as top window");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
         }
+    }
+
+    private String getHWNDTitle() {
+        char[] windowText = new char[512];
+        user32.GetWindowText(browserWindowHandle, windowText, 512);
+        return new String(windowText);
     }
 
     public void focus(HWND mainWindowHandle){
@@ -396,6 +415,7 @@ public class BrowserComponent {
                     initialiseJNA();
                 }
             }
+            logger.info(getHWNDTitle());
             // Restores browser window if it is minimized / maximized
             user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
@@ -406,7 +426,12 @@ public class BrowserComponent {
                 logger.info("Failed to bring bView to front.");
                 logger.info(Kernel32.INSTANCE.GetLastError());
             }
-            user32.SetForegroundWindow(mainWindowHandle);
+            logger.info("Setting pview as top window");
+            boolean result = user32.SetForegroundWindow(mainWindowHandle);
+            if (!result) {
+                logger.info("Failed to set panel view as top window");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
         }
     }
 
