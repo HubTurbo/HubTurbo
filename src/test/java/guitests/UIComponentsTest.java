@@ -13,8 +13,8 @@ public class UIComponentsTest extends UITest {
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
-        doubleClick("#dummy/dummy_col0_filterTextField");
         click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         push(KeyCode.BACK_SPACE);
         type("ass");
         push(KeyCode.TAB);
@@ -24,7 +24,8 @@ public class UIComponentsTest extends UITest {
 
     @Test
     public void filterTextFieldTest() {
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         push(KeyCode.BACK_SPACE);
         type("is:open OR is:closed");
         push(KeyCode.ENTER);

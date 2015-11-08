@@ -17,9 +17,7 @@ public class InvalidLoginTest extends UITest {
 
     @Test
     public void invalidLoginTest() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
@@ -32,9 +30,7 @@ public class InvalidLoginTest extends UITest {
 
     @Test
     public void emptyLoginTest() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).push(KeyCode.TAB).push(KeyCode.BACK_SPACE);
@@ -46,9 +42,7 @@ public class InvalidLoginTest extends UITest {
 
     @Test
     public void emptyUsernameTest() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).push(KeyCode.TAB);
@@ -61,9 +55,7 @@ public class InvalidLoginTest extends UITest {
 
     @Test
     public void emptyPasswordTest() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);
         push(KeyCode.BACK_SPACE).type("abc").push(KeyCode.TAB);

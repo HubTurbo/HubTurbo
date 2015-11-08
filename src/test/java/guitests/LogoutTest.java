@@ -24,9 +24,7 @@ public class LogoutTest extends UITest {
 
     @Test
     public void logoutFunctionTest() {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);

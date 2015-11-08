@@ -152,7 +152,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // remove focus from repo selector
         ComboBox<String> repoSelectorComboBox = find("#repositorySelector");
-        doubleClick(repoSelectorComboBox);
+        click(repoSelectorComboBox);
         assertEquals(true, repoSelectorComboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
         assertEquals(false, repoSelectorComboBox.isFocused());
@@ -161,8 +161,8 @@ public class KeyboardShortcutsTest extends UITest {
         // switch default repo tests
         assertEquals(1, repoSelectorComboBox.getItems().size());
         // setup - add a new repo
-        doubleClick(repoSelectorComboBox);
-        doubleClick();
+        click(repoSelectorComboBox);
+        selectAll();
         type("dummy1/dummy1");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();

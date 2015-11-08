@@ -87,8 +87,8 @@ public class UIEventTests extends UITest {
 
         // Test with multiple repositories
         ComboBox<String> comboBox = find("#repositorySelector");
-        doubleClick(comboBox);
-        doubleClick();
+        click(comboBox);
+        selectAll();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         click("#dummy/dummy_col0_filterTextField");

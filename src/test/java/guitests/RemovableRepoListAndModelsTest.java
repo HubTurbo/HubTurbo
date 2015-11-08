@@ -133,6 +133,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         noOfUsedRepo = 4;
         totalRepoInSystem = 4;
         pushKeys(CREATE_RIGHT_PANEL);
+        waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
         click("#dummy/dummy_col1_filterTextField");
         selectAll();
         type("repo:dummy4/dummy4");
@@ -155,11 +156,6 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(getNoOfEnabledMenuItems(removeRepoMenu.getItems()),
                 totalRepoInSystem + 1 - noOfUsedRepo);
         assertEquals(getNoOfDisabledMenuItems(removeRepoMenu.getItems()), noOfUsedRepo);
-    }
-
-    ////////////// NOTE: please turn off NumLock as it will interfere with this method
-    public void selectAll() {
-        press(KeyCode.SHIFT).press(KeyCode.HOME).release(KeyCode.HOME).release(KeyCode.SHIFT);
     }
 
     public long getNoOfEnabledMenuItems(ObservableList<MenuItem> menuItems) {
