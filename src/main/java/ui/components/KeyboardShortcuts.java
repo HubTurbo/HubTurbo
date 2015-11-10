@@ -97,6 +97,8 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.K);
     public static final KeyCodeCombination SHOW_CONTRIBUTORS =
             new KeyCodeCombination(KeyCode.D);
+    public static final KeyCodeCombination SHOW_RELATED_ISSUE_OR_PR =
+            new KeyCodeCombination(KeyCode.E);
 
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
@@ -133,6 +135,14 @@ public class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
+
+    // ui.issuepanel.PanelControl
+    public static final KeyCodeCombination SWAP_PANEL_LEFT =
+            new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+    public static final KeyCodeCombination SWAP_PANEL_RIGHT =
+            new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+    
+    public static final String GLOBAL_HOTKEY = "control alt H";
     
     private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
         Map<Integer, KeyCodeCombination> result = new HashMap<>();

@@ -3,6 +3,8 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
@@ -13,9 +15,7 @@ import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,7 @@ public class Logic {
 
     private RepoIO repoIO;
     public LoginController loginController;
+    public UpdateController updateController;
 
     public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
         this.uiManager = uiManager;
@@ -39,6 +40,7 @@ public class Logic {
 
         repoIO = new RepoIO(isTestMode, enableTestJSON);
         loginController = new LoginController(this);
+        updateController = new UpdateController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) e -> {
@@ -61,7 +63,7 @@ public class Logic {
         });
 
         // Pass the currently-empty model to the UI
-        uiManager.updateNow(models);
+        uiManager.updateEmpty(models);
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -85,7 +87,7 @@ public class Logic {
                 .map(repoIO::updateModel)
                 .collect(Collectors.toList()))
                 .thenApply(models::replace)
-                .thenRun(this::updateUI)
+                .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateRemainingRate)
                 .exceptionally(Futures::log);
@@ -104,8 +106,8 @@ public class Logic {
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we call updateUI even when the repo is already open.
-            if (isPrimaryRepository) updateUI();
+            // Thus we refresh panels even when the repo is already open.
+            if (isPrimaryRepository) refreshUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -117,7 +119,7 @@ public class Logic {
                 UI.status.displayMessage("Opening " + repoId);
                 return repoIO.openRepository(repoId)
                         .thenApply(models::addPending)
-                        .thenRun(this::updateUI)
+                        .thenRun(this::refreshUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
                         .thenCompose(n -> getRateLimitResetTime())
                         .thenApply(this::updateRemainingRate)
@@ -125,42 +127,6 @@ public class Logic {
                         .exceptionally(withResult(false));
             }
         });
-    }
-
-    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<TurboIssue> issues) {
-        String message = "Getting metadata for " + repoId + "...";
-        logger.info("Getting metadata for issues "
-                + issues.stream().map(TurboIssue::getId).map(Object::toString).collect(Collectors.joining(", ")));
-        UI.status.displayMessage(message);
-
-        String currentUser = prefs.getLastLoginUsername();
-
-        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
-            .thenApply(metadata -> {
-                String updatedMessage = "Received metadata from " + repoId + "!";
-                UI.status.displayMessage(updatedMessage);
-                models.insertMetadata(repoId, metadata, currentUser);
-                return metadata;
-            })
-            .thenApply(Futures.tap(this::updateUIAndShow))
-            .thenCompose(n -> getRateLimitResetTime())
-            .thenApply(this::updateRemainingRate)
-            .thenApply(rateLimits -> true)
-            .exceptionally(withResult(false));
-    }
-
-    // Adds update times to the metadata map
-    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
-        String currentUser = prefs.getLastLoginUsername();
-
-        // Iterates through each entry in the metadata set, and looks for the comment/event with
-        // the latest time created.
-        for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
-            IssueMetadata currentMetadata = entry.getValue();
-
-            entry.setValue(currentMetadata.full(currentUser));
-        }
-        return metadata;
     }
 
     public Set<String> getOpenRepositories() {
@@ -197,23 +163,7 @@ public class Logic {
                 .forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
     }
 
-    /**
-     * Carries the current model in Logic to the GUI and triggers metadata updates if panels require
-     * metadata to display their issues, in which case the changes in the model are not presented to the user.
-     */
-    private void updateUI() {
-        uiManager.update(models, false);
-    }
-
-    /**
-     * Carries the current model in Logic to the GUI and immediately presents it to the user. Does not trigger
-     * further metadata updates.
-     */
-    private void updateUIAndShow() {
-        uiManager.update(models, true);
-    }
-
-    private ImmutablePair<Integer, Long> updateRemainingRate
+    public ImmutablePair<Integer, Long> updateRemainingRate
             (ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateRateLimits(rateLimits);
         return rateLimits;
@@ -251,13 +201,95 @@ public class Logic {
                     replaceIssueLabelsUI(issue, originalLabels);
                     logger.error(e.getLocalizedMessage(), e);
                     return false;
-        });
+                });
     }
 
     public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
         logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
         issue.setLabels(labels);
-        updateUIAndShow();
+        refreshUI();
     }
 
+    /**
+     * Determines data to be sent to the GUI to refresh the entire GUI with the current model in Logic,
+     * and then sends the data to the GUI.
+     */
+    private void refreshUI() {
+        updateController.filterSortRefresh(getAllUIFilters());
+    }
+
+    /**
+     * Feeds a one-element list of filter expressions to updateController.
+     *
+     * @param filterExpr The filter expression to be processed by updateController.
+     */
+    public void refreshPanel(FilterExpression filterExpr) {
+        List<FilterExpression> panelExpr = new ArrayList<>();
+        panelExpr.add(filterExpr);
+        updateController.filterSortRefresh(panelExpr);
+    }
+
+    /**
+     * Retrieves metadata for given issues from the repository source, and then processes them for non-self
+     * update timings.
+     *
+     * @param repoId The repository containing issues to retrieve metadata for.
+     * @param issues Issues sharing the same repository requiring a metadata update.
+     * @return True if metadata retrieval was a success, false otherwise.
+     */
+    public CompletableFuture<Boolean> getIssueMetadata(String repoId, List<TurboIssue> issues) {
+        String message = "Getting metadata for " + repoId + "...";
+        logger.info("Getting metadata for issues " + issues);
+        UI.status.displayMessage(message);
+
+        return repoIO.getIssueMetadata(repoId, issues).thenApply(this::processUpdates)
+                .thenApply(metadata -> insertMetadata(metadata, repoId, prefs.getLastLoginUsername()))
+                .exceptionally(withResult(false));
+    }
+
+    private boolean insertMetadata(Map<Integer, IssueMetadata> metadata, String repoId, String currentUser) {
+        String updatedMessage = "Received metadata from " + repoId + "!";
+        UI.status.displayMessage(updatedMessage);
+        models.insertMetadata(repoId, metadata, currentUser);
+        return true;
+    }
+
+    // Adds update times to the metadata map
+    private Map<Integer, IssueMetadata> processUpdates(Map<Integer, IssueMetadata> metadata) {
+        String currentUser = prefs.getLastLoginUsername();
+
+        // Iterates through each entry in the metadata set, and looks for the comment/event with
+        // the latest time created.
+        for (Map.Entry<Integer, IssueMetadata> entry : metadata.entrySet()) {
+            IssueMetadata currentMetadata = entry.getValue();
+
+            entry.setValue(currentMetadata.full(currentUser));
+        }
+        return metadata;
+    }
+
+    /**
+     * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
+     */
+    public void updateUI(Map<FilterExpression, List<TurboIssue>> issuesToShow) {
+        uiManager.update(models, issuesToShow);
+    }
+
+    /**
+     * Retrieves all filter expressions in active panels from the UI.
+     *
+     * @return Filter expressions in the UI.
+     */
+    private List<FilterExpression> getAllUIFilters() {
+        return uiManager.getAllFilters();
+    }
+
+    /**
+     * For use by UpdateController to perform filtering.
+     *
+     * @return The currently held MultiModel.
+     */
+    public MultiModel getModels() {
+        return models;
+    }
 }

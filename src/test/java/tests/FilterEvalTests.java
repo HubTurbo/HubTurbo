@@ -196,7 +196,7 @@ public class FilterEvalTests {
         TurboIssue iCurrPlus2 = new TurboIssue(REPO, 7, "curr+2");
         iCurrPlus2.setMilestone(msCurrPlus2);
 
-        // test: milestone with no due date should come last
+        // test: milestone with no due date should not be included
         TurboMilestone msCurrPlus3 = new TurboMilestone(REPO, 4, "V0.9");
         msCurrPlus3.setDueDate(Optional.empty());
         TurboIssue iCurrPlus3 = new TurboIssue(REPO, 8, "curr+3");
@@ -273,7 +273,7 @@ public class FilterEvalTests {
         assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
         assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
         assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         // test: negation alias
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("-milestone:curr"));

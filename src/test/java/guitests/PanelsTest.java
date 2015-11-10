@@ -9,13 +9,16 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;
 
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 
 import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 import javafx.scene.input.KeyCode;
 import ui.UI;
+import util.PlatformEx;
 import util.events.PanelClickedEventHandler;
 
 public class PanelsTest extends UITest {
@@ -36,28 +39,36 @@ public class PanelsTest extends UITest {
 
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());
 
-        press(MAXIMIZE_WINDOW);
+        pushKeys(MAXIMIZE_WINDOW);
 
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
+        // Click
+        eventTriggered.value = false;
+        Text name1 = ((FilterPanel) panels.getPanel(1)).getNameText();
+        click(name1);
+        assertTrue(eventTriggered.value);
+
         // Drag
-        // TODO check whether panels are actually reordered
+        // TODO find a way to actually reorder the panels, and make it compatible with swap key command
 
         Label closeButton0 = ((FilterPanel) panels.getPanel(0)).getCloseButton();
         Label closeButton1 = ((FilterPanel) panels.getPanel(1)).getCloseButton();
         drag(closeButton1).to(closeButton0);
 
-        // Click
         eventTriggered.value = false;
-        find("#dummy/dummy_col0_closeButton");
-        moveBy(-50, 0);
-        click(); // Click
+        Text name2 = ((FilterPanel) panels.getPanel(1)).getNameText();
+        click(name2);
         assertTrue(eventTriggered.value);
 
-        // Close
-        click("#dummy/dummy_col0_closeButton");
+        // Reorder panels
+        pushKeys(SWAP_PANEL_LEFT);
+
+        // Close right panel that used to be dummy_dummy_col0
+        click(((FilterPanel) panels.getPanel(1)).getCloseButton());
+
         try {
             find("#dummy/dummy_col0");
             fail();
@@ -70,7 +81,8 @@ public class PanelsTest extends UITest {
         doubleClick();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        press(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
+        PlatformEx.waitOnFxThread();
         // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
         click("#dummy2/dummy2_col1");
     }
