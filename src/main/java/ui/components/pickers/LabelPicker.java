@@ -8,8 +8,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import ui.UI;
 import ui.components.Notification;
+import undo.ChangeLabels;
 import util.DialogMessage;
-import util.GitHubURL;
 import util.events.ShowLabelPickerEventHandler;
 
 import java.util.List;
@@ -49,18 +49,20 @@ public class LabelPicker {
     private void replaceLabels(TurboIssue issue, List<String> labels) {
         List<String> originalLabels = issue.getLabels().stream().sorted().collect(Collectors.toList());
         if (!labels.equals(originalLabels)) {
-            ui.logic.replaceIssueLabelsUI(issue, labels);
+            List<String> resultingLabels = createResultingLabelList(issue, labels);
+            assert(labels.equals(resultingLabels));
+            ui.logic.replaceIssueLabelsUI(issue, resultingLabels);
             Notification undoNotification = new Notification(createInfoOcticon(),
                     "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
                     "Undo",
-                    () -> ui.logic.replaceIssueLabelsRepo(issue, labels, originalLabels)
-                            .thenApply(success -> postReplaceLabelActions(success, issue)),
+                    () -> ui.logic.replaceIssueLabelsRepo(issue, resultingLabels, originalLabels)
+                            .thenApply(success -> showErrorDialogOnFailure(success, issue)),
                     () -> ui.logic.replaceIssueLabelsUI(issue, originalLabels));
             ui.showNotification(undoNotification);
         }
     }
 
-    private boolean postReplaceLabelActions(Boolean success, TurboIssue issue) {
+    private boolean showErrorDialogOnFailure(Boolean success, TurboIssue issue) {
         if (!success) {
             // if not successful, show error dialog
             Platform.runLater(() -> DialogMessage.showErrorDialog(
@@ -81,6 +83,17 @@ public class LabelPicker {
         label.setPadding(new Insets(0, 0, 5, 0));
         label.getStyleClass().addAll("octicon");
         return label;
+    }
+
+    private List<String> createResultingLabelList(TurboIssue issue, List<String> newLabels) {
+        return (new ChangeLabels(
+                newLabels.stream()
+                        .filter(newLabel -> !issue.getLabels().contains(newLabel))
+                        .collect(Collectors.toList()),
+                issue.getLabels().stream()
+                        .filter(originalLabel -> !newLabels.contains(originalLabel))
+                        .collect(Collectors.toList())))
+                .act(issue).getLabels();
     }
 
 }

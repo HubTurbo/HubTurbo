@@ -103,9 +103,11 @@ public class UpdateController {
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
                 boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
+                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+
                 List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExpr, issue))
-                        .sorted(determineComparator(filterExpr, hasUpdatedQualifier))
+                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
                         .collect(Collectors.toList());
 
                 filteredAndSorted.put(filterExpr, filteredAndSortedIssues);

@@ -9,25 +9,15 @@ import javafx.scene.input.KeyCode;
 public class PanelNameTextField extends TextField {
 
     private final FilterPanel panel;
-    private String previousText = "";
-    private static final int PANEL_MAX_NAME_LENGTH = 36;
 
     public PanelNameTextField(String panelName, FilterPanel panel) {
         this.panel = panel;
-        previousText = panelName;
         Platform.runLater(() -> {
             requestFocus();
             selectAll();
         });
         setText(panelName);
         setup();
-        textProperty().addListener(c -> {
-            // Prevent excessive characters
-            if (getText().length() > PANEL_MAX_NAME_LENGTH) {
-                setText(previousText);
-            }
-            previousText = getText();
-        });
         setPrefColumnCount(30);
     }
 

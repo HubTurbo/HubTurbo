@@ -2,7 +2,7 @@ package guitests;
 
 import static com.google.common.io.Files.getFileExtension;
 
-import java.awt.Robot;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -31,12 +33,14 @@ import org.loadui.testfx.utils.FXTestUtils;
 import com.google.common.util.concurrent.SettableFuture;
 
 import backend.interfaces.RepoStore;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
@@ -236,11 +240,11 @@ public class UITest extends GuiTest {
     }
 
     public void waitUntilNodeAppears(Node node) {
-        waitUntil(node, Node::isVisible);
+        waitUntil(node, n -> n.isVisible() && n.getParent() != null);
     }
 
     public void waitUntilNodeDisappears(Node node) {
-        waitUntil(node, n -> !n.isVisible());
+        waitUntil(node, n -> !n.isVisible() || n.getParent() == null);
     }
 
     public void waitUntilNodeAppears(String selector) {
@@ -300,11 +304,62 @@ public class UITest extends GuiTest {
 
     }
 
-    private boolean existsQuiet(String selector) {
+    public boolean existsQuiet(String selector) {
         try {
             return exists(selector);
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return false;
+        }
+    }
+
+    /**
+     * Like drag(from).to(to), but does not relocate the mouse if the target moves.
+     */
+    public void dragUnconditionally(Node from, Node to) {
+        Point2D start = pointFor(from);
+        Point2D end = pointFor(to);
+
+        move(start.getX(), start.getY());
+        press(MouseButton.PRIMARY);
+        move(end.getX(), end.getY());
+        release(MouseButton.PRIMARY);
+    }
+
+    /**
+     * Allows test threads to busy-wait on some condition.
+     *
+     * Taken from org.loadui.testfx.utils, but modified to synchronise with
+     * the JavaFX Application Thread, with a lower frequency.
+     *
+     * The additional synchronisation prevents bugs where
+     *
+     * awaitCondition(a);
+     * awaitCondition(b);
+     *
+     * sometimes may not be equivalent to
+     *
+     * awaitCondition(a && b);
+     *
+     * The lower frequency is a bit more efficient, since a frequency of 10 ms
+     * just isn't necessary for GUI interactions, and we're bottlenecked by the FX
+     * thread anyway.
+     */
+    public void awaitCondition(Callable<Boolean> condition) {
+        awaitCondition(condition, 5);
+    }
+
+    private void awaitCondition(Callable<Boolean> condition, int timeoutInSeconds) {
+        long timeout = System.currentTimeMillis() + timeoutInSeconds * 1000;
+        try {
+            while (!condition.call()) {
+                Thread.sleep(100);
+                PlatformEx.waitOnFxThread();
+                if (System.currentTimeMillis() > timeout) {
+                    throw new TimeoutException();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

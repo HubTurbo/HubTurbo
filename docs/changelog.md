@@ -1,5 +1,11 @@
 # Changelog
 
+# V3.14.0
+
+- Long panel names now wrap
+- Fixed regression in milestone aliases
+- Tests which involve dragging panels are now more reliable
+
 # V3.13.0
 
 - Added keyboard shortcut for swapping panels
