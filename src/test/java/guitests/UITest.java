@@ -2,7 +2,7 @@ package guitests;
 
 import static com.google.common.io.Files.getFileExtension;
 
-import java.awt.Robot;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,12 +31,14 @@ import org.loadui.testfx.utils.FXTestUtils;
 import com.google.common.util.concurrent.SettableFuture;
 
 import backend.interfaces.RepoStore;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
@@ -306,6 +308,19 @@ public class UITest extends GuiTest {
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return false;
         }
+    }
+
+    /**
+     * Like drag(from).to(to), but does not relocate the mouse if the target moves.
+     */
+    public void dragUnconditionally(Node from, Node to) {
+        Point2D start = pointFor(from);
+        Point2D end = pointFor(to);
+
+        move(start.getX(), start.getY());
+        press(MouseButton.PRIMARY);
+        move(end.getX(), end.getY());
+        release(MouseButton.PRIMARY);
     }
 
     /**
