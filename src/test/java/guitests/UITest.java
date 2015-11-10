@@ -304,7 +304,7 @@ public class UITest extends GuiTest {
 
     }
 
-    private boolean existsQuiet(String selector) {
+    public boolean existsQuiet(String selector) {
         try {
             return exists(selector);
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
