@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -321,6 +323,44 @@ public class UITest extends GuiTest {
         press(MouseButton.PRIMARY);
         move(end.getX(), end.getY());
         release(MouseButton.PRIMARY);
+    }
+
+    /**
+     * Allows test threads to busy-wait on some condition.
+     *
+     * Taken from org.loadui.testfx.utils, but modified to synchronise with
+     * the JavaFX Application Thread, with a lower frequency.
+     *
+     * The additional synchronisation prevents bugs where
+     *
+     * awaitCondition(a);
+     * awaitCondition(b);
+     *
+     * sometimes may not be equivalent to
+     *
+     * awaitCondition(a && b);
+     *
+     * The lower frequency is a bit more efficient, since a frequency of 10 ms
+     * just isn't necessary for GUI interactions, and we're bottlenecked by the FX
+     * thread anyway.
+     */
+    public void awaitCondition(Callable<Boolean> condition) {
+        awaitCondition(condition, 5);
+    }
+
+    private void awaitCondition(Callable<Boolean> condition, int timeoutInSeconds) {
+        long timeout = System.currentTimeMillis() + timeoutInSeconds * 1000;
+        try {
+            while (!condition.call()) {
+                Thread.sleep(100);
+                PlatformEx.waitOnFxThread();
+                if (System.currentTimeMillis() > timeout) {
+                    throw new TimeoutException();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
