@@ -240,11 +240,11 @@ public class UITest extends GuiTest {
     }
 
     public void waitUntilNodeAppears(Node node) {
-        waitUntil(node, Node::isVisible);
+        waitUntil(node, n -> n.isVisible() && n.getParent() != null);
     }
 
     public void waitUntilNodeDisappears(Node node) {
-        waitUntil(node, n -> !n.isVisible());
+        waitUntil(node, n -> !n.isVisible() || n.getParent() == null);
     }
 
     public void waitUntilNodeAppears(String selector) {
