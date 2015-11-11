@@ -13,6 +13,19 @@ import java.util.Optional;
 public class FilterTests extends UITest{
 
     @Test
+    public void parseExceptionTest() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+
+        // test parse exception returns Qualifier.EMPTY, i.e. all issues
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("milestone:");
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 10);
+    }
+
+    @Test
     public void milestoneAliasFilterTest() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
@@ -78,11 +91,5 @@ public class FilterTests extends UITest{
         type("milestone:current+s0v8f");
         push(KeyCode.ENTER);
         assertEquals(issuePanel.getIssueCount(), 0);
-    }
-
-
-    ////////////// NOTE: please turn off NumLock as it will interfere with this method
-    public void selectAll() {
-        press(KeyCode.SHIFT).press(KeyCode.HOME).release(KeyCode.HOME).release(KeyCode.SHIFT);
     }
 }

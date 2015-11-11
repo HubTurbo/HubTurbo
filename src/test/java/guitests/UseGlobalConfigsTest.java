@@ -42,9 +42,7 @@ public class UseGlobalConfigsTest extends UITest {
         UI ui = TestController.getUI();
         PanelControl panels = ui.getPanelControl();
 
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         type("dummy");
         pushKeys(KeyCode.TAB);
         type("dummy");

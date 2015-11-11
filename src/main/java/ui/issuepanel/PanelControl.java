@@ -199,20 +199,6 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, one);
     }
 
-    public void movePanelRight(int panelIndex) {
-        if (getPanelCount() < 2 || panelIndex == (getPanelCount() - 1)) return;
-        int other = (panelIndex + 1) % getPanelCount();
-        swapPanels(panelIndex, other);
-        selectPanel(other);
-    }
-
-    public void movePanelLeft(int panelIndex) {
-        if (getPanelCount() < 2 || panelIndex == 0) return;
-        int other = (panelIndex - 1) % getPanelCount();
-        swapPanels(panelIndex, other);
-        selectPanel(other);
-    }
-
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
     }
@@ -260,11 +246,6 @@ public class PanelControl extends HBox {
             if ((KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event))) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
-            }
-            if (KeyboardShortcuts.SWAP_PANEL_LEFT.match(event)) {
-                currentlySelectedPanel.ifPresent(this::movePanelLeft);
-            } else if (KeyboardShortcuts.SWAP_PANEL_RIGHT.match(event)) {
-                currentlySelectedPanel.ifPresent(this::movePanelRight);
             }
         });
     }

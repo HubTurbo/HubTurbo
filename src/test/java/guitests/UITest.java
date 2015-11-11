@@ -3,6 +3,7 @@ package guitests;
 import static com.google.common.io.Files.getFileExtension;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
+import javafx.application.Platform;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -392,4 +394,10 @@ public class UITest extends GuiTest {
         return this;
     }
 
+    /**
+     * Used to select the whole filter text so that it can be replaced
+     */
+    public void selectAll() {
+        pushKeys(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN));
+    }
 }
