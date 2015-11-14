@@ -23,7 +23,6 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.components.FilterTextField;
 import ui.components.KeyboardShortcuts;
-import ui.components.PanelNameTextField;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
@@ -68,10 +67,9 @@ public class UseGlobalConfigsTest extends UITest {
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Renamed panel");
+        push(KeyCode.ENTER);
         FilterPanel filterPanel0 = (FilterPanel) panels.getPanel(0);
-        PanelNameTextField renameTextField0 = filterPanel0.getRenameTextField();
-        assertEquals("Renamed panel", renameTextField0.getText());
-        pushKeys(KeyCode.ENTER);
+        assertEquals("Renamed panel", filterPanel0.getNameText().getText());
 
         FilterTextField filterTextField0 = filterPanel0.getFilterTextField();
         waitUntilNodeAppears(filterTextField0);
@@ -79,7 +77,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("issue");
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
@@ -96,10 +94,8 @@ public class UseGlobalConfigsTest extends UITest {
         Label renameButton1 = filterPanel1.getRenameButton();
         click(renameButton1);
         type("Dummy 2 panel");
-        PanelNameTextField renameTextField1 = filterPanel1.getRenameTextField();
-        waitUntilNodeAppears(renameTextField1);
-        assertEquals("Dummy 2 panel", renameTextField1.getText());
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        assertEquals("Dummy 2 panel", filterPanel1.getNameText().getText());
 
         pushKeys(KeyboardShortcuts.CREATE_LEFT_PANEL);
         PlatformEx.waitOnFxThread();
@@ -116,9 +112,9 @@ public class UseGlobalConfigsTest extends UITest {
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Open issues");
-        PanelNameTextField renameTextField2 = filterPanel2.getRenameTextField();
-        assertEquals("Open issues", renameTextField2.getText());
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        assertEquals("Open issues", filterPanel2.getNameText().getText());
+
 
         // Make a new board
         click("Boards");

@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
@@ -12,7 +13,6 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
-import ui.components.PanelNameTextField;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
@@ -94,7 +94,7 @@ public class PanelRenameTest extends UITest {
         }
 
         String randomName3 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 1);
-        PanelNameTextField renameTextField3 = find("#dummy/dummy_col3_renameTextField");
+        TextField renameTextField3 = find("#dummy/dummy_col3_renameTextField");
         renameTextField3.setText(randomName3);
         push(KeyCode.ENTER);
         boolean isPresentAfterEdit = exists("#dummy/dummy_col3_closeButton");
@@ -104,6 +104,26 @@ public class PanelRenameTest extends UITest {
         assertEquals(true, isPresentAfterEdit);
         assertEquals(randomName3, panelNameText3.getText());
         PlatformEx.waitOnFxThread();
+
+        // Testing case where the edit is confirmed using the tick button in rename mode
+        // Expected: Panel is renamed after the button is pressed
+        pushKeys(CREATE_RIGHT_PANEL);
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(4)));
+        type("Renamed panel with confirm tick");
+        click("#dummy/dummy_col4_confirmButton");
+        FilterPanel panel4 = (FilterPanel) panels.getPanel(4);
+        Text panelNameText4 = panel4.getNameText();
+        assertEquals("Renamed panel with confirm tick", panelNameText4.getText());
+
+        // Testing case where the edit is undone after pressing the undo button in edit mode
+        // Expected: Panel name is unchanged after the button is pressed.
+        pushKeys(CREATE_RIGHT_PANEL);
+        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
+        type("Renamed panel with undo");
+        click("#dummy/dummy_col5_undoButton");
+        FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
+        Text panelNameText5 = panel5.getNameText();
+        assertEquals("Panel", panelNameText5.getText());
         
         // Quitting to update json
         click("File");

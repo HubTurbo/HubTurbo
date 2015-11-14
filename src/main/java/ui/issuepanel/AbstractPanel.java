@@ -23,10 +23,12 @@ public abstract class AbstractPanel extends VBox {
 
     public static final String CLOSE_PANEL = "\u2715";
     public static final String RENAME_PANEL = "\u270E";
+    public static final String OCTICON_TICK_MARK = "\uf03a";
+    public static final String OCTICON_UNDO = "\uf051";
 
     protected final IModel model;
-    protected final PanelControl parentPanelControl;
-    protected int panelIndex;
+    public final PanelControl parentPanelControl;
+    public int panelIndex;
 
     public AbstractPanel(IModel model, PanelControl parentPanelControl, int panelIndex) {
         this.model = model;
@@ -99,4 +101,12 @@ public abstract class AbstractPanel extends VBox {
      * the issue panel was closed.
      */
     public abstract void close();
+
+    public PanelControl getParentPanelControl(){
+        return parentPanelControl;
+    }
+
+    public int getPanelIndex(){
+        return panelIndex;
+    }
 }
