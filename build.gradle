@@ -71,6 +71,7 @@ allprojects {
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
+        testCompile "org.mockito:mockito-core:1.+"
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 
