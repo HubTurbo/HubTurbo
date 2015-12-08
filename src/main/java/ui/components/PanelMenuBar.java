@@ -2,8 +2,8 @@ package ui.components;
 import static ui.issuepanel.AbstractPanel.PANEL_WIDTH;
 import static ui.issuepanel.AbstractPanel.OCTICON_TICK_MARK;
 import static ui.issuepanel.AbstractPanel.OCTICON_UNDO;
-import static ui.issuepanel.AbstractPanel.RENAME_PANEL;
-import static ui.issuepanel.AbstractPanel.CLOSE_PANEL;
+import static ui.issuepanel.AbstractPanel.OCTICON_RENAME_PANEL;
+import static ui.issuepanel.AbstractPanel.OCTICON_CLOSE_PANEL;
 import backend.interfaces.IModel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -86,15 +86,14 @@ public class PanelMenuBar extends HBox {
             }
         });
 
-        renameButton = new Label(RENAME_PANEL);
-        renameButton.getStyleClass().add("label-button");
+        HBox renameBox = new HBox();
+        renameButton = new Label(OCTICON_RENAME_PANEL);
+        renameButton.getStyleClass().addAll("octicon", "label-button");
         renameButton.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
         });
-
-        HBox renameBox = new HBox();
         renameBox.getChildren().add(renameButton);
         renameBox.setAlignment(Pos.TOP_RIGHT);
 
@@ -110,9 +109,9 @@ public class PanelMenuBar extends HBox {
 
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
-        closeButton = new Label(CLOSE_PANEL);
+        closeButton = new Label(OCTICON_CLOSE_PANEL);
         closeButton.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_closeButton");
-        closeButton.getStyleClass().add("label-button");
+        closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
             panel.parentPanelControl.closePanel(panel.panelIndex);
