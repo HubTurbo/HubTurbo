@@ -4,10 +4,10 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
@@ -15,7 +15,10 @@ import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -33,19 +36,21 @@ public class Logic {
     public LoginController loginController;
     public UpdateController updateController;
 
-    public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
+    public Logic(UIManager uiManager, Preferences prefs) {
         this.uiManager = uiManager;
         this.prefs = prefs;
         this.models = new MultiModel(prefs);
 
-        repoIO = new RepoIO(isTestMode, enableTestJSON);
+        repoIO = new RepoIO(TestController.getStubbedRepoSource(false),
+                            TestController.getStubbedRepoStore(false),
+                            TestController.getTestDirectory(false));
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) e -> {
             // DELETE_* and RESET_REPO is handled jointly by Logic and DummyRepo
-            assert isTestMode;
+            assert TestController.isTestMode();
             assert e.repoId != null;
 
             List<Model> toReplace = models.toModels();

@@ -8,6 +8,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 
@@ -33,7 +34,7 @@ public class SavedLoginTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(true);
         try {
             testIO.openRepository("test/test").get();
         } catch (InterruptedException | ExecutionException e) {

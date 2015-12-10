@@ -5,15 +5,14 @@ import backend.resource.MultiModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MultiModelTest {
 
@@ -45,7 +44,7 @@ public class MultiModelTest {
         MultiModel models = new MultiModel(new Preferences(true));
         models.queuePendingRepository(repoId1);
         models.queuePendingRepository(repoId2);
-        RepoIO testIO = new RepoIO(true, false);
+        RepoIO testIO = TestController.createTestingRepoIO(false);
         testIO.openRepository(repoId1).thenApply(models::addPending).get();
         testIO.openRepository(repoId2).thenApply(models::addPending).get();
 

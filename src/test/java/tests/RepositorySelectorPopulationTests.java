@@ -2,10 +2,10 @@ package tests;
 
 import backend.RepoIO;
 import backend.interfaces.RepoStore;
-import backend.resource.Model;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 
@@ -39,7 +39,7 @@ public class RepositorySelectorPopulationTests {
 
     @Test
     public void noJsonFiles() {
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(false);
         assertEquals(0, testIO.getStoredRepos().size());
     }
 
@@ -47,16 +47,17 @@ public class RepositorySelectorPopulationTests {
     public void oneInvalidJsonFile() throws IOException {
         File invalidJson = new File("store/test/dummy-dummy.json");
         assert invalidJson.createNewFile();
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(true);
         assertEquals(0, testIO.getStoredRepos().size());
     }
 
     @Test
     public void oneValidJsonFile() throws ExecutionException, InterruptedException {
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(true);
         testIO.openRepository("dummy/dummy").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
-        RepoIO alternateIO = new RepoIO(true, true);
+
+        RepoIO alternateIO = TestController.createTestingRepoIO(true);
         assertEquals(1, alternateIO.getStoredRepos().size());
     }
 
@@ -66,11 +67,12 @@ public class RepositorySelectorPopulationTests {
         assert invalidJson1.createNewFile();
         File invalidJson2 = new File("store/test/dummy2-dummy2.json");
         assert invalidJson2.createNewFile();
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(true);
         testIO.openRepository("dummy3/dummy3").get();
         testIO.openRepository("dummy4/dummy4").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
-        RepoIO alternateIO = new RepoIO(true, true);
+
+        RepoIO alternateIO = TestController.createTestingRepoIO(true);
         assertEquals(2, alternateIO.getStoredRepos().size());
     }
 

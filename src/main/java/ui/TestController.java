@@ -1,8 +1,15 @@
 package ui;
 
+import backend.RepoIO;
+import backend.interfaces.RepoSource;
+import backend.interfaces.RepoStore;
+import backend.json.JSONStore;
+import backend.json.JSONStoreStub;
+import backend.stub.DummySource;
 import javafx.application.Application;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * A collection of methods that deal with the UI class which are mainly used for testing.
@@ -79,4 +86,33 @@ public final class TestController {
         return hasUI() && commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
 
+    public static Optional<RepoSource> getStubbedRepoSource(boolean forceTestMode) {
+        if (forceTestMode || isTestMode()) {
+            return Optional.of(new DummySource());
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<JSONStore> getStubbedRepoStore(boolean forceDisableJSONStore) {
+        if (forceDisableJSONStore || !isTestJSONEnabled()) {
+            return Optional.of(new JSONStoreStub());
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<String> getTestDirectory(boolean forceTestMode) {
+        if (forceTestMode || isTestMode()) {
+            return Optional.of(RepoStore.TEST_DIRECTORY);
+        }
+
+        return Optional.empty();
+    }
+
+    public static RepoIO createTestingRepoIO(boolean enableJSONStore) {
+        return new RepoIO(TestController.getStubbedRepoSource(true),
+                          enableJSONStore ? Optional.empty() : TestController.getStubbedRepoStore(true),
+                          TestController.getTestDirectory(true));
+    }
 }

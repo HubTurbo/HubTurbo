@@ -4,11 +4,9 @@ import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
-import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.serialization.SerializableModel;
-import backend.stub.DummySource;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
@@ -22,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static util.Futures.withResult;
 
@@ -37,20 +34,32 @@ public class RepoIO {
 
     private static final int MAX_REDOWNLOAD_TRIES = 2;
 
-    public RepoIO(boolean isTestMode, boolean enableTestJSON) {
-        if (isTestMode) {
-            repoSource = new DummySource();
-            RepoStore.enableTestDirectory();
+    /**
+     * Contructs a RepoIO providing IO operations on repositories, taking in various optional
+     * parameters for repos source and storage which are useful for testing purposes.
+     * @param repoSource optional source of repos. Default to GitHubSource if not present
+     * @param jsonStore optional storage for repos. Default to a new JSONStore if not present
+     * @param storeDirectory optional directory for storing repos. Default value is in RepoStore.
+     */
+    public RepoIO(Optional<RepoSource> repoSource, Optional<JSONStore> jsonStore,
+                  Optional<String> storeDirectory) {
+        if (repoSource.isPresent()) {
+            this.repoSource = repoSource.get();
         } else {
-            repoSource = new GitHubSource();
+            this.repoSource = new GitHubSource();
         }
-        if (isTestMode && !enableTestJSON) {
-            jsonStore = new JSONStoreStub();
-            storedRepos = new ArrayList<>();
+
+        if (storeDirectory.isPresent()) {
+            RepoStore.changeDirectory(storeDirectory.get());
+        }
+
+        if (jsonStore.isPresent()) {
+            this.jsonStore = jsonStore.get();
         } else {
-            jsonStore = new JSONStore();
-            storedRepos = new ArrayList<>(jsonStore.getStoredRepos());
+            this.jsonStore = new JSONStore();
         }
+
+        storedRepos = new ArrayList<>(this.jsonStore.getStoredRepos());
     }
 
     public List<String> getStoredRepos() {

@@ -60,11 +60,7 @@ public abstract class RepoStore {
         return true;
     }
 
-    public static void enableTestDirectory() {
-        changeDirectory(RepoStore.TEST_DIRECTORY);
-    }
-
-    private static void changeDirectory(String newDir) {
+    public static void changeDirectory(String newDir) {
         RepoStore.directory = newDir;
     }
 
