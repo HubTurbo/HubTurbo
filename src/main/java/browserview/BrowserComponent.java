@@ -261,7 +261,8 @@ public class BrowserComponent {
     private void resetBrowser(){
         logger.info("Relaunching chrome.");
         quit(); // if the driver hangs
-        initialise();
+        driver = createChromeDriver();
+        login();
     }
 
     /**
