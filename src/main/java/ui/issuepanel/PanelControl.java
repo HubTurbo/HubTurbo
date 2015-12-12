@@ -130,6 +130,10 @@ public class PanelControl extends HBox {
         selectPanel(0);
     }
 
+    public void selectLastPanel() {
+        selectPanel(getPanelCount() - 1);
+    }
+
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
         currentlySelectedPanel = selectedPanel;
         updateCSSforPanels();

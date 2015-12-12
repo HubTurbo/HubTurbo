@@ -36,6 +36,7 @@ public class MenuControl extends MenuBar {
     private final Preferences prefs;
     private final Stage mainStage;
     private final BoardAutoCreator boardAutoCreator;
+    private final PanelMenuCreator panelMenuCreator;
 
     public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs, Stage mainStage) {
         this.panels = panels;
@@ -44,6 +45,7 @@ public class MenuControl extends MenuBar {
         this.ui = ui;
         this.mainStage = mainStage;
         this.boardAutoCreator = new BoardAutoCreator(ui, panels, prefs);
+        this.panelMenuCreator = new PanelMenuCreator(panels, panelsScrollPane);
 
         createMenuItems();
     }
@@ -54,7 +56,7 @@ public class MenuControl extends MenuBar {
         Menu newMenu = new Menu("New");
         newMenu.getItems().addAll(createNewMenuItems());
 
-        Menu panels = createPanelsMenu();
+        Menu panels = panelMenuCreator.generatePanelMenu();
 
         Menu boards = new Menu("Boards");
         boards.getItems().addAll(createBoardsMenu());
@@ -90,54 +92,6 @@ public class MenuControl extends MenuBar {
         
         return file;
 
-    }
-
-    private Menu createPanelsMenu() {
-        Menu cols = new Menu("Panels");
-
-        MenuItem createLeft = new MenuItem("Create (Left)");
-        createLeft.setOnAction(e -> {
-            logger.info("Menu: Panels > Create (Left)");
-            panels.createNewPanelAtStart();
-            panels.scrollToCurrentlySelectedPanel();
-        });
-        createLeft.setAccelerator(CREATE_LEFT_PANEL);
-
-        MenuItem createRight = new MenuItem("Create");
-        createRight.setOnAction(e -> {
-            logger.info("Menu: Panels > Create");
-            panels.createNewPanelAtEnd();
-            // listener is used as panelsScroll's Hmax property doesn't update
-            // synchronously
-            ChangeListener<Number> listener = new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                    for (Node child : panelsScrollPane.getChildrenUnmodifiable()) {
-                        if (child instanceof ScrollBar) {
-                            ScrollBar scrollBar = (ScrollBar) child;
-                            if (scrollBar.getOrientation() == Orientation.HORIZONTAL
-                                    && scrollBar.visibleProperty().get()) {
-                                panels.scrollToCurrentlySelectedPanel();
-                                break;
-                            }
-                        }
-                    }
-                    panels.widthProperty().removeListener(this);
-                }
-            };
-            panels.widthProperty().addListener(listener);
-        });
-        createRight.setAccelerator(CREATE_RIGHT_PANEL);
-
-        MenuItem closePanel = new MenuItem("Close");
-        closePanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Close");
-            panels.closeCurrentPanel();
-        });
-        closePanel.setAccelerator(CLOSE_PANEL);
-
-        cols.getItems().addAll(createRight, createLeft, closePanel);
-        return cols;
     }
     
     private void onBoardSave() {
