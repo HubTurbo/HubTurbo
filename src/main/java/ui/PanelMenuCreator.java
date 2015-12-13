@@ -97,7 +97,8 @@ public class PanelMenuCreator {
         MenuItem assigneePanel = new MenuItem("Self-assigned issues");
         assigneePanel.setOnAction(e -> {
             logger.info("Menu: Panels > Create Self-assigned issues panel");
-            generatePanelWithNameAndFilter("My open issues and PR's", "is:open ((is:issue assignee:me) OR (is:pr author:me))");
+            generatePanelWithNameAndFilter("Open issues and PR's",
+                    "is:open ((is:issue assignee:me) OR (is:pr author:me))");
             panelControl.selectLastPanel();
         });
         return assigneePanel;
@@ -107,7 +108,7 @@ public class PanelMenuCreator {
         MenuItem recentlyUpdatedPanel = new MenuItem("Recently Updated issues");
         recentlyUpdatedPanel.setOnAction(e -> {
             logger.info("Menu: Panels > Create Recently Updated issues panel");
-            generatePanelWithNameAndFilter("My Recently Updated issues", "assignee:me updated:<48");
+            generatePanelWithNameAndFilter("Recently Updated issues", "assignee:me updated:<48");
             panelControl.selectLastPanel();
         });
         return recentlyUpdatedPanel;
