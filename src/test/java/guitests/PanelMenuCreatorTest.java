@@ -7,6 +7,8 @@ import prefs.PanelInfo;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
+import util.PlatformEx;
+
 import java.util.Optional;
 
 import static ui.PanelMenuCreator.ASSIGNEE_FILTER_NAME;
@@ -57,7 +59,9 @@ public class PanelMenuCreatorTest extends UITest{
     }
 
     private void customizedPanelTest(String panelName, String panelFilter){
-        clickMenu("Panels", panelName);
+        PlatformEx.waitOnFxThread();
+        clickMenu("Panels", "Auto-create", panelName);
+
         assertEquals(panelControl.getPanelCount(), 2);
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
 

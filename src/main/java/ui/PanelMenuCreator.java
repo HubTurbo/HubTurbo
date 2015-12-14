@@ -10,7 +10,6 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 
 import java.util.ArrayList;
@@ -41,14 +40,18 @@ public class PanelMenuCreator {
 
     public Menu generatePanelMenu(){
         Menu panelMenu = new Menu("Panels");
+        Menu autoCreatePanelMenu = new Menu("Auto-create");
         List<MenuItem> items = new ArrayList<>();
+        List<MenuItem> autoCreateItems = new ArrayList<>();
         items.add(createLeftPanel());
         items.add(createRightPanel());
-        items.add(createCustomizedPanel(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
-        items.add(createCustomizedPanel(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
-        items.add(createCustomizedPanel(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
         items.add(closePanel());
+        autoCreateItems.add(createCustomizedPanel(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
+        autoCreateItems.add(createCustomizedPanel(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
+        autoCreateItems.add(createCustomizedPanel(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
+        autoCreatePanelMenu.getItems().addAll(autoCreateItems);
         panelMenu.getItems().addAll(items);
+        panelMenu.getItems().add(autoCreatePanelMenu);
         return panelMenu;
     }
 
@@ -105,7 +108,7 @@ public class PanelMenuCreator {
     public MenuItem createCustomizedPanel(String panelName, String panelFilter){
         MenuItem customizedPanel = new MenuItem(panelName);
         customizedPanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Create" +  panelName + "panel");
+            logger.info("Menu: Panels > Auto-create > " +  panelName + "panel");
             panelControl.generatePanelWithNameAndFilter(panelName, panelFilter);
             panelControl.selectLastPanel();
         });
