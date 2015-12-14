@@ -9,6 +9,13 @@ import ui.UI;
 import ui.issuepanel.PanelControl;
 import java.util.Optional;
 
+import static ui.PanelMenuCreator.ASSIGNEE_FILTER_NAME;
+import static ui.PanelMenuCreator.ASSIGNEE_PANEL_NAME;
+import static ui.PanelMenuCreator.MILESTONE_FILTER_NAME;
+import static ui.PanelMenuCreator.MILESTONE_PANEL_NAME;
+import static ui.PanelMenuCreator.UPDATED_FILTER_NAME;
+import static ui.PanelMenuCreator.UPDATED_PANEL_NAME;
+
 public class PanelMenuCreatorTest extends UITest{
     private PanelControl panelControl;
     private UI ui;
@@ -21,41 +28,17 @@ public class PanelMenuCreatorTest extends UITest{
 
     @Test
     public void assigneePanelTest(){
-        clickMenu("Panels", "Self-assigned issues");
-
-        assertEquals(panelControl.getPanelCount(), 2);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
-
-        PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
-        assertEquals(panelInfo.getPanelFilter(), "is:open ((is:issue assignee:me) OR (is:pr author:me))");
-        assertEquals(panelInfo.getPanelName(), "Open issues and PR's");
-        clickMenu("Panels", "Close");
+        customizedPanelTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
     }
 
     @Test
     public void milestonePanelTest(){
-        clickMenu("Panels", "Current Milestone");
-
-        assertEquals(panelControl.getPanelCount(), 2);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
-
-        PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
-        assertEquals(panelInfo.getPanelFilter(), "milestone:curr sort:status");
-        assertEquals(panelInfo.getPanelName(), "Current Milestone");
-        clickMenu("Panels", "Close");
+        customizedPanelTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
     }
 
     @Test
     public void recentlyUpdatedPanelTest(){
-        clickMenu("Panels", "Recently Updated issues");
-
-        assertEquals(panelControl.getPanelCount(), 2);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
-
-        PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
-        assertEquals(panelInfo.getPanelFilter(), "assignee:me updated:<48");
-        assertEquals(panelInfo.getPanelName(), "Recently Updated issues");
-        clickMenu("Panels", "Close");
+        customizedPanelTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
     }
 
     @Test
@@ -70,6 +53,17 @@ public class PanelMenuCreatorTest extends UITest{
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
 
         clickMenu("Panels", "Close");
+        clickMenu("Panels", "Close");
+    }
+
+    private void customizedPanelTest(String panelName, String panelFilter){
+        clickMenu("Panels", panelName);
+        assertEquals(panelControl.getPanelCount(), 2);
+        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
+
+        PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
+        assertEquals(panelInfo.getPanelFilter(), panelFilter);
+        assertEquals(panelInfo.getPanelName(), panelName);
         clickMenu("Panels", "Close");
     }
 

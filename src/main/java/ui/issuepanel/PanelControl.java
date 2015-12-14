@@ -102,6 +102,13 @@ public class PanelControl extends HBox {
         forEach(child -> child.refreshItems());
     }
 
+    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName){
+        FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
+        panelAdded.setPanelName(panelName);
+        panelAdded.setFilterByString(filterName);
+        return panelAdded;
+    }
+
     private FilterPanel addPanel() {
         return addPanelAt(getChildren().size());
     }

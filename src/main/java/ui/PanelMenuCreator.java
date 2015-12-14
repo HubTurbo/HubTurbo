@@ -21,7 +21,16 @@ import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
-    private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
+    public static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
+    public static final String MILESTONE_FILTER_NAME =  "milestone:curr sort:status";
+    public static final String MILESTONE_PANEL_NAME = "Current Milestone";
+
+    public static final String ASSIGNEE_FILTER_NAME =  "is:open ((is:issue assignee:me) OR (is:pr author:me))";
+    public static final String ASSIGNEE_PANEL_NAME = "Open issues and PR's";
+
+    public static final String UPDATED_FILTER_NAME = "assignee:me updated:<48";
+    public static final String UPDATED_PANEL_NAME = "Recently Updated issues";
+
     private final PanelControl panelControl;
     private final ScrollPane panelsScrollPane;
 
@@ -35,9 +44,9 @@ public class PanelMenuCreator {
         List<MenuItem> items = new ArrayList<>();
         items.add(createLeftPanel());
         items.add(createRightPanel());
-        items.add(createAssigneePanel());
-        items.add(createRecentlyUpdatedPanel());
-        items.add(createMilestonePanel());
+        items.add(createCustomizedPanel(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
+        items.add(createCustomizedPanel(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
+        items.add(createCustomizedPanel(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
         items.add(closePanel());
         panelMenu.getItems().addAll(items);
         return panelMenu;
@@ -93,41 +102,13 @@ public class PanelMenuCreator {
         return closePanel;
     }
 
-    public MenuItem createAssigneePanel(){
-        MenuItem assigneePanel = new MenuItem("Self-assigned issues");
-        assigneePanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Create Self-assigned issues panel");
-            generatePanelWithNameAndFilter("Open issues and PR's",
-                    "is:open ((is:issue assignee:me) OR (is:pr author:me))");
+    public MenuItem createCustomizedPanel(String panelName, String panelFilter){
+        MenuItem customizedPanel = new MenuItem(panelName);
+        customizedPanel.setOnAction(e -> {
+            logger.info("Menu: Panels > Create" +  panelName + "panel");
+            panelControl.generatePanelWithNameAndFilter(panelName, panelFilter);
             panelControl.selectLastPanel();
         });
-        return assigneePanel;
-    }
-
-    public MenuItem createRecentlyUpdatedPanel(){
-        MenuItem recentlyUpdatedPanel = new MenuItem("Recently Updated issues");
-        recentlyUpdatedPanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Create Recently Updated issues panel");
-            generatePanelWithNameAndFilter("Recently Updated issues", "assignee:me updated:<48");
-            panelControl.selectLastPanel();
-        });
-        return recentlyUpdatedPanel;
-    }
-
-    public MenuItem createMilestonePanel(){
-        MenuItem recentlyUpdatedPanel = new MenuItem("Current Milestone");
-        recentlyUpdatedPanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Create Current Milestone panel");
-            generatePanelWithNameAndFilter("Current Milestone", "milestone:curr sort:status");
-            panelControl.selectLastPanel();
-        });
-        return recentlyUpdatedPanel;
-    }
-
-    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName){
-        FilterPanel panelAdded = panelControl.addPanelAt(panelControl.getPanelCount());
-        panelAdded.setPanelName(panelName);
-        panelAdded.setFilterByString(filterName);
-        return panelAdded;
+        return customizedPanel;
     }
 }
