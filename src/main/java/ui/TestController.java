@@ -7,6 +7,7 @@ import backend.json.JSONStore;
 import backend.json.JSONStoreStub;
 import backend.stub.DummySource;
 import javafx.application.Application;
+import prefs.Preferences;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -25,7 +26,6 @@ import java.util.Optional;
  * instance which can be called from tests that need to access the UI class directly.
  */
 public final class TestController {
-
     private static UI ui;
     private static HashMap<String, String> commandLineArgs;
 
@@ -86,6 +86,12 @@ public final class TestController {
         return hasUI() && commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
 
+    /**
+     * Gets a stubbed RepoSource for testing
+     * @param forceTestMode
+     * @return a DummySource if run in test mode or forceTestMode is set to true.
+     *         an empty Optional otherwise
+     */
     public static Optional<RepoSource> getStubbedRepoSource(boolean forceTestMode) {
         if (forceTestMode || isTestMode()) {
             return Optional.of(new DummySource());
@@ -94,6 +100,12 @@ public final class TestController {
         return Optional.empty();
     }
 
+    /**
+     * Gets a stubbed RepoSource for testing
+     * @param forceDisableJSONStore
+     * @return a JSONStoreStub if run with --testjson=false or forceDisableJSONStore is set to true.
+     *         an empty Optional otherwise
+     */
     public static Optional<JSONStore> getStubbedRepoStore(boolean forceDisableJSONStore) {
         if (forceDisableJSONStore || !isTestJSONEnabled()) {
             return Optional.of(new JSONStoreStub());
@@ -102,6 +114,12 @@ public final class TestController {
         return Optional.empty();
     }
 
+    /**
+     * Gets the directory name used for storing repos' data during test
+     * @param forceTestMode
+     * @return a directory name if run in test mode or forceTestMode is set to true.
+     *         an empty Optional otherwise
+     */
     public static Optional<String> getTestDirectory(boolean forceTestMode) {
         if (forceTestMode || isTestMode()) {
             return Optional.of(RepoStore.TEST_DIRECTORY);
@@ -110,6 +128,33 @@ public final class TestController {
         return Optional.empty();
     }
 
+    /**
+     * Gets the config file name used for storing Preferences
+     * @param forceTestMode
+     * @return a file name if run in test mode forceTestMode is set to true.
+     *         an empty Optional otherwise
+     */
+    public static Optional<String> getTestConfigFile(boolean forceTestMode) {
+        if (forceTestMode || isTestMode()) {
+            return Optional.of(Preferences.TEST_CONFIG_FILE);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Creates a Preferences that stores data in the test directory
+     * @return
+     */
+    public static Preferences createTestPreferences() {
+        return new Preferences(getTestConfigFile(true));
+    }
+
+    /**
+     * Creates a partially stubbed RepoIO used for testing
+     * @param enableJSONStore set to true if actual json file is to be used for storing repos' data
+     * @return
+     */
     public static RepoIO createTestingRepoIO(boolean enableJSONStore) {
         return new RepoIO(TestController.getStubbedRepoSource(true),
                           enableJSONStore ? Optional.empty() : TestController.getStubbedRepoStore(true),

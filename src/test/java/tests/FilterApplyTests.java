@@ -8,7 +8,7 @@ import filter.expression.Disjunction;
 import filter.expression.Negation;
 import filter.expression.Qualifier;
 import org.junit.Test;
-import prefs.Preferences;
+import ui.TestController;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class FilterApplyTests {
     private final IModel empty;
 
     public FilterApplyTests() {
-        empty = new MultiModel(new Preferences(true));
+        empty = new MultiModel(TestController.createTestPreferences());
         empty.setDefaultRepo(REPO);
     }
 

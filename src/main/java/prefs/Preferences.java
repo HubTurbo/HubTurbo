@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Preferences {
-
     public static final String DIRECTORY = "settings";
     public static final String GLOBAL_CONFIG_FILE = "global.json";
     public static final String TEST_CONFIG_FILE = "test.json";
@@ -18,9 +17,9 @@ public class Preferences {
 
     public GlobalConfig global;
 
-    public Preferences(boolean isTestMode) {
-        if (isTestMode) {
-            this.fileHandler = new ConfigFileHandler(DIRECTORY, TEST_CONFIG_FILE);
+    public Preferences(Optional<String> configFileName) {
+        if (configFileName.isPresent()) {
+            this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName.get());
         } else {
             this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
         }

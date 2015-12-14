@@ -1,13 +1,14 @@
 package tests;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.TestController;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class BoardSwitchTest {
 
@@ -18,11 +19,11 @@ public class BoardSwitchTest {
 
     @Test
     public void boardsSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = TestController.createTestPreferences();
 
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board2 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board3 = new ArrayList<PanelInfo>();
+        List<PanelInfo> board1 = new ArrayList<>();
+        List<PanelInfo> board2 = new ArrayList<>();
+        List<PanelInfo> board3 = new ArrayList<>();
 
         testPrefs.addBoard(BOARDNAME1, board1);
         testPrefs.addBoard(BOARDNAME2, board2);
@@ -46,7 +47,7 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = TestController.createTestPreferences();
 
         testPrefs.switchBoard();
         assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
@@ -54,11 +55,11 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardOpenSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = TestController.createTestPreferences();
 
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board2 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board3 = new ArrayList<PanelInfo>();
+        List<PanelInfo> board1 = new ArrayList<>();
+        List<PanelInfo> board2 = new ArrayList<>();
+        List<PanelInfo> board3 = new ArrayList<>();
 
         testPrefs.addBoard(BOARDNAME1, board1);
         testPrefs.addBoard(BOARDNAME2, board2);
@@ -70,9 +71,9 @@ public class BoardSwitchTest {
 
     @Test
     public void oneBoardSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = TestController.createTestPreferences();
 
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
+        List<PanelInfo> board1 = new ArrayList<>();
         testPrefs.addBoard(BOARDNAME1, board1);
         testPrefs.setLastOpenBoard(BOARDNAME1);
 
