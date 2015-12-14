@@ -8,7 +8,7 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ui.TestController;
+import prefs.Preferences;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,10 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class FilterEvalTests {
 
@@ -27,7 +25,7 @@ public class FilterEvalTests {
     public static final String REPO = "test/test";
 
     public FilterEvalTests() {
-        empty = new MultiModel(TestController.createTestPreferences());
+        empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
     }
 

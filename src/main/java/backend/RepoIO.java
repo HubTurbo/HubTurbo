@@ -43,22 +43,9 @@ public class RepoIO {
      */
     public RepoIO(Optional<RepoSource> repoSource, Optional<JSONStore> jsonStore,
                   Optional<String> storeDirectory) {
-        if (repoSource.isPresent()) {
-            this.repoSource = repoSource.get();
-        } else {
-            this.repoSource = new GitHubSource();
-        }
-
-        if (storeDirectory.isPresent()) {
-            RepoStore.changeDirectory(storeDirectory.get());
-        }
-
-        if (jsonStore.isPresent()) {
-            this.jsonStore = jsonStore.get();
-        } else {
-            this.jsonStore = new JSONStore();
-        }
-
+        this.repoSource = repoSource.orElseGet(() -> new GitHubSource());
+        storeDirectory.ifPresent((dir) -> RepoStore.changeDirectory(dir));
+        this.jsonStore = jsonStore.orElseGet(() -> new JSONStore());
         storedRepos = new ArrayList<>(this.jsonStore.getStoredRepos());
     }
 

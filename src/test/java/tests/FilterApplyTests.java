@@ -8,7 +8,7 @@ import filter.expression.Disjunction;
 import filter.expression.Negation;
 import filter.expression.Qualifier;
 import org.junit.Test;
-import ui.TestController;
+import prefs.Preferences;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class FilterApplyTests {
 
@@ -24,7 +25,7 @@ public class FilterApplyTests {
     private final IModel empty;
 
     public FilterApplyTests() {
-        empty = new MultiModel(TestController.createTestPreferences());
+        empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
     }
 

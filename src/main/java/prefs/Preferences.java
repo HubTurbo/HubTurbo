@@ -18,12 +18,7 @@ public class Preferences {
     public GlobalConfig global;
 
     public Preferences(Optional<String> configFileName) {
-        if (configFileName.isPresent()) {
-            this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName.get());
-        } else {
-            this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
-        }
-
+        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName.orElse(GLOBAL_CONFIG_FILE));
         loadGlobalConfig();
     }
 
