@@ -1,9 +1,7 @@
 package ui;
 
 import backend.RepoIO;
-import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
-import backend.json.JSONStore;
 import backend.json.JSONStoreStub;
 import backend.stub.DummySource;
 import javafx.application.Application;
@@ -87,59 +85,16 @@ public final class TestController {
     }
 
     /**
-     * Gets a stubbed RepoSource for testing
-     * @param forceTestMode
-     * @return a DummySource if run in test mode or forceTestMode is set to true.
-     *         an empty Optional otherwise
+     * Creates a Preferences that store data in test config file if run with test mode
+     * or in a default config file specified in the Preferences class
+     * @return
      */
-    public static Optional<RepoSource> getStubbedRepoSource(boolean forceTestMode) {
-        if (forceTestMode || isTestMode()) {
-            return Optional.of(new DummySource());
+    public static Preferences createApplicationPreference() {
+        if (isTestMode()) {
+            return createTestPreferences();
         }
 
-        return Optional.empty();
-    }
-
-    /**
-     * Gets a stubbed RepoSource for testing
-     * @param forceDisableJSONStore
-     * @return a JSONStoreStub if run with --testjson=false or forceDisableJSONStore is set to true.
-     *         an empty Optional otherwise
-     */
-    public static Optional<JSONStore> getStubbedRepoStore(boolean forceDisableJSONStore) {
-        if (forceDisableJSONStore || !isTestJSONEnabled()) {
-            return Optional.of(new JSONStoreStub());
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Gets the directory name used for storing repos' data during test
-     * @param forceTestMode
-     * @return a directory name if run in test mode or forceTestMode is set to true.
-     *         an empty Optional otherwise
-     */
-    public static Optional<String> getTestDirectory(boolean forceTestMode) {
-        if (forceTestMode || isTestMode()) {
-            return Optional.of(RepoStore.TEST_DIRECTORY);
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Gets the config file name used for storing Preferences
-     * @param forceTestMode
-     * @return a file name if run in test mode forceTestMode is set to true.
-     *         an empty Optional otherwise
-     */
-    public static Optional<String> getTestConfigFile(boolean forceTestMode) {
-        if (forceTestMode || isTestMode()) {
-            return Optional.of(Preferences.TEST_CONFIG_FILE);
-        }
-
-        return Optional.empty();
+        return new Preferences(Optional.empty());
     }
 
     /**
@@ -147,7 +102,18 @@ public final class TestController {
      * @return
      */
     public static Preferences createTestPreferences() {
-        return new Preferences(getTestConfigFile(true));
+        return new Preferences(Optional.of(Preferences.TEST_CONFIG_FILE));
+    }
+
+    /**
+     * Creates a RepoIO for the application that uses different components
+     * depending on various test options: --test, --testjson etc.
+     * @return
+     */
+    public static RepoIO createApplicationRepoIO() {
+        return new RepoIO(isTestMode() ? Optional.of(new DummySource()) : Optional.empty(),
+                          isTestJSONEnabled() ? Optional.of(new JSONStoreStub()) : Optional.empty(),
+                          isTestMode() ? Optional.of(RepoStore.TEST_DIRECTORY) : Optional.empty());
     }
 
     /**
@@ -156,8 +122,8 @@ public final class TestController {
      * @return
      */
     public static RepoIO createTestingRepoIO(boolean enableJSONStore) {
-        return new RepoIO(TestController.getStubbedRepoSource(true),
-                          enableJSONStore ? Optional.empty() : TestController.getStubbedRepoStore(true),
-                          TestController.getTestDirectory(true));
+        return new RepoIO(Optional.of(new DummySource()),
+                          enableJSONStore ? Optional.empty() : Optional.of(new JSONStoreStub()),
+                          Optional.of(RepoStore.TEST_DIRECTORY));
     }
 }

@@ -75,3 +75,7 @@ Certain things we do in tests are unidiomatic and may require us to make excepti
 ## Unit Tests
 
 Unit tests are meant to extensively test the functionality of a HubTurbo component. In most cases, this should be done without the use of File I/O. When testing file I/O components, however, do remember to include code to clean up the project directory at the end of the test, such as through [`UITest.clearTestFolder()`](../src/test/java/guitests/UITest.java).
+
+## Additional Tools
+
+- [mockito](http://mockito.org/) is used in HubTurbo's tests suite to create clean and verifiable stubbed classes. Refer to [mockito's docs](http://mockito.github.io/mockito/docs/current/org/mockito/Mockito.html) for more information, guides and caveats when using *mockito*.

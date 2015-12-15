@@ -35,7 +35,7 @@ public class StoreTests {
 
     @Before
     public void enableTestDirectory() {
-        RepoStore.changeDirectory(TestController.getTestDirectory(true).get());
+        RepoStore.changeDirectory(RepoStore.TEST_DIRECTORY);
     }
 
     @Test
@@ -118,8 +118,7 @@ public class StoreTests {
     @Test
     public void testLoadNonExistentRepo() throws InterruptedException, ExecutionException {
         RepoIO repoIO = TestController.createTestingRepoIO(true);
-        Model model = repoIO.openRepository("nonexist/nonexist").get();
-        TestUtils.delay(1); // allow for file to be written
+        Model model = repoIO.openRepository("nonexistent/nonexistent").get();
         assertEquals(10, model.getIssues().size());
     }
 

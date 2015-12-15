@@ -186,7 +186,7 @@ public class UI extends Application implements EventDispatcher {
                 logger.error(throwable.getMessage(), throwable));
 
         TestController.setUI(this, getParameters());
-        prefs = new Preferences(TestController.getTestConfigFile(false));
+        prefs = TestController.createApplicationPreference();
         KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();

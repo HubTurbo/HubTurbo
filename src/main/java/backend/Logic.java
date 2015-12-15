@@ -41,9 +41,7 @@ public class Logic {
         this.prefs = prefs;
         this.models = new MultiModel(prefs);
 
-        repoIO = new RepoIO(TestController.getStubbedRepoSource(false),
-                            TestController.getStubbedRepoStore(false),
-                            TestController.getTestDirectory(false));
+        repoIO = TestController.createApplicationRepoIO();
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 

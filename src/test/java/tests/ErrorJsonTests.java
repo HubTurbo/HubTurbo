@@ -7,7 +7,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ui.TestController;
 import ui.UI;
 import util.Utility;
 import util.events.EventDispatcherStub;
@@ -30,7 +29,7 @@ public class ErrorJsonTests {
 
     @Before
     public void enableTestDirectory() {
-        RepoStore.changeDirectory(TestController.getTestDirectory(true).get());
+        RepoStore.changeDirectory(RepoStore.TEST_DIRECTORY);
     }
 
     @Test

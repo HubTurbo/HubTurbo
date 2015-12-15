@@ -18,17 +18,24 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SortQualifierTests {
+public class QualifierTests {
     List<TurboIssue> issues = createSampleIssues();
     List<TurboMilestone> milestones = createSampleMilestone();
     MultiModel testModel = mock(MultiModel.class);
 
-    public SortQualifierTests() {
+    public QualifierTests() {
+        setMilestonesForSampleIssues();
+        mockSampleMultiModel();
+    }
+
+    private void setMilestonesForSampleIssues() {
         issues.get(0).setMilestone(milestones.get(0));
         issues.get(1).setMilestone(milestones.get(1));
         issues.get(2).setMilestone(milestones.get(2));
         issues.get(3).setMilestone(milestones.get(3));
+    }
 
+    private void mockSampleMultiModel() {
         when(testModel.getIssues()).thenReturn(issues);
         when(testModel.getMilestones()).thenReturn(milestones);
 

@@ -45,25 +45,4 @@ public class SerializableMilestone {
     public int getClosedIssues() {
         return closedIssues;
     }
-
-    @Override
-    public String toString() {
-        String formatter = "Milestone: {%n"
-                + "  id: %d,%n"
-                + "  title: %s,%n"
-                + "  dueDate: %s,%n"
-                + "  description: %s,%n"
-                + "  isOpen: %b,%n"
-                + "  openIssues: %d,%n"
-                + "  closedIssues: %d,%n"
-                + "}";
-
-        return String.format(
-                formatter,
-                getId(), getTitle(),
-                getDueDate().isPresent() ? getDueDate().get() : "",
-                getDescription(),
-                isOpen(),
-                getOpenIssues(), getClosedIssues());
-    }
 }

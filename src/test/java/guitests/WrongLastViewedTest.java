@@ -20,7 +20,7 @@ public class WrongLastViewedTest extends UITest {
 
     @Override
     public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--testjson=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
     }
 
     @Override
