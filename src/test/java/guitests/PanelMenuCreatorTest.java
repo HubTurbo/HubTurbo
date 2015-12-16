@@ -29,18 +29,18 @@ public class PanelMenuCreatorTest extends UITest{
     }
 
     @Test
-    public void assigneePanelTest(){
-        customizedPanelTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
+    public void assigneePanelMenuItemTest(){
+        customizedPanelMenuItemTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
     }
 
     @Test
-    public void milestonePanelTest(){
-        customizedPanelTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
+    public void milestonePanelMenuItemTest(){
+        customizedPanelMenuItemTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
     }
 
     @Test
-    public void recentlyUpdatedPanelTest(){
-        customizedPanelTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
+    public void recentlyUpdatedPanelMenuItemTest(){
+        customizedPanelMenuItemTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class PanelMenuCreatorTest extends UITest{
         clickMenu("Panels", "Close");
     }
 
-    private void customizedPanelTest(String panelName, String panelFilter){
+    private void customizedPanelMenuItemTest(String panelName, String panelFilter){
         PlatformEx.waitOnFxThread();
         clickMenu("Panels", "Auto-create", panelName);
 

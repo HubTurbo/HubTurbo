@@ -43,19 +43,19 @@ public class PanelMenuCreator {
         Menu autoCreatePanelMenu = new Menu("Auto-create");
         List<MenuItem> items = new ArrayList<>();
         List<MenuItem> autoCreateItems = new ArrayList<>();
-        items.add(createLeftPanel());
-        items.add(createRightPanel());
-        items.add(closePanel());
-        autoCreateItems.add(createCustomizedPanel(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanel(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanel(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
+        items.add(createLeftPanelMenuItem());
+        items.add(createRightPanelMenuItem());
+        items.add(closePanelMenuItem());
+        autoCreateItems.add(createCustomizedPanelMenuItem(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
+        autoCreateItems.add(createCustomizedPanelMenuItem(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
+        autoCreateItems.add(createCustomizedPanelMenuItem(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
         autoCreatePanelMenu.getItems().addAll(autoCreateItems);
         panelMenu.getItems().addAll(items);
         panelMenu.getItems().add(autoCreatePanelMenu);
         return panelMenu;
     }
 
-    public MenuItem createLeftPanel(){
+    public MenuItem createLeftPanelMenuItem(){
         MenuItem createLeft = new MenuItem("Create (Left)");
         createLeft.setOnAction(e -> {
             logger.info("Menu: Panels > Create (Left)");
@@ -66,7 +66,7 @@ public class PanelMenuCreator {
         return createLeft;
     }
 
-    public MenuItem createRightPanel(){
+    public MenuItem createRightPanelMenuItem(){
         MenuItem createRight = new MenuItem("Create");
         createRight.setOnAction(e -> {
             logger.info("Menu: Panels > Create");
@@ -95,7 +95,7 @@ public class PanelMenuCreator {
         return createRight;
     }
 
-    public MenuItem closePanel(){
+    public MenuItem closePanelMenuItem(){
         MenuItem closePanel = new MenuItem("Close");
         closePanel.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
@@ -105,7 +105,7 @@ public class PanelMenuCreator {
         return closePanel;
     }
 
-    public MenuItem createCustomizedPanel(String panelName, String panelFilter){
+    public MenuItem createCustomizedPanelMenuItem(String panelName, String panelFilter){
         MenuItem customizedPanel = new MenuItem(panelName);
         customizedPanel.setOnAction(e -> {
             logger.info("Menu: Panels > Auto-create > " +  panelName + "panel");
