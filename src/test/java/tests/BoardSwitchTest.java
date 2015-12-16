@@ -18,7 +18,7 @@ public class BoardSwitchTest {
 
     @Test
     public void boardsSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = new Preferences(true);
 
         List<PanelInfo> board1 = new ArrayList<PanelInfo>();
         List<PanelInfo> board2 = new ArrayList<PanelInfo>();
@@ -46,7 +46,7 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = new Preferences(true);
 
         testPrefs.switchBoard();
         assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
@@ -54,7 +54,7 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardOpenSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = new Preferences(true);
 
         List<PanelInfo> board1 = new ArrayList<PanelInfo>();
         List<PanelInfo> board2 = new ArrayList<PanelInfo>();
@@ -70,7 +70,7 @@ public class BoardSwitchTest {
 
     @Test
     public void oneBoardSwitchTest() {
-        testPrefs = new Preferences(false);
+        testPrefs = new Preferences(true);
 
         List<PanelInfo> board1 = new ArrayList<PanelInfo>();
         testPrefs.addBoard(BOARDNAME1, board1);
