@@ -28,10 +28,10 @@ public class Qualifier implements FilterExpression {
     public static final Qualifier FALSE = new Qualifier("false", "");
 
     public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
-        "assignee", "as", "author", "au", "body", "closed", "comments", "created", "creator",
+        "assignee", "author", "body", "closed", "comments", "created", "creator",
         "date", "desc", "description", "false", "has", "id", "in", "involves",
-        "is", "issue", "keyword", "label", "labels", "merged", "milestone", "m", "milestones",
-        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status", "s",
+        "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
+        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",
         "title", "type", "unmerged", "unread", UPDATED, "user"
     ));
 

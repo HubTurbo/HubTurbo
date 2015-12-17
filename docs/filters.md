@@ -152,6 +152,8 @@ Matches all issues associated with any milestones whose names contain the given 
 
 `current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. Milestones with no due date will not be considered in resolving `curr`/`current`. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
 
+Aliases: `m`
+
 ### label
 
 *Expects a string in the form `name`, `group.name`, or `group.`*
@@ -164,11 +166,15 @@ Matches all issues with the given label. A group name may be used to qualify the
 
 Matches all issues assigned to the given person, identified by the given alias, GitHub username, or real name, in that priority.
 
+Aliases: `as`
+
 ### author
 
 *Expects a string*
 
 Matches all issues created by the given person, identified by the given alias, GitHub username, or real name, in that priority.
+
+Aliases: `au` or `creator`
 
 ### involves
 
@@ -181,6 +187,8 @@ Matches all issues involving (assigned to or created by) the given person, ident
 *Expects one of `open` or `closed`*
 
 Matches all issues of the given state.
+
+Aliases: `s`
 
 ### has
 

@@ -124,6 +124,20 @@ public class FilterEvalTests {
         assertEquals(false, matches("in:something a is", issue));
     }
 
+    private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
+
+        try {
+            assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
+            fail(". is not a valid token on its own");
+        } catch (ParseException ignored) {
+        }
+        assertEquals(false, matches(milestoneQualifier + ":what", issue));
+    }
+
     @Test
     public void milestone() {
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
@@ -133,28 +147,8 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue));
-
-        assertEquals(true, Qualifier.process(model, Parser.parse("m:v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("m:v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("m:v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("m:1"), issue));
-        try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue));
-            fail(". is not a valid token on its own");
-        } catch (ParseException ignored) {
-        }
-
-        try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("m:."), issue));
-            fail(". is not a valid token on its own");
-        } catch (ParseException ignored) {
-        }
-        assertEquals(false, matches("milestone:what", issue));
-        assertEquals(false, matches("m:what", issue));
+        testMilestoneParsing("milestone", issue, model);
+        testMilestoneParsing("m", issue, model);
 
         // milestone aliases
         // - sorting of milestone is by due date
@@ -436,8 +430,7 @@ public class FilterEvalTests {
         }
     }
 
-    @Test
-    public void assignee() {
+    private void testAssigneeParsing(String assigneeQualifier){
         TurboUser user = new TurboUser(REPO, "bob", "alice");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
@@ -445,40 +438,46 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":BOB"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":bob"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":alice"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":o"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":lic"), issue));
+    }
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("as:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("as:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("as:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("as:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("as:lic"), issue));
+    @Test
+    public void assigneeParsing() {
+        testAssigneeParsing("assignee");
+    }
+
+    @Test
+    public void assigneeWithQualifierAliasParsing() {
+        testAssigneeParsing("as");
     }
 
     @Test
     public void author() {
+        testAuthorParsing("author");
+    }
+
+    @Test
+    public void creator() {
+        testAuthorParsing("creator");
+    }
+
+    @Test
+    public void authorWithQualifierAlias() {
+        testAuthorParsing("au");
+    }
+
+    private void testAuthorParsing(String authorQualifier){
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, matches("creator:BOB", issue));
-        assertEquals(true, matches("creator:bob", issue));
-        assertEquals(false, matches("creator:alice", issue));
-        assertEquals(true, matches("creator:o", issue));
-        assertEquals(false, matches("creator:lic", issue));
-
-        assertEquals(true, matches("author:BOB", issue));
-        assertEquals(true, matches("author:bob", issue));
-        assertEquals(false, matches("author:alice", issue));
-        assertEquals(true, matches("author:o", issue));
-        assertEquals(false, matches("author:lic", issue));
-
-        assertEquals(true, matches("au:BOB", issue));
-        assertEquals(true, matches("au:bob", issue));
-        assertEquals(false, matches("au:alice", issue));
-        assertEquals(true, matches("au:o", issue));
-        assertEquals(false, matches("au:lic", issue));
+        assertEquals(true, matches(authorQualifier + ":BOB", issue));
+        assertEquals(true, matches(authorQualifier + ":bob", issue));
+        assertEquals(false, matches(authorQualifier + ":alice", issue));
+        assertEquals(true, matches(authorQualifier + ":o", issue));
+        assertEquals(false, matches(authorQualifier + ":lic", issue));
     }
 
     @Test
@@ -511,15 +510,20 @@ public class FilterEvalTests {
 
     @Test
     public void state() {
+        testStateParsing("state");
+    }
+
+    @Test
+    public void stateWithQualifierAlias() {
+        testStateParsing("s");
+    }
+
+    private void testStateParsing(String stateQualifier){
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
-        assertEquals(false, matches("state:open", issue));
-        assertEquals(false, matches("state:o", issue));
-        assertEquals(true, matches("state:closed", issue));
-
-        assertEquals(false, matches("s:open", issue));
-        assertEquals(false, matches("s:o", issue));
-        assertEquals(true, matches("s:closed", issue));
+        assertEquals(false, matches(stateQualifier + ":open", issue));
+        assertEquals(false, matches(stateQualifier + ":o", issue));
+        assertEquals(true, matches(stateQualifier + ":closed", issue));
     }
 
     @Test
