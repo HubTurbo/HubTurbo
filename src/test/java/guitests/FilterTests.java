@@ -23,6 +23,14 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(issuePanel.getIssueCount(), 10);
+
+        // test parse exception returns Qualifier.EMPTY, i.e. all issues
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("m:");
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 10);
     }
 
     @Test
@@ -39,6 +47,16 @@ public class FilterTests extends UITest{
         assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
         assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(1));
 
+        // test current-1 : equal to first milestone in dummy repo using qualifier alias
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("m:current-1");
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 1);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(1));
+
         // test current : equal to second milestone in dummy repo
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
@@ -49,10 +67,30 @@ public class FilterTests extends UITest{
         assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
         assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(2));
 
+        // test current : equal to second milestone in dummy repo using qualifier alias
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("m:current");
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 1);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(2));
+
         // test curr+1 : equal to third milestone in dummy repo
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("milestone:curr+1");
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 1);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(3));
+
+        //testing curr + 1 with qualifer alias
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("m:curr+1");
         push(KeyCode.ENTER);
 
         assertEquals(issuePanel.getIssueCount(), 1);

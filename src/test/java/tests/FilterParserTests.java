@@ -110,6 +110,12 @@ public class FilterParserTests {
                         new Qualifier("milestone", "0.4"),
                         new Qualifier("state", "open")),
                     new Qualifier("label", "urgent")));
+        assertEquals(Parser.parse("m:0.4 s:open OR label:urgent"),
+                new Disjunction(
+                        new Conjunction(
+                                new Qualifier("m", "0.4"),
+                                new Qualifier("s", "open")),
+                        new Qualifier("label", "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
             Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
@@ -308,8 +314,12 @@ public class FilterParserTests {
     public void colon() {
         assertEquals(Parser.parse("assignee:darius"),
             new Qualifier("assignee", "darius"));
+        assertEquals(Parser.parse("as:darius"),
+                new Qualifier("as", "darius"));
         assertEquals(Parser.parse("assignee    :    darius   "),
             new Qualifier("assignee", "darius"));
+        assertEquals(Parser.parse("as    :    darius   "),
+                new Qualifier("as", "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
             new Conjunction(
                 new Conjunction(
