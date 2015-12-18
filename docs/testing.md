@@ -78,4 +78,4 @@ Unit tests are meant to extensively test the functionality of a HubTurbo compone
 
 ## Additional Tools
 
-- [mockito](http://mockito.org/) is used in HubTurbo's tests suite to create clean and verifiable stubbed classes. Refer to [mockito's docs](http://mockito.github.io/mockito/docs/current/org/mockito/Mockito.html) for more information, guides and caveats when using *mockito*.
+- [mockito](http://mockito.org/) is used in HubTurbo's tests suite to create clean and verifiable stubbed classes. A common use case is to isolate a small component under test while mocking other required components without having to write complex stubbing logic and mixing between application and testing code. Refer to usage of *mockito* in our tests suite and [mockito's docs](http://mockito.github.io/mockito/docs/current/org/mockito/Mockito.html) for more information, guides and caveats when using *mockito*.

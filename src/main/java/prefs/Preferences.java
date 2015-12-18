@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class Preferences {
     public static final String DIRECTORY = "settings";
+
+    // Standard config filenames used for application and testing
     public static final String GLOBAL_CONFIG_FILE = "global.json";
     public static final String TEST_CONFIG_FILE = "test.json";
 
@@ -17,8 +19,8 @@ public class Preferences {
 
     public GlobalConfig global;
 
-    public Preferences(Optional<String> configFileName) {
-        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName.orElse(GLOBAL_CONFIG_FILE));
+    public Preferences(String configFileName) {
+        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName);
         loadGlobalConfig();
     }
 

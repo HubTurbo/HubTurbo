@@ -1,6 +1,7 @@
 package tests;
 
 import backend.RepoIO;
+import backend.json.JSONStoreStub;
 import backend.resource.MultiModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.*;
@@ -45,7 +47,7 @@ public class MultiModelTest {
         MultiModel models = new MultiModel(mock(Preferences.class));
         models.queuePendingRepository(repoId1);
         models.queuePendingRepository(repoId2);
-        RepoIO testIO = TestController.createTestingRepoIO(false);
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.of(new JSONStoreStub()));
         testIO.openRepository(repoId1).thenApply(models::addPending).get();
         testIO.openRepository(repoId2).thenApply(models::addPending).get();
 

@@ -12,6 +12,7 @@ import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +35,7 @@ public class SavedLoginTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
-        RepoIO testIO = TestController.createTestingRepoIO(true);
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         try {
             testIO.openRepository("test/test").get();
         } catch (InterruptedException | ExecutionException e) {

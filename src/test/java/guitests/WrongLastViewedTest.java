@@ -12,6 +12,7 @@ import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +37,7 @@ public class WrongLastViewedTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
-        RepoIO testIO = TestController.createTestingRepoIO(true);
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         try {
             testIO.openRepository("test2/test2").get();
         } catch (InterruptedException | ExecutionException e) {

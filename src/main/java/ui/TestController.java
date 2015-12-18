@@ -2,6 +2,7 @@ package ui;
 
 import backend.RepoIO;
 import backend.interfaces.RepoStore;
+import backend.json.JSONStore;
 import backend.json.JSONStoreStub;
 import backend.stub.DummySource;
 import javafx.application.Application;
@@ -94,7 +95,7 @@ public final class TestController {
             return createTestPreferences();
         }
 
-        return new Preferences(Optional.empty());
+        return new Preferences(Preferences.GLOBAL_CONFIG_FILE);
     }
 
     /**
@@ -102,7 +103,7 @@ public final class TestController {
      * @return
      */
     public static Preferences createTestPreferences() {
-        return new Preferences(Optional.of(Preferences.TEST_CONFIG_FILE));
+        return new Preferences(Preferences.TEST_CONFIG_FILE);
     }
 
     /**
@@ -118,12 +119,12 @@ public final class TestController {
 
     /**
      * Creates a partially stubbed RepoIO used for testing
-     * @param enableJSONStore set to true if actual json file is to be used for storing repos' data
+     * @param jsonStoreToBeUsed store to be used with RepoIO,
+     *                          defaults to a new instance of JSONStore if this value is empty
      * @return
      */
-    public static RepoIO createTestingRepoIO(boolean enableJSONStore) {
-        return new RepoIO(Optional.of(new DummySource()),
-                          enableJSONStore ? Optional.empty() : Optional.of(new JSONStoreStub()),
+    public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
+        return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,
                           Optional.of(RepoStore.TEST_DIRECTORY));
     }
 }
