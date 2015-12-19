@@ -209,10 +209,6 @@ public abstract class FilterPanel extends AbstractPanel {
         panelMenuBar.setPanelName(newName);
     }
     
-    public String getCurrentName() {
-        return this.panelMenuBar.getPanelName();
-    }
-
     public String getCurrentFilterString() {
         return filterTextField.getText();
     }
