@@ -30,7 +30,7 @@ public interface FilterExpression {
 
     // Walks the syntax tree to get all the qualifier names that appear.
 
-    List<String> getQualifierNames();
+    List<QualifierType> getQualifierNames();
 
     // A given FilterExpression has a string form that, when parsed, is
     // guaranteed to produce an equivalent FilterExpression. It can thus

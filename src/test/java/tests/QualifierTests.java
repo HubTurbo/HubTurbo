@@ -1,22 +1,24 @@
 package tests;
 
-import backend.interfaces.IModel;
-import backend.resource.*;
-import filter.Parser;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+
+import backend.interfaces.IModel;
+import backend.resource.*;
+import filter.Parser;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 
 public class QualifierTests {
     List<TurboIssue> issues = createSampleIssues();
@@ -75,7 +77,7 @@ public class QualifierTests {
         List<Qualifier> metaQualifiers = getMetaQualifiers(Parser.parse(filterExpression));
 
         for (Qualifier metaQualifier : metaQualifiers) {
-            if (metaQualifier.getName().equals("sort")) {
+            if (metaQualifier.getName() == QualifierType.SORT) {
                 return metaQualifier.getCompoundSortComparator(testModel, false);
             }
         }

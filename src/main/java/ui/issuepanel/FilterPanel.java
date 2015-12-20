@@ -6,6 +6,7 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
+import filter.expression.QualifierType;
 import ui.components.PanelMenuBar;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
@@ -30,6 +31,7 @@ import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,10 +106,13 @@ public abstract class FilterPanel extends AbstractPanel {
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
 
         // Update keywords
-        List<String> all = new ArrayList<>(Qualifier.KEYWORDS);
+        List<String> all = new ArrayList<>(QualifierType.getCompletionKeywords());
         all.addAll(e.model.getUsers().stream()
             .map(TurboUser::getLoginName)
             .collect(Collectors.toList()));
+
+        // Ensure that completions appear in lexicographical order
+        Collections.sort(all);
 
         filterTextField.setKeywords(all);
     };

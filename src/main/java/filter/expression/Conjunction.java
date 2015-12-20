@@ -56,10 +56,10 @@ public class Conjunction implements FilterExpression {
     }
 
     private boolean containsDuplicateQualifierNames() {
-        List<String> nonLabelQualifierNames = getQualifierNames().stream()
-            .filter(pn -> !pn.equals("label"))
+        List<QualifierType> nonLabelQualifierNames = getQualifierNames().stream()
+            .filter(pn -> !pn.equals(QualifierType.LABEL))
             .collect(Collectors.toList());
-        HashSet<String> noDuplicates = new HashSet<>(nonLabelQualifierNames);
+        HashSet<QualifierType> noDuplicates = new HashSet<>(nonLabelQualifierNames);
         return noDuplicates.size() != nonLabelQualifierNames.size();
     }
 
@@ -77,8 +77,8 @@ public class Conjunction implements FilterExpression {
     }
 
     @Override
-    public List<String> getQualifierNames() {
-        ArrayList<String> list = new ArrayList<>();
+    public List<QualifierType> getQualifierNames() {
+        ArrayList<QualifierType> list = new ArrayList<>();
         list.addAll(left.getQualifierNames());
         list.addAll(right.getQualifierNames());
         return list;

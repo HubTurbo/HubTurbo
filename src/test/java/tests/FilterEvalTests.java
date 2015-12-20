@@ -1,14 +1,7 @@
 package tests;
 
-import backend.interfaces.IModel;
-import backend.resource.*;
-import filter.ParseException;
-import filter.Parser;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import prefs.Preferences;
+import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +9,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import backend.interfaces.IModel;
+import backend.resource.*;
+import filter.ParseException;
+import filter.Parser;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import prefs.Preferences;
 
 public class FilterEvalTests {
 

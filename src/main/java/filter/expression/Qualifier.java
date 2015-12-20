@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -17,25 +16,12 @@ import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
-
 public class Qualifier implements FilterExpression {
 
-    public static final String REPO = "repo";
-    public static final String SORT = "sort";
-    private static final String UPDATED = "updated";
+    public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
+    public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
 
-    public static final Qualifier EMPTY = new Qualifier("", "");
-    public static final Qualifier FALSE = new Qualifier("false", "");
-
-    public static final List<String> KEYWORDS = Collections.unmodifiableList(Arrays.asList(
-        "assignee", "author", "body", "closed", "comments", "created", "creator",
-        "date", "desc", "description", "false", "has", "id", "in", "involves",
-        "is", "issue", "keyword", "label", "labels", "merged", "milestone", "milestones",
-        "no", "nonSelfUpdate", "open", "pr", "pullrequest", "read", REPO, SORT, "state", "status",
-        "title", "type", "unmerged", "unread", UPDATED, "user"
-    ));
-
-    private final String name;
+    private final QualifierType name;
 
     // Only one of these will be present at a time
     private Optional<DateRange> dateRange = Optional.empty();
@@ -65,39 +51,39 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    public Qualifier(String name, String content) {
+    public Qualifier(QualifierType name, String content) {
         this.name = name;
         this.content = Optional.of(content);
     }
 
-    public Qualifier(String name, NumberRange numberRange) {
+    public Qualifier(QualifierType name, NumberRange numberRange) {
         this.name = name;
         this.numberRange = Optional.of(numberRange);
     }
 
-    public Qualifier(String name, DateRange dateRange) {
+    public Qualifier(QualifierType name, DateRange dateRange) {
         this.name = name;
         this.dateRange = Optional.of(dateRange);
     }
 
-    public Qualifier(String name, LocalDate date) {
+    public Qualifier(QualifierType name, LocalDate date) {
         this.name = name;
         this.date = Optional.of(date);
     }
 
-    public Qualifier(String name, int number) {
+    public Qualifier(QualifierType name, int number) {
         this.name = name;
         this.number = Optional.of(number);
     }
 
-    public Qualifier(String name, List<SortKey> keys) {
+    public Qualifier(QualifierType name, List<SortKey> keys) {
         this.name = name;
         this.sortKeys = new ArrayList<>(keys);
     }
 
     public static FilterExpression replaceMilestoneAliases(IModel model, FilterExpression expr) {
-        List<String> repoIds = getContentOfMetaQualifier(expr, REPO).stream()
-                .map(repoId -> repoId.toLowerCase())
+        List<String> repoIds = getContentOfMetaQualifier(expr, QualifierType.REPO).stream()
+                .map(String::toLowerCase)
                 .collect(Collectors.toList());
 
         if (repoIds.isEmpty()) {
@@ -140,11 +126,11 @@ public class Qualifier implements FilterExpression {
         boolean containsRepoQualifier = metaQualifiers.stream()
                 .map(Qualifier::getName)
                 .collect(Collectors.toList())
-                .contains("repo");
+                .contains(QualifierType.REPO);
 
         if (!containsRepoQualifier) {
             exprWithNormalQualifiers = new Conjunction(
-                new Qualifier("repo", model.getDefaultRepo()),
+                new Qualifier(QualifierType.REPO, model.getDefaultRepo()),
                 exprWithNormalQualifiers);
         }
 
@@ -175,15 +161,7 @@ public class Qualifier implements FilterExpression {
         return Optional.of(allMilestones.size());
     }
 
-    public static void processMetaQualifierEffects(FilterExpression expr,
-                                                   BiConsumer<Qualifier, MetaQualifierInfo> callback) {
-
-        List<Qualifier> qualifiers = expr.find(Qualifier::isMetaQualifier);
-        MetaQualifierInfo info = new MetaQualifierInfo(qualifiers);
-        qualifiers.forEach(q -> callback.accept(q, info));
-    }
-
-    public static HashSet<String> getContentOfMetaQualifier(FilterExpression expr, String qualifierName) {
+    public static HashSet<String> getContentOfMetaQualifier(FilterExpression expr, QualifierType qualifierName) {
         HashSet<String> contentsOfMetaQualifier = new HashSet<>();
         List<Qualifier> panelMetaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
@@ -214,11 +192,11 @@ public class Qualifier implements FilterExpression {
     }
 
     public boolean isEmptyQualifier() {
-        return name.isEmpty() && content.isPresent() && content.get().isEmpty();
+        return name == QualifierType.EMPTY;
     }
 
     public boolean isFalseQualifier() {
-        return name.equalsIgnoreCase("false") && content.isPresent() && content.get().isEmpty();
+        return name == QualifierType.FALSE;
     }
 
     @Override
@@ -232,50 +210,42 @@ public class Qualifier implements FilterExpression {
         if (isFalseQualifier()) return false;
 
         switch (name) {
-        case "id":
+        case ID:
             return idSatisfies(issue);
-        case "keyword":
+        case KEYWORD:
             return keywordSatisfies(issue, info);
-        case "title":
+        case TITLE:
             return titleSatisfies(issue);
-        case "body":
-        case "desc":
-        case "description":
+        case DESCRIPTION:
             return bodySatisfies(issue);
-        case "milestone":
-        case "m":
+        case MILESTONE:
             return milestoneSatisfies(model, issue);
-        case "label":
+        case LABEL:
             return labelsSatisfy(model, issue);
-        case "author":
-        case "creator":
-        case "au":
+        case AUTHOR:
             return authorSatisfies(issue);
-        case "assignee":
-        case "as":
+        case ASSIGNEE:
             return assigneeSatisfies(model, issue);
-        case "involves":
-        case "user":
+        case INVOLVES:
             return involvesSatisfies(model, issue);
-        case "type":
+        case TYPE:
             return typeSatisfies(issue);
-        case "state":
-        case "status":
-        case "s":
+        case STATE:
             return stateSatisfies(issue);
-        case "has":
+        case HAS:
             return satisfiesHasConditions(issue);
-        case "no":
+        case NO:
             return satisfiesNoConditions(issue);
-        case "is":
+        case IS:
             return satisfiesIsConditions(issue);
-        case "created":
+        case CREATED:
             return satisfiesCreationDate(issue);
         case UPDATED:
             return satisfiesUpdatedHours(issue);
         case REPO:
             return satisfiesRepo(issue);
         default:
+            assert false : "Missing case for " + name;
             return false;
         }
     }
@@ -291,44 +261,36 @@ public class Qualifier implements FilterExpression {
         assert !isFalseQualifier();
 
         switch (name) {
-        case "title":
-        case "desc":
-        case "description":
-        case "body":
-        case "keyword":
+        case TITLE:
+        case DESCRIPTION:
+        case KEYWORD:
             throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
-        case "id":
+        case ID:
             throw new QualifierApplicationException("Unnecessary filter: id is immutable");
-        case "created":
+        case CREATED:
             throw new QualifierApplicationException("Unnecessary filter: cannot change issue creation date");
-        case "has":
-        case "no":
-        case "is":
+        case HAS:
+        case NO:
+        case IS:
             throw new QualifierApplicationException("Ambiguous filter: " + name);
-        case "milestone":
-        case "m":
+        case MILESTONE:
             applyMilestone(issue, model);
             break;
-        case "label":
+        case LABEL:
             applyLabel(issue, model);
             break;
-        case "assignee":
-        case "as":
+        case ASSIGNEE:
             applyAssignee(issue, model);
             break;
-        case "author":
-        case "creator":
-        case "au":
+        case AUTHOR:
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
-        case "involves":
-        case "user":
+        case INVOLVES:
             throw new QualifierApplicationException("Ambiguous filter: cannot change users involved with issue");
-        case "state":
-        case "status":
-        case "s":
+        case STATE:
             applyState(issue);
             break;
         default:
+            assert false : "Missing case for " + name;
             break;
         }
     }
@@ -339,7 +301,7 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public List<String> getQualifierNames() {
+    public List<QualifierType> getQualifierNames() {
         return new ArrayList<>(Arrays.asList(name));
     }
 
@@ -381,7 +343,7 @@ public class Qualifier implements FilterExpression {
             if (quotedContent.contains(" ")) {
                 quotedContent = "\"" + quotedContent + "\"";
             }
-            if (name.equals("keyword")) {
+            if (name == QualifierType.KEYWORD) {
                 return quotedContent;
             } else {
                 return name + ":" + quotedContent;
@@ -443,7 +405,7 @@ public class Qualifier implements FilterExpression {
 
     private static boolean shouldBeStripped(Qualifier q) {
         switch (q.getName()) {
-            case "in":
+            case IN:
             case SORT:
                 return true;
             default:
@@ -454,7 +416,7 @@ public class Qualifier implements FilterExpression {
     public static boolean isMetaQualifier(Qualifier q) {
         switch (q.getName()) {
         case SORT:
-        case "in":
+        case IN:
         case REPO:
             return true;
         default:
@@ -464,8 +426,7 @@ public class Qualifier implements FilterExpression {
 
     public static boolean isMilestoneQualifier(Qualifier q) {
         switch (q.getName()) {
-            case "milestone":
-            case "m":
+            case MILESTONE:
                 return true;
             default:
                 return false;
@@ -479,12 +440,6 @@ public class Qualifier implements FilterExpression {
             default:
                 return false;
         }
-    }
-
-    public static boolean hasUpdatedQualifier(List<Qualifier> metaQualifiers) {
-        return metaQualifiers.stream()
-            .filter(Qualifier::isUpdatedQualifier)
-            .findAny().isPresent();
     }
 
     public static boolean hasUpdatedQualifier(FilterExpression expr) {
@@ -523,7 +478,7 @@ public class Qualifier implements FilterExpression {
             case "repo":
                 comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
                 break;
-            case UPDATED:
+            case "updated":
             case "date":
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
                 break;
@@ -584,6 +539,7 @@ public class Qualifier implements FilterExpression {
             case "id":
                 comparator = (a, b) -> a.getId() - b.getId();
                 break;
+            case "state":
             case "status":
             case "s":
                 comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
@@ -1019,7 +975,7 @@ public class Qualifier implements FilterExpression {
         return date;
     }
 
-    public String getName() {
+    public QualifierType getName() {
         return name;
     }
 

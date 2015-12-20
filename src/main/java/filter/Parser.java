@@ -67,7 +67,7 @@ public class Parser {
             left = parseQualifier(token);
             break;
         case QUOTE:
-            left = parseQuotedKeywords(token);
+            left = parseQuotedKeywords();
             break;
         case SYMBOL:
             left = parseKeyword(token);
@@ -106,17 +106,13 @@ public class Parser {
         return left;
     }
 
-    private FilterExpression parseQuotedKeywords(Token token) {
-        FilterExpression result = parseKeywords();
+    private FilterExpression parseQuotedKeywords() {
+        FilterExpression result = parseQuotedContent(QualifierType.KEYWORD);
         consume(TokenType.QUOTE);
         return result;
     }
 
-    private FilterExpression parseKeywords() {
-        return parseKeywords("keyword");
-    }
-
-    private FilterExpression parseKeywords(String qualifierName) {
+    private FilterExpression parseQuotedContent(QualifierType qualifierName) {
         StringBuilder sb = new StringBuilder();
         while (!isQuoteToken(lookAhead())) {
             sb.append(consume().getValue()).append(" ");
@@ -125,7 +121,7 @@ public class Parser {
     }
 
     private FilterExpression parseKeyword(Token token) {
-        return new Qualifier("keyword", token.getValue());
+        return new Qualifier(QualifierType.KEYWORD, token.getValue());
     }
 
     private int getInfixPrecedence(Token token) {
@@ -176,42 +172,40 @@ public class Parser {
         // Strip the : at the end, then trim
         qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
-        return parseQualifierContent(qualifierName, false);
+        QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
+        return parseQualifierContent(type, false);
     }
 
-    private FilterExpression parseQualifierContent(String qualifierName, boolean allowMultipleKeywords) {
-        if (isSortQualifier(qualifierName)) {
+    private FilterExpression parseQualifierContent(QualifierType qualifier, boolean allowMultipleKeywords) {
+        if (qualifier == QualifierType.SORT) {
             return parseSortKeys();
         } else if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
-            return parseRangeOperator(qualifierName, lookAhead());
+            return parseRangeOperator(qualifier, lookAhead());
         } else if (isDateToken(lookAhead())) {
             // [date] | [date] .. [date]
-            return parseDateOrDateRange(qualifierName);
+            return parseDateOrDateRange(qualifier);
         } else if (isNumberToken(lookAhead())) {
             // [number] | [number] .. [number]
-            return parseNumberOrNumberRange(qualifierName);
+            return parseNumberOrNumberRange(qualifier);
         } else if (isQuoteToken(lookAhead())) {
             // " [content] "
             consume(TokenType.QUOTE);
-            FilterExpression result = parseQualifierContent(qualifierName, true);
+            FilterExpression result = parseQualifierContent(qualifier, true);
             consume(TokenType.QUOTE);
             return result;
         } else if (isKeywordToken(lookAhead())) {
-            // Keyword(s)
             if (allowMultipleKeywords) {
-                return parseKeywords(qualifierName);
+                // We're within quotes, with the ability to parse multiple consecutive keywords
+                return parseQuotedContent(qualifier);
             } else {
-                return new Qualifier(qualifierName, consume().getValue());
+                // Everything else
+                return new Qualifier(qualifier, consume().getValue());
             }
         } else {
             throw new ParseException(String.format("Invalid content for qualifier %s: %s",
-                qualifierName, lookAhead()));
+                qualifier, lookAhead()));
         }
-    }
-
-    private boolean isSortQualifier(String qualifierName) {
-        return qualifierName.equals(Qualifier.SORT);
     }
 
     private boolean isKeywordToken(Token token) {
@@ -261,7 +255,7 @@ public class Parser {
         return isNumberToken(token) || isDateToken(token);
     }
 
-    private FilterExpression parseNumberOrNumberRange(String qualifierName) {
+    private FilterExpression parseNumberOrNumberRange(QualifierType qualifierName) {
         Token left = consume();
 
         Optional<Integer> leftDate = parseNumber(left);
@@ -295,7 +289,7 @@ public class Parser {
         return null;
     }
 
-    private FilterExpression parseDateOrDateRange(String qualifierName) {
+    private FilterExpression parseDateOrDateRange(QualifierType qualifierName) {
         Token left = consume();
         Optional<LocalDate> leftDate = parseDate(left);
         if (!leftDate.isPresent()) {
@@ -336,7 +330,7 @@ public class Parser {
             consume(TokenType.COMMA);
             keys.add(parseSortKey());
         }
-        return new Qualifier(Qualifier.SORT, keys);
+        return new Qualifier(QualifierType.SORT, keys);
     }
 
     private SortKey parseSortKey() {
@@ -350,7 +344,7 @@ public class Parser {
         }
     }
 
-    private FilterExpression parseRangeOperator(String name, Token token) {
+    private FilterExpression parseRangeOperator(QualifierType name, Token token) {
         String operator = token.getValue();
 
         consume(token.getType());
