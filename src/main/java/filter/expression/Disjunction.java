@@ -63,10 +63,10 @@ public class Disjunction implements FilterExpression {
     }
 
     @Override
-    public List<QualifierType> getQualifierNames() {
+    public List<QualifierType> getQualifierTypes() {
         ArrayList<QualifierType> list = new ArrayList<>();
-        list.addAll(left.getQualifierNames());
-        list.addAll(right.getQualifierNames());
+        list.addAll(left.getQualifierTypes());
+        list.addAll(right.getQualifierTypes());
         return list;
     }
 

@@ -200,8 +200,8 @@ public class MilestoneAliasTests {
         List<Qualifier> milestoneQualifiers;
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse(filterText));
-        assertEquals(noMilestoneAlias.getQualifierNames().size(), 1);
-        assertEquals(noMilestoneAlias.getQualifierNames().get(0), QualifierType.FALSE);
+        assertEquals(noMilestoneAlias.getQualifierTypes().size(), 1);
+        assertEquals(noMilestoneAlias.getQualifierTypes().get(0), QualifierType.FALSE);
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(milestoneQualifiers.size(), 0);
     }

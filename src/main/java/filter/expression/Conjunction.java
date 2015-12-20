@@ -55,17 +55,17 @@ public class Conjunction implements FilterExpression {
                 && right.isSatisfiedBy(model, issue, info);
     }
 
-    private boolean containsDuplicateQualifierNames() {
-        List<QualifierType> nonLabelQualifierNames = getQualifierNames().stream()
+    private boolean containsDuplicateQualifierTypes() {
+        List<QualifierType> nonLabelQualifierTypes = getQualifierTypes().stream()
             .filter(pn -> !pn.equals(QualifierType.LABEL))
             .collect(Collectors.toList());
-        HashSet<QualifierType> noDuplicates = new HashSet<>(nonLabelQualifierNames);
-        return noDuplicates.size() != nonLabelQualifierNames.size();
+        HashSet<QualifierType> noDuplicates = new HashSet<>(nonLabelQualifierTypes);
+        return noDuplicates.size() != nonLabelQualifierTypes.size();
     }
 
     @Override
     public boolean canBeAppliedToIssue() {
-        return !containsDuplicateQualifierNames()
+        return !containsDuplicateQualifierTypes()
                 && left.canBeAppliedToIssue()
                 && right.canBeAppliedToIssue();
     }
@@ -77,10 +77,10 @@ public class Conjunction implements FilterExpression {
     }
 
     @Override
-    public List<QualifierType> getQualifierNames() {
+    public List<QualifierType> getQualifierTypes() {
         ArrayList<QualifierType> list = new ArrayList<>();
-        list.addAll(left.getQualifierNames());
-        list.addAll(right.getQualifierNames());
+        list.addAll(left.getQualifierTypes());
+        list.addAll(right.getQualifierTypes());
         return list;
     }
 

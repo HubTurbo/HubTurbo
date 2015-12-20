@@ -21,7 +21,7 @@ public class Qualifier implements FilterExpression {
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
 
-    private final QualifierType name;
+    private final QualifierType type;
 
     // Only one of these will be present at a time
     private Optional<DateRange> dateRange = Optional.empty();
@@ -33,7 +33,7 @@ public class Qualifier implements FilterExpression {
 
     // Copy constructor
     public Qualifier(Qualifier other) {
-        this.name = other.getName();
+        this.type = other.getType();
         if (other.getDateRange().isPresent()) {
             this.dateRange = other.getDateRange();
         } else if (other.getDate().isPresent()) {
@@ -51,38 +51,38 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    public Qualifier(QualifierType name, String content) {
-        this.name = name;
+    public Qualifier(QualifierType type, String content) {
+        this.type = type;
         this.content = Optional.of(content);
     }
 
-    public Qualifier(QualifierType name, NumberRange numberRange) {
-        this.name = name;
+    public Qualifier(QualifierType type, NumberRange numberRange) {
+        this.type = type;
         this.numberRange = Optional.of(numberRange);
     }
 
-    public Qualifier(QualifierType name, DateRange dateRange) {
-        this.name = name;
+    public Qualifier(QualifierType type, DateRange dateRange) {
+        this.type = type;
         this.dateRange = Optional.of(dateRange);
     }
 
-    public Qualifier(QualifierType name, LocalDate date) {
-        this.name = name;
+    public Qualifier(QualifierType type, LocalDate date) {
+        this.type = type;
         this.date = Optional.of(date);
     }
 
-    public Qualifier(QualifierType name, int number) {
-        this.name = name;
+    public Qualifier(QualifierType type, int number) {
+        this.type = type;
         this.number = Optional.of(number);
     }
 
-    public Qualifier(QualifierType name, List<SortKey> keys) {
-        this.name = name;
+    public Qualifier(QualifierType type, List<SortKey> keys) {
+        this.type = type;
         this.sortKeys = new ArrayList<>(keys);
     }
 
     public static FilterExpression replaceMilestoneAliases(IModel model, FilterExpression expr) {
-        List<String> repoIds = getContentOfMetaQualifier(expr, QualifierType.REPO).stream()
+        List<String> repoIds = getMetaQualifierContent(expr, QualifierType.REPO).stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toList());
 
@@ -124,7 +124,7 @@ public class Qualifier implements FilterExpression {
 
         // Preprocessing for repo qualifier
         boolean containsRepoQualifier = metaQualifiers.stream()
-                .map(Qualifier::getName)
+                .map(Qualifier::getType)
                 .collect(Collectors.toList())
                 .contains(QualifierType.REPO);
 
@@ -161,17 +161,17 @@ public class Qualifier implements FilterExpression {
         return Optional.of(allMilestones.size());
     }
 
-    public static HashSet<String> getContentOfMetaQualifier(FilterExpression expr, QualifierType qualifierName) {
-        HashSet<String> contentsOfMetaQualifier = new HashSet<>();
+    public static HashSet<String> getMetaQualifierContent(FilterExpression expr, QualifierType qualifierType) {
+        HashSet<String> contents = new HashSet<>();
         List<Qualifier> panelMetaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
         panelMetaQualifiers.forEach(metaQualifier -> {
-            if (metaQualifier.getName().equals(qualifierName) && metaQualifier.getContent().isPresent()) {
-                contentsOfMetaQualifier.add(metaQualifier.getContent().get());
+            if (metaQualifier.getType().equals(qualifierType) && metaQualifier.getContent().isPresent()) {
+                contents.add(metaQualifier.getContent().get());
             }
         });
 
-        return contentsOfMetaQualifier;
+        return contents;
     }
 
     private static LocalDateTime currentTime = null;
@@ -192,16 +192,16 @@ public class Qualifier implements FilterExpression {
     }
 
     public boolean isEmptyQualifier() {
-        return name == QualifierType.EMPTY;
+        return type == QualifierType.EMPTY;
     }
 
     public boolean isFalseQualifier() {
-        return name == QualifierType.FALSE;
+        return type == QualifierType.FALSE;
     }
 
     @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
-        assert name != null;
+        assert type != null;
 
         // The empty qualifier is satisfied by anything
         if (isEmptyQualifier()) return true;
@@ -209,7 +209,7 @@ public class Qualifier implements FilterExpression {
         // The false qualifier is satisfied by nothing
         if (isFalseQualifier()) return false;
 
-        switch (name) {
+        switch (type) {
         case ID:
             return idSatisfies(issue);
         case KEYWORD:
@@ -245,14 +245,14 @@ public class Qualifier implements FilterExpression {
         case REPO:
             return satisfiesRepo(issue);
         default:
-            assert false : "Missing case for " + name;
+            assert false : "Missing case for " + type;
             return false;
         }
     }
 
     @Override
     public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
-        assert name != null && content != null;
+        assert type != null && content != null;
 
         // The empty qualifier should not be applied to anything
         assert !isEmptyQualifier();
@@ -260,7 +260,7 @@ public class Qualifier implements FilterExpression {
         // The false qualifier should not be applied to anything
         assert !isFalseQualifier();
 
-        switch (name) {
+        switch (type) {
         case TITLE:
         case DESCRIPTION:
         case KEYWORD:
@@ -272,7 +272,7 @@ public class Qualifier implements FilterExpression {
         case HAS:
         case NO:
         case IS:
-            throw new QualifierApplicationException("Ambiguous filter: " + name);
+            throw new QualifierApplicationException("Ambiguous filter: " + type);
         case MILESTONE:
             applyMilestone(issue, model);
             break;
@@ -290,7 +290,7 @@ public class Qualifier implements FilterExpression {
             applyState(issue);
             break;
         default:
-            assert false : "Missing case for " + name;
+            assert false : "Missing case for " + type;
             break;
         }
     }
@@ -301,8 +301,8 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public List<QualifierType> getQualifierNames() {
-        return new ArrayList<>(Arrays.asList(name));
+    public List<QualifierType> getQualifierTypes() {
+        return new ArrayList<>(Arrays.asList(type));
     }
 
     @Override
@@ -343,21 +343,21 @@ public class Qualifier implements FilterExpression {
             if (quotedContent.contains(" ")) {
                 quotedContent = "\"" + quotedContent + "\"";
             }
-            if (name == QualifierType.KEYWORD) {
+            if (type == QualifierType.KEYWORD) {
                 return quotedContent;
             } else {
-                return name + ":" + quotedContent;
+                return type + ":" + quotedContent;
             }
         } else if (date.isPresent()) {
-            return name + ":" + date.get().toString();
+            return type + ":" + date.get().toString();
         } else if (dateRange.isPresent()) {
-            return name + ":" + dateRange.get().toString();
+            return type + ":" + dateRange.get().toString();
         } else if (!sortKeys.isEmpty()) {
-            return name + ":" + sortKeys.stream().map(SortKey::toString).collect(Collectors.joining(","));
+            return type + ":" + sortKeys.stream().map(SortKey::toString).collect(Collectors.joining(","));
         } else if (numberRange.isPresent()) {
-            return name + ":" + numberRange.get().toString();
+            return type + ":" + numberRange.get().toString();
         } else if (number.isPresent()) {
-            return name + ":" + number.get().toString();
+            return type + ":" + number.get().toString();
         } else {
             assert false : "Should not happen";
             return "";
@@ -368,7 +368,7 @@ public class Qualifier implements FilterExpression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + ((content == null) ? 0 : content.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
         result = prime * result + ((dateRange == null) ? 0 : dateRange.hashCode());
@@ -396,7 +396,7 @@ public class Qualifier implements FilterExpression {
                 number.equals(other.number) &&
                 numberRange.equals(other.numberRange) &&
                 sortKeys.equals(other.sortKeys) &&
-                name.equals(other.name);
+                type.equals(other.type);
     }
 
     private static boolean shouldNotBeStripped(Qualifier q) {
@@ -404,7 +404,7 @@ public class Qualifier implements FilterExpression {
     }
 
     private static boolean shouldBeStripped(Qualifier q) {
-        switch (q.getName()) {
+        switch (q.getType()) {
             case IN:
             case SORT:
                 return true;
@@ -414,7 +414,7 @@ public class Qualifier implements FilterExpression {
     }
 
     public static boolean isMetaQualifier(Qualifier q) {
-        switch (q.getName()) {
+        switch (q.getType()) {
         case SORT:
         case IN:
         case REPO:
@@ -425,7 +425,7 @@ public class Qualifier implements FilterExpression {
     }
 
     public static boolean isMilestoneQualifier(Qualifier q) {
-        switch (q.getName()) {
+        switch (q.getType()) {
             case MILESTONE:
                 return true;
             default:
@@ -434,7 +434,7 @@ public class Qualifier implements FilterExpression {
     }
 
     public static boolean isUpdatedQualifier(Qualifier q) {
-        switch (q.getName()) {
+        switch (q.getType()) {
             case UPDATED:
                 return true;
             default:
@@ -975,8 +975,8 @@ public class Qualifier implements FilterExpression {
         return date;
     }
 
-    public QualifierType getName() {
-        return name;
+    public QualifierType getType() {
+        return type;
     }
 
     private Qualifier convertMilestoneAliasQualifier(List<TurboMilestone> allMilestones, int currentIndex) {
@@ -1011,7 +1011,7 @@ public class Qualifier implements FilterExpression {
 
         contents = allMilestones.get(currentIndex).getTitle().toLowerCase();
 
-        return new Qualifier(name, contents);
+        return new Qualifier(type, contents);
     }
 
     /**

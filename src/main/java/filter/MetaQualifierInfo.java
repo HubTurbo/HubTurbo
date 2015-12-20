@@ -22,7 +22,7 @@ public class MetaQualifierInfo {
 
     private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
         List<Qualifier> inQualifiers = qualifiers.stream()
-            .filter(q -> q.getName() == QualifierType.IN)
+            .filter(q -> q.getType() == QualifierType.IN)
             .collect(Collectors.toList());
 
         if (inQualifiers.isEmpty()) {

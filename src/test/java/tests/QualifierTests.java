@@ -77,7 +77,7 @@ public class QualifierTests {
         List<Qualifier> metaQualifiers = getMetaQualifiers(Parser.parse(filterExpression));
 
         for (Qualifier metaQualifier : metaQualifiers) {
-            if (metaQualifier.getName() == QualifierType.SORT) {
+            if (metaQualifier.getType() == QualifierType.SORT) {
                 return metaQualifier.getCompoundSortComparator(testModel, false);
             }
         }

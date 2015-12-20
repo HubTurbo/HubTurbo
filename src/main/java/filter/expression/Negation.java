@@ -55,8 +55,8 @@ public class Negation implements FilterExpression {
     }
 
     @Override
-    public List<QualifierType> getQualifierNames() {
-        return expr.getQualifierNames();
+    public List<QualifierType> getQualifierTypes() {
+        return expr.getQualifierTypes();
     }
 
     @Override

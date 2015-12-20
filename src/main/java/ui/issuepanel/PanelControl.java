@@ -310,7 +310,7 @@ public class PanelControl extends HBox {
             if (currPanel instanceof FilterPanel) {
                 FilterPanel currFilterPanel = (FilterPanel) currPanel;
                 FilterExpression panelExpression = currFilterPanel.getCurrentFilterExpression();
-                repositoriesOnPanels.addAll(Qualifier.getContentOfMetaQualifier(panelExpression, QualifierType.REPO));
+                repositoriesOnPanels.addAll(Qualifier.getMetaQualifierContent(panelExpression, QualifierType.REPO));
             }
         }
 

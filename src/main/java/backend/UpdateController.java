@@ -64,7 +64,7 @@ public class UpdateController {
      */
     private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
         filterExprs.stream()
-                .flatMap(filterExpr -> Qualifier.getContentOfMetaQualifier(filterExpr, QualifierType.REPO).stream())
+                .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
                 .distinct()
                 .forEach(logic::openRepositoryFromFilter);
     }
@@ -131,7 +131,7 @@ public class UpdateController {
         MultiModel models = logic.getModels();
         for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
             // Only take into account the first sort qualifier found
-            if (metaQualifier.getName() == QualifierType.SORT) {
+            if (metaQualifier.getType() == QualifierType.SORT) {
                 return metaQualifier.getCompoundSortComparator(models, hasUpdatedQualifier);
             }
         }

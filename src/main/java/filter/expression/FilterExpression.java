@@ -28,9 +28,9 @@ public interface FilterExpression {
 
     void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException;
 
-    // Walks the syntax tree to get all the qualifier names that appear.
+    // Walks the syntax tree to get all the qualifier types that appear.
 
-    List<QualifierType> getQualifierNames();
+    List<QualifierType> getQualifierTypes();
 
     // A given FilterExpression has a string form that, when parsed, is
     // guaranteed to produce an equivalent FilterExpression. It can thus
