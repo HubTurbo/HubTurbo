@@ -243,13 +243,16 @@ public class Qualifier implements FilterExpression {
         case "description":
             return bodySatisfies(issue);
         case "milestone":
+        case "m":
             return milestoneSatisfies(model, issue);
         case "label":
             return labelsSatisfy(model, issue);
         case "author":
         case "creator":
+        case "au":
             return authorSatisfies(issue);
         case "assignee":
+        case "as":
             return assigneeSatisfies(model, issue);
         case "involves":
         case "user":
@@ -258,6 +261,7 @@ public class Qualifier implements FilterExpression {
             return typeSatisfies(issue);
         case "state":
         case "status":
+        case "s":
             return stateSatisfies(issue);
         case "has":
             return satisfiesHasConditions(issue);
@@ -302,22 +306,26 @@ public class Qualifier implements FilterExpression {
         case "is":
             throw new QualifierApplicationException("Ambiguous filter: " + name);
         case "milestone":
+        case "m":
             applyMilestone(issue, model);
             break;
         case "label":
             applyLabel(issue, model);
             break;
         case "assignee":
+        case "as":
             applyAssignee(issue, model);
             break;
         case "author":
         case "creator":
+        case "au":
             throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
         case "involves":
         case "user":
             throw new QualifierApplicationException("Ambiguous filter: cannot change users involved with issue");
         case "state":
         case "status":
+        case "s":
             applyState(issue);
             break;
         default:
@@ -457,6 +465,7 @@ public class Qualifier implements FilterExpression {
     public static boolean isMilestoneQualifier(Qualifier q) {
         switch (q.getName()) {
             case "milestone":
+            case "m":
                 return true;
             default:
                 return false;
@@ -527,6 +536,7 @@ public class Qualifier implements FilterExpression {
                 }
                 break;
             case "assignee":
+            case "as":
                 comparator = (a, b) -> {
                     Optional<String> aAssignee = a.getAssignee();
                     Optional<String> bAssignee = b.getAssignee();
@@ -543,6 +553,7 @@ public class Qualifier implements FilterExpression {
                 };
                 break;
             case "milestone":
+            case "m":
                 comparator = (a, b) -> {
                     Optional<TurboMilestone> aMilestone = model.getMilestoneOfIssue(a);
                     Optional<TurboMilestone> bMilestone = model.getMilestoneOfIssue(b);
@@ -574,6 +585,7 @@ public class Qualifier implements FilterExpression {
                 comparator = (a, b) -> a.getId() - b.getId();
                 break;
             case "status":
+            case "s":
                 comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
                 break;
             default:
@@ -695,10 +707,12 @@ public class Qualifier implements FilterExpression {
             return issue.getLabels().size() > 0;
         case "milestone":
         case "milestones":
+        case "m":
             assert issue.getMilestone() != null;
             return issue.getMilestone().isPresent();
         case "assignee":
         case "assignees":
+        case "as":
             assert issue.getMilestone() != null;
             return issue.getAssignee().isPresent();
         default:

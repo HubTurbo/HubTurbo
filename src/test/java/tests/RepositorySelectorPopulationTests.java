@@ -41,7 +41,7 @@ public class RepositorySelectorPopulationTests {
 
     @Test
     public void noJsonFiles() {
-        RepoIO testIO = TestController.createTestingRepoIO(Optional.of(new JSONStoreStub()));
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         assertEquals(0, testIO.getStoredRepos().size());
     }
 
@@ -49,7 +49,7 @@ public class RepositorySelectorPopulationTests {
     public void oneInvalidJsonFile() throws IOException {
         File invalidJson = new File("store/test/dummy-dummy.json");
         assert invalidJson.createNewFile();
-        RepoIO testIO = TestController.createTestingRepoIO(Optional.of(new JSONStoreStub()));
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         assertEquals(0, testIO.getStoredRepos().size());
     }
 

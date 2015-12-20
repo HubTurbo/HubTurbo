@@ -122,6 +122,20 @@ public class FilterEvalTests {
         assertEquals(false, matches("in:something a is", issue));
     }
 
+    private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
+
+        try {
+            assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
+            fail(". is not a valid token on its own");
+        } catch (ParseException ignored) {
+        }
+        assertEquals(false, matches(milestoneQualifier + ":what", issue));
+    }
+
     @Test
     public void milestone() {
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
@@ -131,16 +145,8 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue));
-        try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue));
-            fail(". is not a valid token on its own");
-        } catch (ParseException ignored) {
-        }
-        assertEquals(false, matches("milestone:what", issue));
+        testMilestoneParsing("milestone", issue, model);
+        testMilestoneParsing("m", issue, model);
 
         // milestone aliases
         // - sorting of milestone is by due date
@@ -422,8 +428,7 @@ public class FilterEvalTests {
         }
     }
 
-    @Test
-    public void assignee() {
+    private void testAssigneeParsing(String assigneeQualifier){
         TurboUser user = new TurboUser(REPO, "bob", "alice");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
@@ -431,28 +436,46 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":BOB"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":bob"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":alice"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":o"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(assigneeQualifier + ":lic"), issue));
+    }
+
+    @Test
+    public void assigneeParsing() {
+        testAssigneeParsing("assignee");
+    }
+
+    @Test
+    public void assigneeWithQualifierAliasParsing() {
+        testAssigneeParsing("as");
     }
 
     @Test
     public void author() {
+        testAuthorParsing("author");
+    }
+
+    @Test
+    public void creator() {
+        testAuthorParsing("creator");
+    }
+
+    @Test
+    public void authorWithQualifierAlias() {
+        testAuthorParsing("au");
+    }
+
+    private void testAuthorParsing(String authorQualifier){
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, matches("creator:BOB", issue));
-        assertEquals(true, matches("creator:bob", issue));
-        assertEquals(false, matches("creator:alice", issue));
-        assertEquals(true, matches("creator:o", issue));
-        assertEquals(false, matches("creator:lic", issue));
-
-        assertEquals(true, matches("author:BOB", issue));
-        assertEquals(true, matches("author:bob", issue));
-        assertEquals(false, matches("author:alice", issue));
-        assertEquals(true, matches("author:o", issue));
-        assertEquals(false, matches("author:lic", issue));
+        assertEquals(true, matches(authorQualifier + ":BOB", issue));
+        assertEquals(true, matches(authorQualifier + ":bob", issue));
+        assertEquals(false, matches(authorQualifier + ":alice", issue));
+        assertEquals(true, matches(authorQualifier + ":o", issue));
+        assertEquals(false, matches(authorQualifier + ":lic", issue));
     }
 
     @Test
@@ -485,11 +508,20 @@ public class FilterEvalTests {
 
     @Test
     public void state() {
+        testStateParsing("state");
+    }
+
+    @Test
+    public void stateWithQualifierAlias() {
+        testStateParsing("s");
+    }
+
+    private void testStateParsing(String stateQualifier){
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
-        assertEquals(false, matches("state:open", issue));
-        assertEquals(false, matches("state:o", issue));
-        assertEquals(true, matches("state:closed", issue));
+        assertEquals(false, matches(stateQualifier + ":open", issue));
+        assertEquals(false, matches(stateQualifier + ":o", issue));
+        assertEquals(true, matches(stateQualifier + ":closed", issue));
     }
 
     @Test
@@ -502,7 +534,9 @@ public class FilterEvalTests {
 
         assertEquals(false, matches("has:label", issue));
         assertEquals(false, matches("has:milestone", issue));
+        assertEquals(false, matches("has:m", issue));
         assertEquals(false, matches("has:assignee", issue));
+        assertEquals(false, matches("has:as", issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.addLabel(label);
@@ -510,7 +544,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.setMilestone(milestone);
@@ -518,7 +554,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.setAssignee(user);
@@ -526,7 +564,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
     }
 
@@ -540,7 +580,9 @@ public class FilterEvalTests {
 
         assertEquals(true, matches("no:label", issue));
         assertEquals(true, matches("no:milestone", issue));
+        assertEquals(true, matches("no:m", issue));
         assertEquals(true, matches("no:assignee", issue));
+        assertEquals(true, matches("no:as", issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.addLabel(label);
@@ -548,7 +590,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.setMilestone(milestone);
@@ -556,7 +600,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.setAssignee(user);
@@ -564,7 +610,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
     }
 
