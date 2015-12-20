@@ -30,44 +30,20 @@ public class FilterTests extends UITest{
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         // test current-1 : equal to first milestone in dummy repo
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("milestone:current-1");
-        push(KeyCode.ENTER);
-
-        assertEquals(issuePanel.getIssueCount(), 1);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(1));
+        currCheckWithResult("milestone", "current-1", issuePanel, 1);
+        currCheckWithResult("m", "current-1", issuePanel, 1);
 
         // test current : equal to second milestone in dummy repo
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("milestone:current");
-        push(KeyCode.ENTER);
-
-        assertEquals(issuePanel.getIssueCount(), 1);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(2));
+        currCheckWithResult("milestone", "current", issuePanel, 2);
+        currCheckWithResult("m", "current", issuePanel, 2);
 
         // test curr+1 : equal to third milestone in dummy repo
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("milestone:curr+1");
-        push(KeyCode.ENTER);
-
-        assertEquals(issuePanel.getIssueCount(), 1);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(3));
+        currCheckWithResult("milestone", "current+1", issuePanel, 3);
+        currCheckWithResult("m", "current+1", issuePanel, 3);
 
         // test current+2 : equal to fourth milestone in dummy repo
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("milestone:current+2");
-        push(KeyCode.ENTER);
-
-        assertEquals(issuePanel.getIssueCount(), 1);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(4));
+        currCheckWithResult("milestone", "current+2", issuePanel, 4);
+        currCheckWithResult("m", "current+2", issuePanel, 4);
 
         // test current-2 : has no result
         click("#dummy/dummy_col0_filterTextField");
@@ -91,5 +67,17 @@ public class FilterTests extends UITest{
         type("milestone:current+s0v8f");
         push(KeyCode.ENTER);
         assertEquals(issuePanel.getIssueCount(), 0);
+    }
+
+    private void currCheckWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
+                                     int milestoneNumber){
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type(milestoneAlias + ":" + currString);
+        push(KeyCode.ENTER);
+
+        assertEquals(issuePanel.getIssueCount(), 1);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
+        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(milestoneNumber));
     }
 }
