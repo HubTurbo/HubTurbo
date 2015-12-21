@@ -113,9 +113,7 @@ public final class TestController {
      */
     public static RepoIO createApplicationRepoIO() {
         if (isTestMode()) {
-            return new RepoIO(Optional.of(new DummySource()),
-                              isTestJSONEnabled() ? Optional.of(new JSONStoreStub()) : Optional.empty(),
-                              Optional.of(RepoStore.TEST_DIRECTORY));
+            return createTestingRepoIO(isTestJSONEnabled() ? Optional.of(new JSONStoreStub()) : Optional.empty());
         } else {
             return new RepoIO(Optional.empty(), Optional.empty(), Optional.empty());
         }
