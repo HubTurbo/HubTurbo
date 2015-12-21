@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+import org.openqa.selenium.os.Kernel32;
 
 import prefs.Preferences;
 import ui.components.HTStatusBar;
@@ -52,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -84,7 +86,7 @@ public class UI extends Application implements EventDispatcher {
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
-
+    private CountDownLatch startLatch = new CountDownLatch(1);
 
     // Main UI elements
 
@@ -162,13 +164,13 @@ public class UI extends Application implements EventDispatcher {
 
         if (TestController.isTestMode()) {
             if (TestController.isTestChromeDriver()) {
-                browserComponent = new BrowserComponent(this, true);
+                browserComponent = new BrowserComponent(this, true, startLatch);
                 browserComponent.initialise();
             } else {
-                browserComponent = new BrowserComponentStub(this);
+                browserComponent = new BrowserComponentStub(this, startLatch);
             }
         } else {
-            browserComponent = new BrowserComponent(this, false);
+            browserComponent = new BrowserComponent(this, false, startLatch);
             browserComponent.initialise();
         }
 
@@ -177,6 +179,7 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
+        startLatch.countDown();
     }
 
     private void initialisePickers() {
@@ -320,7 +323,12 @@ public class UI extends Application implements EventDispatcher {
 
     private static void getMainWindowHandle(String windowTitle) {
         if (PlatformSpecific.isOnWindows()) {
+            logger.info("Getting handle to panel view");
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
+            if (mainWindowHandle == null) {
+                logger.info("failed to get handle to panel view");
+                logger.info(Kernel32.INSTANCE.GetLastError());
+            }
         }
     }
 

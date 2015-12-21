@@ -1,12 +1,13 @@
 package browserview;
 
+import java.util.concurrent.CountDownLatch;
 import com.sun.jna.platform.win32.WinDef;
 import ui.UI;
 
 public class BrowserComponentStub extends BrowserComponent {
 
-    public BrowserComponentStub(UI ui) {
-        super(ui, false);
+    public BrowserComponentStub(UI ui, CountDownLatch startLatch) {
+        super(ui, false, startLatch);
     }
 
     @Override
