@@ -1,33 +1,31 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+import prefs.PanelInfo;
+import prefs.Preferences;
+import ui.TestController;
+import ui.UI;
+import ui.components.FilterTextField;
+import ui.components.KeyboardShortcuts;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
+import util.PlatformEx;
+import util.events.ShowRenamePanelEvent;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import prefs.PanelInfo;
-import prefs.Preferences;
-import ui.TestController;
-import ui.UI;
-import ui.issuepanel.FilterPanel;
-import ui.issuepanel.PanelControl;
-import ui.components.FilterTextField;
-import ui.components.KeyboardShortcuts;
-import util.PlatformEx;
-import util.events.ShowRenamePanelEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UseGlobalConfigsTest extends UITest {
-
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
@@ -133,7 +131,7 @@ public class UseGlobalConfigsTest extends UITest {
         if (!(testConfig.exists() && testConfig.isFile())) fail();
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.createTestPreferences();
 
         // Credentials
         assertEquals("test", testPref.getLastLoginUsername());
@@ -170,7 +168,5 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("Open issues", lastOpenPanelNames.get(0));
         assertEquals("Renamed panel", lastOpenPanelNames.get(1));
         assertEquals("Dummy 2 panel", lastOpenPanelNames.get(2));
-
     }
-
 }

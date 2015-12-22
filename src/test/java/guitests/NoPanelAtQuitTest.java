@@ -5,6 +5,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import prefs.PanelInfo;
+import ui.TestController;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class NoPanelAtQuitTest extends UITest {
         click("File");
         click("Quit");
         
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.createTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();
         
         // Expected result: nothing stored in panelInfo

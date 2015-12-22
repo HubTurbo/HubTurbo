@@ -6,7 +6,6 @@ import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.junit.Test;
-import prefs.Preferences;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,60 +14,51 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class SortQualifierTests {
-    private class ModelStub extends MultiModel {
-        List<TurboIssue> issues;
-        List<TurboMilestone> milestones = createSampleMilestone();
+public class QualifierTests {
+    List<TurboIssue> issues = createSampleIssues();
+    List<TurboMilestone> milestones = createSampleMilestone();
+    MultiModel testModel = mock(MultiModel.class);
 
-        public ModelStub(Preferences prefs, List<TurboIssue> issues) {
-            super(prefs);
-            this.issues = issues;
-
-            issues.get(0).setMilestone(milestones.get(0));
-            issues.get(1).setMilestone(milestones.get(1));
-            issues.get(2).setMilestone(milestones.get(2));
-            issues.get(3).setMilestone(milestones.get(3));
-        }
-
-        @Override
-        public synchronized List<TurboIssue> getIssues() {
-            return issues;
-        }
-
-        @Override
-        public synchronized List<TurboMilestone> getMilestones() {
-            return milestones;
-        }
-
-        @Override
-        public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
-            if (!issue.getMilestone().isPresent()) {
-                return Optional.empty();
-            }
-
-            Integer id = issue.getMilestone().get();
-
-            for (TurboMilestone milestone : getMilestones()) {
-                if (milestone.getId() == id) {
-                    return Optional.of(milestone);
-                }
-            }
-            return Optional.empty();
-        }
-
-        @Override
-        public int hashCode() {
-            return super.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return super.equals(o);
-        }
+    public QualifierTests() {
+        setMilestonesForSampleIssues();
+        mockSampleMultiModel();
     }
 
-    ModelStub testModel = new ModelStub(null, getSampleIssues());
+    private void setMilestonesForSampleIssues() {
+        issues.get(0).setMilestone(milestones.get(0));
+        issues.get(1).setMilestone(milestones.get(1));
+        issues.get(2).setMilestone(milestones.get(2));
+        issues.get(3).setMilestone(milestones.get(3));
+    }
+
+    private void mockSampleMultiModel() {
+        when(testModel.getIssues()).thenReturn(issues);
+        when(testModel.getMilestones()).thenReturn(milestones);
+
+        when(testModel.getMilestoneOfIssue(any(TurboIssue.class))).thenAnswer(
+                invocation -> {
+                    Object[] args = invocation.getArguments();
+                    TurboIssue issue = (TurboIssue) args[0];
+
+                    if (!issue.getMilestone().isPresent()) {
+                        return Optional.empty();
+                    }
+
+                    Integer id = issue.getMilestone().get();
+
+                    for (TurboMilestone milestone : milestones) {
+                        if (milestone.getId() == id) {
+                            return Optional.of(milestone);
+                        }
+                    }
+                    return Optional.empty();
+                }
+        );
+    }
 
     private List<Qualifier> getMetaQualifiers(FilterExpression filterExpression) {
         return filterExpression.find(Qualifier::isMetaQualifier);
@@ -103,7 +93,7 @@ public class SortQualifierTests {
         return issue;
     }
 
-    private List<TurboIssue> getSampleIssues() {
+    private List<TurboIssue> createSampleIssues() {
         TurboIssue issue1 = createIssueWithAssignee(
                 "c/c", 1, "Issue1", "c", "java",
                 LocalDateTime.of(2015, 1, 1, 1, 1), false);
@@ -249,7 +239,7 @@ public class SortQualifierTests {
 
     /**
      * Tests sort qualifier with milestone key. Milestones with due date are sorted from
-     * latest * to earliest, then comes milestones without due date and no milestone
+     * latest to earliest, then comes milestones without due date and no milestone
      */
     @Test
     public void testSortMilestone1() {

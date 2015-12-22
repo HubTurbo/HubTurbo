@@ -19,10 +19,4 @@ public class SerializableLabel {
     public String getColour() {
         return colour;
     }
-
-    @Override
-    public String toString() {
-        String formatter = "Label: {name: %s, color: %s}";
-        return String.format(formatter, getActualName(), getColour());
-    }
 }

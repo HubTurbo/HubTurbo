@@ -2,6 +2,8 @@ package backend.json;
 
 import backend.resource.serialization.SerializableModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -17,5 +19,10 @@ public class JSONStoreStub extends JSONStore {
     @Override
     public CompletableFuture<Boolean> saveRepository(String repoId, SerializableModel model) {
         return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public List<String> getStoredRepos() {
+        return new ArrayList<>();
     }
 }

@@ -1,8 +1,14 @@
 package tests;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import backend.interfaces.IModel;
+import backend.resource.*;
+import filter.ParseException;
+import filter.Parser;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import prefs.Preferences;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,16 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import filter.expression.FilterExpression;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import backend.interfaces.IModel;
-import backend.resource.*;
-import filter.ParseException;
-import filter.Parser;
-import filter.expression.Qualifier;
-import prefs.Preferences;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class FilterEvalTests {
 
@@ -27,7 +25,7 @@ public class FilterEvalTests {
     public static final String REPO = "test/test";
 
     public FilterEvalTests() {
-        empty = new MultiModel(new Preferences(true));
+        empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
     }
 

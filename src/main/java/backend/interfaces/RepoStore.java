@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class RepoStore {
-
     protected static String directory = "store";
     public static final String TEST_DIRECTORY = "store/test";
     private final ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -60,11 +59,7 @@ public abstract class RepoStore {
         return true;
     }
 
-    public static void enableTestDirectory() {
-        changeDirectory(RepoStore.TEST_DIRECTORY);
-    }
-
-    private static void changeDirectory(String newDir) {
+    public static void changeDirectory(String newDir) {
         RepoStore.directory = newDir;
     }
 

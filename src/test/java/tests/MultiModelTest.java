@@ -1,19 +1,21 @@
 package tests;
 
 import backend.RepoIO;
+import backend.json.JSONStoreStub;
 import backend.resource.MultiModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class MultiModelTest {
 
@@ -23,7 +25,7 @@ public class MultiModelTest {
         UI.status = new StatusUIStub();
     }
 
-    MultiModel multiModel = new MultiModel(new Preferences(true));
+    MultiModel multiModel = new MultiModel(mock(Preferences.class));
 
     @Test
     public void equality() {
@@ -34,18 +36,18 @@ public class MultiModelTest {
 
     @Test
     public void multiModelTest() {
-        assertEquals(new MultiModel(new Preferences(true)), multiModel);
-        assertEquals(new MultiModel(new Preferences(true)).hashCode(), multiModel.hashCode());
+        assertEquals(new MultiModel(mock(Preferences.class)), multiModel);
+        assertEquals(new MultiModel(mock(Preferences.class)).hashCode(), multiModel.hashCode());
     }
 
     @Test
     public void testRemoveModel() throws ExecutionException, InterruptedException {
         final String repoId1 = "dummy1/dummy1";
         final String repoId2 = "dummy2/dummy2";
-        MultiModel models = new MultiModel(new Preferences(true));
+        MultiModel models = new MultiModel(mock(Preferences.class));
         models.queuePendingRepository(repoId1);
         models.queuePendingRepository(repoId2);
-        RepoIO testIO = new RepoIO(true, false);
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.of(new JSONStoreStub()));
         testIO.openRepository(repoId1).thenApply(models::addPending).get();
         testIO.openRepository(repoId2).thenApply(models::addPending).get();
 

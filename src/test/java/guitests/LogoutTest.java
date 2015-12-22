@@ -1,11 +1,11 @@
 package guitests;
 
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
+import ui.TestController;
 
 import java.io.File;
 
@@ -39,7 +39,7 @@ public class LogoutTest extends UITest {
         File testConfig = new File(configFileDirectory, testConfigFileName);
         if (!(testConfig.exists() && testConfig.isFile())) fail();
 
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.createTestPreferences();
         assertEquals("", testPref.getLastLoginUsername());
         assertEquals("", testPref.getLastLoginPassword());
     }

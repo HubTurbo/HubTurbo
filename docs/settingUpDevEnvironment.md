@@ -8,7 +8,7 @@
 
 ## Tool Stack
 
-Most of HubTurbo is written in Java. [ControlsFX](http://fxexperience.com/controlsfx/) extends JavaFX with lots of useful components. [EGit](https://github.com/eclipse/egit-github) helps us interface with GitHub. We also make use of [PrettyTime](https://github.com/ocpsoft/prettytime/), [Guava](https://github.com/google/guava), [Gson](https://github.com/google/gson), and [log4j](http://logging.apache.org/log4j/2.x/) for essential tasks, and [JUnit](http://junit.org/) and [TestFx](https://github.com/TestFX/TestFX) for testing.
+Most of HubTurbo is written in Java. [ControlsFX](http://fxexperience.com/controlsfx/) extends JavaFX with lots of useful components. [EGit](https://github.com/eclipse/egit-github) helps us interface with GitHub. We also make use of [PrettyTime](https://github.com/ocpsoft/prettytime/), [Guava](https://github.com/google/guava), [Gson](https://github.com/google/gson), and [log4j](http://logging.apache.org/log4j/2.x/) for essential tasks, and [JUnit](http://junit.org/), [TestFx](https://github.com/TestFX/TestFX) and [mockito](http://mockito.org) for testing.
 
 We use a few platform-specific components: [Selenium](http://www.seleniumhq.org/) to instantiate and control a browser window, and [JNA](https://github.com/twall/jna) for Windows integration.
 

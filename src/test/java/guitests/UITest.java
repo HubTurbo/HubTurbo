@@ -1,26 +1,16 @@
 package guitests;
 
-import static com.google.common.io.Files.getFileExtension;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Predicate;
-
-import javafx.application.Platform;
+import backend.interfaces.RepoStore;
+import com.google.common.util.concurrent.SettableFuture;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,23 +21,24 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.exceptions.NoNodesVisibleException;
 import org.loadui.testfx.utils.FXTestUtils;
-
-import com.google.common.util.concurrent.SettableFuture;
-
-import backend.interfaces.RepoStore;
-import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseButton;
-import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
 import util.PlatformEx;
 import util.PlatformSpecific;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+
+import static com.google.common.io.Files.getFileExtension;
 
 public class UITest extends GuiTest {
 

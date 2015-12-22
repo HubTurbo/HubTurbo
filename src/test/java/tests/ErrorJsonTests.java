@@ -29,7 +29,7 @@ public class ErrorJsonTests {
 
     @Before
     public void enableTestDirectory() {
-        RepoStore.enableTestDirectory();
+        RepoStore.changeDirectory(RepoStore.TEST_DIRECTORY);
     }
 
     @Test

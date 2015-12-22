@@ -16,6 +16,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class FilterApplyTests {
 
@@ -24,7 +25,7 @@ public class FilterApplyTests {
     private final IModel empty;
 
     public FilterApplyTests() {
-        empty = new MultiModel(new Preferences(true));
+        empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
     }
 

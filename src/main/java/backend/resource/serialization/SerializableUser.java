@@ -22,11 +22,4 @@ public class SerializableUser {
     public String getAvatarURL() {
         return avatarURL;
     }
-
-    @Override
-    public String toString() {
-        String formatter = "User: {loginName: %s, realName: %s, avatarURL: %s}";
-        return String.format(formatter,
-                             getLoginName(), getRealName(), getAvatarURL());
-    }
 }

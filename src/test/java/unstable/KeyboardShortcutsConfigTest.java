@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
+import ui.TestController;
 import ui.components.KeyboardShortcuts;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
 
     @Test
     public void invalidNumberOfKeyboardShortcuts() {
-        testPref = new Preferences(true);
+        testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>();
         keyboardShortcuts.put("MARK_AS_READ", "E");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
@@ -41,7 +42,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         testPref.loadGlobalConfig();
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
 
-        testPref = new Preferences(true);
+        testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
         keyboardShortcuts.put("BLAH", "Z");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
@@ -58,7 +59,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
 
     @Test
     public void invalidKeySpecified() {
-        testPref = new Preferences(true);
+        testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
         keyboardShortcuts.remove("MARK_AS_READ");
         keyboardShortcuts.put("MARK_AS_READ", "eee");
@@ -78,7 +79,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
 
     @Test
     public void noKeySpecified() {
-        testPref = new Preferences(true);
+        testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
         keyboardShortcuts.remove("MARK_AS_READ");
         keyboardShortcuts.put("BLAH", "Z");
@@ -97,7 +98,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
 
     @Test
     public void repeatedKeySpecified() {
-        testPref = new Preferences(true);
+        testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
         keyboardShortcuts.remove("MARK_AS_UNREAD");
         keyboardShortcuts.put("MARK_AS_UNREAD", "E");

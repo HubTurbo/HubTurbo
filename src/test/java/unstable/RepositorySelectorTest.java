@@ -12,6 +12,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
@@ -138,7 +139,7 @@ public class RepositorySelectorTest extends UITest {
         if (!(testConfig.exists() && testConfig.isFile())) fail();
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.createTestPreferences();
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());
