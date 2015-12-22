@@ -144,6 +144,8 @@ Matches all issues with a title containing the given string.
 
 Matches all issues with a body (or description) containing the given string.
 
+Aliases: `desc`, `description`
+
 ### milestone
 
 *Expects a string*
@@ -174,7 +176,7 @@ Aliases: `as`
 
 Matches all issues created by the given person, identified by the given alias, GitHub username, or real name, in that priority.
 
-Aliases: `au` or `creator`
+Aliases: `au`, `creator`
 
 ### involves
 
@@ -182,31 +184,41 @@ Aliases: `au` or `creator`
 
 Matches all issues involving (assigned to or created by) the given person, identified by the given alias, GitHub username, or real name, in that priority.
 
+Aliases: `user`
+
 ### state
 
 *Expects one of `open` or `closed`*
 
 Matches all issues of the given state.
 
-Aliases: `s`
+Aliases: `s`, `status`
 
 ### has
 
-*Expects one of `label`, `milestone`, `assignee`
+*Expects one of `label`, `milestone`, `assignee`*
 
-Matches all issues possessing the given attribute.
+Matches issues associated with the given type of resource.
+
+Aliases:
+
+- `label` can be written as `labels`
+- `milestone` can be written as `milestone` or `m`
+- `assignee` can be written as `assignee` or `as`
 
 ### no
 
-*Expects one of `label`, `milestone`, `assignee`
+*Expects one of `label`, `milestone`, `assignee`*
 
-The negation of `has`. Matches all issues without the given attribute.
+The negation of `has`. Matches issues not associated with the given type of resource.
+
+Aliases: see [has](#has).
 
 ### in
 
 *Expects one of `title` or `body`*
 
-Meta-qualifier. Changes the semantics of `keyword` so it only searches in either the title or body.
+Meta-qualifier. Changes the semantics of search terms to check only either the title or body.
 
 ### type
 
@@ -240,18 +252,20 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-*Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`. Here are the available sort criteria:*
-- `comments` : sorts issues by number of comments (in descending order)
-- `repo` : sorts issues by repo. Only applicable if the panel is showing issues from more than one repo
-- `updated` (or `date`) : sorts issues by their updated time (latest updated issues are shown first)
-- `id` : sorts issues by id (in ascending order)
-- `assignee` : sorts issues by assignees (in alphabetical order of assignees' names)
-- `priority` : sorts issues within the group by name (high, low, etc.) (in alphabetical order)
-- `status` : sorts issues by status (`open` issues followed by `closed` issues)
-- `milestone` : sorts issues by their milestones (milestones with latest due date are shown first)
-- label group : sorts issues by the label group specified (in alphabetical order).Label groups can be disambiguated by appending a `.`. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (Will show issues with `high` priority first, followed by `low` priority issues and then followed by `medium` priority)
+*Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`.*
 
 Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
+
+Available sorting criteria:
+
+- `comments`: sorts by number of comments (in descending order)
+- `repo`: sorts by repo. Only applicable if the panel is showing issues from more than one repo
+- `updated` (or `date`): sorts issues by their updated time (latest updated issues are shown first)
+- `id`: sorts by issue id (in ascending order)
+- `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
+- `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `s`
+- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
+- Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
 
 ## Additional features
 
@@ -259,7 +273,7 @@ HubTurbo automatically downloads detailed information about issues when the [`up
 
 When the [`updated`](#updated) filter is specified, the issues to be displayed are also automatically sorted by the latest *non-self update* i.e. the last time someone other than the currently logged-in user makes a change to the issue. This order can be explicitly overridden by specifying another sort order through the [`sort`](#sort) filter.
 
-To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments` 
+To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments`
 
 ## Incompatibilities
 
