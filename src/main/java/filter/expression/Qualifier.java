@@ -669,7 +669,7 @@ public class Qualifier implements FilterExpression {
         case "assignee":
         case "assignees":
         case "as":
-            assert issue.getMilestone() != null;
+            assert issue.getAssignee() != null;
             return issue.getAssignee().isPresent();
         default:
             return false;
