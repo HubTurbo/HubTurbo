@@ -43,11 +43,12 @@ import static com.google.common.io.Files.getFileExtension;
 public class UITest extends GuiTest {
 
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
-
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
-    
-    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap(); 
-    
+    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
+
+    private final Robot robot;
+    private final FXScreenController screenController;
+
     protected static class TestUI extends UI {
         public TestUI() {
             super();
@@ -59,9 +60,6 @@ public class UITest extends GuiTest {
             STAGE_FUTURE.set(primaryStage);
         }
     }
-
-    private final Robot robot;
-    private final FXScreenController screenController;
 
     public UITest() {
         super();

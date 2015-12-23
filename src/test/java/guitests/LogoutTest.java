@@ -37,7 +37,9 @@ public class LogoutTest extends UITest {
 
         // checking that the json file exists and the saved credentials have been emptied
         File testConfig = new File(configFileDirectory, testConfigFileName);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         Preferences testPref = TestController.createTestPreferences();
         assertEquals("", testPref.getLastLoginUsername());

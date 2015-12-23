@@ -60,7 +60,7 @@ class ReadTask extends StoreTask {
                 return new Model(sModel);
             } catch (NullPointerException | JsonParseException e) {
                 logger.error(HTLog.format(repoId, "JSON data is corrupted"));
-                throw new JSONLoadException();
+                throw new JSONLoadException(e);
             }
         }
     }

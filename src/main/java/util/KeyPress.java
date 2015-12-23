@@ -2,7 +2,7 @@ package util;
 
 import javafx.scene.input.KeyCode;
 
-public class KeyPress {
+public final class KeyPress {
 
     private static int keyPressSpeed = 1000; // time difference between keypresses in ms
     private static long lastKeyEventTime = 0;
@@ -41,4 +41,6 @@ public class KeyPress {
         lastKeyEventTime = System.currentTimeMillis();
 
     }
+
+    private KeyPress() {}
 }

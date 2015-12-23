@@ -1,12 +1,14 @@
 package guitests;
 
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
 
-import javafx.scene.input.KeyCode;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import prefs.PanelInfo;
 import prefs.Preferences;
@@ -15,20 +17,15 @@ import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class BoardAutoCreatorTest extends UITest {
-    private UI ui;
+
     private PanelControl panelControl;
-    private Preferences testPref;
 
     @Before
     public void cleanUpBoards() {
-        ui = TestController.getUI();
+        UI ui = TestController.getUI();
         panelControl = ui.getPanelControl();
-        testPref = UI.prefs;
+        Preferences testPref = UI.prefs;
 
         List<String> boardNames = testPref.getAllBoardNames();
         boardNames.stream().forEach(testPref::removeBoard);

@@ -11,8 +11,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Disjunction implements FilterExpression {
-    private FilterExpression left;
-    private FilterExpression right;
+
+    private final FilterExpression left;
+    private final FilterExpression right;
 
     public Disjunction(FilterExpression left, FilterExpression right) {
         this.left = left;

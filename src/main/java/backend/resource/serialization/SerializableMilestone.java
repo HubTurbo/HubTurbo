@@ -5,6 +5,11 @@ import backend.resource.TurboMilestone;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Warnings are suppressed to prevent complaints about fields not being final.
+ * They are this way to give them default values.
+ */
+@SuppressWarnings("PMD")
 public class SerializableMilestone {
     private int id;
     private String title;

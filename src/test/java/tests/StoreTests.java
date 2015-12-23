@@ -56,7 +56,9 @@ public class StoreTests {
         assertEquals(11, dummy1.getIssues().size());
 
         // A new file should not have been created as we are using a stub
-        if (new File("store/test/dummy1-dummy1.json").isFile()) fail();
+        if (new File("store/test/dummy1-dummy1.json").isFile()) {
+            fail();
+        }
     }
 
     @Test

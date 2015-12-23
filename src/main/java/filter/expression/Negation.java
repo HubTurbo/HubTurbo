@@ -11,7 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Negation implements FilterExpression {
-    private FilterExpression expr;
+
+    private final FilterExpression expr;
 
     public Negation(FilterExpression expr) {
         this.expr = expr;

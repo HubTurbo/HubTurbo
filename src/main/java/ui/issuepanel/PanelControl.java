@@ -128,7 +128,7 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
-        assert(index >= 0 && index < getPanelCount());
+        assert index >= 0 && index < getPanelCount();
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
         getPanel(index).requestFocus();
@@ -237,9 +237,10 @@ public class PanelControl extends HBox {
         } else if (getChildren().size() == 0) {
             setCurrentlySelectedPanel(Optional.empty());
         } else {
-            int newPanelIndex = (closedPanelIndex > getChildren().size() - 1)
-                                 ? closedPanelIndex - 1
-                                 : closedPanelIndex;
+            int newPanelIndex =
+                closedPanelIndex > getChildren().size() - 1
+                    ? closedPanelIndex - 1
+                    : closedPanelIndex;
             setCurrentlySelectedPanel(Optional.of(newPanelIndex));
             getPanel(currentlySelectedPanel.get()).requestFocus();
         }
@@ -255,7 +256,7 @@ public class PanelControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if ((KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event))) {
+            if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }

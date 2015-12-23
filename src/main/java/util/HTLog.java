@@ -7,7 +7,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 /**
  * A nicer interface for using loggers.
  */
-public class HTLog {
+public final class HTLog {
 
     public static Logger get(Class<?> c) {
         return LogManager.getLogger(c.getName());
@@ -29,4 +29,5 @@ public class HTLog {
         logger.error(e.getLocalizedMessage(), e);
     }
 
+    private HTLog() {}
 }

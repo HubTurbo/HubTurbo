@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Warnings are suppressed to prevent complaints about fields not being final.
+ * They are this way to give them default values.
+ */
+@SuppressWarnings("PMD")
 public class SerializableIssue {
     private int id = 0;
     private String title = "";

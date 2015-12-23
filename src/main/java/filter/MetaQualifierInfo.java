@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class MetaQualifierInfo {
 
-    private Optional<String> in = Optional.empty();
+    private final Optional<String> in;
 
     public MetaQualifierInfo(List<Qualifier> qualifiers) {
 

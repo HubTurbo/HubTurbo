@@ -20,11 +20,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class BoardNameDialog extends Dialog<String> {
+public final class BoardNameDialog extends Dialog<String> {
     
-    private Preferences prefs;
+    private final Preferences prefs;
     private TextField nameField;
-    private Text prompt;
     private Text errorText;
     private Button submitButton;
     private static Set<String> invalidNames;
@@ -80,8 +79,8 @@ public class BoardNameDialog extends Dialog<String> {
         setTitle("Save board as");
         
         HBox nameArea = new HBox();
-        
-        prompt = new Text("New board name: ");
+
+        Text prompt = new Text("New board name: ");
         
         nameField = new TextField(DEFAULT_NAME);
         nameField.setPrefWidth(300);

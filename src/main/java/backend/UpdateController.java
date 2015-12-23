@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class UpdateController {
     private static final Logger logger = HTLog.get(UpdateController.class);
 
-    private Logic logic;
+    private final Logic logic;
 
     public UpdateController(Logic logic) {
         this.logic = logic;
@@ -37,7 +37,7 @@ public class UpdateController {
         // First filter, for issues requiring a metadata update.
         Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-        if (toUpdate.size() > 0) {
+        if (!toUpdate.isEmpty()) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
             ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
             toUpdate.forEach((repoId, issues) -> {

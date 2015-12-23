@@ -90,11 +90,11 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
-    private LabelPicker labelPicker;
     private Label apiBox;
     private ScrollPane panelsScrollPane;
     private NotificationPane notificationPane;
 
+    @SuppressWarnings("PMD")
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -177,7 +177,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initialisePickers() {
-        labelPicker = new LabelPicker(this, mainStage);
+        new LabelPicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
@@ -210,7 +210,7 @@ public class UI extends Application implements EventDispatcher {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
         logic = new Logic(uiManager, prefs);
-        clearCacheIfNecessary();
+        // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
@@ -280,16 +280,6 @@ public class UI extends Application implements EventDispatcher {
 
     public void onRepoOpened() {
         Platform.runLater(repoSelector::refreshContents);
-    }
-
-    /**
-     * TODO Stop-gap measure pending a more robust updater
-     */
-    private void clearCacheIfNecessary() {
-        if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
-            // TODO
-//          CacheFileHandler.deleteCacheDirectory();
-        }
     }
 
     public String initCSS() {

@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser {
+public final class Parser {
 
     private Parser(ArrayList<Token> input) {
         this.input = input;
@@ -22,7 +22,7 @@ public class Parser {
         return new Parser(new Lexer(input).lex()).parseExpression(0);
     }
 
-    private ArrayList<Token> input;
+    private final ArrayList<Token> input;
     private int position = 0;
     private int sourcePosition = 0;
 
@@ -58,10 +58,10 @@ public class Parser {
 
         switch (token.getType()) {
         case LBRACKET:
-            left = parseGroup(token);
+            left = parseGroup();
             break;
         case NOT:
-            left = parseNegation(token);
+            left = parseNegation();
             break;
         case QUALIFIER:
             left = parseQualifier(token);
@@ -84,11 +84,11 @@ public class Parser {
             switch (token.getType()) {
             case AND:
                 consume();
-                left = parseConjunction(left, token);
+                left = parseConjunction(left);
                 break;
             case OR:
                 consume();
-                left = parseDisjunction(left, token);
+                left = parseDisjunction(left);
                 break;
             case QUALIFIER:
             case SYMBOL:
@@ -96,7 +96,7 @@ public class Parser {
             case LBRACKET:
                 // Implicit conjunction
                 // Every token that could appear in a prefix position will trigger this path
-                left = parseConjunction(left, token);
+                left = parseConjunction(left);
                 break;
             default:
                 throw new ParseException("Invalid infix token " + token);
@@ -115,7 +115,7 @@ public class Parser {
     private FilterExpression parseQuotedContent(QualifierType type) {
         StringBuilder sb = new StringBuilder();
         while (!isQuoteToken(lookAhead())) {
-            sb.append(consume().getValue()).append(" ");
+            sb.append(consume().getValue()).append(' ');
         }
         return new Qualifier(type, sb.toString().trim());
     }
@@ -364,6 +364,7 @@ public class Parser {
                     return new Qualifier(type, new DateRange(null, date.get()));
                 default:
                     assert false : "Should not happen";
+                    break;
                 }
                 assert false : "Should not happen";
                 return null;
@@ -373,7 +374,7 @@ public class Parser {
                     Integer.parseInt(contentToken.getValue());
                 } catch (NumberFormatException e) {
                     // Exit with an exception if it's not a number
-                    throw new ParseException(String.format(
+                    throw new ParseException(String.format(// NOPMD
                         "Operator %s can only be applied to number or date", operator));
                 }
 
@@ -391,6 +392,7 @@ public class Parser {
                     return new Qualifier(type, new NumberRange(null, num));
                 default:
                     assert false : "Should not happen";
+                    break;
                 }
                 assert false : "Should not happen";
                 return null;
@@ -401,21 +403,21 @@ public class Parser {
         }
     }
 
-    private FilterExpression parseGroup(Token token) {
+    private FilterExpression parseGroup() {
         FilterExpression expr = parseExpression(0);
         consume(TokenType.RBRACKET);
         return expr;
     }
 
-    private FilterExpression parseDisjunction(FilterExpression left, Token token) {
+    private FilterExpression parseDisjunction(FilterExpression left) {
         return new Disjunction(left, parseExpression(Precedence.DISJUNCTION));
     }
 
-    private FilterExpression parseConjunction(FilterExpression left, Token token) {
+    private FilterExpression parseConjunction(FilterExpression left) {
         return new Conjunction(left, parseExpression(Precedence.CONJUNCTION));
     }
 
-    private FilterExpression parseNegation(Token token) {
+    private FilterExpression parseNegation() {
         return new Negation(parseExpression(Precedence.PREFIX));
     }
 }

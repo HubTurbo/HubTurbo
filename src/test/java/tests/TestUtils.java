@@ -8,9 +8,11 @@ import ui.UI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TestUtils {
+public final class TestUtils {
 
     public static final String REPO = "test/test";
+
+    private TestUtils() {}
 
     public static IModel singletonModel(Model model) {
         MultiModel models = new MultiModel(TestController.createTestPreferences());
