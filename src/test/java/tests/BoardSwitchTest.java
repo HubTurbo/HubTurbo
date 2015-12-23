@@ -12,14 +12,13 @@ import static org.junit.Assert.assertEquals;
 
 public class BoardSwitchTest {
 
-    Preferences testPrefs;
     private static final String BOARDNAME1 = "Board 1";
     private static final String BOARDNAME2 = "Board 2";
     private static final String BOARDNAME3 = "Board 3";
 
     @Test
     public void boardsSwitchTest() {
-        testPrefs = TestController.createTestPreferences();
+        Preferences testPrefs = TestController.createApplicationPreference();
 
         List<PanelInfo> board1 = new ArrayList<>();
         List<PanelInfo> board2 = new ArrayList<>();
@@ -47,7 +46,7 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardSwitchTest() {
-        testPrefs = TestController.createTestPreferences();
+        Preferences testPrefs = TestController.createApplicationPreference();
 
         testPrefs.switchBoard();
         assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
@@ -55,7 +54,7 @@ public class BoardSwitchTest {
 
     @Test
     public void noBoardOpenSwitchTest() {
-        testPrefs = TestController.createTestPreferences();
+        Preferences testPrefs = TestController.createApplicationPreference();
 
         List<PanelInfo> board1 = new ArrayList<>();
         List<PanelInfo> board2 = new ArrayList<>();
@@ -71,7 +70,7 @@ public class BoardSwitchTest {
 
     @Test
     public void oneBoardSwitchTest() {
-        testPrefs = TestController.createTestPreferences();
+        Preferences testPrefs = TestController.createApplicationPreference();
 
         List<PanelInfo> board1 = new ArrayList<>();
         testPrefs.addBoard(BOARDNAME1, board1);
