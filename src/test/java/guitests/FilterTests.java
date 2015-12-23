@@ -2,12 +2,10 @@ package guitests;
 
 import static org.junit.Assert.assertEquals;
 
-import backend.resource.TurboIssue;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.listpanel.ListPanel;
 
-import java.util.List;
 import java.util.Optional;
 
 public class FilterTests extends UITest{
@@ -30,20 +28,16 @@ public class FilterTests extends UITest{
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         // test current-1 : equal to first milestone in dummy repo
-        currCheckWithResult("milestone", "current-1", issuePanel, 1);
-        currCheckWithResult("m", "current-1", issuePanel, 1);
+        checkCurrWithResult("milestone", "current-1", issuePanel, 1);
 
         // test current : equal to second milestone in dummy repo
-        currCheckWithResult("milestone", "current", issuePanel, 2);
-        currCheckWithResult("m", "current", issuePanel, 2);
+        checkCurrWithResult("milestone", "current", issuePanel, 2);
 
         // test curr+1 : equal to third milestone in dummy repo
-        currCheckWithResult("milestone", "current+1", issuePanel, 3);
-        currCheckWithResult("m", "current+1", issuePanel, 3);
+        checkCurrWithResult("milestone", "current+1", issuePanel, 3);
 
         // test current+2 : equal to fourth milestone in dummy repo
-        currCheckWithResult("milestone", "current+2", issuePanel, 4);
-        currCheckWithResult("m", "current+2", issuePanel, 4);
+        checkCurrWithResult("milestone", "current+2", issuePanel, 4);
 
         // test current-2 : has no result
         click("#dummy/dummy_col0_filterTextField");
@@ -69,7 +63,7 @@ public class FilterTests extends UITest{
         assertEquals(issuePanel.getIssueCount(), 0);
     }
 
-    private void currCheckWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
+    private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
                                      int milestoneNumber){
         click("#dummy/dummy_col0_filterTextField");
         selectAll();

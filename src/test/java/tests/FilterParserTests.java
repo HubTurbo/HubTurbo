@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import static filter.expression.QualifierType.*;
 import static org.junit.Assert.*;
 
 public class FilterParserTests {
@@ -21,36 +22,36 @@ public class FilterParserTests {
     @Test
     public void keywords() {
         assertEquals(Parser.parse("a(b)"),
-            new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+            new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
         assertEquals(Parser.parse("    a   (   b   )   "),
-            new Conjunction(new Qualifier("keyword", "a"), new Qualifier("keyword", "b")));
+            new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
         assertEquals(Parser.parse("a(b c)"),
             new Conjunction(
-                new Qualifier("keyword", "a"),
-                new Conjunction(new Qualifier("keyword", "b"), new Qualifier("keyword", "c"))));
+                new Qualifier(KEYWORD, "a"),
+                new Conjunction(new Qualifier(KEYWORD, "b"), new Qualifier(KEYWORD, "c"))));
         assertEquals(Parser.parse("c a(b)"),
             new Conjunction(
                 new Conjunction(
-                    new Qualifier("keyword", "c"),
-                    new Qualifier("keyword", "a")),
-                new Qualifier("keyword", "b")));
-        assertNotEquals(new Qualifier("", ""), null);
-        assertNotEquals(new Qualifier("", ""), "null");
-        assertNotEquals(new Qualifier("keyword", "a"), new Qualifier("keyword", "b"));
-        assertNotEquals(new Qualifier("", "a"), new Qualifier("keyword", "a"));
+                    new Qualifier(KEYWORD, "c"),
+                    new Qualifier(KEYWORD, "a")),
+                new Qualifier(KEYWORD, "b")));
+        assertNotEquals(new Qualifier(EMPTY, ""), null);
+        assertNotEquals(new Qualifier(EMPTY, ""), "null");
+        assertNotEquals(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b"));
+        assertNotEquals(new Qualifier(EMPTY, "a"), new Qualifier(KEYWORD, "a"));
     }
 
     @Test
     public void quotes() {
         // Quoted qualifier content
-        assertEquals(Parser.parse("created:\"a b\""), new Qualifier("created", "a b"));
+        assertEquals(Parser.parse("created:\"a b\""), new Qualifier(CREATED, "a b"));
         assertEquals(Parser.parse("created:\" > 2014-5-1 \""),
-            new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), null, true)));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 5, 1), null, true)));
         assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""),
-            new Qualifier("created", new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
 
         // Prefix quotes
-        assertEquals(Parser.parse("\"a b\""), new Qualifier("keyword", "a b"));
+        assertEquals(Parser.parse("\"a b\""), new Qualifier(KEYWORD, "a b"));
     }
 
     @Test
@@ -89,101 +90,105 @@ public class FilterParserTests {
 
     @Test
     public void operators() {
-        assertEquals(Parser.parse("a:b OR c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
-        assertEquals(Parser.parse("a:b | c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
-        assertEquals(Parser.parse("a:b || c:d"), new Disjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("id:b OR id:d"),
+            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+        assertEquals(Parser.parse("id:b | id:d"),
+            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+        assertEquals(Parser.parse("id:b || id:d"),
+            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
 
-        assertEquals(Parser.parse("a:b c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
-        assertEquals(Parser.parse("a:b AND c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
-        assertEquals(Parser.parse("a:b & c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
-        assertEquals(Parser.parse("a:b && c:d"), new Conjunction(new Qualifier("a", "b"), new Qualifier("c", "d")));
+        assertEquals(Parser.parse("id:b id:d"),
+            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+        assertEquals(Parser.parse("id:b AND id:d"),
+            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+        assertEquals(Parser.parse("id:b & id:d"),
+            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+        assertEquals(Parser.parse("id:b && id:d"),
+            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
 
-        assertEquals(Parser.parse("!a:b"), new Negation(new Qualifier("a", "b")));
-        assertEquals(Parser.parse("-a:b"), new Negation(new Qualifier("a", "b")));
-        assertEquals(Parser.parse("~a:b"), new Negation(new Qualifier("a", "b")));
+        assertEquals(Parser.parse("!id:b"),
+            new Negation(new Qualifier(ID, "b")));
+        assertEquals(Parser.parse("-id:b"),
+            new Negation(new Qualifier(ID, "b")));
+        assertEquals(Parser.parse("~id:b"),
+            new Negation(new Qualifier(ID, "b")));
 
         // Implicit conjunction
 
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
                 new Disjunction(
                     new Conjunction(
-                        new Qualifier("milestone", "0.4"),
-                        new Qualifier("state", "open")),
-                    new Qualifier("label", "urgent")));
-        assertEquals(Parser.parse("m:0.4 s:open OR label:urgent"),
-                new Disjunction(
-                        new Conjunction(
-                                new Qualifier("m", "0.4"),
-                                new Qualifier("s", "open")),
-                        new Qualifier("label", "urgent")));
+                        new Qualifier(MILESTONE, "0.4"),
+                        new Qualifier(STATE, "open")),
+                    new Qualifier(LABEL, "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
             Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
 
     @Test
     public void associativity() {
-        assertEquals(Parser.parse("a:b OR c:d OR e:f"),
+        assertEquals(Parser.parse("id:b OR id:d OR id:f"),
                 new Disjunction(
                     new Disjunction(
-                        new Qualifier("a", "b"),
-                        new Qualifier("c", "d")),
-                    new Qualifier("e", "f")));
+                        new Qualifier(ID, "b"),
+                        new Qualifier(ID, "d")),
+                    new Qualifier(ID, "f")));
 
-        assertEquals(Parser.parse("a:b AND c:d AND e:f"),
+        assertEquals(Parser.parse("id:b AND id:d AND id:f"),
                 new Conjunction(
                     new Conjunction(
-                        new Qualifier("a", "b"),
-                        new Qualifier("c", "d")),
-                    new Qualifier("e", "f")));
+                        new Qualifier(ID, "b"),
+                        new Qualifier(ID, "d")),
+                    new Qualifier(ID, "f")));
     }
 
     @Test
     public void numberOperators() {
         assertEquals(Parser.parse("updated:<24"),
-                new Qualifier("updated", new NumberRange(null, 24, true)));
+                new Qualifier(UPDATED, new NumberRange(null, 24, true)));
         assertEquals(Parser.parse("updated:<=24"),
-                new Qualifier("updated", new NumberRange(null, 24)));
+                new Qualifier(UPDATED, new NumberRange(null, 24)));
         assertEquals(Parser.parse("updated:>=24"),
-                new Qualifier("updated", new NumberRange(24, null)));
+                new Qualifier(UPDATED, new NumberRange(24, null)));
         assertEquals(Parser.parse("updated:>24"),
-                new Qualifier("updated", new NumberRange(24, null, true)));
+                new Qualifier(UPDATED, new NumberRange(24, null, true)));
         assertNotEquals(Parser.parse("updated:<24"),
-                new Qualifier("updated", new NumberRange(24, null, true)));
+                new Qualifier(UPDATED, new NumberRange(24, null, true)));
 
         assertEquals(Parser.parse("updated:24"),
-                new Qualifier("updated", 24));
+                new Qualifier(UPDATED, 24));
         assertNotEquals(Parser.parse("updated:25"),
-                new Qualifier("updated", 24));
+                new Qualifier(UPDATED, 24));
     }
 
     @Test
     public void numberRanges() {
         assertEquals(Parser.parse("updated:1 .. 24"),
-                new Qualifier("updated", new NumberRange(1, 24, false)));
+                new Qualifier(UPDATED, new NumberRange(1, 24, false)));
         assertEquals(Parser.parse("updated:1 .. *"),
-                new Qualifier("updated", new NumberRange(1, null)));
+                new Qualifier(UPDATED, new NumberRange(1, null)));
 
         // Parsing currently requires a space between operand and operator
         assertEquals(Parser.parse("updated:1..2"),
-                new Qualifier("updated", "1..2"));
+                new Qualifier(UPDATED, "1..2"));
     }
 
     @Test
     public void dateRanges() {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
 
         assertEquals(Parser.parse("created:2014-06-01 .. *"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
                 new Conjunction(
                         new Conjunction(
-                                new Qualifier("keyword", "a"),
-                                new Qualifier("created",
+                                new Qualifier(KEYWORD, "a"),
+                                new Qualifier(CREATED,
                                     new DateRange(LocalDate.of(2014, 6, 1),
                                         LocalDate.of(2013, 3, 15)))),
-                        new Qualifier("keyword", "b"))
+                        new Qualifier(KEYWORD, "b"))
         );
     }
 
@@ -235,114 +240,110 @@ public class FilterParserTests {
     @Test
     public void dateRangeOperators() {
         assertEquals(Parser.parse("created:<2014-06-01"),
-                new Qualifier("created", new DateRange(null, LocalDate.of(2014, 6, 1), true)));
+                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1), true)));
 
         assertEquals(Parser.parse("created : <= 2014-06-01"),
-                new Qualifier("created", new DateRange(null, LocalDate.of(2014, 6, 1))));
+                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1))));
 
         assertEquals(Parser.parse("created : > 2014-06-01"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null, true)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null, true)));
 
         assertEquals(Parser.parse("created : >= 2014-06-01"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertNotEquals(Parser.parse("created : <= 2014-06-01"),
-                new Qualifier("created", new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
     }
 
     @Test
     public void dates() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
-                new Qualifier("created", LocalDate.of(2014, 6, 1)));
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("created   :   2014-06-01"),
-                new Qualifier("created", LocalDate.of(2014, 6, 1)));
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
                 new Conjunction(
                         new Conjunction(
-                                new Qualifier("keyword", "a"),
-                                new Qualifier("created", LocalDate.of(2014, 6, 1))),
-                        new Qualifier("keyword", "b")));
+                                new Qualifier(KEYWORD, "a"),
+                                new Qualifier(CREATED, LocalDate.of(2014, 6, 1))),
+                        new Qualifier(KEYWORD, "b")));
 
-        assertNotEquals(new Qualifier("created", LocalDate.of(2014, 6, 2)),
-                new Qualifier("created", LocalDate.of(2014, 6, 1)));
+        assertNotEquals(new Qualifier(CREATED, LocalDate.of(2014, 6, 2)),
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
     }
 
     @Test
     public void precedence() {
-        assertEquals(Parser.parse("a:b OR c:d AND e:f"),
+        assertEquals(Parser.parse("id:b OR id:d AND id:f"),
                 new Disjunction(
-                    new Qualifier("a", "b"),
+                    new Qualifier(ID, "b"),
                     new Conjunction(
-                        new Qualifier("c", "d"),
-                        new Qualifier("e", "f"))));
-        assertEquals(Parser.parse("~a:b OR c:d AND e:f"),
+                        new Qualifier(ID, "d"),
+                        new Qualifier(ID, "f"))));
+        assertEquals(Parser.parse("~id:b OR id:d AND id:f"),
                 new Disjunction(
                     new Negation(
-                        new Qualifier("a", "b")),
-                    new Conjunction(new Qualifier("c", "d"), new Qualifier("e", "f"))));
+                        new Qualifier(ID, "b")),
+                    new Conjunction(new Qualifier(ID, "d"), new Qualifier(ID, "f"))));
 
-        assertEquals(Parser.parse("a:b ~c:d"),
-            new Conjunction(new Qualifier("a", "b"), new Negation(new Qualifier("c", "d"))));
+        assertEquals(Parser.parse("id:b ~id:d"),
+            new Conjunction(new Qualifier(ID, "b"), new Negation(new Qualifier(ID, "d"))));
     }
 
     @Test
     public void grouping() {
-        assertEquals(Parser.parse("(a:b OR c:d) AND e:f"),
+        assertEquals(Parser.parse("(id:b OR id:d) AND id:f"),
                 new Conjunction(
                     new Disjunction(
-                        new Qualifier("a", "b"),
-                        new Qualifier("c", "d")),
-                    new Qualifier("e", "f")));
-        assertEquals(Parser.parse("(a:b OR c:d) e:f"),
+                        new Qualifier(ID, "b"),
+                        new Qualifier(ID, "d")),
+                    new Qualifier(ID, "f")));
+        assertEquals(Parser.parse("(id:b OR id:d) id:f"),
                 new Conjunction(
                     new Disjunction(
-                        new Qualifier("a", "b"),
-                        new Qualifier("c", "d")),
-                    new Qualifier("e", "f")));
-        assertEquals(Parser.parse("e:f ~(a:b OR c:d)"),
+                        new Qualifier(ID, "b"),
+                        new Qualifier(ID, "d")),
+                    new Qualifier(ID, "f")));
+        assertEquals(Parser.parse("id:f ~(id:b OR id:d)"),
                 new Conjunction(
-                    new Qualifier("e", "f"),
+                    new Qualifier(ID, "f"),
                     new Negation(
                         new Disjunction(
-                            new Qualifier("a", "b"),
-                            new Qualifier("c", "d")))));
+                            new Qualifier(ID, "b"),
+                            new Qualifier(ID, "d")))));
     }
 
     @Test
     public void colon() {
         assertEquals(Parser.parse("assignee:darius"),
-            new Qualifier("assignee", "darius"));
-        assertEquals(Parser.parse("as:darius"),
-                new Qualifier("as", "darius"));
+            new Qualifier(ASSIGNEE, "darius"));
         assertEquals(Parser.parse("assignee    :    darius   "),
-            new Qualifier("assignee", "darius"));
-        assertEquals(Parser.parse("as    :    darius   "),
-                new Qualifier("as", "darius"));
+            new Qualifier(ASSIGNEE, "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
             new Conjunction(
                 new Conjunction(
-                    new Qualifier("assignee", "dar"),
-                    new Qualifier("keyword", "ius")),
-                new Qualifier("keyword", "one")));
+                    new Qualifier(ASSIGNEE, "dar"),
+                    new Qualifier(KEYWORD, "ius")),
+                new Qualifier(KEYWORD, "one")));
     }
 
     @Test
     public void sortingKeys() {
         assertEquals(Parser.parse("sort:id"),
-            new Qualifier("sort", Arrays.asList(new SortKey("id", false))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", false))));
         assertEquals(Parser.parse("sort: id , repo "),
-            new Qualifier("sort", Arrays.asList(new SortKey("id", false), new SortKey("repo", false))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", false))));
 
         assertEquals(Parser.parse("sort:-id"),
-            new Qualifier("sort", Arrays.asList(new SortKey("id", true))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", true))));
         assertEquals(Parser.parse("sort:id, ~repo"),
-            new Qualifier("sort", Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
         assertEquals(Parser.parse("sort:~id, NOT repo"),
-            new Qualifier("sort", Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
         assertNotEquals(Parser.parse("sort:~repo, NOT id"),
-                new Qualifier("sort", Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }
 
     @Test

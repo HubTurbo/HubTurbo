@@ -20,7 +20,9 @@ import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
-    public static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
+
+    private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
+
     public static final String MILESTONE_FILTER_NAME =  "milestone:curr sort:status";
     public static final String MILESTONE_PANEL_NAME = "Current Milestone";
 

@@ -5,6 +5,8 @@ import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.apache.logging.log4j.Logger;
+
+import filter.expression.QualifierType;
 import util.Futures;
 import util.HTLog;
 
@@ -62,7 +64,7 @@ public class UpdateController {
      */
     private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
         filterExprs.stream()
-                .flatMap(filterExpr -> Qualifier.getContentOfMetaQualifier(filterExpr, Qualifier.REPO).stream())
+                .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
                 .distinct()
                 .forEach(logic::openRepositoryFromFilter);
     }
@@ -129,7 +131,7 @@ public class UpdateController {
         MultiModel models = logic.getModels();
         for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
             // Only take into account the first sort qualifier found
-            if (metaQualifier.getName().equals("sort")) {
+            if (metaQualifier.getType() == QualifierType.SORT) {
                 return metaQualifier.getCompoundSortComparator(models, hasUpdatedQualifier);
             }
         }

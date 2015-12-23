@@ -3,6 +3,7 @@ package ui.issuepanel;
 import backend.interfaces.IModel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -309,7 +310,7 @@ public class PanelControl extends HBox {
             if (currPanel instanceof FilterPanel) {
                 FilterPanel currFilterPanel = (FilterPanel) currPanel;
                 FilterExpression panelExpression = currFilterPanel.getCurrentFilterExpression();
-                repositoriesOnPanels.addAll(Qualifier.getContentOfMetaQualifier(panelExpression, Qualifier.REPO));
+                repositoriesOnPanels.addAll(Qualifier.getMetaQualifierContent(panelExpression, QualifierType.REPO));
             }
         }
 

@@ -63,10 +63,10 @@ public class Disjunction implements FilterExpression {
     }
 
     @Override
-    public List<String> getQualifierNames() {
-        ArrayList<String> list = new ArrayList<>();
-        list.addAll(left.getQualifierNames());
-        list.addAll(right.getQualifierNames());
+    public List<QualifierType> getQualifierTypes() {
+        ArrayList<QualifierType> list = new ArrayList<>();
+        list.addAll(left.getQualifierTypes());
+        list.addAll(right.getQualifierTypes());
         return list;
     }
 
@@ -74,9 +74,9 @@ public class Disjunction implements FilterExpression {
     public FilterExpression filter(Predicate<Qualifier> pred) {
         FilterExpression left = this.left.filter(pred);
         FilterExpression right = this.right.filter(pred);
-        if (left == Qualifier.EMPTY) {
+        if (left.isEmpty()) {
             return right;
-        } else if (right == Qualifier.EMPTY) {
+        } else if (right.isEmpty()) {
             return left;
         } else {
             return new Disjunction(left, right);
@@ -97,12 +97,16 @@ public class Disjunction implements FilterExpression {
     public FilterExpression map(Function<Qualifier, Qualifier> func) {
         FilterExpression left = this.left.map(func);
         FilterExpression right = this.right.map(func);
-        if (left == Qualifier.EMPTY) {
+        if (left.isEmpty()) {
             return right;
-        } else if (right == Qualifier.EMPTY) {
+        } else if (right.isEmpty()) {
             return left;
         } else {
             return new Disjunction(left, right);
         }
+    }
+    @Override
+    public boolean isEmpty() {
+        return left.isEmpty() && right.isEmpty();
     }
 }
