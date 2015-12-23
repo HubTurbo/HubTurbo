@@ -102,15 +102,13 @@ public class Qualifier implements FilterExpression {
             return expr;
         }
 
-        expr = expr.map(q -> {
+        return expr.map(q -> {
             if (Qualifier.isMilestoneQualifier(q)) {
                 return q.convertMilestoneAliasQualifier(allMilestones, currentMilestoneIndex.get());
             } else {
                 return q;
             }
         });
-
-        return expr;
     }
 
     /**
@@ -147,7 +145,7 @@ public class Qualifier implements FilterExpression {
         for (TurboMilestone checker : allMilestones) {
             boolean overdue = checker.getDueDate().isPresent() &&
                     checker.getDueDate().get().isBefore(LocalDate.now());
-            boolean relevant = !(overdue && (checker.getOpenIssues() == 0));
+            boolean relevant = !(overdue && checker.getOpenIssues() == 0);
 
             if (checker.isOpen() && relevant) {
                 return Optional.of(currentIndex);
@@ -582,12 +580,12 @@ public class Qualifier implements FilterExpression {
             Collections.sort(bLabels, labelComparator);
 
             // Put empty lists at the back
-            if (aLabels.size() == 0 && bLabels.size() == 0) {
+            if (aLabels.isEmpty() && bLabels.isEmpty()) {
                 return 0;
-            } else if (aLabels.size() == 0) {
+            } else if (aLabels.isEmpty()) {
                 // a is larger
                 return 1;
-            } else if (bLabels.size() == 0) {
+            } else if (bLabels.isEmpty()) {
                 // b is larger
                 return -1;
             }
@@ -990,27 +988,28 @@ public class Qualifier implements FilterExpression {
 
         Pattern aliasPattern = Pattern.compile("(curr(?:ent)?)(?:(\\+|-)(\\d+))?$");
         Matcher aliasMatcher = aliasPattern.matcher(alias);
-        int offset = 0;
 
         if (!aliasMatcher.find()) {
             return this;
         }
 
+        int offset;
+        int newIndex = currentIndex;
         if (aliasMatcher.group(2) != null && aliasMatcher.group(3) != null) {
             offset = Integer.parseInt(aliasMatcher.group(3));
             if (aliasMatcher.group(2).equals("+")) {
-                currentIndex += offset;
+                newIndex += offset;
             } else {
-                currentIndex -= offset;
+                newIndex -= offset;
             }
         }
 
         // if out of milestone range, don't convert alias
-        if (currentIndex >= allMilestones.size() || currentIndex < 0) {
+        if (newIndex >= allMilestones.size() || newIndex < 0) {
             return Qualifier.FALSE;
         }
 
-        contents = allMilestones.get(currentIndex).getTitle().toLowerCase();
+        contents = allMilestones.get(newIndex).getTitle().toLowerCase();
 
         return new Qualifier(type, contents);
     }
@@ -1020,12 +1019,12 @@ public class Qualifier implements FilterExpression {
      */
     public static Comparator<TurboMilestone> getMilestoneDueDateComparator() {
         return (a, b) -> {
-            assert(a.getDueDate().isPresent());
-            assert(b.getDueDate().isPresent());
+            assert a.getDueDate().isPresent();
+            assert b.getDueDate().isPresent();
             LocalDate aDueDate = a.getDueDate().get();
             LocalDate bDueDate = b.getDueDate().get();
 
-            return (aDueDate.compareTo(bDueDate));
+            return aDueDate.compareTo(bDueDate);
         };
     }
 }

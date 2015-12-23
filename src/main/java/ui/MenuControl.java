@@ -31,7 +31,6 @@ public class MenuControl extends MenuBar {
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
     private final PanelControl panels;
-    private final ScrollPane panelsScrollPane;
     private final UI ui;
     private final Preferences prefs;
     private final Stage mainStage;
@@ -41,7 +40,6 @@ public class MenuControl extends MenuBar {
     public MenuControl(UI ui, PanelControl panels, ScrollPane panelsScrollPane, Preferences prefs, Stage mainStage) {
         this.panels = panels;
         this.prefs = prefs;
-        this.panelsScrollPane = panelsScrollPane;
         this.ui = ui;
         this.mainStage = mainStage;
         this.boardAutoCreator = new BoardAutoCreator(ui, panels, prefs);
@@ -171,10 +169,10 @@ public class MenuControl extends MenuBar {
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
-            if (prefs.getLastOpenBoard().isPresent()) {
-                if (prefs.getLastOpenBoard().get().equals(boardName)) {
-                    prefs.clearLastOpenBoard();
-                }
+            if (prefs.getLastOpenBoard().isPresent() &&
+                prefs.getLastOpenBoard().get().equals(boardName)) {
+
+                prefs.clearLastOpenBoard();
             }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");

@@ -79,7 +79,7 @@ public class UtilityTest {
         Date date = null;
 
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd-k-m-s").parse("1994-11-15-12-45-26");
+            date = new SimpleDateFormat("yyyy-MM-dd-k-m-s", Locale.US).parse("1994-11-15-12-45-26");
         } catch (ParseException e) {
             fail();
         }

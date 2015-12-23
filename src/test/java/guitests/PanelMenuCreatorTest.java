@@ -19,12 +19,12 @@ import static ui.PanelMenuCreator.UPDATED_FILTER_NAME;
 import static ui.PanelMenuCreator.UPDATED_PANEL_NAME;
 
 public class PanelMenuCreatorTest extends UITest{
+
     private PanelControl panelControl;
-    private UI ui;
 
     @Before
     public void setup() {
-        ui = TestController.getUI();
+        UI ui = TestController.getUI();
         panelControl = ui.getPanelControl();
     }
 

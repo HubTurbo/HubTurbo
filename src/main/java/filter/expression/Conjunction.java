@@ -13,8 +13,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Conjunction implements FilterExpression {
-    public FilterExpression left;
-    public FilterExpression right;
+
+    public final FilterExpression left;
+    public final FilterExpression right;
 
     public Conjunction(FilterExpression left, FilterExpression right) {
         this.left = left;

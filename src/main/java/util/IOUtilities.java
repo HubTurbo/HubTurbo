@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class IOUtilities {
+public final class IOUtilities {
 
     public static ByteArrayOutputStream inputStreamToByteArrayOutputStream(InputStream is) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -17,4 +17,5 @@ public class IOUtilities {
         return buffer;
     }
 
+    private IOUtilities() {}
 }

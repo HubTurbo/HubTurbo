@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 /**
  * Combinators for dealing with CompletableFutures.
  */
-public class Futures {
+public final class Futures {
 
     private static final Logger logger = HTLog.get(Futures.class);
+
+    private Futures() {}
 
     /**
      * Returns a CompletableFuture that will be completed 'later' with the given result.

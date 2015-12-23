@@ -65,7 +65,7 @@ public abstract class AbstractPanel extends VBox {
         setOnDragDetected((event) -> {
             Dragboard db = startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            DragData dd = new DragData(DragData.Source.PANEL, -1, -1);
+            DragData dd = new DragData(-1);
             content.putString(dd.serialise());
             db.setContent(content);
             // We're using this because the content of a dragboard can't be changed

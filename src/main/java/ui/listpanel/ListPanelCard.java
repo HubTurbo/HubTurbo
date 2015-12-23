@@ -42,8 +42,8 @@ public class ListPanelCard extends VBox {
 
     private final TurboIssue issue;
     private final Model model;
-    private FlowPane issueDetails = new FlowPane();
-    private FilterPanel parentPanel;
+    private final FlowPane issueDetails = new FlowPane();
+    private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
     /**
@@ -146,7 +146,7 @@ public class ListPanelCard extends VBox {
             .forEach(e -> result.getChildren().add(e));
 
         // Comments
-        if (comments.size() > 0) {
+        if (!comments.isEmpty()) {
             String names = comments.stream()
                 .map(comment -> comment.getUser().getLogin())
                 .distinct()
@@ -165,7 +165,7 @@ public class ListPanelCard extends VBox {
 
     private int getUpdateFilterHours(FilterExpression currentFilterExpression) {
         List<Qualifier> filters = currentFilterExpression.find(Qualifier::isUpdatedQualifier);
-        assert filters.size() > 0 : "Problem with isUpdateFilter";
+        assert !filters.isEmpty() : "Problem with isUpdateFilter";
 
         // Return the first of the updated qualifiers, if there are multiple
         Qualifier qualifier = filters.get(0);

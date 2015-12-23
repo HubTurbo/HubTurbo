@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class IssueMetadata {
+public final class IssueMetadata {
 
     private final List<TurboIssueEvent> events;
     private final List<Comment> comments;
@@ -150,9 +150,9 @@ public class IssueMetadata {
     }
 
     private static int countCommentsBySelf(List<Comment> comments, String user) {
-        return Utility.safeLongToInt((comments.stream()
+        return Utility.safeLongToInt(comments.stream()
             .filter(c -> isCommentBySelf(c, user))
-            .count()));
+            .count());
     }
 
     private static boolean isEventBySelf(TurboIssueEvent event, String user) {

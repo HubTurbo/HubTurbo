@@ -10,24 +10,27 @@ import javafx.stage.WindowEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-public abstract class Dialog<T> {
+public class Dialog<T> {
 
-    private Stage stage = null;
-    private CompletableFuture<T> response;
+    private final Stage stage;
+    private final CompletableFuture<T> response;
 
     private double width = 300, height = 400;
     private String title = "";
     private StageStyle stageStyle = StageStyle.UTILITY;
-    private Modality modality = Modality.APPLICATION_MODAL;
 
     public Dialog(Stage parentStage) {
         this.response = new CompletableFuture<>();
-        Scene scene = new Scene(content(), width, height);
+
+        // TODO Calling an overridable method during construction should be
+        // fixed via an API change
+        Scene scene = new Scene(content(), width, height); // NOPMD
         stage = new Stage();
         stage.setScene(scene);
         stage.setTitle(title);
         stage.setOnCloseRequest(this::onClose);
         stage.initOwner(parentStage);
+        Modality modality = Modality.APPLICATION_MODAL;
         stage.initModality(modality);
         stage.initStyle(stageStyle);
     }

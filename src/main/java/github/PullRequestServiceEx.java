@@ -67,10 +67,10 @@ public class PullRequestServiceEx extends PullRequestService {
         logger.info("Getting review comments for PR" + pullRequestNumber + " " + repoId);
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-        uri.append('/').append(repoId);
-        uri.append(SEGMENT_PULLS);
-        uri.append('/').append(pullRequestNumber);
-        uri.append(SEGMENT_COMMENTS);
+        uri.append('/').append(repoId)
+            .append(SEGMENT_PULLS)
+            .append('/').append(pullRequestNumber)
+            .append(SEGMENT_COMMENTS);
 
         PagedRequest<ReviewComment> request = createPagedRequest();
         request.setUri(uri);

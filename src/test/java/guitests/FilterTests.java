@@ -1,5 +1,6 @@
 package guitests;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import javafx.scene.input.KeyCode;
@@ -20,7 +21,7 @@ public class FilterTests extends UITest{
         type("milestone:");
         push(KeyCode.ENTER);
 
-        assertEquals(issuePanel.getIssueCount(), 10);
+        assertEquals(10, issuePanel.getIssueCount());
     }
 
     @Test
@@ -45,7 +46,7 @@ public class FilterTests extends UITest{
         type("milestone:curr-2");
         push(KeyCode.ENTER);
 
-        assertEquals(issuePanel.getIssueCount(), 0);
+        assertEquals(0, issuePanel.getIssueCount());
 
         // test current+3 : has no result
         click("#dummy/dummy_col0_filterTextField");
@@ -53,14 +54,14 @@ public class FilterTests extends UITest{
         type("milestone:current+3");
         push(KeyCode.ENTER);
 
-        assertEquals(issuePanel.getIssueCount(), 0);
+        assertEquals(0, issuePanel.getIssueCount());
 
         // test wrong alias
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("milestone:current+s0v8f");
         push(KeyCode.ENTER);
-        assertEquals(issuePanel.getIssueCount(), 0);
+        assertEquals(0, issuePanel.getIssueCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
@@ -70,8 +71,8 @@ public class FilterTests extends UITest{
         type(milestoneAlias + ":" + currString);
         push(KeyCode.ENTER);
 
-        assertEquals(issuePanel.getIssueCount(), 1);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone().isPresent(), true);
-        assertEquals(issuePanel.getIssueList().get(0).getMilestone(), Optional.of(milestoneNumber));
+        assertEquals(1, issuePanel.getIssueCount());
+        assertTrue(issuePanel.getIssueList().get(0).getMilestone().isPresent());
+        assertEquals(Optional.of(milestoneNumber), issuePanel.getIssueList().get(0).getMilestone());
     }
 }

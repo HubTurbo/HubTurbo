@@ -20,7 +20,7 @@ import static ui.components.KeyboardShortcuts.*;
 
 public class MenuControlTest extends UITest {
 
-    private boolean modelUpdatedEventTriggered;
+    private boolean modelUpdatedEventTriggered = false; // NOPMD
 
     @Test
     public void menuControlTest() {
@@ -32,7 +32,6 @@ public class MenuControlTest extends UITest {
         String uiTitle = ("HubTurbo " + 
         Utility.version(UI.VERSION_MAJOR, UI.VERSION_MINOR, UI.VERSION_PATCH) + " (%s)");
         
-        modelUpdatedEventTriggered = false;
         UI.events.registerEvent((ModelUpdatedEventHandler) e -> modelUpdatedEventTriggered = true);
         
         press(CLOSE_PANEL);

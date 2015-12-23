@@ -10,12 +10,12 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
-    private LabelPickerUILogic labelPickerUILogic;
+    private final LabelPickerUILogic labelPickerUILogic;
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
-    private boolean isTop;
+    private final boolean isTop;
 
     public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
@@ -51,7 +51,7 @@ public class PickerLabel extends TurboLabel {
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = (double) fontLoader.computeStringWidth(label.getText(), label.getFont());
         label.setPrefWidth(width + 30);
-        label.setText(label.getText() + ((!isTop && isSelected) ? " ✓" : ""));
+        label.setText(label.getText() + (!isTop && isSelected ? " ✓" : ""));
 
         if (getGroup().isPresent()) {
             Tooltip groupTooltip = new Tooltip(getGroup().get());
@@ -86,12 +86,22 @@ public class PickerLabel extends TurboLabel {
         this.isFaded = isFaded;
     }
 
+    /**
+     * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     * @return
+     */
     @Override
+    @SuppressWarnings("PMD")
     public boolean equals(Object o) {
         return super.equals(o);
     }
 
+    /**
+     * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     * @return
+     */
     @Override
+    @SuppressWarnings("PMD")
     public int hashCode() {
         return super.hashCode();
     }

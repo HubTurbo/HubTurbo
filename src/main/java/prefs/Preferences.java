@@ -28,7 +28,7 @@ public class Preferences {
         fileHandler.saveGlobalConfig(global);
     }
 
-    public void loadGlobalConfig() {
+    public final void loadGlobalConfig() {
         global = fileHandler.loadGlobalConfig();
     }
 

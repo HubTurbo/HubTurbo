@@ -13,10 +13,10 @@ public class LabelPickerUILogic {
     private final TurboIssue issue;
     private final LabelPickerDialog dialog;
     private List<TurboLabel> allLabels;
-    private List<PickerLabel> topLabels = new ArrayList<>();
+    private final List<PickerLabel> topLabels = new ArrayList<>();
     private List<PickerLabel> bottomLabels;
-    private Map<String, Boolean> groups = new HashMap<>();
-    private Map<String, Boolean> resultList = new HashMap<>();
+    private final Map<String, Boolean> groups = new HashMap<>();
+    private final Map<String, Boolean> resultList = new HashMap<>();
     private Optional<String> targetLabel = Optional.empty();
 
     // Used for multiple spaces
@@ -73,6 +73,7 @@ public class LabelPickerUILogic {
         }
     }
 
+    @SuppressWarnings("PMD")
     public void processTextFieldChange(String text) {
         String[] textArray = text.split(" ");
         if (textArray.length > 0) {
@@ -83,6 +84,7 @@ public class LabelPickerUILogic {
                 boolean isBottomLabelsUpdated = false;
 
                 // group check
+                // TODO rewrite this to remove some nesting, and the PMD warning
                 if (TurboLabel.getDelimiter(query).isPresent()) {
                     String delimiter = TurboLabel.getDelimiter(query).get();
                     String[] queryArray = query.split(Pattern.quote(delimiter));
@@ -113,6 +115,7 @@ public class LabelPickerUILogic {
     * Top pane methods do not need to worry about capitalisation because they
     * all deal with actual labels.
     */
+    @SuppressWarnings("unused")
     private void ______TOP_PANE______() {}
 
     private void addExistingLabels() {
@@ -241,6 +244,7 @@ public class LabelPickerUILogic {
     }
 
     // Bottom box deals with possible matches so we usually ignore the case for these methods.
+    @SuppressWarnings("unused")
     private void ______BOTTOM_BOX______() {}
 
     private void updateBottomLabels(String group, String match) {
@@ -356,6 +360,7 @@ public class LabelPickerUILogic {
                 .findAny();
     }
 
+    @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
 
     public Map<String, Boolean> getResultList() {

@@ -28,10 +28,10 @@ public class LabelServiceEx extends LabelService {
 //        Github api format: DELETE /repos/:owner/:repo/issues/:number/labels/:name
         String repoId = getId(repository);
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-        uri.append('/').append(repoId);
-        uri.append(SEGMENT_ISSUES);
-        uri.append('/').append(issueId);
-        uri.append('/').append(label.getName());
+        uri.append('/').append(repoId)
+            .append(SEGMENT_ISSUES)
+            .append('/').append(issueId)
+            .append('/').append(label.getName());
         client.delete(uri.toString());
     }
 
@@ -53,10 +53,10 @@ public class LabelServiceEx extends LabelService {
 //        POST /repos/:owner/:repo/issues/:number/labels
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-        uri.append('/').append(id);
-        uri.append(SEGMENT_ISSUES);
-        uri.append('/').append(issueId);
-        uri.append(SEGMENT_LABELS);
+        uri.append('/').append(id)
+            .append(SEGMENT_ISSUES)
+            .append('/').append(issueId)
+            .append(SEGMENT_LABELS);
 
         return client.post(uri.toString(), labels, new TypeToken<List<Label>>() {
         }.getType());
@@ -85,9 +85,9 @@ public class LabelServiceEx extends LabelService {
         }
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-        uri.append('/').append(repoId);
-        uri.append(SEGMENT_LABELS);
-        uri.append('/').append(name);
+        uri.append('/').append(repoId)
+            .append(SEGMENT_LABELS)
+            .append('/').append(name);
 
         return client.post(uri.toString(), label, Label.class);
     }

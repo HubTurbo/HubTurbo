@@ -31,9 +31,6 @@ public class GitHubClientEx extends GitHubClient {
     // Request method for HEAD API call
     protected static final String METHOD_HEAD = "HEAD";
 
-    public GitHubClientEx() {
-    }
-
     /**
      * Extends superclass method with connection timeout parameters.
      */
@@ -203,6 +200,7 @@ public class GitHubClientEx extends GitHubClient {
      * Overridden to make public.
      */
     @Override
+    @SuppressWarnings("PMD")
     public IOException createException(InputStream response, int code, String status) {
         return super.createException(response, code, status);
     }
@@ -211,6 +209,7 @@ public class GitHubClientEx extends GitHubClient {
      * Overridden to make public.
      */
     @Override
+    @SuppressWarnings("PMD")
     public HttpURLConnection createPost(String uri) throws IOException {
         return super.createPost(uri);
     }
@@ -219,6 +218,7 @@ public class GitHubClientEx extends GitHubClient {
      * Overridden to make public.
      */
     @Override
+    @SuppressWarnings("PMD")
     public InputStream getStream(HttpURLConnection request) throws IOException {
         return super.getStream(request);
     }
@@ -227,6 +227,7 @@ public class GitHubClientEx extends GitHubClient {
      * Overridden to make public.
      */
     @Override
+    @SuppressWarnings("PMD")
     public Object getBody(GitHubRequest request, InputStream stream) throws IOException {
         return super.getBody(request, stream);
     }
@@ -235,6 +236,7 @@ public class GitHubClientEx extends GitHubClient {
      * Overridden to make public.
      */
     @Override
+    @SuppressWarnings("PMD")
     public boolean isError(final int code) {
         return super.isError(code);
     }
@@ -246,6 +248,7 @@ public class GitHubClientEx extends GitHubClient {
      * @return
      */
     @Override
+    @SuppressWarnings("PMD")
     public boolean isOk(final int code) {
         return super.isOk(code);
     }

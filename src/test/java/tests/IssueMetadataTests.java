@@ -19,6 +19,8 @@ import util.Utility;
 
 public class IssueMetadataTests {
 
+    private static final Date now = new Date();
+
     @Test
     public void immutability() {
         List<TurboIssueEvent> events = stubEvents();
@@ -124,8 +126,6 @@ public class IssueMetadataTests {
         assertEquals("events", updated.getEventsETag());
         assertEquals("comments", updated.getCommentsETag());
     }
-
-    private static final Date now = new Date();
 
     private static List<TurboIssueEvent> stubEvents() {
         List<TurboIssueEvent> events = new ArrayList<>();

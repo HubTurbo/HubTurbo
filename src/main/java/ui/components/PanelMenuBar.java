@@ -28,17 +28,17 @@ import util.events.ShowRenamePanelEvent;
  */
 public class PanelMenuBar extends HBox {
 
-    private HBox menuBarUndoButton;
-    private HBox menuBarConfirmButton;
-    private HBox menuBarCloseButton;
+    private final HBox menuBarUndoButton;
+    private final HBox menuBarConfirmButton;
+    private final HBox menuBarCloseButton;
     private TextField renameableTextField;
-    private HBox menuBarNameArea;
+    private final HBox menuBarNameArea;
     private HBox nameBox;
     private Label renameButton;
-    private FilterPanel panel;
-    private IModel model;
+    private final FilterPanel panel;
+    private final IModel model;
     private Label closeButton;
-    private UI ui;
+    private final UI ui;
     private String panelName = "Panel";
     private Text nameText;
 
@@ -78,11 +78,11 @@ public class PanelMenuBar extends HBox {
         nameBox.setAlignment(Pos.CENTER_LEFT);
 
         nameBox.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                if (mouseEvent.getClickCount() == 2) {
-                    mouseEvent.consume();
-                    activateInplaceRename();
-                }
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
+                && mouseEvent.getClickCount() == 2) {
+
+                mouseEvent.consume();
+                activateInplaceRename();
             }
         });
 

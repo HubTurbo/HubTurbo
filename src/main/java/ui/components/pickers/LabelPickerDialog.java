@@ -22,9 +22,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private static final int ELEMENT_MAX_WIDTH = 400;
 
     private final LabelPickerUILogic uiLogic;
-    private TextField textField;
-    private FlowPane topPane;
-    private VBox bottomBox;
+    private final TextField textField;
+    private final FlowPane topPane;
+    private final VBox bottomBox;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         // UI creation
@@ -74,6 +74,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         });
     }
 
+    @SuppressWarnings("unused")
     private void ______POPULATION______() {}
 
     protected void populatePanes(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels,
@@ -84,13 +85,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void populateTopPane(List<PickerLabel> existingLabels, List<PickerLabel> newTopLabels) {
         topPane.getChildren().clear();
-        if (existingLabels.size() == 0 && newTopLabels.size() == 0) {
+        if (existingLabels.isEmpty() && newTopLabels.isEmpty()) {
             Label label = new Label("No currently selected labels. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             topPane.getChildren().add(label);
         } else {
             existingLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
-            if (newTopLabels.size() > 0) {
+            if (!newTopLabels.isEmpty()) {
                 topPane.getChildren().add(new Label("|"));
                 newTopLabels.forEach(label -> topPane.getChildren().add(label.getNode()));
             }
@@ -99,7 +100,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void populateBottomBox(List<PickerLabel> bottomLabels, Map<String, Boolean> groups) {
         bottomBox.getChildren().clear();
-        if (bottomLabels.size() == 0) {
+        if (bottomLabels.isEmpty()) {
             Label label = new Label("No labels in repository. ");
             label.setPadding(new Insets(2, 5, 2, 5));
             bottomBox.getChildren().add(label);
@@ -137,6 +138,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
+    @SuppressWarnings("unused")
     private void ______UI_CREATION______() {}
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -146,7 +148,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 issue.getId() + " in " + issue.getRepoId());
     }
 
-    public void positionDialog(Stage stage) {
+    public final void positionDialog(Stage stage) {
         if (!Double.isNaN(getHeight())) {
             setX(stage.getX() + stage.getScene().getX());
             setY(stage.getY() +

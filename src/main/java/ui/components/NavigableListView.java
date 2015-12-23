@@ -118,7 +118,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     public abstract boolean areItemsEqual(T item1, T item2);
 
-    protected void setupMouseEvents() {
+    private void setupMouseEvents() {
         setOnMouseClicked(e -> {
             int currentlySelected = getSelectionModel().getSelectedIndex();
 
@@ -134,7 +134,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         });
     }
 
-    protected void setupKeyEvents() {
+    private void setupKeyEvents() {
         setOnKeyPressed(e -> {
             if (e.isControlDown()) {
                 return;
@@ -193,7 +193,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
      * @param n - Nth item, indexing is 1-based (1st item would correspond to n = 1)
      */
 
-    public void selectNthItem(int n) {
+    public final void selectNthItem(int n) {
         requestFocus();
         assert n <= getItems().size() && n > 0;
         getSelectionModel().clearAndSelect(n - 1);
