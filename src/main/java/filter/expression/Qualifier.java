@@ -191,11 +191,12 @@ public class Qualifier implements FilterExpression {
         currentTime = dateTime;
     }
 
-    public boolean isEmptyQualifier() {
+    @Override
+    public boolean isEmpty() {
         return type == QualifierType.EMPTY;
     }
 
-    public boolean isFalseQualifier() {
+    public boolean isFalse() {
         return type == QualifierType.FALSE;
     }
 
@@ -204,10 +205,10 @@ public class Qualifier implements FilterExpression {
         assert type != null;
 
         // The empty qualifier is satisfied by anything
-        if (isEmptyQualifier()) return true;
+        if (isEmpty()) return true;
 
         // The false qualifier is satisfied by nothing
-        if (isFalseQualifier()) return false;
+        if (isFalse()) return false;
 
         switch (type) {
         case ID:
@@ -255,10 +256,10 @@ public class Qualifier implements FilterExpression {
         assert type != null && content != null;
 
         // The empty qualifier should not be applied to anything
-        assert !isEmptyQualifier();
+        assert !isEmpty();
 
         // The false qualifier should not be applied to anything
-        assert !isFalseQualifier();
+        assert !isFalse();
 
         switch (type) {
         case TITLE:
@@ -336,7 +337,7 @@ public class Qualifier implements FilterExpression {
      */
     @Override
     public String toString() {
-        if (this == EMPTY) {
+        if (this.isEmpty()) {
             return "";
         } else if (content.isPresent()) {
             String quotedContent = content.get();

@@ -50,4 +50,8 @@ public interface FilterExpression {
     // Apply the given function to the syntax tree, returning a new FilterExpression.
 
     FilterExpression map(Function<Qualifier, Qualifier> func);
+
+    // Checks if a subtree is the empty qualifier.
+
+    boolean isEmpty();
 }

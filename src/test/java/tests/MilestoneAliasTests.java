@@ -155,7 +155,7 @@ public class MilestoneAliasTests {
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
                 Parser.parse("milestone:curr+2 && milestone:curr+3"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
-        assertEquals(false, milestoneQualifiers.get(0).isFalseQualifier());
+        assertEquals(false, milestoneQualifiers.get(0).isFalse());
 
     }
 

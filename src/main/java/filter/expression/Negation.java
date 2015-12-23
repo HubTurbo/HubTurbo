@@ -62,7 +62,7 @@ public class Negation implements FilterExpression {
     @Override
     public FilterExpression filter(Predicate<Qualifier> pred) {
         FilterExpression expr = this.expr.filter(pred);
-        if (expr == Qualifier.EMPTY) {
+        if (expr.isEmpty()) {
             return Qualifier.EMPTY;
         } else {
             return new Negation(expr);
@@ -80,10 +80,15 @@ public class Negation implements FilterExpression {
     @Override
     public FilterExpression map(Function<Qualifier, Qualifier> func) {
         FilterExpression expr = this.expr.map(func);
-        if (expr == Qualifier.EMPTY) {
+        if (expr.isEmpty()) {
             return Qualifier.EMPTY;
         } else {
             return new Negation(expr);
         }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return expr.isEmpty();
     }
 }
