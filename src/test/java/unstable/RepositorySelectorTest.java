@@ -143,7 +143,7 @@ public class RepositorySelectorTest extends UITest {
         }
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = TestController.createTestPreferences();
+        Preferences testPref = TestController.loadTestPreferences();
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());

@@ -31,7 +31,7 @@ public class NoPanelAtQuitTest extends UITest {
         click("File");
         click("Quit");
         
-        Preferences testPref = TestController.createTestPreferences();
+        Preferences testPref = TestController.loadTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();
         
         // Expected result: nothing stored in panelInfo

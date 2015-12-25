@@ -133,7 +133,7 @@ public class UseGlobalConfigsTest extends UITest {
         }
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = TestController.createTestPreferences();
+        Preferences testPref = TestController.loadTestPreferences();
 
         // Credentials
         assertEquals("test", testPref.getLastLoginUsername());

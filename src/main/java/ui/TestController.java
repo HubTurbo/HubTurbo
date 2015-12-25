@@ -86,24 +86,34 @@ public final class TestController {
     }
 
     /**
-     * Creates a Preferences that store data in test config file if run with test mode
-     * or in a default config file specified in the Preferences class
+     * Creates a Preferences instance that stores data in test config file if run in
+     * test mode, or in a default config file specified in the Preferences class
      * @return
      */
-    public static Preferences createApplicationPreference() {
+    public static Preferences loadApplicationPreferences() {
         if (isTestMode()) {
-            return createTestPreferences();
+            return loadTestPreferences();
         }
 
-        return new Preferences(Preferences.GLOBAL_CONFIG_FILE);
+        return Preferences.load(Preferences.GLOBAL_CONFIG_FILE);
     }
 
     /**
-     * Creates a Preferences that stores data in the test directory
+     * Creates a Preferences instance that stores data in a config file for testing, loading
+     * from it if it already exists.
+     * @return
+     */
+    public static Preferences loadTestPreferences() {
+        return Preferences.load(Preferences.TEST_CONFIG_FILE);
+    }
+
+    /**
+     * Creates a Preferences instance that stores data in a config file for testing, unconditionally
+     * initialising it beforehand.
      * @return
      */
     public static Preferences createTestPreferences() {
-        return new Preferences(Preferences.TEST_CONFIG_FILE);
+        return Preferences.initialise(Preferences.TEST_CONFIG_FILE);
     }
 
     /**
