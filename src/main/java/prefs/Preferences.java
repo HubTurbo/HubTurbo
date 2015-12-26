@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * Represents persistent user configuration. Maps to a file on disk.
+ *
  * Overrides PMD's recommendation that this class should be final.
  * It cannot be as we need to mock it.
  */
@@ -33,11 +35,19 @@ public class Preferences { // NOPMD
         }
     }
 
+    /**
+     * Initialises a Preferences instance which creates its config file, or loads
+     * from it if it already exists.
+     */
     public static Preferences load(String configFileName) {
         return new Preferences(configFileName, false);
     }
 
-    public static Preferences initialise(String configFileName) {
+    /**
+     * Initialises a Preferences instance which always creates its config file.
+     * This will overwrite it with a default configuration if it already exists.
+     */
+    public static Preferences create(String configFileName) {
         return new Preferences(configFileName, true);
     }
 
@@ -45,11 +55,11 @@ public class Preferences { // NOPMD
         fileHandler.saveGlobalConfig(global);
     }
 
-    public void initGlobalConfig() {
+    private void initGlobalConfig() {
         global = fileHandler.initGlobalConfig();
     }
 
-    public void loadGlobalConfig() {
+    private void loadGlobalConfig() {
         global = fileHandler.loadGlobalConfig();
     }
 

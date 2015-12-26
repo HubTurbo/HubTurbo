@@ -113,7 +113,7 @@ public final class TestController {
      * @return
      */
     public static Preferences createTestPreferences() {
-        return Preferences.initialise(Preferences.TEST_CONFIG_FILE);
+        return Preferences.create(Preferences.TEST_CONFIG_FILE);
     }
 
     /**
