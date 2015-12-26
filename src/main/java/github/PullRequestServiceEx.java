@@ -77,6 +77,8 @@ public class PullRequestServiceEx extends PullRequestService {
         request.setType(new TypeToken<List<ReviewComment>>() {
         }.getType());
 
+        System.out.println(request.generateUri());
+
         return getAll(request);
     }
 }

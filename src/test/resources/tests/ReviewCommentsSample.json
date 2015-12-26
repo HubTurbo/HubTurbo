@@ -1,0 +1,182 @@
+[
+  {
+    "url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44284073",
+    "id": 44284073,
+    "diff_hunk": "@@ -1,80 +1,63 @@\n package guitests;\n \n-import static org.junit.Assert.assertEquals;\n-import static org.junit.Assert.assertTrue;\n-import static org.junit.Assert.fail;\n+import static ui.components.KeyboardShortcuts.*;\n \n-import ui.TestController;\n-import ui.issuepanel.FilterPanel;\n-import ui.issuepanel.PanelControl;\n-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;\n-import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;\n-import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;\n+import java.util.concurrent.atomic.AtomicBoolean;\n \n import org.junit.Test;\n-import org.loadui.testfx.exceptions.NoNodesFoundException;\n+import org.loadui.testfx.utils.TestUtils;\n \n-import javafx.scene.control.Label;\n-import javafx.scene.text.Text;\n+import javafx.scene.Node;\n import javafx.scene.input.KeyCode;\n+import javafx.scene.text.Text;\n+import ui.TestController;\n import ui.UI;\n-import util.PlatformEx;\n+import ui.issuepanel.AbstractPanel;\n+import ui.issuepanel.FilterPanel;\n+import ui.issuepanel.PanelControl;\n import util.events.PanelClickedEventHandler;\n \n public class PanelsTest extends UITest {\n     \n-    private static class Bool {\n-        public boolean value = false;\n-        public void negate() {\n-            value = !value;\n-        }\n-    }\n-\n-    // TODO check if interactions result in any effects\n     @Test\n     public void panelsTest() {\n         PanelControl panels = TestController.getUI().getPanelControl();\n \n-        Bool eventTriggered = new Bool();\n+        final AtomicBoolean eventTriggered = new AtomicBoolean(false);\n \n-        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());\n+        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.set(true));\n \n         pushKeys(MAXIMIZE_WINDOW);\n-\n         pushKeys(CREATE_RIGHT_PANEL);\n+        waitUntilNodeAppears(((FilterPanel) panels.getPanel(0)).getFilterTextField());\n+\n         type(\"repo:dummy2/dummy2\");\n         push(KeyCode.ENTER);\n \n         // Click\n-        eventTriggered.value = false;\n+        eventTriggered.set(false);\n         Text name1 = ((FilterPanel) panels.getPanel(1)).getNameText();\n         click(name1);\n-        assertTrue(eventTriggered.value);\n+        TestUtils.awaitCondition(eventTriggered::get);\n \n-        // Drag\n-        // TODO find a way to actually reorder the panels, and make it compatible with swap key command\n+        // Reorder panels by dragging, and wait for them to swap position\n+        final AbstractPanel firstPanel = panels.getPanel(0);\n+        Node from = ((FilterPanel) panels.getPanel(1)).getCloseButton();\n+        Node to = ((FilterPanel) panels.getPanel(0)).getFilterTextField();",
+    "path": "src/test/java/guitests/PanelsTest.java",
+    "position": null,
+    "original_position": 74,
+    "commit_id": "ba533551bdd7bac4ea3830ac4a70daff9abe1ffd",
+    "original_commit_id": "1c555140c047f63096deff5af17be8c4a7943ef6",
+    "user": {
+      "login": "HansNewbie",
+      "id": 3381536,
+      "avatar_url": "https://avatars.githubusercontent.com/u/3381536?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/HansNewbie",
+      "html_url": "https://github.com/HansNewbie",
+      "followers_url": "https://api.github.com/users/HansNewbie/followers",
+      "following_url": "https://api.github.com/users/HansNewbie/following{/other_user}",
+      "gists_url": "https://api.github.com/users/HansNewbie/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/HansNewbie/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/HansNewbie/subscriptions",
+      "organizations_url": "https://api.github.com/users/HansNewbie/orgs",
+      "repos_url": "https://api.github.com/users/HansNewbie/repos",
+      "events_url": "https://api.github.com/users/HansNewbie/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/HansNewbie/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Why don't we use close button as well here? Might be confusing in the future. If there is a reason why we use filter text field instead of close button, maybe put a comment about it?",
+    "created_at": "2015-11-09T15:05:24Z",
+    "updated_at": "2015-11-10T06:24:18Z",
+    "html_url": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44284073",
+    "pull_request_url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44284073"
+      },
+      "html": {
+        "href": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44284073"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44370708",
+    "id": 44370708,
+    "diff_hunk": "@@ -1,80 +1,63 @@\n package guitests;\n \n-import static org.junit.Assert.assertEquals;\n-import static org.junit.Assert.assertTrue;\n-import static org.junit.Assert.fail;\n+import static ui.components.KeyboardShortcuts.*;\n \n-import ui.TestController;\n-import ui.issuepanel.FilterPanel;\n-import ui.issuepanel.PanelControl;\n-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;\n-import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;\n-import static ui.components.KeyboardShortcuts.SWAP_PANEL_LEFT;\n+import java.util.concurrent.atomic.AtomicBoolean;\n \n import org.junit.Test;\n-import org.loadui.testfx.exceptions.NoNodesFoundException;\n+import org.loadui.testfx.utils.TestUtils;\n \n-import javafx.scene.control.Label;\n-import javafx.scene.text.Text;\n+import javafx.scene.Node;\n import javafx.scene.input.KeyCode;\n+import javafx.scene.text.Text;\n+import ui.TestController;\n import ui.UI;\n-import util.PlatformEx;\n+import ui.issuepanel.AbstractPanel;\n+import ui.issuepanel.FilterPanel;\n+import ui.issuepanel.PanelControl;\n import util.events.PanelClickedEventHandler;\n \n public class PanelsTest extends UITest {\n     \n-    private static class Bool {\n-        public boolean value = false;\n-        public void negate() {\n-            value = !value;\n-        }\n-    }\n-\n-    // TODO check if interactions result in any effects\n     @Test\n     public void panelsTest() {\n         PanelControl panels = TestController.getUI().getPanelControl();\n \n-        Bool eventTriggered = new Bool();\n+        final AtomicBoolean eventTriggered = new AtomicBoolean(false);\n \n-        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());\n+        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.set(true));\n \n         pushKeys(MAXIMIZE_WINDOW);\n-\n         pushKeys(CREATE_RIGHT_PANEL);\n+        waitUntilNodeAppears(((FilterPanel) panels.getPanel(0)).getFilterTextField());\n+\n         type(\"repo:dummy2/dummy2\");\n         push(KeyCode.ENTER);\n \n         // Click\n-        eventTriggered.value = false;\n+        eventTriggered.set(false);\n         Text name1 = ((FilterPanel) panels.getPanel(1)).getNameText();\n         click(name1);\n-        assertTrue(eventTriggered.value);\n+        TestUtils.awaitCondition(eventTriggered::get);\n \n-        // Drag\n-        // TODO find a way to actually reorder the panels, and make it compatible with swap key command\n+        // Reorder panels by dragging, and wait for them to swap position\n+        final AbstractPanel firstPanel = panels.getPanel(0);\n+        Node from = ((FilterPanel) panels.getPanel(1)).getCloseButton();\n+        Node to = ((FilterPanel) panels.getPanel(0)).getFilterTextField();",
+    "path": "src/test/java/guitests/PanelsTest.java",
+    "position": null,
+    "original_position": 74,
+    "commit_id": "ba533551bdd7bac4ea3830ac4a70daff9abe1ffd",
+    "original_commit_id": "1c555140c047f63096deff5af17be8c4a7943ef6",
+    "user": {
+      "login": "dariusf",
+      "id": 4328341,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4328341?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dariusf",
+      "html_url": "https://github.com/dariusf",
+      "followers_url": "https://api.github.com/users/dariusf/followers",
+      "following_url": "https://api.github.com/users/dariusf/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dariusf/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dariusf/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dariusf/subscriptions",
+      "organizations_url": "https://api.github.com/users/dariusf/orgs",
+      "repos_url": "https://api.github.com/users/dariusf/repos",
+      "events_url": "https://api.github.com/users/dariusf/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dariusf/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "With the close button as a target, the swap doesn't actually trigger. It's due to the way the node hierarchy is set up.\r\n\r\nI've pulled out the means of getting the node into a method, so we can change that if the node hierarchy changes.",
+    "created_at": "2015-11-10T05:08:07Z",
+    "updated_at": "2015-11-10T06:24:18Z",
+    "html_url": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44370708",
+    "pull_request_url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44370708"
+      },
+      "html": {
+        "href": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44370708"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44372870",
+    "id": 44372870,
+    "diff_hunk": "@@ -82,8 +50,60 @@ public void panelsTest() {\n         type(\"dummy2/dummy2\");\n         push(KeyCode.ENTER);\n         pushKeys(CREATE_RIGHT_PANEL);\n-        PlatformEx.waitOnFxThread();\n-        // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.\n-        click(\"#dummy2/dummy2_col1\");\n+\n+        waitUntilNodeAppears(panel1);",
+    "path": "src/test/java/guitests/PanelsTest.java",
+    "position": null,
+    "original_position": 110,
+    "commit_id": "ba533551bdd7bac4ea3830ac4a70daff9abe1ffd",
+    "original_commit_id": "26fc47f80da3b03ad1aeeaca19aa6ac8fcb5c5b0",
+    "user": {
+      "login": "HansNewbie",
+      "id": 3381536,
+      "avatar_url": "https://avatars.githubusercontent.com/u/3381536?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/HansNewbie",
+      "html_url": "https://github.com/HansNewbie",
+      "followers_url": "https://api.github.com/users/HansNewbie/followers",
+      "following_url": "https://api.github.com/users/HansNewbie/following{/other_user}",
+      "gists_url": "https://api.github.com/users/HansNewbie/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/HansNewbie/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/HansNewbie/subscriptions",
+      "organizations_url": "https://api.github.com/users/HansNewbie/orgs",
+      "repos_url": "https://api.github.com/users/HansNewbie/repos",
+      "events_url": "https://api.github.com/users/HansNewbie/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/HansNewbie/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Is this the same as the original? To me it seems that originally we want to assert that a panel can be created after dragging other panels. But in this wait, we just check if the original panel is still present after creating a new panel.",
+    "created_at": "2015-11-10T06:06:04Z",
+    "updated_at": "2015-11-10T06:24:18Z",
+    "html_url": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44372870",
+    "pull_request_url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44372870"
+      },
+      "html": {
+        "href": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44372870"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44373622",
+    "id": 44373622,
+    "diff_hunk": "@@ -82,8 +50,60 @@ public void panelsTest() {\n         type(\"dummy2/dummy2\");\n         push(KeyCode.ENTER);\n         pushKeys(CREATE_RIGHT_PANEL);\n-        PlatformEx.waitOnFxThread();\n-        // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.\n-        click(\"#dummy2/dummy2_col1\");\n+\n+        waitUntilNodeAppears(panel1);",
+    "path": "src/test/java/guitests/PanelsTest.java",
+    "position": null,
+    "original_position": 110,
+    "commit_id": "ba533551bdd7bac4ea3830ac4a70daff9abe1ffd",
+    "original_commit_id": "26fc47f80da3b03ad1aeeaca19aa6ac8fcb5c5b0",
+    "user": {
+      "login": "dariusf",
+      "id": 4328341,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4328341?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dariusf",
+      "html_url": "https://github.com/dariusf",
+      "followers_url": "https://api.github.com/users/dariusf/followers",
+      "following_url": "https://api.github.com/users/dariusf/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dariusf/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dariusf/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dariusf/subscriptions",
+      "organizations_url": "https://api.github.com/users/dariusf/orgs",
+      "repos_url": "https://api.github.com/users/dariusf/repos",
+      "events_url": "https://api.github.com/users/dariusf/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dariusf/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Good catch, it's different.",
+    "created_at": "2015-11-10T06:24:22Z",
+    "updated_at": "2015-11-10T06:24:22Z",
+    "html_url": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44373622",
+    "pull_request_url": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/comments/44373622"
+      },
+      "html": {
+        "href": "https://github.com/HubTurbo/HubTurbo/pull/1125#discussion_r44373622"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/HubTurbo/HubTurbo/pulls/1125"
+      }
+    }
+  }
+]

@@ -2,9 +2,11 @@ package tests;
 
 import backend.interfaces.IModel;
 import backend.resource.*;
+import org.apache.commons.io.IOUtils;
 import ui.TestController;
 import ui.UI;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -77,4 +79,8 @@ public final class TestUtils {
         }
     }
 
+    public static String readFileFromResource(Object callingObject, String filename) throws IOException {
+        ClassLoader classLoader = callingObject.getClass().getClassLoader();
+        return IOUtils.toString(classLoader.getResourceAsStream(filename));
+    }
 }
