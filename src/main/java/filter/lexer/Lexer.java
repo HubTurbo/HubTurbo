@@ -27,7 +27,7 @@ public class Lexer {
             new Rule("\\)", TokenType.RBRACKET),
             new Rule("\\\"", TokenType.QUOTE),
             new Rule(",", TokenType.COMMA),
-        new Rule("%", TokenType.PERCENT),
+            new Rule("%", TokenType.PERCENT),
             new Rule("\\.\\.", TokenType.DOTDOT),
 
             // These have higher priority than < and >
