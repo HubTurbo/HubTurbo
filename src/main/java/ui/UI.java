@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -39,7 +40,10 @@ import util.events.Event;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
+import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
@@ -57,6 +61,8 @@ public class UI extends Application implements EventDispatcher {
     public static final String ARG_UPDATED_TO = "--updated-to";
 
     private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
+
+    private static final String APPLICATION_LOGO_FILENAME = "logo.png";
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
@@ -230,6 +236,31 @@ public class UI extends Application implements EventDispatcher {
         loadFonts();
         String css = initCSS();
         applyCSS(css, scene);
+
+        setApplicationIcon(stage);
+    }
+
+    public void setApplicationIcon(Stage stage) {
+        stage.getIcons().add(new Image(UI.class.getResourceAsStream(APPLICATION_LOGO_FILENAME)));
+
+        // set Icon for OSX
+        // - need to use Apple Java Extension, using reflection to load the
+        //   class so that HubTurbo is compilable
+        if (PlatformSpecific.isOnMac()) {
+            try {
+                Class util = Class.forName("com.apple.eawt.Application");
+                Method getApplication = util.getMethod("getApplication", new Class[0]);
+                Object application = getApplication.invoke(util);
+                Class params[] = new Class[1];
+                params[0] = java.awt.Image.class;
+                Method setDockIconImage = util.getMethod("setDockIconImage", params);
+                setDockIconImage.invoke(application,
+                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
+            } catch (Exception e) {
+                logger.info("Not OSX", e);
+            }
+        }
+
     }
 
     public void quit() {
