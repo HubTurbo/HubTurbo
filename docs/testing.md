@@ -16,9 +16,9 @@ As far as possible we try not to add new tests to this package, and work towards
 
 ## GUI Tests
 
-For GUI Tests, HubTurbo supports a few launch arguments/flags to aid in testing. 
+For GUI Tests, HubTurbo supports a few launch arguments/flags to aid in testing.
 
-E.g. `--test=true --bypasslogin=true --closeonquit=true` (in program arguments) which simulates a test mode. 
+E.g. `--test=true --bypasslogin=true --closeonquit=true` (in program arguments) which simulates a test mode.
 - `test` - used to enable test mode which by default doesn't read/write to any external `json` file (everything is kept in memory) and uses stubs for certain components like `BrowserComponent`
 - `testconfig` - used to enable reading/writing of the `settings/test.json` file during test mode (for user preferences)
 - `bypasslogin` - used to bypass the login dialog (username and password will be left empty)
@@ -26,13 +26,13 @@ E.g. `--test=true --bypasslogin=true --closeonquit=true` (in program arguments) 
 - `testchromedriver` - used to test `BrowserComponent` and `ChromeDriverEx`
 - `closeonquit` - used for test mode to shutdown `JVM` on quit (mostly for manual testing, not used for ci/tests because that will cause tests to fail)
 
-Most GUI Tests extend [`UITest`](../src/test/java/guitests/UITest.java) which in turn extends `GuiTest` which is part of `TestFX`. 
+Most GUI Tests extend [`UITest`](../src/test/java/guitests/UITest.java) which in turn extends `GuiTest` which is part of `TestFX`.
 - Override `launchApp` to define your own program arguments for the test
 - Override `setupMethod` to add any pre-test configuration/setup before the stage is launched
 
 **Interacting with the `UI`**
 
-The [`TestController`](../src/main/java/ui/TestController.java) class allows tests to call the `UI` instance through `TestController.getUI()`. 
+The [`TestController`](../src/main/java/ui/TestController.java) class allows tests to call the `UI` instance through `TestController.getUI()`.
 
 **Interacting with the `Stage`**
 
@@ -42,17 +42,22 @@ Follow the conventions for existing ids when assigning ids to new elements.
 
 **Concurrency**
 
-Any code that changes the UI from a thread other than the JavaFX Application Thread must be wrapped in `Platform.runLater` (see guidelines on [thread safety](designRationalesAndGuidelines.md#thread-safety), specifically the part on thread confinement).
+Any code that modifies GUI objects from a thread other than the JavaFX Application Thread (aka the UI thread) must be wrapped in `Platform.runLater` (see guidelines on [thread safety](designDecisionsAndGuidelines.md#thread-safety), specifically the part on thread confinement).
 
-Note, however, that `Platform.runLater` does not provide any guarantees as to *when* your code actually executes. If you need another thread to wait until a UI operation is finished, use `PlatformEx.runAndWait`, or one of the synchronisation aids in [java.util.concurrent](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/package-summary.html), if `PlatformEx.runAndWait` isn't what you need. A latch or barrier should work in most cases.
+Note that `Platform.runLater` does not provide any guarantees as to *when* your code actually executes. If it is important that your threads are synchronised, try the following:
 
-Do not use `Thread.sleep` to sequence the execution of threads with respect to each other. It is unreliable due to the semantics of `Platform.runLater` and can result in slow, brittle, and/or nondeterministic code as tests get more complex.
+- If another thread is doing something on the UI thread, then waiting until it is done, `PlatformEx.runAndWait` is the solution. There are a few other flavours of it in [`PlatformEx`](https://github.com/HubTurbo/HubTurbo/blob/master/src/main/java/util/PlatformEx.java).
+- [`UITest`](https://github.com/HubTurbo/HubTurbo/blob/master/src/test/java/guitests/UITest.java) contains many useful synchronisation methods, such as `waitUntilNodeAppears` and `awaitCondition`. These are generally what is required.
+- Otherwise, use one of the synchronisation aids in [java.util.concurrent](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/package-summary.html), possibly to implement your own abstraction.
+- If you absolutely have to [busy-wait](https://en.wikipedia.org/wiki/Busy_waiting) (for example, to implement an abstraction), `PlatformEx.waitOnFxThread` helps throttle the rate at which the UI thread must be queried. It is for implementing lower-level operations and generally shouldn't be used directly in tests.
 
-In general, ensure as far as possible that tests are deterministic. Make all inputs to tests (such as global state) explicit.
+*Do not use `Thread.sleep` to sequence the execution of threads with respect to each other.* It is unreliable due to the semantics of `Platform.runLater` and can result in [slow, brittle, and/or nondeterministic code](http://googletesting.blogspot.sg/2008/08/tott-sleeping-synchronization.html) as tests get more complex.
+
+In general, ensure as far as possible that tests are deterministic. Keep tests stateless and make all their inputs (such as global state) explicit.
 
 **Events**
 
-To test for events, you can create new events for the test in [`util.events.testevents`](../src/main/java/util/events/testevents), ensure that you also create the corresponding event handler. You can then test for event triggering using [`UI.events.registerEvent((EventHandler))`](../src/main/java/ui/UI.java). 
+To test for events, you can create new events for the test in [`util.events.testevents`](../src/main/java/util/events/testevents), ensure that you also create the corresponding event handler. You can then test for event triggering using [`UI.events.registerEvent((EventHandler))`](../src/main/java/ui/UI.java).
 
 ## CI Quirks
 
