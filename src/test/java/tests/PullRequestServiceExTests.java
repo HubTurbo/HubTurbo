@@ -58,8 +58,7 @@ public class PullRequestServiceExTests {
     @Test
     public void testGetReviewComments() throws IOException {
         MockServerClient mockServer = ClientAndServer.startClientAndServer(8888);
-        TestUtils testUtils = new TestUtils();
-        String sampleComments = testUtils.readFileFromResource(this, "tests/ReviewCommentsSample.json");
+        String sampleComments = TestUtils.readFileFromResource(this, "tests/ReviewCommentsSample.json");
 
         mockServer.when(
                 request()
@@ -77,7 +76,7 @@ public class PullRequestServiceExTests {
         PullRequestServiceEx service = new PullRequestServiceEx(client);
 
         Type listOfComments = new TypeToken<List<ReviewComment>>() {}.getType();
-        List<ReviewComment> expectedComments = (new Gson()).fromJson(sampleComments, listOfComments);
+        List<ReviewComment> expectedComments = new Gson().fromJson(sampleComments, listOfComments);
         List<ReviewComment> actualComments = service.getReviewComments(
                 RepositoryId.createFromId("hubturbo/hubturbo"), 1125);
 

@@ -3,12 +3,14 @@ package tests;
 import backend.interfaces.IModel;
 import backend.resource.*;
 import org.apache.commons.io.IOUtils;
+import org.mockserver.model.Header;
 import ui.TestController;
 import ui.UI;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public final class TestUtils {
 
@@ -82,5 +84,24 @@ public final class TestUtils {
     public static String readFileFromResource(Object callingObject, String filename) throws IOException {
         ClassLoader classLoader = callingObject.getClass().getClassLoader();
         return IOUtils.toString(classLoader.getResourceAsStream(filename));
+    }
+
+    /**
+     * Parses a string containing HTTP header fields and return a List of Header to be used with MockServer
+     * @param header
+     * @return
+     */
+    public static List<Header> parseHeaderRecord(String header) {
+        List<Header> result = new ArrayList<>();
+        String[] fields = header.split("[\r\n]+");
+
+        for (String field : fields) {
+            String[] nameAndValue = field.split(":", 2);
+            if (nameAndValue.length == 2) {
+                result.add(new Header(nameAndValue[0].trim(), nameAndValue[1].trim()));
+            }
+        }
+
+        return result;
     }
 }

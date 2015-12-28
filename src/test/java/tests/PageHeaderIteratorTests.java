@@ -103,7 +103,7 @@ public class PageHeaderIteratorTests {
     }
 
     private HttpRequest createMockServerPagedHeaderRequest(String page) {
-        String path = page.equals("1") ?
+        String path = "1".equals(page) ?
                 "/api/v3/repos/hubturbo/hubturbo/pulls" : "/api/v3/repositories/20919534/pulls";
 
         return request()
