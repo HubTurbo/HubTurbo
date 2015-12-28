@@ -11,7 +11,12 @@ import static org.junit.Assert.fail;
 
 public class EventTests {
 
-    private EventBus events = new EventBus();
+    private final EventBus events = new EventBus();
+
+    private final EventHandler succeed2 = (IssueSelectedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
+    private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
 
     @Test
     public void basics() {
@@ -56,11 +61,6 @@ public class EventTests {
         events.post(te);
         events.post(te2);
     }
-
-    private final EventHandler succeed2 = (IssueSelectedEventHandler) e -> assertTrue(true);
-    private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
-    private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
-    private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
 
     @Test
     public void testSuperclassHandlerOnSubclassEvent() {

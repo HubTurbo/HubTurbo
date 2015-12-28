@@ -39,9 +39,6 @@ public class GitHubRepo implements Repo {
     private final LabelServiceEx labelService = new LabelServiceEx(client);
     private final MilestoneService milestoneService = new MilestoneService(client);
 
-    public GitHubRepo() {
-    }
-
     @Override
     public boolean login(UserCredentials credentials) {
         client.setCredentials(credentials.username, credentials.password);
@@ -181,7 +178,7 @@ public class GitHubRepo implements Repo {
                 // Total is approximate: always >= the actual amount
                 assert totalIssueCount >= elements.size();
 
-                float progress = ((float) elements.size() / (float) totalIssueCount);
+                float progress = (float) elements.size() / (float) totalIssueCount;
                 UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
                 logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)",
                     elements.size(), progress * 100));

@@ -1,6 +1,6 @@
 package util;
 
-public class GitHubURL {
+public final class GitHubURL {
 
     public static final String LOGIN_PAGE = "https://github.com/login";
     public static final String DOCS_PAGE =
@@ -52,4 +52,5 @@ public class GitHubURL {
         return url.matches("https://github.com/([^/]+)/([^/]+)/pull/([0-9]+)(/|/commits|/files)?");
     }
 
+    private GitHubURL() {}
 }

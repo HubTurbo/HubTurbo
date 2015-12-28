@@ -83,12 +83,6 @@ public class PanelsTest extends UITest {
         return panel.getFilterTextField();
     }
 
-    private boolean isSwapComplete() {
-        PanelControl panels = TestController.getUI().getPanelControl();
-        return panels.getChildren().stream()
-            .noneMatch(child -> child instanceof HBox);
-    }
-
     private void selectPanel(int index) {
         eventTriggered.set(false);
         click(getPanel(index).getNameText());

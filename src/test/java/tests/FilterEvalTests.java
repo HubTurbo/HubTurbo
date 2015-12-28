@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import backend.interfaces.IModel;
@@ -28,10 +27,6 @@ public class FilterEvalTests {
     public FilterEvalTests() {
         empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
-    }
-
-    @BeforeClass
-    public static void setup() {
     }
 
     /**

@@ -11,6 +11,7 @@ import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -19,19 +20,19 @@ import static org.mockito.Mockito.mock;
 
 public class MultiModelTest {
 
+    MultiModel multiModel = new MultiModel(mock(Preferences.class));
+
     @BeforeClass
     public static void setup() {
         UI.events = new EventDispatcherStub();
         UI.status = new StatusUIStub();
     }
 
-    MultiModel multiModel = new MultiModel(mock(Preferences.class));
-
     @Test
     public void equality() {
         assertTrue(multiModel.equals(multiModel));
         assertFalse(multiModel.equals(null));
-        assertFalse(multiModel.equals(""));
+        assertFalse(multiModel.equals("")); // NOPMD
     }
 
     @Test

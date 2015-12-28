@@ -1,9 +1,9 @@
 
 # Workflow
 
-Working on HubTurbo involves a number of common tasks. This document outlines them.
+Working on HubTurbo involves a number of common tasks.
 
-Most of these tasks are accessed via Gradle, which we will assume to be the lowest common denominator in terms of ways to do things, and which should work out of the box without any additional setup. Plugins providing graphical interfaces to these tasks in IDEs are generally also available and will be listed.
+Most are accessed via Gradle, which we will assume to be the lowest common denominator in terms of ways to do things, and which should work out of the box without any additional setup. Plugins providing graphical interfaces to these tasks in IDEs are generally also available and will be listed.
 
 ## Running Tests
 
@@ -13,7 +13,7 @@ Most of these tasks are accessed via Gradle, which we will assume to be the lowe
 
 The `-i` flag enables logging. This command will run all tests, [stable and unstable](testing.md#unstable-tests).
 
-To simulate testing in the CI environment, add `CI=true`.
+To simulate testing in the CI environment, add the environment variable `CI=true`.
 
 ```sh
 CI=true ./gradlew clean test -i
@@ -51,9 +51,11 @@ should be sufficient. Adding `CI=true` will generate coverage only for stable te
 ./gradlew clean check
 ```
 
-will check for violations before running tests, and will fail if there are any. Reports will be placed in `build/reports` if this happens.
+This will run all static analysis tools before running tests. Violations will cause the entire build to fail, so they must be resolved. Reports will be placed in `build/reports` if this happens. Configuration for these tools can be found in `config`.
 
-Plugins available for viewing CheckStyle violations in [Eclipse](http://eclipse-cs.sourceforge.net/#!/) and [IntelliJ](https://plugins.jetbrains.com/plugin/1065) are available.
+If you're not sure how to resolve a violation and wish to make an exception for it, please highlight it for discussion in your pull request.
+
+More information on tools can be found [here](staticAnalysis.md).
 
 ## Building a JAR
 
@@ -61,5 +63,4 @@ Plugins available for viewing CheckStyle violations in [Eclipse](http://eclipse-
 ./gradlew clean shadowJar
 ```
 
-Eclipse and Intellij have built-in ways to export JARs.
-
+Eclipse and IntelliJ have built-in ways to export JARs.

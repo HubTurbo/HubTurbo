@@ -1,9 +1,9 @@
 package ui.listpanel;
 
 import static ui.components.KeyboardShortcuts.*;
-import static util.GithubURLPageElements.DISCUSSION_TAB;
-import static util.GithubURLPageElements.COMMITS_TAB;
-import static util.GithubURLPageElements.FILES_TAB;
+import static util.GithubPageElements.DISCUSSION_TAB;
+import static util.GithubPageElements.COMMITS_TAB;
+import static util.GithubPageElements.FILES_TAB;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +20,7 @@ import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
-import util.GithubURLPageElements;
+import util.GithubPageElements;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
@@ -34,9 +34,9 @@ public class ListPanel extends FilterPanel {
     private final UI ui;
     private int issueCount;
 
-    private IssueListView listView;
-    private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
-    private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
+    private final IssueListView listView;
+    private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
+    private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
@@ -104,13 +104,12 @@ public class ListPanel extends FilterPanel {
      * in the panel.
      */
     @Override
-    public void refreshItems() {
+    public final void refreshItems() {
         final HashSet<Integer> issuesWithNewComments
                 = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
 
         // Set the cell factory every time - this forces the list view to update
-        listView.setCellFactory(list ->
-                new ListPanelCell(model, ListPanel.this, panelIndex, issuesWithNewComments));
+        listView.setCellFactory(list -> new ListPanelCell(model, this, panelIndex, issuesWithNewComments));
         listView.saveSelection();
 
         // Supposedly this also causes the list view to update - not sure
@@ -159,31 +158,31 @@ public class ListPanel extends FilterPanel {
             if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (SHOW_ISSUES.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showIssues();
-                }
+            if (SHOW_ISSUES.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showIssues();
             }
-            if (SHOW_PULL_REQUESTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showPullRequests();
-                }
+            if (SHOW_PULL_REQUESTS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showPullRequests();
             }
-            if (SHOW_HELP.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showDocs();
-                }
+            if (SHOW_HELP.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showDocs();
             }
-            if (SHOW_KEYBOARD_SHORTCUTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showKeyboardShortcuts();
-                }
+            if (SHOW_KEYBOARD_SHORTCUTS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showKeyboardShortcuts();
             }
-            if (SHOW_CONTRIBUTORS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showContributors();
-                    event.consume();
-                }
+            if (SHOW_CONTRIBUTORS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showContributors();
+                event.consume();
             }
             if (KeyboardShortcuts.scrollToTop.match(event)) {
                 ui.getBrowserComponent().scrollToTop();
@@ -205,18 +204,17 @@ public class ListPanel extends FilterPanel {
                     ui.getBrowserComponent().jumpToComment();
                 }
             }
-            if (PR_FILES_CHANGED.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab(FILES_TAB);
-                    event.consume();
+            if (PR_FILES_CHANGED.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
-                }
+                ui.getBrowserComponent().switchToTab(FILES_TAB);
+                event.consume();
             }
-            if (PR_COMMITS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab(COMMITS_TAB);
-                    event.consume();
-                }
+            if (PR_COMMITS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().switchToTab(COMMITS_TAB);
+                event.consume();
             }
             if (SHOW_LABELS.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -265,7 +263,7 @@ public class ListPanel extends FilterPanel {
         if (!listView.getSelectedItem().isPresent()) return;
         TurboIssue issue = listView.getSelectedItem().get();
         Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
-            ? GithubURLPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
+            ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
             : ui.getBrowserComponent().getPRNumberFromIssue();
         if (!relatedIssueNumber.isPresent()) return;
         ui.triggerEvent(
@@ -350,7 +348,7 @@ public class ListPanel extends FilterPanel {
         Optional<TurboIssue> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get();
-            issue.markAsRead(ui.prefs);
+            issue.markAsRead(UI.prefs);
 
             parentPanelControl.refresh();
             listView.selectNextItem();

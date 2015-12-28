@@ -50,7 +50,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
     public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
-    private UI ui;
+    private final UI ui;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
@@ -118,7 +118,7 @@ public abstract class FilterPanel extends AbstractPanel {
     };
 
     private Node createFilterBox() {
-        filterTextField = new FilterTextField("", 0)
+        filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
                     applyStringFilter(text);
                     return text;

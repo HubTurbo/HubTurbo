@@ -74,7 +74,9 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
         // check if test json is present
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // we check that only 1 repo is in use
         noOfUsedRepo = 1;
@@ -159,7 +161,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
     }
 
     public long getNoOfEnabledMenuItems(ObservableList<MenuItem> menuItems) {
-        return menuItems.stream().filter(menuItem -> (!menuItem.disableProperty().get())).count();
+        return menuItems.stream().filter(menuItem -> !menuItem.disableProperty().get()).count();
     }
 
     public long getNoOfDisabledMenuItems(ObservableList<MenuItem> menuItems) {

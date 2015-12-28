@@ -1,19 +1,22 @@
 package unstable;
 
-import guitests.UITest;
-import javafx.application.Platform;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-import prefs.Preferences;
-import ui.TestController;
-import ui.components.KeyboardShortcuts;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.loadui.testfx.controls.Commons.hasText;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+
+import guitests.UITest;
+import javafx.application.Platform;
+import prefs.Preferences;
+import ui.TestController;
+import ui.components.KeyboardShortcuts;
 
 public class KeyboardShortcutsConfigTest extends UITest {
 
@@ -32,28 +35,22 @@ public class KeyboardShortcutsConfigTest extends UITest {
         keyboardShortcuts = new HashMap<>();
         keyboardShortcuts.put("MARK_AS_READ", "E");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        sleep(1000);
-        assertNodeExists(hasText("Invalid number of shortcut keys specified"));
+        waitUntilNodeAppears(hasText("Invalid number of shortcut keys specified"));
         click("Reset to default");
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
 
         testPref = TestController.createTestPreferences();
         keyboardShortcuts = new HashMap<>(KeyboardShortcuts.getDefaultKeyboardShortcuts());
         keyboardShortcuts.put("BLAH", "Z");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        sleep(1000);
-        assertNodeExists(hasText("Invalid number of shortcut keys specified"));
+        waitUntilNodeAppears(hasText("Invalid number of shortcut keys specified"));
         click("Reset to default");
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
     }
 
@@ -64,15 +61,12 @@ public class KeyboardShortcutsConfigTest extends UITest {
         keyboardShortcuts.remove("MARK_AS_READ");
         keyboardShortcuts.put("MARK_AS_READ", "eee");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        sleep(1000);
-        assertNodeExists(hasText("Invalid key specified for MARK_AS_READ" +
-                " or it has already been used for some other shortcut. "));
+        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ" +
+            " or it has already been used for some other shortcut. "));
         click("Use default key");
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
                 testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
@@ -84,14 +78,11 @@ public class KeyboardShortcutsConfigTest extends UITest {
         keyboardShortcuts.remove("MARK_AS_READ");
         keyboardShortcuts.put("BLAH", "Z");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        sleep(1000);
-        assertNodeExists(hasText("Could not find user defined keyboard shortcut for MARK_AS_READ"));
+        waitUntilNodeAppears(hasText("Could not find user defined keyboard shortcut for MARK_AS_READ"));
         click("Use default key");
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
                 testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
@@ -103,17 +94,25 @@ public class KeyboardShortcutsConfigTest extends UITest {
         keyboardShortcuts.remove("MARK_AS_UNREAD");
         keyboardShortcuts.put("MARK_AS_UNREAD", "E");
         testPref.setKeyboardShortcuts(keyboardShortcuts);
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        sleep(1000);
-        assertNodeExists(hasText("Invalid key specified for MARK_AS_UNREAD" +
-                " or it has already been used for some other shortcut. "));
+        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_UNREAD" +
+            " or it has already been used for some other shortcut. "));
         click("Use default key");
-        testPref.saveGlobalConfig();
-        testPref.loadGlobalConfig();
+        reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_UNREAD"),
                 testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
     }
 
+    private static void reloadPrefs(Preferences prefs) {
+        prefs.saveGlobalConfig();
+        String loadGlobalConfig = "loadGlobalConfig";
+        try {
+            Method method = Preferences.class.getDeclaredMethod(loadGlobalConfig);
+            method.setAccessible(true);
+            method.invoke(prefs);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            fail(String.format("Problem invoking private method; does %s still exist?", loadGlobalConfig));
+        }
+    }
 }

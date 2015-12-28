@@ -84,7 +84,9 @@ public class TickingTimerTests {
         tickingTimer.stop();
 
         for (int i = 0; i < ideal.size(); i++) {
-            if (ticks.get(i) != ideal.get(i)) fail();
+            if (ticks.get(i) != ideal.get(i)) {
+                fail();
+            }
         }
     }
 }

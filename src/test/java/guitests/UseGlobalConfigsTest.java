@@ -128,10 +128,12 @@ public class UseGlobalConfigsTest extends UITest {
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = TestController.createTestPreferences();
+        Preferences testPref = TestController.loadTestPreferences();
 
         // Credentials
         assertEquals("test", testPref.getLastLoginUsername());

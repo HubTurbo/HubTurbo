@@ -30,7 +30,7 @@ public class RepoIO {
     private final RepoSource repoSource;
     private final JSONStore jsonStore;
 
-    private List<String> storedRepos;
+    private final List<String> storedRepos;
 
     private static final int MAX_REDOWNLOAD_TRIES = 2;
 

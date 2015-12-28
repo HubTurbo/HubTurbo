@@ -61,16 +61,16 @@ public enum QualifierType {
             return Optional.empty();
         }
 
-        input = input.trim().toLowerCase();
+        String toBeParsed = input.trim().toLowerCase();
 
-        if (isSpecialQualifier(input)) {
+        if (isSpecialQualifier(toBeParsed)) {
             return Optional.empty();
         }
 
         try {
-            return Optional.of(QualifierType.valueOf(input.toUpperCase()));
+            return Optional.of(QualifierType.valueOf(toBeParsed.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            return resolveAlias(input);
+            return resolveAlias(toBeParsed);
         }
     }
 

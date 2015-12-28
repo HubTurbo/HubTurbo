@@ -82,14 +82,16 @@ public class DummyRepo implements Repo {
                     repoStates.put(e.repoId, new DummyRepoState(e.repoId));
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
+                default:
+                    assert false : "Missing case " + e.updateType;
+                    break;
             }
         });
     }
 
     @Override
     public boolean login(UserCredentials credentials) {
-        if (credentials.username.equals("test") && credentials.password.equals("test")) return true;
-        return false;
+        return credentials.username.equals("test") && credentials.password.equals("test");
     }
 
     private DummyRepoState getRepoState(String repoId) {

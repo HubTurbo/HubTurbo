@@ -65,7 +65,9 @@ public class RepositorySelectorTest extends UITest {
     public void repositorySelectorTest() {
         // check if test json is present
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
@@ -136,10 +138,12 @@ public class RepositorySelectorTest extends UITest {
 
         // testing that the correct repo was saved in the json
         // check if the test JSON is still there...
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = TestController.createTestPreferences();
+        Preferences testPref = TestController.loadTestPreferences();
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());

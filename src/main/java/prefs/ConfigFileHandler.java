@@ -57,6 +57,12 @@ public class ConfigFileHandler {
         }
     }
 
+    public GlobalConfig initGlobalConfig() {
+        GlobalConfig config = new GlobalConfig();
+        saveGlobalConfig(config);
+        return config;
+    }
+
     public GlobalConfig loadGlobalConfig() {
 
         // Default to an empty configuration

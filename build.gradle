@@ -23,6 +23,7 @@ allprojects {
     }
 
     apply plugin: 'findbugs'
+    apply plugin: 'pmd'
 
     apply plugin: 'java'
 
@@ -140,6 +141,12 @@ tasks.withType(FindBugs) {
 
 findbugs {
     excludeFilter = file("${projectDir}/config/findbugs/excludeFilter.xml")
+}
+
+pmd {
+    toolVersion = "5.4.1"
+    ruleSetFiles = files("${projectDir}/config/pmd/mainRuleset.xml", "${projectDir}/config/pmd/testRuleset.xml")
+    ruleSets = []
 }
 
 task jacocoRootReport(type: JacocoReport) {
