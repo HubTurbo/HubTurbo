@@ -104,7 +104,7 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
+    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
