@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser {
+public final class Parser {
 
     private Parser(ArrayList<Token> input) {
         this.input = input;
@@ -22,7 +22,7 @@ public class Parser {
         return new Parser(new Lexer(input).lex()).parseExpression(0);
     }
 
-    private ArrayList<Token> input;
+    private final ArrayList<Token> input;
     private int position = 0;
     private int sourcePosition = 0;
 
@@ -58,16 +58,16 @@ public class Parser {
 
         switch (token.getType()) {
         case LBRACKET:
-            left = parseGroup(token);
+            left = parseGroup();
             break;
         case NOT:
-            left = parseNegation(token);
+            left = parseNegation();
             break;
         case QUALIFIER:
             left = parseQualifier(token);
             break;
         case QUOTE:
-            left = parseQuotedKeywords(token);
+            left = parseQuotedKeywords();
             break;
         case SYMBOL:
             left = parseKeyword(token);
@@ -84,11 +84,11 @@ public class Parser {
             switch (token.getType()) {
             case AND:
                 consume();
-                left = parseConjunction(left, token);
+                left = parseConjunction(left);
                 break;
             case OR:
                 consume();
-                left = parseDisjunction(left, token);
+                left = parseDisjunction(left);
                 break;
             case QUALIFIER:
             case SYMBOL:
@@ -96,7 +96,7 @@ public class Parser {
             case LBRACKET:
                 // Implicit conjunction
                 // Every token that could appear in a prefix position will trigger this path
-                left = parseConjunction(left, token);
+                left = parseConjunction(left);
                 break;
             default:
                 throw new ParseException("Invalid infix token " + token);
@@ -106,26 +106,22 @@ public class Parser {
         return left;
     }
 
-    private FilterExpression parseQuotedKeywords(Token token) {
-        FilterExpression result = parseKeywords();
+    private FilterExpression parseQuotedKeywords() {
+        FilterExpression result = parseQuotedContent(QualifierType.KEYWORD);
         consume(TokenType.QUOTE);
         return result;
     }
 
-    private FilterExpression parseKeywords() {
-        return parseKeywords("keyword");
-    }
-
-    private FilterExpression parseKeywords(String qualifierName) {
+    private FilterExpression parseQuotedContent(QualifierType type) {
         StringBuilder sb = new StringBuilder();
         while (!isQuoteToken(lookAhead())) {
-            sb.append(consume().getValue()).append(" ");
+            sb.append(consume().getValue()).append(' ');
         }
-        return new Qualifier(qualifierName, sb.toString().trim());
+        return new Qualifier(type, sb.toString().trim());
     }
 
     private FilterExpression parseKeyword(Token token) {
-        return new Qualifier("keyword", token.getValue());
+        return new Qualifier(QualifierType.KEYWORD, token.getValue());
     }
 
     private int getInfixPrecedence(Token token) {
@@ -176,42 +172,40 @@ public class Parser {
         // Strip the : at the end, then trim
         qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
-        return parseQualifierContent(qualifierName, false);
+        QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
+        return parseQualifierContent(type, false);
     }
 
-    private FilterExpression parseQualifierContent(String qualifierName, boolean allowMultipleKeywords) {
-        if (isSortQualifier(qualifierName)) {
+    private FilterExpression parseQualifierContent(QualifierType type, boolean allowMultipleKeywords) {
+        if (type == QualifierType.SORT) {
             return parseSortKeys();
         } else if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
-            return parseRangeOperator(qualifierName, lookAhead());
+            return parseRangeOperator(type, lookAhead());
         } else if (isDateToken(lookAhead())) {
             // [date] | [date] .. [date]
-            return parseDateOrDateRange(qualifierName);
+            return parseDateOrDateRange(type);
         } else if (isNumberToken(lookAhead())) {
             // [number] | [number] .. [number]
-            return parseNumberOrNumberRange(qualifierName);
+            return parseNumberOrNumberRange(type);
         } else if (isQuoteToken(lookAhead())) {
             // " [content] "
             consume(TokenType.QUOTE);
-            FilterExpression result = parseQualifierContent(qualifierName, true);
+            FilterExpression result = parseQualifierContent(type, true);
             consume(TokenType.QUOTE);
             return result;
         } else if (isKeywordToken(lookAhead())) {
-            // Keyword(s)
             if (allowMultipleKeywords) {
-                return parseKeywords(qualifierName);
+                // We're within quotes, with the ability to parse multiple consecutive keywords
+                return parseQuotedContent(type);
             } else {
-                return new Qualifier(qualifierName, consume().getValue());
+                // Everything else
+                return new Qualifier(type, consume().getValue());
             }
         } else {
             throw new ParseException(String.format("Invalid content for qualifier %s: %s",
-                qualifierName, lookAhead()));
+                type, lookAhead()));
         }
-    }
-
-    private boolean isSortQualifier(String qualifierName) {
-        return qualifierName.equals(Qualifier.SORT);
     }
 
     private boolean isKeywordToken(Token token) {
@@ -261,12 +255,12 @@ public class Parser {
         return isNumberToken(token) || isDateToken(token);
     }
 
-    private FilterExpression parseNumberOrNumberRange(String qualifierName) {
+    private FilterExpression parseNumberOrNumberRange(QualifierType type) {
         Token left = consume();
 
         Optional<Integer> leftDate = parseNumber(left);
         if (!leftDate.isPresent()) {
-            throw new ParseException("Expected a number as the input to " + qualifierName);
+            throw new ParseException("Expected a number as the input to " + type);
         }
 
         if (lookAhead().getType() == TokenType.DOTDOT) {
@@ -277,29 +271,29 @@ public class Parser {
             if (isNumberToken(right)) {
                 Optional<Integer> rightNumber = parseNumber(right);
                 if (rightNumber.isPresent()) {
-                    return new Qualifier(qualifierName,
+                    return new Qualifier(type,
                         new NumberRange(leftDate.get(), rightNumber.get()));
                 } else {
                     assert false : "Possible problem with lexer processing number";
                 }
             } else if (right.getType() == TokenType.STAR) {
-                return new Qualifier(qualifierName, new NumberRange(leftDate.get(), null));
+                return new Qualifier(type, new NumberRange(leftDate.get(), null));
             } else {
                 throw new ParseException("Right operand of .. must be a number or *");
             }
         } else {
             // Just one number, not a range
-            return new Qualifier(qualifierName, leftDate.get());
+            return new Qualifier(type, leftDate.get());
         }
         assert false : "Should never reach here";
         return null;
     }
 
-    private FilterExpression parseDateOrDateRange(String qualifierName) {
+    private FilterExpression parseDateOrDateRange(QualifierType type) {
         Token left = consume();
         Optional<LocalDate> leftDate = parseDate(left);
         if (!leftDate.isPresent()) {
-            throw new ParseException("Expected a date as the input to " + qualifierName);
+            throw new ParseException("Expected a date as the input to " + type);
         }
 
         if (lookAhead().getType() == TokenType.DOTDOT) {
@@ -310,19 +304,19 @@ public class Parser {
             if (isDateToken(right)) {
                 Optional<LocalDate> rightDate = parseDate(right);
                 if (rightDate.isPresent()) {
-                    return new Qualifier(qualifierName,
+                    return new Qualifier(type,
                         new DateRange(leftDate.get(), rightDate.get()));
                 } else {
                     assert false : "Possible problem with lexer processing date";
                 }
             } else if (right.getType() == TokenType.STAR) {
-                return new Qualifier(qualifierName, new DateRange(leftDate.get(), null));
+                return new Qualifier(type, new DateRange(leftDate.get(), null));
             } else {
                 throw new ParseException("Right operand of .. must be a date or *");
             }
         } else {
             // Just one date, not a range
-            return new Qualifier(qualifierName, leftDate.get());
+            return new Qualifier(type, leftDate.get());
         }
         assert false : "Should never reach here";
         return null;
@@ -336,7 +330,7 @@ public class Parser {
             consume(TokenType.COMMA);
             keys.add(parseSortKey());
         }
-        return new Qualifier(Qualifier.SORT, keys);
+        return new Qualifier(QualifierType.SORT, keys);
     }
 
     private SortKey parseSortKey() {
@@ -350,7 +344,7 @@ public class Parser {
         }
     }
 
-    private FilterExpression parseRangeOperator(String name, Token token) {
+    private FilterExpression parseRangeOperator(QualifierType type, Token token) {
         String operator = token.getValue();
 
         consume(token.getType());
@@ -361,15 +355,16 @@ public class Parser {
                 // Date
                 switch (token.getType()) {
                 case GT:
-                    return new Qualifier(name, new DateRange(date.get(), null, true));
+                    return new Qualifier(type, new DateRange(date.get(), null, true));
                 case GTE:
-                    return new Qualifier(name, new DateRange(date.get(), null));
+                    return new Qualifier(type, new DateRange(date.get(), null));
                 case LT:
-                    return new Qualifier(name, new DateRange(null, date.get(), true));
+                    return new Qualifier(type, new DateRange(null, date.get(), true));
                 case LTE:
-                    return new Qualifier(name, new DateRange(null, date.get()));
+                    return new Qualifier(type, new DateRange(null, date.get()));
                 default:
                     assert false : "Should not happen";
+                    break;
                 }
                 assert false : "Should not happen";
                 return null;
@@ -379,7 +374,7 @@ public class Parser {
                     Integer.parseInt(contentToken.getValue());
                 } catch (NumberFormatException e) {
                     // Exit with an exception if it's not a number
-                    throw new ParseException(String.format(
+                    throw new ParseException(String.format(// NOPMD
                         "Operator %s can only be applied to number or date", operator));
                 }
 
@@ -388,15 +383,16 @@ public class Parser {
 
                 switch (token.getType()) {
                 case GT:
-                    return new Qualifier(name, new NumberRange(num, null, true));
+                    return new Qualifier(type, new NumberRange(num, null, true));
                 case GTE:
-                    return new Qualifier(name, new NumberRange(num, null));
+                    return new Qualifier(type, new NumberRange(num, null));
                 case LT:
-                    return new Qualifier(name, new NumberRange(null, num, true));
+                    return new Qualifier(type, new NumberRange(null, num, true));
                 case LTE:
-                    return new Qualifier(name, new NumberRange(null, num));
+                    return new Qualifier(type, new NumberRange(null, num));
                 default:
                     assert false : "Should not happen";
+                    break;
                 }
                 assert false : "Should not happen";
                 return null;
@@ -407,21 +403,21 @@ public class Parser {
         }
     }
 
-    private FilterExpression parseGroup(Token token) {
+    private FilterExpression parseGroup() {
         FilterExpression expr = parseExpression(0);
         consume(TokenType.RBRACKET);
         return expr;
     }
 
-    private FilterExpression parseDisjunction(FilterExpression left, Token token) {
+    private FilterExpression parseDisjunction(FilterExpression left) {
         return new Disjunction(left, parseExpression(Precedence.DISJUNCTION));
     }
 
-    private FilterExpression parseConjunction(FilterExpression left, Token token) {
+    private FilterExpression parseConjunction(FilterExpression left) {
         return new Conjunction(left, parseExpression(Precedence.CONJUNCTION));
     }
 
-    private FilterExpression parseNegation(Token token) {
+    private FilterExpression parseNegation() {
         return new Negation(parseExpression(Precedence.PREFIX));
     }
 }

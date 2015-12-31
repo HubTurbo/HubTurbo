@@ -3,6 +3,7 @@ package unstable;
 import org.junit.Test;
 
 import guitests.UITest;
+import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
@@ -17,6 +18,11 @@ import static org.junit.Assert.assertEquals;
 public class ModelUpdateUITest extends UITest {
 
     private static final int EVENT_DELAY = 1500;
+
+    @Override
+    public void launchApp() {
+        FXTestUtils.launchApp(TestUI.class, "--test=true", "--testjson=true", "--bypasslogin=true");
+    }
 
     @Test
     @SuppressWarnings("unchecked")

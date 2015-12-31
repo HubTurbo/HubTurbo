@@ -20,8 +20,8 @@ public class LabelPicker {
 
     private static final String OCTICON_INFO = "\uf059";
 
-    private UI ui;
-    private Stage stage;
+    private final UI ui;
+    private final Stage stage;
 
     // A LabelPicker is created by trigger a ShowLabelPickerEvent.
     public LabelPicker(UI ui, Stage stage) {
@@ -50,7 +50,7 @@ public class LabelPicker {
         List<String> originalLabels = issue.getLabels().stream().sorted().collect(Collectors.toList());
         if (!labels.equals(originalLabels)) {
             List<String> resultingLabels = createResultingLabelList(issue, labels);
-            assert(labels.equals(resultingLabels));
+            assert labels.equals(resultingLabels);
             ui.logic.replaceIssueLabelsUI(issue, resultingLabels);
             Notification undoNotification = new Notification(createInfoOcticon(),
                     "Undo label change(s) for #" + issue.getId() + ": " + issue.getTitle(),
@@ -86,14 +86,13 @@ public class LabelPicker {
     }
 
     private List<String> createResultingLabelList(TurboIssue issue, List<String> newLabels) {
-        return (new ChangeLabels(
-                newLabels.stream()
-                        .filter(newLabel -> !issue.getLabels().contains(newLabel))
-                        .collect(Collectors.toList()),
-                issue.getLabels().stream()
-                        .filter(originalLabel -> !newLabels.contains(originalLabel))
-                        .collect(Collectors.toList())))
-                .act(issue).getLabels();
+        return new ChangeLabels(
+            newLabels.stream()
+                .filter(newLabel -> !issue.getLabels().contains(newLabel))
+                .collect(Collectors.toList()),
+            issue.getLabels().stream()
+                .filter(originalLabel -> !newLabels.contains(originalLabel))
+                .collect(Collectors.toList()))
+            .act(issue).getLabels();
     }
-
 }

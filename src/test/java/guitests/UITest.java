@@ -1,24 +1,16 @@
 package guitests;
 
-import static com.google.common.io.Files.getFileExtension;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Predicate;
-
+import backend.interfaces.RepoStore;
+import com.google.common.util.concurrent.SettableFuture;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,32 +21,34 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.exceptions.NoNodesVisibleException;
 import org.loadui.testfx.utils.FXTestUtils;
-
-import com.google.common.util.concurrent.SettableFuture;
-
-import backend.interfaces.RepoStore;
-import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseButton;
-import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
 import util.PlatformEx;
 import util.PlatformSpecific;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+
+import static com.google.common.io.Files.getFileExtension;
+
 public class UITest extends GuiTest {
 
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
-
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
-    
-    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap(); 
-    
+    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
+
+    private final Robot robot;
+    private final FXScreenController screenController;
+
     protected static class TestUI extends UI {
         public TestUI() {
             super();
@@ -66,9 +60,6 @@ public class UITest extends GuiTest {
             STAGE_FUTURE.set(primaryStage);
         }
     }
-
-    private final Robot robot;
-    private final FXScreenController screenController;
 
     public UITest() {
         super();
@@ -392,4 +383,10 @@ public class UITest extends GuiTest {
         return this;
     }
 
+    /**
+     * Used to select the whole filter text so that it can be replaced
+     */
+    public void selectAll() {
+        pushKeys(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN));
+    }
 }

@@ -54,7 +54,7 @@ public class TickingTimer {
     private int time;
     private boolean paused = false;
     private boolean started = false;
-    private List<CountDownLatch> latches = Collections.synchronizedList(new ArrayList<>());
+    private final List<CountDownLatch> latches = Collections.synchronizedList(new ArrayList<>());
 
     public TickingTimer(String name, int period, Consumer<Integer> onTick, Runnable onTimeout, TimeUnit timeUnit) {
         this.name = name;

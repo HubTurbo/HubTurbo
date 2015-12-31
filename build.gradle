@@ -23,11 +23,12 @@ allprojects {
     }
 
     apply plugin: 'findbugs'
+    apply plugin: 'pmd'
 
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.14.0'
+    version = '3.16.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -71,6 +72,7 @@ allprojects {
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
+        testCompile "org.mockito:mockito-core:1.+"
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 
@@ -139,6 +141,12 @@ tasks.withType(FindBugs) {
 
 findbugs {
     excludeFilter = file("${projectDir}/config/findbugs/excludeFilter.xml")
+}
+
+pmd {
+    toolVersion = "5.4.1"
+    ruleSetFiles = files("${projectDir}/config/pmd/mainRuleset.xml", "${projectDir}/config/pmd/testRuleset.xml")
+    ruleSets = []
 }
 
 task jacocoRootReport(type: JacocoReport) {

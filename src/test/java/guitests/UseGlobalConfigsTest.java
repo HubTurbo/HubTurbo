@@ -1,34 +1,31 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
+import prefs.PanelInfo;
+import prefs.Preferences;
+import ui.TestController;
+import ui.UI;
+import ui.components.FilterTextField;
+import ui.components.KeyboardShortcuts;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
+import util.PlatformEx;
+import util.events.ShowRenamePanelEvent;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import prefs.PanelInfo;
-import prefs.Preferences;
-import ui.TestController;
-import ui.UI;
-import ui.issuepanel.FilterPanel;
-import ui.issuepanel.PanelControl;
-import ui.components.FilterTextField;
-import ui.components.KeyboardShortcuts;
-import ui.components.PanelNameTextField;
-import util.PlatformEx;
-import util.events.ShowRenamePanelEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UseGlobalConfigsTest extends UITest {
-
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
@@ -42,9 +39,7 @@ public class UseGlobalConfigsTest extends UITest {
         UI ui = TestController.getUI();
         PanelControl panels = ui.getPanelControl();
 
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         type("dummy");
         pushKeys(KeyCode.TAB);
         type("dummy");
@@ -70,10 +65,9 @@ public class UseGlobalConfigsTest extends UITest {
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Renamed panel");
+        push(KeyCode.ENTER);
         FilterPanel filterPanel0 = (FilterPanel) panels.getPanel(0);
-        PanelNameTextField renameTextField0 = filterPanel0.getRenameTextField();
-        assertEquals("Renamed panel", renameTextField0.getText());
-        pushKeys(KeyCode.ENTER);
+        assertEquals("Renamed panel", filterPanel0.getNameText().getText());
 
         FilterTextField filterTextField0 = filterPanel0.getFilterTextField();
         waitUntilNodeAppears(filterTextField0);
@@ -81,7 +75,7 @@ public class UseGlobalConfigsTest extends UITest {
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("issue");
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
 
         // Load dummy2/dummy2 too
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
@@ -98,10 +92,8 @@ public class UseGlobalConfigsTest extends UITest {
         Label renameButton1 = filterPanel1.getRenameButton();
         click(renameButton1);
         type("Dummy 2 panel");
-        PanelNameTextField renameTextField1 = filterPanel1.getRenameTextField();
-        waitUntilNodeAppears(renameTextField1);
-        assertEquals("Dummy 2 panel", renameTextField1.getText());
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        assertEquals("Dummy 2 panel", filterPanel1.getNameText().getText());
 
         pushKeys(KeyboardShortcuts.CREATE_LEFT_PANEL);
         PlatformEx.waitOnFxThread();
@@ -118,9 +110,9 @@ public class UseGlobalConfigsTest extends UITest {
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Open issues");
-        PanelNameTextField renameTextField2 = filterPanel2.getRenameTextField();
-        assertEquals("Open issues", renameTextField2.getText());
-        pushKeys(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        assertEquals("Open issues", filterPanel2.getNameText().getText());
+
 
         // Make a new board
         click("Boards");
@@ -136,10 +128,12 @@ public class UseGlobalConfigsTest extends UITest {
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // ...then check that the JSON file contents are correct.
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.loadTestPreferences();
 
         // Credentials
         assertEquals("test", testPref.getLastLoginUsername());
@@ -176,7 +170,5 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("Open issues", lastOpenPanelNames.get(0));
         assertEquals("Renamed panel", lastOpenPanelNames.get(1));
         assertEquals("Dummy 2 panel", lastOpenPanelNames.get(2));
-
     }
-
 }

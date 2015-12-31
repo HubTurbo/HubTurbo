@@ -11,7 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Negation implements FilterExpression {
-    private FilterExpression expr;
+
+    private final FilterExpression expr;
 
     public Negation(FilterExpression expr) {
         this.expr = expr;
@@ -55,14 +56,14 @@ public class Negation implements FilterExpression {
     }
 
     @Override
-    public List<String> getQualifierNames() {
-        return expr.getQualifierNames();
+    public List<QualifierType> getQualifierTypes() {
+        return expr.getQualifierTypes();
     }
 
     @Override
     public FilterExpression filter(Predicate<Qualifier> pred) {
         FilterExpression expr = this.expr.filter(pred);
-        if (expr == Qualifier.EMPTY) {
+        if (expr.isEmpty()) {
             return Qualifier.EMPTY;
         } else {
             return new Negation(expr);
@@ -80,10 +81,15 @@ public class Negation implements FilterExpression {
     @Override
     public FilterExpression map(Function<Qualifier, Qualifier> func) {
         FilterExpression expr = this.expr.map(func);
-        if (expr == Qualifier.EMPTY) {
+        if (expr.isEmpty()) {
             return Qualifier.EMPTY;
         } else {
             return new Negation(expr);
         }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return expr.isEmpty();
     }
 }

@@ -50,11 +50,12 @@
 }
 
 .issue-panel-name {
+    -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
 .issue-panel-name-read {
-    -fx-text-fill: #808080;
+    -fx-font-weight: normal;
 }
 
 .issue-panel-closed .text {

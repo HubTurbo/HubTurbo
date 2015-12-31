@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NotificationController {
 
-    private NotificationPane notificationPane;
+    private final NotificationPane notificationPane;
     private TickingTimer notificationPaneTimer;
     private Optional<Notification> notification = Optional.empty();
 
@@ -48,10 +48,10 @@ public class NotificationController {
     }
 
     private void determineAndRunTimeoutAction() {
-        if (notification.isPresent()) {
-            if (notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
-                notification.get().getTimeoutRunnable().run();
-            }
+        if (notification.isPresent() &&
+            notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
+
+            notification.get().getTimeoutRunnable().run();
             // other NotifcationTypes can be implemented here if needed
         }
     }
@@ -75,10 +75,10 @@ public class NotificationController {
     }
 
     private void determineAndRunNotificationAction() {
-        if (notification.isPresent()) {
-            if (notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
-                notification.get().getButtonRunnable().run();
-            }
+        if (notification.isPresent() &&
+            notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
+
+            notification.get().getButtonRunnable().run();
             // other NotifcationTypes can be implemented here if needed
         }
     }

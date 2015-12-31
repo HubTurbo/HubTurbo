@@ -2,6 +2,10 @@ package backend.stub;
 
 import backend.IssueMetadata;
 import backend.UserCredentials;
+import backend.github.CheckRateLimitTask;
+import backend.github.DownloadRepoTask;
+import backend.github.ReplaceIssueLabelsTask;
+import backend.github.UpdateModelTask;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
@@ -30,12 +34,12 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<Model> downloadRepository(String repoId) {
-        return addTask(new DownloadRepoTaskStub(this, dummy, repoId)).response;
+        return addTask(new DownloadRepoTask(this, dummy, repoId)).response;
     }
 
     @Override
     public CompletableFuture<Model> updateModel(Model model) {
-        return addTask(new UpdateModelTaskStub(this, dummy, model)).response;
+        return addTask(new UpdateModelTask(this, dummy, model)).response;
     }
 
     @Override
@@ -46,7 +50,7 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        return addTask(new ReplaceIssueLabelsTaskStub(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
+        return addTask(new ReplaceIssueLabelsTask(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
-        return addTask(new CheckRateLimitTaskStub(this, dummy)).response;
+        return addTask(new CheckRateLimitTask(this, dummy)).response;
     }
 
 }

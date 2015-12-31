@@ -16,7 +16,9 @@ Notes:
 
 Fixing issues:
 
-1. Select an issue to handle. For your first issue, select an issue labelled `difficulty.beginner`. Optionally, you may discuss the issue using the issue tracker to see if your intended solution is suitable. 
+1. Select an issue to handle. For your first issue, select an issue labelled `forFirstTimers`. 
+   For subsequent issues, prefer those labelled `forContributors`.<br>
+   Optionally, you may discuss the issue using the issue tracker to see if your intended solution is suitable. 
 2. Create a branch off the current `master` named "X-short-description", where `X` is the issue number. For example, `2342-remove-println` for an issue named `Remove all unnecessary println statements`.
 3. Implement your changes in the created branch. [Run tests locally](workflow.md) and ensure that there are no failures.
 4. Push your changes to your fork.

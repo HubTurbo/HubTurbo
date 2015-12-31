@@ -9,6 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import backend.interfaces.IModel;
+import filter.expression.QualifierType;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -154,7 +155,7 @@ public class MilestoneAliasTests {
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
                 Parser.parse("milestone:curr+2 && milestone:curr+3"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
-        assertEquals(false, milestoneQualifiers.get(0).isFalseQualifier());
+        assertEquals(false, milestoneQualifiers.get(0).isFalse());
 
     }
 
@@ -199,8 +200,8 @@ public class MilestoneAliasTests {
         List<Qualifier> milestoneQualifiers;
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse(filterText));
-        assertEquals(noMilestoneAlias.getQualifierNames().size(), 1);
-        assertEquals(noMilestoneAlias.getQualifierNames().get(0), "false");
+        assertEquals(noMilestoneAlias.getQualifierTypes().size(), 1);
+        assertEquals(noMilestoneAlias.getQualifierTypes().get(0), QualifierType.FALSE);
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(milestoneQualifiers.size(), 0);
     }

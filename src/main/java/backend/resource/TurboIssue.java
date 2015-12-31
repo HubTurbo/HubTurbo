@@ -21,7 +21,6 @@ import static util.Utility.replaceNull;
 /**
  * The guidelines in this class apply to all TurboResources.
  */
-@SuppressWarnings("unused")
 public class TurboIssue {
     private static final Logger logger = HTLog.get(TurboIssue.class);
 
@@ -29,13 +28,13 @@ public class TurboIssue {
     public static final String STATE_OPEN = "open";
 
     /**
+     * Serialized fields.
+     *
      * Must have reasonable, NON-NULL defaults.
      * Should be primitive types, or at least easily-serializable ones.
      * Should be specified in order.
      * Should be immutable as much as possible.
      */
-    private void ______SERIALIZED_FIELDS______() {
-    }
 
     // Immutable
     private final int id;
@@ -57,15 +56,15 @@ public class TurboIssue {
     /**
      * Metadata associated with issues that is not serialized.
      */
-    private void ______TRANSIENT_FIELDS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______TRANSIENT_FIELDS______() {}
 
     private final String repoId;
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
 
-    private void ______CONSTRUCTORS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______CONSTRUCTORS______() {}
 
     /**
      * Default constructor: provides reasonable defaults for things.
@@ -170,8 +169,8 @@ public class TurboIssue {
         this.markedReadAt = Optional.empty();
     }
 
-    private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {}
 
     private static boolean isPullRequest(Issue issue) {
         return issue.getPullRequest() != null && issue.getPullRequest().getUrl() != null;
@@ -206,8 +205,8 @@ public class TurboIssue {
     /**
      * Conceptually, operations on issues. They should only modify non-serialized fields.
      */
-    private void ______METHODS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______METHODS______() {}
 
     @Override
     public String toString() {
@@ -219,26 +218,26 @@ public class TurboIssue {
      * returning a list of TurboIssues with updates from the second.
      */
     public static List<TurboIssue> reconcile(String repoId, List<TurboIssue> existing, List<TurboIssue> changed) {
-        existing = new ArrayList<>(existing);
+        List<TurboIssue> existingCopy = new ArrayList<>(existing);
         for (TurboIssue issue : changed) {
             int id = issue.getId();
 
             // TODO O(n^2), fix by preprocessing and copying into a map
-            Optional<Integer> corresponding = findIssueWithId(existing, id);
+            Optional<Integer> corresponding = findIssueWithId(existingCopy, id);
             if (corresponding.isPresent()) {
 
                 // issue is constructed from an external Issue object.
                 // It won't have the transient state that its TurboIssue
                 // counterpart has, so we have to explicitly transfer it.
                 TurboIssue newIssue = new TurboIssue(issue);
-                newIssue.transferTransientState(existing.get(corresponding.get()));
+                newIssue.transferTransientState(existingCopy.get(corresponding.get()));
 
-                existing.set(corresponding.get(), newIssue);
+                existingCopy.set(corresponding.get(), newIssue);
             } else {
-                existing.add(new TurboIssue(issue));
+                existingCopy.add(new TurboIssue(issue));
             }
         }
-        return existing;
+        return existingCopy;
     }
 
     /**
@@ -250,22 +249,22 @@ public class TurboIssue {
      */
     public static List<TurboIssue> combineWithPullRequests(List<TurboIssue> issues,
                                                            List<PullRequest> pullRequests) {
-        issues = new ArrayList<>(issues);
+        List<TurboIssue> issuesCopy = new ArrayList<>(issues);
 
         for (PullRequest pullRequest : pullRequests) {
             int id = pullRequest.getNumber();
 
-            Optional<Integer> corresponding = findIssueWithId(issues, id);
+            Optional<Integer> corresponding = findIssueWithId(issuesCopy, id);
             if (corresponding.isPresent()) {
-                TurboIssue issue = issues.get(corresponding.get());
-                issues.set(corresponding.get(), issue.combineWithPullRequest(pullRequest));
+                TurboIssue issue = issuesCopy.get(corresponding.get());
+                issuesCopy.set(corresponding.get(), issue.combineWithPullRequest(pullRequest));
             } else {
                 String errorMsg = "No corresponding issue for pull request " + pullRequest;
                 logger.error(errorMsg);
             }
         }
 
-        return issues;
+        return issuesCopy;
     }
 
     /**
@@ -301,8 +300,8 @@ public class TurboIssue {
         return Optional.empty();
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______BOILERPLATE______() {}
 
     public String getRepoId() {
         return repoId;

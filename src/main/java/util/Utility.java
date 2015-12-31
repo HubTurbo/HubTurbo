@@ -32,7 +32,7 @@ import util.events.ShowErrorDialogEvent;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 
-public class Utility {
+public final class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
@@ -44,7 +44,7 @@ public class Utility {
     public static boolean isWellFormedRepoId(String repoId) {
         RepositoryId repositoryId = RepositoryId.createFromId(repoId);
         return repoId != null && !repoId.isEmpty() && repositoryId != null
-            && repositoryId.generateId().equals(repoId);
+            && repoId.equals(repositoryId.generateId());
     }
 
     public static Optional<String> readFile(String fileName) {
@@ -110,8 +110,7 @@ public class Utility {
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.
-        if ((issueCount > 0) &&
-                (sizeAfterWrite > ((long) issueCount * 2000))) {
+        if (issueCount > 0 && sizeAfterWrite > ((long) issueCount * 2000)) {
             UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
                             + "Now proceeding to delete the file and redownload the repository to prevent "
@@ -162,7 +161,7 @@ public class Utility {
         return s.replaceAll("^\"|\"$", "");
     }
 
-    public static String removeAllWhiteSpaces(String s) {
+    public static String removeAllWhitespace(String s) {
         return s.replaceAll("\\s", "");
     }
 
@@ -194,7 +193,7 @@ public class Utility {
             return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US).parse(dateString);
         } catch (ParseException e) {
             logger.error(e.getLocalizedMessage(), e);
-            throw new IllegalArgumentException("Could not parse date " + dateString);
+            throw new IllegalArgumentException("Could not parse date " + dateString, e);
         }
     }
 
@@ -240,9 +239,9 @@ public class Utility {
      */
     public static Optional<int[]> parseVersionNumber(String version) {
         // Strip non-digits
-        version = version.replaceAll("[^0-9.]+", "");
+        String numericVersion = version.replaceAll("[^0-9.]+", "");
 
-        String[] temp = version.split("\\.");
+        String[] temp = numericVersion.split("\\.");
         try {
             int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
             int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
@@ -328,4 +327,6 @@ public class Utility {
     public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
         return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
+
+    private Utility() {}
 }

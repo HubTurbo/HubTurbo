@@ -62,14 +62,14 @@ public class LoginDialog extends Dialog<Boolean> {
         }
     }
 
-    private void login(Event unused) {
+    private void login() {
         Platform.runLater(() -> enableUI(false));
         CompletableFuture.supplyAsync(
-                () -> ui.logic.loginController.attemptLogin(repoOwnerField.getText(),
-                                                            repoNameField.getText(),
-                                                            usernameField.getText(),
-                                                            passwordField.getText()),
-                executor).thenAccept(success -> {
+            () -> ui.logic.loginController.attemptLogin(repoOwnerField.getText(),
+                repoNameField.getText(),
+                usernameField.getText(),
+                passwordField.getText()),
+            executor).thenAccept(success -> {
             if (success) {
                 Platform.runLater(() -> {
                     close();
@@ -128,15 +128,15 @@ public class LoginDialog extends Dialog<Boolean> {
         passwordField = new PasswordField();
         grid.add(passwordField, 1, 2, 4, 1);
 
-        repoOwnerField.setOnAction(this::login);
-        repoNameField.setOnAction(this::login);
-        usernameField.setOnAction(this::login);
-        passwordField.setOnAction(this::login);
+        repoOwnerField.setOnAction(e -> login());
+        repoNameField.setOnAction(e -> login());
+        usernameField.setOnAction(e -> login());
+        passwordField.setOnAction(e -> login());
 
         HBox buttons = new HBox(10);
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
         loginButton = new Button(BUTTON_SIGN_IN);
-        loginButton.setOnAction(this::login);
+        loginButton.setOnAction(e -> login());
         buttons.getChildren().add(loginButton);
         grid.add(buttons, 4, 3);
 

@@ -10,10 +10,10 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
-public class LoginController {
+public final class LoginController {
 
     private static final Logger logger = HTLog.get(LoginController.class);
-    private Logic logic;
+    private final Logic logic;
 
     private String owner = "";
     private String repo = "";
@@ -60,21 +60,20 @@ public class LoginController {
     }
 
     public boolean attemptLogin() {
-        if (Utility.isWellFormedRepoId(owner, repo) && !username.isEmpty() && !password.isEmpty()) {
-            if (login(username, password)) {
-                logic.prefs.setLastLoginCredentials(username, password);
-                return true;
-            }
+
+        boolean validRepoId = Utility.isWellFormedRepoId(owner, repo) && !username.isEmpty() && !password.isEmpty();
+        boolean loginSuccessful = login(username, password);
+
+        if (validRepoId && loginSuccessful) {
+            logic.prefs.setLastLoginCredentials(username, password);
+            return true;
         }
         return false;
     }
 
     public boolean attemptLogin(String owner, String repo, String username, String password) {
-        owner = Utility.removeAllWhiteSpaces(owner);
-        repo = Utility.removeAllWhiteSpaces(repo);
-
-        this.owner = owner;
-        this.repo = repo;
+        this.owner = Utility.removeAllWhitespace(owner);
+        this.repo = Utility.removeAllWhitespace(repo);
         this.username = username;
         this.password = password;
 

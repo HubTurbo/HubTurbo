@@ -1,5 +1,4 @@
-<FindBugsFilter>        
-
+<FindBugsFilter>
     <!-- EC_UNRELATED_TYPES: Call to equals() comparing different types -->
     <!-- Add exceptions for tests here-->
 
@@ -74,6 +73,13 @@
             <Field name="scrollToTop" />
             <Field name="scrollUp" />
             <Field name="upIssue" />
+        </Or>
+    </Match>
+    <Match>
+        <Class name="tests.PreferencesTests" />
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+        <Or>
+            <Method name="testGetBoardPanels" />
         </Or>
     </Match>
 </FindBugsFilter>

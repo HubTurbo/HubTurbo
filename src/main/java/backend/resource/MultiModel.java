@@ -213,8 +213,8 @@ public class MultiModel implements IModel {
         }
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______BOILERPLATE______() {}
 
     @Override
     public boolean equals(Object o) {

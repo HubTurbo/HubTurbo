@@ -66,6 +66,7 @@ public class NumberRange {
     }
 
     @Override
+    @SuppressWarnings("PMD")
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

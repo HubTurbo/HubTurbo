@@ -1,6 +1,7 @@
 package filter;
 
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class MetaQualifierInfo {
 
-    private Optional<String> in = Optional.empty();
+    private final Optional<String> in;
 
     public MetaQualifierInfo(List<Qualifier> qualifiers) {
 
@@ -21,7 +22,7 @@ public class MetaQualifierInfo {
 
     private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
         List<Qualifier> inQualifiers = qualifiers.stream()
-            .filter(q -> q.getName().equals("in"))
+            .filter(q -> q.getType() == QualifierType.IN)
             .collect(Collectors.toList());
 
         if (inQualifiers.isEmpty()) {

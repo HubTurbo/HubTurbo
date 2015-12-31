@@ -40,14 +40,13 @@ public class PanelsTest extends UITest {
         final FilterPanel panel2 = getPanel(2);
 
         reorderPanelsByDragging(panel0, panel1, panel2);
-        reorderPanelsViaHotkeys(panel0, panel1);
 
         click(panel0.getCloseButton());
         waitUntilNodeDisappears(panel0);
 
         // Switch default repo
-        doubleClick("#repositorySelector");
-        doubleClick();
+        click("#repositorySelector");
+        selectAll();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
         pushKeys(CREATE_RIGHT_PANEL);
@@ -76,26 +75,12 @@ public class PanelsTest extends UITest {
         awaitCondition(() -> getPanel(0) == panel1);
     }
 
-    private void reorderPanelsViaHotkeys(FilterPanel panel0, FilterPanel panel1) {
-        selectPanel(0);
-        pushKeys(SWAP_PANEL_RIGHT);
-        awaitCondition(() -> isSwapComplete() && getPanel(0) == panel0);
-        pushKeys(SWAP_PANEL_LEFT);
-        awaitCondition(() -> isSwapComplete() && getPanel(0) == panel1);
-    }
-
     private Node dragSrc(FilterPanel panel) {
         return panel.getCloseButton();
     }
 
     private Node dragDest(FilterPanel panel) {
         return panel.getFilterTextField();
-    }
-
-    private boolean isSwapComplete() {
-        PanelControl panels = TestController.getUI().getPanelControl();
-        return panels.getChildren().stream()
-            .noneMatch(child -> child instanceof HBox);
     }
 
     private void selectPanel(int index) {

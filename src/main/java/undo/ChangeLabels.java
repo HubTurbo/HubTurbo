@@ -7,8 +7,8 @@ import java.util.List;
 
 public class ChangeLabels implements Action<TurboIssue> {
 
-    private List<String> addedLabels;
-    private List<String> removedLabels;
+    private final List<String> addedLabels;
+    private final List<String> removedLabels;
 
     public ChangeLabels(List<String> addedLabels, List<String> removedLabels) {
         this.addedLabels = new ArrayList<>(addedLabels);

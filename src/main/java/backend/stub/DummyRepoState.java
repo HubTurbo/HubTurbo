@@ -20,25 +20,25 @@ import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
-    private String dummyRepoId;
+    private final String dummyRepoId;
 
-    private TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> labels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> users = new TreeMap<>();
+    private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
+    private final TreeMap<String, TurboLabel> labels = new TreeMap<>();
+    private final TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
+    private final TreeMap<String, TurboUser> users = new TreeMap<>();
 
-    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
+    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>(); // NOPMD
+    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>(); // NOPMD
 
     // We store issueMetadata separately from issues so that metadata of issues returned by getUpdatedIssues/getIssues
     // is empty. This is the case when interfacing with GitHub. (and then metadata gets retrieved separately from
     // getEvents and getComments).
-    private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
+    private final HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
     // We keep track of issues that user has not gotten metadata from.
-    private HashSet<Integer> updatedEvents = new HashSet<>();
-    private HashSet<Integer> updatedComments = new HashSet<>();
+    private final HashSet<Integer> updatedEvents = new HashSet<>();
+    private final HashSet<Integer> updatedComments = new HashSet<>();
 
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
