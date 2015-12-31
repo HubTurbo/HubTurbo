@@ -60,7 +60,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 13;
+    public static final int VERSION_MINOR = 14;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -479,11 +479,11 @@ public class UI extends Application implements EventDispatcher {
         logic.setDefaultRepo(repoId);
         triggerEvent(new UsedReposChangedEvent());
     }
-    
+
     public void switchDefaultRepo(){
         String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
-        
+
         // Cycle to the next open repository
         for (int i = 0; i < openRepos.length; i++) {
             if (openRepos[i].equals(currentRepo)) {
@@ -510,11 +510,11 @@ public class UI extends Application implements EventDispatcher {
     public MenuControl getMenuControl() {
         return menuBar;
     }
-    
+
     public PanelControl getPanelControl() {
         return panels;
     }
-    
+
     /**
      * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
      */
@@ -526,10 +526,8 @@ public class UI extends Application implements EventDispatcher {
         mainStage.setMaximized(false);
         mainStage.setIconified(false);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(panels.getPanelWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(panels.getPanelWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(panels.getPanelWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
@@ -537,10 +535,8 @@ public class UI extends Application implements EventDispatcher {
     public void maximizeWindow() {
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(dimensions.getWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(dimensions.getWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(dimensions.getWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
@@ -566,7 +562,7 @@ public class UI extends Application implements EventDispatcher {
         // must be run in a Platform.runLater or from the UI thread
         notificationController.triggerTimeoutAction();
     }
-    
+
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
@@ -577,7 +573,7 @@ public class UI extends Application implements EventDispatcher {
     public boolean isNotificationPaneShowing() {
         return notificationPane.isShowing();
     }
-    
+
     public String getTitle() {
         return mainStage.getTitle();
     }

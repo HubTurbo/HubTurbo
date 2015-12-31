@@ -37,13 +37,13 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // maximize
-        assertEquals(false, stage.getMinWidth() > 500);
+        assertEquals(false, stage.getWidth() > 500);
         press(MAXIMIZE_WINDOW);
-        assertEquals(true, stage.getMinWidth() > 500);
+        assertEquals(true, stage.getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
-        assertEquals(false, stage.getMinWidth() > 500);
+        assertEquals(false, stage.getWidth() > 500);
 
         // jump from panel focus to first issue
         // - This is because on startup focus is on panel and not on filter box
