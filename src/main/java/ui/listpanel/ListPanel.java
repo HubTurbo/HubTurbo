@@ -118,7 +118,7 @@ public class ListPanel extends FilterPanel {
         // if it actually does on platforms other than Linux...
         listView.setItems(null);
         listView.setItems(finalIssueList);
-        issueCount = getIssueList().size();
+        issueCount = finalIssueList.size();
 
         listView.restoreSelection();
         this.setId(model.getDefaultRepo() + "_col" + panelIndex);
@@ -306,14 +306,13 @@ public class ListPanel extends FilterPanel {
     private ObservableList<TurboIssue> applyCountQualifierToIssueList(ObservableList<TurboIssue> issueList,
                                                 FilterExpression expression){
         List<Qualifier> countFilters = expression.find(Qualifier::isCountQualifier);
-        if(!countFilters.isEmpty()){
+        if (!countFilters.isEmpty()) {
             Qualifier qualifier = countFilters.get(0);
-            if (qualifier.getNumber().isPresent()) {
+            if (qualifier.getNumber().isPresent() && qualifier.getNumber().get() >= 0) {
                 int finalIssueCount  = qualifier.getNumber().get() > issueList.size() ? issueList.size() :
                         qualifier.getNumber().get();
                 return FXCollections.observableArrayList(issueList.subList(0, finalIssueCount));
-            }
-            else{
+            } else {
                 return issueList;
             }
         }
