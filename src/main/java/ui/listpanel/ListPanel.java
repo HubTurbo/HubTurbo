@@ -5,11 +5,11 @@ import static util.GithubPageElements.DISCUSSION_TAB;
 import static util.GithubPageElements.COMMITS_TAB;
 import static util.GithubPageElements.FILES_TAB;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
+import filter.expression.FilterExpression;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -112,10 +112,12 @@ public class ListPanel extends FilterPanel {
         listView.setCellFactory(list -> new ListPanelCell(model, this, panelIndex, issuesWithNewComments));
         listView.saveSelection();
 
+        ObservableList<TurboIssue> finalIssueList = applyCountQualifierToIssueList(getIssueList(),
+                getCurrentFilterExpression());
         // Supposedly this also causes the list view to update - not sure
         // if it actually does on platforms other than Linux...
         listView.setItems(null);
-        listView.setItems(getIssueList());
+        listView.setItems(finalIssueList);
         issueCount = getIssueList().size();
 
         listView.restoreSelection();
@@ -299,6 +301,23 @@ public class ListPanel extends FilterPanel {
         updateChangeLabelsMenuItem();
 
         return contextMenu;
+    }
+
+    private ObservableList<TurboIssue> applyCountQualifierToIssueList(ObservableList<TurboIssue> issueList,
+                                                FilterExpression expression){
+        List<Qualifier> countFilters = expression.find(Qualifier::isCountQualifier);
+        if(!countFilters.isEmpty()){
+            Qualifier qualifier = countFilters.get(0);
+            if (qualifier.getNumber().isPresent()) {
+                int finalIssueCount  = qualifier.getNumber().get() > issueList.size() ? issueList.size() :
+                        qualifier.getNumber().get();
+                return FXCollections.observableArrayList(issueList.subList(0, finalIssueCount));
+            }
+            else{
+                return issueList;
+            }
+        }
+        return issueList;
     }
 
     public ContextMenu getContextMenu() {

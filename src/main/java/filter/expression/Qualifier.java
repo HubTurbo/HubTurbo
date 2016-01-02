@@ -243,6 +243,8 @@ public class Qualifier implements FilterExpression {
             return satisfiesUpdatedHours(issue);
         case REPO:
             return satisfiesRepo(issue);
+        case COUNT:
+                return satisfiesCount();
         default:
             assert false : "Missing case for " + type;
             return false;
@@ -435,6 +437,15 @@ public class Qualifier implements FilterExpression {
     public static boolean isUpdatedQualifier(Qualifier q) {
         switch (q.getType()) {
             case UPDATED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isCountQualifier(Qualifier q) {
+        switch (q.getType()) {
+            case COUNT:
                 return true;
             default:
                 return false;
@@ -636,6 +647,10 @@ public class Qualifier implements FilterExpression {
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
         int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
         return updatedRange.encloses(hoursSinceUpdate);
+    }
+
+    private boolean satisfiesCount(){
+        return number.isPresent() && number.get() >= 0;
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {

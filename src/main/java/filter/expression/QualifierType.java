@@ -11,7 +11,7 @@ public enum QualifierType {
 
     KEYWORD, // A special value that indicates a search term
 
-    ASSIGNEE, AUTHOR, CREATED, DATE, DESCRIPTION, HAS, ID, IN,
+    ASSIGNEE, AUTHOR, CREATED, COUNT, DATE, DESCRIPTION, HAS, ID, IN,
     INVOLVES, IS, LABEL, LABELS, MILESTONE, MILESTONES, NO,
     REPO, SORT, STATE, TITLE, TYPE, UPDATED;
 
