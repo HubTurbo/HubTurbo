@@ -4,12 +4,15 @@
 
 - Added an application icon for Windows and OS X
 - Added a few panel templates
-- Added buttons to confirm and revert panel renaming
 - Fixed bug with navigating to the related PR of an issue
 - Improved appearance of closed issue titles
 - Improved testing infrastructure (integrated Mockito)
 - Improvements to filter expression parser
 - Integrated PMD
+
+# V3.15.0
+
+- Added buttons to confirm and revert panel renaming
 
 # V3.14.0
 
