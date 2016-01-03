@@ -54,7 +54,7 @@ public class GitHubClientExTests {
         MockServerClient mockServer = ClientAndServer.startClientAndServer(8888);
         HttpRequest expectedRequest = request()
                         .withMethod("HEAD")
-                        .withPath("/api/v3/repos/repo")
+                        .withPath(TestUtils.API_PREFIX + "/repos/repo")
                         .withQueryStringParameters(
                                 new Parameter("state", "all"),
                                 new Parameter("per_page", "100"),

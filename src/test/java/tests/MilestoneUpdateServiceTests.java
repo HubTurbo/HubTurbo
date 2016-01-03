@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 public class MilestoneUpdateServiceTests {
@@ -46,13 +45,13 @@ public class MilestoneUpdateServiceTests {
         List<Header> page2Headers = TestUtils.parseHeaderRecord(page2Header);
 
         mockServer.when(
-                createMockServerRequest("HEAD", "1")
+                createMockServerRequest("HEAD", 1)
         ).respond(
                 response().withHeaders(page1Headers)
         );
 
         mockServer.when(
-                createMockServerRequest("GET", "1")
+                createMockServerRequest("GET", 1)
         ).respond(
                 response()
                         .withHeaders(page1Headers)
@@ -60,13 +59,13 @@ public class MilestoneUpdateServiceTests {
         );
 
         mockServer.when(
-                createMockServerRequest("HEAD", "2")
+                createMockServerRequest("HEAD", 2)
         ).respond(
                 response().withHeaders(page2Headers)
         );
 
         mockServer.when(
-                createMockServerRequest("GET", "2")
+                createMockServerRequest("GET", 2)
         ).respond(
                 response()
                         .withHeaders(page2Headers)
@@ -113,15 +112,7 @@ public class MilestoneUpdateServiceTests {
                 service.getUpdatedCheckTime());
     }
 
-    private static HttpRequest createMockServerRequest(String method, String page) {
-        String path = "1".equals(page) ?
-                "/api/v3/repos/teammates/repo/milestones" : "/api/v3/repositories/19369035/milestones";
-
-        return request()
-                .withMethod(method)
-                .withPath(path)
-                .withQueryStringParameter("state", "all")
-                .withQueryStringParameter("per_page", "100")
-                .withQueryStringParameter("page", page);
+    private static HttpRequest createMockServerRequest(String method, int page) {
+        return TestUtils.createMockServerRequest(method, page, "teammates/repo", "19369035", "/milestones");
     }
 }

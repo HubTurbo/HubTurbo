@@ -62,7 +62,7 @@ public class PullRequestServiceExTests {
 
         mockServer.when(
                 request()
-                    .withPath("/api/v3/repos/hubturbo/hubturbo/pulls/1125/comments")
+                    .withPath(TestUtils.API_PREFIX + "/repos/hubturbo/hubturbo/pulls/1125/comments")
                     .withQueryStringParameters(
                             new Parameter("per_page", "100"),
                             new Parameter("page", "1")

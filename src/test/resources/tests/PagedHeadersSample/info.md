@@ -1,0 +1,1 @@
+This directory contains generic sample of headers for a sequence of GitHub API v3 pagination requests

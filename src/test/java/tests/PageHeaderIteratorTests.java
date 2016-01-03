@@ -9,19 +9,17 @@ import org.mockserver.client.server.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
-import org.mockserver.model.Parameter;
+import util.Utility;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CONTENT_TYPE_JSON;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_PULLS;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 public class PageHeaderIteratorTests {
@@ -58,29 +56,24 @@ public class PageHeaderIteratorTests {
     public void testHeaderIterator() throws NoSuchElementException, IOException {
         MockServerClient mockServer = ClientAndServer.startClientAndServer(8888);
 
-        HttpRequest page1Request = createMockServerPagedHeaderRequest("1");
+        HttpRequest page1Request = createMockServerPagedHeaderRequest(1);
+        List<Header> page1Headers = TestUtils.parseHeaderRecord(
+                TestUtils.readFileFromResource(this, "tests/PagedHeadersSample/page1-header.txt"));
         String page1Etag = "aaf65fc6b10d5afbdc9cd0aa6e6ada4c";
-        String page1Link =
-             "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=2>; rel=\"next\", "
-           + "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=3>; rel=\"last\"";
 
-        HttpRequest page2Request = createMockServerPagedHeaderRequest("2");
+        HttpRequest page2Request = createMockServerPagedHeaderRequest(2);
+        List<Header> page2Headers = TestUtils.parseHeaderRecord(
+                TestUtils.readFileFromResource(this, "tests/PagedHeadersSample/page2-header.txt"));
         String page2Etag = "731501e0f7d9816305782bc4c3f70d9f";
-        String page2Link =
-              "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=3>; rel=\"next\", "
-            + "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=3>; rel=\"last\", "
-            + "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=1>; rel=\"first\", "
-            + "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=1>; rel=\"prev\"";
 
-        HttpRequest page3Request = createMockServerPagedHeaderRequest("3");
+        HttpRequest page3Request = createMockServerPagedHeaderRequest(3);
+        List<Header> page3Headers = TestUtils.parseHeaderRecord(
+                TestUtils.readFileFromResource(this, "tests/PagedHeadersSample/page3-header.txt"));
         String page3Etag = "a6f367d674155d6fbbacbc2fca04917b";
-        String page3Link =
-              "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=1>; rel=\"first\", "
-            + "<https://localhost:8888/repositories/20919534/pulls?state=all&per_page=100&page=2>; rel=\"prev\"";
 
-        setUpHeadRequestOnMockServer(mockServer, page1Request, page1Etag, page1Link);
-        setUpHeadRequestOnMockServer(mockServer, page2Request, page2Etag, page2Link);
-        setUpHeadRequestOnMockServer(mockServer, page3Request, page3Etag, page3Link);
+        setUpHeadRequestOnMockServer(mockServer, page1Request, page1Headers);
+        setUpHeadRequestOnMockServer(mockServer, page2Request, page2Headers);
+        setUpHeadRequestOnMockServer(mockServer, page3Request, page3Headers);
 
         PagedRequest<Milestone> request = new PagedRequest<>();
         Map<String, String> params = new HashMap<>();
@@ -94,38 +87,23 @@ public class PageHeaderIteratorTests {
         request.setParams(params);
 
         PageHeaderIterator iter = new PageHeaderIterator(request, client, "ETag");
-        assertEquals(page1Etag, iter.next());
-        assertEquals(page2Etag, iter.next());
-        assertEquals(page3Etag, iter.next());
+        assertEquals(page1Etag, Utility.stripQuotes(iter.next()));
+        assertEquals(page2Etag, Utility.stripQuotes(iter.next()));
+        assertEquals(page3Etag, Utility.stripQuotes(iter.next()));
         assertFalse(iter.hasNext());
 
         mockServer.stop();
     }
 
-    private HttpRequest createMockServerPagedHeaderRequest(String page) {
-        String path = "1".equals(page) ?
-                "/api/v3/repos/hubturbo/hubturbo/pulls" : "/api/v3/repositories/20919534/pulls";
-
-        return request()
-                .withMethod("HEAD")
-                .withPath(path)
-                .withQueryStringParameters(
-                        new Parameter("state", "all"),
-                        new Parameter("per_page", "100"),
-                        new Parameter("page", page)
-                );
+    private HttpRequest createMockServerPagedHeaderRequest(int page) {
+        return TestUtils.createMockServerRequest("HEAD", page, "hubturbo/hubturbo", "20919534", SEGMENT_PULLS);
     }
 
-    private void setUpHeadRequestOnMockServer(MockServerClient mockServer, HttpRequest request,
-                                              String eTagHeader, String linkHeader) {
+    private void setUpHeadRequestOnMockServer(MockServerClient mockServer, HttpRequest request, List<Header> headers) {
         mockServer
                 .when(request)
                 .respond(
-                        response()
-                                .withHeaders(
-                                        new Header("ETag", eTagHeader),
-                                        new Header("Link", linkHeader)
-                                )
+                        response().withHeaders(headers)
                 );
     }
 }
