@@ -100,7 +100,7 @@ public class FilterTests extends UITest{
 
         assertEquals(0, issuePanel.getIssueCount());
 
-        // The first count qualifier is chosen if more than 1 are present.
+        //first count qualifier chosen
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("count:6 count:9");
@@ -108,21 +108,45 @@ public class FilterTests extends UITest{
 
         assertEquals(6, issuePanel.getIssueCount());
 
-        // test parse exception returns Qualifier.EMPTY, i.e. all issues
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("count:-1");
-        push(KeyCode.ENTER);
+        // Not-a-number returns the whole list
 
-        assertEquals(10, issuePanel.getIssueCount());
-
-        //no result on characters entered for count
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("count:abcd");
         push(KeyCode.ENTER);
 
-        assertEquals(0, issuePanel.getIssueCount());
+        assertEquals(10, issuePanel.getIssueCount());
+
+        // Not-a-number returns the whole list
+
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:abcd");
+        push(KeyCode.ENTER);
+
+        assertEquals(10, issuePanel.getIssueCount());
+
+        // Return the value from the first valid count qualifier
+
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:abc count:8 count:2");
+        push(KeyCode.ENTER);
+
+        assertEquals(8, issuePanel.getIssueCount());
+        assertEquals("Issue 10", issuePanel.getIssueList().get(0).getTitle());
+        assertEquals("Issue 9", issuePanel.getIssueList().get(1).getTitle());
+
+        // Test with sort qualifier
+
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:8 count:2 sort:unmerged");
+        push(KeyCode.ENTER);
+
+        assertEquals(8, issuePanel.getIssueCount());
+        assertEquals("Issue 1", issuePanel.getIssueList().get(0).getTitle());
+        assertEquals("Issue 2", issuePanel.getIssueList().get(1).getTitle());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,

@@ -50,10 +50,10 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(filterAndSort(filterExprs))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
         } else {
             // If no issues requiring metadata update, just run the filter and sort.
-            logic.updateUI(filterAndSort(filterExprs));
+            logic.updateUI(processFilter(filterExprs));
         }
     }
 
@@ -93,30 +93,31 @@ public class UpdateController {
      * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering and sorting.
      */
-    private Map<FilterExpression, List<TurboIssue>> filterAndSort(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<TurboIssue>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<TurboIssue>> filteredAndSorted = new HashMap<>();
+        Map<FilterExpression, List<TurboIssue>> filteredSortedAndCounted = new HashMap<>();
 
         filterExprs.forEach(filterExpr -> {
-            List<TurboIssue> filterAndSortedExpression = filteredAndSorted.get(filterExpr);
+            List<TurboIssue> filterAndSortedExpression = filteredSortedAndCounted.get(filterExpr);
 
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
                 boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
                 FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-                List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
+                List<TurboIssue> filteredSortedAndCountedIssues = allModelIssues.stream()
                         .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
                         .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                        .limit(determineCount(allModelIssues, filterExprNoAlias))
                         .collect(Collectors.toList());
 
-                filteredAndSorted.put(filterExpr, filteredAndSortedIssues);
+                filteredSortedAndCounted.put(filterExpr, filteredSortedAndCountedIssues);
             }
         });
 
-        return filteredAndSorted;
+        return filteredSortedAndCounted;
     }
 
     /**
@@ -143,5 +144,21 @@ public class UpdateController {
 
         // No sort or updated, return sort by descending ID, which is the default.
         return Qualifier.getSortComparator(models, "id", true, false);
+    }
+
+    /**
+     * Applies the count qualifier to the set of issues obtained after the sorting order is applied.
+     *
+     * @param issueList Issue list obtained after filtering and sorting.
+     * @param filterExpr The filter expression of the particular panel.
+     * @return The count value in the qualifier
+     */
+    private int determineCount(List<TurboIssue> issueList, FilterExpression filterExpr){
+        for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
+            if (metaQualifier.getType() == QualifierType.COUNT && metaQualifier.getNumber().isPresent()) {
+                return metaQualifier.getNumber().get();
+            }
+        }
+        return issueList.size();
     }
 }
