@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.text.Text;
 import javafx.application.Platform;
@@ -45,6 +46,7 @@ public class PanelMenuBar extends HBox {
     public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 70;
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 40;
     public static final int NAME_AREA_EDIT_WIDTH = PANEL_WIDTH - 65; //width in the panel rename edit mode
+    public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
     public PanelMenuBar(FilterPanel panel, IModel model, UI ui){
         this.model = model;
@@ -85,6 +87,7 @@ public class PanelMenuBar extends HBox {
                 activateInplaceRename();
             }
         });
+        Tooltip.install(nameArea, new Tooltip("Edit the name of this panel"));
 
         HBox renameBox = new HBox();
         renameButton = new Label(OCTICON_RENAME_PANEL);
@@ -116,6 +119,7 @@ public class PanelMenuBar extends HBox {
             e.consume();
             panel.parentPanelControl.closePanel(panel.panelIndex);
         });
+        Tooltip.install(closeArea, new Tooltip("Close this panel"));
 
         closeArea.getChildren().add(closeButton);
 
@@ -186,6 +190,10 @@ public class PanelMenuBar extends HBox {
         menuBarNameArea.getChildren().addAll(renameableTextField);
         menuBarNameArea.setMinWidth(NAME_AREA_EDIT_WIDTH);
         menuBarNameArea.setMaxWidth(NAME_AREA_EDIT_WIDTH);
+        Tooltip.install(menuBarConfirmButton, new Tooltip("Confirm this name change"));
+        Tooltip undoTip = new Tooltip("Abandon this name change and go back to the previous name");
+        undoTip.setPrefWidth(TOOLTIP_WRAP_WIDTH);
+        Tooltip.install(menuBarUndoButton, undoTip);
         this.getChildren().addAll(menuBarConfirmButton, menuBarUndoButton);
     }
 
