@@ -29,14 +29,14 @@ public class DateRange {
     public boolean encloses(LocalDate date) {
         if (start == null) {
             // * .. end
-            return date.isBefore(end) || (!strictly && date.isEqual(end));
+            return date.isBefore(end) || !strictly && date.isEqual(end);
         } else if (end == null) {
             // start .. *
-            return date.isAfter(start) || (!strictly && date.isEqual(start));
+            return date.isAfter(start) || !strictly && date.isEqual(start);
         } else {
             // start .. end
             return date.isAfter(start) && date.isBefore(end)
-                    || (!strictly && (date.isEqual(start) || date.isEqual(end)));
+                    || !strictly && (date.isEqual(start) || date.isEqual(end));
         }
     }
 

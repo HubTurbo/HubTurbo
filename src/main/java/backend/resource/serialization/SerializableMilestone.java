@@ -5,6 +5,11 @@ import backend.resource.TurboMilestone;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Warnings are suppressed to prevent complaints about fields not being final.
+ * They are this way to give them default values.
+ */
+@SuppressWarnings("PMD")
 public class SerializableMilestone {
     private int id;
     private String title;
@@ -44,26 +49,5 @@ public class SerializableMilestone {
     }
     public int getClosedIssues() {
         return closedIssues;
-    }
-
-    @Override
-    public String toString() {
-        String formatter = "Milestone: {%n"
-                + "  id: %d,%n"
-                + "  title: %s,%n"
-                + "  dueDate: %s,%n"
-                + "  description: %s,%n"
-                + "  isOpen: %b,%n"
-                + "  openIssues: %d,%n"
-                + "  closedIssues: %d,%n"
-                + "}";
-
-        return String.format(
-                formatter,
-                getId(), getTitle(),
-                getDueDate().isPresent() ? getDueDate().get() : "",
-                getDescription(),
-                isOpen(),
-                getOpenIssues(), getClosedIssues());
     }
 }

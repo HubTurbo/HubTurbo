@@ -1,22 +1,16 @@
 package guitests;
 
-import static com.google.common.io.Files.getFileExtension;
-
-import java.awt.Robot;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-
+import backend.interfaces.RepoStore;
+import com.google.common.util.concurrent.SettableFuture;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,30 +21,34 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.exceptions.NoNodesVisibleException;
 import org.loadui.testfx.utils.FXTestUtils;
-
-import com.google.common.util.concurrent.SettableFuture;
-
-import backend.interfaces.RepoStore;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.UI;
 import util.PlatformEx;
 import util.PlatformSpecific;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+
+import static com.google.common.io.Files.getFileExtension;
+
 public class UITest extends GuiTest {
 
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
-
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
-    
-    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap(); 
-    
+    private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
+
+    private final Robot robot;
+    private final FXScreenController screenController;
+
     protected static class TestUI extends UI {
         public TestUI() {
             super();
@@ -62,9 +60,6 @@ public class UITest extends GuiTest {
             STAGE_FUTURE.set(primaryStage);
         }
     }
-
-    private final Robot robot;
-    private final FXScreenController screenController;
 
     public UITest() {
         super();
@@ -236,11 +231,11 @@ public class UITest extends GuiTest {
     }
 
     public void waitUntilNodeAppears(Node node) {
-        waitUntil(node, Node::isVisible);
+        waitUntil(node, n -> n.isVisible() && n.getParent() != null);
     }
 
     public void waitUntilNodeDisappears(Node node) {
-        waitUntil(node, n -> !n.isVisible());
+        waitUntil(node, n -> !n.isVisible() || n.getParent() == null);
     }
 
     public void waitUntilNodeAppears(String selector) {
@@ -300,11 +295,62 @@ public class UITest extends GuiTest {
 
     }
 
-    private boolean existsQuiet(String selector) {
+    public boolean existsQuiet(String selector) {
         try {
             return exists(selector);
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return false;
+        }
+    }
+
+    /**
+     * Like drag(from).to(to), but does not relocate the mouse if the target moves.
+     */
+    public void dragUnconditionally(Node from, Node to) {
+        Point2D start = pointFor(from);
+        Point2D end = pointFor(to);
+
+        move(start.getX(), start.getY());
+        press(MouseButton.PRIMARY);
+        move(end.getX(), end.getY());
+        release(MouseButton.PRIMARY);
+    }
+
+    /**
+     * Allows test threads to busy-wait on some condition.
+     *
+     * Taken from org.loadui.testfx.utils, but modified to synchronise with
+     * the JavaFX Application Thread, with a lower frequency.
+     *
+     * The additional synchronisation prevents bugs where
+     *
+     * awaitCondition(a);
+     * awaitCondition(b);
+     *
+     * sometimes may not be equivalent to
+     *
+     * awaitCondition(a && b);
+     *
+     * The lower frequency is a bit more efficient, since a frequency of 10 ms
+     * just isn't necessary for GUI interactions, and we're bottlenecked by the FX
+     * thread anyway.
+     */
+    public void awaitCondition(Callable<Boolean> condition) {
+        awaitCondition(condition, 5);
+    }
+
+    private void awaitCondition(Callable<Boolean> condition, int timeoutInSeconds) {
+        long timeout = System.currentTimeMillis() + timeoutInSeconds * 1000;
+        try {
+            while (!condition.call()) {
+                Thread.sleep(100);
+                PlatformEx.waitOnFxThread();
+                if (System.currentTimeMillis() > timeout) {
+                    throw new TimeoutException();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -337,4 +383,10 @@ public class UITest extends GuiTest {
         return this;
     }
 
+    /**
+     * Used to select the whole filter text so that it can be replaced
+     */
+    public void selectAll() {
+        pushKeys(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN));
+    }
 }

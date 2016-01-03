@@ -3,6 +3,7 @@ package filter.lexer;
 public enum TokenType {
     EOF,
     LBRACKET,
+    PERCENT,
     RBRACKET,
     SYMBOL,
     NOT,

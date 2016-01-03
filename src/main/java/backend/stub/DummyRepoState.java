@@ -13,31 +13,32 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
-    private String dummyRepoId;
+    private final String dummyRepoId;
 
-    private TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> labels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> users = new TreeMap<>();
+    private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
+    private final TreeMap<String, TurboLabel> labels = new TreeMap<>();
+    private final TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
+    private final TreeMap<String, TurboUser> users = new TreeMap<>();
 
-    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
+    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>(); // NOPMD
+    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>(); // NOPMD
 
     // We store issueMetadata separately from issues so that metadata of issues returned by getUpdatedIssues/getIssues
     // is empty. This is the case when interfacing with GitHub. (and then metadata gets retrieved separately from
     // getEvents and getComments).
-    private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
+    private final HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
     // We keep track of issues that user has not gotten metadata from.
-    private HashSet<Integer> updatedEvents = new HashSet<>();
-    private HashSet<Integer> updatedComments = new HashSet<>();
+    private final HashSet<Integer> updatedEvents = new HashSet<>();
+    private final HashSet<Integer> updatedComments = new HashSet<>();
 
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
@@ -73,12 +74,21 @@ public class DummyRepoState {
         labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
         labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
         labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
+
+        // set milestones for testing milestone alias
+        milestones.get(1).setDueDate(Optional.of(LocalDate.now().minusMonths(3)));
+        milestones.get(1).setOpen(false);
+        milestones.get(2).setDueDate(Optional.of(LocalDate.now().minusMonths(2))); // current
+        milestones.get(3).setDueDate(Optional.of(LocalDate.now().minusMonths(1)));
+        milestones.get(3).setOpen(false);
+        milestones.get(4).setDueDate(Optional.of(LocalDate.now().plusMonths(1)));
     }
 
     private void connectRepoEntities() {
         // Issues #1-5 are assigned milestones 1-5 respectively
         for (int i = 1; i <= 5; i++) {
             issues.get(i).setMilestone(milestones.get(i));
+            milestones.get(i).setOpenIssues(1);
         }
 
         // Odd issues are assigned label 1, even issues are assigned label 2

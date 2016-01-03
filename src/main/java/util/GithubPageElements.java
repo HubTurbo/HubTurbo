@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GithubURLPageElements {
+public final class GithubPageElements {
     // Web Element Names
     public static final String BODY = "body";
     public static final String NEW_COMMENT = "new_comment_field";
@@ -34,4 +34,6 @@ public class GithubURLPageElements {
         }
         return Optional.empty();
     }
+
+    private GithubPageElements() {}
 }

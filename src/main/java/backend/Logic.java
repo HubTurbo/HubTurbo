@@ -4,15 +4,16 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
+import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
 import java.util.*;
@@ -29,41 +30,43 @@ public class Logic {
     private final UIManager uiManager;
     protected final Preferences prefs;
 
-    private RepoIO repoIO;
+    private final RepoIO repoIO;
     public LoginController loginController;
     public UpdateController updateController;
 
-    public Logic(UIManager uiManager, Preferences prefs, boolean isTestMode, boolean enableTestJSON) {
+    public Logic(UIManager uiManager, Preferences prefs) {
         this.uiManager = uiManager;
         this.prefs = prefs;
         this.models = new MultiModel(prefs);
 
-        repoIO = new RepoIO(isTestMode, enableTestJSON);
+        repoIO = TestController.createApplicationRepoIO();
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
-        UI.events.registerEvent((ClearLogicModelEventHandler) e -> {
-            // DELETE_* and RESET_REPO is handled jointly by Logic and DummyRepo
-            assert isTestMode;
-            assert e.repoId != null;
-
-            List<Model> toReplace = models.toModels();
-
-            logger.info("Attempting to reset " + e.repoId);
-            if (toReplace.remove(models.get(e.repoId))) {
-                logger.info("Clearing " + e.repoId + " successful.");
-            } else {
-                logger.info(e.repoId + " not currently in model.");
-            }
-            models.replace(toReplace);
-
-            // Re-"download" repo after clearing
-            openPrimaryRepository(e.repoId);
-        });
+        UI.events.registerEvent((ClearLogicModelEventHandler) this::onLogicModelClear);
 
         // Pass the currently-empty model to the UI
         uiManager.updateEmpty(models);
+    }
+
+    private void onLogicModelClear(ClearLogicModelEvent e) {
+        // DELETE_* and RESET_REPO is handled jointly by Logic and DummyRepo
+        assert TestController.isTestMode();
+        assert e.repoId != null;
+
+        List<Model> toReplace = models.toModels();
+
+        logger.info("Attempting to reset " + e.repoId);
+        if (toReplace.remove(models.get(e.repoId))) {
+            logger.info("Clearing " + e.repoId + " successful.");
+        } else {
+            logger.info(e.repoId + " not currently in model.");
+        }
+        models.replace(toReplace);
+
+        // Re-"download" repo after clearing
+        openPrimaryRepository(e.repoId);
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -160,7 +163,7 @@ public class Logic {
     public void removeUnusedModels(Set<String> reposInUse) {
         models.toModels().stream().map(Model::getRepoId)
                 .filter(repoId -> !reposInUse.contains(repoId.toLowerCase()))
-                .forEach(repoIdNotInUse -> models.removeRepoModelById(repoIdNotInUse));
+                .forEach(models::removeRepoModelById);
     }
 
     public ImmutablePair<Integer, Long> updateRemainingRate

@@ -29,9 +29,9 @@ public class FilterTextField extends TextField {
     private List<String> keywords = new ArrayList<>();
 
     // For on-the-fly parsing and checking
-    private ValidationSupport validationSupport = new ValidationSupport();
+    private final ValidationSupport validationSupport = new ValidationSupport();
 
-    public FilterTextField(String initialText, int position) {
+    public FilterTextField(String initialText) {
         super(initialText);
         previousText = initialText;
         setup();
@@ -55,13 +55,12 @@ public class FilterTextField extends TextField {
                 return;
             }
             char typed = e.getCharacter().charAt(0);
+            // \b will allow us to detect deletion, but we can't find out the characters deleted
             if (typed == '\t') {
                 e.consume();
                 if (!getSelectedText().isEmpty()) {
                     confirmCompletion();
                 }
-            } else if (typed == '\b') {
-                // Can't find out the characters deleted...
             } else if (Character.isAlphabetic(typed)) {
                 // Only trigger completion when there's effectively nothing
                 // (only whitespace) after the caret
@@ -69,11 +68,9 @@ public class FilterTextField extends TextField {
                 if (shouldTriggerCompletion) {
                     performCompletion(e);
                 }
-            } else if (typed == ' '){
+            } else if (typed == ' ' && (getText().isEmpty() || getText().endsWith(" "))) {
                 // Prevent consecutive spaces
-                if (getText().isEmpty() || getText().endsWith(" ")) {
-                    e.consume();
-                }
+                e.consume();
             }
         });
         setOnKeyPressed(e -> {
@@ -149,11 +146,11 @@ public class FilterTextField extends TextField {
 
     // Caveat: algorithm only works for character-class regexes
     private int regexLastIndexOf(String inString, String charClassRegex) {
-        inString = new StringBuilder(inString).reverse().toString();
+        String reversed = new StringBuilder(inString).reverse().toString();
         Pattern pattern = Pattern.compile(charClassRegex);
-        Matcher m = pattern.matcher(inString);
+        Matcher m = pattern.matcher(reversed);
         if (m.find()) {
-            return inString.length() - (m.start() + 1);
+            return reversed.length() - (m.start() + 1);
         } else {
             return -1;
         }

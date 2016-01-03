@@ -12,31 +12,38 @@ public class SortTest extends UITest {
         // Ascending ID
         type("sort:id");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Descending ID (default)
         type("sort:-id");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Comment count
         type("sort:comments");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Repo ID (e.g. dummy2/dummy)
         type("sort:repo");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Updated time (ascending)
         type("sort:updated");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Updated time (descending)
         type("sort:-date");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Issue state (open)
         type("sort:status");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Issue state (closed)
         type("sort:-status");
         push(KeyCode.ENTER);

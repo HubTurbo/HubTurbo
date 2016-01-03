@@ -12,7 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
-import util.GithubURLPageElements;
+import util.GithubPageElements;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
@@ -33,7 +33,7 @@ public class BrowserComponent {
 
     private static final String CHROMEDRIVER_VERSION = "2-18";
     private static final boolean USE_MOBILE_USER_AGENT = false;
-    private boolean isTestChromeDriver;
+    private final boolean isTestChromeDriver;
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
@@ -63,7 +63,7 @@ public class BrowserComponent {
 
     // The first is not desirable and the second does not seem to be possible
     // at the moment.
-    private Executor executor;
+    private final Executor executor;
 
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
@@ -106,6 +106,7 @@ public class BrowserComponent {
                 driver.quit();
             } catch (WebDriverException e) {
                 // Chrome was closed; do nothing
+                logger.info("Chrome already closed");
             }
         }
     }
@@ -219,7 +220,7 @@ public class BrowserComponent {
             UI.events.triggerEvent(new JumpToCommentEvent());
         }
         try {
-            WebElement comment = driver.findElementById(GithubURLPageElements.NEW_COMMENT);
+            WebElement comment = driver.findElementById(GithubPageElements.NEW_COMMENT);
             comment.click();
             bringToTop();
         } catch (Exception e) {
@@ -300,9 +301,9 @@ public class BrowserComponent {
         runBrowserOperation(() -> {
             driver.get(GitHubURL.LOGIN_PAGE, false);
             try {
-                WebElement searchBox = driver.findElement(By.name(GithubURLPageElements.LOGIN_FIELD));
+                WebElement searchBox = driver.findElement(By.name(GithubPageElements.LOGIN_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.username);
-                searchBox = driver.findElement(By.name(GithubURLPageElements.PASSWORD_FIELD));
+                searchBox = driver.findElement(By.name(GithubPageElements.PASSWORD_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.password);
                 searchBox.submit();
             } catch (Exception e) {
@@ -416,21 +417,21 @@ public class BrowserComponent {
     }
 
     public void scrollToTop() {
-        String script = GithubURLPageElements.SCROLL_TO_TOP;
+        String script = GithubPageElements.SCROLL_TO_TOP;
         executeJavaScript(script);
     }
 
     public void scrollToBottom() {
-        String script = GithubURLPageElements.SCROLL_TO_BOTTOM;
+        String script = GithubPageElements.SCROLL_TO_BOTTOM;
         executeJavaScript(script);
     }
 
     public void scrollPage(boolean isDownScroll) {
         String script;
         if (isDownScroll) {
-            script = GithubURLPageElements.SCROLL_DOWN;
+            script = GithubPageElements.SCROLL_DOWN;
         } else {
-            script = GithubURLPageElements.SCROLL_UP;
+            script = GithubPageElements.SCROLL_UP;
         }
         executeJavaScript(script);
     }
@@ -441,7 +442,7 @@ public class BrowserComponent {
         }
         WebElement body;
         try {
-            body = driver.findElementByTagName(GithubURLPageElements.BODY);
+            body = driver.findElementByTagName(GithubPageElements.BODY);
             body.sendKeys(keyCode);
         } catch (Exception e) {
             logger.error("No such element");
@@ -503,7 +504,7 @@ public class BrowserComponent {
             WebElement element = driver.findElement(By.xpath("//div[contains(@id, 'ref-pullrequest')]"));
             return Optional.of(Integer.parseInt(element.findElement(By.xpath(".."))
                     .findElement(By.xpath(".//h3/a/span"))
-                    .getAttribute("innerHTML").substring(1)));
+                    .getAttribute("innerHTML").trim().substring(1)));
         } catch (NoSuchElementException e) {
             logger.info("no PR mention found");
         }

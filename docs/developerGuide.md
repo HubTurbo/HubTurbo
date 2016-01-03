@@ -6,8 +6,9 @@ For contributors:
 - [Workflow](workflow.md)
 - [Testing](testing.md)
 - [Design](design.md)
-- [Decision rationales and guidelines](designRationalesAndGuidelines.md)
+- [Decision decisions and guidelines](designDecisionsAndGuidelines.md)
 - [Java coding conventions](codingConventions.md)
+- [Static analysis tools](staticAnalysis.md)
 
 For core team members:
 - [Creating a Release](creatingARelease.md)

@@ -4,11 +4,9 @@ import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
-import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.serialization.SerializableModel;
-import backend.stub.DummySource;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
@@ -22,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static util.Futures.withResult;
 
@@ -33,24 +30,23 @@ public class RepoIO {
     private final RepoSource repoSource;
     private final JSONStore jsonStore;
 
-    private List<String> storedRepos;
+    private final List<String> storedRepos;
 
     private static final int MAX_REDOWNLOAD_TRIES = 2;
 
-    public RepoIO(boolean isTestMode, boolean enableTestJSON) {
-        if (isTestMode) {
-            repoSource = new DummySource();
-            RepoStore.enableTestDirectory();
-        } else {
-            repoSource = new GitHubSource();
-        }
-        if (isTestMode && !enableTestJSON) {
-            jsonStore = new JSONStoreStub();
-            storedRepos = new ArrayList<>();
-        } else {
-            jsonStore = new JSONStore();
-            storedRepos = new ArrayList<>(jsonStore.getStoredRepos());
-        }
+    /**
+     * Contructs a RepoIO providing IO operations on repositories, taking in various optional
+     * parameters for repos source and storage which are useful for testing purposes.
+     * @param repoSource optional source of repos. Default to GitHubSource if not present
+     * @param jsonStore optional storage for repos. Default to a new JSONStore if not present
+     * @param storeDirectory optional directory for storing repos. Default value is in RepoStore.
+     */
+    public RepoIO(Optional<RepoSource> repoSource, Optional<JSONStore> jsonStore,
+                  Optional<String> storeDirectory) {
+        this.repoSource = repoSource.orElseGet(() -> new GitHubSource());
+        storeDirectory.ifPresent((dir) -> RepoStore.changeDirectory(dir));
+        this.jsonStore = jsonStore.orElseGet(() -> new JSONStore());
+        storedRepos = new ArrayList<>(this.jsonStore.getStoredRepos());
     }
 
     public List<String> getStoredRepos() {

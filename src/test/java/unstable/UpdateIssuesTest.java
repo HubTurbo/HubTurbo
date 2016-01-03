@@ -76,10 +76,10 @@ public class UpdateIssuesTest extends UITest {
         FutureTask<Integer> countIssues = new FutureTask<Integer>(((ListPanel) 
                 TestController.getUI().getPanelControl().getPanel(0))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        return (int) countIssues.get();
+        return countIssues.get();
     }
 
     private int getApiCount(String apiBoxText) {
-        return Integer.parseInt(apiBoxText.substring(0, apiBoxText.indexOf("/")));
+        return Integer.parseInt(apiBoxText.substring(0, apiBoxText.indexOf('/')));
     }
 }

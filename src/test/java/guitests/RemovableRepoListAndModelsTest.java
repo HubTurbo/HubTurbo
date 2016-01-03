@@ -74,7 +74,9 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
         // check if test json is present
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
         // we check that only 1 repo is in use
         noOfUsedRepo = 1;
@@ -133,6 +135,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         noOfUsedRepo = 4;
         totalRepoInSystem = 4;
         pushKeys(CREATE_RIGHT_PANEL);
+        waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
         click("#dummy/dummy_col1_filterTextField");
         selectAll();
         type("repo:dummy4/dummy4");
@@ -157,13 +160,8 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(getNoOfDisabledMenuItems(removeRepoMenu.getItems()), noOfUsedRepo);
     }
 
-    ////////////// NOTE: please turn off NumLock as it will interfere with this method
-    public void selectAll() {
-        press(KeyCode.SHIFT).press(KeyCode.HOME).release(KeyCode.HOME).release(KeyCode.SHIFT);
-    }
-
     public long getNoOfEnabledMenuItems(ObservableList<MenuItem> menuItems) {
-        return menuItems.stream().filter(menuItem -> (!menuItem.disableProperty().get())).count();
+        return menuItems.stream().filter(menuItem -> !menuItem.disableProperty().get()).count();
     }
 
     public long getNoOfDisabledMenuItems(ObservableList<MenuItem> menuItems) {

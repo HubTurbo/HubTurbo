@@ -42,7 +42,7 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            String repoId = Utility.removeAllWhiteSpaces(newVal);
+            String repoId = Utility.removeAllWhitespace(newVal);
             if (!repoId.equals(newVal)) {
                 comboBox.setValue(repoId);
                 return;

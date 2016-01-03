@@ -37,13 +37,13 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // maximize
-        assertEquals(false, stage.getMinWidth() > 500);
+        assertEquals(false, stage.getWidth() > 500);
         press(MAXIMIZE_WINDOW);
-        assertEquals(true, stage.getMinWidth() > 500);
+        assertEquals(true, stage.getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
-        assertEquals(false, stage.getMinWidth() > 500);
+        assertEquals(false, stage.getWidth() > 500);
 
         // jump from panel focus to first issue
         // - This is because on startup focus is on panel and not on filter box
@@ -152,7 +152,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // remove focus from repo selector
         ComboBox<String> repoSelectorComboBox = find("#repositorySelector");
-        doubleClick(repoSelectorComboBox);
+        click(repoSelectorComboBox);
         assertEquals(true, repoSelectorComboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
         assertEquals(false, repoSelectorComboBox.isFocused());
@@ -161,8 +161,8 @@ public class KeyboardShortcutsTest extends UITest {
         // switch default repo tests
         assertEquals(1, repoSelectorComboBox.getItems().size());
         // setup - add a new repo
-        doubleClick(repoSelectorComboBox);
-        doubleClick();
+        click(repoSelectorComboBox);
+        selectAll();
         type("dummy1/dummy1");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();

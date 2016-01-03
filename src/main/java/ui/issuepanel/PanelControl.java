@@ -3,6 +3,7 @@ package ui.issuepanel;
 import backend.interfaces.IModel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -46,7 +47,7 @@ public class PanelControl extends HBox {
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((ShowRenamePanelEventHandler) e ->
-                ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
+                ((FilterPanel) getPanel(e.panelId)).startRename());
 
         setupKeyEvents();
     }
@@ -102,6 +103,13 @@ public class PanelControl extends HBox {
         forEach(child -> child.refreshItems());
     }
 
+    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName){
+        FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
+        panelAdded.setPanelName(panelName);
+        panelAdded.setFilterByString(filterName);
+        return panelAdded;
+    }
+
     private FilterPanel addPanel() {
         return addPanelAt(getChildren().size());
     }
@@ -120,7 +128,7 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
-        assert(index >= 0 && index < getPanelCount());
+        assert index >= 0 && index < getPanelCount();
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
         getPanel(index).requestFocus();
@@ -128,6 +136,10 @@ public class PanelControl extends HBox {
 
     public void selectFirstPanel() {
         selectPanel(0);
+    }
+
+    public void selectLastPanel() {
+        selectPanel(getPanelCount() - 1);
     }
 
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
@@ -199,20 +211,6 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, one);
     }
 
-    public void movePanelRight(int panelIndex) {
-        if (getPanelCount() < 2 || panelIndex == (getPanelCount() - 1)) return;
-        int other = (panelIndex + 1) % getPanelCount();
-        swapPanels(panelIndex, other);
-        selectPanel(other);
-    }
-
-    public void movePanelLeft(int panelIndex) {
-        if (getPanelCount() < 2 || panelIndex == 0) return;
-        int other = (panelIndex - 1) % getPanelCount();
-        swapPanels(panelIndex, other);
-        selectPanel(other);
-    }
-
     public Optional<Integer> getCurrentlySelectedPanel() {
         return currentlySelectedPanel;
     }
@@ -239,9 +237,10 @@ public class PanelControl extends HBox {
         } else if (getChildren().size() == 0) {
             setCurrentlySelectedPanel(Optional.empty());
         } else {
-            int newPanelIndex = (closedPanelIndex > getChildren().size() - 1)
-                                 ? closedPanelIndex - 1
-                                 : closedPanelIndex;
+            int newPanelIndex =
+                closedPanelIndex > getChildren().size() - 1
+                    ? closedPanelIndex - 1
+                    : closedPanelIndex;
             setCurrentlySelectedPanel(Optional.of(newPanelIndex));
             getPanel(currentlySelectedPanel.get()).requestFocus();
         }
@@ -257,14 +256,9 @@ public class PanelControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if ((KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event))) {
+            if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
-            }
-            if (KeyboardShortcuts.SWAP_PANEL_LEFT.match(event)) {
-                currentlySelectedPanel.ifPresent(this::movePanelLeft);
-            } else if (KeyboardShortcuts.SWAP_PANEL_RIGHT.match(event)) {
-                currentlySelectedPanel.ifPresent(this::movePanelRight);
             }
         });
     }
@@ -317,7 +311,7 @@ public class PanelControl extends HBox {
             if (currPanel instanceof FilterPanel) {
                 FilterPanel currFilterPanel = (FilterPanel) currPanel;
                 FilterExpression panelExpression = currFilterPanel.getCurrentFilterExpression();
-                repositoriesOnPanels.addAll(Qualifier.getContentOfMetaQualifier(panelExpression, Qualifier.REPO));
+                repositoriesOnPanels.addAll(Qualifier.getMetaQualifierContent(panelExpression, QualifierType.REPO));
             }
         }
 

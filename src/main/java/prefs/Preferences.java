@@ -8,9 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Preferences {
-
+/**
+ * Represents persistent user configuration. Maps to a file on disk.
+ *
+ * Overrides PMD's recommendation that this class should be final.
+ * It cannot be as we need to mock it.
+ */
+public class Preferences { // NOPMD
     public static final String DIRECTORY = "settings";
+
+    // Standard config filenames used for application and testing
     public static final String GLOBAL_CONFIG_FILE = "global.json";
     public static final String TEST_CONFIG_FILE = "test.json";
 
@@ -18,21 +25,41 @@ public class Preferences {
 
     public GlobalConfig global;
 
-    public Preferences(boolean isTestMode) {
-        if (isTestMode) {
-            this.fileHandler = new ConfigFileHandler(DIRECTORY, TEST_CONFIG_FILE);
-        } else {
-            this.fileHandler = new ConfigFileHandler(DIRECTORY, GLOBAL_CONFIG_FILE);
-        }
+    private Preferences(String configFileName, boolean createUnconditionally) {
+        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName);
 
-        loadGlobalConfig();
+        if (createUnconditionally) {
+            initGlobalConfig();
+        } else {
+            loadGlobalConfig();
+        }
+    }
+
+    /**
+     * Initialises a Preferences instance which creates its config file, or loads
+     * from it if it already exists.
+     */
+    public static Preferences load(String configFileName) {
+        return new Preferences(configFileName, false);
+    }
+
+    /**
+     * Initialises a Preferences instance which always creates its config file.
+     * This will overwrite it with a default configuration if it already exists.
+     */
+    public static Preferences create(String configFileName) {
+        return new Preferences(configFileName, true);
     }
 
     public void saveGlobalConfig() {
         fileHandler.saveGlobalConfig(global);
     }
 
-    public void loadGlobalConfig() {
+    private void initGlobalConfig() {
+        global = fileHandler.initGlobalConfig();
+    }
+
+    private void loadGlobalConfig() {
         global = fileHandler.loadGlobalConfig();
     }
 

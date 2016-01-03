@@ -7,10 +7,12 @@ import org.loadui.testfx.utils.FXTestUtils;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +21,7 @@ public class WrongLastViewedTest extends UITest {
 
     @Override
     public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--testjson=true");
+        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
     }
 
     @Override
@@ -35,7 +37,7 @@ public class WrongLastViewedTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
-        RepoIO testIO = new RepoIO(true, true);
+        RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         try {
             testIO.openRepository("test2/test2").get();
         } catch (InterruptedException | ExecutionException e) {

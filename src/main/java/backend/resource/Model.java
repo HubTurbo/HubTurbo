@@ -118,8 +118,8 @@ public class Model implements IBaseModel {
         return new ArrayList<>(users);
     }
 
-    private void ______OPERATIONS_____() {
-    }
+    @SuppressWarnings("unused")
+    private void ______OPERATIONS_____() {}
 
     public Optional<TurboIssue> getIssueById(int issueId) {
         assert issueId >= 1 : "Invalid issue id " + issueId;
@@ -186,8 +186,8 @@ public class Model implements IBaseModel {
             .collect(Collectors.toList());
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______BOILERPLATE______() {}
 
     @Override
     public boolean equals(Object o) {

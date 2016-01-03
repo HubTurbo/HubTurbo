@@ -21,9 +21,10 @@ import java.util.stream.Collectors;
  */
 
 public class GUIController {
-    private PanelControl panelControl;
-    private UI ui;
-    private Label apiBox;
+
+    private final PanelControl panelControl;
+    private final UI ui;
+    private final Label apiBox;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -37,7 +38,7 @@ public class GUIController {
         registerEvents();
     }
 
-    public void registerEvents() {
+    public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
         UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);

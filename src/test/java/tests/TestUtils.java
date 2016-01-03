@@ -2,18 +2,20 @@ package tests;
 
 import backend.interfaces.IModel;
 import backend.resource.*;
-import prefs.Preferences;
+import ui.TestController;
 import ui.UI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TestUtils {
+public final class TestUtils {
 
     public static final String REPO = "test/test";
 
+    private TestUtils() {}
+
     public static IModel singletonModel(Model model) {
-        MultiModel models = new MultiModel(new Preferences(true));
+        MultiModel models = new MultiModel(TestController.createTestPreferences());
         models.queuePendingRepository(model.getRepoId());
         models.addPending(model);
         models.setDefaultRepo(model.getRepoId());

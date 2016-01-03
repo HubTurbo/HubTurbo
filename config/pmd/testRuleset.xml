@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="HubTurboTestRuleset"
+  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+  <description>
+    This is the ruleset used by HubTurbo for all tests.
+  </description>
+
+  <rule ref="rulesets/java/basic.xml" />
+  <rule ref="rulesets/java/empty.xml">
+    <!-- Checks for thrown exceptions -->
+    <exclude name="EmptyCatchBlock"/>
+  </rule>
+
+  <rule ref="rulesets/java/unnecessary.xml" />
+
+  <rule ref="rulesets/java/braces.xml" />
+
+  <rule ref="rulesets/java/strings.xml">
+    <exclude name="AvoidDuplicateLiterals"/>
+  </rule>
+
+  <rule ref="rulesets/java/design.xml">
+    <!-- Boilerplate not worth added safety -->
+    <exclude name="UseLocaleWithCaseConversions"/>
+
+    <!-- TestUtils -->
+    <exclude name="GodClass"/>
+
+    <!-- For coverage -->
+    <exclude name="EqualsNull"/>
+  </rule>
+
+  <rule ref="rulesets/java/unusedcode.xml" />
+
+  <exclude-pattern>.*/main/java/.*</exclude-pattern>
+</ruleset>

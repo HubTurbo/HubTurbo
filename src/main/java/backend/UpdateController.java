@@ -5,6 +5,8 @@ import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.apache.logging.log4j.Logger;
+
+import filter.expression.QualifierType;
 import util.Futures;
 import util.HTLog;
 
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class UpdateController {
     private static final Logger logger = HTLog.get(UpdateController.class);
 
-    private Logic logic;
+    private final Logic logic;
 
     public UpdateController(Logic logic) {
         this.logic = logic;
@@ -35,7 +37,7 @@ public class UpdateController {
         // First filter, for issues requiring a metadata update.
         Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-        if (toUpdate.size() > 0) {
+        if (!toUpdate.isEmpty()) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
             ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
             toUpdate.forEach((repoId, issues) -> {
@@ -62,7 +64,7 @@ public class UpdateController {
      */
     private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
         filterExprs.stream()
-                .flatMap(filterExpr -> Qualifier.getContentOfMetaQualifier(filterExpr, Qualifier.REPO).stream())
+                .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
                 .distinct()
                 .forEach(logic::openRepositoryFromFilter);
     }
@@ -103,9 +105,11 @@ public class UpdateController {
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
                 boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
+                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+
                 List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExpr, issue))
-                        .sorted(determineComparator(filterExpr, hasUpdatedQualifier))
+                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
                         .collect(Collectors.toList());
 
                 filteredAndSorted.put(filterExpr, filteredAndSortedIssues);
@@ -127,7 +131,7 @@ public class UpdateController {
         MultiModel models = logic.getModels();
         for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
             // Only take into account the first sort qualifier found
-            if (metaQualifier.getName().equals("sort")) {
+            if (metaQualifier.getType() == QualifierType.SORT) {
                 return metaQualifier.getCompoundSortComparator(models, hasUpdatedQualifier);
             }
         }
