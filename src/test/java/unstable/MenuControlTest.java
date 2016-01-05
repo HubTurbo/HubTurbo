@@ -61,7 +61,7 @@ public class MenuControlTest extends UITest {
         // Testing board save when no board is open because nothing has been saved
         // Expected: prompts user to save as new board
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         type("Board 1");
         push(KeyCode.ESCAPE);
         PlatformEx.waitOnFxThread();
@@ -81,7 +81,16 @@ public class MenuControlTest extends UITest {
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(2, panelControl.getPanelCount());
         assertEquals(ui.getTitle(), String.format(uiTitle, "Board 1"));
-        
+
+        // Testing board create new and cancel
+        // Expected: nothing happens
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        click("Cancel");
+        PlatformEx.waitOnFxThread();
+        assertEquals(1, panelControl.getNumberOfSavedBoards());
+        assertEquals(2, panelControl.getPanelCount());
+
         // Testing board switch keyboard shortcut when there is only one saved board
         // Expected: nothing happens
         press(SWITCH_BOARD);
@@ -92,7 +101,7 @@ public class MenuControlTest extends UITest {
         assertEquals(3, panelControl.getPanelCount());
         
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("Board 2");
         click("OK");
         PlatformEx.waitOnFxThread();
@@ -102,21 +111,21 @@ public class MenuControlTest extends UITest {
         // Testing invalid board names
         // Expected: save button disabled
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("");
         Button saveButton1 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton1.isDisabled());
         push(KeyCode.ESCAPE);
 
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("   ");
         Button saveButton2 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton2.isDisabled());
         click("Cancel");
 
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("   none  ");
         Button saveButton3 = (Button) find("#boardsavebutton");
         assertEquals(true, saveButton3.isDisabled());
@@ -129,7 +138,7 @@ public class MenuControlTest extends UITest {
 
         // Testing board open
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
         push(KeyCode.ENTER); // Opening Board "2"
         PlatformEx.waitOnFxThread();
@@ -150,14 +159,31 @@ public class MenuControlTest extends UITest {
         // Testing board save
         press(CLOSE_PANEL);
         click("Boards");
-        push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(2, panelControl.getNumberOfSavedBoards());
-        
+
+        // Testing board create new and confirm
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        click("OK");
+        assertEquals(0, panelControl.getPanelCount());
+        ((TextField) find("#boardnameinput")).setText("empty");
+        push(KeyCode.ENTER);
+        assertEquals(0, panelControl.getPanelCount());
+        assertEquals(ui.getTitle(), String.format(uiTitle, "empty"));
+        assertEquals(3, panelControl.getNumberOfSavedBoards());
+        click("Boards");
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.DOWN);
+        push(KeyCode.ENTER); // Deleting current board (empty): no board is set as open
+        click("OK");
+
         // Testing board delete
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.RIGHT);
         push(KeyCode.DOWN);
         push(KeyCode.ENTER); // Deleting current board (Board 1): no board is set as open
@@ -174,7 +200,7 @@ public class MenuControlTest extends UITest {
         // Testing board save when no board is open because current board was closed
         // Expected: prompts user to save as new board
         click("Boards");
-        push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
         ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
         PlatformEx.waitOnFxThread();
