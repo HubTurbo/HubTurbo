@@ -54,6 +54,8 @@ allprojects {
 
         junitVersion = '4.12'
         testFxVersion = '3.1.0'
+        mockitoVersion = '1+'
+        mockServerVersion = '3.10.1'
     }
 
     dependencies {
@@ -72,11 +74,13 @@ allprojects {
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
-        testCompile "org.mockito:mockito-core:1.+"
+        testCompile "org.mockito:mockito-core:$mockitoVersion"
+        testCompile group: "org.mock-server", name: "mockserver-netty", version: "$mockServerVersion"
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 
     test {
+        systemProperty "logback.configurationFile", "${projectDir}/config/mockserver/mockserver.xml"
         forkEvery = 1
         if (System.env.'CI') {
             exclude 'unstable'

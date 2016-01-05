@@ -1,5 +1,17 @@
 package github;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.io.input.NullInputStream;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import util.HTLog;
+import util.IOUtilities;
+import util.Utility;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,28 +20,21 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.Map;
 
-import org.apache.commons.io.input.NullInputStream;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-
-import util.HTLog;
-import util.IOUtilities;
-import util.Utility;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 public class GitHubClientEx extends GitHubClient {
     private static final Logger logger = HTLog.get(GitHubClientEx.class);
 
-    public static final int NO_UPDATE_RESPONSE_CODE = 304;
     protected static final int CONNECTION_TIMEOUT = 30000;
 
     // Request method for HEAD API call
     protected static final String METHOD_HEAD = "HEAD";
+
+    public GitHubClientEx() {
+        super();
+    }
+
+    public GitHubClientEx(String hostname, int port, String scheme) {
+        super(hostname, port, scheme);
+    }
 
     /**
      * Extends superclass method with connection timeout parameters.
@@ -40,17 +45,6 @@ public class GitHubClientEx extends GitHubClient {
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
         return connection;
-    }
-
-    /**
-     * Utility method for creating a connection from a GitHubRequest.
-     *
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    public HttpURLConnection createConnection(GitHubRequest request) throws IOException {
-        return createGet(request.generateUri());
     }
 
     /**
@@ -181,13 +175,13 @@ public class GitHubClientEx extends GitHubClient {
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
         }
         logger.info(String.format("Requesting: %s %s",
-                        httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
+                    httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
 
         final int code = httpRequest.getResponseCode();
         updateRateLimits(httpRequest);
 
         logger.info(String.format("%s responded with %d %s",
-                        httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
+                    httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
         if (isOk(code) || code == HttpURLConnection.HTTP_NOT_MODIFIED || isEmpty(code)) {
             return new ImmutablePair<>(httpRequest, new GitHubResponse(httpRequest, null));
         }
