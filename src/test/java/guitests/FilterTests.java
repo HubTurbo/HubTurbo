@@ -76,18 +76,10 @@ public class FilterTests extends UITest{
 
         assertEquals(7, issuePanel.getIssueCount());
 
-        // if the count is greater than the number of issues, all the issues are shown in the list view
+        // Checking 10 issues shown for count:10
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
-        type("count:15");
-        push(KeyCode.ENTER);
-
-        assertEquals(10, issuePanel.getIssueCount());
-
-        // Checking for negative number
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("count:-1");
+        type("count:10");
         push(KeyCode.ENTER);
 
         assertEquals(10, issuePanel.getIssueCount());
@@ -100,15 +92,23 @@ public class FilterTests extends UITest{
 
         assertEquals(0, issuePanel.getIssueCount());
 
-        //first count qualifier chosen
+        // if the count is greater than the number of issues, all the issues are shown in the list view
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:15");
+        push(KeyCode.ENTER);
+
+        assertEquals(10, issuePanel.getIssueCount());
+
+        //multiple count qualifiers
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("count:6 count:9");
         push(KeyCode.ENTER);
 
-        assertEquals(6, issuePanel.getIssueCount());
+        assertEquals(10, issuePanel.getIssueCount());
 
-        // Not-a-number returns the whole list
+        // Not-a-number
 
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
@@ -116,26 +116,6 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(10, issuePanel.getIssueCount());
-
-        // Not-a-number returns the whole list
-
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("count:abcd");
-        push(KeyCode.ENTER);
-
-        assertEquals(10, issuePanel.getIssueCount());
-
-        // Return the value from the first valid count qualifier
-
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("count:abcd count:8 count:2");
-        push(KeyCode.ENTER);
-
-        assertEquals(8, issuePanel.getIssueCount());
-        assertEquals("Issue 10", issuePanel.getIssueList().get(0).getTitle());
-        assertEquals("Issue 9", issuePanel.getIssueList().get(1).getTitle());
 
         // Test with sort qualifier as the second qualifier
 
@@ -157,6 +137,14 @@ public class FilterTests extends UITest{
         assertEquals(8, issuePanel.getIssueCount());
         assertEquals("Issue 1", issuePanel.getIssueList().get(0).getTitle());
         assertEquals("Issue 2", issuePanel.getIssueList().get(1).getTitle());
+
+        // Checking for negative number
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:-1");
+        push(KeyCode.ENTER);
+
+        assertEquals(10, issuePanel.getIssueCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,

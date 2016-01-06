@@ -4,6 +4,7 @@ import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import org.apache.http.ParseException;
 import org.apache.logging.log4j.Logger;
 
 import filter.expression.QualifierType;
@@ -110,7 +111,7 @@ public class UpdateController {
                 List<TurboIssue> filteredSortedAndCountedIssues = allModelIssues.stream()
                         .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
                         .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                        .limit(determineCount(allModelIssues, filterExprNoAlias))
+                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
                         .collect(Collectors.toList());
 
                 filteredSortedAndCounted.put(filterExpr, filteredSortedAndCountedIssues);
@@ -123,7 +124,7 @@ public class UpdateController {
     /**
      * Produces a suitable comparator based on the given filter expression.
      *
-     * @param filterExpr The given filter expression.
+     * @param filterExpr          The given filter expression.
      * @param hasUpdatedQualifier Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The comparator to use.
      */
@@ -144,21 +145,5 @@ public class UpdateController {
 
         // No sort or updated, return sort by descending ID, which is the default.
         return Qualifier.getSortComparator(models, "id", true, false);
-    }
-
-    /**
-     * Determines the count value to be taken from the first valid count qualifier.
-     *
-     * @param issueList Issue list obtained after filtering and sorting.
-     * @param filterExpr The filter expression of the particular panel.
-     * @return The count value in the qualifier
-     */
-    private int determineCount(List<TurboIssue> issueList, FilterExpression filterExpr){
-        for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
-            if (metaQualifier.getType() == QualifierType.COUNT && metaQualifier.getNumber().isPresent()) {
-                return metaQualifier.getNumber().get();
-            }
-        }
-        return issueList.size();
     }
 }

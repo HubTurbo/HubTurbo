@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import backend.resource.*;
+import filter.ParseException;
 import util.Utility;
 import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
@@ -1028,5 +1029,28 @@ public class Qualifier implements FilterExpression {
 
             return aDueDate.compareTo(bDueDate);
         };
+    }
+
+    /**
+     * Determines the count value to be taken from the count qualifier. Throw a ParseException if count
+     * qualifier is not valid.
+     *
+     * @param issueList Issue list obtained after filtering and sorting.
+     * @param filterExpr The filter expression of the particular panel.
+     * @return The valid count value in the qualifier or the issueList.size() by default
+     */
+    public static int determineCount(List<TurboIssue> issueList, FilterExpression filterExpr) {
+        List<Qualifier> countQualifiers = filterExpr.find(Qualifier::isMetaQualifier).stream()
+                .filter(q -> q.getType() == QualifierType.COUNT)
+                .collect(Collectors.toList());
+        if (countQualifiers.isEmpty()) {
+            return issueList.size();
+        } else if (countQualifiers.size() > 1) {
+            throw new ParseException("More than one count qualifier");
+        } else if (!countQualifiers.get(0).getNumber().isPresent()) {
+            throw new ParseException("Count qualifier should be a number greater than or equal to 0");
+        } else {
+            return countQualifiers.get(0).getNumber().get();
+        }
     }
 }
