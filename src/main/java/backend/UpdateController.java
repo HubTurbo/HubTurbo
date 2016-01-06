@@ -91,7 +91,7 @@ public class UpdateController {
      * Filters and sorts issues within the model according to the given filter expressions.
      *
      * @param filterExprs Filter expressions to process.
-     * @return Filter expressions and their corresponding issues after filtering and sorting.
+     * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
     private Map<FilterExpression, List<TurboIssue>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
@@ -147,7 +147,7 @@ public class UpdateController {
     }
 
     /**
-     * Applies the count qualifier to the set of issues obtained after the sorting order is applied.
+     * Determines the count value to be taken from the first valid count qualifier.
      *
      * @param issueList Issue list obtained after filtering and sorting.
      * @param filterExpr The filter expression of the particular panel.

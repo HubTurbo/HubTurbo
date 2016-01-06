@@ -68,14 +68,6 @@ public class FilterTests extends UITest{
     public void countFilterTest(){
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
-        // Checking 2 issues show for count:2
-        click("#dummy/dummy_col0_filterTextField");
-        selectAll();
-        type("count:2");
-        push(KeyCode.ENTER);
-
-        assertEquals(2, issuePanel.getIssueCount());
-
         // Checking 7 issues shown for count:7
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
@@ -88,6 +80,14 @@ public class FilterTests extends UITest{
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("count:15");
+        push(KeyCode.ENTER);
+
+        assertEquals(10, issuePanel.getIssueCount());
+
+        // Checking for negative number
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("count:-1");
         push(KeyCode.ENTER);
 
         assertEquals(10, issuePanel.getIssueCount());
@@ -130,18 +130,28 @@ public class FilterTests extends UITest{
 
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
-        type("count:abc count:8 count:2");
+        type("count:abcd count:8 count:2");
         push(KeyCode.ENTER);
 
         assertEquals(8, issuePanel.getIssueCount());
         assertEquals("Issue 10", issuePanel.getIssueList().get(0).getTitle());
         assertEquals("Issue 9", issuePanel.getIssueList().get(1).getTitle());
 
-        // Test with sort qualifier
+        // Test with sort qualifier as the second qualifier
 
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
-        type("count:8 count:2 sort:unmerged");
+        type("count:8 sort:unmerged");
+        push(KeyCode.ENTER);
+
+        assertEquals(8, issuePanel.getIssueCount());
+        assertEquals("Issue 1", issuePanel.getIssueList().get(0).getTitle());
+        assertEquals("Issue 2", issuePanel.getIssueList().get(1).getTitle());
+
+        // Test with sort qualifier as the first qualifier
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("sort:unmerged count:8");
         push(KeyCode.ENTER);
 
         assertEquals(8, issuePanel.getIssueCount());
