@@ -110,6 +110,7 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`updated`](#updated)
 - [`repo`](#repo)
 - [`sort`](#sort)
+- [`count`](#count)
 
 #### Formats
 
@@ -255,6 +256,12 @@ Matches issues of the given repository. If omitted, will match issues of the def
 *Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`.*
 
 Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
+
+### count
+
+*Expects a number*
+
+The maximum number of issues that can be displayed in a panel. For example, `count:4` would display a maximum of 4 issues in the panel.
 
 Available sorting criteria:
 
