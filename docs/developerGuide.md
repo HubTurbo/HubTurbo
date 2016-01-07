@@ -1,6 +1,5 @@
 # Developer Guide
 
-- [Vision](vision.md)
 - [Setting Up](settingUp.md)
 - [Development Process](process.md)
 - [Workflow](workflow.md)
