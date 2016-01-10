@@ -1,6 +1,5 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import filter.expression.QualifierType;
@@ -25,13 +24,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 public class PanelControl extends HBox {
 
     private final UI ui;
     private final Preferences prefs;
     private ScrollPane panelsScrollPane;
-    private IModel model;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
@@ -60,10 +57,6 @@ public class PanelControl extends HBox {
         this.panelsScrollPane = panelsScrollPane;
         restorePanels();
         selectFirstPanel();
-    }
-
-    public void updateModel(IModel newModel) {
-        model = newModel;
     }
 
     public void saveSession() {
@@ -115,7 +108,7 @@ public class PanelControl extends HBox {
     }
 
     public FilterPanel addPanelAt(int index) {
-        FilterPanel panel = new ListPanel(ui, model, this, index);
+        FilterPanel panel = new ListPanel(ui, guiController, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.

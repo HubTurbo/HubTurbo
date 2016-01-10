@@ -1,10 +1,8 @@
 package ui;
 
-import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
@@ -25,6 +23,7 @@ public class GUIController {
     private final PanelControl panelControl;
     private final UI ui;
     private final Label apiBox;
+    private String defaultRepoId;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -59,7 +58,7 @@ public class GUIController {
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        panelControl.updateModel(e.model); // Updates model, to be used to display issue labels.
+        defaultRepoId = e.defaultRepoId;
 
         panelControl.getChildren().stream()
                 .filter(child -> child instanceof FilterPanel)
@@ -107,5 +106,9 @@ public class GUIController {
 
     private void showErrorDialog(ShowErrorDialogEvent e) {
         Platform.runLater(() -> DialogMessage.showErrorDialog(e.header, e.message));
+    }
+
+    public String getDefaultRepo() {
+        return defaultRepoId;
     }
 }

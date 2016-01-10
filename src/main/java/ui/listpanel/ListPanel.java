@@ -15,6 +15,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
+import ui.GUIController;
 import ui.GUIElement;
 import ui.UI;
 import ui.components.IssueListView;
@@ -25,14 +26,13 @@ import util.GithubPageElements;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
-import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
 public class ListPanel extends FilterPanel {
 
-    private final IModel model;
     private final UI ui;
+    private final GUIController guiController;
     private int issueCount;
 
     private final IssueListView listView;
@@ -49,10 +49,10 @@ public class ListPanel extends FilterPanel {
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
 
-    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
-        super(ui, model, parentPanelControl, panelIndex);
-        this.model = model;
+    public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        super(ui, guiController, parentPanelControl, panelIndex);
         this.ui = ui;
+        this.guiController = guiController;
 
         listView = new IssueListView();
         setupListView();
@@ -121,7 +121,7 @@ public class ListPanel extends FilterPanel {
         issueCount = getElementsList().size();
 
         listView.restoreSelection();
-        this.setId(model.getDefaultRepo() + "_col" + panelIndex);
+        this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
     }
 
     private void setupListView() {

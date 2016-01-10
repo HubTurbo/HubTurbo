@@ -1,13 +1,12 @@
 package ui.components;
+
 import static ui.issuepanel.AbstractPanel.PANEL_WIDTH;
 import static ui.issuepanel.AbstractPanel.OCTICON_TICK_MARK;
 import static ui.issuepanel.AbstractPanel.OCTICON_UNDO;
 import static ui.issuepanel.AbstractPanel.OCTICON_RENAME_PANEL;
 import static ui.issuepanel.AbstractPanel.OCTICON_CLOSE_PANEL;
-import backend.interfaces.IModel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
@@ -16,9 +15,9 @@ import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import ui.GUIController;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
-import ui.issuepanel.PanelControl;
 import util.events.ShowRenamePanelEvent;
 
 /**
@@ -37,7 +36,7 @@ public class PanelMenuBar extends HBox {
     private HBox nameBox;
     private Label renameButton;
     private final FilterPanel panel;
-    private final IModel model;
+    private final GUIController guiController;
     private Label closeButton;
     private final UI ui;
     private String panelName = "Panel";
@@ -48,9 +47,9 @@ public class PanelMenuBar extends HBox {
     public static final int NAME_AREA_EDIT_WIDTH = PANEL_WIDTH - 65; //width in the panel rename edit mode
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
-    public PanelMenuBar(FilterPanel panel, IModel model, UI ui){
-        this.model = model;
+    public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui){
         this.ui = ui;
+        this.guiController = guiController;
         this.panel = panel;
         this.setSpacing(2);
         this.setMinWidth(PANEL_WIDTH);
@@ -70,7 +69,7 @@ public class PanelMenuBar extends HBox {
         HBox nameArea = new HBox();
 
         nameText = new Text(panelName);
-        nameText.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_nameText");
+        nameText.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_nameText");
         nameText.setWrappingWidth(NAME_DISPLAY_WIDTH);
 
         nameBox = new HBox();
@@ -92,7 +91,7 @@ public class PanelMenuBar extends HBox {
         HBox renameBox = new HBox();
         renameButton = new Label(OCTICON_RENAME_PANEL);
         renameButton.getStyleClass().addAll("octicon", "label-button");
-        renameButton.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
+        renameButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
@@ -113,7 +112,7 @@ public class PanelMenuBar extends HBox {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         closeButton = new Label(OCTICON_CLOSE_PANEL);
-        closeButton.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_closeButton");
+        closeButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_closeButton");
         closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
@@ -131,7 +130,7 @@ public class PanelMenuBar extends HBox {
 
         Label buttonType = new Label(octString);
         buttonType.getStyleClass().addAll("octicon", "issue-event-icon");
-        buttonType.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_" + cssName);
+        buttonType.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_" + cssName);
         buttonType.getStyleClass().add("label-button");
         buttonArea.getChildren().add(buttonType);
 
@@ -143,7 +142,7 @@ public class PanelMenuBar extends HBox {
      */
     public void initRenameableTextFieldAndEvents() {
         renameableTextField = new TextField();
-        renameableTextField.setId(model.getDefaultRepo() + "_col" + panel.panelIndex + "_renameTextField");
+        renameableTextField.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameTextField");
         Platform.runLater(() -> {
             renameableTextField.requestFocus();
             renameableTextField.selectAll();
