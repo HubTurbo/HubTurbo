@@ -95,11 +95,13 @@ public class FilterTextField extends TextField {
 
     /**
      * Completion is only started when there's effectively nothing (only whitespace)
-     * after the caret.
+     * after the caret, or if there is selected text (indicating either that we are in
+     * the midst of completion, or that the user does not want the selected text and is
+     * typing to replace it)
      * @return true if completion should be started
      */
     private boolean shouldStartCompletion() {
-        return getCharAfterCaret().trim().isEmpty();
+        return getCharAfterCaret().trim().isEmpty() || !getSelectedText().isEmpty();
     }
 
     /**
