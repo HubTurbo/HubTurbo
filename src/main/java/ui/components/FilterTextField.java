@@ -68,9 +68,6 @@ public class FilterTextField extends TextField {
                 if (shouldTriggerCompletion) {
                     performCompletion(e);
                 }
-            } else if (typed == ' ' && (getText().isEmpty() || getText().endsWith(" "))) {
-                // Prevent consecutive spaces
-                e.consume();
             }
         });
         setOnKeyPressed(e -> {
