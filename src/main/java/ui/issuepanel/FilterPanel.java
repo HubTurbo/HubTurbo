@@ -107,7 +107,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
         // Update keywords
         List<String> all = new ArrayList<>(QualifierType.getCompletionKeywords());
-        all.addAll(e.model.getUsers().stream()
+        all.addAll(e.users.stream()
             .map(TurboUser::getLoginName)
             .collect(Collectors.toList()));
 
