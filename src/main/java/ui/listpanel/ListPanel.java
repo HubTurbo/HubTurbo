@@ -15,6 +15,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
+import ui.GUIElement;
 import ui.UI;
 import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
@@ -84,7 +85,8 @@ public class ListPanel extends FilterPanel {
      */
     private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
         HashSet<Integer> result = new HashSet<>();
-        for (TurboIssue issue : getIssueList()) {
+        for (GUIElement guiElement : getElementsList()) {
+            TurboIssue issue = guiElement.getIssue();
             if (issueCommentCounts.containsKey(issue.getId())) {
                 // We know about this issue; check if it's been updated
                 if (issueHasNewComments(issue, hasMetadata)) {
@@ -109,14 +111,14 @@ public class ListPanel extends FilterPanel {
                 = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
 
         // Set the cell factory every time - this forces the list view to update
-        listView.setCellFactory(list -> new ListPanelCell(model, this, panelIndex, issuesWithNewComments));
+        listView.setCellFactory(list -> new ListPanelCell(this, panelIndex, issuesWithNewComments));
         listView.saveSelection();
 
         // Supposedly this also causes the list view to update - not sure
         // if it actually does on platforms other than Linux...
         listView.setItems(null);
-        listView.setItems(getIssueList());
-        issueCount = getIssueList().size();
+        listView.setItems(getElementsList());
+        issueCount = getElementsList().size();
 
         listView.restoreSelection();
         this.setId(model.getDefaultRepo() + "_col" + panelIndex);
@@ -130,7 +132,7 @@ public class ListPanel extends FilterPanel {
         listView.setOnItemSelected(i -> {
             updateContextMenu(contextMenu);
 
-            TurboIssue issue = listView.getItems().get(i);
+            TurboIssue issue = listView.getItems().get(i).getIssue();
             ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
             );
@@ -261,9 +263,9 @@ public class ListPanel extends FilterPanel {
 
     private void showRelatedIssueOrPR() {
         if (!listView.getSelectedItem().isPresent()) return;
-        TurboIssue issue = listView.getSelectedItem().get();
-        Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().isPullRequest()
-            ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getDescription())
+        TurboIssue issue = listView.getSelectedItem().get().getIssue();
+        Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().getIssue().isPullRequest()
+            ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getIssue().getDescription())
             : ui.getBrowserComponent().getPRNumberFromIssue();
         if (!relatedIssueNumber.isPresent()) return;
         ui.triggerEvent(
@@ -306,7 +308,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GUIElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             changeLabelsMenuItem.setDisable(false);
         } else {
@@ -317,10 +319,10 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateMarkAsReadUnreadMenuItem() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GUIElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             markAsReadUnreadMenuItem.setDisable(false);
-            TurboIssue selectedIssue = item.get();
+            TurboIssue selectedIssue = item.get().getIssue();
 
             if (selectedIssue.isCurrentlyRead()) {
                 markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
@@ -338,16 +340,16 @@ public class ListPanel extends FilterPanel {
         return issueCount;
     }
 
-    public Optional<TurboIssue> getSelectedIssue() {
+    public Optional<GUIElement> getSelectedElement() {
         return listView.getSelectedItem();
     }
 
     /* Methods that perform user's actions under the context of this ListPanel */
 
     private void markAsRead() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GUIElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
-            TurboIssue issue = item.get();
+            TurboIssue issue = item.get().getIssue();
             issue.markAsRead(UI.prefs);
 
             parentPanelControl.refresh();
@@ -356,9 +358,9 @@ public class ListPanel extends FilterPanel {
     }
 
     private void markAsUnread() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GUIElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
-            TurboIssue issue = item.get();
+            TurboIssue issue = item.get().getIssue();
             issue.markAsUnread(ui.prefs);
 
             parentPanelControl.refresh();
@@ -366,8 +368,8 @@ public class ListPanel extends FilterPanel {
     }
 
     private void changeLabels() {
-        if (getSelectedIssue().isPresent()) {
-            ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue().get()));
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowLabelPickerEvent(getSelectedElement().get().getIssue()));
         }
     }
 }

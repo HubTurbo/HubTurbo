@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import ui.GUIElement;
 import util.Utility;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
@@ -137,7 +138,7 @@ public class TurboIssueEvent {
         return text;
     }
 
-    public Node display(Model model, TurboIssue issue) {
+    public Node display(GUIElement guiElement, TurboIssue issue) {
         String actorName = getActor().getLogin();
         String time = new PrettyTime().format(getDate());
 
@@ -167,7 +168,7 @@ public class TurboIssueEvent {
                 return display;
             }
             case Labeled: {
-                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
+                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
@@ -180,7 +181,7 @@ public class TurboIssueEvent {
                 return display;
             }
             case Unlabeled: {
-                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
+                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
@@ -267,12 +268,11 @@ public class TurboIssueEvent {
 
     /**
      * Create a list of JavaFX nodes to display label update events
-     * @param model
      * @param labelUpdateEvents
      * @return list of Node corresponding to groups of label update events
      */
     public static List<Node> createLabelUpdateEventNodes(
-            Model model, List<TurboIssueEvent> labelUpdateEvents) {
+            GUIElement guiElement, List<TurboIssueEvent> labelUpdateEvents) {
 
         assert labelUpdateEvents != null : "Error: Received null list of events";
 
@@ -292,7 +292,7 @@ public class TurboIssueEvent {
                     new Text(String.format("%s :", actorName)));
 
             group.forEach(e -> {
-                Node node = createLabelNode(model, e);
+                Node node = createLabelNode(guiElement, e);
                 box.getChildren().add(node);
             });
 
@@ -304,8 +304,8 @@ public class TurboIssueEvent {
         return result;
     }
 
-    private static Node createLabelNode(Model model, TurboIssueEvent e) {
-        Optional<TurboLabel> label = model.getLabelByActualName(e.getLabelName());
+    private static Node createLabelNode(GUIElement guiElement, TurboIssueEvent e) {
+        Optional<TurboLabel> label = guiElement.getLabelByActualName(e.getLabelName());
 
         Node node = label.isPresent() ?
                     label.get().getNode() : new Label(e.getLabelName());

@@ -1,30 +1,26 @@
 package ui.listpanel;
 
-import backend.interfaces.IModel;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import org.apache.logging.log4j.Logger;
+import ui.GUIElement;
 import util.HTLog;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-public class ListPanelCell extends ListCell<TurboIssue> {
+public class ListPanelCell extends ListCell<GUIElement> {
     private static final Logger logger = HTLog.get(ListPanelCell.class);
 
-    private final IModel model;
     private final int parentPanelIndex;
     private final ListPanel parent;
     private final HashSet<Integer> issuesWithNewComments;
-    private TurboIssue issue;
+    private GUIElement guiElement;
 
-    public ListPanelCell(IModel model, ListPanel parent,
+    public ListPanelCell(ListPanel parent,
                          int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
         super();
-        this.model = model;
         this.parent = parent;
         this.parentPanelIndex = parentPanelIndex;
         this.issuesWithNewComments = issuesWithNewComments;
@@ -33,22 +29,16 @@ public class ListPanelCell extends ListCell<TurboIssue> {
     }
 
     @Override
-    public void updateItem(TurboIssue issue, boolean empty) {
-        super.updateItem(issue, empty);
-        if (issue == null) {
+    public void updateItem(GUIElement guiElement, boolean empty) {
+        super.updateItem(guiElement, empty);
+        if (guiElement == null) {
             return;
         }
+        this.guiElement = guiElement;
+        TurboIssue issue = guiElement.getIssue();
         updateStyleToMatchStatus(issue);
-        this.issue = issue;
-        Optional<Model> currentModel = model.getModelById(issue.getRepoId());
-        if (!currentModel.isPresent()) {
-            // TODO: see issue #1089
-            logger.error("Model is not present for issue " + issue.getId() + " at " + issue.getRepoId());
-            setGraphic(getGraphic());
-            return;
-        }
 
-        setGraphic(new ListPanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
+        setGraphic(new ListPanelCard(guiElement, parent, issuesWithNewComments));
         this.setId(issue.getRepoId() + "_col" + parentPanelIndex + "_" + issue.getId());
     }
 
@@ -67,11 +57,11 @@ public class ListPanelCell extends ListCell<TurboIssue> {
     }
 
     public List<String> getIssueLabels() {
-        return issue.getLabels();
+        return guiElement.getIssue().getLabels();
     }
 
     public TurboIssue getIssue() {
-        return issue;
+        return guiElement.getIssue();
     }
 
 }

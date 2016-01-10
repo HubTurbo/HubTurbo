@@ -7,9 +7,9 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
+import ui.GUIElement;
 import ui.components.PanelMenuBar;
 import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private ObservableList<TurboIssue> issuesToDisplay = null;
+    private ObservableList<GUIElement> elementsToDisplay = null;
 
     public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
@@ -218,8 +218,8 @@ public abstract class FilterPanel extends AbstractPanel {
         return new PanelInfo(this.panelMenuBar.getPanelName(), filterTextField.getText());
     }
 
-    public ObservableList<TurboIssue> getIssueList() {
-        return issuesToDisplay;
+    public ObservableList<GUIElement> getElementsList() {
+        return elementsToDisplay;
     }
 
     public Text getNameText() {
@@ -238,12 +238,12 @@ public abstract class FilterPanel extends AbstractPanel {
         return this.panelMenuBar.getCloseButton();
     }
 
-    public void setIssueList(List<TurboIssue> transformedIssueList) {
-        this.issuesToDisplay = FXCollections.observableArrayList(transformedIssueList);
+    public void setElementsList(List<GUIElement> transformedElementList) {
+        this.elementsToDisplay = FXCollections.observableArrayList(transformedElementList);
     }
 
-    public void updatePanel(List<TurboIssue> filteredAndSortedIssues) {
-        setIssueList(filteredAndSortedIssues);
+    public void updatePanel(List<GUIElement> filteredAndSortedElements) {
+        setElementsList(filteredAndSortedElements);
         refreshItems();
     }
 
