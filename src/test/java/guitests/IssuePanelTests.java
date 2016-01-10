@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
@@ -22,6 +23,7 @@ import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
 import tests.TurboIssueEventTests;
+import ui.GUIElement;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
@@ -46,23 +48,27 @@ public class IssuePanelTests extends UITest {
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
-        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
-        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(3, issuePanel.getSelectedElement().get().getIssue().getId());
         sleep(EVENT_DELAY);
         UI.events.triggerEvent(UpdateDummyRepoEvent.updateIssue("dummy/dummy", 3, "updated issue"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
-        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
-        assertEquals(3, issuePanel.getSelectedIssue().get().getId());
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(3, issuePanel.getSelectedElement().get().getIssue().getId());
     }
 
     @Test
     public void testCreateLabelUpdateEventNodesForNoEvent() {
-        Model sampleModel = new Model("test/test", null, null, null, null);
+        GUIElement guiElement = new GUIElement(
+                new TurboIssue("test/test", 1, "Test issue"),
+                new ArrayList<>(),
+                Optional.empty(),
+                Optional.empty());
 
         assertEquals(0,
                 TurboIssueEvent.createLabelUpdateEventNodes(
-                        sampleModel, new ArrayList<TurboIssueEvent>()).size());
+                        guiElement, new ArrayList<>()).size());
     }
 
     @Test
@@ -81,27 +87,34 @@ public class IssuePanelTests extends UITest {
         labels.add(new TurboLabel("test/test", "B2"));
         labels.add(new TurboLabel("test/test", "C1"));
         labels.add(new TurboLabel("test/test", "D1"));
-        Model sampleModel = new Model("test/test", null, labels, null, null);
+        GUIElement guiElement = new GUIElement(
+                new TurboIssue("test/test", 1, "Test issue"),
+                labels,
+                Optional.empty(),
+                Optional.empty());
 
         List<TurboIssueEvent> events =
                 new ArrayList<>(new TurboIssueEventTests().sampleEvents);
-        List<Node> nodes = TurboIssueEvent.createLabelUpdateEventNodes(sampleModel, events);
+        List<Node> nodes = TurboIssueEvent.createLabelUpdateEventNodes(guiElement, events);
 
-        assertEquals(5, TurboIssueEvent.createLabelUpdateEventNodes(sampleModel, events).size());
+        assertEquals(5, TurboIssueEvent.createLabelUpdateEventNodes(guiElement, events).size());
         assertEquals(5, ((HBox) nodes.get(0)).getChildren().size());
         assertEquals(5, ((HBox) nodes.get(1)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(2)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(3)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(4)).getChildren().size());
         assertEquals(5, ((VBox) layoutMethod.invoke(null,
-                                    sampleModel, new TurboIssue("test/test", 1, "issue"),
+                                    guiElement, new TurboIssue("test/test", 1, "issue"),
                                     events, new ArrayList<Comment>())).getChildren().size());
     }
 
     @Test
     public void testCreateLabelUpdateEventNodesForNonExistentLabel() {
-        List<TurboLabel> labels = new ArrayList<>();
-        Model sampleModel = new Model("test/test", null, labels, null, null);
+        GUIElement guiElement = new GUIElement(
+                new TurboIssue("test/test", 1, "Test issue"),
+                new ArrayList<>(),
+                Optional.empty(),
+                Optional.empty());
 
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(
@@ -112,6 +125,6 @@ public class IssuePanelTests extends UITest {
 
         assertEquals(1,
                 TurboIssueEvent.createLabelUpdateEventNodes(
-                        sampleModel, events).size());
+                        guiElement, events).size());
     }
 }

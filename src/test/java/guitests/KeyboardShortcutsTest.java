@@ -5,8 +5,6 @@ import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
 
-import org.loadui.testfx.utils.TestUtils;
-import ui.TestController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
@@ -195,21 +193,21 @@ public class KeyboardShortcutsTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals(issueIdExpected, selectedIssueId);
         push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
-        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
-        assertEquals(true, issuePanel.getSelectedIssue().get().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         
         // mark as read an issue at the bottom
         push(KeyCode.END);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at bottom issue
         assertEquals(1, selectedIssueId);
-        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
-        assertEquals(true, issuePanel.getSelectedIssue().get().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         
         // mark as unread
         push(getKeyCode("MARK_AS_UNREAD"));
-        assertEquals(true, issuePanel.getSelectedIssue().isPresent());
-        assertEquals(false, issuePanel.getSelectedIssue().get().isCurrentlyRead());
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
         // testing corner case for mark as read where there is only one issue displayed

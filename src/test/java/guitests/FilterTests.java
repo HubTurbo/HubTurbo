@@ -72,7 +72,7 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(1, issuePanel.getIssueCount());
-        assertTrue(issuePanel.getIssueList().get(0).getMilestone().isPresent());
-        assertEquals(Optional.of(milestoneNumber), issuePanel.getIssueList().get(0).getMilestone());
+        assertTrue(issuePanel.getElementsList().get(0).getIssue().getMilestone().isPresent());
+        assertEquals(Optional.of(milestoneNumber), issuePanel.getElementsList().get(0).getIssue().getMilestone());
     }
 }
