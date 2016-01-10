@@ -2,9 +2,11 @@ package backend;
 
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import backend.resource.TurboUser;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import ui.GUIElement;
 import ui.UI;
 import util.events.ModelUpdatedEvent;
 import util.events.UpdateRateLimitsEvent;
@@ -22,14 +24,15 @@ public class UIManager {
         this.ui = ui;
     }
 
-    public void update(MultiModel models,
-                       Map<FilterExpression, List<TurboIssue>> issuesToShow) {
+    public void update(Map<FilterExpression, List<GUIElement>> elementsToShow,
+                       List<TurboUser> users,
+                       String defaultRepoId) {
         Platform.runLater(() ->
-                ui.triggerEvent(new ModelUpdatedEvent(models, issuesToShow)));
+                ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users, defaultRepoId)));
     }
 
-    public void updateEmpty(MultiModel models) {
-        ui.triggerEvent(new ModelUpdatedEvent(models, new HashMap<>()));
+    public void updateEmpty() {
+        ui.triggerEvent(new ModelUpdatedEvent(new HashMap<>(), new ArrayList<>(), null));
     }
 
     public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {

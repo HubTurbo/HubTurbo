@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.TestController;
+import ui.GUIElement;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
@@ -47,7 +48,7 @@ public class Logic {
         UI.events.registerEvent((ClearLogicModelEventHandler) this::onLogicModelClear);
 
         // Pass the currently-empty model to the UI
-        uiManager.updateEmpty(models);
+        uiManager.updateEmpty();
     }
 
     private void onLogicModelClear(ClearLogicModelEvent e) {
@@ -274,8 +275,8 @@ public class Logic {
     /**
      * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
      */
-    public void updateUI(Map<FilterExpression, List<TurboIssue>> issuesToShow) {
-        uiManager.update(models, issuesToShow);
+    public void updateUI(Map<FilterExpression, List<GUIElement>> elementsToShow) {
+        uiManager.update(elementsToShow, models.getUsers(), models.getDefaultRepo());
     }
 
     /**
