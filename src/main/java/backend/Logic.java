@@ -219,7 +219,7 @@ public class Logic {
      * and then sends the data to the GUI.
      */
     private void refreshUI() {
-        updateController.filterSortRefresh(getAllUIFilters());
+        updateController.processAndRefresh(getAllUIFilters());
     }
 
     /**
@@ -230,7 +230,7 @@ public class Logic {
     public void refreshPanel(FilterExpression filterExpr) {
         List<FilterExpression> panelExpr = new ArrayList<>();
         panelExpr.add(filterExpr);
-        updateController.filterSortRefresh(panelExpr);
+        updateController.processAndRefresh(panelExpr);
     }
 
     /**

@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
  *
- * The central logic is contained in filterSortRefresh, while the remaining methods are auxiliary methods to be
- * called by filterSortRefresh.
+ * The central logic is contained in processAndRefresh, while the remaining methods are auxiliary methods to be
+ * called by processAndRefresh.
  */
 public class UpdateController {
     private static final Logger logger = HTLog.get(UpdateController.class);
@@ -40,7 +40,7 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process
      */
-    public void filterSortRefresh(List<FilterExpression> filterExprs) {
+    public void processAndRefresh(List<FilterExpression> filterExprs) {
         // Open specified repos
         openRepositoriesInFilters(filterExprs);
 
@@ -58,10 +58,10 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(filterAndSort(filterExprs))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
         } else {
             // If no issues requiring metadata update, just run the filter and sort.
-            logic.updateUI(filterAndSort(filterExprs));
+            logic.updateUI(processFilter(filterExprs));
         }
     }
 
@@ -96,39 +96,41 @@ public class UpdateController {
     }
 
     /**
-     * Filters and sorts issues within the model according to the given filter expressions.
+     * Filters, sorts and counts issues within the model according to the given filter expressions.
+     * In here, "processed" is equivalent to "filtered, sorted and counted".
      *
      * @param filterExprs Filter expressions to process.
-     * @return Filter expressions and their corresponding issues after filtering and sorting.
+     * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<GUIElement>> filterAndSort(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GUIElement>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<GUIElement>> filteredAndSorted = new HashMap<>();
+        Map<FilterExpression, List<GUIElement>> processed = new HashMap<>();
 
         filterExprs.stream().distinct().forEach(filterExpr -> {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
             FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-            List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
+            List<TurboIssue> processedIssues = allModelIssues.stream()
                     .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
                     .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                    .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
                     .collect(Collectors.toList());
 
-            List<GUIElement> filteredAndSortedElements = produceGUIElements(models, filteredAndSortedIssues);
+            List<GUIElement> processedElements = produceGUIElements(models, processedIssues);
 
-            filteredAndSorted.put(filterExpr, filteredAndSortedElements);
+            processed.put(filterExpr, processedElements);
         });
 
-        return filteredAndSorted;
+        return processed;
     }
 
     /**
      * Produces a suitable comparator based on the given filter expression.
      *
-     * @param filterExpr The given filter expression.
+     * @param filterExpr          The given filter expression.
      * @param hasUpdatedQualifier Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The comparator to use.
      */

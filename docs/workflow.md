@@ -25,7 +25,7 @@ This will run only the stable tests. To run the unstable tests separately,
 ./gradlew clean unstableTests
 ```
 
-If you've [set up a project for your IDE](settingUpDevEnvironment.md), there are also ways to run tests with the configuration specified in the project.
+If you've [set up a project for your IDE](settingUp.md), there are also ways to run tests with the configuration specified in the project.
 
 ## Code Coverage
 

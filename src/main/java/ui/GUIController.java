@@ -75,8 +75,8 @@ public class GUIController {
      * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
      * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
      *
-     * Triggers a filterSortRefresh call in Logic with only the given panel's filterExpression. Contrast this
-     * with refreshAllPanels in Logic, triggers filterSortRefresh with all FilterExpressions from the GUI.
+     * Triggers a processAndRefresh call in Logic with only the given panel's filterExpression. Contrast this
+     * with refreshAllPanels in Logic, triggers processAndRefresh with all FilterExpressions from the GUI.
      *
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */

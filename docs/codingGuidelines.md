@@ -1,8 +1,19 @@
-# Design Decisions and Guidelines
 
-This document contains explanations for some of the design decisions made, as well as tips on how to safely extend the codebase.
+# Coding Guidelines
 
-It makes reference to many points first covered in [Design](design.md).
+## Java Coding Conventions
+
+We use a coding standard derived from [TEAMMATES'](https://docs.google.com/document/pub?id=1iAESIXM0zSxEa5OY7dFURam_SgLiSMhPQtU0drQagrs&embedded=true), which is in turn a variant of Google's.
+
+We've tweaked a few of the rules for our needs:
+
+- Conventions we don't follow: Google copyright notice, named TODOs
+- Import order matches Eclipse's default (no priority given to Google-specific package names)
+- Such `__METHOD_NAMES__` are allowed
+- Line length is increased to 120
+- `if` and `else` blocks that are multi-line require braces. Single line `if` and `else` blocks **should** not have braces.
+
+These changes are documented in our [CheckStyle configuration](../config/checkstyle/checkstyle.xml).
 
 ## Communication between `UI` and `Logic`
 
@@ -25,27 +36,27 @@ A few benefits of using it are:
 
 An article which summarises the plus points of `Optional` can be found [here](https://www.voxxed.com/blog/2015/05/why-even-use-java-8-optional/).
 
-## Immutability and Functional Style
+## Immutability
 
-Much of the back end is written in functional style, favouring immutability. There are many benefits to this:
+Where possible, keep objects immutable. There are many benefits to immutability-by-default:
 
-- Immutable objects are thread-safe by default. This greatly simplifies things in the presence of concurrency.
+- Immutable objects are trivially thread-safe. This greatly simplifies things in the presence of concurrency.
 - Immutability makes the flow of data through code explicit. Pure functions are easier to reason about in isolation.
 - As explicit return values are preferred to updating internal state, immutable interfaces are easier to test.
-- Well-designed interfaces allow maximum composition of functionality. A good example of this is in the use of `CompletableFuture` in `Logic` and `RepoIO`, where asynchronous actions are strung together by chaining method calls.
+- Immutable interfaces leverage the type system and are generally more self-explanatory.
+- Well-designed interfaces allow functionality to be composed. A good example of this is in the use of `CompletableFuture` to string together asynchronous computations.
 
 General tips:
 
 - Make as many fields immutable as possible. Mark fields as final by default. This rule should be followed unless it makes dealing with programs much more inconvenient, or if it increases code complexity more than it helps.
     + For example, updating a deeply-nested field immutably can be inconvenient if all containing classes up to that point are immutable.
-- Prefer `forEach` over loops with explicit indices; off-by-one errors are impossible with the former.
-- Many abstractions for reduction, grouping, mapping, and filtering are available with the new `Stream` class, and reusing those over potentially-buggy reimplementations with explicit loops is also preferred.
+- Many abstractions for reduction, grouping, mapping, and filtering are available with the new `Stream` API. Using it effectively can greatly simplify code which transforms data.
 
 Sometimes immutability is inapplicable, for example if the UI is inherently stateful, or if performance is required. For those cases...
 
 ## Thread-safety
 
-In general, immutable interfaces are trivially thread-safe. In the presence of state, however, thread-safety can be very tricky to reason about, due to the implicitness of the thread that a particular block of code executes in.
+Immutable objects are thread-safe by default. In the presence of state, however, thread-safety can be very tricky to reason about, due to the implicitness of the thread that a particular block of code executes in.
 
 - Try to ensure by design that multiple threads *cannot* interfere. Keep the effects of threads as encapsulated as possible. If two threads only work on their own queues and do not modify the same state, there cannot be race conditions between them.
 - Stopping threads in Java is *cooperative*. This means that it is not in general possible to stop a concurrent task *now* with any guarantee. That should be kept in mind when designing interactions between threads.

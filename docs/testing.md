@@ -42,7 +42,7 @@ Follow the conventions for existing ids when assigning ids to new elements.
 
 **Concurrency**
 
-Any code that modifies GUI objects from a thread other than the JavaFX Application Thread (aka the UI thread) must be wrapped in `Platform.runLater` (see guidelines on [thread safety](designDecisionsAndGuidelines.md#thread-safety), specifically the part on thread confinement).
+Any code that modifies GUI objects from a thread other than the JavaFX Application Thread (aka the UI thread) must be wrapped in `Platform.runLater` (see guidelines on [thread safety](codingGuidelines.md#thread-safety), specifically the part on thread confinement).
 
 Note that `Platform.runLater` does not provide any guarantees as to *when* your code actually executes. If it is important that your threads are synchronised, try the following:
 
