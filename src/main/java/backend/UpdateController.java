@@ -1,19 +1,29 @@
 package backend;
 
+import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import github.IssueEventType;
 import org.apache.logging.log4j.Logger;
-
 import filter.expression.QualifierType;
+import ui.GUIElement;
 import util.Futures;
 import util.HTLog;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+/**
+ * Manages the flow of logic during a data retrieval cycle from the repository source.
+ *
+ * The central logic is contained in filterSortRefresh, while the remaining methods are auxiliary methods to be
+ * called by filterSortRefresh.
+ */
 public class UpdateController {
     private static final Logger logger = HTLog.get(UpdateController.class);
 
@@ -40,9 +50,7 @@ public class UpdateController {
         if (!toUpdate.isEmpty()) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
             ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-            toUpdate.forEach((repoId, issues) -> {
-                metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues));
-            });
+            toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
             // ...and then wait for all of them to complete.
             Futures.sequence(metadataRetrievalTasks)
                     .thenAccept(results -> logger.info("Metadata retrieval successful for "
@@ -93,27 +101,25 @@ public class UpdateController {
      * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering and sorting.
      */
-    private Map<FilterExpression, List<TurboIssue>> filterAndSort(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GUIElement>> filterAndSort(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<TurboIssue>> filteredAndSorted = new HashMap<>();
+        Map<FilterExpression, List<GUIElement>> filteredAndSorted = new HashMap<>();
 
-        filterExprs.forEach(filterExpr -> {
-            List<TurboIssue> filterAndSortedExpression = filteredAndSorted.get(filterExpr);
+        filterExprs.stream().distinct().forEach(filterExpr -> {
+            boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
-            if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
-                boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
+            FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+            List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
+                    .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                    .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                    .collect(Collectors.toList());
 
-                List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
-                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                        .collect(Collectors.toList());
+            List<GUIElement> filteredAndSortedElements = produceGUIElements(models, filteredAndSortedIssues);
 
-                filteredAndSorted.put(filterExpr, filteredAndSortedIssues);
-            }
+            filteredAndSorted.put(filterExpr, filteredAndSortedElements);
         });
 
         return filteredAndSorted;
@@ -143,5 +149,47 @@ public class UpdateController {
 
         // No sort or updated, return sort by descending ID, which is the default.
         return Qualifier.getSortComparator(models, "id", true, false);
+    }
+
+    /**
+     * Constructs GUIElements (including all necessary references to labels/milestones/users to properly display
+     * the issue) corresponding to a list of issues without changing the order.
+     *
+     * @param models The MultiModel from which necessary references are extracted.
+     * @param filteredAndSortedIssues The list of issues to construct GUIElements for.
+     * @return A list of GUIElements corresponding to the given list of issues.
+     */
+    private List<GUIElement> produceGUIElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
+        return filteredAndSortedIssues.stream().map(issue -> {
+            Optional<Model> modelOfIssue = models.getModelById(issue.getRepoId());
+            assert modelOfIssue.isPresent();
+
+            return new GUIElement(issue,
+                    produceRelevantLabels(modelOfIssue.get(), issue),
+                    models.getMilestoneOfIssue(issue),
+                    models.getAssigneeOfIssue(issue));
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a list of relevant labels to an issue, containing current labels of the issue combined with
+     * labels removed from the issue.
+     *
+     * @param model The model containing the relevant issue.
+     * @param issue The issue, the labels of which are to be retrieved.
+     * @return A list of labels needed for displaying the issue properly.
+     */
+    private List<TurboLabel> produceRelevantLabels(Model model, TurboIssue issue) {
+        Stream<TurboLabel> removedLabels = issue.getMetadata().getEvents().stream()
+                .filter(issueEvent -> issueEvent.getType() == IssueEventType.Unlabeled)
+                .map(unlabeledEvent -> {
+                    Optional<TurboLabel> label = model.getLabelByActualName(unlabeledEvent.getLabelName());
+                    assert label.isPresent() : issue + " Label \"" + unlabeledEvent.getLabelName() + "\" not found.";
+                    return label.get();
+                });
+
+        return Stream.concat(model.getLabelsOfIssue(issue).stream(), removedLabels)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
