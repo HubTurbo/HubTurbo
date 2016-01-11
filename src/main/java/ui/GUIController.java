@@ -64,7 +64,7 @@ public class GUIController {
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
                     // Search for the corresponding entry in e.issuesToShow.
-                    List<GUIElement> filterResult =
+                    List<GuiElement> filterResult =
                             e.elementsToShow.get(((FilterPanel) child).getCurrentFilterExpression());
 
                     if (filterResult != null) ((FilterPanel) child).updatePanel(filterResult);

@@ -16,7 +16,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import ui.GUIController;
-import ui.GUIElement;
+import ui.GuiElement;
 import ui.UI;
 import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
@@ -85,7 +85,7 @@ public class ListPanel extends FilterPanel {
      */
     private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
         HashSet<Integer> result = new HashSet<>();
-        for (GUIElement guiElement : getElementsList()) {
+        for (GuiElement guiElement : getElementsList()) {
             TurboIssue issue = guiElement.getIssue();
             if (issueCommentCounts.containsKey(issue.getId())) {
                 // We know about this issue; check if it's been updated
@@ -308,7 +308,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
-        Optional<GUIElement> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             changeLabelsMenuItem.setDisable(false);
         } else {
@@ -319,7 +319,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateMarkAsReadUnreadMenuItem() {
-        Optional<GUIElement> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             markAsReadUnreadMenuItem.setDisable(false);
             TurboIssue selectedIssue = item.get().getIssue();
@@ -340,14 +340,14 @@ public class ListPanel extends FilterPanel {
         return issueCount;
     }
 
-    public Optional<GUIElement> getSelectedElement() {
+    public Optional<GuiElement> getSelectedElement() {
         return listView.getSelectedItem();
     }
 
     /* Methods that perform user's actions under the context of this ListPanel */
 
     private void markAsRead() {
-        Optional<GUIElement> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get().getIssue();
             issue.markAsRead(UI.prefs);
@@ -358,7 +358,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void markAsUnread() {
-        Optional<GUIElement> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get().getIssue();
             issue.markAsUnread(ui.prefs);

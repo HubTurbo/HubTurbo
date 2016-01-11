@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class GUIElement {
+public class GuiElement {
     private TurboIssue issue;
     private List<TurboLabel> labels;
     private Optional<TurboMilestone> milestone;
     private Optional<TurboUser> assignee;
 
-    public GUIElement(TurboIssue issue,
+    public GuiElement(TurboIssue issue,
                       List<TurboLabel> labels,
                       Optional<TurboMilestone> milestone,
                       Optional<TurboUser> assignee) {
@@ -33,7 +33,7 @@ public class GUIElement {
      * Returns all labels related to an issue (including labels that have been added and then removed).
      * Use getLabelsOfIssue to retrieve an issue's current labels instead.
      *
-     * @return Labels related to an issue, or null if the GUIElement has been constructed as such.
+     * @return Labels related to an issue, or null if the GuiElement has been constructed as such.
      */
     public List<TurboLabel> getLabels() {
         return labels;

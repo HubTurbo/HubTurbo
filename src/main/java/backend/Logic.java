@@ -7,8 +7,8 @@ import filter.expression.FilterExpression;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.GuiElement;
 import ui.TestController;
-import ui.GUIElement;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
@@ -275,7 +275,7 @@ public class Logic {
     /**
      * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
      */
-    public void updateUI(Map<FilterExpression, List<GUIElement>> elementsToShow) {
+    public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
         uiManager.update(elementsToShow, models.getUsers(), models.getDefaultRepo());
     }
 

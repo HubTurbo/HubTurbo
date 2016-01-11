@@ -8,7 +8,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
 import ui.GUIController;
-import ui.GUIElement;
+import ui.GuiElement;
 import ui.components.PanelMenuBar;
 import backend.resource.TurboUser;
 import filter.ParseException;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private ObservableList<GUIElement> elementsToDisplay = null;
+    private ObservableList<GuiElement> elementsToDisplay = null;
 
     public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
@@ -218,7 +218,7 @@ public abstract class FilterPanel extends AbstractPanel {
         return new PanelInfo(this.panelMenuBar.getPanelName(), filterTextField.getText());
     }
 
-    public ObservableList<GUIElement> getElementsList() {
+    public ObservableList<GuiElement> getElementsList() {
         return elementsToDisplay;
     }
 
@@ -238,11 +238,11 @@ public abstract class FilterPanel extends AbstractPanel {
         return this.panelMenuBar.getCloseButton();
     }
 
-    public void setElementsList(List<GUIElement> transformedElementList) {
+    public void setElementsList(List<GuiElement> transformedElementList) {
         this.elementsToDisplay = FXCollections.observableArrayList(transformedElementList);
     }
 
-    public void updatePanel(List<GUIElement> filteredAndSortedElements) {
+    public void updatePanel(List<GuiElement> filteredAndSortedElements) {
         setElementsList(filteredAndSortedElements);
         refreshItems();
     }

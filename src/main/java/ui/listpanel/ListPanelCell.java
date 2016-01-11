@@ -4,19 +4,19 @@ import backend.resource.TurboIssue;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import org.apache.logging.log4j.Logger;
-import ui.GUIElement;
+import ui.GuiElement;
 import util.HTLog;
 
 import java.util.HashSet;
 import java.util.List;
 
-public class ListPanelCell extends ListCell<GUIElement> {
+public class ListPanelCell extends ListCell<GuiElement> {
     private static final Logger logger = HTLog.get(ListPanelCell.class);
 
     private final int parentPanelIndex;
     private final ListPanel parent;
     private final HashSet<Integer> issuesWithNewComments;
-    private GUIElement guiElement;
+    private GuiElement guiElement;
 
     public ListPanelCell(ListPanel parent,
                          int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
@@ -29,7 +29,7 @@ public class ListPanelCell extends ListCell<GUIElement> {
     }
 
     @Override
-    public void updateItem(GUIElement guiElement, boolean empty) {
+    public void updateItem(GuiElement guiElement, boolean empty) {
         super.updateItem(guiElement, empty);
         if (guiElement == null) {
             return;

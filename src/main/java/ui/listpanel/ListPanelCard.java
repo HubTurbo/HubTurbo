@@ -18,10 +18,9 @@ import javafx.scene.layout.VBox;
 
 import org.eclipse.egit.github.core.Comment;
 
-import ui.GUIElement;
+import ui.GuiElement;
 import ui.issuepanel.FilterPanel;
 import util.Utility;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
@@ -41,7 +40,7 @@ public class ListPanelCard extends VBox {
      * are bound to the issue's fields and will update automatically.
      */
 
-    private final GUIElement guiElement;
+    private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
     private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
@@ -54,7 +53,7 @@ public class ListPanelCard extends VBox {
      * @param parentPanel
      * @param issuesWithNewComments
      */
-    public ListPanelCard(GUIElement guiElement, FilterPanel parentPanel,
+    public ListPanelCard(GuiElement guiElement, FilterPanel parentPanel,
                          HashSet<Integer> issuesWithNewComments) {
         this.guiElement = guiElement;
         this.parentPanel = parentPanel;
@@ -123,7 +122,7 @@ public class ListPanelCard extends VBox {
      * @param comments
      * @return
      */
-    private static Node layoutEvents(GUIElement guiElement,
+    private static Node layoutEvents(GuiElement guiElement,
                                      List<TurboIssueEvent> events, List<Comment> comments) {
         TurboIssue issue = guiElement.getIssue();
 

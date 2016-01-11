@@ -16,9 +16,8 @@ import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
-import ui.GUIElement;
+import ui.GuiElement;
 import util.Utility;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 
@@ -138,7 +137,7 @@ public class TurboIssueEvent {
         return text;
     }
 
-    public Node display(GUIElement guiElement, TurboIssue issue) {
+    public Node display(GuiElement guiElement, TurboIssue issue) {
         String actorName = getActor().getLogin();
         String time = new PrettyTime().format(getDate());
 
@@ -272,7 +271,7 @@ public class TurboIssueEvent {
      * @return list of Node corresponding to groups of label update events
      */
     public static List<Node> createLabelUpdateEventNodes(
-            GUIElement guiElement, List<TurboIssueEvent> labelUpdateEvents) {
+            GuiElement guiElement, List<TurboIssueEvent> labelUpdateEvents) {
 
         assert labelUpdateEvents != null : "Error: Received null list of events";
 
@@ -304,7 +303,7 @@ public class TurboIssueEvent {
         return result;
     }
 
-    private static Node createLabelNode(GUIElement guiElement, TurboIssueEvent e) {
+    private static Node createLabelNode(GuiElement guiElement, TurboIssueEvent e) {
         Optional<TurboLabel> label = guiElement.getLabelByActualName(e.getLabelName());
 
         Node node = label.isPresent() ?

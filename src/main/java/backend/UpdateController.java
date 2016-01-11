@@ -9,7 +9,7 @@ import filter.expression.Qualifier;
 import github.IssueEventType;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
-import ui.GUIElement;
+import ui.GuiElement;
 import util.Futures;
 import util.HTLog;
 
@@ -102,11 +102,11 @@ public class UpdateController {
      * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<GUIElement>> processFilter(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GuiElement>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<GUIElement>> processed = new HashMap<>();
+        Map<FilterExpression, List<GuiElement>> processed = new HashMap<>();
 
         filterExprs.stream().distinct().forEach(filterExpr -> {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
@@ -119,7 +119,7 @@ public class UpdateController {
                     .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
                     .collect(Collectors.toList());
 
-            List<GUIElement> processedElements = produceGUIElements(models, processedIssues);
+            List<GuiElement> processedElements = produceGUIElements(models, processedIssues);
 
             processed.put(filterExpr, processedElements);
         });
@@ -161,12 +161,12 @@ public class UpdateController {
      * @param filteredAndSortedIssues The list of issues to construct GUIElements for.
      * @return A list of GUIElements corresponding to the given list of issues.
      */
-    private List<GUIElement> produceGUIElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
+    private List<GuiElement> produceGUIElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
         return filteredAndSortedIssues.stream().map(issue -> {
             Optional<Model> modelOfIssue = models.getModelById(issue.getRepoId());
             assert modelOfIssue.isPresent();
 
-            return new GUIElement(issue,
+            return new GuiElement(issue,
                     produceRelevantLabels(modelOfIssue.get(), issue),
                     models.getMilestoneOfIssue(issue),
                     models.getAssigneeOfIssue(issue));

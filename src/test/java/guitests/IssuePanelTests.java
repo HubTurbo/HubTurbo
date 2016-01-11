@@ -23,7 +23,7 @@ import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
 import tests.TurboIssueEventTests;
-import ui.GUIElement;
+import ui.GuiElement;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
@@ -60,7 +60,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void testCreateLabelUpdateEventNodesForNoEvent() {
-        GUIElement guiElement = new GUIElement(
+        GuiElement guiElement = new GuiElement(
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),
@@ -87,7 +87,7 @@ public class IssuePanelTests extends UITest {
         labels.add(new TurboLabel("test/test", "B2"));
         labels.add(new TurboLabel("test/test", "C1"));
         labels.add(new TurboLabel("test/test", "D1"));
-        GUIElement guiElement = new GUIElement(
+        GuiElement guiElement = new GuiElement(
                 new TurboIssue("test/test", 1, "Test issue"),
                 labels,
                 Optional.empty(),
@@ -110,7 +110,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void testCreateLabelUpdateEventNodesForNonExistentLabel() {
-        GUIElement guiElement = new GUIElement(
+        GuiElement guiElement = new GuiElement(
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),

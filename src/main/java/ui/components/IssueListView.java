@@ -1,11 +1,11 @@
 package ui.components;
 
 import backend.resource.TurboIssue;
-import ui.GUIElement;
+import ui.GuiElement;
 
-public class IssueListView extends NavigableListView<GUIElement> {
+public class IssueListView extends NavigableListView<GuiElement> {
 
-    public boolean areItemsEqual(GUIElement guiElement1, GUIElement guiElement2) {
+    public boolean areItemsEqual(GuiElement guiElement1, GuiElement guiElement2) {
         TurboIssue item1 = guiElement1.getIssue();
         TurboIssue item2 = guiElement2.getIssue();
         return item1.getId() == item2.getId() &&
