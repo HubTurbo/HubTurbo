@@ -38,7 +38,7 @@ public class Logic {
     public Logic(UIManager uiManager, Preferences prefs) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        this.models = new MultiModel(prefs);
+        models = new MultiModel(prefs);
 
         repoIO = TestController.createApplicationRepoIO();
         loginController = new LoginController(this);
@@ -46,9 +46,6 @@ public class Logic {
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) this::onLogicModelClear);
-
-        // Pass the currently-empty model to the UI
-        uiManager.updateEmpty();
     }
 
     private void onLogicModelClear(ClearLogicModelEvent e) {
@@ -276,7 +273,7 @@ public class Logic {
      * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
      */
     public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
-        uiManager.update(elementsToShow, models.getUsers(), models.getDefaultRepo());
+        uiManager.update(elementsToShow, models.getUsers());
     }
 
     /**

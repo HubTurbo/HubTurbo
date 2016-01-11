@@ -9,6 +9,8 @@ import ui.issuepanel.UIBrowserBridge;
 import util.DialogMessage;
 import util.Utility;
 import util.events.*;
+import util.events.testevents.PrimaryRepoChangedEvent;
+import util.events.testevents.PrimaryRepoChangedEventHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +43,7 @@ public class GUIController {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
         UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
 
     /**
@@ -52,14 +55,9 @@ public class GUIController {
      * - If there is a match, the panel's issue list is changed to the corresponding one contained in the
      * ModelUpdatedEvent.
      *
-     * Within each entry in the ModelUpdatedEvent's issuesToShow Map, there is a Boolean value dictating whether
-     * to display the corresponding panel in feed form (i.e. the filter string contains UPDATED).
-     *
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        defaultRepoId = e.defaultRepoId;
-
         panelControl.getChildren().stream()
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
@@ -106,6 +104,10 @@ public class GUIController {
 
     private void showErrorDialog(ShowErrorDialogEvent e) {
         Platform.runLater(() -> DialogMessage.showErrorDialog(e.header, e.message));
+    }
+
+    private void setDefaultRepo(PrimaryRepoChangedEvent e) {
+        defaultRepoId = e.repoId;
     }
 
     public String getDefaultRepo() {

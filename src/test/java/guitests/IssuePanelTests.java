@@ -44,9 +44,8 @@ public class IssuePanelTests extends UITest {
         // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
         ListPanel issuePanel = find("#dummy/dummy_col0");
-        click("#dummy/dummy_col0_filterTextField"); // Triple click to select all
         click("#dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
         press(JUMP_TO_FIRST_ISSUE);
@@ -64,9 +63,8 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
-        click("#dummy/dummy_col0_filterTextField"); // Triple click to select all
         click("#dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         type("id:8");
         push(KeyCode.ENTER);
         // Issue #8 was assigned label 11, but it was removed

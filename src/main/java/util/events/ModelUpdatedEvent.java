@@ -10,13 +10,10 @@ import java.util.Map;
 public class ModelUpdatedEvent extends Event {
     public final Map<FilterExpression, List<GuiElement>> elementsToShow;
     public final List<TurboUser> users;
-    public final String defaultRepoId;
 
     public ModelUpdatedEvent(Map<FilterExpression, List<GuiElement>> elementsToShow,
-                             List<TurboUser> users,
-                             String defaultRepoId) {
+                             List<TurboUser> users) {
         this.elementsToShow = elementsToShow;
         this.users = users;
-        this.defaultRepoId = defaultRepoId;
     }
 }

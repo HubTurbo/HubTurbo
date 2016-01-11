@@ -23,14 +23,9 @@ public class UIManager {
     }
 
     public void update(Map<FilterExpression, List<GuiElement>> elementsToShow,
-                       List<TurboUser> users,
-                       String defaultRepoId) {
+                       List<TurboUser> users) {
         Platform.runLater(() ->
-                ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users, defaultRepoId)));
-    }
-
-    public void updateEmpty() {
-        ui.triggerEvent(new ModelUpdatedEvent(new HashMap<>(), new ArrayList<>(), null));
+                ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
 
     public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
