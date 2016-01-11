@@ -352,7 +352,7 @@ public class DummyRepoState {
         return users.remove(idString);
     }
 
-    protected List<Label> setLabels(int issueId, List<String> labels) {
+    protected final List<Label> setLabels(int issueId, List<String> labels) {
         // Get copies of issue itself and its metadata
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();

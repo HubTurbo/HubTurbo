@@ -63,6 +63,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
         return guiElement.getIssue();
     }
 
-    public GuiElement getGuiElement() { return guiElement; }
+    public GuiElement getGuiElement() {
+        return guiElement; }
 
 }
