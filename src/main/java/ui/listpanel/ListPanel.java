@@ -122,6 +122,7 @@ public class ListPanel extends FilterPanel {
 
         listView.restoreSelection();
         this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
+        filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
     }
 
     private void setupListView() {

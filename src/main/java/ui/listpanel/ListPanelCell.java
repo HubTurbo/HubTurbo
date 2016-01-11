@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class ListPanelCell extends ListCell<GuiElement> {
-    private static final Logger logger = HTLog.get(ListPanelCell.class);
 
     private final int parentPanelIndex;
     private final ListPanel parent;
@@ -63,5 +62,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
     public TurboIssue getIssue() {
         return guiElement.getIssue();
     }
+
+    public GuiElement getGuiElement() { return guiElement; }
 
 }

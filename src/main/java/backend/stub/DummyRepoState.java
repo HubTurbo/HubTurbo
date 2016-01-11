@@ -93,7 +93,7 @@ public class DummyRepoState {
 
         // Odd issues are assigned label 1, even issues are assigned label 2
         for (int i = 1; i <= 10; i++) {
-            issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
+            issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 
         // We assign a colorful label to issue 10
@@ -140,6 +140,12 @@ public class DummyRepoState {
                 "", ""
         ));
         updatedEvents.add(10);
+
+        // Then set label 3 and 11 for issue 8, and immediately remove label 11
+        String[] oldLabels = {"Label 3", "Label 11"};
+        String[] newLabels = {"Label 3"};
+        setLabels(8, Arrays.asList(oldLabels));
+        setLabels(8, Arrays.asList(newLabels));
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
