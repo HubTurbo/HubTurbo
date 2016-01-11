@@ -53,7 +53,7 @@ public class FilterTextFieldTest extends UITest {
         // Insertion of spaces before spaces
         clearField();
         type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE);
+        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT, 2);
         type(" ");
         awaitCondition(() -> field.getText().equals("assignee  c"));
@@ -61,10 +61,19 @@ public class FilterTextFieldTest extends UITest {
         // Insertion of spaces after spaces
         clearField();
         type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE);
+        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT);
         type(" ");
         awaitCondition(() -> field.getText().equals("assignee  c"));
+
+        // Insertion of spaces with trailing spaces
+        clearField();
+        type("assignee ");
+        push(KeyCode.LEFT, 2);
+        type(" ");
+        push(KeyCode.LEFT, 8);
+        type(" ");
+        awaitCondition(() -> field.getText().equals(" assigne e "));
     }
 
     @Test
