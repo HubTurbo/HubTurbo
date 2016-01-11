@@ -10,10 +10,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GuiElement {
-    private TurboIssue issue;
-    private List<TurboLabel> labels;
-    private Optional<TurboMilestone> milestone;
-    private Optional<TurboUser> assignee;
+    private final TurboIssue issue;
+    private final List<TurboLabel> labels;
+    private final Optional<TurboMilestone> milestone;
+    private final Optional<TurboUser> assignee;
 
     public GuiElement(TurboIssue issue,
                       List<TurboLabel> labels,
