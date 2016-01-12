@@ -42,7 +42,7 @@ public class PanelMenuBar extends HBox {
     private String panelName = "Panel";
     private Text nameText;
 
-    public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 70;
+    public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 80;
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
@@ -93,6 +93,7 @@ public class PanelMenuBar extends HBox {
         nameArea.getChildren().add(nameBox);
         nameArea.setMinWidth(NAME_AREA_WIDTH);
         nameArea.setMaxWidth(NAME_AREA_WIDTH);
+        nameArea.setPadding(new Insets(0, 10, 0, 5));
         return nameArea;
     }
 
