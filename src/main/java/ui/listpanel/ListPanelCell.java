@@ -64,6 +64,6 @@ public class ListPanelCell extends ListCell<GuiElement> {
     }
 
     public GuiElement getGuiElement() {
-        return guiElement; }
-
+        return guiElement;
+    }
 }

@@ -119,7 +119,7 @@ public class UpdateController {
                     .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
                     .collect(Collectors.toList());
 
-            List<GuiElement> processedElements = produceGUIElements(models, processedIssues);
+            List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
 
             processed.put(filterExpr, processedElements);
         });
@@ -154,14 +154,14 @@ public class UpdateController {
     }
 
     /**
-     * Constructs GUIElements (including all necessary references to labels/milestones/users to properly display
+     * Constructs GuiElements (including all necessary references to labels/milestones/users to properly display
      * the issue) corresponding to a list of issues without changing the order.
      *
      * @param models The MultiModel from which necessary references are extracted.
      * @param filteredAndSortedIssues The list of issues to construct GUIElements for.
      * @return A list of GUIElements corresponding to the given list of issues.
      */
-    private List<GuiElement> produceGUIElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
+    private List<GuiElement> produceGuiElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
         return filteredAndSortedIssues.stream().map(issue -> {
             Optional<Model> modelOfIssue = models.getModelById(issue.getRepoId());
             assert modelOfIssue.isPresent();

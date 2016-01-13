@@ -270,7 +270,7 @@ public class Logic {
     }
 
     /**
-     * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
+     * Carries the current set of GUI elements, as well as the current list of users in the model, to the GUI.
      */
     public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
         uiManager.update(elementsToShow, models.getUsers());
