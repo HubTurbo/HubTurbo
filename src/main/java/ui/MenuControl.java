@@ -1,15 +1,11 @@
 package ui;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.stage.Stage;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.PanelInfo;
@@ -241,7 +237,7 @@ public class MenuControl extends MenuBar {
             logger.info("Menu: View > Refresh");
             if (ui.isNotificationPaneShowing()) {
                 // we trigger the notification timeout action first before refreshing
-                ui.triggerNotificationTimeoutAction();
+                ui.hideNotification();
             }
             ui.logic.refresh(false);
         });

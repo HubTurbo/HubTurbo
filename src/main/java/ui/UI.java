@@ -43,7 +43,6 @@ import util.events.testevents.UILogicRefreshEventHandler;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
@@ -215,7 +214,7 @@ public class UI extends Application implements EventDispatcher {
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
-        undoController = new UndoController(logic, notificationController);
+        undoController = new UndoController(notificationController);
     }
 
     private void initUI(Stage stage) {
@@ -568,9 +567,8 @@ public class UI extends Application implements EventDispatcher {
         notificationController.triggerNotificationAction();
     }
 
-    public void triggerNotificationTimeoutAction() {
-        // must be run in a Platform.runLater or from the UI thread
-        notificationController.triggerTimeoutAction();
+    public void hideNotification() {
+        notificationController.hideNotification();
     }
 
     public void updateTitle() {

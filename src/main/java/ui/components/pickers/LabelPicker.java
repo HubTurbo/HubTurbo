@@ -3,13 +3,9 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import ui.UI;
-import ui.components.Notification;
 import undo.actions.ChangeLabelsAction;
-import util.DialogMessage;
 import util.events.ShowLabelPickerEventHandler;
 
 import java.util.List;
@@ -43,7 +39,7 @@ public class LabelPicker {
             List<String> originalLabels = issue.getLabels().stream().sorted().collect(Collectors.toList());
             List<String> newLabels = result.get().stream().sorted().collect(Collectors.toList());
             if (!newLabels.equals(originalLabels)) {
-                ui.undoController.addAction(issue, ChangeLabelsAction.createChangeLabelsAction(issue, newLabels));
+                ui.undoController.addAction(issue, new ChangeLabelsAction(ui.logic, issue.getLabels(), newLabels));
             }
         }
     }
