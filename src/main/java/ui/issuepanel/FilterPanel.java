@@ -114,7 +114,7 @@ public abstract class FilterPanel extends AbstractPanel {
         // Ensure that completions appear in lexicographical order
         Collections.sort(all);
 
-        filterTextField.setKeywords(all);
+        filterTextField.setCompletionKeywords(all);
     };
 
     private Node createFilterBox() {

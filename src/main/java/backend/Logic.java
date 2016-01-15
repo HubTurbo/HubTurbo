@@ -1,5 +1,6 @@
 package backend;
 
+import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -30,8 +31,9 @@ public class Logic {
     private final MultiModel models;
     private final UIManager uiManager;
     protected final Preferences prefs;
+    private final RepoIO repoIO = TestController.createApplicationRepoIO();
+    private final RepoOpControl repoOpControl = new RepoOpControl(repoIO);
 
-    private final RepoIO repoIO;
     public LoginController loginController;
     public UpdateController updateController;
 
@@ -40,7 +42,6 @@ public class Logic {
         this.prefs = prefs;
         models = new MultiModel(prefs);
 
-        repoIO = TestController.createApplicationRepoIO();
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
@@ -85,7 +86,7 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map(repoIO::updateModel)
+                .map(repoOpControl::updateModel)
                 .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::refreshUI)
@@ -102,7 +103,7 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
+    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
@@ -118,7 +119,7 @@ public class Logic {
             } else {
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
-                return repoIO.openRepository(repoId)
+                return repoOpControl.openRepository(repoId)
                         .thenApply(models::addPending)
                         .thenRun(this::refreshUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
@@ -151,7 +152,7 @@ public class Logic {
     }
 
     public CompletableFuture<Boolean> removeStoredRepository(String repoId) {
-        return repoIO.removeRepository(repoId);
+        return repoOpControl.removeRepository(repoId);
     }
 
     /**

@@ -202,6 +202,13 @@ public class UITest extends GuiTest {
         return keys;
     }
 
+    public void push(KeyCode keyCode, int times) {
+        assert times > 0;
+        for (int i = 0; i < times; i++) {
+            push(keyCode);
+        }
+    }
+
     public void pushKeys(KeyCodeCombination combination) {
         pushKeys(getKeyCodes(combination));
     }

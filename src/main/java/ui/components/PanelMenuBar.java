@@ -30,6 +30,7 @@ public class PanelMenuBar extends HBox {
 
     private final HBox menuBarUndoButton;
     private final HBox menuBarConfirmButton;
+    private final HBox menuBarRenameButton;
     private final HBox menuBarCloseButton;
     private TextField renameableTextField;
     private final HBox menuBarNameArea;
@@ -42,9 +43,8 @@ public class PanelMenuBar extends HBox {
     private String panelName = "Panel";
     private Text nameText;
 
-    public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 70;
-    public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 40;
-    public static final int NAME_AREA_EDIT_WIDTH = PANEL_WIDTH - 65; //width in the panel rename edit mode
+    public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 80;
+    public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
     public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui){
@@ -55,13 +55,16 @@ public class PanelMenuBar extends HBox {
         this.setMinWidth(PANEL_WIDTH);
         this.setMaxWidth(PANEL_WIDTH);
         menuBarNameArea = createNameArea();
+        menuBarRenameButton = createRenameButton();
         menuBarCloseButton = createCloseButton();
         menuBarConfirmButton = createOcticonButton(OCTICON_TICK_MARK, "confirmButton");
         menuBarUndoButton = createOcticonButton(OCTICON_UNDO, "undoButton");
 
+        menuBarRenameButton.setMaxWidth(27);
+        menuBarRenameButton.setMinWidth(27);
         menuBarConfirmButton.setMaxWidth(27);
         menuBarConfirmButton.setMinWidth(27);
-        this.getChildren().addAll(menuBarNameArea, menuBarCloseButton);
+        this.getChildren().addAll(menuBarNameArea, menuBarRenameButton, menuBarCloseButton);
         this.setPadding(new Insets(0, 0, 8, 0));
     }
 
@@ -86,27 +89,33 @@ public class PanelMenuBar extends HBox {
                 activateInplaceRename();
             }
         });
-        Tooltip.install(nameArea, new Tooltip("Edit the name of this panel"));
+        Tooltip.install(nameArea, new Tooltip("Double click to edit the name of this panel"));
 
+        nameArea.getChildren().add(nameBox);
+        nameArea.setMinWidth(NAME_AREA_WIDTH);
+        nameArea.setMaxWidth(NAME_AREA_WIDTH);
+        nameArea.setPadding(new Insets(0, 10, 0, 5));
+        return nameArea;
+    }
+
+    private void activateInplaceRename() {
+        ui.triggerEvent(new ShowRenamePanelEvent(panel.panelIndex));
+    }
+
+    private HBox createRenameButton() {
         HBox renameBox = new HBox();
         renameButton = new Label(OCTICON_RENAME_PANEL);
+
         renameButton.getStyleClass().addAll("octicon", "label-button");
         renameButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
         });
+        Tooltip.install(renameBox, new Tooltip("Edit the name of this panel"));
+
         renameBox.getChildren().add(renameButton);
-        renameBox.setAlignment(Pos.TOP_RIGHT);
-
-        nameArea.getChildren().addAll(nameBox, renameButton);
-        nameArea.setMinWidth(360);
-        nameArea.setMaxWidth(360);
-        return nameArea;
-    }
-
-    private void activateInplaceRename() {
-        ui.triggerEvent(new ShowRenamePanelEvent(panel.panelIndex));
+        return renameBox;
     }
 
     private HBox createCloseButton() {
@@ -129,9 +138,8 @@ public class PanelMenuBar extends HBox {
         HBox buttonArea = new HBox();
 
         Label buttonType = new Label(octString);
-        buttonType.getStyleClass().addAll("octicon", "issue-event-icon");
+        buttonType.getStyleClass().addAll("octicon", "label-button");
         buttonType.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_" + cssName);
-        buttonType.getStyleClass().add("label-button");
         buttonArea.getChildren().add(buttonType);
 
         return buttonArea;
@@ -184,11 +192,9 @@ public class PanelMenuBar extends HBox {
      * The confirm button and the undo button are added to the panel.
      */
     private void augmentRenameableTextField(){
-        menuBarNameArea.getChildren().removeAll(nameBox, renameButton);
-        this.getChildren().remove(menuBarCloseButton);
+        menuBarNameArea.getChildren().remove(nameBox);
+        this.getChildren().removeAll(menuBarRenameButton, menuBarCloseButton);
         menuBarNameArea.getChildren().addAll(renameableTextField);
-        menuBarNameArea.setMinWidth(NAME_AREA_EDIT_WIDTH);
-        menuBarNameArea.setMaxWidth(NAME_AREA_EDIT_WIDTH);
         Tooltip.install(menuBarConfirmButton, new Tooltip("Confirm this name change"));
         Tooltip undoTip = new Tooltip("Abandon this name change and go back to the previous name");
         undoTip.setPrefWidth(TOOLTIP_WRAP_WIDTH);
@@ -202,10 +208,8 @@ public class PanelMenuBar extends HBox {
     private void closeRenameableTextField() {
         menuBarNameArea.getChildren().remove(renameableTextField);
         this.getChildren().removeAll(menuBarConfirmButton, menuBarUndoButton);
-        this.getChildren().add(menuBarCloseButton);
-        menuBarNameArea.getChildren().addAll(nameBox, renameButton);
-        menuBarNameArea.setMinWidth(NAME_AREA_WIDTH);
-        menuBarNameArea.setMaxWidth(NAME_AREA_WIDTH);
+        menuBarNameArea.getChildren().add(nameBox);
+        this.getChildren().addAll(menuBarRenameButton, menuBarCloseButton);
         panel.requestFocus();
     }
 
