@@ -219,7 +219,7 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(commentCount);
         }
 
-        for (TurboLabel label : guiElement.getLabelsOfIssue(issue)) {
+        for (TurboLabel label : guiElement.getLabels()) {
             issueDetails.getChildren().add(label.getNode());
         }
 

@@ -8,20 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ModelUpdatedEvent extends Event {
+    // Each List of GuiElements matches with a panel identified by the filter expression.
+    // Each GuiElement in the list is then displayed as an issue card in the panel.
     public final Map<FilterExpression, List<GuiElement>> elementsToShow;
-    public final List<TurboUser> users;
+    public final List<TurboUser> users; // User names are used as autocomplete keywords for filters.
 
-    /**
-     * Each filter expression is matched with the list of GuiElements that were filtered and sorted based on its
-     * rules. Each GuiElement, in turn, corresponds to a ListPanelCard to be displayed in a panel containing said
-     * filter expression on the GUI.
-     *
-     * The list of current users on the repos in the MultiModel is required as their names are added to the
-     * autocomplete suggestions.
-     *
-     * @param elementsToShow
-     * @param users
-     */
     public ModelUpdatedEvent(Map<FilterExpression, List<GuiElement>> elementsToShow,
                              List<TurboUser> users) {
         this.elementsToShow = elementsToShow;

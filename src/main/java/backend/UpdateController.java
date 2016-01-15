@@ -158,40 +158,18 @@ public class UpdateController {
      * the issue) corresponding to a list of issues without changing the order.
      *
      * @param models The MultiModel from which necessary references are extracted.
-     * @param filteredAndSortedIssues The list of issues to construct GUIElements for.
+     * @param processedIssues The list of issues to construct GUIElements for.
      * @return A list of GUIElements corresponding to the given list of issues.
      */
-    private List<GuiElement> produceGuiElements(MultiModel models, List<TurboIssue> filteredAndSortedIssues) {
-        return filteredAndSortedIssues.stream().map(issue -> {
+    private List<GuiElement> produceGuiElements(MultiModel models, List<TurboIssue> processedIssues) {
+        return processedIssues.stream().map(issue -> {
             Optional<Model> modelOfIssue = models.getModelById(issue.getRepoId());
             assert modelOfIssue.isPresent();
 
             return new GuiElement(issue,
-                    produceRelevantLabels(modelOfIssue.get(), issue),
+                    models.getLabelsOfIssue(issue),
                     models.getMilestoneOfIssue(issue),
                     models.getAssigneeOfIssue(issue));
         }).collect(Collectors.toList());
-    }
-
-    /**
-     * Creates a list of relevant labels to an issue, containing current labels of the issue combined with
-     * labels removed from the issue.
-     *
-     * @param model The model containing the relevant issue.
-     * @param issue The issue, the labels of which are to be retrieved.
-     * @return A list of labels needed for displaying the issue properly.
-     */
-    private List<TurboLabel> produceRelevantLabels(Model model, TurboIssue issue) {
-        Stream<TurboLabel> removedLabels = issue.getMetadata().getEvents().stream()
-                .filter(issueEvent -> issueEvent.getType() == IssueEventType.Unlabeled)
-                .map(unlabeledEvent -> {
-                    Optional<TurboLabel> label = model.getLabelByActualName(unlabeledEvent.getLabelName());
-                    assert label.isPresent() : issue + " Label \"" + unlabeledEvent.getLabelName() + "\" not found.";
-                    return label.get();
-                });
-
-        return Stream.concat(model.getLabelsOfIssue(issue).stream(), removedLabels)
-                .distinct()
-                .collect(Collectors.toList());
     }
 }

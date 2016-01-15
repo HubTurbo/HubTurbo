@@ -30,10 +30,11 @@ public class GuiElement {
     }
 
     /**
-     * Returns all labels related to an issue (including labels that have been added and then removed).
-     * Use getLabelsOfIssue to retrieve an issue's current labels instead.
+     * Returns labels of the issue, not including those that have been removed from the issue, as they might
+     * have been deleted from the repo altogether. Thus, this list is not used for displaying removing/adding-label
+     * events.
      *
-     * @return Labels related to an issue, or null if the GuiElement has been constructed as such.
+     * @return Current labels of the encapsulated issue, or an empty list if it doesn't have any labels currently.
      */
     public List<TurboLabel> getLabels() {
         return labels;
@@ -49,13 +50,5 @@ public class GuiElement {
 
     public Optional<TurboLabel> getLabelByActualName(String actualName) {
         return labels.stream().filter(label -> label.getActualName().equals(actualName)).findFirst();
-    }
-
-    public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
-        return issue.getLabels().stream().map(labelName -> {
-            Optional<TurboLabel> label = getLabelByActualName(labelName); // O(n^2) for the additional assert.
-            assert label.isPresent();
-            return label.get();
-        }).collect(Collectors.toList());
     }
 }
