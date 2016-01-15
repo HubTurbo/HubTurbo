@@ -80,9 +80,10 @@ public class TurboIssueEvent {
         assert isLabelUpdateEvent();
         return labelColour;
     }
-    public void setLabelColour(String labelColour) {
+    public TurboIssueEvent setLabelColour(String labelColour) {
         assert isLabelUpdateEvent();
         this.labelColour = labelColour;
+        return this;
     }
     public String getMilestoneTitle() {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
