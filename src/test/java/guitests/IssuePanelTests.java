@@ -77,9 +77,10 @@ public class IssuePanelTests extends UITest {
         push(KeyCode.ENTER);
         // After we load the metadata, label 11 should appear.
         waitUntilNodeAppears("Label 11");
-        Node label11 = find("Label 11");
         // Ensure that the "Label 11" text found represents the label from backend
-        assertEquals(true, label11.getStyle().contains("-fx-background-color: #ffa500"));
+        assertEquals(true, find("Label 11").getStyle().contains("-fx-background-color: #ffa500"));
+        // At the same time, we should see the "Deleted" label with the proper color despite the label being deleted.
+        assertEquals(true, find("Deleted").getStyle().contains("-fx-background-color: #84b6eb"));
     }
 
     @Test

@@ -146,6 +146,13 @@ public class DummyRepoState {
         String[] newLabels = {"Label 3"};
         setLabels(8, Arrays.asList(oldLabels));
         setLabels(8, Arrays.asList(newLabels));
+        // Then put a temporary (colourful) label into the repo
+        labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
+        String[] issue9Labels = {"Label 1"};
+        String[] deletedLabels = {"Label 1", "Deleted"};
+        setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
+        setLabels(9, Arrays.asList(issue9Labels));
+        labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
