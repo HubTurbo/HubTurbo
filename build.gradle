@@ -128,6 +128,8 @@ allprojects {
     assemble.dependsOn shadowJar
 }
 
+test.dependsOn generateUnstableTestResources
+
 task checkstyleHtml << {
     ant.xslt(in: checkstyleMain.reports.xml.destination,
              style: file('config/checkstyle/checkstyle-noframes-sorted.xsl'),
