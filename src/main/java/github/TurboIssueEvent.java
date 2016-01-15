@@ -29,7 +29,7 @@ public class TurboIssueEvent {
     private static final String OCTICON_MILESTONE = "\uf075";
     private static final String OCTICON_ISSUE_CLOSED = "\uf028";
     private static final String OCTICON_ISSUE_OPENED = "\uf027";
-    private static final String OCTICON_MEGAPHONE = "\uf077";
+    private static final String OCTICON_PENCIL = "\uf058";
     private static final String OCTICON_PERSON = "\uf018";
     public static final String OCTICON_QUOTE = "\uf063";
 
@@ -147,7 +147,7 @@ public class TurboIssueEvent {
         switch (getType()) {
             case Renamed: {
                 HBox display = new HBox();
-                display.getChildren().addAll(octicon(OCTICON_MEGAPHONE),
+                display.getChildren().addAll(octicon(OCTICON_PENCIL),
                     conditionallyBold(bold,
                         new Text(String.format("%s renamed this issue %s.", actorName, time))));
                 return display;
