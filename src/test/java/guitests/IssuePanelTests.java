@@ -105,12 +105,12 @@ public class IssuePanelTests extends UITest {
         layoutMethod.setAccessible(true);
 
         List<TurboLabel> labels = new ArrayList<>();
-        labels.add(new TurboLabel("test/test", "A1"));
-        labels.add(new TurboLabel("test/test", "A2"));
-        labels.add(new TurboLabel("test/test", "B1"));
-        labels.add(new TurboLabel("test/test", "B2"));
-        labels.add(new TurboLabel("test/test", "C1"));
-        labels.add(new TurboLabel("test/test", "D1"));
+        labels.add(new TurboLabel("test/test", "aaaaaa", "A1"));
+        labels.add(new TurboLabel("test/test", "aaaaaa", "A2"));
+        labels.add(new TurboLabel("test/test", "bbbbbb", "B1"));
+        labels.add(new TurboLabel("test/test", "bbbbbb", "B2"));
+        labels.add(new TurboLabel("test/test", "cccccc", "C1"));
+        labels.add(new TurboLabel("test/test", "dddddd", "D1"));
         GuiElement guiElement = new GuiElement(
                 new TurboIssue("test/test", 1, "issue"),
                 labels,
@@ -144,7 +144,7 @@ public class IssuePanelTests extends UITest {
             new TurboIssueEvent(
                 new User().setLogin("A"), IssueEventType.Labeled,
                 new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("X"));
+            .setLabelName("X").setLabelColour("ffffff"));
 
         assertEquals(1,
                 TurboIssueEvent.createLabelUpdateEventNodes(
