@@ -166,6 +166,8 @@ public class TurboIssueEvent {
                         "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
                 return display;
             }
+            // Labeled and Unlabeled are not invoked as createLabelUpdateEventNodes is invoked
+            // instead for these event types (see ListPanelCard.layoutEvents)
             case Labeled: {
                 Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
@@ -304,14 +306,14 @@ public class TurboIssueEvent {
     }
 
     private static Node createLabelNode(GuiElement guiElement, TurboIssueEvent e) {
-        Optional<TurboLabel> label = guiElement.getLabelByActualName(e.getLabelName());
-
-        Node node = label.isPresent() ?
-                    label.get().getNode() : new Label(e.getLabelName());
+        // Unlabeled/Labeled events use data from the TurboIssueEvent itself (see GuiElement.getLabels documentation)
+        TurboLabel label = new TurboLabel(guiElement.getIssue().getRepoId(),
+                e.getLabelColour(),
+                e.getLabelName());
+        Node node = label.getNode();
         if (e.getType() == IssueEventType.Unlabeled) {
             node.getStyleClass().add("labels-removed");
         }
-
         return node;
     }
 
