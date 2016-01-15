@@ -352,7 +352,7 @@ public class DummyRepoState {
         return users.remove(idString);
     }
 
-    protected final List<Label> setLabels(int issueId, List<String> labels) {
+    protected final List<Label> setLabels(int issueId, List<String> newLabels) {
         // Get copies of issue itself and its metadata
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();
@@ -361,23 +361,23 @@ public class DummyRepoState {
 
         // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.forEach(labelName ->
+        labelsOfIssue.stream().filter(existingLabel -> !newLabels.contains(existingLabel)).forEach(labelName ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Unlabeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
         );
-        labels.forEach(labelName ->
+        newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Labeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
         );
-        toSet.setLabels(labels);
+        toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
-        return labels.stream().map(new Label()::setName).collect(Collectors.toList());
+        return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {
