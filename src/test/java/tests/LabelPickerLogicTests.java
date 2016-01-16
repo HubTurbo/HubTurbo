@@ -149,7 +149,7 @@ public class LabelPickerLogicTests {
         assertEquals("Label 10",
                 invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).get().getActualName());
         // toggle label
-        logic.toggleSelectedLabel("1 ");
+        logic.toggleHighlightedLabel();
         assertEquals(1, getLabels(logic).size());
         assertEquals(true, getLabels(logic).contains("Label 10"));
         assertEquals(false, invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).isPresent());
@@ -161,10 +161,11 @@ public class LabelPickerLogicTests {
         assertEquals("Label 1",
                 invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).get().getActualName());
         // toggle label
-        logic.toggleSelectedLabel("1 1 ");
+        logic.toggleHighlightedLabel();
         assertEquals(2, getLabels(logic).size());
         assertEquals(true, getLabels(logic).contains("Label 1"));
         assertEquals(false, invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).isPresent());
+
     }
 
     @Test

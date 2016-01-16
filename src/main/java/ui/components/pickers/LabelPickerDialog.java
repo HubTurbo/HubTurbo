@@ -66,9 +66,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 } else if (e.getCode() == KeyCode.UP) {
                     e.consume();
                     uiLogic.moveHighlightOnLabel(false);
-                } else if (e.getCode() == KeyCode.SPACE) {
-                    e.consume();
-                    uiLogic.toggleSelectedLabel(textField.getText());
                 }
             }
         });
@@ -165,7 +162,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 // if there is a highlighted label, toggle that label first
-                if (uiLogic.hasHighlightedLabel()) uiLogic.toggleSelectedLabel(textField.getText());
+                if (uiLogic.hasHighlightedLabel()) uiLogic.toggleHighlightedLabel();
                 // if user confirms selection, return list of labels
                 return uiLogic.getResultList().entrySet().stream()
                         .filter(Map.Entry::getValue)

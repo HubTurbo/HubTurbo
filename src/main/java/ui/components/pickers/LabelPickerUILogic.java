@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/*
+ * Handles the logic when typing in the text field of the label picker UI.
+ */
 public class LabelPickerUILogic {
 
     private final TurboIssue issue;
@@ -19,9 +22,10 @@ public class LabelPickerUILogic {
     private final Map<String, Boolean> resultList = new HashMap<>();
     private Optional<String> targetLabel = Optional.empty();
 
-    // Used for multiple spaces
-    private String lastAction = "";
-    private int previousNumberOfActions = 0;
+    private int previousTextFieldLength = 0;
+    private Character previousLastChar = null;
+    private final ArrayList<String> listOfSpecifiedLabels = new ArrayList<>();
+    private final ArrayList<ArrayList<String>> listOfRemovedExclusiveLabels = new ArrayList<>();
 
     LabelPickerUILogic(TurboIssue issue, List<TurboLabel> repoLabels, LabelPickerDialog dialog) {
         this.issue = issue;
@@ -60,56 +64,105 @@ public class LabelPickerUILogic {
     }
 
     public void toggleLabel(String name) {
-        addRemovePossibleLabel("");
+        removePossibleLabel();
         preProcessAndUpdateTopLabels(name);
         updateBottomLabels(""); // clears search query, removes faded-out overlay on bottom labels
         populatePanes();
     }
 
-    public void toggleSelectedLabel(String text) {
-        if (!bottomLabels.isEmpty() && !text.isEmpty() && hasHighlightedLabel()) {
+    public void toggleHighlightedLabel() {
+        if (!bottomLabels.isEmpty() && hasHighlightedLabel()) {
             toggleLabel(
                     bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
         }
     }
 
-    @SuppressWarnings("PMD")
     public void processTextFieldChange(String text) {
-        String[] textArray = text.split(" ");
-        if (textArray.length > 0) {
-            String query = textArray[textArray.length - 1];
-            if (previousNumberOfActions != textArray.length || !query.equals(lastAction)) {
-                previousNumberOfActions = textArray.length;
-                lastAction = query;
-                boolean isBottomLabelsUpdated = false;
+        int curTextFieldLength = text.length();
+        if (curTextFieldLength > 0) {
+            if (curTextFieldLength > previousTextFieldLength) {
+                // char was added
+                char lastChar = text.charAt(curTextFieldLength - 1);
+                String[] textArray = text.trim().split(" ");
+                String finalLabel = textArray[textArray.length - 1];
 
-                // group check
-                // TODO rewrite this to remove some nesting, and the PMD warning
-                if (TurboLabel.getDelimiter(query).isPresent()) {
-                    String delimiter = TurboLabel.getDelimiter(query).get();
-                    String[] queryArray = query.split(Pattern.quote(delimiter));
-                    if (queryArray.length == 1) {
-                        isBottomLabelsUpdated = true;
-                        updateBottomLabels(queryArray[0], "");
-                    } else if (queryArray.length == 2) {
-                        isBottomLabelsUpdated = true;
-                        updateBottomLabels(queryArray[0], queryArray[1]);
+                if (lastChar == ' ') {
+                    // toggle if the added character was space, and there is a highlighted label
+                    if (hasHighlightedLabel()) {
+                        listOfSpecifiedLabels.add(getHighlightedLabelName().get().getActualName());
+                        toggleHighlightedLabel();
+                    } else {
+                        listOfSpecifiedLabels.add(null);
+                        listOfRemovedExclusiveLabels.add(null);
+                    }
+                } else {
+                    // fade/unfade bottom labels according to query, then update the possible label
+                    updateBottomLabelsWithRawQuery(finalLabel);
+                    updatePossibleLabel();
+                }
+            } else {
+                // char was removed
+                char lastChar = text.charAt(curTextFieldLength - 1);
+                if (lastChar != ' ' && previousLastChar == ' ' && !listOfSpecifiedLabels.isEmpty()) {
+                    // toggle the last label if removed character was space
+                    // and is at the end of previous label
+                    int lastIndex = listOfSpecifiedLabels.size() - 1;
+
+                    String lastLabel = listOfSpecifiedLabels.get(lastIndex);
+                    listOfSpecifiedLabels.remove(lastIndex);
+                    if (lastLabel != null) {
+                        updateTopLabels(lastLabel, !resultList.get(lastLabel));
+                    }
+
+                    ArrayList<String> listOfRemovedLabels = listOfRemovedExclusiveLabels.get(lastIndex);
+                    listOfRemovedExclusiveLabels.remove(lastIndex);
+                    if (listOfRemovedLabels != null) {
+                        listOfRemovedLabels.stream()
+                                .forEach(labelName -> {
+                                    updateTopLabels(labelName, true);
+                                });
                     }
                 }
 
-                if (!isBottomLabelsUpdated) {
-                    updateBottomLabels(query);
-                }
-
-                if (hasHighlightedLabel()) {
-                    addRemovePossibleLabel(getHighlightedLabelName().get().getActualName());
+                if (lastChar == ' ') {
+                    removePossibleLabel();
                 } else {
-                    addRemovePossibleLabel("");
+                    String[] textArray = text.trim().split(" ");
+                    String finalLabel = textArray[textArray.length - 1];
+                    updateBottomLabelsWithRawQuery(finalLabel);
+                    updatePossibleLabel();
                 }
-                populatePanes();
             }
+
+            // update variables
+            previousTextFieldLength = curTextFieldLength;
+            previousLastChar = text.charAt(curTextFieldLength - 1);
+        } else {
+            // empty text, revert to existing labels
+            removePossibleLabel();
+        }
+        populatePanes();
+    }
+
+    /*
+     * Updates the bottom labels given a raw query entered by the user
+     * This query should be taken from the last word of the user input (after a space)
+     */
+    private void updateBottomLabelsWithRawQuery(String query) {
+        if (TurboLabel.getDelimiter(query).isPresent()) {
+            String delimiter = TurboLabel.getDelimiter(query).get();
+            String[] queryArray = query.split(Pattern.quote(delimiter));
+
+            if (queryArray.length == 1) {
+                updateBottomLabels(queryArray[0], "");
+            } else if (queryArray.length == 2) {
+                updateBottomLabels(queryArray[0], queryArray[1]);
+            }
+        } else {
+            updateBottomLabels(query);
         }
     }
+
 
     /*
     * Top pane methods do not need to worry about capitalisation because they
@@ -129,6 +182,7 @@ public class LabelPickerUILogic {
         Optional<TurboLabel> turboLabel =
                 allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
         if (turboLabel.isPresent()) {
+            ArrayList<String> listOfRemovedNames = new ArrayList<>();
             if (turboLabel.get().isExclusive() && !resultList.get(name)) {
                 // exclusive label check
                 String group = turboLabel.get().getGroup().get();
@@ -136,11 +190,18 @@ public class LabelPickerUILogic {
                         .stream()
                         .filter(TurboLabel::isExclusive)
                         .filter(label -> label.getGroup().get().equals(group))
-                        .forEach(label -> updateTopLabels(label.getActualName(), false));
+                        .forEach(label -> {
+                            if (isInTopLabels(label.getActualName()) && !isARemovedTopLabel(label.getActualName())) {
+                                listOfRemovedNames.add(label.getActualName());
+                            }
+                            updateTopLabels(label.getActualName(), false);
+                        });
                 updateTopLabels(name, true);
             } else {
                 updateTopLabels(name, !resultList.get(name));
             }
+
+            listOfRemovedExclusiveLabels.add(listOfRemovedNames);
         }
     }
 
@@ -185,62 +246,94 @@ public class LabelPickerUILogic {
                 .isPresent();
     }
 
-    private void addRemovePossibleLabel(String name) {
-        // Deletes previous selection
+    private boolean isARemovedTopLabel(String name) {
+        // used to prevent duplicates in topLabels
+        return topLabels.stream()
+                .filter(label -> label.getActualName().equals(name) && label.isRemoved())
+                .findAny()
+                .isPresent();
+    }
+
+    /*
+     * Reverts any changes to the UI relating to the possible label
+     *
+     * 'possible label' here refers to the faded label (if there is)
+     */
+    private void removePossibleLabel() {
+        // Deletes previous possible label
         if (targetLabel.isPresent()) {
-            // if there's a previous possible selection, delete it
-            // targetLabel can be
             topLabels.stream()
                     .filter(label -> label.getActualName().equals(targetLabel.get()))
                     .findFirst()
                     .ifPresent(label -> {
-                        if (issue.getLabels().contains(targetLabel.get()) || resultList.get(targetLabel.get())) {
-                            // if it is an existing label toggle fade and strike through
-                            label.setIsHighlighted(false);
-                            label.setIsFaded(false);
-                            if (resultList.get(label.getActualName())) {
+                        if (issue.getLabels().contains(targetLabel.get())) {
+                            if (label.isRemoved()) {
+                                label.setIsFaded(false);
                                 label.setIsRemoved(false);
                             } else {
+                                label.setIsFaded(false);
                                 label.setIsRemoved(true);
                             }
                         } else {
-                            // if not then remove it
-                            topLabels.remove(label);
+                            if (label.isRemoved()) {
+                                label.setIsFaded(false);
+                                label.setIsRemoved(false);
+                            } else {
+                                topLabels.remove(label);
+                            }
                         }
                     });
             targetLabel = Optional.empty();
         }
+    }
 
-        if (!name.isEmpty()) {
-            // Try to add current selection
-            if (isInTopLabels(name)) {
-                // if it exists in the top pane
+    /*
+     * This adds a faded label to topLabels if there is an ongoing query
+     *
+     * Assumptions: Any possible label has been cleared beforehand, if not
+     * it might not work as intended
+     */
+    private void addPossibleLabel() {
+        if (hasHighlightedLabel()) {
+            //something is highlighted, try to add possible label
+            TurboLabel highlightedLabel = getHighlightedLabelName().get();
+            String highlightedLabelName = highlightedLabel.getActualName();
+            if (issue.getLabels().contains(highlightedLabelName)) {
+                // part of existing labels
                 topLabels.stream()
-                        .filter(label -> label.getActualName().equals(name))
+                        .filter(label -> label.getActualName().equals(highlightedLabelName))
                         .findFirst()
                         .ifPresent(label -> {
-                            label.setIsHighlighted(true);
-                            if (issue.getLabels().contains(name)) {
-                                // if it is an existing label toggle fade and strike through
-                                label.setIsFaded(resultList.get(name));
-                                label.setIsRemoved(resultList.get(name));
-                            } else {
-                                // else set fade and strike through
-                                // if space is pressed afterwards, label is removed from topLabels altogether
+                            if (label.isRemoved()) {
+                                label.setIsRemoved(false);
                                 label.setIsFaded(true);
+                            } else {
                                 label.setIsRemoved(true);
+                                label.setIsFaded(true);
                             }
                         });
             } else {
-                // add it to the top pane
-                allLabels.stream()
-                        .filter(label -> label.getActualName().equals(name))
-                        .findFirst()
-                        .ifPresent(label -> topLabels.add(
-                                new PickerLabel(label, this, false, true, false, true, true)));
+                if (isInTopLabels(highlightedLabelName)) {
+                    //find the label and remove it
+                    topLabels.stream()
+                            .filter(label -> label.getActualName().equals(highlightedLabelName))
+                            .findFirst()
+                            .ifPresent(label -> {
+                                label.setIsRemoved(true);
+                                label.setIsFaded(true);
+                            });
+                } else {
+                    topLabels.add(new PickerLabel(highlightedLabel, this, false, true, false, true, true));
+                }
             }
-            targetLabel = Optional.of(name);
+
+            targetLabel = Optional.of(highlightedLabelName);
         }
+    }
+
+    private void updatePossibleLabel() {
+        removePossibleLabel();
+        addPossibleLabel();
     }
 
     // Bottom box deals with possible matches so we usually ignore the case for these methods.
@@ -315,11 +408,11 @@ public class LabelPickerUILogic {
                     if (isDown && i < matchingLabels.size() - 1) {
                         matchingLabels.get(i).setIsHighlighted(false);
                         matchingLabels.get(i + 1).setIsHighlighted(true);
-                        addRemovePossibleLabel(matchingLabels.get(i + 1).getActualName());
+                        updatePossibleLabel();
                     } else if (!isDown && i > 0) {
                         matchingLabels.get(i - 1).setIsHighlighted(true);
                         matchingLabels.get(i).setIsHighlighted(false);
-                        addRemovePossibleLabel(matchingLabels.get(i - 1).getActualName());
+                        updatePossibleLabel();
                     }
                     populatePanes();
                     return;
@@ -371,6 +464,12 @@ public class LabelPickerUILogic {
         return topLabels.stream()
                 .filter(label -> issue.getLabels().contains(label.getActualName()))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isExistingLabel(PickerLabel targetLabel) {
+        return allLabels.stream()
+                .filter(label -> issue.getLabels().contains(targetLabel.getActualName()))
+                .count() > 0;
     }
 
     private List<PickerLabel> getNewTopLabels() {
