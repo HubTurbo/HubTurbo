@@ -79,7 +79,15 @@ public class IssuePanelTests extends UITest {
         waitUntilNodeAppears("Label 11");
         // Ensure that the "Label 11" text found represents the label from backend
         assertEquals(true, find("Label 11").getStyle().contains("-fx-background-color: #ffa500"));
-        // At the same time, we should see the "Deleted" label with the proper color despite the label being deleted.
+
+        // Next we check for a label that was deleted from the repository, but should still be displayed under
+        // metadata (label update events).
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:9 updated:5");
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Deleted");
+        // We should see the "Deleted" label with the proper color despite the label having been deleted.
         assertEquals(true, find("Deleted").getStyle().contains("-fx-background-color: #84b6eb"));
     }
 
