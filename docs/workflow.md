@@ -25,6 +25,12 @@ This will run only the stable tests. To run the unstable tests separately,
 ./gradlew clean unstableTests
 ```
 
+To run only a single test i.e. PanelFocusTest of the unstable tests.
+
+```sh
+./gradlew clean -DunstableTests.single=PanelFocus unstableTests -i
+```
+
 If you've [set up a project for your IDE](settingUp.md), there are also ways to run tests with the configuration specified in the project.
 
 ## Code Coverage
