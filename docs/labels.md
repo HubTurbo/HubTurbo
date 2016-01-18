@@ -4,7 +4,7 @@
 
 Labels are created through GitHub's UI.
 
-- Select `New > Label` (<kbd>Ctrl</kbd> + <kbd>L</kbd>) from the menu.
+- Select `New > Label` (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>) from the menu.
 
 ## Label Groups
 
