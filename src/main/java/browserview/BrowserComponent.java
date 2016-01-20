@@ -39,6 +39,8 @@ public class BrowserComponent {
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
+    private static final String CHROME_USER_DATA_DIR = "store/chrome_profile";
+
     private static final String CHROME_DRIVER_LOCATION = "browserview/";
     private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
 
@@ -120,6 +122,7 @@ public class BrowserComponent {
         if (USE_MOBILE_USER_AGENT) {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
+        options.addArguments(String.format("user-data-dir=%s", CHROME_USER_DATA_DIR));
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
         WebDriver.Options manage = driver.manage();
         if (!isTestChromeDriver) {
