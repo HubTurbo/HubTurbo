@@ -9,8 +9,8 @@ import github.TurboIssueEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +30,7 @@ import ui.GuiElement;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
+import util.Utility;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
 import backend.resource.TurboIssue;
@@ -150,10 +151,10 @@ public class IssuePanelTests extends UITest {
 
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(
-            new TurboIssueEvent(
-                new User().setLogin("A"), IssueEventType.Labeled,
-                new GregorianCalendar(2015, 1, 1, 1, 1, 0).getTime())
-            .setLabelName("X").setLabelColour("ffffff"));
+                new TurboIssueEvent(
+                    new User().setLogin("A"), IssueEventType.Labeled,
+                        Utility.localDateTimeToDate(LocalDateTime.of(2015, 1, 1, 1, 1, 0)))
+                    .setLabelName("X").setLabelColour("ffffff"));
 
         assertEquals(1,
                 TurboIssueEvent.createLabelUpdateEventNodes(

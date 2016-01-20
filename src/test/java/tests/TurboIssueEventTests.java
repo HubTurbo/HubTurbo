@@ -4,12 +4,13 @@ import static org.junit.Assert.assertEquals;
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
+import util.Utility;
 
 public class TurboIssueEventTests {
 
@@ -17,10 +18,10 @@ public class TurboIssueEventTests {
 
     private static TurboIssueEvent createLabelUpdateEvent(
             String userName, IssueEventType eventType,
-            GregorianCalendar time, String labelName, String labelColour) {
+            LocalDateTime time, String labelName, String labelColour) {
 
         return new TurboIssueEvent(
-                   new User().setLogin(userName), eventType, time.getTime())
+                   new User().setLogin(userName), eventType, Utility.localDateTimeToDate(time))
                .setLabelName(labelName).setLabelColour(labelColour);
     }
 
@@ -29,31 +30,31 @@ public class TurboIssueEventTests {
 
         sampleEvents.add(
                 createLabelUpdateEvent("A", IssueEventType.Labeled,
-                        new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                        LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                         "A1", "aaaaaa"));
         sampleEvents.add(
                 createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                        new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                        LocalDateTime.of(2015, 1, 1, 1, 2, 0),
                         "A2", "aaaaaa"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Labeled,
-                        new GregorianCalendar(2015, 1, 1, 1, 0, 30),
+                        LocalDateTime.of(2015, 1, 1, 1, 0, 30),
                         "B1", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Labeled,
-                        new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                        LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                         "B2", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                        new GregorianCalendar(2015, 1, 1, 1, 1, 31),
+                        LocalDateTime.of(2015, 1, 1, 1, 1, 31),
                         "B1", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("C", IssueEventType.Labeled,
-                        new GregorianCalendar(2015, 1, 1, 2, 30, 15),
+                        LocalDateTime.of(2015, 1, 1, 2, 30, 15),
                         "C1", "cccccc"));
         sampleEvents.add(
                 createLabelUpdateEvent("D", IssueEventType.Unlabeled,
-                        new GregorianCalendar(2015, 1, 1, 3, 20, 59),
+                        LocalDateTime.of(2015, 1, 1, 3, 20, 59),
                         "D1", "dddddd"));
     }
 
@@ -106,16 +107,16 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 25),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 25),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 40),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 11),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 11),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -145,16 +146,16 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 40),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 40),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -184,25 +185,25 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 5),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 5),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 10),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 10),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 15),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 15),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 15),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 15),
                                           "L3", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 25),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 25),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 35),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 35),
                                           "L2", "cccccc"));
 
         List<List<TurboIssueEvent>> expected = new ArrayList<>();
@@ -222,25 +223,25 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 5),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 5),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 10),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 10),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 15),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 15),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 15),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 15),
                                           "L3", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 45),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 45),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 5, 35),
+                                          LocalDateTime.of(2015, 1, 1, 1, 5, 35),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -317,16 +318,16 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 40),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 40),
                                           "L2", "ffffff"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 0),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -356,22 +357,22 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("C", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 5, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 5, 0),
                                           "C1", "cccccc"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 5, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 5, 40),
                                           "B1", "bbbbbb"));
         events.add(createLabelUpdateEvent("C", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 5, 59),
+                                          LocalDateTime.of(2015, 1, 1, 1, 5, 59),
                                           "C2", "eeeeee"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 4, 55),
+                                          LocalDateTime.of(2015, 1, 1, 1, 4, 55),
                                           "A2", "aaaaaa"));
         events.add(createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 6, 15),
+                                          LocalDateTime.of(2015, 1, 1, 1, 6, 15),
                                           "B2", "bbbbbb"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 3, 40),
+                                          LocalDateTime.of(2015, 1, 1, 1, 3, 40),
                                           "A1", "aaaaaa"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -407,10 +408,10 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 1),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 1),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -436,10 +437,10 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 0),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
@@ -462,10 +463,10 @@ public class TurboIssueEventTests {
         List<TurboIssueEvent> events = new ArrayList<>();
 
         events.add(createLabelUpdateEvent("A", IssueEventType.Labeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 1, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 1, 0),
                                           "L1", "ffffff"));
         events.add(createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                                          new GregorianCalendar(2015, 1, 1, 1, 2, 0),
+                                          LocalDateTime.of(2015, 1, 1, 1, 2, 0),
                                           "L2", "ffffff"));
 
         List<TurboIssueEvent> expectedSubList1 = new ArrayList<>();
