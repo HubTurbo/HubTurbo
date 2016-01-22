@@ -52,6 +52,25 @@ public class Qualifier implements FilterExpression {
         }
     }
 
+    public Qualifier(QualifierType type, QualifierContent content) {
+        this.type = type;
+        if (content.getDateRange().isPresent()) {
+            this.dateRange = content.getDateRange();
+        } else if (content.getDate().isPresent()) {
+            this.date = content.getDate();
+        } else if (content.getContent().isPresent()) {
+            this.content = content.getContent();
+        } else if (content.getNumberRange().isPresent()) {
+            this.numberRange = content.getNumberRange();
+        } else if (content.getNumber().isPresent()) {
+            this.number = content.getNumber();
+        } else if (!content.getSortKeys().isEmpty()) {
+            this.sortKeys = new ArrayList<>(content.getSortKeys());
+        } else {
+            assert false : "Unrecognised content type! You may have forgotten to add it above";
+        }
+    }
+
     public Qualifier(QualifierType type, String content) {
         this.type = type;
         this.content = Optional.of(content);
