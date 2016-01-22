@@ -1,8 +1,8 @@
 package filter;
 
 @SuppressWarnings("serial")
-public class ParseException extends RuntimeException {
+public class ParseException extends FilterException {
       public ParseException(String message) {
-         super(message);
+         super("Error in filter: " + message);
       }
  }
