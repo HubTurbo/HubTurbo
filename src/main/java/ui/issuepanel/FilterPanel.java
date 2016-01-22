@@ -5,13 +5,12 @@ import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
-
 import filter.expression.QualifierType;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
 import backend.resource.TurboUser;
-import filter.ParseException;
+import filter.FilterException;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
@@ -179,11 +178,11 @@ public abstract class FilterPanel extends AbstractPanel {
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
-        } catch (ParseException ex) {
+        } catch (FilterException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
             // Overrides message in status bar
             UI.status.displayMessage("Panel " + (panelIndex + 1)
-                + ": Parse error in filter: " + ex.getMessage());
+                + ": " + ex.getMessage());
         }
     }
 
