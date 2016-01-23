@@ -127,6 +127,7 @@ public class LabelPickerLogicTests {
         assertEquals("Priority.High",
                 invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).get().getActualName());
 
+        // try handling invalid label with backspacing
         // start with an issue with no labels
         logic = prepareLogic();
         assertEquals(0, getLabels(logic).size());
@@ -136,13 +137,13 @@ public class LabelPickerLogicTests {
         // invalid space-toggle
         logic.processTextFieldChange("asdf ");
         assertEquals(0, getLabels(logic).size());
-        // highlights priority.high
+        // highlights Priority.High
         logic.processTextFieldChange("asdf p.h");
         assertEquals(true, logic.hasHighlightedLabel());
-        // toggles priority.high
+        // toggles Priority.High
         logic.processTextFieldChange("asdf p.h ");
         assertEquals(1, getLabels(logic).size());
-        // untoggles priority.high
+        // untoggles Priority.High
         logic.processTextFieldChange("asdf p.h");
         assertEquals(0, getLabels(logic).size());
         assertEquals(true, logic.hasHighlightedLabel());
@@ -150,6 +151,32 @@ public class LabelPickerLogicTests {
         logic.processTextFieldChange("asdf ");
         assertEquals(0, getLabels(logic).size());
         assertEquals(false, logic.hasHighlightedLabel());
+
+        // let's test for restoring exclusive labels
+        // start with an issue with no labels
+        logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // query highlights Priority.Low
+        logic.processTextFieldChange("p.l");
+        assertEquals(true, logic.hasHighlightedLabel());
+        // toggle Priority.Low
+        logic.processTextFieldChange("p.l ");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals(false, logic.hasHighlightedLabel());
+        // query highlights Priority.Mid
+        logic.processTextFieldChange("p.l p.m");
+        assertEquals(true, logic.hasHighlightedLabel());
+        // toggle exclusive label Priority.Mid, should only have 1 remaining
+        logic.processTextFieldChange("p.l p.m ");
+        assertEquals(1, getLabels(logic).size());
+        System.out.println(getLabels(logic).toString());
+        assertEquals(true, getLabels(logic).contains("Priority.Mid"));
+        assertEquals(false, logic.hasHighlightedLabel());
+        // undo, Priority.Low should be restored automatically
+        logic.processTextFieldChange("p.l p.m");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals(true, getLabels(logic).contains("Priority.Low"));
+        assertEquals(true, logic.hasHighlightedLabel());
     }
 
     @Test
