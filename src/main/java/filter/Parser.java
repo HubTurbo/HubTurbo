@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,13 +174,25 @@ public final class Parser {
         qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
         QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
-        return parseQualifierContent(type, false);
+        if (type == QualifierType.SORT) {
+            //special case for sort
+            return parseSortKeys();
+        } else {
+            return parseSeparatedContent(() -> parseQualifierContent(type, false));
+        }
+    }
+
+    private FilterExpression parseSeparatedContent(Supplier<FilterExpression> contentParser) {
+        FilterExpression expr = contentParser.get();
+        while (lookAhead().getType() == TokenType.SEMICOLON) {
+            consume(TokenType.SEMICOLON);
+            expr = new Disjunction(expr, contentParser.get());
+        }
+        return expr;
     }
 
     private FilterExpression parseQualifierContent(QualifierType type, boolean allowMultipleKeywords) {
-        if (type == QualifierType.SORT) {
-            return parseSortKeys();
-        } else if (isRangeOperatorToken(lookAhead())) {
+        if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
             return parseRangeOperator(type, lookAhead());
         } else if (isDateToken(lookAhead())) {
@@ -271,8 +284,7 @@ public final class Parser {
             if (isNumberToken(right)) {
                 Optional<Integer> rightNumber = parseNumber(right);
                 if (rightNumber.isPresent()) {
-                    return new Qualifier(type,
-                        new NumberRange(leftDate.get(), rightNumber.get()));
+                    return new Qualifier(type, new NumberRange(leftDate.get(), rightNumber.get()));
                 } else {
                     assert false : "Possible problem with lexer processing number";
                 }
@@ -304,8 +316,7 @@ public final class Parser {
             if (isDateToken(right)) {
                 Optional<LocalDate> rightDate = parseDate(right);
                 if (rightDate.isPresent()) {
-                    return new Qualifier(type,
-                        new DateRange(leftDate.get(), rightDate.get()));
+                    return new Qualifier(type, new DateRange(leftDate.get(), rightDate.get()));
                 } else {
                     assert false : "Possible problem with lexer processing date";
                 }
