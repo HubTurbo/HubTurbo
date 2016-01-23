@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 
+import javafx.event.ActionEvent;
 import prefs.Preferences;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -19,6 +20,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import util.DialogMessage;
 
 public final class BoardNameDialog extends Dialog<String> {
     
@@ -35,6 +37,9 @@ public final class BoardNameDialog extends Dialog<String> {
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
     private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
     private static final String ERROR_INVALID_NAME = "Error: invalid name.";
+
+    private static final String WARNING_MESSAGE_DUPLICATE_NAME = "Overwrite the existing board with the same name?";
+    private static final String WARNING_HEADER_DUPLICATE_NAME = "Duplicate name";
 
     public BoardNameDialog(Preferences prefs, Stage mainStage) {
         this.prefs = prefs;
@@ -61,6 +66,11 @@ public final class BoardNameDialog extends Dialog<String> {
         ButtonType submitButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
         submitButton = (Button) getDialogPane().lookupButton(submitButtonType);
+        submitButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if (isBoardNameDuplicate(nameField.getText()) && !showWarningDuplicateName()) {
+                event.consume();
+            }
+        });
         submitButton.setId("boardsavebutton");
         
         setResultConverter(submit -> {
@@ -71,7 +81,12 @@ public final class BoardNameDialog extends Dialog<String> {
         });
         
     }
-    
+
+    private boolean showWarningDuplicateName() {
+        return DialogMessage.showYesNoWarningDialog("Warning", WARNING_HEADER_DUPLICATE_NAME,
+                WARNING_MESSAGE_DUPLICATE_NAME, "Yes", "No");
+    }
+
     protected void setupGrid() {
         GridPane grid = new GridPane();
         setupGridPane(grid);
