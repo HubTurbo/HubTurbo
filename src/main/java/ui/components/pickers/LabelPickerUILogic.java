@@ -11,24 +11,11 @@ import java.util.stream.Collectors;
 /**
  * Handles the logic of the label picker UI.
  *
- * The crux of the logic is as follows:
- * 1. When the text in the LabelPicker's text field changes, processTextFieldChange is called.
- * 2. If the text is not empty, this method will try to determine if the the user typed in a character or backspaced.
- *   2a. Typing is handled by addCharHandler
- *     i. If the user typed ' ', it will attempt to add the current highlighted label (if there is).
- *     ii. Else it is an ongoing query
- *     Bottom labels that do not fit the query will be faded.
- *     The first of the unfaded labels will be 'highlighted'.
- *     The highlighted bottom label will then be displayed as a 'possible label' at the top.
- *   2b. Backspacing is handled by removeCharHandler
- *     i. When the current last character is ' ', there is no current query, therefore any 'possible label'
- *     is removed
- *     ii. When the removed character is ' ', and the last character is not ' ', the most recently specified label is
- *     toggled. In addition, there is an existing query that will result in a 'possible label'
- *
- * listOfSpecifiedLabels is maintained to keep track of the mapping between what the user has entered in the
- * text field, and the labels that have been added/removed due to them.
- * listOfRemovedExclusiveLabels is also maintained so that the removed labels can be added back when needed.
+ * This class provides the following key methods:
+ * 1. processTextFieldChange: this should be called after every change in the UI's text field
+ * 2. toggleLabel
+ * 3. toggleHighlightedLabel
+ * 4. moveHighlightOnLabel
  */
 public class LabelPickerUILogic {
 
@@ -44,8 +31,8 @@ public class LabelPickerUILogic {
     // variables to handle text field changes
     private int previousTextFieldLength = 0;
     private Character previousLastChar = null;
-    private final ArrayList<String> listOfSpecifiedLabels = new ArrayList<>();
-    private final ArrayList<ArrayList<String>> listOfRemovedExclusiveLabels = new ArrayList<>();
+    private final Stack<String> stackOfSpecifiedLabels = new Stack<>();
+    private final Stack<ArrayList<String>> stackOfRemovedExclusiveLabels = new Stack<>();
 
 
     LabelPickerUILogic(TurboIssue issue, List<TurboLabel> repoLabels, LabelPickerDialog dialog) {
@@ -73,7 +60,7 @@ public class LabelPickerUILogic {
         // in issue.getLabels()
         repoLabels.forEach(label -> {
             // matching with exact labels so no need to worry about capitalisation
-            resultList.put(label.getActualName(), issue.getLabels().contains(label.getActualName()));
+            resultList.put(label.getActualName(), isExistingLabel(label.getActualName()));
             if (label.getGroup().isPresent() && !groups.containsKey(label.getGroup().get())) {
                 groups.put(label.getGroup().get(), label.isExclusive());
             }
@@ -84,106 +71,138 @@ public class LabelPickerUILogic {
         if (dialog != null) dialog.populatePanes(getExistingLabels(), getNewTopLabels(), bottomLabels, groups);
     }
 
-    public void toggleLabel(String name) {
+    public ArrayList<String> toggleLabel(String name) {
         removePossibleLabel();
-        preProcessAndUpdateTopLabels(name);
+        ArrayList<String> removedLabels = processAndUpdateTopLabels(name);
         updateBottomLabels(""); // clears search query, removes faded-out overlay on bottom labels
         populatePanes();
+        return removedLabels;
     }
 
-    public void toggleHighlightedLabel() {
-        if (!bottomLabels.isEmpty() && hasHighlightedLabel()) {
-            listOfSpecifiedLabels.add(getHighlightedLabelName().get().getActualName());
-            toggleLabel(
-                    bottomLabels.stream().filter(PickerLabel::isHighlighted).findFirst().get().getActualName());
-        } else {
-            listOfSpecifiedLabels.add(null);
-            listOfRemovedExclusiveLabels.add(null);
-        }
+    public ArrayList<String> toggleHighlightedLabel() {
+        return toggleLabel(getHighlightedLabelName().get().getActualName());
     }
 
     @SuppressWarnings("unused")
     private void ______TEXT_FIELD______() {}
 
     public void processTextFieldChange(String text) {
-        int curTextFieldLength = text.length();
-
-        if (curTextFieldLength == 0) {
-            // empty text, no possible labels to show
+        if (isEmpty(text)) {
             removePossibleLabel();
         } else {
-            char lastChar = text.charAt(curTextFieldLength - 1);
-            if (curTextFieldLength > previousTextFieldLength) {
-                // char was added
-                addCharHandler(text, lastChar);
-            } else {
-                // char was removed
-                removeCharHandler(text, lastChar);
-            }
-
-            // update variables
-            previousTextFieldLength = curTextFieldLength;
-            previousLastChar = lastChar;
+            processChangeAndUpdateVariables(text);
         }
         populatePanes();
     }
 
-    private void removeCharHandler(String text, char lastChar) {
-        if (lastChar != ' ' && previousLastChar == ' ' && !listOfSpecifiedLabels.isEmpty()) {
-            // if the last removed character was space
-            // and is at the end of the last label (must have at least 1 specified label!)
-
-            // untoggle last label if applicable
-            toggleRecentlySpecifiedLabel();
-
-            // restore removed label(s) due to exclusive grouping if applicable
-            restoreRecentlyRemovedLabels();
+    private void processChangeAndUpdateVariables(String text) {
+        if (isLongerTextFieldThanPrevious(text)) {
+            addCharHandler(text);
+        } else {
+            removeCharHandler(text);
         }
 
-        if (lastChar == ' ') {
-            // there is no query, remove all possible labels
+        updateVariables(text);
+    }
+
+    /**
+     * This method will either toggle the highlighted label, or update both the bottom labels and the possible label
+     * in the top pane, depending on the last character of text (added character)
+     */
+    private void addCharHandler(String text) {
+        if (isLastCharSpace(text)) {
+            // space-toggle
+            spaceToggle();
+        } else {
+            queryHandler(getLastWord(text));
+        }
+    }
+
+    private void spaceToggle() {
+        if (!bottomLabels.isEmpty() && hasHighlightedLabel()) {
+            stackOfSpecifiedLabels.push(getHighlightedLabelName().get().getActualName());
+            stackOfRemovedExclusiveLabels.push(toggleHighlightedLabel());
+        } else {
+            stackOfSpecifiedLabels.push(null);
+            stackOfRemovedExclusiveLabels.push(null);
+        }
+    }
+
+    private void queryHandler(String lastWord) {
+        updateBottomLabelsWithRawQuery(lastWord);
+        updatePossibleLabel();
+    }
+
+    private void removeCharHandler(String text) {
+        if (isWordRemoved(text)) {
+            undoPreviousSpaceToggle();
+        }
+
+        if (isLastCharSpace(text)) {
             removePossibleLabel();
         } else {
-            // update bottom labels with last word query, then update the possible label
-            String[] textArray = text.trim().split(" ");
-            String lastWord = textArray[textArray.length - 1];
-            updateBottomLabelsWithRawQuery(lastWord);
-            updatePossibleLabel();
+            queryHandler(getLastWord(text));
         }
     }
 
-    private void addCharHandler(String text, char lastChar) {
-        String[] textArray = text.trim().split(" ");
-        String lastWord = textArray[textArray.length - 1];
-
-        if (lastChar == ' ') {
-            // attempt to toggle if the added character was space
-            toggleHighlightedLabel();
-        } else {
-            // fade/unfade bottom labels according to query, then update the possible label
-            updateBottomLabelsWithRawQuery(lastWord);
-            updatePossibleLabel();
-        }
+    private void undoPreviousSpaceToggle() {
+        toggleRecentlySpecifiedLabel();
+        restoreRecentlyRemovedLabels();
     }
 
+    /**
+     * Untoggles last label that was specified
+     * This may do nothing if the last label added was null (i.e. added without any highlighted label)
+     */
     private void toggleRecentlySpecifiedLabel() {
-        int lastIndex = listOfSpecifiedLabels.size() - 1;
-
-        String lastSpecifiedLabel = listOfSpecifiedLabels.remove(lastIndex);
+        String lastSpecifiedLabel = stackOfSpecifiedLabels.pop();
         if (lastSpecifiedLabel != null) {
             // if the last label is mapped to an actual label
             updateTopLabels(lastSpecifiedLabel, !resultList.get(lastSpecifiedLabel));
         }
     }
 
+    /**
+     * Restores the most recent set of removed label(s) due to exclusive grouping
+     */
     private void restoreRecentlyRemovedLabels() {
-        int lastIndex = listOfRemovedExclusiveLabels.size() - 1;
-
-        ArrayList<String> listOfRemovedLabels = listOfRemovedExclusiveLabels.remove(lastIndex);
+        ArrayList<String> listOfRemovedLabels = stackOfRemovedExclusiveLabels.pop();
         if (listOfRemovedLabels != null) {
             listOfRemovedLabels.stream()
                     .forEach(labelName -> updateTopLabels(labelName, true));
         }
+    }
+
+    private boolean isEmpty(String text) {
+        return text.length() == 0;
+    }
+
+    private boolean isLongerTextFieldThanPrevious(String text) {
+        return text.length() > previousTextFieldLength;
+    }
+
+    private void updateVariables(String text) {
+        previousTextFieldLength = text.length();
+        previousLastChar = text.charAt(text.length() - 1);
+    }
+
+    private String getLastWord(String text) {
+        String[] textArray = text.trim().split(" ");
+        return textArray[textArray.length - 1];
+    }
+
+    private boolean isLastCharSpace(String text) {
+        char lastChar = text.charAt(text.length() - 1);
+        return isSpace(lastChar);
+    }
+
+    private boolean isSpace(char lastChar) {
+        return lastChar == ' ';
+    }
+
+    // Assumptions: text is not empty or null
+    private boolean isWordRemoved(String text) {
+        return !isLastCharSpace(text) && isSpace(previousLastChar) && !stackOfSpecifiedLabels.isEmpty();
     }
 
     /*
@@ -196,42 +215,48 @@ public class LabelPickerUILogic {
     private void addExistingLabels() {
         // used once to populate topLabels at the start
         allLabels.stream()
-                .filter(label -> issue.getLabels().contains(label.getActualName()))
+                .filter(label -> isExistingLabel(label.getActualName()))
                 .forEach(label -> topLabels.add(new PickerLabel(label, this, true)));
     }
 
-    private void preProcessAndUpdateTopLabels(String name) {
+    private ArrayList<String> processAndUpdateTopLabels(String name) {
+        ArrayList<String> listOfRemovedNames = new ArrayList<>();
         Optional<TurboLabel> turboLabel =
                 allLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
         if (turboLabel.isPresent()) {
-            ArrayList<String> listOfRemovedNames = new ArrayList<>();
             if (turboLabel.get().isExclusive() && !resultList.get(name)) {
-                // checks and removes any conflicting exclusive labels
-                String group = turboLabel.get().getGroup().get();
-                allLabels
-                        .stream()
-                        .filter(TurboLabel::isExclusive)
-                        .filter(label -> label.getGroup().get().equals(group))
-                        .forEach(label -> {
-                            if (isInTopLabels(label.getActualName()) && !isARemovedTopLabel(label.getActualName())) {
-                                listOfRemovedNames.add(label.getActualName());
-                            }
-                            updateTopLabels(label.getActualName(), false);
-                        });
-                updateTopLabels(name, true);
-            } else {
-                updateTopLabels(name, !resultList.get(name));
+                removeConflictingExclusiveLabels(turboLabel, listOfRemovedNames);
             }
-
-            listOfRemovedExclusiveLabels.add(listOfRemovedNames);
+            updateTopLabels(name, !resultList.get(name));
         }
+        return listOfRemovedNames;
+    }
+
+    /**
+     * Removes any conflicting exclusive labels from top pane and adds them to listOfRemovedNames
+     * @param turboLabel
+     * @param listOfRemovedNames
+     */
+    private void removeConflictingExclusiveLabels(Optional<TurboLabel> turboLabel,
+                                                  ArrayList<String> listOfRemovedNames) {
+        String group = turboLabel.get().getGroup().get();
+        allLabels
+                .stream()
+                .filter(TurboLabel::isExclusive)
+                .filter(label -> label.getGroup().get().equals(group))
+                .forEach(label -> {
+                    if (isInTopLabels(label.getActualName()) && !isARemovedTopLabel(label.getActualName())) {
+                        listOfRemovedNames.add(label.getActualName());
+                    }
+                    updateTopLabels(label.getActualName(), false);
+                });
     }
 
     private void updateTopLabels(String name, boolean isAdd) {
         // adds new labels to the end of the list
         resultList.put(name, isAdd); // update resultList first
         if (isAdd) {
-            if (issue.getLabels().contains(name)) {
+            if (isExistingLabel(name)) {
                 topLabels.stream()
                         .filter(label -> label.getActualName().equals(name))
                         .forEach(label -> {
@@ -251,7 +276,7 @@ public class LabelPickerUILogic {
                     .filter(label -> label.getActualName().equals(name))
                     .findFirst()
                     .ifPresent(label -> {
-                        if (issue.getLabels().contains(name)) {
+                        if (isExistingLabel(name)) {
                             label.setIsRemoved(true);
                         } else {
                             topLabels.remove(label);
@@ -273,6 +298,14 @@ public class LabelPickerUILogic {
                 .filter(label -> label.getActualName().equals(name) && label.isRemoved())
                 .findAny()
                 .isPresent();
+    }
+
+    /**
+     * Updates the possible label based on the current highlighted label
+     */
+    private void updatePossibleLabel() {
+        removePossibleLabel();
+        addPossibleLabel();
     }
 
     /**
@@ -317,8 +350,7 @@ public class LabelPickerUILogic {
             //something is highlighted, try to add possible label
             TurboLabel highlightedLabel = getHighlightedLabelName().get();
             String highlightedLabelName = highlightedLabel.getActualName();
-            if (issue.getLabels().contains(highlightedLabelName)) {
-                // is an existing label, either
+            if (isExistingLabel(highlightedLabelName)) {
                 topLabels.stream()
                         .filter(label -> label.getActualName().equals(highlightedLabelName))
                         .findFirst()
@@ -348,14 +380,6 @@ public class LabelPickerUILogic {
 
             targetLabel = Optional.of(highlightedLabelName);
         }
-    }
-
-    /**
-     * Updates the possible label based on the current highlighted label
-     */
-    private void updatePossibleLabel() {
-        removePossibleLabel();
-        addPossibleLabel();
     }
 
     // Bottom box deals with possible matches so we usually ignore the case for these methods.
@@ -503,19 +527,21 @@ public class LabelPickerUILogic {
 
     private List<PickerLabel> getExistingLabels() {
         return topLabels.stream()
-                .filter(label -> issue.getLabels().contains(label.getActualName()))
+                .filter(label -> isExistingLabel(label.getActualName()))
                 .collect(Collectors.toList());
     }
 
-    public boolean isExistingLabel(PickerLabel targetLabel) {
-        return allLabels.stream()
-                .filter(label -> issue.getLabels().contains(targetLabel.getActualName()))
-                .count() > 0;
+    private boolean isExistingLabel(PickerLabel targetLabel) {
+        return isExistingLabel(targetLabel.getActualName());
+    }
+
+    private boolean isExistingLabel(String labelName) {
+        return issue.getLabels().contains(labelName);
     }
 
     private List<PickerLabel> getNewTopLabels() {
         return topLabels.stream()
-                .filter(label -> !issue.getLabels().contains(label.getActualName()))
+                .filter(label -> !isExistingLabel(label.getActualName()))
                 .collect(Collectors.toList());
     }
 }
