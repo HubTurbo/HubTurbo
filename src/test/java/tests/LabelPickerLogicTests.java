@@ -126,6 +126,30 @@ public class LabelPickerLogicTests {
         assertEquals(true, invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).isPresent());
         assertEquals("Priority.High",
                 invokeGetHighlightedLabelNameMethod(getHighlightedLabelNameMethod, logic).get().getActualName());
+
+        // start with an issue with no labels
+        logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // query highlights nothing
+        logic.processTextFieldChange("asdf");
+        assertEquals(false, logic.hasHighlightedLabel());
+        // invalid space-toggle
+        logic.processTextFieldChange("asdf ");
+        assertEquals(0, getLabels(logic).size());
+        // highlights priority.high
+        logic.processTextFieldChange("asdf p.h");
+        assertEquals(true, logic.hasHighlightedLabel());
+        // toggles priority.high
+        logic.processTextFieldChange("asdf p.h ");
+        assertEquals(1, getLabels(logic).size());
+        // untoggles priority.high
+        logic.processTextFieldChange("asdf p.h");
+        assertEquals(0, getLabels(logic).size());
+        assertEquals(true, logic.hasHighlightedLabel());
+        // clears query
+        logic.processTextFieldChange("asdf ");
+        assertEquals(0, getLabels(logic).size());
+        assertEquals(false, logic.hasHighlightedLabel());
     }
 
     @Test

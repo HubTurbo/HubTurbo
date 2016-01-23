@@ -74,7 +74,7 @@ public class LabelPickerUILogic {
     public ArrayList<String> toggleLabel(String name) {
         removePossibleLabel();
         ArrayList<String> removedLabels = processAndUpdateTopLabels(name);
-        updateBottomLabels(""); // clears search query, removes faded-out overlay on bottom labels
+        restoreBottomLabels(); // clears search query, removes faded-out overlay on bottom labels
         populatePanes();
         return removedLabels;
     }
@@ -89,6 +89,7 @@ public class LabelPickerUILogic {
     public void processTextFieldChange(String text) {
         if (isEmpty(text)) {
             removePossibleLabel();
+            restoreBottomLabels();
         } else {
             processChangeAndUpdateVariables(text);
         }
@@ -140,9 +141,14 @@ public class LabelPickerUILogic {
 
         if (isLastCharSpace(text)) {
             removePossibleLabel();
+            restoreBottomLabels();
         } else {
             queryHandler(getLastWord(text));
         }
+    }
+
+    private void restoreBottomLabels() {
+        updateBottomLabels("");
     }
 
     private void undoPreviousSpaceToggle() {
