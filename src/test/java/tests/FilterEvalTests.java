@@ -9,17 +9,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.ParseException;
 import filter.Parser;
+import filter.SemanticException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import prefs.Preferences;
 
 public class FilterEvalTests {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private final IModel empty;
     public static final String REPO = "test/test";
@@ -35,6 +42,17 @@ public class FilterEvalTests {
      */
     public boolean matches(String filterExpr, TurboIssue issue) {
         return Qualifier.process(empty, Parser.parse(filterExpr), issue);
+    }
+
+    /**
+     * Helper method for testing SemanticException thrown by different qualifiers
+     */
+    public void expectSemanticException(QualifierType type, String invalidInput) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "");
+        thrown.expect(SemanticException.class);
+        thrown.expectMessage(String.format(SemanticException.ERR_MSG, type, 
+                type.getValidInputs()));
+        matches(invalidInput, issue);
     }
 
     @Test
@@ -68,9 +86,11 @@ public class FilterEvalTests {
         assertEquals(true, matches("id:<=2", issue1));
         assertEquals(true, matches("id:>0", issue1));
         assertEquals(true, matches("id:>=0", issue1));
+    }
 
-        // Non-number
-        assertEquals(false, matches("id:a", issue1));
+    @Test
+    public void invalidId() {
+        expectSemanticException(QualifierType.ID, "id:something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -483,8 +503,12 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
         assertEquals(false, matches("state:open", issue));
-        assertEquals(false, matches("state:o", issue));
         assertEquals(true, matches("state:closed", issue));
+    }
+
+    @Test
+    public void invalidState() {
+        expectSemanticException(QualifierType.STATE, "state:something");
     }
 
     @Test
@@ -500,7 +524,6 @@ public class FilterEvalTests {
         assertEquals(false, matches("has:m", issue));
         assertEquals(false, matches("has:assignee", issue));
         assertEquals(false, matches("has:as", issue));
-        assertEquals(false, matches("has:something", issue));
 
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
@@ -510,7 +533,6 @@ public class FilterEvalTests {
         assertEquals(false, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
@@ -520,7 +542,6 @@ public class FilterEvalTests {
         assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
@@ -530,7 +551,11 @@ public class FilterEvalTests {
         assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
+    }
+
+    @Test
+    public void invalidHas() {
+        expectSemanticException(QualifierType.HAS, "has:something");
     }
 
     @Test
@@ -546,7 +571,6 @@ public class FilterEvalTests {
         assertEquals(true, matches("no:m", issue));
         assertEquals(true, matches("no:assignee", issue));
         assertEquals(true, matches("no:as", issue));
-        assertEquals(true, matches("no:something", issue));
 
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
@@ -556,7 +580,6 @@ public class FilterEvalTests {
         assertEquals(true, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
@@ -566,7 +589,6 @@ public class FilterEvalTests {
         assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
@@ -576,7 +598,11 @@ public class FilterEvalTests {
         assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
+    }
+
+    @Test
+    public void invalidNo() {
+        expectSemanticException(QualifierType.NO, "no:something");
     }
 
     @Test
@@ -585,21 +611,22 @@ public class FilterEvalTests {
 
         assertEquals(false, matches("type:issue", issue));
         assertEquals(true, matches("type:pr", issue));
-        assertEquals(false, matches("type:sldkj", issue));
 
         issue = new TurboIssue(REPO, 1, "", "", null, false);
 
         assertEquals(true, matches("type:issue", issue));
         assertEquals(false, matches("type:pr", issue));
-        assertEquals(false, matches("type:lkjs", issue));
+    }
+
+    @Test
+    public void invalidType() {
+        expectSemanticException(QualifierType.TYPE, "type:something");
     }
 
     @Test
     public void is() {
 
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
-
-        assertEquals(false, matches("is:sldkj", issue));
 
         assertEquals(false, matches("is:issue", issue));
         assertEquals(true, matches("is:pr", issue));
@@ -658,6 +685,11 @@ public class FilterEvalTests {
     }
 
     @Test
+    public void invalidIs() {
+        expectSemanticException(QualifierType.IS, "is:something");
+    }
+
+    @Test
     public void created() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", LocalDateTime.of(2014, 12, 2, 12, 0), false);
 
@@ -665,7 +697,11 @@ public class FilterEvalTests {
         assertEquals(false, matches("created:<=2014-12-1", issue));
         assertEquals(true, matches("created:>2014-12-1", issue));
         assertEquals(true, matches("created:2014-12-2", issue));
-        assertEquals(false, matches("created:nondate", issue));
+    }
+
+    @Test
+    public void invalidCreated() {
+        expectSemanticException(QualifierType.CREATED, "created:nondate");
     }
 
     @Test
@@ -680,7 +716,6 @@ public class FilterEvalTests {
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
         assertEquals(true, matches("updated:>24", issue));
-        assertEquals(false, matches("updated:nondate", issue));
 
         issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(1));
@@ -689,7 +724,11 @@ public class FilterEvalTests {
         assertEquals(matches("updated:<26", issue),
             matches("updated:26", issue));
         assertEquals(false, matches("updated:>26", issue));
-        assertEquals(false, matches("updated:nondate", issue));
+    }
+
+    @Test
+    public void invalidUpdated() {
+        expectSemanticException(QualifierType.UPDATED, "updated:nondate");
     }
 
     @Test

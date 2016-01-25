@@ -17,11 +17,13 @@ import util.Utility;
 import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
+
 
     private final QualifierType type;
 
@@ -695,7 +697,7 @@ public class Qualifier implements FilterExpression {
         } else if (numberRange.isPresent()) {
             return numberRange.get().encloses(issue.getId());
         }
-        return false;
+        throw new SemanticException(type, type.getValidInputs());
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
@@ -706,7 +708,7 @@ public class Qualifier implements FilterExpression {
         } else if (number.isPresent()) {
             updatedRange = new NumberRange(null, number.get(), true);
         } else {
-            return false;
+            throw new SemanticException(type, type.getValidInputs());
         }
 
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
@@ -726,7 +728,7 @@ public class Qualifier implements FilterExpression {
         } else if (dateRange.isPresent()) {
             return dateRange.get().encloses(creationDate);
         } else {
-            return false;
+            throw new SemanticException(type, type.getValidInputs());
         }
     }
 
@@ -747,7 +749,7 @@ public class Qualifier implements FilterExpression {
             assert issue.getAssignee() != null;
             return issue.getAssignee().isPresent();
         default:
-            return false;
+            throw new SemanticException(type, type.getValidInputs());
         }
     }
 
@@ -773,7 +775,7 @@ public class Qualifier implements FilterExpression {
         case "unread":
             return !issue.isCurrentlyRead();
         default:
-            return false;
+            throw new SemanticException(type, type.getValidInputs());
         }
     }
 
@@ -785,7 +787,7 @@ public class Qualifier implements FilterExpression {
         } else if (content.contains("closed")) {
             return !issue.isOpen();
         } else {
-            return false;
+            throw new SemanticException(type, type.getValidInputs());
         }
     }
 
@@ -913,7 +915,7 @@ public class Qualifier implements FilterExpression {
             case "pullrequest":
                 return issue.isPullRequest();
             default:
-                return false;
+                throw new SemanticException(type, type.getValidInputs());
         }
     }
 

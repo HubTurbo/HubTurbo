@@ -16,6 +16,7 @@ public enum QualifierType {
     REPO, SORT, STATE, TITLE, TYPE, UPDATED;
 
     private static final Map<String, QualifierType> ALIASES = initialiseAliases();
+    private static final Map<QualifierType, String> VALID_INPUTS = initialiseValidInputs();
 
     private static Map<String, QualifierType> initialiseAliases() {
         Map<String, QualifierType> aliases = new HashMap<>();
@@ -29,6 +30,27 @@ public enum QualifierType {
         aliases.put("body", DESCRIPTION);
         aliases.put("desc", DESCRIPTION);
         return Collections.unmodifiableMap(aliases);
+    }
+
+    // Ignore Qualifiers that expects a string where any user input would be valid
+    private static Map<QualifierType, String> initialiseValidInputs() {
+        Map<QualifierType, String> validInputs = new HashMap<>();
+        validInputs.put(ID, "a number or a number range");
+        validInputs.put(UPDATED, "a number or  a number range");
+        validInputs.put(STATE, "\"open\" or \"closed\"");
+        validInputs.put(HAS, "\"label\", \"milestone\", or \"assignee\"");
+        validInputs.put(NO, "\"label\", \"milestone\", or \"assignee\"");
+        validInputs.put(IN, "\"title\" or \"body\"");
+        validInputs.put(TYPE, "\"issue\" or \"pr\"");
+        validInputs.put(CREATED, "a date or a date range");
+        validInputs.put(REPO, "repo id");
+        
+        //Show only most common inputs to safe space
+        validInputs.put(IS, "\"open\", \"closed\", \"pr\", \"issue\", \"merged\","
+                + " \"read\", \"unread\", or \"unmerged\"");
+        validInputs.put(SORT, "\"comments\", \"repo\", \"updated\", \"id\", "
+                + " \"assignee\", \"label\", \"state\", or \"milestone\"");
+        return Collections.unmodifiableMap(validInputs);
     }
 
     /**
@@ -92,5 +114,12 @@ public enum QualifierType {
     @Override
     public String toString() {
         return name().toLowerCase();
+    }
+    
+    public String getValidInputs() {
+        String defaultExpectedInput = "string";
+        if (VALID_INPUTS.containsKey(this)) return VALID_INPUTS.get(this);
+        return defaultExpectedInput;
+
     }
 }
