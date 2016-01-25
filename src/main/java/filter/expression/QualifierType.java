@@ -19,15 +19,27 @@ public enum QualifierType {
 
     private static Map<String, QualifierType> initialiseAliases() {
         Map<String, QualifierType> aliases = new HashMap<>();
-        aliases.put("m", MILESTONE);
         aliases.put("as", ASSIGNEE);
         aliases.put("au", AUTHOR);
-        aliases.put("s", STATE);
         aliases.put("creator", AUTHOR);
-        aliases.put("user", INVOLVES);
-        aliases.put("status", STATE);
-        aliases.put("body", DESCRIPTION);
+        aliases.put("cr", CREATED);
+        aliases.put("cn", COUNT);
+        aliases.put("d", DATE);
+        aliases.put("de", DESCRIPTION);
         aliases.put("desc", DESCRIPTION);
+        aliases.put("body", DESCRIPTION);
+        aliases.put("h", HAS);
+        aliases.put("user", INVOLVES);
+        aliases.put("l", LABEL);
+        aliases.put("m", MILESTONE);
+        aliases.put("n", NO);
+        aliases.put("r", REPO);
+        aliases.put("s", SORT);
+        aliases.put("st", STATE);
+        aliases.put("status", STATE);
+        aliases.put("t", TITLE);
+        aliases.put("ty", TYPE);
+        aliases.put("u", UPDATED);
         return Collections.unmodifiableMap(aliases);
     }
 
