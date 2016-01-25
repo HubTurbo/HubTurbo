@@ -164,7 +164,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 // if there is a highlighted label, toggle that label first
                 if (uiLogic.hasHighlightedLabel()) uiLogic.toggleHighlightedLabel();
                 // if user confirms selection, return list of labels
-                return uiLogic.getResultList().entrySet().stream()
+                return uiLogic.getActiveLabels().entrySet().stream()
                         .filter(Map.Entry::getValue)
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toList());
