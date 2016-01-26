@@ -22,6 +22,8 @@ public class BoardAutoCreator {
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
     private static final String MILESTONES = "Milestones";
     private static final String WORK_ALLOCATION = "Work Allocation";
+    private static final String SAMPLE = "Sample Board!";
+    private static final String SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
     private static final int MAX_WORK_ALLOCATION_PANELS = 5;
 
     private final UI ui;
@@ -36,6 +38,10 @@ public class BoardAutoCreator {
 
     public Menu generateBoardAutoCreateMenu() {
         Menu autoCreate = new Menu("Auto-create");
+
+        MenuItem sample = new MenuItem(SAMPLE);
+        sample.setOnAction(e -> createSampleBoard());
+        autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
         milestone.setOnAction(e -> createMilestoneBoard());
@@ -98,6 +104,30 @@ public class BoardAutoCreator {
 
         DialogMessage.showInformationDialog("Auto-create Board - " + WORK_ALLOCATION,
                 WORK_ALLOCATION + " board has been created and loaded.\n\n" +
+                        "It is saved under the name \"" + boardName + "\".");
+    }
+
+    private void createSampleBoard() {
+        logger.info("Creating " + SAMPLE);
+
+        panelControl.closeAllPanels();
+
+        List<PanelInfo> panelData = new ArrayList<>();
+
+        panelData.add(new PanelInfo("Open issues and PR's", SAMPLE_REPO_NAME + " " + "(is:issue OR is:pr) is:open"));
+        panelData.add(new PanelInfo("V5 Milestone", SAMPLE_REPO_NAME + " " + "milestone:V5 sort:status"));
+        panelData.add(new PanelInfo("Urgent issues assigned to Darius",
+                SAMPLE_REPO_NAME + " " + "label:urgent assignee:dariusf"));
+
+        String boardName = "Sample Board!";
+        createBoard(panelData, boardName);
+
+        panelControl.selectPanel(1); // current
+
+        triggerBoardSaveEventSequence(boardName);
+
+        DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE,
+                SAMPLE + " has been created and loaded.\n\n" +
                         "It is saved under the name \"" + boardName + "\".");
     }
 
