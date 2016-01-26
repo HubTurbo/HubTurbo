@@ -49,14 +49,18 @@ public class LabelPickerLogicTests {
                 .collect(Collectors.toList());
     }
 
+    public Method makeMethodAccessible(String methodName) throws NoSuchMethodException {
+        Method getHighlightedLabelMethod =
+                LabelPickerUILogic.class.getDeclaredMethod(methodName);
+        getHighlightedLabelMethod.setAccessible(true);
+        return getHighlightedLabelMethod;
+    }
+
     @Test
-    public void groupTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void exclusiveGroupingTest() {
         // check for exclusive group toggling
         // we start with no labels
         LabelPickerUILogic logic = prepareLogic();
-        Method getHighlightedLabelMethod =
-                LabelPickerUILogic.class.getDeclaredMethod("getHighlightedLabel");
-        getHighlightedLabelMethod.setAccessible(true);
         assertEquals(0, getLabels(logic).size());
         // let's toggle two exclusive labels
         logic.toggleLabel("p.low");
@@ -96,30 +100,14 @@ public class LabelPickerLogicTests {
         // we should be left with one label
         assertEquals(1, getLabels(logic).size());
         assertEquals(true, logic.getActiveLabels().get("p.high"));
+    }
+
+    @Test
+    public void queryFilterTest() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method getHighlightedLabelMethod = makeMethodAccessible("getHighlightedLabel");
 
         // starting with an issue with no labels
-        logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
-        // check for correct label selection
-        logic.processTextFieldChange("f.d");
-        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
-        assertEquals("f-dcd",
-                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
-        // move highlight up once
-        logic.moveHighlightOnLabel(false);
-        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
-        assertEquals("f-cdc",
-                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
-        // keep moving it upwards
-        logic.moveHighlightOnLabel(false);
-        logic.moveHighlightOnLabel(false);
-        logic.moveHighlightOnLabel(false);
-        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
-        assertEquals("f-cdc",
-                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
-
-        // starting with an issue with no labels
-        logic = prepareLogic();
+        LabelPickerUILogic logic = prepareLogic();
         assertEquals(0, getLabels(logic).size());
         // check for correct label selection
         logic.processTextFieldChange("pri.h");
@@ -127,22 +115,72 @@ public class LabelPickerLogicTests {
         assertEquals("Priority.High",
                 invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
 
-        // try handling invalid label with backspacing
-        // start with an issue with no labels
+
         logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
         // query highlights nothing
         logic.processTextFieldChange("asdf");
         assertEquals(false, logic.hasHighlightedLabel());
         // invalid space-toggle
         logic.processTextFieldChange("asdf ");
         assertEquals(0, getLabels(logic).size());
+    }
+
+    @Test
+    public void backspaceTest() {
+        // typical use case
+        LabelPickerUILogic logic = prepareLogic();
+        // query highlights Priority.Low
+        logic.processTextFieldChange("p.l");
+        // toggle Priority.Low
+        logic.processTextFieldChange("p.l ");
+        // query highlights Label1
+        logic.processTextFieldChange("p.l label");
+        // toggle Label1
+        logic.processTextFieldChange("p.l label ");
+        // backspace
+        logic.processTextFieldChange("p.l label");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals(true, logic.hasHighlightedLabel());
+        // backspace until no query
+        logic.processTextFieldChange("p.l ");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals(false, logic.hasHighlightedLabel());
+        // backspace
+        logic.processTextFieldChange("p.l");
+        assertEquals(0, getLabels(logic).size());
+        assertEquals(true, logic.hasHighlightedLabel());
+        logic.processTextFieldChange("");
+        assertEquals(0, getLabels(logic).size());
+        assertEquals(false, logic.hasHighlightedLabel());
+
+        // let's test for restoring exclusive labels
+        // start with an issue with no labels
+        logic = prepareLogic();
+        // query highlights Priority.Low
+        logic.processTextFieldChange("p.l");
+        // toggle Priority.Low
+        logic.processTextFieldChange("p.l ");
+        // query highlights Priority.Mid
+        logic.processTextFieldChange("p.l p.m");
+        // toggle exclusive label Priority.Mid, should only have 1 remaining
+        logic.processTextFieldChange("p.l p.m ");
+        // undo, Priority.Low should be restored automatically
+        logic.processTextFieldChange("p.l p.m");
+        assertEquals(1, getLabels(logic).size());
+        assertEquals(true, getLabels(logic).contains("Priority.Low"));
+        assertEquals(true, logic.hasHighlightedLabel());
+
+        // try handling invalid label with backspacing
+        // start with an issue with no labels
+        logic = prepareLogic();
+        // query highlights nothing
+        logic.processTextFieldChange("asdf");
+        // invalid space-toggle
+        logic.processTextFieldChange("asdf ");
         // highlights Priority.High
         logic.processTextFieldChange("asdf p.h");
-        assertEquals(true, logic.hasHighlightedLabel());
         // toggles Priority.High
         logic.processTextFieldChange("asdf p.h ");
-        assertEquals(1, getLabels(logic).size());
         // untoggles Priority.High
         logic.processTextFieldChange("asdf p.h");
         assertEquals(0, getLabels(logic).size());
@@ -152,39 +190,15 @@ public class LabelPickerLogicTests {
         assertEquals(0, getLabels(logic).size());
         assertEquals(false, logic.hasHighlightedLabel());
 
-        // let's test for restoring exclusive labels
-        // start with an issue with no labels
-        logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
-        // query highlights Priority.Low
-        logic.processTextFieldChange("p.l");
-        assertEquals(true, logic.hasHighlightedLabel());
-        // toggle Priority.Low
-        logic.processTextFieldChange("p.l ");
-        assertEquals(1, getLabels(logic).size());
-        assertEquals(false, logic.hasHighlightedLabel());
-        // query highlights Priority.Mid
-        logic.processTextFieldChange("p.l p.m");
-        assertEquals(true, logic.hasHighlightedLabel());
-        // toggle exclusive label Priority.Mid, should only have 1 remaining
-        logic.processTextFieldChange("p.l p.m ");
-        assertEquals(1, getLabels(logic).size());
-        assertEquals(true, getLabels(logic).contains("Priority.Mid"));
-        assertEquals(false, logic.hasHighlightedLabel());
-        // undo, Priority.Low should be restored automatically
-        logic.processTextFieldChange("p.l p.m");
-        assertEquals(1, getLabels(logic).size());
-        assertEquals(true, getLabels(logic).contains("Priority.Low"));
-        assertEquals(true, logic.hasHighlightedLabel());
+
     }
 
     @Test
     public void moveHighlightTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         // check for highlighted label movement
         LabelPickerUILogic logic = prepareLogic();
-        Method getHighlightedLabelMethod =
-                LabelPickerUILogic.class.getDeclaredMethod("getHighlightedLabel");
-        getHighlightedLabelMethod.setAccessible(true);
+        Method getHighlightedLabelMethod = makeMethodAccessible("getHighlightedLabel");
+
         assertEquals(0, getLabels(logic).size());
         // check for no highlight
         assertEquals(false, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
@@ -216,10 +230,33 @@ public class LabelPickerLogicTests {
         assertEquals(true, getLabels(logic).contains("Label 1"));
         assertEquals(false, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
 
+        // starting with an issue with no labels
+        logic = prepareLogic();
+        assertEquals(0, getLabels(logic).size());
+        // check for correct label selection
+        logic.processTextFieldChange("f.d");
+        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
+        assertEquals("f-dcd",
+                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
+        // move highlight up once
+        logic.moveHighlightOnLabel(false);
+        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
+        assertEquals("f-cdc",
+                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
+        // keep moving it upwards
+        logic.moveHighlightOnLabel(false);
+        logic.moveHighlightOnLabel(false);
+        logic.moveHighlightOnLabel(false);
+        assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
+        assertEquals("f-cdc",
+                invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
     }
 
     @Test
-    public void separatorTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void mixedSeparatorsTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method getExistingLabelsMethod = makeMethodAccessible("getExistingLabels");
+        Method getAddedLabelsMethod = makeMethodAccessible("getAddedLabels");
+
         // we start off with an issue with two labels
         TurboIssue issue = new TurboIssue("dummy/dummy", 1, "Issue 1");
         ArrayList<String> labels = new ArrayList<>();
@@ -227,10 +264,6 @@ public class LabelPickerLogicTests {
         labels.add("p.low");
         issue.setLabels(labels);
         LabelPickerUILogic logic = prepareLogic(issue);
-        Method getExistingLabelsMethod = LabelPickerUILogic.class.getDeclaredMethod("getExistingLabels");
-        getExistingLabelsMethod.setAccessible(true);
-        Method getAddedLabelsMethod = LabelPickerUILogic.class.getDeclaredMethod("getAddedLabels");
-        getAddedLabelsMethod.setAccessible(true);
         // check for two existing labels
         assertEquals(2, invokePickerLabelListMethod(getExistingLabelsMethod, logic).size());
         assertEquals(0, invokePickerLabelListMethod(getAddedLabelsMethod, logic).size());
