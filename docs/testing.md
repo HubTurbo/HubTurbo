@@ -42,7 +42,7 @@ Follow the conventions for existing ids when assigning ids to new elements.
 
 **Concurrency**
 
-Any code that modifies GUI objects from a thread other than the JavaFX Application Thread (aka the UI thread) must be wrapped in `Platform.runLater` (see guidelines on [thread safety](designDecisionsAndGuidelines.md#thread-safety), specifically the part on thread confinement).
+Any code that modifies GUI objects from a thread other than the JavaFX Application Thread (aka the UI thread) must be wrapped in `Platform.runLater` (see guidelines on [thread safety](codingGuidelines.md#thread-safety), specifically the part on thread confinement).
 
 Note that `Platform.runLater` does not provide any guarantees as to *when* your code actually executes. If it is important that your threads are synchronised, try the following:
 
@@ -83,4 +83,17 @@ Unit tests are meant to extensively test the functionality of a HubTurbo compone
 
 ## Additional Tools
 
-- [mockito](http://mockito.org/) is used in HubTurbo's tests suite to create clean and verifiable stubbed classes. A common use case is to isolate a small component under test while mocking other required components without having to write complex stubbing logic and mixing between application and testing code. Refer to usage of *mockito* in our tests suite and [mockito's docs](http://mockito.github.io/mockito/docs/current/org/mockito/Mockito.html) for more information, guides and caveats when using *mockito*.
+[mockito](http://mockito.org/) is used in HubTurbo's tests suite to create clean and verifiable stubbed classes.
+A common use case is to isolate a small component under test while mocking other required components without having to write complex stubbing logic and mixing between application and testing code. Refer to usage of *mockito* in our tests suite and [mockito's docs](http://mockito.github.io/mockito/docs/current/org/mockito/Mockito.html) for more information, guides and caveats when using *mockito*.
+
+[MockServer](http://www.mock-server.com) is used in HubTurbo' tests suite to emulate and verify interactions with GitHub API services.
+Note that when passing in `hostname` other than `api.github.com` (usually `"localhost"` when MockServer is used) to `egit`'s `GitHubClient` constructor, subsequent request paths will be appended to the `/api/v3` prefix.
+Recorded data from GitHub API to be used with MockServer should be placed inside the `test/resources/tests` directory.
+Refer to existing usage of MockServer in our tests suite and guides on [MockServer' website](http://www.mock-server.com) for more information.
+
+**404 error from MockServer**
+
+If you receive a 404 for a valid request path and parameters, a possible cause is that the MockServer process may take while to build the expectations when a large amount of request or response data is involved.
+This typically happens when we only get the headers from multiple requests i.e. HEAD requests, which take very short time, while the body is still building up.
+This error should not happen if we request for the body (GET, POST etc.) as the request will block until the body is available.
+As a result, this situation can be avoided by omitting body data in expectations that only concern headers or making a full request.

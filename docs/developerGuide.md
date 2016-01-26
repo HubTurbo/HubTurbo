@@ -1,14 +1,10 @@
 # Developer Guide
 
-For contributors:
-- [Setting up dev environment](settingUpDevEnvironment.md)
-- [Development process](process.md)
+- [Setting Up](settingUp.md)
+- [Development Process](process.md)
 - [Workflow](workflow.md)
-- [Testing](testing.md)
+- [Tool Stack](toolStack.md)
 - [Design](design.md)
-- [Decision decisions and guidelines](designDecisionsAndGuidelines.md)
-- [Java coding conventions](codingConventions.md)
-- [Static analysis tools](staticAnalysis.md)
-
-For core team members:
-- [Creating a Release](creatingARelease.md)
+- [Testing](testing.md)
+- [Coding Guidelines](codingGuidelines.md)
+- [Troubleshooting](troubleshooting.md)

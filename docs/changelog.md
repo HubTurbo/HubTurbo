@@ -1,15 +1,31 @@
+
 # Changelog
+
+# V3.17.0
+
+- Added tooltips to panel buttons and improved layout
+- Changed icon used for updates to issue titles in feed
+- Reworked undo for label changes
+- Fixed race condition when performing actions on repositories
+- Fixed bug involving missing resources in unstable tests
+- Fixed bug where space key did not work in the filter field
+- Fixed bugs with filter field autocompletion
+- Refined developer documentation
+- Fixed errors in user guide
 
 # V3.16.0
 
 - Added an application icon for Windows and OS X
 - Added a few panel templates
-- Added buttons to confirm and revert panel renaming
 - Fixed bug with navigating to the related PR of an issue
 - Improved appearance of closed issue titles
 - Improved testing infrastructure (integrated Mockito)
 - Improvements to filter expression parser
 - Integrated PMD
+
+# V3.15.0
+
+- Added buttons to confirm and revert panel renaming
 
 # V3.14.0
 

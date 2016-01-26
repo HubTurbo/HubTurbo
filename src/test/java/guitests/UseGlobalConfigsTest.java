@@ -33,7 +33,7 @@ public class UseGlobalConfigsTest extends UITest {
     }
 
     @Test
-    public void globalConfigTest() {
+    public void useGlobalConfigTest() {
         // Override setupMethod() if you want to do stuff to the JSON beforehand
 
         UI ui = TestController.getUI();
