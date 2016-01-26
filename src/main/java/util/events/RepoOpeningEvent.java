@@ -1,11 +1,15 @@
 package util.events;
 
-public class RepoOpenedEvent extends UnusedStoredReposChangedEvent {
+import ui.issuepanel.AbstractPanel;
+
+public class RepoOpeningEvent extends Event {
+
     public final String repoId;
     public final boolean isPrimaryRepo;
 
-    public RepoOpenedEvent(String repoId, boolean isPrimaryRepo) {
+    public RepoOpeningEvent(String repoId, boolean isPrimaryRepo) {
         this.repoId = repoId;
         this.isPrimaryRepo = isPrimaryRepo;
     }
+
 }

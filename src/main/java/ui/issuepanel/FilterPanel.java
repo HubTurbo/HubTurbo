@@ -7,6 +7,9 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
+import javafx.application.Platform;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Filter;
 import ui.components.PanelMenuBar;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
@@ -26,12 +29,14 @@ import javafx.scene.input.KeyEvent;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
+import util.HTLog;
 import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +50,8 @@ import java.util.stream.Collectors;
  * which determine that.
  */
 public abstract class FilterPanel extends AbstractPanel {
+
+    private static final Logger logger = HTLog.get(FilterPanel.class);
 
     private ObservableList<TurboIssue> issuesToDisplay = null;
 
@@ -101,6 +108,10 @@ public abstract class FilterPanel extends AbstractPanel {
             ui.triggerEvent(new PanelClickedEvent(this.panelIndex));
             requestFocus();
         });
+
+        ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
+
+        ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -180,6 +191,54 @@ public abstract class FilterPanel extends AbstractPanel {
             UI.status.displayMessage("Panel " + (panelIndex + 1)
                 + ": Parse error in filter: " + ex.getMessage());
         }
+    }
+
+    private void indicatePanelLoading(RepoOpeningEvent e) {
+        Platform.runLater(() -> {
+            HashSet<String> allReposInFilterExpr = Qualifier.getMetaQualifierContent(getCurrentFilterExpression(),
+                    QualifierType.REPO);
+
+            if (e.isPrimaryRepo && allReposInFilterExpr.isEmpty()) {
+                // the filter expression must not contain repos, hence it pulls from primary repo
+                addPanelLoadingIndication();
+            } else if (allReposInFilterExpr.contains(e.repoId)) {
+                // the repo must be in the filter expression
+                addPanelLoadingIndication();
+            }
+        });
+    }
+
+    private void unindicatePanelLoading(RepoOpenedEvent e) {
+        Platform.runLater(() -> {
+            HashSet<String> allReposInFilterExpr = Qualifier.getMetaQualifierContent(getCurrentFilterExpression(),
+                    QualifierType.REPO);
+
+            if (e.isPrimaryRepo && allReposInFilterExpr.isEmpty()) {
+                // the filter expression must not contain repos, hence it pulls from primary repo
+                removePanelLoadingIndication();
+            } else if (allReposInFilterExpr.contains(e.repoId)) {
+                // the repo must be in the filter expression
+                removePanelLoadingIndication();
+            }
+        });
+    }
+
+    /**
+     * Triggered when a RepoOpeningEvent is received by the filter panel
+     *
+     */
+    private void addPanelLoadingIndication() {
+        logger.info("Preparing to add panel loading indication");
+        getStyleClass().add("panel-loading");
+    }
+
+    /**
+     * Triggered when a RepoOpenedEvent is received by the filter panel
+     *
+     */
+    private void removePanelLoadingIndication() {
+        logger.info("Preparing to remove panel loading indication");
+        getStyleClass().removeIf(cssClass -> cssClass.equals("panel-loading"));
     }
 
     /**

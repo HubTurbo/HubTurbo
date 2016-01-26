@@ -86,7 +86,7 @@ public class EventTests {
         eventsSuperSub.register(superclassHandlerSucceed);
         eventsSuperSub.register(subclassHandlerSucceed);
 
-        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("");
+        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("", false);
 
         eventsSuperSub.post(subclassEvent);
     }

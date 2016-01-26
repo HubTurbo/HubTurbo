@@ -70,6 +70,10 @@
     -fx-background-color: #A9BCF5;
 }
 
+.panel-loading {
+    -fx-background-color: grey;
+}
+
 .issue-creator {
     -fx-font-style: italic;
     -fx-text-fill: grey;
