@@ -127,6 +127,8 @@ public final class Parser {
 
     private int getInfixPrecedence(Token token) {
         switch (token.getType()) {
+        case SEMICOLON:
+            return Precedence.SHORTER_DISJUNCTION;
         case AND:
         case QUALIFIER:
         case SYMBOL: // Implicit conjunction
@@ -175,7 +177,8 @@ public final class Parser {
 
         QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
         if (type == QualifierType.SORT) {
-            //special case for sort
+            //special case for sort, only parse sort keys when
+            //there is a sort qualifier.
             return parseSortKeys();
         } else {
             return parseSeparatedContent(() -> parseQualifierContent(type, false));
