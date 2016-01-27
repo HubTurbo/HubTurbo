@@ -72,10 +72,6 @@ public class FilterParserTests {
             Parser.parse("a(b) ||");
             fail("Inputs which end unexpectedly should throw a parse exception");
         } catch (ParseException ignored) {}
-        try {
-            Parser.parse("a:b; c:d;e");
-            fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException ignored) {}
     }
 
     @Test
@@ -91,6 +87,10 @@ public class FilterParserTests {
             fail("Empty qualifiers should cause a parse exception");
         } catch (ParseException ignored) {}
 
+        try {
+            Parser.parse("a:b; c:d;e");
+            fail("Qualifier content expected, start of a new qualifier found.");
+        } catch (ParseException ignored) {}
     }
 
     @Test
@@ -137,6 +137,13 @@ public class FilterParserTests {
                         )
                 ));
 
+        //TODO: change this test in the future when proper semantic exception is implemented #1173
+        try {
+            Parser.parse("sort:label;assignee");
+        } catch (ParseException ignored) {
+            fail("Change this test to account for semantic error in the future.");
+        }
+
         // Implicit conjunction
 
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
@@ -155,13 +162,6 @@ public class FilterParserTests {
 
         try {
             Parser.parse("&&");
-            fail("Operator by itself should cause a parse exception.");
-        } catch (ParseException ignored) {}
-
-        //might move this test in the future when proper
-        //semantic exception is implemented
-        try {
-            Parser.parse("sort:label;assignee");
             fail("Operator by itself should cause a parse exception.");
         } catch (ParseException ignored) {}
     }
