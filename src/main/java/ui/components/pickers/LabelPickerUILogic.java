@@ -81,7 +81,7 @@ public class LabelPickerUILogic {
      */
     public ArrayList<String> toggleLabel(String name) {
         removePossibleLabel();
-        ArrayList<String> removedLabels = toggleModificationLabel(name);
+        ArrayList<String> removedLabels = resolveConflictsAndUpdateLabels(name);
         resetMatchingLabels();
         populatePanes();
         return removedLabels;
@@ -181,7 +181,7 @@ public class LabelPickerUILogic {
         String lastSpecifiedLabel = stackOfSpecifiedLabels.pop();
         if (lastSpecifiedLabel != null) {
             // if the last label is mapped to an actual label
-            updateModificationLabels(lastSpecifiedLabel, !activeLabels.get(lastSpecifiedLabel));
+            updateLabels(lastSpecifiedLabel, !activeLabels.get(lastSpecifiedLabel));
         }
     }
 
@@ -192,7 +192,7 @@ public class LabelPickerUILogic {
         ArrayList<String> listOfRemovedLabels = stackOfRemovedExclusiveLabels.pop();
         if (listOfRemovedLabels != null) {
             listOfRemovedLabels.stream()
-                    .forEach(labelName -> updateModificationLabels(labelName, true));
+                    .forEach(labelName -> updateLabels(labelName, true));
         }
     }
 
@@ -243,12 +243,15 @@ public class LabelPickerUILogic {
     }
 
     /**
-     * Toggles modification label that matches 'name'
+     * Helper function to toggleLabel
+     *
+     * Checks if there are conflicting labels and remove them
+     * before updating the specified label
      *
      * @param name
      * @return list of removed label names due to exclusive grouping
      */
-    private ArrayList<String> toggleModificationLabel(String name) {
+    private ArrayList<String> resolveConflictsAndUpdateLabels(String name) {
         ArrayList<String> listOfRemovedNames = new ArrayList<>();
         Optional<TurboLabel> turboLabel =
                 repoLabels.stream().filter(label -> label.getActualName().equals(name)).findFirst();
@@ -256,7 +259,7 @@ public class LabelPickerUILogic {
             if (turboLabel.get().isExclusive() && !isActiveLabel(name)) {
                 removeConflictingExclusiveLabels(turboLabel, listOfRemovedNames);
             }
-            updateModificationLabels(name, !isActiveLabel(name));
+            updateLabels(name, !isActiveLabel(name));
         }
         return listOfRemovedNames;
     }
@@ -277,11 +280,11 @@ public class LabelPickerUILogic {
                     if (isActiveLabel(label.getActualName())) {
                         listOfRemovedNames.add(label.getActualName());
                     }
-                    updateModificationLabels(label.getActualName(), false);
+                    updateLabels(label.getActualName(), false);
                 });
     }
 
-    private void updateModificationLabels(String name, boolean isAdd) {
+    private void updateLabels(String name, boolean isAdd) {
         // adds new labels to the end of the list
         activeLabels.put(name, isAdd); // update activeLabels first
         if (isAdd) {

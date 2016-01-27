@@ -42,7 +42,7 @@ public class LabelPickerLogicTests {
         return new LabelPickerUILogic(issue, repoLabels);
     }
 
-    public List<String> getLabels(LabelPickerUILogic logic) {
+    public List<String> getActiveLabels(LabelPickerUILogic logic) {
         return logic.getActiveLabels().entrySet().stream()
                 .filter(Map.Entry::getValue)
                 .map(Map.Entry::getKey)
@@ -61,18 +61,18 @@ public class LabelPickerLogicTests {
         // check for exclusive group toggling
         // we start with no labels
         LabelPickerUILogic logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         // let's toggle two exclusive labels
         logic.toggleLabel("p.low");
         logic.toggleLabel("p.mid");
         // check to see that only one label has been applied
-        assertEquals(1, getLabels(logic).size());
+        assertEquals(1, getActiveLabels(logic).size());
         assertEquals(true, logic.getActiveLabels().get("p.mid"));
         // let's toggle two non-exclusive labels
         logic.toggleLabel("f-aaa");
         logic.toggleLabel("f-bbb");
         // so we should have 3 labels now
-        assertEquals(3, getLabels(logic).size());
+        assertEquals(3, getActiveLabels(logic).size());
 
         // let's try starting with an issue with two exclusive labels in the same group
         TurboIssue issue = new TurboIssue("dummy/dummy", 1, "Issue 1");
@@ -82,11 +82,11 @@ public class LabelPickerLogicTests {
         issue.setLabels(labels);
         logic = prepareLogic(issue);
         // there should be two labels at first
-        assertEquals(2, getLabels(logic).size());
+        assertEquals(2, getActiveLabels(logic).size());
         // we shall toggle one of the labels already in it
         logic.toggleLabel("p.mid");
         // we should be left with one label
-        assertEquals(1, getLabels(logic).size());
+        assertEquals(1, getActiveLabels(logic).size());
         assertEquals(true, logic.getActiveLabels().get("p.low"));
 
         // let's try starting with an issue with two exclusive labels in the same group
@@ -94,11 +94,30 @@ public class LabelPickerLogicTests {
         issue.setLabels(labels);
         logic = prepareLogic(issue);
         // there should be two labels at first
-        assertEquals(2, getLabels(logic).size());
+        assertEquals(2, getActiveLabels(logic).size());
         // we shall toggle one of the labels in the same group but not in it
         logic.toggleLabel("p.high");
         // we should be left with one label
-        assertEquals(1, getLabels(logic).size());
+        assertEquals(1, getActiveLabels(logic).size());
+        assertEquals(true, logic.getActiveLabels().get("p.high"));
+
+        // typing tests
+        // let's try starting with an issue with two exclusive labels in the same group
+        issue = new TurboIssue("dummy/dummy", 1, "Issue 1");
+        labels = new ArrayList<>();
+        labels.add("p.low");
+        labels.add("p.mid");
+        issue.setLabels(labels);
+        logic = prepareLogic(issue);
+        // there should be two labels at first
+        assertEquals(2, getActiveLabels(logic).size());
+        // we shall attempt to toggle p.high
+        logic.processTextFieldChange("p.high");
+        // current at priority.high, use arrow to move
+        logic.moveHighlightOnLabel(true);
+        logic.processTextFieldChange("p.high ");
+        // we should be left with one label
+        assertEquals(1, getActiveLabels(logic).size());
         assertEquals(true, logic.getActiveLabels().get("p.high"));
     }
 
@@ -108,7 +127,7 @@ public class LabelPickerLogicTests {
 
         // starting with an issue with no labels
         LabelPickerUILogic logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         // check for correct label selection
         logic.processTextFieldChange("pri.h");
         assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
@@ -122,7 +141,7 @@ public class LabelPickerLogicTests {
         assertEquals(false, logic.hasHighlightedLabel());
         // invalid space-toggle
         logic.processTextFieldChange("asdf ");
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
     }
 
     @Test
@@ -139,18 +158,18 @@ public class LabelPickerLogicTests {
         logic.processTextFieldChange("p.l label ");
         // backspace
         logic.processTextFieldChange("p.l label");
-        assertEquals(1, getLabels(logic).size());
+        assertEquals(1, getActiveLabels(logic).size());
         assertEquals(true, logic.hasHighlightedLabel());
         // backspace until no query
         logic.processTextFieldChange("p.l ");
-        assertEquals(1, getLabels(logic).size());
+        assertEquals(1, getActiveLabels(logic).size());
         assertEquals(false, logic.hasHighlightedLabel());
         // backspace
         logic.processTextFieldChange("p.l");
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         assertEquals(true, logic.hasHighlightedLabel());
         logic.processTextFieldChange("");
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         assertEquals(false, logic.hasHighlightedLabel());
 
         // let's test for restoring exclusive labels
@@ -166,8 +185,8 @@ public class LabelPickerLogicTests {
         logic.processTextFieldChange("p.l p.m ");
         // undo, Priority.Low should be restored automatically
         logic.processTextFieldChange("p.l p.m");
-        assertEquals(1, getLabels(logic).size());
-        assertEquals(true, getLabels(logic).contains("Priority.Low"));
+        assertEquals(1, getActiveLabels(logic).size());
+        assertEquals(true, getActiveLabels(logic).contains("Priority.Low"));
         assertEquals(true, logic.hasHighlightedLabel());
 
         // try handling invalid label with backspacing
@@ -183,14 +202,34 @@ public class LabelPickerLogicTests {
         logic.processTextFieldChange("asdf p.h ");
         // untoggles Priority.High
         logic.processTextFieldChange("asdf p.h");
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         assertEquals(true, logic.hasHighlightedLabel());
         // clears query
         logic.processTextFieldChange("asdf ");
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         assertEquals(false, logic.hasHighlightedLabel());
 
-
+        // try handling removal of existing label,
+        // adding back of label
+        // then backspacing until empty
+        TurboIssue issue = new TurboIssue("dummy/dummy", 1, "Issue 1");
+        issue.addLabel("f-aaa");
+        logic = prepareLogic(issue);
+        // toggle existing label once
+        logic.processTextFieldChange("f-aaa");
+        logic.processTextFieldChange("f-aaa ");
+        assertEquals(0, getActiveLabels(logic).size());
+        // toggle again, should be restored
+        logic.processTextFieldChange("f-aaa f-aaa");
+        logic.processTextFieldChange("f-aaa f-aaa ");
+        assertEquals(1, getActiveLabels(logic).size());
+        // untoggle, should have no labels again
+        logic.processTextFieldChange("f-aaa f-aaa");
+        assertEquals(0, getActiveLabels(logic).size());
+        // untoggle, original state should be restored
+        logic.processTextFieldChange("f-aaa ");
+        logic.processTextFieldChange("f-aaa");
+        assertEquals(1, getActiveLabels(logic).size());
     }
 
     @Test
@@ -199,7 +238,7 @@ public class LabelPickerLogicTests {
         LabelPickerUILogic logic = prepareLogic();
         Method getHighlightedLabelMethod = makeMethodAccessible("getHighlightedLabel");
 
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         // check for no highlight
         assertEquals(false, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
         // enter search query
@@ -214,8 +253,8 @@ public class LabelPickerLogicTests {
                 invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
         // toggle label
         logic.toggleHighlightedLabel();
-        assertEquals(1, getLabels(logic).size());
-        assertEquals(true, getLabels(logic).contains("Label 10"));
+        assertEquals(1, getActiveLabels(logic).size());
+        assertEquals(true, getActiveLabels(logic).contains("Label 10"));
         assertEquals(false, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
         // enter search query and move down and up
         logic.processTextFieldChange("1 1");
@@ -226,13 +265,13 @@ public class LabelPickerLogicTests {
                 invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).get().getActualName());
         // toggle label
         logic.toggleHighlightedLabel();
-        assertEquals(2, getLabels(logic).size());
-        assertEquals(true, getLabels(logic).contains("Label 1"));
+        assertEquals(2, getActiveLabels(logic).size());
+        assertEquals(true, getActiveLabels(logic).contains("Label 1"));
         assertEquals(false, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
 
         // starting with an issue with no labels
         logic = prepareLogic();
-        assertEquals(0, getLabels(logic).size());
+        assertEquals(0, getActiveLabels(logic).size());
         // check for correct label selection
         logic.processTextFieldChange("f.d");
         assertEquals(true, invokeGetHighlightedLabelMethod(getHighlightedLabelMethod, logic).isPresent());
