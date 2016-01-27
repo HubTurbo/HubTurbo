@@ -127,8 +127,6 @@ public final class Parser {
 
     private int getInfixPrecedence(Token token) {
         switch (token.getType()) {
-        case SEMICOLON:
-            return Precedence.SHORTER_DISJUNCTION;
         case AND:
         case QUALIFIER:
         case SYMBOL: // Implicit conjunction
@@ -176,13 +174,7 @@ public final class Parser {
         qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
         QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
-        if (type == QualifierType.SORT) {
-            //special case for sort, only parse sort keys when
-            //there is a sort qualifier.
-            return parseSortKeys();
-        } else {
-            return parseSeparatedContent(() -> parseQualifierContent(type, false));
-        }
+        return parseSeparatedContent(() -> parseQualifierContent(type, false));
     }
 
     private FilterExpression parseSeparatedContent(Supplier<FilterExpression> contentParser) {
@@ -195,7 +187,9 @@ public final class Parser {
     }
 
     private FilterExpression parseQualifierContent(QualifierType type, boolean allowMultipleKeywords) {
-        if (isRangeOperatorToken(lookAhead())) {
+        if (type == QualifierType.SORT) {
+            return parseSortKeys();
+        } else if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
             return parseRangeOperator(type, lookAhead());
         } else if (isDateToken(lookAhead())) {
