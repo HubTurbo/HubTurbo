@@ -16,6 +16,8 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
+import static ui.BoardAutoCreator.SAMPLE;
+import static ui.BoardAutoCreator.SAMPLE_REPO_NAME;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -62,7 +64,6 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelInfos.get(4).getPanelName(), "Next Next Next Milestone");
     }
 
-
     @Test
     public void workAllocationBoardAutoCreationTest() {
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
@@ -91,6 +92,32 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelInfos.get(2).getPanelName(), "Work allocated to User 2");
         assertEquals(panelInfos.get(3).getPanelName(), "Work allocated to User 3");
         assertEquals(panelInfos.get(4).getPanelName(), "Work allocated to User 4");
+    }
+
+    @Test
+    public void sampleBoardAutoCreationTest() {
+        assertEquals(panelControl.getNumberOfSavedBoards(), 0);
+
+        clickMenu("Boards", "Auto-create", SAMPLE);
+
+        PlatformEx.waitOnFxThread();
+        assertNodeExists(hasText(SAMPLE + " has been created and loaded.\n\n" +
+                        "It is saved under the name \"" + SAMPLE + "\"."));
+        click("OK");
+
+        assertEquals(panelControl.getPanelCount(), 3);
+        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
+        assertEquals(panelControl.getNumberOfSavedBoards(), 1);
+
+        List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
+
+        assertEquals(panelInfos.get(0).getPanelFilter(), SAMPLE_REPO_NAME + " " + "(is:issue OR is:pr) is:open");
+        assertEquals(panelInfos.get(1).getPanelFilter(), SAMPLE_REPO_NAME + " " + "milestone:V5 sort:status");
+        assertEquals(panelInfos.get(2).getPanelFilter(), SAMPLE_REPO_NAME + " " + "label:urgent assignee:dariusf");
+
+        assertEquals(panelInfos.get(0).getPanelName(), "Open issues and PR's");
+        assertEquals(panelInfos.get(1).getPanelName(), "V5 Milestone");
+        assertEquals(panelInfos.get(2).getPanelName(), "Urgent issues assigned to Darius");
     }
 
 }

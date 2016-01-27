@@ -22,8 +22,8 @@ public class BoardAutoCreator {
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
     private static final String MILESTONES = "Milestones";
     private static final String WORK_ALLOCATION = "Work Allocation";
-    private static final String SAMPLE = "Sample Board!";
-    private static final String SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
+    public static final String SAMPLE = "Sample Board!";
+    public static final String SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
     private static final int MAX_WORK_ALLOCATION_PANELS = 5;
 
     private final UI ui;
@@ -119,16 +119,15 @@ public class BoardAutoCreator {
         panelData.add(new PanelInfo("Urgent issues assigned to Darius",
                 SAMPLE_REPO_NAME + " " + "label:urgent assignee:dariusf"));
 
-        String boardName = "Sample Board!";
-        createBoard(panelData, boardName);
+        createBoard(panelData, SAMPLE);
 
         panelControl.selectPanel(1); // current
 
-        triggerBoardSaveEventSequence(boardName);
+        triggerBoardSaveEventSequence(SAMPLE);
 
         DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE,
                 SAMPLE + " has been created and loaded.\n\n" +
-                        "It is saved under the name \"" + boardName + "\".");
+                        "It is saved under the name \"" + SAMPLE + "\".");
     }
 
     private List<PanelInfo> generatePanelInfoFromTurboUsers(List<TurboUser> users,
