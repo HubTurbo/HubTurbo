@@ -77,12 +77,7 @@ public class Logic {
         return repoIO.isRepositoryValid(repoId);
     }
 
-    public void refresh(boolean isNotificationPaneShowing) {
-        // TODO fix refresh to take into account the possible pending actions associated with the notification pane
-        if (isNotificationPaneShowing) {
-            logger.info("Notification Pane is currently showing, not going to refresh. ");
-            return;
-        }
+    public void refresh() {
         String message = "Refreshing " + models.toModels().stream()
                 .map(Model::getRepoId)
                 .collect(Collectors.joining(", "));
