@@ -114,14 +114,15 @@ public class BoardAutoCreator {
 
         List<PanelInfo> panelData = new ArrayList<>();
 
-        panelData.add(new PanelInfo("Open issues and PR's", SAMPLE_REPO_NAME + " " + "(is:issue OR is:pr) is:open"));
-        panelData.add(new PanelInfo("V5 Milestone", SAMPLE_REPO_NAME + " " + "milestone:V5 sort:status"));
+        panelData.add(new PanelInfo("Open issues and PR's", "repo:" + SAMPLE_REPO_NAME + " " +
+                "(is:issue OR is:pr) is:open"));
+        panelData.add(new PanelInfo("V5 Milestone", "repo:" + SAMPLE_REPO_NAME + " " + "milestone:V5 sort:status"));
         panelData.add(new PanelInfo("Urgent issues assigned to Darius",
-                SAMPLE_REPO_NAME + " " + "label:urgent assignee:dariusf"));
+                "repo:" + SAMPLE_REPO_NAME + " " + "label:\"urgent\" assignee:dariusf"));
 
         createBoard(panelData, SAMPLE);
 
-        panelControl.selectPanel(1); // current
+        panelControl.selectPanel(0); // current
 
         triggerBoardSaveEventSequence(SAMPLE);
 
