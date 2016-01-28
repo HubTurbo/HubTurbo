@@ -199,15 +199,36 @@ public class Logic {
      * @return True if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        eagerlyUpdateIssueLabels(issue, newLabels);
+
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoIO.replaceIssueLabels(issue, newLabels)
+        return repoOpControl.replaceIssueLabels(issue, newLabels)
                 .thenApply(labels -> {
-                    logger.info("Changing labels for " + issue + " on UI");
-                    issue.setLabels(labels);
-                    refreshUI();
+                    eagerlyUpdateIssueLabels(issue, labels);
                     return true;
                 })
                 .exceptionally(Futures.withResult(false));
+    }
+
+    /**
+     * Assigns a list of labels to an issue offline and immediately reflect the change on the UI without
+     * concerning whether the labels have been updated on the remote repo's data source
+     *
+     * The UI will not be force refreshed if the set of labels are the same as the existing labels
+     * assigned to the issue.
+     * @param issue
+     * @param labels
+     */
+    private void eagerlyUpdateIssueLabels(TurboIssue issue, List<String> labels) {
+        logger.info("Changing labels for " + issue + " on UI");
+
+        if (issue.getLabels().size() == labels.size() && issue.getLabels().containsAll(labels)) {
+            return;
+        }
+
+        issue.setLabels(labels);
+        refreshUI();
+
     }
 
     /**

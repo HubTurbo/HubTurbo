@@ -1,18 +1,16 @@
 package backend.control;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.*;
-
+import backend.RepoIO;
+import backend.control.ops.*;
+import backend.resource.Model;
+import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import backend.RepoIO;
-import backend.control.ops.OpenRepoOp;
-import backend.control.ops.RemoveRepoOp;
-import backend.control.ops.RepoOp;
-import backend.control.ops.UpdateModelOp;
-import backend.resource.Model;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 
 /**
@@ -55,6 +53,13 @@ public class RepoOpControl {
         init(oldModel.getRepoId());
         CompletableFuture<Model> result = new CompletableFuture<>();
         enqueue(new UpdateModelOp(oldModel, repoIO, result));
+        return result;
+    }
+
+    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        init(issue.getRepoId());
+        CompletableFuture<List<String>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueLabelsOp(repoIO, result, issue, labels));
         return result;
     }
 
