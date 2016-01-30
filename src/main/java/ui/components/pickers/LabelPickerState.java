@@ -57,6 +57,8 @@ public class LabelPickerState {
     public LabelPickerState toggleLabel(String name) {
         if (isAnInitialLabel(name)) {
             if (isARemovedLabel(name)) {
+                // add back initial label
+                removeConflictingLabels(name);
                 removedLabels.remove(name);
             } else {
                 removedLabels.add(name);
@@ -65,11 +67,34 @@ public class LabelPickerState {
             if (isAnAddedLabel(name)) {
                 addedLabels.remove(name);
             } else {
+                // add new label
+                removeConflictingLabels(name);
                 addedLabels.add(name);
             }
         }
 
         return new LabelPickerState(initialLabels, addedLabels, removedLabels, new ArrayList<>());
+    }
+
+    private void removeConflictingLabels(String name) {
+        if (TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals('.')) {
+            String group = getGroup(name);
+            // remove added labels in same group
+            addedLabels = addedLabels.stream()
+                    .filter(label -> {
+                        String labelGroup = getGroup(label);
+                        return !labelGroup.equals(group);
+                    })
+                    .collect(Collectors.toSet());
+
+            // remove existing
+            removedLabels.addAll(initialLabels.stream()
+                    .filter(label -> {
+                        String labelGroup = getGroup(label);
+                        return !labelGroup.equals(group) && !removedLabels.contains(name);
+                    })
+                    .collect(Collectors.toSet()));
+        }
     }
 
     public LabelPickerState nextSuggestion() {
