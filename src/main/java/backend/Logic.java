@@ -203,10 +203,7 @@ public class Logic {
 
         logger.info("Changing labels for " + issue + " on GitHub");
         return repoOpControl.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> {
-                    eagerlyUpdateIssueLabels(issue, labels);
-                    return true;
-                })
+                .thenApply(labels -> labels.containsAll(newLabels))
                 .exceptionally(Futures.withResult(false));
     }
 
