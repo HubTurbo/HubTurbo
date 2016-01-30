@@ -74,6 +74,13 @@
     -fx-background-color: grey;
 }
 
+.listview-loading {
+    -fx-background-image: url("loading.gif");
+    -fx-background-size: 40 40;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
 .issue-creator {
     -fx-font-style: italic;
     -fx-text-fill: grey;

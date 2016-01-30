@@ -131,7 +131,12 @@ public class Logic {
                 return repoOpControl.openRepository(repoId)
                         .thenApply(models::addPending)
                         .thenRun(this::refreshUI)
-                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository)))
+                        .thenRun(() ->
+                                Platform.runLater(() ->
+                                        // to trigger the event from the UI thread
+                                        UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
+                                )
+                        )
                         .thenCompose(n -> getRateLimitResetTime())
                         .thenApply(this::updateRemainingRate)
                         .thenApply(rateLimits -> true)

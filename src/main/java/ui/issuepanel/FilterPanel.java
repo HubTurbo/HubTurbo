@@ -8,8 +8,6 @@ import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
 import javafx.application.Platform;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Filter;
 import ui.components.PanelMenuBar;
 import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
@@ -29,7 +27,6 @@ import javafx.scene.input.KeyEvent;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
-import util.HTLog;
 import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
@@ -50,8 +47,6 @@ import java.util.stream.Collectors;
  * which determine that.
  */
 public abstract class FilterPanel extends AbstractPanel {
-
-    private static final Logger logger = HTLog.get(FilterPanel.class);
 
     private ObservableList<TurboIssue> issuesToDisplay = null;
 
@@ -194,52 +189,30 @@ public abstract class FilterPanel extends AbstractPanel {
     }
 
     private void indicatePanelLoading(RepoOpeningEvent e) {
-        Platform.runLater(() -> {
-            HashSet<String> allReposInFilterExpr = Qualifier.getMetaQualifierContent(getCurrentFilterExpression(),
-                    QualifierType.REPO);
-
-            if (e.isPrimaryRepo && allReposInFilterExpr.isEmpty()) {
-                // the filter expression must not contain repos, hence it pulls from primary repo
-                addPanelLoadingIndication();
-            } else if (allReposInFilterExpr.contains(e.repoId)) {
-                // the repo must be in the filter expression
-                addPanelLoadingIndication();
-            }
-        });
+        togglePanelLoading(e.isPrimaryRepo, e.repoId, true);
     }
 
     private void unindicatePanelLoading(RepoOpenedEvent e) {
-        Platform.runLater(() -> {
-            HashSet<String> allReposInFilterExpr = Qualifier.getMetaQualifierContent(getCurrentFilterExpression(),
-                    QualifierType.REPO);
+        togglePanelLoading(e.isPrimaryRepo, e.repoId, false);
+    }
 
-            if (e.isPrimaryRepo && allReposInFilterExpr.isEmpty()) {
-                // the filter expression must not contain repos, hence it pulls from primary repo
-                removePanelLoadingIndication();
-            } else if (allReposInFilterExpr.contains(e.repoId)) {
-                // the repo must be in the filter expression
+    private void togglePanelLoading(boolean isPrimaryRepo, String repoId, boolean toIndicate) {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+
+        // either primary repo changed and no repo filters, or repo filters changed
+        if (isPrimaryRepo && allReposInFilterExpr.isEmpty() || allReposInFilterExpr.contains(repoId)) {
+            if (toIndicate) {
+                addPanelLoadingIndication();
+            } else {
                 removePanelLoadingIndication();
             }
-        });
+        }
     }
 
-    /**
-     * Triggered when a RepoOpeningEvent is received by the filter panel
-     *
-     */
-    private void addPanelLoadingIndication() {
-        logger.info("Preparing to add panel loading indication");
-        getStyleClass().add("panel-loading");
-    }
+    protected abstract void addPanelLoadingIndication();
 
-    /**
-     * Triggered when a RepoOpenedEvent is received by the filter panel
-     *
-     */
-    private void removePanelLoadingIndication() {
-        logger.info("Preparing to remove panel loading indication");
-        getStyleClass().removeIf(cssClass -> cssClass.equals("panel-loading"));
-    }
+    protected abstract void removePanelLoadingIndication();
 
     /**
      * Triggered after pressing ENTER in the filter box.
