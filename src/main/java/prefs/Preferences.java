@@ -128,12 +128,15 @@ public class Preferences { // NOPMD
     }
     
     public Optional<String> switchBoard() {
-        if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
-            List<String> boardNames = getAllBoardNames();
+        List<String> boardNames = getAllBoardNames();
+        if (getLastOpenBoard().isPresent() && getAllBoardNames().size() > 1) {
             int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
             int index = (lastBoard + 1) % boardNames.size();
             
             setLastOpenBoard(boardNames.get(index));
+        } else if (!getLastOpenBoard().isPresent() && getAllBoardNames().size() > 1) {
+
+            setLastOpenBoard(boardNames.get(0));
         }
         
         return getLastOpenBoard();
