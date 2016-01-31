@@ -76,29 +76,8 @@ public class LabelPickerState {
         return new LabelPickerState(initialLabels, addedLabels, removedLabels, new ArrayList<>());
     }
 
-    private void removeConflictingLabels(String name) {
-        if (TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals(".")) {
-            String group = getGroup(name);
-            // remove added labels in same group
-            addedLabels = addedLabels.stream()
-                    .filter(label -> {
-                        String labelGroup = getGroup(label);
-                        return !labelGroup.equals(group);
-                    })
-                    .collect(Collectors.toSet());
-
-            // remove existing
-            removedLabels.addAll(initialLabels.stream()
-                    .filter(label -> {
-                        String labelGroup = getGroup(label);
-                        return labelGroup.equals(group) && !removedLabels.contains(name);
-                    })
-                    .collect(Collectors.toSet()));
-        }
-    }
-
     public LabelPickerState nextSuggestion() {
-        if (currentSuggestionIndex.isPresent() && currentSuggestionIndex.getAsInt() < matchedLabels.size() - 1) {
+        if (canIncreaseIndex()) {
             return new LabelPickerState(initialLabels, removedLabels, addedLabels,
                     matchedLabels, OptionalInt.of(currentSuggestionIndex.getAsInt() + 1));
         }
@@ -106,7 +85,7 @@ public class LabelPickerState {
     }
 
     public LabelPickerState previousSuggestion() {
-        if (currentSuggestionIndex.isPresent() && currentSuggestionIndex.getAsInt() > 0) {
+        if (canDecreaseIndex()) {
             return new LabelPickerState(initialLabels, removedLabels, addedLabels,
                         matchedLabels, OptionalInt.of(currentSuggestionIndex.getAsInt() - 1));
         }
@@ -127,6 +106,70 @@ public class LabelPickerState {
         }
 
         return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, newSuggestionIndex);
+    }
+
+    /*
+     * Methods for updating UI
+     */
+
+    public List<String> getAssignedLabels() {
+        List<String> assignedLabels = new ArrayList<>();
+        assignedLabels.addAll(initialLabels);
+        assignedLabels.addAll(addedLabels);
+        assignedLabels.removeAll(removedLabels);
+        return assignedLabels;
+    }
+
+    public List<String> getInitialLabels() {
+        return convertToList(initialLabels);
+    }
+
+    public List<String> getRemovedLabels() {
+        return convertToList(removedLabels);
+    }
+
+    public List<String> getAddedLabels() {
+        return convertToList(addedLabels);
+    }
+
+    public Optional<String> getCurrentSuggestion() {
+        if (currentSuggestionIndex.isPresent() && isValidSuggestionIndex()) {
+            return Optional.of(getSuggestedLabel());
+        }
+        return Optional.empty();
+    }
+
+    public List<String> getMatchedLabels() {
+        return matchedLabels;
+    }
+
+    /*
+     * Helper functions
+     */
+
+    private void removeConflictingLabels(String name) {
+        if (hasExclusiveGroup(name)) {
+            String group = getGroup(name);
+            // Remove from addedLabels
+            addedLabels = addedLabels.stream()
+                    .filter(label -> {
+                        String labelGroup = getGroup(label);
+                        return !labelGroup.equals(group);
+                    })
+                    .collect(Collectors.toSet());
+
+            // Add to removedLabels all initialLabels that have conflicting group
+            removedLabels.addAll(initialLabels.stream()
+                    .filter(label -> {
+                        String labelGroup = getGroup(label);
+                        return labelGroup.equals(group) && !removedLabels.contains(name);
+                    })
+                    .collect(Collectors.toSet()));
+        }
+    }
+
+    private boolean hasExclusiveGroup(String name) {
+        return TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals(".");
     }
 
     private List<String> filterByName(List<String> repoLabels, String labelName) {
@@ -181,40 +224,20 @@ public class LabelPickerState {
         return this.removedLabels.contains(name);
     }
 
-    /*
-     * methods to update UI
-     */
-    public List<String> getAssignedLabels() {
-        List<String> assignedLabels = new ArrayList<>();
-        assignedLabels.addAll(initialLabels);
-        assignedLabels.addAll(addedLabels);
-        assignedLabels.removeAll(removedLabels);
-        return assignedLabels;
+    private String getSuggestedLabel() {
+        return matchedLabels.get(currentSuggestionIndex.getAsInt());
     }
 
-    public List<String> getInitialLabels() {
-        return convertToList(initialLabels);
+    private boolean isValidSuggestionIndex() {
+        return currentSuggestionIndex.getAsInt() >= 0 && currentSuggestionIndex.getAsInt() < matchedLabels.size();
     }
 
-    public List<String> getRemovedLabels() {
-        return convertToList(removedLabels);
+    private boolean canIncreaseIndex() {
+        return currentSuggestionIndex.isPresent() && currentSuggestionIndex.getAsInt() < matchedLabels.size() - 1;
     }
 
-    public List<String> getAddedLabels() {
-        return convertToList(addedLabels);
-    }
-
-    public Optional<String> getCurrentSuggestion() {
-        if (currentSuggestionIndex.isPresent()) {
-            if (currentSuggestionIndex.getAsInt() >= 0 && currentSuggestionIndex.getAsInt() < matchedLabels.size()) {
-                return Optional.of(matchedLabels.get(currentSuggestionIndex.getAsInt()));
-            }
-        }
-        return Optional.empty();
-    }
-
-    public List<String> getMatchedLabels() {
-        return matchedLabels;
+    private boolean canDecreaseIndex() {
+        return currentSuggestionIndex.isPresent() && currentSuggestionIndex.getAsInt() > 0;
     }
 
     private List<String> convertToList(Set<String> labelSet){
