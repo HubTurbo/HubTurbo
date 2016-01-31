@@ -42,6 +42,10 @@ public class LabelPickerUILogic {
         return newState;
     }
 
+    public LabelPickerState getNewState(String clickedLabel) {
+        return currentState.toggleLabel(clickedLabel);
+    }
+
     private LabelPickerState handleKeyUp(LabelPickerState currentState) {
         return currentState.previousSuggestion();
     }
