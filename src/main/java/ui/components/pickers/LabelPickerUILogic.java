@@ -8,11 +8,12 @@ import java.util.*;
 public class LabelPickerUILogic {
 
     private Stack<LabelPickerState> history = new Stack<>();
+    private LabelPickerState currentState;
     private final Set<String> repoLabels;
 
     public LabelPickerUILogic(LabelPickerState state, Set<String> repoLabels) {
         this.repoLabels = repoLabels;
-        history.push(state);
+        currentState = state;
     }
 
     /**
@@ -22,34 +23,30 @@ public class LabelPickerUILogic {
      * @return new state of LabelPicker
      */
     public LabelPickerState getNewState(KeyEvent keyEvent, String currentString) {
-        LabelPickerState currentState = history.peek();
         LabelPickerState newState;
         if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.KP_UP) {
             newState = handleKeyUp(currentState);
-            history.push(newState);
         } else if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.KP_DOWN) {
             newState = handleKeyDown(currentState);
-            history.push(newState);
         } else if (keyEvent.getCode() == KeyCode.SPACE) {
             newState = handleSpace(currentState, currentString);
-            history.push(newState);
+            history.add(currentState);
         } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
-            newState = handleBackSpace(currentString);
+            newState = handleBackSpace();
         } else {
             newState = handleCharAddition(currentState, currentString);
-            history.push(newState);
+            history.add(currentState);
         }
         assert newState != null;
+        currentState = newState;
         return newState;
     }
 
     private LabelPickerState handleKeyUp(LabelPickerState currentState) {
-        history.pop();
         return currentState.previousSuggestion();
     }
 
     private LabelPickerState handleKeyDown(LabelPickerState currentState) {
-        history.pop();
         return currentState.nextSuggestion();
     }
 
@@ -63,13 +60,12 @@ public class LabelPickerUILogic {
         return currentState;
     }
 
-    private LabelPickerState handleBackSpace(String currentString) {
-        if (history.size() > 1) {
+    private LabelPickerState handleBackSpace() {
+        if (!history.isEmpty()) {
+            currentState = history.peek();
             history.pop();
-        } else {
-            assert currentString.length() == 0;
         }
-        return history.peek();
+        return currentState;
     }
 
     private LabelPickerState handleCharAddition(LabelPickerState currentState, String currentString) {
