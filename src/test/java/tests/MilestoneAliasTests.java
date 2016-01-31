@@ -1,6 +1,7 @@
 package tests;
 
 import backend.resource.Model;
+import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import filter.Parser;
 import filter.expression.FilterExpression;
@@ -157,6 +158,72 @@ public class MilestoneAliasTests {
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(false, milestoneQualifiers.get(0).isFalse());
 
+    }
+
+    @Test
+    public void replaceMilestoneAliasesTestNoRelevantMilestone() {
+        //every milestone with due date is irrelevant
+
+        TurboMilestone msIrrelevant1 = new TurboMilestone(REPO, 1, "irrelevant1");
+        msIrrelevant1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
+        msIrrelevant1.setOpen(true);
+
+        TurboMilestone msIrrelevant2 = new TurboMilestone(REPO, 2, "irrelevant2");
+        msIrrelevant2.setDueDate(Optional.of(LocalDate.now().minusDays(2)));
+        msIrrelevant1.setOpen(true);
+
+        TurboMilestone msRelevant1 = new TurboMilestone(REPO, 3, "relevant1");
+        msRelevant1.setDueDate(Optional.empty());
+        msRelevant1.setOpen(true);
+
+        TurboMilestone msRelevant2 = new TurboMilestone(REPO, 4, "relevant2");
+        msRelevant2.setDueDate(Optional.empty());
+        msRelevant2.setOpen(true);
+
+        model = TestUtils.singletonModel(new Model(REPO,
+               new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2)),
+                new ArrayList<>()
+        ));
+
+        FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
+        List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        assertEquals(0, milestoneQualifiers.size());
+
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2, msRelevant1)),
+                new ArrayList<>()
+        ));
+
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        milestoneQualifiers.stream().forEach(msQ -> {
+            assertEquals("relevant1", msQ.getContent().get());
+        });
+
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-2"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        milestoneQualifiers.stream().forEach(msQ -> {
+            assertEquals("irrelevant2", msQ.getContent().get());
+        });
+
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-3"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        assertEquals(0, milestoneQualifiers.size());
+
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2, msRelevant1, msRelevant2)),
+                new ArrayList<>()
+        ));
+
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        assertEquals(0, milestoneQualifiers.size());
     }
 
     @Test
