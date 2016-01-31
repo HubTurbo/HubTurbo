@@ -1,4 +1,4 @@
-package backend.control.ops;
+package backend.control.operations;
 
 import backend.RepoIO;
 import backend.resource.TurboIssue;

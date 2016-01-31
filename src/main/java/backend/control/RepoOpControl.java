@@ -1,7 +1,7 @@
 package backend.control;
 
 import backend.RepoIO;
-import backend.control.ops.*;
+import backend.control.operations.*;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;

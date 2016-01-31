@@ -1,4 +1,4 @@
-package backend.control.ops;
+package backend.control.operations;
 
 import java.util.concurrent.CompletableFuture;
 
