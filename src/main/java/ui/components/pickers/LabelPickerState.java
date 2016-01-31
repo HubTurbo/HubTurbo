@@ -77,7 +77,7 @@ public class LabelPickerState {
     }
 
     private void removeConflictingLabels(String name) {
-        if (TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals('.')) {
+        if (TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals(".")) {
             String group = getGroup(name);
             // remove added labels in same group
             addedLabels = addedLabels.stream()
@@ -91,7 +91,7 @@ public class LabelPickerState {
             removedLabels.addAll(initialLabels.stream()
                     .filter(label -> {
                         String labelGroup = getGroup(label);
-                        return !labelGroup.equals(group) && !removedLabels.contains(name);
+                        return labelGroup.equals(group) && !removedLabels.contains(name);
                     })
                     .collect(Collectors.toSet()));
         }

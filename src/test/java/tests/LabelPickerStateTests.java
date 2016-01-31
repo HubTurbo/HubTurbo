@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LabelPickerStateTests {
 
@@ -24,7 +25,7 @@ public class LabelPickerStateTests {
     }
 
     @Test
-    public void updateMatchedLabelTest() {
+    public void updateMatchedLabelsTest() {
         LabelPickerState initialState = setupState();
         LabelPickerState nextState = initialState.updateMatchedLabels(
                 getLabelHashSet("priority.high", "priority.low", "highest", "Problem.Heavy"),
@@ -48,6 +49,31 @@ public class LabelPickerStateTests {
         nextState = nextState.nextSuggestion();
         assertEquals(true, nextState.getCurrentSuggestion().isPresent());
         assertEquals("Problem.Heavy", nextState.getCurrentSuggestion().get());
+
+        nextState = nextState.previousSuggestion();
+        assertEquals(true, nextState.getCurrentSuggestion().isPresent());
+        assertEquals("priority.high", nextState.getCurrentSuggestion().get());
     }
 
+    @Test
+    public void toggleLabelTest() {
+        LabelPickerState initialState = setupState();
+        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
+        assertEquals(1, nextState.getAddedLabels().size());
+        nextState = nextState.toggleLabel("f-aaa");
+        assertEquals(2, nextState.getAddedLabels().size());
+    }
+
+    @Test
+    public void removeConflictingTest() {
+        LabelPickerState initialState = setupState("priority.low", "priority.high");
+        assertEquals(2, initialState.getInitialLabels().size());
+        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
+
+        assertEquals("priority.medium", nextState.getAddedLabels().get(0));
+        assertEquals(1, nextState.getAddedLabels().size());
+        assertEquals(2, nextState.getRemovedLabels().size());
+        assertTrue(nextState.getRemovedLabels().contains("priority.low"));
+        assertTrue(nextState.getRemovedLabels().contains("priority.high"));
+    }
 }
