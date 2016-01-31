@@ -43,7 +43,15 @@ public class LabelPickerUILogic {
     }
 
     public LabelPickerState getNewState(String clickedLabel) {
-        return currentState.toggleLabel(clickedLabel);
+        switchToClickMode();
+        currentState = currentState.toggleLabel(clickedLabel);
+        return currentState;
+    }
+
+    private void switchToClickMode() {
+        while (!history.empty()) {
+            history.pop();
+        }
     }
 
     private LabelPickerState handleKeyUp(LabelPickerState currentState) {
