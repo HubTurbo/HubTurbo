@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ArrayList;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -377,11 +376,9 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Triggered when a RepoOpeningEvent is received by the filter panel.
-     *
-     * Applies a css class to the listview to indicate that the panel is loading items
-     *
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
      */
+    @Override
     protected void addPanelLoadingIndication() {
         logger.info("Preparing to add panel loading indication");
         listView.getStyleClass().add("listview-loading");
@@ -392,13 +389,10 @@ public class ListPanel extends FilterPanel {
         listView.setItems(null);
     }
 
-
     /**
-     * Triggered when a RepoOpenedEvent is received by the filter panel.
-     *
-     * Removes the loading css class from the listview to indicate that the panel is not loading any items
-     *
+     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
      */
+    @Override
     protected void removePanelLoadingIndication() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
