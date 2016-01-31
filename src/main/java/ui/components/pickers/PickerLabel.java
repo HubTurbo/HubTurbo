@@ -58,7 +58,7 @@ public class PickerLabel extends TurboLabel {
             label.setTooltip(groupTooltip);
         }
 
-        label.setOnMouseClicked(e -> labelPickerUILogic.toggleLabel(getActualName()));
+        //label.setOnMouseClicked(e -> labelPickerUILogic.toggleLabel(getActualName()));
         return label;
     }
 

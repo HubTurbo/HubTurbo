@@ -119,13 +119,20 @@ public class LabelPickerState {
         newMatchedLabels = filterByName(newMatchedLabels, getName(query));
         newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(query));
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, currentSuggestionIndex);
+        OptionalInt newSuggestionIndex;
+        if (newMatchedLabels.isEmpty()) {
+            newSuggestionIndex = currentSuggestionIndex;
+        } else {
+            newSuggestionIndex = OptionalInt.of(0);
+        }
+
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, newSuggestionIndex);
     }
 
     private List<String> filterByName(List<String> repoLabels, String labelName) {
         return repoLabels
                 .stream()
-                .filter(name -> Utility.containsIgnoreCase(getGroup(name), labelName))
+                .filter(name -> Utility.containsIgnoreCase(getName(name), labelName))
                 .collect(Collectors.toList());
     }
 
@@ -152,7 +159,7 @@ public class LabelPickerState {
 
     private String getName(String name) {
         if (hasGroup(name)) {
-            return name.substring(name.indexOf(TurboLabel.getDelimiter(name).get()) - 1);
+            return name.substring(name.indexOf(TurboLabel.getDelimiter(name).get()) + 1);
         } else {
             return name;
         }
