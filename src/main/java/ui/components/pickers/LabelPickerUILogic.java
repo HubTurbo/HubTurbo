@@ -69,7 +69,12 @@ public class LabelPickerUILogic {
     }
 
     private LabelPickerState handleCharAddition(LabelPickerState currentState, String currentString) {
-        return currentState.updateMatchedLabels(repoLabels, currentString);
+        String[] keywords = currentString.split("\\s+");
+        if (keywords.length > 0) {
+            return currentState.updateMatchedLabels(repoLabels, keywords[keywords.length - 1]);
+        } else {
+            return currentState.updateMatchedLabels(repoLabels, "");
+        }
     }
 
 }
