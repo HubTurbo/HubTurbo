@@ -97,6 +97,21 @@ public class Qualifier implements FilterExpression {
                 .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
                 .collect(Collectors.toList());
 
+        boolean hasRelevantMilestone = allMilestones.stream().anyMatch(ms -> isRelevantMilestone(ms));
+
+        if (!hasRelevantMilestone) {
+            List<TurboMilestone> openMilestonesWithoutDueDate = model.getMilestones().stream()
+                    .filter(ms -> !ms.getDueDate().isPresent())
+                    .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                    .filter(ms -> ms.isOpen())
+                    .collect(Collectors.toList());
+
+            if (openMilestonesWithoutDueDate.size() == 1) {
+                //milestones without due date can only be located at the end of the list
+                allMilestones.add(openMilestonesWithoutDueDate.get(0));
+            }
+        }
+
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
 
         if (!currentMilestoneIndex.isPresent()) {
@@ -144,11 +159,7 @@ public class Qualifier implements FilterExpression {
         int currentIndex = 0;
 
         for (TurboMilestone checker : allMilestones) {
-            boolean overdue = checker.getDueDate().isPresent() &&
-                    checker.getDueDate().get().isBefore(LocalDate.now());
-            boolean relevant = !(overdue && checker.getOpenIssues() == 0);
-
-            if (checker.isOpen() && relevant) {
+            if (checker.isOpen() && isRelevantMilestone(checker)) {
                 return Optional.of(currentIndex);
             }
 
@@ -158,6 +169,12 @@ public class Qualifier implements FilterExpression {
         // if no open milestone, set current as one after last milestone
         // - this means that no such milestone, which will return no issue
         return Optional.of(allMilestones.size());
+    }
+
+    private static boolean isRelevantMilestone(TurboMilestone milestone) {
+        boolean overdue = milestone.getDueDate().isPresent() &&
+                milestone.getDueDate().get().isBefore(LocalDate.now());
+        return !(overdue && milestone.getOpenIssues() == 0);
     }
 
     public static HashSet<String> getMetaQualifierContent(FilterExpression expr, QualifierType qualifierType) {
