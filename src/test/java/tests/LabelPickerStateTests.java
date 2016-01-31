@@ -25,7 +25,7 @@ public class LabelPickerStateTests {
     }
 
     @Test
-    public void updateMatchedLabelsTest() {
+    public void matchedLabelsTest() {
         LabelPickerState initialState = setupState();
         LabelPickerState nextState = initialState.updateMatchedLabels(
                 getLabelHashSet("priority.high", "priority.low", "highest", "Problem.Heavy"),
@@ -33,6 +33,9 @@ public class LabelPickerStateTests {
         );
 
         assertEquals(2, nextState.getMatchedLabels().size());
+
+        nextState = nextState.clearMatchedLabels();
+        assertEquals(0, nextState.getMatchedLabels().size());
     }
 
     @Test
@@ -75,5 +78,22 @@ public class LabelPickerStateTests {
         assertEquals(2, nextState.getRemovedLabels().size());
         assertTrue(nextState.getRemovedLabels().contains("priority.low"));
         assertTrue(nextState.getRemovedLabels().contains("priority.high"));
+    }
+
+    @Test
+    public void getAssignedLabelsTest() {
+        LabelPickerState initialState = setupState("priority.low", "priority.high");
+        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
+        nextState = nextState.toggleLabel("priority.medium");
+        assertEquals(0, nextState.getAssignedLabels().size());
+
+        nextState = nextState.toggleLabel("priority.low");
+        nextState = nextState.toggleLabel("priority.low");
+        nextState = nextState.toggleLabel("priority.low");
+        nextState = nextState.toggleLabel("Problem.Heavy");
+        nextState = nextState.toggleLabel("priority.medium");
+        assertEquals(2, nextState.getAssignedLabels().size());
+        assertTrue(nextState.getAssignedLabels().contains("priority.medium"));
+        assertTrue(nextState.getAssignedLabels().contains("Problem.Heavy"));
     }
 }
