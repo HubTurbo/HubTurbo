@@ -97,19 +97,14 @@ public class Qualifier implements FilterExpression {
                 .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
                 .collect(Collectors.toList());
 
-        boolean hasRelevantMilestone = allMilestones.stream().anyMatch(ms -> isRelevantMilestone(ms));
+        List<TurboMilestone> openMilestones = model.getMilestones().stream()
+                .filter(ms -> ms.isOpen())
+                .collect(Collectors.toList());
 
-        if (!hasRelevantMilestone) {
-            List<TurboMilestone> openMilestonesWithoutDueDate = model.getMilestones().stream()
-                    .filter(ms -> !ms.getDueDate().isPresent())
-                    .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
-                    .filter(ms -> ms.isOpen())
-                    .collect(Collectors.toList());
-
-            if (openMilestonesWithoutDueDate.size() == 1) {
-                //milestones without due date can only be located at the end of the list
-                allMilestones.add(openMilestonesWithoutDueDate.get(0));
-            }
+        if (openMilestones.size() == 1 && !openMilestones.get(0).getDueDate().isPresent()) {
+            //if there is only one open issue in the repo and it doesn't have a due date, add it
+            //to the list of all milestones
+            allMilestones.addAll(openMilestones);
         }
 
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
@@ -156,14 +151,20 @@ public class Qualifier implements FilterExpression {
             return Optional.empty();
         }
 
-        int currentIndex = 0;
+        Optional<TurboMilestone> openAndRelevantMilestone = allMilestones.stream()
+                .filter(ms -> ms.isOpen() && isRelevantMilestone(ms))
+                .findFirst();
 
-        for (TurboMilestone checker : allMilestones) {
-            if (checker.isOpen() && isRelevantMilestone(checker)) {
-                return Optional.of(currentIndex);
+        if (openAndRelevantMilestone.isPresent()) {
+            return Optional.of(allMilestones.indexOf(openAndRelevantMilestone.get()));
+        } else {
+            int currentIndex = 0;
+            for (TurboMilestone checker : allMilestones) {
+                if (checker.isOpen()) {
+                    return Optional.of(currentIndex);
+                }
+                currentIndex++;
             }
-
-            currentIndex++;
         }
 
         // if no open milestone, set current as one after last milestone

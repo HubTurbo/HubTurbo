@@ -166,11 +166,11 @@ public class MilestoneAliasTests {
 
         TurboMilestone msIrrelevant1 = new TurboMilestone(REPO, 1, "irrelevant1");
         msIrrelevant1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
-        msIrrelevant1.setOpen(true);
+        msIrrelevant1.setOpen(false);
 
         TurboMilestone msIrrelevant2 = new TurboMilestone(REPO, 2, "irrelevant2");
         msIrrelevant2.setDueDate(Optional.of(LocalDate.now().minusDays(2)));
-        msIrrelevant1.setOpen(true);
+        msIrrelevant2.setOpen(true);
 
         TurboMilestone msRelevant1 = new TurboMilestone(REPO, 3, "relevant1");
         msRelevant1.setDueDate(Optional.empty());
@@ -189,7 +189,11 @@ public class MilestoneAliasTests {
 
         FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
-        assertEquals(0, milestoneQualifiers.size());
+        milestoneQualifiers.stream().forEach(msQ -> {
+            assertEquals("irrelevant2", msQ.getContent().get());
+        });
+
+        msIrrelevant2.setOpen(false);
 
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
