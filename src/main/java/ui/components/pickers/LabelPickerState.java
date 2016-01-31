@@ -212,7 +212,7 @@ public class LabelPickerState {
 
     private List<String> convertToList(Set<String> labelSet){
         List<String> resultingList = new ArrayList<>();
-        resultingList.addAll(initialLabels);
+        resultingList.addAll(labelSet);
         return resultingList;
     }
 
