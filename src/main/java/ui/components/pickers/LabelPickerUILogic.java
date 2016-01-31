@@ -8,11 +8,11 @@ import java.util.*;
 public class LabelPickerUILogic {
 
     private Stack<LabelPickerState> history = new Stack<>();
-    private Set<String> repoLabels;
+    private final Set<String> repoLabels;
 
     public LabelPickerUILogic(LabelPickerState state, Set<String> repoLabels) {
         this.repoLabels = repoLabels;
-        history.add(state);
+        history.push(state);
     }
 
     /**
@@ -26,18 +26,18 @@ public class LabelPickerUILogic {
         LabelPickerState newState;
         if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.KP_UP) {
             newState = handleKeyUp(currentState);
-            history.add(newState);
+            history.push(newState);
         } else if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.KP_DOWN) {
             newState = handleKeyDown(currentState);
-            history.add(newState);
+            history.push(newState);
         } else if (keyEvent.getCode() == KeyCode.SPACE) {
             newState = handleSpace(currentState, currentString);
-            history.add(newState);
+            history.push(newState);
         } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
             newState = handleBackSpace(currentString);
         } else {
             newState = handleCharAddition(currentState, currentString);
-            history.add(newState);
+            history.push(newState);
         }
         assert newState != null;
         return newState;
