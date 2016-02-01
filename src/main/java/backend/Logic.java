@@ -192,44 +192,21 @@ public class Logic {
     }
 
     /**
-     * Replaces labels of issue on GitHub
+     * Replaces existing labels with new labels in the issue object, the UI, and the server, in that order.
+     * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue whose labels are to be replaced on GitHub.
-     * @param newLabels The list of new labels to be applied on the issue.
-     * @return True if label replacement on GitHub was a success, false otherwise.
+     * @param issue The issue object whose labels are to be replaced.
+     * @param newLabels The list of new labels to be assigned to the issue.
+     * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
-        boolean isLabelsChanged = updateIssueLabels(issue, newLabels);
-
-        if (isLabelsChanged) {
-            logger.info("Changing labels for " + issue + " on UI");
-            refreshUI();
-        }
+        logger.info("Changing labels for " + issue + " on UI");
+        issue.setLabels(newLabels);
+        refreshUI();
 
         return updateIssueLabelsOnRepo(issue, newLabels);
     }
 
-    /**
-     * Updates an issue with a set of labels
-     * @return true if changes are made to the labels on the issue
-     */
-    private Boolean updateIssueLabels(TurboIssue issue, List<String> labels) {
-        boolean isLabelsUnchanged = issue.getLabels().size() == labels.size() && issue.getLabels().containsAll(labels);
-        if (isLabelsUnchanged) {
-            logger.info("No changes to labels of " + issue);
-            return false;
-        }
-
-        issue.setLabels(labels);
-        return true;
-    }
-
-    /**
-     * Updates an issue on the repository with a set of labels
-     * @param issue
-     * @param newLabels
-     * @return
-     */
     private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
         return repoOpControl.replaceIssueLabels(issue, newLabels)

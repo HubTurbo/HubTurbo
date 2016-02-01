@@ -8,6 +8,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static util.Futures.chain;
 
+/**
+ * This class represents a repository operation that replaces a list of labels assigned to an issue
+ */
 public class ReplaceIssueLabelsOp implements RepoOp<List<String>> {
 
     private final RepoIO repoIO;

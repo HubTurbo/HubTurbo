@@ -11,15 +11,13 @@ import ui.UI;
 import util.events.EventDispatcher;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.mock;
@@ -43,43 +41,60 @@ public class LogicTests {
     }
 
     /**
-     * Tests that all issue's labels are removed if an empty list is passed into replaceIssueLabels
+     * Tests that all issue's labels are replaced with new labels when
+     * the new labels are different from the current ones
      */
     @Test
-    public void testReplaceIssueLabelsEmptyList() throws ExecutionException, InterruptedException {
-        TurboIssue issue = new TurboIssue("testowner/testrepo", 1, "Issue title");
-        List<String> oldLabels = Arrays.asList("label1", "label2");
-        issue.setLabels(oldLabels);
-
-        CompletableFuture<List<String>> resultLabels = new CompletableFuture<>();
-        resultLabels.complete(new ArrayList<>());
-        when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class)))
-                .thenReturn(resultLabels);
-
-        boolean status = logic.replaceIssueLabels(issue, new ArrayList<>()).get();
-
-        assertTrue(status);
-        assertEquals(0, issue.getLabels().size());
-    }
-
-    /**
-     * Tests that all issue's labels are replaced with new labels passed in
-     */
-    @Test
-    public void  testReplaceIssueLabels() throws ExecutionException, InterruptedException {
-        TurboIssue issue = new TurboIssue("testowner/testrepo", 1, "Issue title");
-        List<String> oldLabels = Arrays.asList("label1", "label2");
-        issue.setLabels(oldLabels);
-
+    public void testReplaceIssueLabelsNonOverlapping() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithLabels(Arrays.asList("label1", "label2"));
         List<String> newLabels = Arrays.asList("label3", "label4");
-        CompletableFuture<List<String>> resultLabels = new CompletableFuture<>();
-        resultLabels.complete(newLabels);
-        when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class)))
-                .thenReturn(resultLabels);
+        mockRepoIOReplaceIssueLabelsResult(newLabels);
 
         boolean status = logic.replaceIssueLabels(issue, newLabels).get();
 
         assertTrue(status);
-        assertEquals(resultLabels.get(), issue.getLabels());
+        assertEquals(newLabels, issue.getLabels());
+    }
+
+    /**
+     * Tests that all issue's labels remain the same if the new labels are the same as the current ones
+     */
+    @Test
+    public void testReplaceIssueLabelsNoChange() throws ExecutionException, InterruptedException {
+        List<String> labels = Arrays.asList("label1", "label2");
+        TurboIssue issue = createIssueWithLabels(labels);
+        mockRepoIOReplaceIssueLabelsResult(labels);
+
+        boolean status = logic.replaceIssueLabels(issue, labels).get();
+
+        assertTrue(status);
+        assertEquals(labels, issue.getLabels());
+    }
+
+    /**
+     * Tests that the returned status is false when the returned result from RepoIO is inconsistent
+     * with the given labels argument
+     */
+    @Test
+    public void testReplaceIssueLabelsInconsistent() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithLabels(Arrays.asList("label1", "label2", "label3"));
+        mockRepoIOReplaceIssueLabelsResult(Arrays.asList("label3", "label4"));
+
+        boolean status = logic.replaceIssueLabels(issue, Arrays.asList("label1", "label2")).get();
+
+        assertFalse(status);
+    }
+
+    private void mockRepoIOReplaceIssueLabelsResult(List<String> resultLabels) {
+        CompletableFuture<List<String>> resultFuture = new CompletableFuture<>();
+        resultFuture.complete(resultLabels);
+        when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class)))
+                .thenReturn(resultFuture);
+    }
+
+    public static TurboIssue createIssueWithLabels(List<String> labels) {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", 1, "Issue title");
+        issue.setLabels(labels);
+        return issue;
     }
 }
