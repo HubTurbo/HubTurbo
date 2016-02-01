@@ -1,92 +1,27 @@
 package ui.components.pickers;
 
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-
 import java.util.*;
 
 public class LabelPickerUILogic {
 
-    private Stack<LabelPickerState> history = new Stack<>();
-    private LabelPickerState currentState;
-    private final Set<String> repoLabels;
-
-    public LabelPickerUILogic(LabelPickerState state, Set<String> repoLabels) {
-        this.repoLabels = repoLabels;
-        currentState = state;
+    public LabelPickerUILogic() {
     }
 
-    /**
-     * Get a new state of LabelPicker after the user presses keyEvent resulting in currentString
-     * @param keyEvent
-     * @param currentString
-     * @return new state of LabelPicker
-     */
-    public LabelPickerState getNewState(KeyEvent keyEvent, String currentString) {
-        LabelPickerState newState;
-        if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.KP_UP) {
-            newState = handleKeyUp(currentState);
-        } else if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.KP_DOWN) {
-            newState = handleKeyDown(currentState);
-        } else if (keyEvent.getCode() == KeyCode.SPACE) {
-            newState = handleSpace(currentState, currentString);
-            history.add(currentState);
-        } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
-            newState = handleBackSpace();
-        } else {
-            newState = handleCharAddition(currentState, currentString);
-            history.add(currentState);
+    public LabelPickerState determineState(LabelPickerState initialState, Set<String> repoLabels, String userInput) {
+        String[] keywords = userInput.split("\\s+");
+        LabelPickerState state = initialState;
+        for (int i = 0; i < keywords.length; i++) {
+            if (isConfirmedKeyword(keywords, userInput, i)) {
+                state = state.toggleLabel(keywords[i]);
+            } else {
+                state = state.updateMatchedLabels(repoLabels, keywords[i]);
+            }
         }
-        assert newState != null;
-        currentState = newState;
-        return newState;
+        return state;
     }
 
-    public LabelPickerState getNewState(String clickedLabel) {
-        switchToClickMode();
-        currentState = currentState.toggleLabel(clickedLabel);
-        return currentState;
-    }
-
-    private void switchToClickMode() {
-        while (!history.empty()) {
-            history.pop();
-        }
-    }
-
-    private LabelPickerState handleKeyUp(LabelPickerState currentState) {
-        return currentState.previousSuggestion();
-    }
-
-    private LabelPickerState handleKeyDown(LabelPickerState currentState) {
-        return currentState.nextSuggestion();
-    }
-
-    private LabelPickerState handleSpace(LabelPickerState currentState, String currentString) {
-        assert currentString.charAt(currentString.length() - 1) == ' ';
-        String[] keywords = currentString.split("\\s+");
-        if (keywords.length > 0 && !Character.isSpaceChar(currentString.charAt(currentString.length() - 2))) {
-            //just confirmed a word
-            return currentState.clearMatchedLabels().toggleLabel(keywords[keywords.length - 1]);
-        }
-        return currentState;
-    }
-
-    private LabelPickerState handleBackSpace() {
-        if (!history.isEmpty()) {
-            currentState = history.peek();
-            history.pop();
-        }
-        return currentState;
-    }
-
-    private LabelPickerState handleCharAddition(LabelPickerState currentState, String currentString) {
-        String[] keywords = currentString.split("\\s+");
-        if (keywords.length > 0) {
-            return currentState.updateMatchedLabels(repoLabels, keywords[keywords.length - 1]);
-        } else {
-            return currentState.updateMatchedLabels(repoLabels, "");
-        }
+    private boolean isConfirmedKeyword(String[] keywords, String userInput, int keywordIndex) {
+        return !(keywordIndex == keywords.length - 1 && !userInput.endsWith(" "));
     }
 
 }

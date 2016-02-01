@@ -26,6 +26,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private static final int ELEMENT_MAX_WIDTH = 108;
 
     private final LabelPickerUILogic uiLogic;
+    private final List<TurboLabel> repoLabels;
+    private final Set<String> repoLabelsString;
+    private final Map<String, Boolean> groups;
+    private final TurboIssue issue;
 
     @FXML
     private VBox mainLayout;
@@ -39,6 +43,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private VBox feedbackLabels;
 
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
+        this.repoLabels = repoLabels;
+        this.repoLabelsString = repoLabels.stream()
+                .map(TurboLabel::getActualName)
+                .collect(Collectors.toSet());
+        this.issue = issue;
+        LabelPickerState initialState = new LabelPickerState(new HashSet<String>(issue.getLabels()));
+        uiLogic = new LabelPickerUILogic();
+
         // UI creation
         initUI(stage, issue);
         setupEvents(stage);
@@ -56,21 +68,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void setupKeyEvents() {
         queryField.textProperty().addListener((observable, oldValue, newValue) -> {
-            uiLogic.processTextFieldChange(newValue.toLowerCase());
-        });
-        queryField.setOnKeyPressed(e -> {
-            if (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown()) {
-                if (e.getCode() == KeyCode.DOWN) {
-                    e.consume();
-                    uiLogic.moveHighlightOnLabel(true);
-                } else if (e.getCode() == KeyCode.UP) {
-                    e.consume();
-                    uiLogic.moveHighlightOnLabel(false);
-                } else if (e.getCode() == KeyCode.SPACE) {
-                    e.consume();
-                    uiLogic.toggleSelectedLabel(queryField.getText());
-                }
-            }
+            uiLogic.determineState(new LabelPickerState(new HashSet<String>(issue.getLabels())),
+                    repoLabelsString,
+                    queryField.getText().toLowerCase());
         });
     }
 
