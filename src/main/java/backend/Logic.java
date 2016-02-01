@@ -5,6 +5,7 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
+import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
@@ -14,6 +15,7 @@ import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
+import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
@@ -121,18 +123,26 @@ public class Logic {
         return isRepositoryValid(repoId).thenCompose(valid -> {
             if (!valid) {
                 return Futures.unit(false);
-            } else {
-                logger.info("Opening " + repoId);
-                UI.status.displayMessage("Opening " + repoId);
-                return repoOpControl.openRepository(repoId)
-                        .thenApply(models::addPending)
-                        .thenRun(this::refreshUI)
-                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                        .thenCompose(n -> getRateLimitResetTime())
-                        .thenApply(this::updateRemainingRate)
-                        .thenApply(rateLimits -> true)
-                        .exceptionally(withResult(false));
             }
+
+            logger.info("Opening " + repoId);
+            UI.status.displayMessage("Opening " + repoId);
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+
+            return repoOpControl.openRepository(repoId)
+                    .thenApply(models::addPending)
+                    .thenRun(this::refreshUI)
+                    .thenRun(() ->
+                            Platform.runLater(() ->
+                                    // to trigger the event from the UI thread
+                                    UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
+                            )
+                    )
+                    .thenCompose(n -> getRateLimitResetTime())
+                    .thenApply(this::updateRemainingRate)
+                    .thenApply(rateLimits -> true)
+                    .exceptionally(withResult(false));
+
         });
     }
 
