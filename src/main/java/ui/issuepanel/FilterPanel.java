@@ -199,25 +199,24 @@ public abstract class FilterPanel extends AbstractPanel {
     }
 
     private void indicatePanelLoading(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo, e.repoId)) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
             addPanelLoadingIndication();
         }
     }
 
     private void unindicatePanelLoading(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo, e.repoId)) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
             removePanelLoadingIndication();
         }
     }
 
-    private boolean isIndicatorApplicable(boolean isPrimaryRepo, String repoId) {
+    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
 
         boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
-        boolean isRepoFiltersChanged = allReposInFilterExpr.contains(repoId);
 
-        return isPrimaryRepoChanged || isRepoFiltersChanged;
+        return isPrimaryRepoChanged;
     }
 
     /**
