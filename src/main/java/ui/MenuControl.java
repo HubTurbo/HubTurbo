@@ -38,7 +38,7 @@ public class MenuControl extends MenuBar {
         this.prefs = prefs;
         this.ui = ui;
         this.mainStage = mainStage;
-        this.boardAutoCreator = new BoardAutoCreator(ui, panels, prefs);
+        this.boardAutoCreator = new BoardAutoCreator(ui, panels, prefs, mainStage);
         this.panelMenuCreator = new PanelMenuCreator(panels, panelsScrollPane);
 
         createMenuItems();
@@ -68,40 +68,40 @@ public class MenuControl extends MenuBar {
 
     private Menu createFileMenu() {
         Menu file = new Menu("File");
-        
+
         MenuItem logout = new MenuItem("Logout");
         logout.setOnAction(e -> {
             logger.info("Logging out of HT");
             prefs.setLastLoginCredentials("", "");
             ui.quit();
         });
-        
+
         MenuItem quit = new MenuItem("Quit");
         quit.setOnAction(e -> {
             logger.info("Quitting HT");
             ui.quit();
         });
-        
+
         file.getItems().addAll(logout, quit);
-        
+
         return file;
 
     }
-    
+
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
-        
+
         if (!prefs.getLastOpenBoard().isPresent()) {
             onBoardSaveAs();
             return;
         }
-        
+
         List<PanelInfo> panelList = panels.getCurrentPanelInfos();
         if (panelList.isEmpty()) {
             logger.info("Did not save board " + prefs.getLastOpenBoard().get());
             return;
         }
-        
+
         prefs.addBoard(prefs.getLastOpenBoard().get(), panelList);
         ui.triggerEvent(new BoardSavedEvent());
         logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
@@ -124,7 +124,7 @@ public class MenuControl extends MenuBar {
         Optional<String> response = dlg.showAndWait();
         ui.showMainStage();
         panels.selectFirstPanel();
-        
+
         if (response.isPresent()) {
             String boardName = response.get().trim();
             prefs.addBoard(boardName, panelList);
@@ -166,7 +166,7 @@ public class MenuControl extends MenuBar {
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
             prefs.removeBoard(boardName);
             if (prefs.getLastOpenBoard().isPresent() &&
-                prefs.getLastOpenBoard().get().equals(boardName)) {
+                    prefs.getLastOpenBoard().get().equals(boardName)) {
 
                 prefs.clearLastOpenBoard();
             }
@@ -181,7 +181,7 @@ public class MenuControl extends MenuBar {
     private MenuItem[] createBoardsMenu() {
         MenuItem saveAs = new MenuItem("Save as");
         saveAs.setOnAction(e -> onBoardSaveAs());
-        
+
         MenuItem save = new MenuItem("Save");
         save.setOnAction(e -> onBoardSave());
 
@@ -194,7 +194,7 @@ public class MenuControl extends MenuBar {
             delete.getItems().clear();
 
             Map<String, List<PanelInfo>> boards = prefs.getAllBoards();
-            
+
             for (Map.Entry<String, List<PanelInfo>> entry : boards.entrySet()) {
                 final String boardName = entry.getKey();
                 final List<PanelInfo> panelSet = entry.getValue();
@@ -213,7 +213,7 @@ public class MenuControl extends MenuBar {
 
         return new MenuItem[] {save, saveAs, open, delete, autoCreate};
     }
-    
+
     public void switchBoard() {
         Optional<String> name = prefs.switchBoard();
         if (name.isPresent()) {
