@@ -2,13 +2,18 @@ package filter;
 
 import filter.expression.QualifierType;
 
+/**
+ * Thrown to indicate failure to interpret a filter expression which may 
+ * be resulted from invalid qualifier inputs, multiple qualifiers which 
+ * should only appear once or simply an empty input.
+ */
 @SuppressWarnings("serial")
 public class SemanticException extends FilterException {
     
-    public static final String ERR_MSG = "\"%s\" expects %s";
+    public static final String ERROR_MESSAGE = "\"%s\" expects %s";
+
     public SemanticException(QualifierType type, String details) {
-        super(String.format(ERR_MSG, type, details));
-        System.out.println(String.format(ERR_MSG, type, details));
+        super(String.format(ERROR_MESSAGE, type, details));
     }
 
 }

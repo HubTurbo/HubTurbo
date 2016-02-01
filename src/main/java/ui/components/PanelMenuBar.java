@@ -40,9 +40,10 @@ public class PanelMenuBar extends HBox {
     private final GUIController guiController;
     private Label closeButton;
     private final UI ui;
-    private String panelName = "Panel";
+    private String panelName = DEFAULT_PANEL_NAME;
     private Text nameText;
 
+    public static final String DEFAULT_PANEL_NAME = "Panel";
     public static final int NAME_DISPLAY_WIDTH = PANEL_WIDTH - 80;
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip

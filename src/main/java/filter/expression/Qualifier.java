@@ -697,7 +697,7 @@ public class Qualifier implements FilterExpression {
         } else if (numberRange.isPresent()) {
             return numberRange.get().encloses(issue.getId());
         }
-        throw new SemanticException(type, type.getValidInputs());
+        throw new SemanticException(type, type.getDescriptionOfValidInputs());
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
@@ -708,7 +708,7 @@ public class Qualifier implements FilterExpression {
         } else if (number.isPresent()) {
             updatedRange = new NumberRange(null, number.get(), true);
         } else {
-            throw new SemanticException(type, type.getValidInputs());
+            throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
 
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
@@ -728,7 +728,7 @@ public class Qualifier implements FilterExpression {
         } else if (dateRange.isPresent()) {
             return dateRange.get().encloses(creationDate);
         } else {
-            throw new SemanticException(type, type.getValidInputs());
+            throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
     }
 
@@ -749,7 +749,7 @@ public class Qualifier implements FilterExpression {
             assert issue.getAssignee() != null;
             return issue.getAssignee().isPresent();
         default:
-            throw new SemanticException(type, type.getValidInputs());
+            throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
     }
 
@@ -775,7 +775,7 @@ public class Qualifier implements FilterExpression {
         case "unread":
             return !issue.isCurrentlyRead();
         default:
-            throw new SemanticException(type, type.getValidInputs());
+            throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
     }
 
@@ -787,7 +787,7 @@ public class Qualifier implements FilterExpression {
         } else if (content.contains("closed")) {
             return !issue.isOpen();
         } else {
-            throw new SemanticException(type, type.getValidInputs());
+            throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
     }
 
@@ -915,7 +915,7 @@ public class Qualifier implements FilterExpression {
             case "pullrequest":
                 return issue.isPullRequest();
             default:
-                throw new SemanticException(type, type.getValidInputs());
+                throw new SemanticException(type, type.getDescriptionOfValidInputs());
         }
     }
 

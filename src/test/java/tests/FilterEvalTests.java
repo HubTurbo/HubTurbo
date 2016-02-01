@@ -45,13 +45,14 @@ public class FilterEvalTests {
     }
 
     /**
-     * Helper method for testing SemanticException thrown by different qualifiers
+     * Confirms that the input causes a Semantic Exception to be thrown
+     * with correct error message. Test fails if it doesn't.
      */
-    public void expectSemanticException(QualifierType type, String invalidInput) {
+    public void verifySemanticException(QualifierType type, String invalidInput) {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         thrown.expect(SemanticException.class);
-        thrown.expectMessage(String.format(SemanticException.ERR_MSG, type, 
-                type.getValidInputs()));
+        thrown.expectMessage(
+            String.format(SemanticException.ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
         matches(invalidInput, issue);
     }
 
@@ -90,7 +91,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidId() {
-        expectSemanticException(QualifierType.ID, "id:something");
+        verifySemanticException(QualifierType.ID, "id:something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -508,7 +509,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidState() {
-        expectSemanticException(QualifierType.STATE, "state:something");
+        verifySemanticException(QualifierType.STATE, "state:something");
     }
 
     @Test
@@ -555,7 +556,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidHas() {
-        expectSemanticException(QualifierType.HAS, "has:something");
+        verifySemanticException(QualifierType.HAS, "has:something");
     }
 
     @Test
@@ -602,7 +603,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidNo() {
-        expectSemanticException(QualifierType.NO, "no:something");
+        verifySemanticException(QualifierType.NO, "no:something");
     }
 
     @Test
@@ -620,7 +621,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidType() {
-        expectSemanticException(QualifierType.TYPE, "type:something");
+        verifySemanticException(QualifierType.TYPE, "type:something");
     }
 
     @Test
@@ -686,7 +687,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidIs() {
-        expectSemanticException(QualifierType.IS, "is:something");
+        verifySemanticException(QualifierType.IS, "is:something");
     }
 
     @Test
@@ -701,7 +702,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidCreated() {
-        expectSemanticException(QualifierType.CREATED, "created:nondate");
+        verifySemanticException(QualifierType.CREATED, "created:nondate");
     }
 
     @Test
@@ -728,7 +729,7 @@ public class FilterEvalTests {
 
     @Test
     public void invalidUpdated() {
-        expectSemanticException(QualifierType.UPDATED, "updated:nondate");
+        verifySemanticException(QualifierType.UPDATED, "updated:nondate");
     }
 
     @Test
