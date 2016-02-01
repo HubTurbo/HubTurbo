@@ -12,7 +12,7 @@ public class LabelPickerUILogic {
         LabelPickerState state = initialState;
         for (int i = 0; i < keywords.length; i++) {
             if (isConfirmedKeyword(keywords, userInput, i)) {
-                state = state.toggleLabel(keywords[i]);
+                state = state.toggleLabel(repoLabels, keywords[i]);
             } else {
                 state = state.updateMatchedLabels(repoLabels, keywords[i]);
             }

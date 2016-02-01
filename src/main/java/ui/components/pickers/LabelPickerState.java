@@ -54,22 +54,25 @@ public class LabelPickerState {
                     new ArrayList<>(), currentSuggestionIndex);
     }
 
-    public LabelPickerState toggleLabel(String name) {
-        if (isAnInitialLabel(name)) {
-            if (isARemovedLabel(name)) {
+    public LabelPickerState toggleLabel(Set<String> repoLabels, String keyword) {
+        if (!hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
+        String labelName = getMatchedLabelName(repoLabels, keyword);
+
+        if (isAnInitialLabel(labelName)) {
+            if (isARemovedLabel(labelName)) {
                 // add back initial label
-                removeConflictingLabels(name);
-                removedLabels.remove(name);
+                removeConflictingLabels(labelName);
+                removedLabels.remove(labelName);
             } else {
-                removedLabels.add(name);
+                removedLabels.add(labelName);
             }
         } else {
-            if (isAnAddedLabel(name)) {
-                addedLabels.remove(name);
+            if (isAnAddedLabel(labelName)) {
+                addedLabels.remove(labelName);
             } else {
                 // add new label
-                removeConflictingLabels(name);
-                addedLabels.add(name);
+                removeConflictingLabels(labelName);
+                addedLabels.add(labelName);
             }
         }
 
@@ -147,6 +150,22 @@ public class LabelPickerState {
      * Helper functions
      */
 
+    private String getMatchedLabelName(Set<String> repoLabels, String keyword) {
+        List<String> newMatchedLabels = new ArrayList<>();
+        newMatchedLabels.addAll(repoLabels);
+        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        return newMatchedLabels.get(0);
+    }
+
+    private boolean hasExactlyOneMatchedLabel(Set<String> repoLabels, String keyword) {
+        List<String> newMatchedLabels = new ArrayList<>();
+        newMatchedLabels.addAll(repoLabels);
+        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        return newMatchedLabels.size() == 1;
+    }
+
     private void removeConflictingLabels(String name) {
         if (hasExclusiveGroup(name)) {
             String group = getGroup(name);
@@ -180,16 +199,20 @@ public class LabelPickerState {
     }
 
     private List<String> filterByGroup(List<String> repoLabels, String labelGroup) {
-        return repoLabels
-                .stream()
-                .filter(name -> {
-                    if (hasGroup(name)) {
-                        return Utility.containsIgnoreCase(getGroup(name), labelGroup);
-                    } else {
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList());
+        if (labelGroup.equals("")) {
+            return repoLabels;
+        } else {
+            return repoLabels
+                    .stream()
+                    .filter(name -> {
+                        if (hasGroup(name)) {
+                            return Utility.containsIgnoreCase(getGroup(name), labelGroup);
+                        } else {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     private String getGroup(String name) {
