@@ -3,10 +3,8 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import github.IssueEventType;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
@@ -16,7 +14,6 @@ import util.HTLog;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
