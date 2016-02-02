@@ -2,8 +2,11 @@ package ui;
 
 
 import backend.resource.TurboUser;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.PanelInfo;
@@ -27,11 +30,13 @@ public class BoardAutoCreator {
     private final UI ui;
     private final PanelControl panelControl;
     private final Preferences prefs;
+    private final Stage stage;
 
-    public BoardAutoCreator(UI ui, PanelControl panelControl, Preferences prefs) {
+    public BoardAutoCreator(UI ui, PanelControl panelControl, Preferences prefs, Stage stage) {
         this.ui = ui;
         this.panelControl = panelControl;
         this.prefs = prefs;
+        this.stage = stage;
     }
 
     public Menu generateBoardAutoCreateMenu() {
@@ -86,7 +91,48 @@ public class BoardAutoCreator {
 
             return;
         }
+        List<ComboBox<TurboUser>> listOfComboBoxes = new ArrayList<ComboBox<TurboUser>>();
 
+        ComboBox<Integer> comboBox = new ComboBox<>();
+        Dialog dlg = new Dialog<>();
+        DialogPane dlgPane = new DialogPane();
+        dlgPane.setPrefWidth(200);
+        dlg.setWidth(200);
+        dlg.setDialogPane(dlgPane);
+        HBox assigneeSelector = new HBox(5);
+        assigneeSelector.setAlignment(Pos.CENTER_LEFT);
+        assigneeSelector.setPrefWidth(100);
+        dlgPane.setContent(assigneeSelector);
+        assigneeSelector.getChildren().add(comboBox);
+
+        int noOfUsers = (userList.size() > 10) ? 10 : userList.size();
+        for (int j = 0; j < noOfUsers; j++) {
+            comboBox.getItems().addAll(j+1);
+        }
+
+        comboBox.valueProperty().addListener((observable, oldVal, newVal) -> {
+            generateUserComboBoxes(oldVal, newVal, userList, comboBox, assigneeSelector, listOfComboBoxes, dlgPane, dlg);
+        });
+
+        dlg.setOnCloseRequest(new EventHandler<DialogEvent>() {
+            @Override
+            public void handle(DialogEvent event) {
+                List<TurboUser> selectedUserList = new ArrayList<>();
+                for (int i = 0; i < listOfComboBoxes.size(); i++) {
+                    selectedUserList.add(listOfComboBoxes.get(i).getValue());
+                }
+
+                generatePanels(selectedUserList);
+            }
+        });
+
+        dlgPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dlg.initOwner(stage);
+        dlg.showAndWait();
+    }
+
+    private void generatePanels(List<TurboUser> userList) {
+        System.out.println("generating panels!");
         int noOfPanelsToBeGenerated = Math.min(MAX_WORK_ALLOCATION_PANELS, userList.size());
 
         List<PanelInfo> panelData = generatePanelInfoFromTurboUsers(userList.subList(0, noOfPanelsToBeGenerated),
@@ -99,6 +145,24 @@ public class BoardAutoCreator {
         DialogMessage.showInformationDialog("Auto-create Board - " + WORK_ALLOCATION,
                 WORK_ALLOCATION + " board has been created and loaded.\n\n" +
                         "It is saved under the name \"" + boardName + "\".");
+    }
+
+    private void generateUserComboBoxes(Integer oldNoOfUsers, int noOfUsers, List<TurboUser> userList, ComboBox<Integer> comboBox, HBox assigneeSelector, List<ComboBox<TurboUser>> listOfComboBoxes, DialogPane dlgPane, Dialog dlg) {
+        if (oldNoOfUsers == null) oldNoOfUsers = 0;
+        if (noOfUsers > oldNoOfUsers) {
+            for (int i = oldNoOfUsers; i < noOfUsers; i++) {
+                ComboBox<TurboUser> userComboBox = new ComboBox<>();
+                userComboBox.getItems().addAll(userList); // fill selector
+                assigneeSelector.getChildren().add(userComboBox);
+                userComboBox.setPrefWidth(100);
+                dlg.setWidth(dlgPane.getWidth()+105);
+                listOfComboBoxes.add(userComboBox);
+            }
+        } else {
+            for (int i = assigneeSelector.getChildren().size() - 1; i >= noOfUsers+1; i--) {
+                assigneeSelector.getChildren().remove(i);
+            }
+        }
     }
 
     private List<PanelInfo> generatePanelInfoFromTurboUsers(List<TurboUser> users,
