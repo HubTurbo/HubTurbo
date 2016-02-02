@@ -39,7 +39,7 @@ public class BoardAutoCreator {
 
     public static final List<String> SAMPLE_PANEL_FILTERS =
             Collections.unmodifiableList(Arrays.asList(
-            String.format("(repo:%s || repo:%s) is:issue sort:updated,comments",
+            String.format("(repo:%s;%s) is:issue sort:updated,comments",
                     FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
             String.format("repo:%s count:3 is:issue is:open label:\"urgent\"", FIRST_SAMPLE_REPO_NAME),
             String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
