@@ -34,16 +34,23 @@ public class BoardAutoCreator {
             Collections.unmodifiableList(Arrays.asList(
                     "All issues in my two sample repos",
                     "Latest 3 urgent open issues",
-                    "Open issues assigned to Darius or Manmeet"
+                    "Open issues assigned to Darius or Manmeet",
+                    "Progress of the current milestone",
+                    "Issues awaiting prioritization",
+                    "Recent unread updates from my repos"
             ));
 
     public static final List<String> SAMPLE_PANEL_FILTERS =
             Collections.unmodifiableList(Arrays.asList(
-            String.format("(repo:%s;%s) is:issue sort:updated,comments",
+            String.format("repo:%s;%s is:issue sort:!updated,comments",
                     FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
             String.format("repo:%s count:3 is:issue is:open label:\"urgent\"", FIRST_SAMPLE_REPO_NAME),
             String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
-                    FIRST_SAMPLE_REPO_NAME)
+                    FIRST_SAMPLE_REPO_NAME),
+            String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME),
+            String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME),
+            String.format("repo:%s;%s is:unread updated<24 sort:!updated",
+                    FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME)
             ));
 
     private final UI ui;

@@ -105,7 +105,7 @@ public class BoardAutoCreatorTest extends UITest {
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
 
-        assertEquals(panelControl.getPanelCount(), 3);
+        assertEquals(panelControl.getPanelCount(), SAMPLE_PANEL_NAMES.size());
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
         assertEquals(panelControl.getNumberOfSavedBoards(), 1);
 
