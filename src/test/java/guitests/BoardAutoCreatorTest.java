@@ -16,8 +16,10 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
-import static ui.BoardAutoCreator.SAMPLE;
-import static ui.BoardAutoCreator.SAMPLE_REPO_NAME;
+import static ui.BoardAutoCreator.SAMPLE_BOARD;
+import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
+import static ui.BoardAutoCreator.SAMPLE_PANEL_FILTERS;
+import static ui.BoardAutoCreator.SAMPLE_PANEL_NAMES;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -98,11 +100,9 @@ public class BoardAutoCreatorTest extends UITest {
     public void sampleBoardAutoCreationTest() {
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
 
-        clickMenu("Boards", "Auto-create", SAMPLE);
+        clickMenu("Boards", "Auto-create", SAMPLE_BOARD);
 
-        PlatformEx.waitOnFxThread();
-        assertNodeExists(hasText(SAMPLE + " has been created and loaded.\n\n" +
-                        "It is saved under the name \"" + SAMPLE + "\"."));
+        waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
 
         assertEquals(panelControl.getPanelCount(), 3);
@@ -110,16 +110,10 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelControl.getNumberOfSavedBoards(), 1);
 
         List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
-
-        assertEquals(panelInfos.get(0).getPanelFilter(), "repo:" + SAMPLE_REPO_NAME + " " +
-                "(is:issue OR is:pr) is:open");
-        assertEquals(panelInfos.get(1).getPanelFilter(), "repo:" + SAMPLE_REPO_NAME + " " + "milestone:V5 sort:status");
-        assertEquals(panelInfos.get(2).getPanelFilter(),
-                "repo:" + SAMPLE_REPO_NAME + " " + "label:\"urgent\" assignee:dariusf");
-
-        assertEquals(panelInfos.get(0).getPanelName(), "Open issues and PR's");
-        assertEquals(panelInfos.get(1).getPanelName(), "V5 Milestone");
-        assertEquals(panelInfos.get(2).getPanelName(), "Urgent issues assigned to Darius");
+        for (int i = 0; i < SAMPLE_PANEL_NAMES.size(); i++){
+            assertEquals(panelInfos.get(i).getPanelFilter(), SAMPLE_PANEL_FILTERS.get(i));
+            assertEquals(panelInfos.get(i).getPanelName(), SAMPLE_PANEL_NAMES.get(i));
+        }
     }
 
 }
