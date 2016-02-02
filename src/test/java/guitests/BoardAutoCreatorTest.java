@@ -16,6 +16,10 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
+import static ui.BoardAutoCreator.SAMPLE_BOARD;
+import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
+import static ui.BoardAutoCreator.SAMPLE_PANEL_FILTERS;
+import static ui.BoardAutoCreator.SAMPLE_PANEL_NAMES;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -62,7 +66,6 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelInfos.get(4).getPanelName(), "Next Next Next Milestone");
     }
 
-
     @Test
     public void workAllocationBoardAutoCreationTest() {
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
@@ -91,6 +94,26 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelInfos.get(2).getPanelName(), "Work allocated to User 2");
         assertEquals(panelInfos.get(3).getPanelName(), "Work allocated to User 3");
         assertEquals(panelInfos.get(4).getPanelName(), "Work allocated to User 4");
+    }
+
+    @Test
+    public void sampleBoardAutoCreationTest() {
+        assertEquals(panelControl.getNumberOfSavedBoards(), 0);
+
+        clickMenu("Boards", "Auto-create", SAMPLE_BOARD);
+
+        waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
+        click("OK");
+
+        assertEquals(panelControl.getPanelCount(), SAMPLE_PANEL_NAMES.size());
+        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
+        assertEquals(panelControl.getNumberOfSavedBoards(), 1);
+
+        List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
+        for (int i = 0; i < SAMPLE_PANEL_NAMES.size(); i++){
+            assertEquals(panelInfos.get(i).getPanelFilter(), SAMPLE_PANEL_FILTERS.get(i));
+            assertEquals(panelInfos.get(i).getPanelName(), SAMPLE_PANEL_NAMES.get(i));
+        }
     }
 
 }
