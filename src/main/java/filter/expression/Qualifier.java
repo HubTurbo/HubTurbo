@@ -131,7 +131,9 @@ public class Qualifier implements FilterExpression {
         return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
     }
 
-    // Get all milestones that can be aliased with the keyword "current".
+    /**
+     * Get all milestones that can be aliased with the keyword "current".
+     */
     private static List<TurboMilestone> getMilestonesWithAlias(IModel model, List<String> repoIds) {
         List<TurboMilestone> milestones = new ArrayList<>();
         // add milestones with due date first
@@ -146,8 +148,12 @@ public class Qualifier implements FilterExpression {
         // In this case, if it is not included already (the open milestone does not
         // have due date), append it to the milestone list.
         List<TurboMilestone> openMilestones = getOpenMilestones(model, repoIds);
-        if (openMilestones.size() == 1 && !openMilestones.get(0).getDueDate().isPresent()) {
-            milestones.add(openMilestones.get(0));
+        if (openMilestones.size() == 1) {
+            TurboMilestone openMilestone = openMilestones.get(0);
+            boolean hasDueDate = openMilestone.getDueDate().isPresent();
+            if (!hasDueDate) {
+                milestones.add(openMilestone);
+            }
         }
 
         return milestones;
@@ -187,8 +193,10 @@ public class Qualifier implements FilterExpression {
         return Optional.of(allMilestones.size());
     }
 
+    /**
+     * Checks whether a milestone still has open issues or it is not due yet.
+     */
     private static boolean isRelevantMilestone(TurboMilestone milestone) {
-        // a milestone is relevant if it still has open issues or it is not due yet.
         boolean overdue = milestone.getDueDate().isPresent() &&
                 milestone.getDueDate().get().isBefore(LocalDate.now());
         return !(overdue && milestone.getOpenIssues() == 0);
