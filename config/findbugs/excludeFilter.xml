@@ -82,4 +82,8 @@
             <Method name="testGetBoardPanels" />
         </Or>
     </Match>
+    <Match>
+        <Class name="tests.MilestoneUpdateServiceTests" />
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+    </Match>
 </FindBugsFilter>

@@ -36,14 +36,20 @@ public final class Futures {
     private static Executor unitFutureExecutor = Executors.newSingleThreadExecutor();
     public static <T> CompletableFuture<T> unit(T result) {
         CompletableFuture<T> f = new CompletableFuture<>();
-//        Platform.runLater(() -> f.complete(result));
         unitFutureExecutor.execute(() -> f.complete(result));
         return f;
     }
 
-    public static <T> Function<T, T> tap(Runnable runnable) {
+    /**
+     * For use as an argument to thenApply. Given
+     *
+     * a.thenApply(chain(b));
+     *
+     * If a completes with some value v, then b will also complete with v.
+     */
+    public static <T> Function<T, T> chain(CompletableFuture<T> other) {
         return a -> {
-            runnable.run();
+            other.complete(a);
             return a;
         };
     }
@@ -66,6 +72,10 @@ public final class Futures {
         };
     }
 
+    /**
+     * Turns a List<Future<T>> into a Future<List<T>>. In other words, ensures that all
+     * futures in a collection complete and gathers their results.
+     */
     public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
         CompletableFuture<Void> allDoneFuture =
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));

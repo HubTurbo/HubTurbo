@@ -1,5 +1,6 @@
 package backend;
 
+import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -16,7 +17,10 @@ import util.events.RepoOpenedEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -29,8 +33,9 @@ public class Logic {
     private final MultiModel models;
     private final UIManager uiManager;
     protected final Preferences prefs;
+    private final RepoIO repoIO = TestController.createApplicationRepoIO();
+    private final RepoOpControl repoOpControl = new RepoOpControl(repoIO);
 
-    private final RepoIO repoIO;
     public LoginController loginController;
     public UpdateController updateController;
 
@@ -39,7 +44,6 @@ public class Logic {
         this.prefs = prefs;
         this.models = new MultiModel(prefs);
 
-        repoIO = TestController.createApplicationRepoIO();
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
@@ -87,7 +91,7 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map(repoIO::updateModel)
+                .map(repoOpControl::updateModel)
                 .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::refreshUI)
@@ -104,7 +108,7 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
-    public CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
+    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
@@ -120,7 +124,7 @@ public class Logic {
             } else {
                 logger.info("Opening " + repoId);
                 UI.status.displayMessage("Opening " + repoId);
-                return repoIO.openRepository(repoId)
+                return repoOpControl.openRepository(repoId)
                         .thenApply(models::addPending)
                         .thenRun(this::refreshUI)
                         .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
@@ -153,7 +157,7 @@ public class Logic {
     }
 
     public CompletableFuture<Boolean> removeStoredRepository(String repoId) {
-        return repoIO.removeRepository(repoId);
+        return repoOpControl.removeRepository(repoId);
     }
 
     /**
@@ -185,32 +189,22 @@ public class Logic {
     }
 
     /**
-     * Dispatches a PUT request to the GitHub API to replace the given issue's labels.
-     * At the same time, immediately change the GUI to pre-empt this change.
+     * Replaces labels of issue on GitHub
      *
-     * Assumes that the model object is shared among GUI and Logic.
-     *
-     * @param issue The issue whose labels are to be replaced
-     * @param labels The labels to be applied to the given issue
-     * @param originalLabels The original labels to be applied to the UI in case of failure
-     * @return A boolean indicating the result of the label replacement from GitHub
+     * @param issue The issue whose labels are to be replaced on GitHub.
+     * @param newLabels The list of new labels to be applied on the issue.
+     * @return True if label replacement on GitHub was a success, false otherwise.
      */
-    public CompletableFuture<Boolean> replaceIssueLabelsRepo
-            (TurboIssue issue, List<String> labels, List<String> originalLabels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Sending labels " + labels + " for " + issue + " to GitHub"));
-        return repoIO.replaceIssueLabels(issue, labels)
-                .thenApply(e -> true)
-                .exceptionally(e -> {
-                    replaceIssueLabelsUI(issue, originalLabels);
-                    logger.error(e.getLocalizedMessage(), e);
-                    return false;
-                });
-    }
-
-    public void replaceIssueLabelsUI(TurboIssue issue, List<String> labels) {
-        logger.info(HTLog.format(issue.getRepoId(), "Applying labels " + labels + " to " + issue + " in UI"));
-        issue.setLabels(labels);
-        refreshUI();
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        logger.info("Changing labels for " + issue + " on GitHub");
+        return repoIO.replaceIssueLabels(issue, newLabels)
+                .thenApply(labels -> {
+                    logger.info("Changing labels for " + issue + " on UI");
+                    issue.setLabels(labels);
+                    refreshUI();
+                    return true;
+                })
+                .exceptionally(Futures.withResult(false));
     }
 
     /**

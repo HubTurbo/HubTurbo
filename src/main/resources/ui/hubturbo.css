@@ -226,3 +226,7 @@
     -fx-text-fill: derive(black, 90%);
 }
 
+.tooltip {
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}

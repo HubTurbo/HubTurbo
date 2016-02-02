@@ -4,6 +4,7 @@ import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import org.apache.http.ParseException;
 import org.apache.logging.log4j.Logger;
 
 import filter.expression.QualifierType;
@@ -50,10 +51,10 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(filterAndSort(filterExprs))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
         } else {
             // If no issues requiring metadata update, just run the filter and sort.
-            logic.updateUI(filterAndSort(filterExprs));
+            logic.updateUI(processFilter(filterExprs));
         }
     }
 
@@ -91,38 +92,39 @@ public class UpdateController {
      * Filters and sorts issues within the model according to the given filter expressions.
      *
      * @param filterExprs Filter expressions to process.
-     * @return Filter expressions and their corresponding issues after filtering and sorting.
+     * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<TurboIssue>> filterAndSort(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<TurboIssue>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<TurboIssue>> filteredAndSorted = new HashMap<>();
+        Map<FilterExpression, List<TurboIssue>> filteredSortedAndCounted = new HashMap<>();
 
         filterExprs.forEach(filterExpr -> {
-            List<TurboIssue> filterAndSortedExpression = filteredAndSorted.get(filterExpr);
+            List<TurboIssue> filterAndSortedExpression = filteredSortedAndCounted.get(filterExpr);
 
             if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
                 boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
                 FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-                List<TurboIssue> filteredAndSortedIssues = allModelIssues.stream()
+                List<TurboIssue> filteredSortedAndCountedIssues = allModelIssues.stream()
                         .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
                         .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
                         .collect(Collectors.toList());
 
-                filteredAndSorted.put(filterExpr, filteredAndSortedIssues);
+                filteredSortedAndCounted.put(filterExpr, filteredSortedAndCountedIssues);
             }
         });
 
-        return filteredAndSorted;
+        return filteredSortedAndCounted;
     }
 
     /**
      * Produces a suitable comparator based on the given filter expression.
      *
-     * @param filterExpr The given filter expression.
+     * @param filterExpr          The given filter expression.
      * @param hasUpdatedQualifier Determines the behaviour of the sort key "nonSelfUpdate".
      * @return The comparator to use.
      */
