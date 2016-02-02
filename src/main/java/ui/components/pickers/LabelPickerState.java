@@ -102,8 +102,8 @@ public class LabelPickerState {
         newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(query));
 
         OptionalInt newSuggestionIndex;
-        if (newMatchedLabels.isEmpty()) {
-            newSuggestionIndex = currentSuggestionIndex;
+        if (query.equals("") || newMatchedLabels.isEmpty()) {
+            newSuggestionIndex = OptionalInt.empty();
         } else {
             newSuggestionIndex = OptionalInt.of(0);
         }
