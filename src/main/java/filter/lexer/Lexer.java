@@ -21,6 +21,7 @@ public class Lexer {
             // These have higher priority than Symbol
             new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
             new Rule("[A-Za-z]+(-[A-Za-z]+)*\\s*:", TokenType.QUALIFIER),
+            new Rule(";", TokenType.SEMICOLON),
             new Rule("[A-Za-z0-9#][/A-Za-z0-9.'+-]*", TokenType.SYMBOL),
 
             new Rule("\\(", TokenType.LBRACKET),

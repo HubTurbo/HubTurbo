@@ -4,25 +4,23 @@ import javafx.scene.Node;
 
 public class Notification {
 
-    public static final int DEFAULT_NOTIFICATION_PANE_VISIBLE_PERIOD = 10;
+    public static final int DEFAULT_NOTIFICATION_PANE_VISIBLE_PERIOD = 30;
 
-    public enum NotificationType { NOACTION, ACTIONONBUTTON, ACTIONONTIMEOUT, ACTIONONBUTTONANDTIMEOUT }
+    public enum NotificationType { NOACTION, ACTIONONBUTTON }
 
     private final NotificationType notificationType;
     private final Node icon;
     private final String message;
     private final String buttonLabel;
-    private final Runnable timeoutRunnable;
     private final Runnable buttonRunnable;
     private final int timeoutDuration;
 
     public Notification
-            (Node icon, String message, String buttonLabel, Runnable timeoutRunnable, Runnable buttonRunnable) {
-        this.notificationType = NotificationType.ACTIONONBUTTONANDTIMEOUT;
+            (Node icon, String message, String buttonLabel, Runnable buttonRunnable) {
+        this.notificationType = NotificationType.ACTIONONBUTTON;
         this.icon = icon;
         this.message = message;
         this.buttonLabel = buttonLabel;
-        this.timeoutRunnable = timeoutRunnable;
         this.buttonRunnable = buttonRunnable;
         this.timeoutDuration = DEFAULT_NOTIFICATION_PANE_VISIBLE_PERIOD;
     }
@@ -41,10 +39,6 @@ public class Notification {
 
     public String getButtonLabel() {
         return buttonLabel;
-    }
-
-    public Runnable getTimeoutRunnable() {
-        return timeoutRunnable;
     }
 
     public Runnable getButtonRunnable() {

@@ -9,6 +9,7 @@ public enum TokenType {
     NOT,
     AND,
     OR,
+    SEMICOLON,
     COLON,
     COMMA,
     QUOTE,

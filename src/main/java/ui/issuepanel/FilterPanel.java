@@ -32,6 +32,7 @@ import prefs.PanelInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,6 +102,10 @@ public abstract class FilterPanel extends AbstractPanel {
             ui.triggerEvent(new PanelClickedEvent(this.panelIndex));
             requestFocus();
         });
+
+        ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
+
+        ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -192,6 +197,38 @@ public abstract class FilterPanel extends AbstractPanel {
 
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
+
+    private void indicatePanelLoading(RepoOpeningEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            addPanelLoadingIndication();
+        }
+    }
+
+    private void unindicatePanelLoading(RepoOpenedEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            removePanelLoadingIndication();
+        }
+    }
+
+    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+
+        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
+
+        return isPrimaryRepoChanged;
+    }
+
+    /**
+     * Implements a user-visible indication that the current panel is loading a repo.
+     */
+    protected abstract void addPanelLoadingIndication();
+
+    /**
+     * Implements the removal of the panel-loading indication that was applied by the method
+     * addPanelLoadingIndication().
+     */
+    protected abstract void removePanelLoadingIndication();
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);

@@ -15,6 +15,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
+
+import org.apache.logging.log4j.Logger;
+
 import ui.GUIController;
 import ui.GuiElement;
 import ui.UI;
@@ -23,6 +26,7 @@ import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import util.GithubPageElements;
+import util.HTLog;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
@@ -30,6 +34,8 @@ import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
 public class ListPanel extends FilterPanel {
+
+    private static final Logger logger = HTLog.get(ListPanel.class);
 
     private final UI ui;
     private final GUIController guiController;
@@ -371,5 +377,28 @@ public class ListPanel extends FilterPanel {
         if (getSelectedElement().isPresent()) {
             ui.triggerEvent(new ShowLabelPickerEvent(getSelectedElement().get().getIssue()));
         }
+    }
+
+    /**
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
+     */
+    @Override
+    protected void addPanelLoadingIndication() {
+        logger.info("Preparing to add panel loading indication");
+        listView.getStyleClass().add("listview-loading");
+
+        // Remove the items in the issue list because they are not relevant to the filter anymore.
+        // This also makes the listview background visible, since we intend to show a loading indicator on the
+        // background.
+        listView.setItems(null);
+    }
+
+    /**
+     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
+     */
+    @Override
+    protected void removePanelLoadingIndication() {
+        logger.info("Preparing to remove panel loading indication");
+        listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
 }

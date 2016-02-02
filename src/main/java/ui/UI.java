@@ -30,10 +30,10 @@ import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
-import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
+import undo.UndoController;
 import util.*;
 import util.events.*;
 import util.events.Event;
@@ -43,7 +43,6 @@ import util.events.testevents.UILogicRefreshEventHandler;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
@@ -55,7 +54,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 16;
+    public static final int VERSION_MINOR = 17;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -81,6 +80,7 @@ public class UI extends Application implements EventDispatcher {
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
+    public UndoController undoController;
 
 
     // Main UI elements
@@ -214,6 +214,7 @@ public class UI extends Application implements EventDispatcher {
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
             status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
+        undoController = new UndoController(notificationController);
     }
 
     private void initUI(Stage stage) {
@@ -562,17 +563,12 @@ public class UI extends Application implements EventDispatcher {
         return mainWindowHandle;
     }
 
-    public void showNotification(Notification notification) {
-        notificationController.showNotification(notification);
-    }
-
     public void triggerNotificationAction() {
         notificationController.triggerNotificationAction();
     }
 
-    public void triggerNotificationTimeoutAction() {
-        // must be run in a Platform.runLater or from the UI thread
-        notificationController.triggerTimeoutAction();
+    public void hideNotification() {
+        notificationController.hideNotification();
     }
 
     public void updateTitle() {
