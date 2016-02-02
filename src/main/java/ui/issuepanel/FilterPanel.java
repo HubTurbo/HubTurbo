@@ -7,9 +7,9 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
+import ui.GUIController;
+import ui.GuiElement;
 import ui.components.PanelMenuBar;
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private ObservableList<TurboIssue> issuesToDisplay = null;
+    private ObservableList<GuiElement> elementsToDisplay = null;
 
     public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
@@ -55,11 +55,11 @@ public abstract class FilterPanel extends AbstractPanel {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
-        super(model, parentPanelControl, panelIndex);
+    public FilterPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        super(guiController, parentPanelControl, panelIndex);
         this.ui = ui;
 
-        panelMenuBar = new PanelMenuBar(this, model, ui);
+        panelMenuBar = new PanelMenuBar(this, guiController, ui);
         getChildren().addAll(panelMenuBar, createFilterBox());
         setUpEventHandler();
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
@@ -112,7 +112,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
         // Update keywords
         List<String> all = new ArrayList<>(QualifierType.getCompletionKeywords());
-        all.addAll(e.model.getUsers().stream()
+        all.addAll(e.users.stream()
             .map(TurboUser::getLoginName)
             .collect(Collectors.toList()));
 
@@ -129,7 +129,7 @@ public abstract class FilterPanel extends AbstractPanel {
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
-        filterTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
+        filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
 
@@ -255,8 +255,8 @@ public abstract class FilterPanel extends AbstractPanel {
         return new PanelInfo(this.panelMenuBar.getPanelName(), filterTextField.getText());
     }
 
-    public ObservableList<TurboIssue> getIssueList() {
-        return issuesToDisplay;
+    public ObservableList<GuiElement> getElementsList() {
+        return elementsToDisplay;
     }
 
     public Text getNameText() {
@@ -275,12 +275,12 @@ public abstract class FilterPanel extends AbstractPanel {
         return this.panelMenuBar.getCloseButton();
     }
 
-    public void setIssueList(List<TurboIssue> transformedIssueList) {
-        this.issuesToDisplay = FXCollections.observableArrayList(transformedIssueList);
+    public void setElementsList(List<GuiElement> transformedElementList) {
+        this.elementsToDisplay = FXCollections.observableArrayList(transformedElementList);
     }
 
-    public void updatePanel(List<TurboIssue> filteredAndSortedIssues) {
-        setIssueList(filteredAndSortedIssues);
+    public void updatePanel(List<GuiElement> filteredAndSortedElements) {
+        setElementsList(filteredAndSortedElements);
         refreshItems();
     }
 

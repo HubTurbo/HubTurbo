@@ -1,6 +1,5 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.input.ClipboardContent;
@@ -8,6 +7,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import ui.DragData;
+import ui.GUIController;
 
 /**
  * A AbstractPanel is a JavaFX node that is contained by a PanelControl.
@@ -26,12 +26,12 @@ public abstract class AbstractPanel extends VBox {
     public static final String OCTICON_TICK_MARK = "\uf03a";
     public static final String OCTICON_UNDO = "\uf051";
 
-    protected final IModel model;
+    protected final GUIController guiController;
     public final PanelControl parentPanelControl;
     public int panelIndex;
 
-    public AbstractPanel(IModel model, PanelControl parentPanelControl, int panelIndex) {
-        this.model = model;
+    public AbstractPanel(GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        this.guiController = guiController;
         this.parentPanelControl = parentPanelControl;
         this.panelIndex = panelIndex;
 
