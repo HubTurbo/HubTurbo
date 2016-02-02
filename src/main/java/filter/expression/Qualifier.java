@@ -91,22 +91,7 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> allMilestones = model.getMilestones().stream()
-                .filter(ms -> ms.getDueDate().isPresent())
-                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
-                .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
-                .collect(Collectors.toList());
-
-        List<TurboMilestone> openMilestones = model.getMilestones().stream()
-                .filter(ms -> ms.isOpen())
-                .collect(Collectors.toList());
-
-        if (openMilestones.size() == 1 && !openMilestones.get(0).getDueDate().isPresent()) {
-            //if there is only one open issue in the repo and it doesn't have a due date, add it
-            //to the list of all milestones
-            allMilestones.addAll(openMilestones);
-        }
-
+        List<TurboMilestone> allMilestones = getMilestonesWithAlias(model, repoIds);
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
 
         if (!currentMilestoneIndex.isPresent()) {
@@ -146,6 +131,35 @@ public class Qualifier implements FilterExpression {
         return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
     }
 
+    // Get all milestones that can be aliased with the keyword "current".
+    private static List<TurboMilestone> getMilestonesWithAlias(IModel model, List<String> repoIds) {
+        List<TurboMilestone> milestones = new ArrayList<>();
+        // add milestones with due date first
+        milestones.addAll(model.getMilestones().stream()
+                .filter(ms -> ms.getDueDate().isPresent())
+                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
+                .collect(Collectors.toList()));
+
+        // Special case: if there is only one open milestone, it should be included regardless of whether
+        // it has due date or not.
+        // In this case, if it is not included already (the open milestone does not
+        // have due date), append it to the milestone list.
+        List<TurboMilestone> openMilestones = getOpenMilestones(model, repoIds);
+        if (openMilestones.size() == 1 && !openMilestones.get(0).getDueDate().isPresent()) {
+            milestones.add(openMilestones.get(0));
+        }
+
+        return milestones;
+    }
+
+    private static List<TurboMilestone> getOpenMilestones(IModel model, List<String> repoIds) {
+        return model.getMilestones().stream()
+                .filter(ms -> ms.isOpen())
+                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> allMilestones) {
         if (allMilestones.isEmpty()) {
             return Optional.empty();
@@ -158,6 +172,7 @@ public class Qualifier implements FilterExpression {
         if (openAndRelevantMilestone.isPresent()) {
             return Optional.of(allMilestones.indexOf(openAndRelevantMilestone.get()));
         } else {
+            //look for open milestone
             int currentIndex = 0;
             for (TurboMilestone checker : allMilestones) {
                 if (checker.isOpen()) {
@@ -173,6 +188,7 @@ public class Qualifier implements FilterExpression {
     }
 
     private static boolean isRelevantMilestone(TurboMilestone milestone) {
+        // a milestone is relevant if it still has open issues or it is not due yet.
         boolean overdue = milestone.getDueDate().isPresent() &&
                 milestone.getDueDate().get().isBefore(LocalDate.now());
         return !(overdue && milestone.getOpenIssues() == 0);
