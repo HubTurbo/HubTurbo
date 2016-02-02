@@ -18,9 +18,9 @@ import javafx.scene.layout.VBox;
 
 import org.eclipse.egit.github.core.Comment;
 
+import ui.GuiElement;
 import ui.issuepanel.FilterPanel;
 import util.Utility;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
@@ -40,8 +40,7 @@ public class ListPanelCard extends VBox {
      * are bound to the issue's fields and will update automatically.
      */
 
-    private final TurboIssue issue;
-    private final Model model;
+    private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
     private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
@@ -50,21 +49,20 @@ public class ListPanelCard extends VBox {
      * The constructor is the only method called from ListPanelCard. The rest of the methods in this class
      * are auxiliary methods called from the constructor so that the code is easier to understand.
      *
-     * @param model
-     * @param issue
+     * @param guiElement
      * @param parentPanel
      * @param issuesWithNewComments
      */
-    public ListPanelCard(Model model, TurboIssue issue, FilterPanel parentPanel, HashSet<Integer>
-            issuesWithNewComments) {
-        this.model = model;
-        this.issue = issue;
+    public ListPanelCard(GuiElement guiElement, FilterPanel parentPanel,
+                         HashSet<Integer> issuesWithNewComments) {
+        this.guiElement = guiElement;
         this.parentPanel = parentPanel;
         this.issuesWithNewComments = issuesWithNewComments;
         setup();
     }
 
     private void setup() {
+        TurboIssue issue = guiElement.getIssue();
         Label issueTitle = new Label("#" + issue.getId() + " " + issue.getTitle());
         issueTitle.setMaxWidth(CARD_WIDTH);
         issueTitle.setWrapText(true);
@@ -115,7 +113,7 @@ public class ListPanelCard extends VBox {
             })
             .collect(Collectors.toList());
 
-        return layoutEvents(model, issue, eventsWithinDuration, commentsWithinDuration);
+        return layoutEvents(guiElement, eventsWithinDuration, commentsWithinDuration);
     }
 
     /**
@@ -124,8 +122,10 @@ public class ListPanelCard extends VBox {
      * @param comments
      * @return
      */
-    private static Node layoutEvents(Model model, TurboIssue issue,
+    private static Node layoutEvents(GuiElement guiElement,
                                      List<TurboIssueEvent> events, List<Comment> comments) {
+        TurboIssue issue = guiElement.getIssue();
+
         VBox result = new VBox();
         result.setSpacing(3);
         VBox.setMargin(result, new Insets(3, 0, 0, 0));
@@ -136,13 +136,13 @@ public class ListPanelCard extends VBox {
                         .filter(TurboIssueEvent::isLabelUpdateEvent)
                         .collect(Collectors.toList());
         List<Node> labelUpdateEventNodes =
-                TurboIssueEvent.createLabelUpdateEventNodes(model, labelUpdateEvents);
+                TurboIssueEvent.createLabelUpdateEventNodes(guiElement, labelUpdateEvents);
         labelUpdateEventNodes.forEach(node -> result.getChildren().add(node));
 
         // Other events beside label updates
         events.stream()
             .filter(e -> !e.isLabelUpdateEvent())
-            .map(e -> e.display(model, issue))
+            .map(e -> e.display(guiElement, issue))
             .forEach(e -> result.getChildren().add(e));
 
         // Comments
@@ -197,6 +197,7 @@ public class ListPanelCard extends VBox {
 
     private void updateDetails() {
         issueDetails.getChildren().clear();
+        TurboIssue issue = guiElement.getIssue();
 
         if (issue.isPullRequest()) {
             Label icon = new Label(OCTICON_PULL_REQUEST);
@@ -218,17 +219,17 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(commentCount);
         }
 
-        for (TurboLabel label : model.getLabelsOfIssue(issue)) {
+        for (TurboLabel label : guiElement.getLabels()) {
             issueDetails.getChildren().add(label.getNode());
         }
 
-        if (issue.getMilestone().isPresent() && model.getMilestoneOfIssue(issue).isPresent()) {
-            TurboMilestone milestone = model.getMilestoneOfIssue(issue).get();
+        if (issue.getMilestone().isPresent() && guiElement.getMilestone().isPresent()) {
+            TurboMilestone milestone = guiElement.getMilestone().get();
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
         }
 
-        if (issue.getAssignee().isPresent() && model.getAssigneeOfIssue(issue).isPresent()) {
-            TurboUser assignee = model.getAssigneeOfIssue(issue).get();
+        if (issue.getAssignee().isPresent() && guiElement.getAssignee().isPresent()) {
+            TurboUser assignee = guiElement.getAssignee().get();
             Label assigneeNameLabel = new Label(issue.getAssignee().get());
             assigneeNameLabel.getStyleClass().add("display-box-padding");
 

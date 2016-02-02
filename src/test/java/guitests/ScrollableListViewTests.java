@@ -24,14 +24,14 @@ public class ScrollableListViewTests extends UITest {
             push(KeyCode.DOWN);
         }
         sleep(1000);
-        assertEquals(true, col0.getSelectedIssue().isPresent());
-        assertEquals(9, col0.getSelectedIssue().get().getId());
+        assertEquals(true, col0.getSelectedElement().isPresent());
+        assertEquals(9, col0.getSelectedElement().get().getIssue().getId());
         for (int i = 0; i < 40; i++) {
             push(KeyCode.UP);
         }
         sleep(1000);
-        assertEquals(true, col0.getSelectedIssue().isPresent());
-        assertEquals(49, col0.getSelectedIssue().get().getId());
+        assertEquals(true, col0.getSelectedElement().isPresent());
+        assertEquals(49, col0.getSelectedElement().get().getIssue().getId());
     }
 
 }

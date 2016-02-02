@@ -93,7 +93,7 @@ public class DummyRepoState {
 
         // Odd issues are assigned label 1, even issues are assigned label 2
         for (int i = 1; i <= 10; i++) {
-            issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
+            issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 
         // We assign a colorful label to issue 10
@@ -140,6 +140,19 @@ public class DummyRepoState {
                 "", ""
         ));
         updatedEvents.add(10);
+
+        // Then set label 3 and 11 for issue 8, and immediately remove label 11
+        String[] oldLabels = {"Label 3", "Label 11"};
+        String[] newLabels = {"Label 3"};
+        setLabels(8, Arrays.asList(oldLabels));
+        setLabels(8, Arrays.asList(newLabels));
+        // Then put a temporary (colourful) label into the repo
+        labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
+        String[] issue9Labels = {"Label 1"};
+        String[] deletedLabels = {"Label 1", "Deleted"};
+        setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
+        setLabels(9, Arrays.asList(issue9Labels));
+        labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -346,7 +359,7 @@ public class DummyRepoState {
         return users.remove(idString);
     }
 
-    protected List<Label> setLabels(int issueId, List<String> labels) {
+    protected final List<Label> setLabels(int issueId, List<String> newLabels) {
         // Get copies of issue itself and its metadata
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();
@@ -355,23 +368,23 @@ public class DummyRepoState {
 
         // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.forEach(labelName ->
+        labelsOfIssue.stream().filter(existingLabel -> !newLabels.contains(existingLabel)).forEach(labelName ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Unlabeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
         );
-        labels.forEach(labelName ->
+        newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Labeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
         );
-        toSet.setLabels(labels);
+        toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
-        return labels.stream().map(new Label()::setName).collect(Collectors.toList());
+        return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {

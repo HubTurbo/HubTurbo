@@ -125,8 +125,8 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(8, issuePanel.getIssueCount());
-        assertEquals("Issue 1", issuePanel.getIssueList().get(0).getTitle());
-        assertEquals("Issue 2", issuePanel.getIssueList().get(1).getTitle());
+        assertEquals("Issue 1", issuePanel.getElementsList().get(0).getIssue().getTitle());
+        assertEquals("Issue 2", issuePanel.getElementsList().get(1).getIssue().getTitle());
 
         // Test with sort qualifier as the first qualifier
         click("#dummy/dummy_col0_filterTextField");
@@ -135,8 +135,8 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(8, issuePanel.getIssueCount());
-        assertEquals("Issue 1", issuePanel.getIssueList().get(0).getTitle());
-        assertEquals("Issue 2", issuePanel.getIssueList().get(1).getTitle());
+        assertEquals("Issue 1", issuePanel.getElementsList().get(0).getIssue().getTitle());
+        assertEquals("Issue 2", issuePanel.getElementsList().get(1).getIssue().getTitle());
 
         // Checking for negative number
         click("#dummy/dummy_col0_filterTextField");
@@ -155,7 +155,7 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(1, issuePanel.getIssueCount());
-        assertTrue(issuePanel.getIssueList().get(0).getMilestone().isPresent());
-        assertEquals(Optional.of(milestoneNumber), issuePanel.getIssueList().get(0).getMilestone());
+        assertTrue(issuePanel.getElementsList().get(0).getIssue().getMilestone().isPresent());
+        assertEquals(Optional.of(milestoneNumber), issuePanel.getElementsList().get(0).getIssue().getMilestone());
     }
 }

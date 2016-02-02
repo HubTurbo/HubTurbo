@@ -1,13 +1,13 @@
 package backend;
 
+import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import org.apache.http.ParseException;
 import org.apache.logging.log4j.Logger;
-
 import filter.expression.QualifierType;
+import ui.GuiElement;
 import util.Futures;
 import util.HTLog;
 
@@ -15,6 +15,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * Manages the flow of logic during a data retrieval cycle from the repository source.
+ *
+ * The central logic is contained in processAndRefresh, while the remaining methods are auxiliary methods to be
+ * called by processAndRefresh.
+ */
 public class UpdateController {
     private static final Logger logger = HTLog.get(UpdateController.class);
 
@@ -31,7 +37,7 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process
      */
-    public void filterSortRefresh(List<FilterExpression> filterExprs) {
+    public void processAndRefresh(List<FilterExpression> filterExprs) {
         // Open specified repos
         openRepositoriesInFilters(filterExprs);
 
@@ -41,9 +47,7 @@ public class UpdateController {
         if (!toUpdate.isEmpty()) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
             ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-            toUpdate.forEach((repoId, issues) -> {
-                metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues));
-            });
+            toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
             // ...and then wait for all of them to complete.
             Futures.sequence(metadataRetrievalTasks)
                     .thenAccept(results -> logger.info("Metadata retrieval successful for "
@@ -89,36 +93,35 @@ public class UpdateController {
     }
 
     /**
-     * Filters and sorts issues within the model according to the given filter expressions.
+     * Filters, sorts and counts issues within the model according to the given filter expressions.
+     * In here, "processed" is equivalent to "filtered, sorted and counted".
      *
      * @param filterExprs Filter expressions to process.
      * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<TurboIssue>> processFilter(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GuiElement>> processFilter(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
-        Map<FilterExpression, List<TurboIssue>> filteredSortedAndCounted = new HashMap<>();
+        Map<FilterExpression, List<GuiElement>> processed = new HashMap<>();
 
-        filterExprs.forEach(filterExpr -> {
-            List<TurboIssue> filterAndSortedExpression = filteredSortedAndCounted.get(filterExpr);
+        filterExprs.stream().distinct().forEach(filterExpr -> {
+            boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
-            if (filterAndSortedExpression == null) { // If it already exists, no need to filter anymore
-                boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
+            FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+            List<TurboIssue> processedIssues = allModelIssues.stream()
+                    .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                    .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                    .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
+                    .collect(Collectors.toList());
 
-                List<TurboIssue> filteredSortedAndCountedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
-                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
-                        .collect(Collectors.toList());
+            List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
 
-                filteredSortedAndCounted.put(filterExpr, filteredSortedAndCountedIssues);
-            }
+            processed.put(filterExpr, processedElements);
         });
 
-        return filteredSortedAndCounted;
+        return processed;
     }
 
     /**
@@ -145,5 +148,25 @@ public class UpdateController {
 
         // No sort or updated, return sort by descending ID, which is the default.
         return Qualifier.getSortComparator(models, "id", true, false);
+    }
+
+    /**
+     * Constructs GuiElements (including all necessary references to labels/milestones/users to properly display
+     * the issue) corresponding to a list of issues without changing the order.
+     *
+     * @param models The MultiModel from which necessary references are extracted.
+     * @param processedIssues The list of issues to construct GUIElements for.
+     * @return A list of GUIElements corresponding to the given list of issues.
+     */
+    private List<GuiElement> produceGuiElements(MultiModel models, List<TurboIssue> processedIssues) {
+        return processedIssues.stream().map(issue -> {
+            Optional<Model> modelOfIssue = models.getModelById(issue.getRepoId());
+            assert modelOfIssue.isPresent();
+
+            return new GuiElement(issue,
+                    models.getLabelsOfIssue(issue),
+                    models.getMilestoneOfIssue(issue),
+                    models.getAssigneeOfIssue(issue));
+        }).collect(Collectors.toList());
     }
 }

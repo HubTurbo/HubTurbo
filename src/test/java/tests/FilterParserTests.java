@@ -86,6 +86,11 @@ public class FilterParserTests {
             Parser.parse("label:priority.high -milestone:");
             fail("Empty qualifiers should cause a parse exception");
         } catch (ParseException ignored) {}
+
+        try {
+            Parser.parse("a:b; c:d;e");
+            fail("Qualifier content expected, start of a new qualifier found.");
+        } catch (ParseException ignored) {}
     }
 
     @Test
@@ -113,6 +118,32 @@ public class FilterParserTests {
         assertEquals(Parser.parse("~id:b"),
             new Negation(new Qualifier(ID, "b")));
 
+        // Shorter form of OR
+
+        assertEquals(Parser.parse("label:a;b;c"),
+                new Disjunction(
+                        new Disjunction(
+                                new Qualifier(LABEL, "a"),
+                                new Qualifier(LABEL, "b")
+                        ),
+                        new Qualifier(LABEL, "c")
+                ));
+
+        assertEquals(Parser.parse("~label:a;b"),
+                new Negation(
+                        new Disjunction(
+                                new Qualifier(LABEL, "a"),
+                                new Qualifier(LABEL, "b")
+                        )
+                ));
+
+        //TODO: change this test in the future when proper semantic exception is implemented #1173
+        try {
+            Parser.parse("sort:label;assignee");
+        } catch (ParseException ignored) {
+            fail("Change this test to account for semantic error in the future.");
+        }
+
         // Implicit conjunction
 
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
@@ -123,6 +154,16 @@ public class FilterParserTests {
                     new Qualifier(LABEL, "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
             Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
+
+        try {
+            Parser.parse(";");
+            fail("Operator by itself should cause a parse exception.");
+        } catch (ParseException ignored) {}
+
+        try {
+            Parser.parse("&&");
+            fail("Operator by itself should cause a parse exception.");
+        } catch (ParseException ignored) {}
     }
 
     @Test
