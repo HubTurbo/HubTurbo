@@ -1,16 +1,16 @@
 package ui;
 
-import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
 import util.DialogMessage;
 import util.Utility;
 import util.events.*;
+import util.events.testevents.PrimaryRepoChangedEvent;
+import util.events.testevents.PrimaryRepoChangedEventHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +25,7 @@ public class GUIController {
     private final PanelControl panelControl;
     private final UI ui;
     private final Label apiBox;
+    private String defaultRepoId;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -42,6 +43,7 @@ public class GUIController {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
         UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
 
     /**
@@ -53,20 +55,15 @@ public class GUIController {
      * - If there is a match, the panel's issue list is changed to the corresponding one contained in the
      * ModelUpdatedEvent.
      *
-     * Within each entry in the ModelUpdatedEvent's issuesToShow Map, there is a Boolean value dictating whether
-     * to display the corresponding panel in feed form (i.e. the filter string contains UPDATED).
-     *
      * @param e The ModelUpdatedEvent triggered by the uiManager.
      */
     private void modelUpdated(ModelUpdatedEvent e) {
-        panelControl.updateModel(e.model); // Updates model, to be used to display issue labels.
-
         panelControl.getChildren().stream()
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
                     // Search for the corresponding entry in e.issuesToShow.
-                    List<TurboIssue> filterResult =
-                            e.issuesToShow.get(((FilterPanel) child).getCurrentFilterExpression());
+                    List<GuiElement> filterResult =
+                            e.elementsToShow.get(((FilterPanel) child).getCurrentFilterExpression());
 
                     if (filterResult != null) ((FilterPanel) child).updatePanel(filterResult);
                 });
@@ -76,8 +73,8 @@ public class GUIController {
      * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
      * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
      *
-     * Triggers a filterSortRefresh call in Logic with only the given panel's filterExpression. Contrast this
-     * with refreshAllPanels in Logic, triggers filterSortRefresh with all FilterExpressions from the GUI.
+     * Triggers a processAndRefresh call in Logic with only the given panel's filterExpression. Contrast this
+     * with refreshAllPanels in Logic, triggers processAndRefresh with all FilterExpressions from the GUI.
      *
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */
@@ -107,5 +104,13 @@ public class GUIController {
 
     private void showErrorDialog(ShowErrorDialogEvent e) {
         Platform.runLater(() -> DialogMessage.showErrorDialog(e.header, e.message));
+    }
+
+    private void setDefaultRepo(PrimaryRepoChangedEvent e) {
+        defaultRepoId = e.repoId;
+    }
+
+    public String getDefaultRepo() {
+        return defaultRepoId;
     }
 }

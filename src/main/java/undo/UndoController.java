@@ -50,7 +50,7 @@ public class UndoController {
         undoBuffer = Optional.of(new Pair<>(issue, action));
         action.act(issue).thenApply(success -> showErrorDialogOnFailure(success, issue, action));
         Notification notification = new Notification(createInfoOcticon(),
-                "Undo " + action.getDescription() + " for #" + issue.getId() + ": " + issue.getTitle(),
+                action.getDescription() + " for #" + issue.getId() + ": " + issue.getTitle(),
                 "Undo", this::undoCallback);
         notificationController.showNotification(notification);
     }
