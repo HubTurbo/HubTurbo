@@ -11,6 +11,7 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 import ui.UI;
@@ -180,6 +181,11 @@ public class DummyRepo implements Repo {
     @Override
     public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
         return getRepoState(repoId).setLabels(issueId, labels);
+    }
+
+    @Override
+    public Issue setMilestone(String repoId, int issueId, String issueTitle, Integer issueMilestone) {
+        return getRepoState(repoId).setMilestone(issueId, issueMilestone);
     }
 
     @Override

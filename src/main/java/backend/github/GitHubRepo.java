@@ -13,6 +13,8 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -257,6 +259,30 @@ public class GitHubRepo implements Repo {
                         .map(labelName -> new Label().setName(labelName))
                         .collect(Collectors.toList())
         );
+    }
+
+
+    @Override
+    public Issue setMilestone(String repoId, int issueId, String issueTitle, Integer issueMilestone) throws IOException {
+        Issue iss = issueService.getIssue(RepositoryId.createFromId(repoId), issueId);
+
+
+
+        Milestone gitHubMilestone = new Milestone();
+        gitHubMilestone.setNumber(issueMilestone);
+
+        Issue createdIssue = new Issue();
+        createdIssue.setNumber(issueId);
+        createdIssue.setTitle("1");
+        createdIssue.setMilestone(gitHubMilestone);
+        //createdIssue.setUpdatedAt(iss.getUpdatedAt());
+
+
+
+        //iss.setMilestone(gitHubMilestone);
+
+        return issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
+
     }
 
     @Override

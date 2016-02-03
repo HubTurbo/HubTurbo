@@ -6,9 +6,11 @@ import backend.interfaces.RepoStore;
 import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
 import backend.resource.serialization.SerializableModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
 import ui.UI;
 import util.HTLog;
 import util.events.ShowErrorDialogEvent;
@@ -162,6 +164,10 @@ public class RepoIO {
 
     public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return repoSource.replaceIssueLabels(issue, labels);
+    }
+
+    public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+        return repoSource.replaceIssueMilestone(issue, milestone);
     }
 
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
