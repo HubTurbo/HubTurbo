@@ -27,7 +27,6 @@ public class MilestonePicker {
         List<TurboMilestone> milestoneList = ui.logic.getRepo(issue.getRepoId()).getMilestones();
         MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestoneList);
         Optional<TurboMilestone> assignedMilestone = dialog.showAndWait();
-        System.out.println("Result is present: " + assignedMilestone.isPresent());
         if (assignedMilestone.isPresent()) {
             if (issue.getMilestone().isPresent()) {
                 ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone().get(), assignedMilestone.get().getId()));
