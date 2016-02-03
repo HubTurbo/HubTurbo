@@ -4,6 +4,7 @@ import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import filter.expression.QualifierType;
@@ -328,6 +329,18 @@ public class Logic {
             models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
             refreshUI();
         }
+    }
+
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+        logger.info("Changing milestone for " + issue + " on GitHub");
+        return repoIO.replaceIssueMilestone(issue, milestone)
+                .thenApply(resultingIssue -> {
+                    logger.info("Changing milestone for " + issue + " on UI");
+                    issue.setMilestone(milestone);
+                    refreshUI();
+                    return true;
+                })
+                .exceptionally(Futures.withResult(false));
     }
 
     /**

@@ -10,6 +10,7 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 
@@ -398,6 +399,10 @@ public class DummyRepoState {
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
+    }
+
+    protected final Issue setMilestone(int issueId, Integer milestone) {
+        return null;
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {

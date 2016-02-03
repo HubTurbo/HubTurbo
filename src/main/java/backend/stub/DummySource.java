@@ -6,7 +6,9 @@ import backend.github.*;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.egit.github.core.Issue;
 import util.Futures;
 
 import java.util.List;
@@ -48,6 +50,11 @@ public class DummySource extends RepoSource {
     @Override
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return addTask(new ReplaceIssueLabelsTask(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
+    }
+
+    @Override
+    public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+        return null;
     }
 
     @Override
