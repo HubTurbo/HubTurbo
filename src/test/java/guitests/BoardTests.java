@@ -40,7 +40,7 @@ public class BoardTests extends UITest {
         clickMenu("Boards", "Save as");
         type("board 1");
         click("OK");
-        assertNodeExists(hasText("A board by the name 'board 1' already exists."));
+        waitUntilNodeAppears(hasText("A board by the name 'board 1' already exists."));
 
         // Overwrite previous board, then open the board again
         // Expected: the board should contain 2 panels
