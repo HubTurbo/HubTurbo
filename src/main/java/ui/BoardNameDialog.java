@@ -67,7 +67,7 @@ public final class BoardNameDialog extends Dialog<String> {
         getDialogPane().getButtonTypes().addAll(submitButtonType, ButtonType.CANCEL);
         submitButton = (Button) getDialogPane().lookupButton(submitButtonType);
         submitButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (isBoardNameDuplicate(nameField.getText()) && !confirmDuplicateBoardName()) {
+            if (isBoardNameDuplicate(nameField.getText()) && !shouldOverwriteDuplicateBoard()) {
                 event.consume();
             }
         });
@@ -82,7 +82,7 @@ public final class BoardNameDialog extends Dialog<String> {
 
     }
 
-    private boolean confirmDuplicateBoardName() {
+    private boolean shouldOverwriteDuplicateBoard() {
         return DialogMessage.showYesNoWarningDialog("Warning",
                 String.format(WARNING_HEADER_DUPLICATE_NAME, nameField.getText()),
                 WARNING_MESSAGE_DUPLICATE_NAME, "Yes", "No");
@@ -92,7 +92,7 @@ public final class BoardNameDialog extends Dialog<String> {
         GridPane grid = new GridPane();
         setupGridPane(grid);
 
-        setTitle("Save board as");
+        setTitle("Save board as ...");
 
         HBox nameArea = new HBox();
 

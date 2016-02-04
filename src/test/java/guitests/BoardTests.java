@@ -49,7 +49,7 @@ public class BoardTests extends UITest {
         assertEquals(2, panelControl.getPanelCount());
 
 
-        // Create a new panel, then save with the same name to show warning dialog
+        // Create a new panel, then save with the same name to show warning dialog,
         // don't save and try to reopen board
         // Expected: Board is not overwritten, should contain 2 panels
         clickMenu("Panels", "Create");
