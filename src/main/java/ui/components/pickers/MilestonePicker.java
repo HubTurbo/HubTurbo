@@ -26,13 +26,10 @@ public class MilestonePicker {
     private void showMilestonePicker(TurboIssue issue) {
         List<TurboMilestone> milestoneList = ui.logic.getRepo(issue.getRepoId()).getMilestones();
         MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestoneList);
-        Optional<TurboMilestone> assignedMilestone = dialog.showAndWait();
-        if (assignedMilestone.isPresent()) {
-            if (issue.getMilestone().isPresent()) {
-                ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone().get(), assignedMilestone.get().getId()));
-            } else {
-                ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, null, assignedMilestone.get().getId()));
-            }
+        Optional<Integer> assignedMilestone = dialog.showAndWait();;
+
+        if (issue.getMilestone() != assignedMilestone ) {
+            ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(), assignedMilestone));
         }
     }
 

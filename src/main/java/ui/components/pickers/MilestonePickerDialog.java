@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MilestonePickerDialog extends Dialog<TurboMilestone> {
+public class MilestonePickerDialog extends Dialog<Integer> {
     private final List<PickerMilestone> milestones = new ArrayList<>();
 
     MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
@@ -50,7 +50,7 @@ public class MilestonePickerDialog extends Dialog<TurboMilestone> {
                     .count() > 0) {
                return this.milestones.stream()
                        .filter(milestone -> milestone.isSelected())
-                       .map(milestone -> new TurboMilestone(milestone.getRepoId(), milestone.getId(), milestone.getDescription()))
+                       .map(milestone -> milestone.getId())
                        .findFirst()
                        .get();
            } else {
@@ -101,7 +101,8 @@ public class MilestonePickerDialog extends Dialog<TurboMilestone> {
     public void selectMilestone(String milestoneName) {
         milestones.stream()
                 .forEach(milestone -> {
-                    milestone.setSelected(milestone.getTitle().equals(milestoneName));
+                    milestone.setSelected(milestone.getTitle().equals(milestoneName)
+                            && !milestone.isSelected());
                 });
         refreshUI();
     }
