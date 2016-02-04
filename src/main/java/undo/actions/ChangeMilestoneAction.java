@@ -3,18 +3,19 @@ package undo.actions;
 import backend.Logic;
 import backend.resource.TurboIssue;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class ChangeMilestoneAction implements Action<TurboIssue> {
     public static final String DESCRIPTION = "Change milestone";
 
-    private Integer oldMilestone;
-    private Integer newMilestone;
+    private Integer oldMilestoneValue;
+    private Integer newMilestoneValue;
     private Logic logic;
 
-    public ChangeMilestoneAction(Logic logic, Integer oldMilestone, Integer newMilestone) {
-        this.oldMilestone = oldMilestone;
-        this.newMilestone = newMilestone;
+    public ChangeMilestoneAction(Logic logic, Optional<Integer> oldMilestone, Optional<Integer> newMilestone) {
+        this.oldMilestoneValue = (oldMilestone.isPresent()) ? oldMilestone.get() : null;
+        this.newMilestoneValue = (newMilestone.isPresent()) ? newMilestone.get() : null;
         this.logic = logic;
     }
 
@@ -23,11 +24,11 @@ public class ChangeMilestoneAction implements Action<TurboIssue> {
     }
 
     public CompletableFuture<Boolean> act(TurboIssue issue) {
-        return logic.replaceIssueMilestone(issue, newMilestone);
+        return logic.replaceIssueMilestone(issue, newMilestoneValue);
     }
 
     public CompletableFuture<Boolean> undo(TurboIssue issue) {
-        return logic.replaceIssueMilestone(issue, oldMilestone);
+        return logic.replaceIssueMilestone(issue, oldMilestoneValue);
     }
 
 }

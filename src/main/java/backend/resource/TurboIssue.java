@@ -440,7 +440,7 @@ public class TurboIssue {
     }
 
     public void setMilestone(Integer milestone) {
-        this.milestone = Optional.of(milestone);
+        this.milestone = (milestone == null) ? Optional.empty() : Optional.of(milestone);
     }
 
     public void setMilestone(TurboMilestone milestone) {
