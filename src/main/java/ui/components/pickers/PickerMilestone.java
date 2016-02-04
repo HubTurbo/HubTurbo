@@ -36,7 +36,7 @@ public class PickerMilestone extends TurboMilestone {
             label.setText(label.getText() + " ✓");
         }
 
-        label.setOnMouseClicked(e -> dialog.selectMilestone(getDescription()));
+        label.setOnMouseClicked(e -> dialog.selectMilestone(getTitle()));
         return label;
     }
 

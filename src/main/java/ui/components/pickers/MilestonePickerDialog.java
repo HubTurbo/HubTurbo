@@ -101,7 +101,7 @@ public class MilestonePickerDialog extends Dialog<TurboMilestone> {
     public void selectMilestone(String milestoneName) {
         milestones.stream()
                 .forEach(milestone -> {
-                    milestone.setSelected(milestone.getDescription().equals(milestoneName));
+                    milestone.setSelected(milestone.getTitle().equals(milestoneName));
                 });
         refreshUI();
     }
