@@ -1,5 +1,6 @@
 package ui;
 
+import backend.RepoID;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
@@ -48,7 +49,7 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
+            if (RepoID.isWellFormedRepoId(repoId) && !changesDisabled) {
                 onValueChangeCallback.accept(repoId);
             }
         });

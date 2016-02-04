@@ -61,7 +61,7 @@ public final class LoginController {
 
     public boolean attemptLogin() {
 
-        boolean validRepoId = Utility.isWellFormedRepoId(owner, repo) && !username.isEmpty() && !password.isEmpty();
+        boolean validRepoId = RepoID.isWellFormedRepoId(owner, repo) && !username.isEmpty() && !password.isEmpty();
         boolean loginSuccessful = login(username, password);
 
         if (validRepoId && loginSuccessful) {
