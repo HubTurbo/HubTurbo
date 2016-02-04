@@ -102,6 +102,26 @@ public class PickerLabel extends TurboLabel {
         return getNode();
     }
 
+    public Node processChoiceLabel(List<String> assignedLabels, List<String> matchedLabels,
+                                   Optional<String> suggestion) {
+        String labelName = getActualName();
+        if (!assignedLabels.isEmpty() && assignedLabels.contains(labelName)) setIsSelected(true);
+        
+        if (!matchedLabels.isEmpty() && !matchedLabels.contains(labelName)) setIsFaded(true);
+        
+        if (isSuggested(suggestion)) setIsHighlighted(true);
+        
+        return getNode();
+    }
+
+    public Optional<String> getGroupName() {
+        Optional<String> groupName = Optional.empty();
+        if (getGroup().isPresent()) {
+            groupName = Optional.of(getGroup().get() + (isExclusive() ? "." : "-"));
+        }
+        return groupName;
+    }
+
     /**
      * This isn't unnecessary as fields are added, but are not taken into account for equality.
      * @return
