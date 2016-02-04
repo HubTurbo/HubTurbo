@@ -57,7 +57,7 @@ public class ListPanel extends FilterPanel {
     private static final String changeLabelsMenuItemText = "Change labels (L)";
 
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
-    private static final String changeMilestoneMenuItemText = "Change milestone";
+    private static final String changeMilestoneMenuItemText = "Change milestone (M)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -242,9 +242,8 @@ public class ListPanel extends FilterPanel {
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
-                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                    ui.getBrowserComponent().manageMilestones(event.getCode().toString());
+                } else {
+                    changeMilestone();
                 }
             }
             if (UNDO_LABEL_CHANGES.match(event)) {

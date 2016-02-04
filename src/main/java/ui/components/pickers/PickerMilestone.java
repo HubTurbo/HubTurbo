@@ -5,12 +5,14 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import util.Utility;
 
 import java.util.Optional;
 
 public class PickerMilestone extends TurboMilestone {
     boolean isSelected = false;
+    boolean isHighlighted = false;
     MilestonePickerDialog dialog;
 
     PickerMilestone(TurboMilestone milestone, MilestonePickerDialog dialog) {
@@ -24,20 +26,24 @@ public class PickerMilestone extends TurboMilestone {
     }
 
     public Node getNode() {
-        Label label = new Label(getTitle());
+        Label milestone = new Label(getTitle());
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(label.getText(), label.getFont());
-        label.setPrefWidth(width + 30);
-        label.getStyleClass().add("labels");
-        label.setStyle("-fx-border-color: black;");
-        label.setStyle("-fx-background-color: yellow;");
+        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
+        milestone.setPrefWidth(width + 30);
+        milestone.getStyleClass().add("labels");
+        milestone.setStyle("-fx-background-color: yellow;");
 
         if (isSelected) {
-            label.setText(label.getText() + " ✓");
+            milestone.setText(milestone.getText() + " ✓");
         }
 
-        label.setOnMouseClicked(e -> dialog.selectMilestone(getTitle()));
-        return label;
+        if (isHighlighted) {
+            milestone.setStyle("-fx-border-color: black;");
+        }
+
+        milestone.setOnMouseClicked(e -> dialog.selectMilestone(getTitle()));
+
+        return milestone;
     }
 
     public void setSelected(boolean isSelected) {
@@ -46,5 +52,13 @@ public class PickerMilestone extends TurboMilestone {
 
     public boolean isSelected() {
         return this.isSelected;
+    }
+
+    public void setHighlighted(boolean isHighlighted) {
+        this.isHighlighted = isHighlighted;
+    }
+
+    public boolean isHighlighted() {
+        return this.isHighlighted;
     }
 }
