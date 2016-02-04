@@ -1,8 +1,13 @@
 package ui.components.pickers;
 
+import java.util.List;
+import java.util.Optional;
+
 import backend.resource.TurboLabel;
+
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
+
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -10,16 +15,14 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
-    private final LabelPickerUILogic labelPickerUILogic;
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
     private final boolean isTop;
 
-    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic, boolean isTop) {
+    public PickerLabel(TurboLabel label, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerUILogic = labelPickerUILogic;
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
@@ -27,10 +30,9 @@ public class PickerLabel extends TurboLabel {
         this.isTop = isTop;
     }
 
-    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic,
-                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded, boolean isTop) {
+    public PickerLabel(TurboLabel label, boolean isSelected, boolean isHighlighted, 
+                       boolean isRemoved, boolean isFaded, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerUILogic = labelPickerUILogic;
         this.isSelected = isSelected;
         this.isHighlighted = isHighlighted;
         this.isRemoved = isRemoved;
@@ -86,6 +88,20 @@ public class PickerLabel extends TurboLabel {
         this.isFaded = isFaded;
     }
 
+    public Node processAssignedLabel(List<String> assignedLabels, Optional<String> suggestion) {
+        if (isSuggested(suggestion) && !assignedLabels.contains(getActualName())) {
+            setIsFaded(true);
+            return getNode();
+        }
+        
+        if (!assignedLabels.contains(getActualName())) {
+           setIsRemoved(true); 
+           setIsFaded(true);
+           return getNode();
+        }
+        return getNode();
+    }
+
     /**
      * This isn't unnecessary as fields are added, but are not taken into account for equality.
      * @return
@@ -104,5 +120,9 @@ public class PickerLabel extends TurboLabel {
     @SuppressWarnings("PMD")
     public int hashCode() {
         return super.hashCode();
+    }
+    
+    private boolean isSuggested(Optional<String> suggestion) {
+        return suggestion.isPresent() && suggestion.get().equals(getActualName());
     }
 }
