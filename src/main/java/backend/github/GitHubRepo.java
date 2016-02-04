@@ -264,25 +264,16 @@ public class GitHubRepo implements Repo {
 
     @Override
     public Issue setMilestone(String repoId, int issueId, String issueTitle, Integer issueMilestone) throws IOException {
-        Issue iss = issueService.getIssue(RepositoryId.createFromId(repoId), issueId);
-
-
-
         Milestone gitHubMilestone = new Milestone();
         gitHubMilestone.setNumber(issueMilestone);
 
+        // github api requires at least id and title
         Issue createdIssue = new Issue();
         createdIssue.setNumber(issueId);
-        createdIssue.setTitle("1");
+        createdIssue.setTitle(issueTitle);
         createdIssue.setMilestone(gitHubMilestone);
-        //createdIssue.setUpdatedAt(iss.getUpdatedAt());
-
-
-
-        //iss.setMilestone(gitHubMilestone);
 
         return issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
-
     }
 
     @Override
