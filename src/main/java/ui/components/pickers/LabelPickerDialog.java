@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,10 @@ import java.util.stream.Collectors;
 import ui.UI;
 
 public class LabelPickerDialog extends Dialog<List<String>> {
+
+    private static final int ELEMENT_MAX_WIDTH = 400;
+    private static final Insets GROUPLESS_PAD = new Insets(5,0,0,0);
+    private static final Insets GROUP_PAD = new Insets(0,0,10,10);
 
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
@@ -63,9 +68,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         createButtons();
         
         List<String> finalLabels = new ArrayList<>();
-        finalLabels.add("bug");
         List<String> matchedLabels = new ArrayList<>();
-        populatePanes(finalLabels, matchedLabels, Optional.of("taskrunner"));
+        populatePanes(finalLabels, matchedLabels, Optional.empty());
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -97,6 +101,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                               Optional<String> suggestion) {
         // Population of UI elements
         populateAssignedLabels(finalLabels, suggestion);
+        populateFeedbackLabels(finalLabels, matchedLabels, suggestion);
     }
 
     private void populateAssignedLabels(List<String> finalLabels, Optional<String> suggestion) {
@@ -105,6 +110,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         populateInitialLabels(initialLabels, finalLabels, suggestion);
         populateAddedLabels(getAddedLabels(initialLabels, finalLabels, suggestion), 
                             finalLabels, suggestion);
+
+        if (assignedLabels.getChildren().isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
     private void populateInitialLabels(List<String> initialLabels, List<String> finalLabels,
@@ -126,6 +133,50 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .forEach(label -> assignedLabels.getChildren()
                     .add(label.processAssignedLabel(finalLabels, suggestion)));
         }
+    }
+
+    private void populateFeedbackLabels(List<String> finalLabels, List<String> matchedLabels,
+                                        Optional<String> suggestion) {
+        populateGroupLabels(finalLabels, matchedLabels, suggestion);
+        populateGrouplessLabels(finalLabels, matchedLabels, suggestion);
+    }
+
+    private void populateGroupLabels(List<String> finalLabels, List<String> matchedLabels,
+                                     Optional<String> suggestion) {
+        Map<String, FlowPane> groupContent = getGroupContent(finalLabels, matchedLabels, suggestion);
+        groupContent.entrySet().stream().forEach(entry -> {
+            feedbackLabels.getChildren().addAll(
+                createGroupTitle(entry.getKey()), entry.getValue());
+        });
+    }
+
+    private Map<String, FlowPane> getGroupContent(List<String> finalLabels, List<String> matchedLabels,
+            Optional<String> suggestion) {
+        Map<String, FlowPane> groupContent = new HashMap<>();
+        repoLabels.stream().sorted()
+            .filter(label -> label.getGroup().isPresent())
+            .map(label -> new PickerLabel(label, false))
+            .forEach(label -> {
+                String group = label.getGroupName().get();
+                if (!groupContent.containsKey((group))) {
+                    groupContent.put(group, createGroupPane(GROUP_PAD));
+                } 
+                groupContent.get(group).getChildren()
+                    .add(label.processChoiceLabel(finalLabels, matchedLabels, suggestion));
+            });
+        return groupContent;
+    }
+
+    private void populateGrouplessLabels(List<String> finalLabels, List<String> matchedLabels, 
+                                         Optional<String> suggestion) {
+        FlowPane groupless = createGroupPane(GROUPLESS_PAD);
+        repoLabels.stream()                                                               
+            .filter(label -> !label.getGroup().isPresent())                               
+            .map(label -> new PickerLabel(label, false))
+            .forEach(label -> groupless.getChildren()
+                .add(label.processChoiceLabel(finalLabels, matchedLabels, suggestion)));
+        
+        if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
     }
 
     private void createMainLayout() throws IOException {
@@ -166,6 +217,22 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         return label;
     }
 
+
+    private Label createGroupTitle(String name) {
+        Label groupName = new Label(name);
+        groupName.setPadding(new Insets(0, 5, 5, 0));                                     
+        groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);                                    
+        groupName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold;");            
+        return groupName;
+    }
+
+    private FlowPane createGroupPane(Insets padding) {
+        FlowPane group = new FlowPane();                                                
+        group.setHgap(5);
+        group.setVgap(5);
+        group.setPadding(padding);
+        return group;
+    }
 
     // Event handling 
 
@@ -220,11 +287,5 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             .collect(Collectors.toList());
     }
 
-
-    private List<String> getGroupNames(Map<String, Boolean> groups) {
-        List<String> groupNames = groups.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
-        Collections.sort(groupNames);
-        return groupNames;
-    }
 
 }
