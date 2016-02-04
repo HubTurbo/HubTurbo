@@ -28,7 +28,7 @@ public class MilestonePicker {
         MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestoneList);
         Optional<Integer> assignedMilestone = dialog.showAndWait();;
 
-        if (issue.getMilestone() != assignedMilestone ) {
+        if (!issue.getMilestone().equals(assignedMilestone)) {
             ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(), assignedMilestone));
         }
     }
