@@ -15,28 +15,20 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
+    private LabelPickerDialog presenter;
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
     private final boolean isTop;
 
-    public PickerLabel(TurboLabel label, boolean isTop) {
+    public PickerLabel(LabelPickerDialog presenter, TurboLabel label, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
+        this.presenter = presenter;
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
         isFaded = false;
-        this.isTop = isTop;
-    }
-
-    public PickerLabel(TurboLabel label, boolean isSelected, boolean isHighlighted, 
-                       boolean isRemoved, boolean isFaded, boolean isTop) {
-        super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.isSelected = isSelected;
-        this.isHighlighted = isHighlighted;
-        this.isRemoved = isRemoved;
-        this.isFaded = isFaded;
         this.isTop = isTop;
     }
 
@@ -60,8 +52,14 @@ public class PickerLabel extends TurboLabel {
             label.setTooltip(groupTooltip);
         }
 
-        //label.setOnMouseClicked(e -> labelPickerUILogic.toggleLabel(getActualName()));
+        label.setOnMouseClicked(e -> {
+            presenter.handleLabelClick(getActualName());
+        });    
         return label;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 
     public void setIsSelected(boolean isSelected) {
@@ -88,6 +86,12 @@ public class PickerLabel extends TurboLabel {
         this.isFaded = isFaded;
     }
 
+    /**
+     * Set visual style of a label based on query 
+     * @param assignedLabels    labels that will associated with an issue
+     * @param suggestion        suggested label that matches user query 
+     * @return
+     */
     public Node processAssignedLabel(List<String> assignedLabels, Optional<String> suggestion) {
         if (isSuggested(suggestion) && !assignedLabels.contains(getActualName())) {
             setIsFaded(true);
@@ -99,6 +103,9 @@ public class PickerLabel extends TurboLabel {
            setIsFaded(true);
            return getNode();
         }
+        
+        if (assignedLabels.contains(getActualName())) setIsSelected(true);
+
         return getNode();
     }
 
