@@ -3,29 +3,41 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.controlsfx.control.spreadsheet.Picker;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MilestonePickerDialog extends Dialog<Integer> {
+    public static final String DIALOG_TITLE = "Select Milestone";
     private final List<PickerMilestone> milestones = new ArrayList<>();
-    VBox milestoneBox;
+    private VBox milestoneBox;
 
-    MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
+    /**
+     * Constructor to create a MilestonePickerDialog
+     *
+     * The issue and the milestones list provided should come from the same repository
+     * @param stage
+     * @param issue
+     * @param milestones
+     */
+    public MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
         initOwner(stage);
-        setTitle("Edit Milestone");
-        setupButtons();
+        setTitle(DIALOG_TITLE);
+        setupButtons(getDialogPane());
         convertToPickerMilestones(issue, milestones);
         refreshUI();
+        setupKeyEvents(getDialogPane());
+    }
 
-        getDialogPane().setOnKeyPressed((event) -> {
+    private void setupKeyEvents(Node milestoneDialogPane) {
+        milestoneDialogPane.setOnKeyPressed((event) -> {
             if (event.getCode() == KeyCode.RIGHT) {
                 highlightNextMilestone(this.milestones);
                 event.consume();
@@ -45,15 +57,9 @@ public class MilestonePickerDialog extends Dialog<Integer> {
     }
 
     private void selectMilestone(List<PickerMilestone> milestones) {
-        if (!milestones.stream()
-                .filter(milestone -> milestone.isHighlighted())
-                .findAny()
-                .isPresent()) return;
+        if (!hasHighlightedMilestone(milestones)) return;
 
-        PickerMilestone highlightedMilestone = milestones.stream()
-                .filter(milestone -> milestone.isHighlighted())
-                .findAny()
-                .get();
+        PickerMilestone highlightedMilestone = getHighlightedMilestone(milestones);
 
         milestones.stream()
                 .forEach(milestone -> {
@@ -61,16 +67,17 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                 });
     }
 
-    private void unselectMilestone(List<PickerMilestone> milestones) {
-        if (!milestones.stream()
+    private boolean hasHighlightedMilestone(List<PickerMilestone> milestones) {
+        return milestones.stream()
                 .filter(milestone -> milestone.isHighlighted())
                 .findAny()
-                .isPresent()) return;
+                .isPresent();
+    }
 
-        PickerMilestone highlightedMilestone = milestones.stream()
-                .filter(milestone -> milestone.isHighlighted())
-                .findAny()
-                .get();
+    private void unselectMilestone(List<PickerMilestone> milestones) {
+        if (!hasHighlightedMilestone(milestones)) return;
+
+        PickerMilestone highlightedMilestone = getHighlightedMilestone(milestones);
 
         milestones.stream()
                 .forEach(milestone -> {
@@ -78,11 +85,15 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                 });
     }
 
-    private void highlightNextMilestone(List<PickerMilestone> milestones) {
-        PickerMilestone curMilestone = milestones.stream()
+    private PickerMilestone getHighlightedMilestone(List<PickerMilestone> milestones) {
+        return milestones.stream()
                 .filter(milestone -> milestone.isHighlighted())
                 .findAny()
                 .get();
+    }
+
+    private void highlightNextMilestone(List<PickerMilestone> milestones) {
+        PickerMilestone curMilestone = getHighlightedMilestone(milestones);
         int curMilestoneIndex = milestones.indexOf(curMilestone);
         if (curMilestoneIndex < milestones.size() - 1) {
             PickerMilestone nextMilestone = milestones.get(curMilestoneIndex + 1);
@@ -92,10 +103,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
     }
 
     private void highlightPreviousMilestone(List<PickerMilestone> milestones) {
-        PickerMilestone curMilestone = milestones.stream()
-                .filter(milestone -> milestone.isHighlighted())
-                .findAny()
-                .get();
+        PickerMilestone curMilestone = getHighlightedMilestone(milestones);
         int curMilestoneIndex = milestones.indexOf(curMilestone);
         if (curMilestoneIndex > 0) {
             PickerMilestone nextMilestone = milestones.get(curMilestoneIndex - 1);
@@ -109,6 +117,37 @@ public class MilestonePickerDialog extends Dialog<Integer> {
             this.milestones.add(new PickerMilestone(milestones.get(i), this));
         }
 
+        selectAssignedMilestone(issue);
+
+        if (hasSelectedMilestone()) {
+            highlightSelectedMilestone();
+        } else {
+            highlightFirstMilestone();
+        }
+    }
+
+    private void highlightFirstMilestone() {
+        if (!this.milestones.isEmpty()) {
+            this.milestones.get(0).setHighlighted(true);
+        }
+    }
+
+    private void highlightSelectedMilestone() {
+        this.milestones.stream()
+                .filter(milestone -> milestone.isSelected())
+                .findAny()
+                .get()
+                .setHighlighted(true);
+    }
+
+    private boolean hasSelectedMilestone() {
+        return this.milestones.stream()
+                .filter(milestone -> milestone.isSelected())
+                .findAny()
+                .isPresent();
+    }
+
+    private void selectAssignedMilestone(TurboIssue issue) {
         this.milestones.stream()
                 .filter(milestone -> {
                     if (issue.getMilestone().isPresent()) {
@@ -120,27 +159,16 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                 .forEach(milestone -> {
                     milestone.setSelected(true);
                 });
-
-        if (this.milestones.stream()
-                .filter(milestone -> milestone.isSelected())
-                .findAny()
-                .isPresent()) {
-            this.milestones.stream()
-                    .filter(milestone -> milestone.isSelected())
-                    .findAny()
-                    .get()
-                    .setHighlighted(true);
-        } else {
-            if (!this.milestones.isEmpty()) {
-                this.milestones.get(0).setHighlighted(true);
-            }
-        }
     }
 
-    private void setupButtons() {
+    private void setupButtons(DialogPane milestonePickerDialogPane) {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+        setConfirmResultConverter(confirmButtonType);
 
+        milestonePickerDialogPane.getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+    }
+
+    private void setConfirmResultConverter(ButtonType confirmButtonType) {
         setResultConverter((dialogButton) -> {
            if (dialogButton == confirmButtonType && this.milestones.stream()
                     .filter(milestone -> milestone.isSelected())
@@ -194,8 +222,13 @@ public class MilestonePickerDialog extends Dialog<Integer> {
         return milestoneGroup;
     }
 
+    /**
+     * Finds the PickerMilestone in the milestones list which has milestoneName as title,
+     * then toggles the selection status
+     * @param milestoneName
+     */
     public void toggleMilestone(String milestoneName) {
-        milestones.stream()
+        this.milestones.stream()
                 .forEach(milestone -> {
                     milestone.setSelected(milestone.getTitle().equals(milestoneName)
                             && !milestone.isSelected());
