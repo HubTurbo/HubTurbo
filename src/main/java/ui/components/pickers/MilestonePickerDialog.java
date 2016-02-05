@@ -9,9 +9,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.controlsfx.control.spreadsheet.Picker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MilestonePickerDialog extends Dialog<Integer> {
@@ -93,23 +93,35 @@ public class MilestonePickerDialog extends Dialog<Integer> {
     }
 
     private void highlightNextMilestone(List<PickerMilestone> milestones) {
+        if (milestones.isEmpty()) return;
+
         PickerMilestone curMilestone = getHighlightedMilestone(milestones);
         int curMilestoneIndex = milestones.indexOf(curMilestone);
-        if (curMilestoneIndex < milestones.size() - 1) {
-            PickerMilestone nextMilestone = milestones.get(curMilestoneIndex + 1);
-            nextMilestone.setHighlighted(true);
-            curMilestone.setHighlighted(false);
-        }
+        PickerMilestone nextMilestone = getNextMilestone(milestones, curMilestoneIndex);
+        nextMilestone.setHighlighted(true);
+        curMilestone.setHighlighted(false);
+    }
+
+    private PickerMilestone getNextMilestone(List<PickerMilestone> milestones, int curMilestoneIndex) {
+        return (curMilestoneIndex < milestones.size() - 1)
+                ? milestones.get(curMilestoneIndex + 1)
+                : milestones.get(0);
     }
 
     private void highlightPreviousMilestone(List<PickerMilestone> milestones) {
+        if (milestones.isEmpty()) return;
+
         PickerMilestone curMilestone = getHighlightedMilestone(milestones);
         int curMilestoneIndex = milestones.indexOf(curMilestone);
-        if (curMilestoneIndex > 0) {
-            PickerMilestone nextMilestone = milestones.get(curMilestoneIndex - 1);
-            nextMilestone.setHighlighted(true);
-            curMilestone.setHighlighted(false);
-        }
+        PickerMilestone nextMilestone = getPreviousMilestone(milestones, curMilestoneIndex);
+        nextMilestone.setHighlighted(true);
+        curMilestone.setHighlighted(false);
+    }
+
+    private PickerMilestone getPreviousMilestone(List<PickerMilestone> milestones, int curMilestoneIndex) {
+        return (curMilestoneIndex > 0)
+                ? milestones.get(curMilestoneIndex - 1)
+                : milestones.get(milestones.size() - 1);
     }
 
     private void convertToPickerMilestones(TurboIssue issue, List<TurboMilestone> milestones) {
@@ -117,6 +129,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
             this.milestones.add(new PickerMilestone(milestones.get(i), this));
         }
 
+        Collections.sort(this.milestones);
         selectAssignedMilestone(issue);
 
         if (hasSelectedMilestone()) {
@@ -147,6 +160,13 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                 .isPresent();
     }
 
+    private PickerMilestone getSelectedMilestone() {
+        return this.milestones.stream()
+                .filter(milestone -> milestone.isSelected())
+                .findAny()
+                .get();
+    }
+
     private void selectAssignedMilestone(TurboIssue issue) {
         this.milestones.stream()
                 .filter(milestone -> {
@@ -156,9 +176,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                         return false;
                     }
                 })
-                .forEach(milestone -> {
-                    milestone.setSelected(true);
-                });
+                .forEach(milestone -> milestone.setSelected(true));
     }
 
     private void setupButtons(DialogPane milestonePickerDialogPane) {
@@ -170,14 +188,8 @@ public class MilestonePickerDialog extends Dialog<Integer> {
 
     private void setConfirmResultConverter(ButtonType confirmButtonType) {
         setResultConverter((dialogButton) -> {
-           if (dialogButton == confirmButtonType && this.milestones.stream()
-                    .filter(milestone -> milestone.isSelected())
-                    .count() > 0) {
-               return this.milestones.stream()
-                       .filter(milestone -> milestone.isSelected())
-                       .map(milestone -> milestone.getId())
-                       .findFirst()
-                       .get();
+           if (dialogButton == confirmButtonType && hasSelectedMilestone()) {
+               return getSelectedMilestone().getId();
            } else {
                return null;
            }
@@ -218,6 +230,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
         FlowPane milestoneGroup = new FlowPane();
         milestoneGroup.setPadding(new Insets(3));
         milestoneGroup.setHgap(3);
+        milestoneGroup.setVgap(3);
         milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
         return milestoneGroup;
     }

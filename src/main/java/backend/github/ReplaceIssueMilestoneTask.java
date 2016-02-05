@@ -12,7 +12,8 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Issue> {
     private final String issueTitle;
     private final Integer issueMilestone;
 
-    public ReplaceIssueMilestoneTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId, String issueTitle, Integer issueMilestone) {
+    public ReplaceIssueMilestoneTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId, String issueTitle,
+                                     Integer issueMilestone) {
         super(taskRunner, repo);
         this.repoId = repoId;
         this.issueId = issueId;
