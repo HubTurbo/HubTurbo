@@ -5,10 +5,6 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
-import util.Utility;
-
-import java.util.Optional;
 
 public class PickerMilestone extends TurboMilestone {
     boolean isSelected = false;
@@ -41,7 +37,7 @@ public class PickerMilestone extends TurboMilestone {
             milestone.setStyle("-fx-border-color: black;");
         }
 
-        milestone.setOnMouseClicked(e -> dialog.selectMilestone(getTitle()));
+        milestone.setOnMouseClicked(e -> dialog.toggleMilestone(getTitle()));
 
         return milestone;
     }
