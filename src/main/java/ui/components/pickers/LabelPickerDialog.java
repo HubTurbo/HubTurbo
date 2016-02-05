@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -36,7 +37,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
+    private final Set<String> repoLabelsSet;
     private final TurboIssue issue;
+
+    private List<String> finalAssignedLabels;
     
     @FXML
     private VBox mainLayout;
@@ -52,11 +56,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
+        repoLabelsSet = getRepoLabelsSet();
+        finalAssignedLabels = new ArrayList<>(getInitialLabels());
         uiLogic = new LabelPickerUILogic();
 
         initUI(stage, issue);
         setupEvents(stage);
         Platform.runLater(queryField::requestFocus);
+    }
+
+    void handleLabelClick(String labelName) {
+        if (!queryField.isDisabled()) {
+            queryField.setDisable(true);
+        }
+        finalAssignedLabels = updateFinalAssignedLabels(labelName);
+        populatePanes(new ArrayList<>(), Optional.empty());
     }
 
     // Initilisation of UI
@@ -67,9 +81,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
         
-        List<String> finalLabels = new ArrayList<>();
-        List<String> matchedLabels = new ArrayList<>();
-        populatePanes(finalLabels, matchedLabels, Optional.empty());
+        populatePanes(new ArrayList<>(), Optional.empty());
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -96,12 +108,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
      * Updates ui elements based on current state
      * @param state
      */
-    public void populatePanes(List<String> finalLabels, 
-                              List<String> matchedLabels, 
-                              Optional<String> suggestion) {
+    public void populatePanes(List<String> matchedLabels, Optional<String> suggestion) {
         // Population of UI elements
-        populateAssignedLabels(finalLabels, suggestion);
-        populateFeedbackLabels(finalLabels, matchedLabels, suggestion);
+        populateAssignedLabels(finalAssignedLabels, suggestion);
+        populateFeedbackLabels(finalAssignedLabels, matchedLabels, suggestion);
     }
 
     private void populateAssignedLabels(List<String> finalLabels, Optional<String> suggestion) {
@@ -111,14 +121,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         populateAddedLabels(getAddedLabels(initialLabels, finalLabels, suggestion), 
                             finalLabels, suggestion);
 
-        if (assignedLabels.getChildren().isEmpty()) createTextLabel("No currently selected labels. ");
+        if (finalAssignedLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
     private void populateInitialLabels(List<String> initialLabels, List<String> finalLabels,
                                        Optional<String> suggestion) {
         repoLabels.stream()
             .filter(label -> initialLabels.contains(label.getActualName()))
-            .map(label -> new PickerLabel(label, true))
+            .map(label -> new PickerLabel(this, label, true))
             .forEach(label -> assignedLabels.getChildren()
                 .add(label.processAssignedLabel(finalLabels, suggestion)));
     }
@@ -129,7 +139,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             assignedLabels.getChildren().add(new Label("|"));
             repoLabels.stream()
                 .filter(label -> addedLabels.contains(label.getActualName()))
-                .map(label -> new PickerLabel(label, true))
+                .map(label -> new PickerLabel(this, label, true))
                 .forEach(label -> assignedLabels.getChildren()
                     .add(label.processAssignedLabel(finalLabels, suggestion)));
         }
@@ -137,6 +147,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void populateFeedbackLabels(List<String> finalLabels, List<String> matchedLabels,
                                         Optional<String> suggestion) {
+        feedbackLabels.getChildren().clear();
         populateGroupLabels(finalLabels, matchedLabels, suggestion);
         populateGrouplessLabels(finalLabels, matchedLabels, suggestion);
     }
@@ -155,7 +166,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         Map<String, FlowPane> groupContent = new HashMap<>();
         repoLabels.stream().sorted()
             .filter(label -> label.getGroup().isPresent())
-            .map(label -> new PickerLabel(label, false))
+            .map(label -> new PickerLabel(this, label, false))
             .forEach(label -> {
                 String group = label.getGroupName().get();
                 if (!groupContent.containsKey((group))) {
@@ -172,7 +183,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
         repoLabels.stream()                                                               
             .filter(label -> !label.getGroup().isPresent())                               
-            .map(label -> new PickerLabel(label, false))
+            .map(label -> new PickerLabel(this, label, false))
             .forEach(label -> groupless.getChildren()
                 .add(label.processChoiceLabel(finalLabels, matchedLabels, suggestion)));
         
@@ -192,7 +203,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return getFinalLabels();
+                return finalAssignedLabels;
             }
             return null;
         });
@@ -246,6 +257,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void setupKeyEvents() {
         queryField.textProperty().addListener((observable, oldValue, newValue) -> {
+            LabelPickerState state = uiLogic.determineState(
+                new LabelPickerState(new HashSet<String>(issue.getLabels())), 
+                repoLabelsSet, queryField.getText().toLowerCase());
+            finalAssignedLabels = state.getAssignedLabels();
+            populatePanes(state.getMatchedLabels(), state.getCurrentSuggestion());
         });
     }
 
@@ -258,11 +274,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         }
     }
 
-
-
-    // Obtain domain objects
-
-    private List<String> getInitialLabels() {
+    public List<String> getInitialLabels() {
         return issue.getLabels();
     }
 
@@ -281,11 +293,20 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
 
-    private List<String> getFinalLabels() {
-        return repoLabels.stream()
-            .map(TurboLabel::getActualName)
-            .collect(Collectors.toList());
+    private List<String> updateFinalAssignedLabels(String name) {
+        List<String> finalLabels = finalAssignedLabels;
+        
+        if (!finalLabels.contains(name)) {
+            finalLabels.add(name);
+        } else {
+            finalLabels.remove(name);
+        }
+        return finalLabels;
     }
 
-
+    private Set<String> getRepoLabelsSet() {
+        return repoLabels.stream()
+            .map(TurboLabel::getActualName)
+            .collect(Collectors.toSet());
+    }
 }
