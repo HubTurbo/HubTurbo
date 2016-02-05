@@ -29,11 +29,10 @@ import org.apache.logging.log4j.Logger;
 
 import ui.UI;
 import util.HTLog;
+import util.Utility;
 
 /**
- * Serves as a presenter that synchronizes changes in labels with dialog view
- *
- * @author jinified
+ * Serves as a presenter that synchronizes changes in labels with dialog view  
  */
 public class LabelPickerDialog extends Dialog<List<String>> implements Initializable {
 
@@ -44,8 +43,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
-    private final List<String> initialLabels;
-    private final Set<String> repoLabelsSet;
     private final TurboIssue issue;
 
     private List<String> finalAssignedLabels;
@@ -64,9 +61,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
-        repoLabelsSet = getRepoLabelsSet();
-        initialLabels = issue.getLabels();
-        finalAssignedLabels = new ArrayList<>(initialLabels);
+        finalAssignedLabels = new ArrayList<>(issue.getLabels());
         uiLogic = new LabelPickerUILogic();
 
         initUI(stage, issue);
@@ -120,7 +115,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     // Population of UI elements
 
     /**
-     * Updates ui elements based on current state
+     * Populate respective panes with labels that matches current query
+     * @param matchedLabels
+     * @param suggestion
      */
     public void populatePanes(LabelPickerState state) {
         // Population of UI elements
@@ -132,7 +129,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         assignedLabels.getChildren().clear();
         populateInitialLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getCurrentSuggestion());
         populateToBeAddedLabels(state.getAddedLabels(), state.getCurrentSuggestion());
-
         if (finalAssignedLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
@@ -352,6 +348,15 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         });
     }
 
+    // TODO passed in as callback to PickerLabel
+    void handleLabelClick(PickerLabel label) {
+        if (!queryField.isDisabled()) {
+            queryField.setDisable(true);
+        }
+        finalAssignedLabels = updateFinalAssignedLabels(label);
+        populatePanes(new ArrayList<>(), Optional.empty());
+    }
+
     private void positionDialog(Stage stage) {
         if (getDialogHeight().isPresent()) {
             setX(stage.getX() + stage.getScene().getX());
@@ -381,7 +386,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private Optional<Double> getDialogHeight() {
         return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
     }
-
 
     private Set<String> getRepoLabelsSet() {
         return repoLabels.stream()
