@@ -17,16 +17,34 @@ You may not need these at the beginning, but be prepared to learn them along the
 
 ## Roles
 
-- **Devs**: fix issues assigned to them, can be core team members or contributors
-- **Reviewers**: assigned to pull requests, usually core team members
-- **Team Lead**: subsumes above roles, releases new versions
-- **Project Manager**: general project coordination
+- **Developers**: fix issues assigned to them; can be contributors, committers, or senior developers
+- **Reviewers**: assigned to pull requests; usually senior developers
+- **Team Lead**: subsumes above roles, releases new versions, ensures that milestone plan is ready at the beginning of each milestone
+- **Project Manager**: project coordination, approves pull requests
 
 ## Branches
 
 * `master` contains the latest stable code (including unreleased features/fixes)
 * `rc` contains the release candidate: the latest version which has not been released to the public
 * `release` contains the latest version released to the public
+
+## Issue Lifecycle
+
+- An issue is created. It is accepted by being given a priority.
+- The issue is taken up by a developer.
+    - Senior developers should take only `priority.high` issues as far as possible.
+- A corresponding PR is created.
+- The issue is closed when the PR is merged.
+
+## PR Lifecycle
+
+- A PR corresponding to an issue is created and labelled as `ongoing`.
+- It is labelled as `toReview` when the developer finishes their work.
+- The reviewer labels it as `toMerge` when satisfied, or `ongoing` if further changes have to be made.
+- The PM labels it as `mergeApproved` when satisfied, or `ongoing` if further changes have to be made.
+- The PR is merged.
+
+A PR should be merged within one release cycle, two at the most. The onus is on the developer to remind the reviewer to keep things moving. PRs still open after two weeks may be closed without merging.
 
 ## Submitting a Pull Request
 
@@ -50,19 +68,22 @@ You may not need these at the beginning, but be prepared to learn them along the
     - You don't have to wait until your changes are ready to do this. Feel free to use the PR to discuss any difficulties you run into, or clarify requirements.
 1. After creating the PR, you can check its status on the CI service [here](https://travis-ci.org/HubTurbo/HubTurbo/pull_requests). Ensure that all tests and checks pass.
     - If your PR includes additional functional code and this causes coverage to drop, either update an existing test to cover the added/fixed functionality or add a new test.
-1. When ready, get someone on the dev team to review it by commenting on the PR.
-1. The reviewer will merge it when he/she is satisfied.
+    - To restart the build, you can open and close the PR, or push new commits (squashing them later if they were only for the purpose of restarting)
+1. When ready, get a core team member to review it by commenting on the PR. Try to do this at least a few days before the weekly milestone, as the process takes time.
+1. Evaluate the reviewer's suggestions and make changes accordingly.
+1. The reviewer and PM will approve the PR before merging it.
 
 If you need any clarification on the development process, you may also post in the [mailing list](https://groups.google.com/forum/#!forum/hubturbo-contributors).
 
 ### Developers
 
-Similar to above, except for following differences:
+Similar to the contributor process, except for following differences:
 
 1. You'll push to the main repo.
-2. You can also create new issues, label issues, and review code from others.
-3. When creating a PR, label it as `ongoing` and choose another core developer as the reviewer. Try to pick someone who is likely to know the code touched by the PR well.
-4. When your PR is marked as `toMerge` by the reviewer, merge the PR yourself (see the section on merging below).
+1. You can also create new issues, label issues, and review code from others.
+1. When creating a PR, label it as `ongoing` and choose another core developer as the reviewer. Try to pick someone who is likely to know the code touched by the PR well.
+1. When your PR is labelled as `toMerge` by the reviewer, its state will be verified by the PM.
+1. When your PR is labelled as `mergeApproved`, merge the PR yourself (see the section on merging below).
 
 ## Reviewing a Pull Request
 
@@ -88,23 +109,25 @@ An exhaustive list of things to look out for really cannot be given here, but th
 - Self-explanatory method signatures
 - Appropriate abstractions used, intent expressed clearly
 - Overall SLAP, with methods in the right places
+- Proper javadoc comments on public classes, public methods, and nontrivial private methods
 - Method names and comments not outdated as a result of changes
-- `Optional` values checked before use
 - Static imports used effectively
+- `Optional` values checked before use
 - Thread-safe
 - Meaningful test cases
 - Proper synchronisation in GUI tests (no `Thread.sleep` or `PlatformEx.waitOnFxThread` without good reason)
 
-When you are satisfied with the quality of the changes in the PR, change the label to `toMerge`.
+When you are satisfied with the quality of the changes in the PR, change the label to `toMerge`. At this point it will await approval.
 
-If the PR was from a contributor, you can merge it at this point.
+If the PR was from a contributor, merge it only after it is approved.
 
 ## Merging a Pull Request
 
-- Wait for the green light (the `toMerge` label) before merging.
+- Wait for the green light (the `mergeApproved` label) before merging.
 - Merging should be done locally, not using GitHub.
-- Format for the merge commit: `[issue number] issue title` e.g. `[324] Add keyboard shortcut for creating an issue`
-- Perform a non-fast-forward merge. `git merge --no-ff -m "merge commit message" your-branch-name` is one way to accomplish this.
+    - Format for the merge commit: `[issue number] issue title` e.g. `[324] Add keyboard shortcut for creating an issue`
+- Perform a non-fast-forward merge.
+    - `git merge --no-ff -m "merge commit message" your-branch-name` is one way to accomplish this.
 - Ensure all tests, including unstable ones, pass before you push the merge commit to `master`.
 
 ## Releasing a New Version
@@ -113,6 +136,9 @@ If the PR was from a contributor, you can merge it at this point.
 
 - Put completed issues under current milestone
 - Remove milestones for issues which weren't finished
+- Determine if open PRs can be merged by the next milestone
+    - Comment on open PRs requesting to merge by the next milestone
+    - Close PRs that have not been making progress despite reminders
 - Close current milestone
 - Open next milestone
 
