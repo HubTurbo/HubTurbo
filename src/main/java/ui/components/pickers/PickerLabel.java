@@ -15,7 +15,8 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
-    private LabelPickerDialog presenter;
+    private final LabelPickerDialog presenter;
+
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
@@ -87,8 +88,8 @@ public class PickerLabel extends TurboLabel {
     }
 
     /**
-     * Set visual style of a label based on query 
-     * @param assignedLabels    labels that will associated with an issue
+     * Set visual style of a top label based on query 
+     * @param assignedLabels    labels that will be associated with an issue
      * @param suggestion        suggested label that matches user query 
      * @return
      */
@@ -104,11 +105,23 @@ public class PickerLabel extends TurboLabel {
            return getNode();
         }
         
-        if (assignedLabels.contains(getActualName())) setIsSelected(true);
+        if (isSuggested(suggestion) && assignedLabels.contains(getActualName())) {
+           setIsRemoved(true); 
+           setIsFaded(true);
+           return getNode();
+        }
+
+        // if (assignedLabels.contains(getActualName())) setIsSelected(true);
 
         return getNode();
     }
 
+    /**
+     * Set visual style of a bottom label based on query 
+     * @param assignedLabels    labels that will be associated with an issue
+     * @param suggestion        suggested label that matches user query 
+     * @return
+     */
     public Node processChoiceLabel(List<String> assignedLabels, List<String> matchedLabels,
                                    Optional<String> suggestion) {
         String labelName = getActualName();
