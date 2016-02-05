@@ -27,7 +27,6 @@ public class MilestonePickerDialog extends Dialog<Integer> {
 
 
         getDialogPane().setOnKeyPressed((event) -> {
-            System.out.println("Key pressed!");
             if (event.getCode() == KeyCode.DOWN) {
                 highlightNextMilestone(this.milestones);
             }
@@ -86,7 +85,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
                 .findAny()
                 .isPresent()) {
             this.milestones.stream()
-                    .filter(milestone -> milestone.isHighlighted())
+                    .filter(milestone -> milestone.isSelected())
                     .findAny()
                     .get()
                     .setHighlighted(true);
