@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import ui.UI;
 import util.HTLog;
+import util.Utility;
 
 /**
  * Serves as a presenter that synchronizes changes in labels with dialog view  
@@ -74,11 +75,11 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         Platform.runLater(queryField::requestFocus);
     }
 
-    void handleLabelClick(String labelName) {
+    void handleLabelClick(PickerLabel label) {
         if (!queryField.isDisabled()) {
             queryField.setDisable(true);
         }
-        finalAssignedLabels = updateFinalAssignedLabels(labelName);
+        finalAssignedLabels = updateFinalAssignedLabels(label);
         populatePanes(new ArrayList<>(), Optional.empty());
     }
 
@@ -285,6 +286,23 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         } 
     }
 
+    // TODO refactor if else 
+    private List<String> updateFinalAssignedLabels(PickerLabel selectedLabel) {
+        List<String> finalLabels = finalAssignedLabels;
+        String labelName = selectedLabel.getActualName();
+
+        if (!finalLabels.contains(labelName)) {
+            if (selectedLabel.isExclusive()) {
+                finalLabels.removeIf(label -> label.contains(selectedLabel.getGroup().get()));
+            }
+
+            finalLabels.add(labelName);
+        } else {
+            finalLabels.remove(labelName);
+        }
+        return finalLabels;
+    }
+
     private Optional<Double> getDialogHeight() {
         return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
     }
@@ -302,17 +320,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         return addedLabels;
     }
 
-
-    private List<String> updateFinalAssignedLabels(String name) {
-        List<String> finalLabels = finalAssignedLabels;
-        
-        if (!finalLabels.contains(name)) {
-            finalLabels.add(name);
-        } else {
-            finalLabels.remove(name);
-        }
-        return finalLabels;
-    }
 
     private Set<String> getRepoLabelsSet() {
         return repoLabels.stream()
