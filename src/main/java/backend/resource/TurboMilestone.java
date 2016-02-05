@@ -5,7 +5,9 @@ import org.eclipse.egit.github.core.Milestone;
 import util.Utility;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class TurboMilestone {
@@ -81,6 +83,33 @@ public class TurboMilestone {
     }
 
     private void ______METHODS______() {
+    }
+
+    public boolean isOverdue() {
+        return dueDate.isPresent() && dueDate.get().isBefore(LocalDate.now());
+    }
+
+    public boolean hasOpenIssues() {
+        return openIssues > 0;
+    }
+
+    /**
+     * A milestone is ongoing if it is not due yet or it is overdue but still has open issues.
+     */
+    public boolean isOngoing() {
+        return !isOverdue() || hasOpenIssues();
+    }
+
+    public static List<TurboMilestone> getMilestonesOfRepos(List<TurboMilestone> milestoneList, List<String> repoIds) {
+        return milestoneList.stream()
+                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<TurboMilestone> getOpenMilestones(List<TurboMilestone> milestoneList) {
+        return milestoneList.stream()
+                .filter(TurboMilestone::isOpen)
+                .collect(Collectors.toList());
     }
 
     @Override
