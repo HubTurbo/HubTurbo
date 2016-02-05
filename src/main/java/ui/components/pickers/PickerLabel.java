@@ -54,7 +54,7 @@ public class PickerLabel extends TurboLabel {
         }
 
         label.setOnMouseClicked(e -> {
-            presenter.handleLabelClick(getActualName());
+            presenter.handleLabelClick(this);
         });    
         return label;
     }
