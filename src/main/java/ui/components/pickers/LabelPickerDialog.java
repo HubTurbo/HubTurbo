@@ -3,14 +3,11 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -19,7 +16,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,17 +23,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import ui.UI;
+import org.apache.logging.log4j.Logger;
 
+import ui.UI;
+import util.HTLog;
+
+/**
+ * Serves as a presenter that synchronizes changes in labels with dialog view  
+ * @author jinified
+ *
+ */
 public class LabelPickerDialog extends Dialog<List<String>> implements Initializable {
 
     private static final int ELEMENT_MAX_WIDTH = 400;
     private static final Insets GROUPLESS_PAD = new Insets(5, 0, 0, 0);
     private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
+    private static final Logger logger = HTLog.get(LabelPickerDialog.class);
 
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
@@ -103,14 +106,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private void setDialogPaneContent(TurboIssue issue) {
-        try {
-            createMainLayout();
-            setTitleLabel(issue);
-            getDialogPane().setContent(mainLayout);
-        } catch (IOException e) {
-            // TODO use a HTLogger instead when failed to load fxml
-            e.printStackTrace();
-        }
+        createMainLayout();
+        setTitleLabel(issue);
+        getDialogPane().setContent(mainLayout);
     }
 
     // Population of UI elements
@@ -200,10 +198,15 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
     }
 
-    private void createMainLayout() throws IOException {
+    private void createMainLayout() {
         FXMLLoader loader = new FXMLLoader(UI.class.getResource("fxml/LabelPickerView.fxml"));
         loader.setController(this);
-        mainLayout = (VBox) loader.load();
+        try {
+            mainLayout = (VBox) loader.load();
+        } catch (IOException e) {
+            logger.error("Failure to load FXML. " + e.getMessage());
+            close();
+        }
     }
 
     private void createButtons() {
@@ -274,12 +277,16 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private void positionDialog(Stage stage) {
-        if (!Double.isNaN(getHeight())) {
+        if (getDialogHeight().isPresent()) {
             setX(stage.getX() + stage.getScene().getX());
             setY(stage.getY() +
                  stage.getScene().getY() +
                  (stage.getScene().getHeight() - getHeight()) / 2);
-        }
+        } 
+    }
+
+    private Optional<Double> getDialogHeight() {
+        return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
     }
 
     private List<String> getAddedLabels(List<String> initialLabels, List<String> finalLabels,
@@ -288,8 +295,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
             .filter(label -> !initialLabels.contains(label))
             .collect(Collectors.toList());
 
-        if (suggestion.isPresent() 
-            && !initialLabels.contains(suggestion.get()) 
+        if (suggestion.isPresent() && !initialLabels.contains(suggestion.get()) 
             && !addedLabels.contains(suggestion.get())) {
             addedLabels.add(suggestion.get());
         }
