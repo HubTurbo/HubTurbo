@@ -33,11 +33,10 @@ public final class BoardNameDialog extends Dialog<String> {
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
     private static final int BOARD_MAX_NAME_LENGTH = 100;
-    private static final String ERROR_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
     private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
     private static final String ERROR_INVALID_NAME = "Error: invalid name.";
-
+    private static final String WARNING_DUPLICATE_NAME = "Warning: duplicate name. Overwrite?";
     private static final String WARNING_MESSAGE_DUPLICATE_NAME = "Overwrite?";
     private static final String WARNING_HEADER_DUPLICATE_NAME = "A board by the name '%s' already exists.";
 
@@ -128,7 +127,7 @@ public final class BoardNameDialog extends Dialog<String> {
                 errorText.setText(ERROR_EMPTY_NAME);
                 submitButton.setDisable(true);
             } else if (isBoardNameDuplicate(newName)) {
-                errorText.setText(ERROR_DUPLICATE_NAME);
+                errorText.setText(WARNING_DUPLICATE_NAME);
                 submitButton.setDisable(false);
             } else {
                 errorText.setText("");

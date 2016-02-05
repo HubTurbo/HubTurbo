@@ -53,6 +53,7 @@ public class BoardTests extends UITest {
         // don't save and try to reopen board
         // Expected: Board is not overwritten, should contain 2 panels
         clickMenu("Panels", "Create");
+        assertEquals(3, panelControl.getPanelCount());
         clickMenu("Boards", "Save as");
         type("board 1");
         click("OK");
