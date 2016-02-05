@@ -3,8 +3,10 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -15,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,14 +33,15 @@ import java.util.stream.Collectors;
 
 import ui.UI;
 
-public class LabelPickerDialog extends Dialog<List<String>> {
+public class LabelPickerDialog extends Dialog<List<String>> implements Initializable {
 
     private static final int ELEMENT_MAX_WIDTH = 400;
-    private static final Insets GROUPLESS_PAD = new Insets(5,0,0,0);
-    private static final Insets GROUP_PAD = new Insets(0,0,10,10);
+    private static final Insets GROUPLESS_PAD = new Insets(5, 0, 0, 0);
+    private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
 
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
+    private final List<String> initialLabels;
     private final Set<String> repoLabelsSet;
     private final TurboIssue issue;
 
@@ -57,7 +62,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         this.repoLabels = repoLabels;
         this.issue = issue;
         repoLabelsSet = getRepoLabelsSet();
-        finalAssignedLabels = new ArrayList<>(getInitialLabels());
+        initialLabels = issue.getLabels();
+        finalAssignedLabels = new ArrayList<>(initialLabels);
         uiLogic = new LabelPickerUILogic();
 
         initUI(stage, issue);
@@ -74,6 +80,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     // Initilisation of UI
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        registerQueryHandler();
+    }
 
     private void initUI(Stage stage, TurboIssue issue) {
         initialiseDialog(stage, issue);
@@ -116,7 +127,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void populateAssignedLabels(List<String> finalLabels, Optional<String> suggestion) {
         assignedLabels.getChildren().clear();
-        List<String> initialLabels = getInitialLabels();
         populateInitialLabels(initialLabels, finalLabels, suggestion);
         populateAddedLabels(getAddedLabels(initialLabels, finalLabels, suggestion), 
                             finalLabels, suggestion);
@@ -169,7 +179,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             .map(label -> new PickerLabel(this, label, false))
             .forEach(label -> {
                 String group = label.getGroupName().get();
-                if (!groupContent.containsKey((group))) {
+                if (!groupContent.containsKey(group)) {
                     groupContent.put(group, createGroupPane(GROUP_PAD));
                 } 
                 groupContent.get(group).getChildren()
@@ -248,14 +258,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     // Event handling 
 
     private void setupEvents(Stage stage) {
-        setupKeyEvents();
-
         showingProperty().addListener(e -> {
             positionDialog(stage);
         });
     }
 
-    private void setupKeyEvents() {
+    private void registerQueryHandler() {
         queryField.textProperty().addListener((observable, oldValue, newValue) -> {
             LabelPickerState state = uiLogic.determineState(
                 new LabelPickerState(new HashSet<String>(issue.getLabels())), 
@@ -272,10 +280,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                  stage.getScene().getY() +
                  (stage.getScene().getHeight() - getHeight()) / 2);
         }
-    }
-
-    public List<String> getInitialLabels() {
-        return issue.getLabels();
     }
 
     private List<String> getAddedLabels(List<String> initialLabels, List<String> finalLabels,
@@ -309,4 +313,5 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             .map(TurboLabel::getActualName)
             .collect(Collectors.toSet());
     }
+
 }
