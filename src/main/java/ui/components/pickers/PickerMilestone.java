@@ -3,7 +3,6 @@ package ui.components.pickers;
 import backend.resource.TurboMilestone;
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 
