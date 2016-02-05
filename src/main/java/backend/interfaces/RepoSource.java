@@ -4,7 +4,9 @@ import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.egit.github.core.Issue;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,8 @@ public abstract class RepoSource implements TaskRunner {
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
 
     public abstract CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels);
+
+    public abstract CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone);
 
     public abstract CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime();
 
