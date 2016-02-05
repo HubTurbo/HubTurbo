@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import org.controlsfx.control.spreadsheet.Picker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MilestonePickerDialog extends Dialog<Integer> {
@@ -93,20 +94,30 @@ public class MilestonePickerDialog extends Dialog<Integer> {
     }
 
     private void highlightNextMilestone(List<PickerMilestone> milestones) {
-        PickerMilestone curMilestone = getHighlightedMilestone(milestones);
-        int curMilestoneIndex = milestones.indexOf(curMilestone);
-        if (curMilestoneIndex < milestones.size() - 1) {
-            PickerMilestone nextMilestone = milestones.get(curMilestoneIndex + 1);
+        if (!milestones.isEmpty()) {
+            PickerMilestone curMilestone = getHighlightedMilestone(milestones);
+            int curMilestoneIndex = milestones.indexOf(curMilestone);
+            PickerMilestone nextMilestone;
+            if (curMilestoneIndex < milestones.size() - 1) {
+                nextMilestone = milestones.get(curMilestoneIndex + 1);
+            } else {
+                nextMilestone = milestones.get(0);
+            }
             nextMilestone.setHighlighted(true);
             curMilestone.setHighlighted(false);
         }
     }
 
     private void highlightPreviousMilestone(List<PickerMilestone> milestones) {
-        PickerMilestone curMilestone = getHighlightedMilestone(milestones);
-        int curMilestoneIndex = milestones.indexOf(curMilestone);
-        if (curMilestoneIndex > 0) {
-            PickerMilestone nextMilestone = milestones.get(curMilestoneIndex - 1);
+        if (!milestones.isEmpty()) {
+            PickerMilestone curMilestone = getHighlightedMilestone(milestones);
+            int curMilestoneIndex = milestones.indexOf(curMilestone);
+            PickerMilestone nextMilestone;
+            if (curMilestoneIndex > 0) {
+                nextMilestone = milestones.get(curMilestoneIndex - 1);
+            } else {
+                nextMilestone = milestones.get(milestones.size() - 1);
+            }
             nextMilestone.setHighlighted(true);
             curMilestone.setHighlighted(false);
         }
@@ -117,6 +128,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
             this.milestones.add(new PickerMilestone(milestones.get(i), this));
         }
 
+        Collections.sort(this.milestones);
         selectAssignedMilestone(issue);
 
         if (hasSelectedMilestone()) {
@@ -218,6 +230,7 @@ public class MilestonePickerDialog extends Dialog<Integer> {
         FlowPane milestoneGroup = new FlowPane();
         milestoneGroup.setPadding(new Insets(3));
         milestoneGroup.setHgap(3);
+        milestoneGroup.setVgap(3);
         milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
         return milestoneGroup;
     }
