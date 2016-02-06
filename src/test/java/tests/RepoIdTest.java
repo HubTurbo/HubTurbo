@@ -1,41 +1,39 @@
 package tests;
 
-import backend.RepoID;
+import backend.RepoId;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class RepoIDTest {
+public class RepoIdTest {
 
     private static final String REPO1 = "Owner1/Repo1";
     private static final String REPO2 = "Owner2/Repo2";
 
-    private static RepoID repoId, repoIdAllCaps, repoIdMixed, repoIdDiff;
+    private static RepoId repoId, repoIdAllCaps, repoIdMixed, repoIdDiff;
 
     @BeforeClass
     public static void initialize() {
-        repoId = new RepoID(REPO1.toLowerCase());
-        repoIdAllCaps = new RepoID(REPO1.toUpperCase());
-        repoIdMixed = new RepoID(REPO1);
-        repoIdDiff = new RepoID(REPO2);
+        repoId = new RepoId(REPO1.toLowerCase());
+        repoIdAllCaps = new RepoId(REPO1.toUpperCase());
+        repoIdMixed = new RepoId(REPO1);
+        repoIdDiff = new RepoId(REPO2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createInstance() {
         // Test invalid repoID
-        new RepoID("invalidTest");
+        new RepoId("invalidTest");
     }
 
     @Test
     public void isWellFormed() {
         // Test not well formed
-        assertFalse(RepoID.isWellFormedRepoId("", ""));
-        assertFalse(RepoID.isWellFormedRepoId(""));
+        assertFalse(RepoId.isWellFormedRepoIdString(""));
 
         // Test well formed
-        assertTrue(RepoID.isWellFormedRepoId("hurturbo", "hubturbo"));
-        assertTrue(RepoID.isWellFormedRepoId("hubturbo/hubturbo"));
+        assertTrue(RepoId.isWellFormedRepoIdString("hubturbo/hubturbo"));
     }
 
     @Test
