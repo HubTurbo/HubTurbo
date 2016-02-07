@@ -15,9 +15,13 @@ public enum QualifierType {
     INVOLVES, IS, LABEL, LABELS, MILESTONE, MILESTONES, NO,
     REPO, SORT, STATE, TITLE, TYPE, UPDATED;
 
-    private static final Map<String, QualifierType> ALIASES = initialiseAliases();
+    private static final Map<String, QualifierType> ALIASES = initialiseQualifierAliases();
 
-    private static Map<String, QualifierType> initialiseAliases() {
+    /**
+     * Consists of aliases for all supported qualifiers. Applicable only when 
+     * parsing Qualifier left hand side of ":"
+     */
+    private static Map<String, QualifierType> initialiseQualifierAliases() {
         Map<String, QualifierType> aliases = new HashMap<>();
         aliases.put("as", ASSIGNEE);
         aliases.put("au", AUTHOR);
@@ -58,8 +62,8 @@ public enum QualifierType {
                 .collect(Collectors.toSet());
         defaultCompletions.removeAll(Arrays.asList("false", "empty", "keyword"));
 
-        defaultCompletions.addAll(ALIASES.keySet());
-        defaultCompletions.removeAll(Arrays.asList("m", "as", "au", "s"));
+        // Add only longer aliases
+        defaultCompletions.addAll(Arrays.asList("body", "desc", "status", "user", "creator"));
 
         defaultCompletions.addAll(Arrays.asList("closed", "open", "issue", "pr",
             "pullrequest", "read", "unread",  "merged", "unmerged", "comments",
@@ -82,7 +86,7 @@ public enum QualifierType {
         try {
             return Optional.of(QualifierType.valueOf(toBeParsed.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            return resolveAlias(toBeParsed);
+            return resolveQualifierAlias(toBeParsed);
         }
     }
 
@@ -97,7 +101,7 @@ public enum QualifierType {
         }
     }
 
-    private static Optional<QualifierType> resolveAlias(String input) {
+    private static Optional<QualifierType> resolveQualifierAlias(String input) {
         return Optional.ofNullable(ALIASES.get(input));
     }
 
