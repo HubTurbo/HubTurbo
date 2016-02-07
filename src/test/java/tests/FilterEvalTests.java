@@ -112,6 +112,7 @@ public class FilterEvalTests {
 
         issue = new TurboIssue(REPO, 1, "this is a test");
         testForPresenceOfKeywords("in:title ", issue);
+        testForPresenceOfKeywords("in:t ", issue);
     }
 
     @Test
@@ -143,6 +144,7 @@ public class FilterEvalTests {
         IModel model = TestUtils.modelWith(issue, milestone);
 
         testMilestoneParsing("milestone", issue, model);
+        testMilestoneParsing("m", issue, model);
 
         // milestone aliases
         // - sorting of milestone is by due date
@@ -435,6 +437,7 @@ public class FilterEvalTests {
 
         assertTrue(Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:bob"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("as:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:alice"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:o"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:lic"), issue));
@@ -464,6 +467,7 @@ public class FilterEvalTests {
         IModel model = TestUtils.modelWith(issue, user);
 
         assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("user:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:alice"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
@@ -484,7 +488,10 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
         assertFalse(matches("state:open", issue));
+        assertFalse(matches("st:open", issue));
+        assertFalse(matches("state:o", issue));
         assertTrue(matches("state:closed", issue));
+        assertTrue(matches("state:c", issue));
     }
 
     @Test
@@ -502,10 +509,15 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
 
         assertFalse(matches("has:label", issue));
+        assertFalse(matches("h:label", issue));
+        assertFalse(matches("has:labels", issue));
+        assertFalse(matches("has:l", issue));
         assertFalse(matches("has:milestone", issue));
+        assertFalse(matches("has:milestones", issue));
         assertFalse(matches("has:m", issue));
         assertFalse(matches("has:assignee", issue));
         assertFalse(matches("has:as", issue));
+        assertFalse(matches("has:something", issue));
 
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
@@ -593,7 +605,11 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
         assertFalse(matches("type:issue", issue));
+        assertFalse(matches("ty:issue", issue));
+        assertFalse(matches("type:i", issue));
         assertTrue(matches("type:pr", issue));
+        assertTrue(matches("type:p", issue));
+        assertFalse(matches("type:sldkj", issue));
 
         issue = new TurboIssue(REPO, 1, "", "", null, false);
 
@@ -613,12 +629,18 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
         assertFalse(matches("is:issue", issue));
+        assertFalse(matches("is:i", issue));
         assertTrue(matches("is:pr", issue));
+        assertTrue(matches("is:p", issue));
 
         assertTrue(matches("is:open", issue));
+        assertTrue(matches("is:o", issue));
         assertTrue(matches("is:unmerged", issue));
+        assertTrue(matches("is:um", issue));
         assertFalse(matches("is:closed", issue));
+        assertFalse(matches("is:c", issue));
         assertFalse(matches("is:merged", issue));
+        assertFalse(matches("is:mg", issue));
 
         issue.setOpen(false);
 
@@ -653,7 +675,9 @@ public class FilterEvalTests {
         assertFalse(issue.isCurrentlyRead());
 
         assertTrue(matches("is:unread", issue));
+        assertTrue(matches("is:ur", issue));
         assertFalse(matches("is:read", issue));
+        assertFalse(matches("is:rd", issue));
 
         issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
         issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
@@ -679,9 +703,11 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", LocalDateTime.of(2014, 12, 2, 12, 0), false);
 
         assertFalse(matches("created:<2014-12-1", issue));
+        assertFalse(matches("cr:<2014-12-1", issue));
         assertFalse(matches("created:<=2014-12-1", issue));
         assertTrue(matches("created:>2014-12-1", issue));
         assertTrue(matches("created:2014-12-2", issue));
+        assertFalse(matches("created:nondate", issue));
     }
 
     @Test
@@ -698,6 +724,7 @@ public class FilterEvalTests {
         issue.setUpdatedAt(now.minusDays(2));
 
         assertFalse(matches("updated:<24", issue));
+        assertFalse(matches("u:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
         assertTrue(matches("updated:>24", issue));
@@ -721,6 +748,7 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
 
         assertTrue(matches("repo:" + REPO, issue));
+        assertTrue(matches("r:" + REPO, issue));
         assertFalse(matches("repo:something/else", issue));
     }
 

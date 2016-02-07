@@ -324,6 +324,13 @@ public class QualifierTests {
         assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
+
+        Collections.sort(renderedIssues,
+            Qualifier.getSortComparator(model, "r", false, false));
+
+        assertEquals(Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), renderedIssues.stream()
+            .map(TurboIssue::getId)
+            .collect(Collectors.toList()));
     }
 
     @Test
@@ -352,6 +359,13 @@ public class QualifierTests {
             Qualifier.getSortComparator(model, "updated", true, false));
 
         assertEquals(Arrays.asList(4, 3, 2, 1, 0), renderedIssues.stream()
+            .map(TurboIssue::getId)
+            .collect(Collectors.toList()));
+
+        Collections.sort(renderedIssues,
+            Qualifier.getSortComparator(model, "u", false, false));
+
+        assertEquals(Arrays.asList(0, 1, 2, 3, 4), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
     }
@@ -410,6 +424,13 @@ public class QualifierTests {
             Qualifier.getSortComparator(model, "comments", true, false));
 
         assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
+            .map(TurboIssue::getId)
+            .collect(Collectors.toList()));
+
+        Collections.sort(renderedIssues,
+            Qualifier.getSortComparator(model, "cm", false, false));
+
+        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
     }
@@ -501,6 +522,13 @@ public class QualifierTests {
                 Qualifier.getSortComparator(model, "status", true, false));
         
         assertEquals(Arrays.asList(4, 5, 6, 7, 0, 1, 2, 3), renderedIssues.stream()
+                .map(TurboIssue::getId)
+                .collect(Collectors.toList()));
+
+        Collections.sort(renderedIssues,
+                Qualifier.getSortComparator(model, "st", false, false));
+        
+        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
                 .map(TurboIssue::getId)
                 .collect(Collectors.toList()));
     }
