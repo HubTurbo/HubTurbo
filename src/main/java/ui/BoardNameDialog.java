@@ -32,6 +32,7 @@ public final class BoardNameDialog extends Dialog<String> {
 
     private String previousText = "";
     private static final String DEFAULT_NAME = "New Board";
+    private static final String BOARD_DIALOG_NAME = "Save board as ...";
     private static final int BOARD_MAX_NAME_LENGTH = 100;
     private static final String ERROR_EMPTY_NAME = "Error: empty name.";
     private static final String ERROR_LONG_NAME = "Error: board name cannot exceed %d letters.";
@@ -58,7 +59,7 @@ public final class BoardNameDialog extends Dialog<String> {
     private void initializeDialog(Stage mainStage) {
         initOwner(mainStage);
         initModality(Modality.APPLICATION_MODAL);
-        setTitle("Save board as");
+        setTitle(BOARD_DIALOG_NAME);
     }
 
     private void createButtons() {
@@ -91,7 +92,7 @@ public final class BoardNameDialog extends Dialog<String> {
         GridPane grid = new GridPane();
         setupGridPane(grid);
 
-        setTitle("Save board as ...");
+        setTitle(BOARD_DIALOG_NAME);
 
         HBox nameArea = new HBox();
 
