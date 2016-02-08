@@ -164,15 +164,15 @@ public class Qualifier implements FilterExpression {
      * i.e. 0 for "current" milestone, -1 for "current-1" milestone, etc.
      */
     private static Map<Integer, TurboMilestone> getMilestoneAliasIndex(List<TurboMilestone> milestones) {
-        Collections.sort(milestones, getMilestoneDueDateComparator());
-        Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(milestones);
+        List<TurboMilestone> sortedMilestones = TurboMilestone.getSortedMilestonesByDueDate(milestones);
+        Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(sortedMilestones);
 
         return IntStream
-                .range(0, milestones.size())
+                .range(0, sortedMilestones.size())
                 .boxed()
                 .collect(Collectors.toMap(
                         i -> i - currentMilestoneIndex.get(),
-                        i -> milestones.get(i)));
+                        i -> sortedMilestones.get(i)));
     }
 
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> milestones) {
@@ -180,7 +180,7 @@ public class Qualifier implements FilterExpression {
             return Optional.empty();
         }
 
-        long openMilestonesCount = milestones.stream().filter(ms -> ms.isOpen()).count();
+        long openMilestonesCount = milestones.stream().filter(TurboMilestone::isOpen).count();
         if (openMilestonesCount == 1) {
             return IntStream
                     .range(0, milestones.size())
@@ -188,7 +188,7 @@ public class Qualifier implements FilterExpression {
                     .filter(i -> milestones.get(i).isOpen())
                     .findFirst();
         } else {
-            // Look for the first milestone in the (sorted) list which is both open and ongoing.
+            // Look for the first milestone in the (sorted) list that is both open and ongoing.
             int currentIndex = 0;
             for (TurboMilestone checker : milestones) {
                 if (checker.isOpen() && checker.isOngoing()) {
@@ -575,7 +575,7 @@ public class Qualifier implements FilterExpression {
                         } else if (!bDueDate.isPresent()) {
                             return -1;
                         } else {
-                            return -(getMilestoneDueDateComparator()
+                            return -(TurboMilestone.getDueDateComparator()
                                     .compare(aMilestone.get(), bMilestone.get()));
                         }
                     }
@@ -1041,7 +1041,11 @@ public class Qualifier implements FilterExpression {
 
         int offset = 0;
         if (aliasMatcher.group(2) != null && aliasMatcher.group(3) != null) {
-            offset = Integer.parseInt(aliasMatcher.group(3));
+            if (aliasMatcher.group(2).equals("+")) {
+                offset = Integer.parseInt(aliasMatcher.group(3));
+            } else {
+                offset = -Integer.parseInt(aliasMatcher.group(3));
+            }
         }
 
         // if out of milestone range, don't convert alias
@@ -1052,20 +1056,6 @@ public class Qualifier implements FilterExpression {
         contents = milestoneAliasIndex.get(offset).getTitle().toLowerCase();
 
         return new Qualifier(type, contents);
-    }
-
-    /**
-     * Condition: milestone must have due dates
-     */
-    public static Comparator<TurboMilestone> getMilestoneDueDateComparator() {
-        return (a, b) -> {
-            assert a.getDueDate().isPresent();
-            assert b.getDueDate().isPresent();
-            LocalDate aDueDate = a.getDueDate().get();
-            LocalDate bDueDate = b.getDueDate().get();
-
-            return aDueDate.compareTo(bDueDate);
-        };
     }
 
     /**
