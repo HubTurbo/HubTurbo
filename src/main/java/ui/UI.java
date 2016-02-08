@@ -143,6 +143,16 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
+    private void startupBoardInitiator(boolean shouldCreateSampleBoard){
+        if(shouldCreateSampleBoard){
+            BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
+            if(prefs.getAllBoardNames().contains(boardCreator.SAMPLE_BOARD)){
+                prefs.removeBoard(boardCreator.SAMPLE_BOARD);
+            }
+            boardCreator.createSampleBoard(true);
+        }
+    }
+
     private void disableUI(boolean disable) {
         mainStage.setResizable(!disable);
         menuBar.setDisable(disable);
@@ -150,6 +160,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
+        boolean shouldCreateSampleBoardAfterWindowInit = logic.getStoredRepos().size() == 0;
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
@@ -174,6 +185,9 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
+        if (!TestController.isTestMode()){
+            startupBoardInitiator(shouldCreateSampleBoardAfterWindowInit);
+        }
     }
 
     private void initialisePickers() {

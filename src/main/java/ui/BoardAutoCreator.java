@@ -66,7 +66,7 @@ public class BoardAutoCreator {
     public Menu generateBoardAutoCreateMenu() {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
-        sample.setOnAction(e -> createSampleBoard());
+        sample.setOnAction(e -> createSampleBoard(false));
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
@@ -133,7 +133,7 @@ public class BoardAutoCreator {
                         "It is saved under the name \"" + boardName + "\".");
     }
 
-    private void createSampleBoard() {
+    public void createSampleBoard(boolean isCalledOnStartup) {
         logger.info("Creating " + SAMPLE_BOARD);
 
         panelControl.closeAllPanels();
@@ -149,8 +149,9 @@ public class BoardAutoCreator {
         panelControl.selectPanel(0); // current
 
         triggerBoardSaveEventSequence(SAMPLE_BOARD);
-
-        DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
+        if(!isCalledOnStartup){
+            DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
+        }
     }
 
     private List<PanelInfo> generatePanelInfoFromTurboUsers(List<TurboUser> users,
