@@ -5,6 +5,7 @@ import org.eclipse.egit.github.core.Milestone;
 import util.Utility;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -100,16 +101,42 @@ public class TurboMilestone {
         return !isOverdue() || hasOpenIssues();
     }
 
-    public static List<TurboMilestone> getMilestonesOfRepos(List<TurboMilestone> milestoneList, List<String> repoIds) {
-        return milestoneList.stream()
+    public static List<TurboMilestone> getMilestonesOfRepos(List<TurboMilestone> milestones, List<String> repoIds) {
+        return milestones.stream()
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
                 .collect(Collectors.toList());
     }
 
-    public static List<TurboMilestone> getOpenMilestones(List<TurboMilestone> milestoneList) {
-        return milestoneList.stream()
+    public static List<TurboMilestone> getOpenMilestones(List<TurboMilestone> milestones) {
+        return milestones.stream()
                 .filter(TurboMilestone::isOpen)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Condition: milestone must have due dates
+     */
+    public static Comparator<TurboMilestone> getDueDateComparator() {
+        return (a, b) -> {
+            assert a.getDueDate().isPresent();
+            assert b.getDueDate().isPresent();
+            LocalDate aDueDate = a.getDueDate().get();
+            LocalDate bDueDate = b.getDueDate().get();
+            return aDueDate.compareTo(bDueDate);
+        };
+    }
+
+    public static List<TurboMilestone> getSortedMilestonesByDueDate(List<TurboMilestone> milestones) {
+        List<TurboMilestone> milestonesWithDueDate = milestones.stream()
+                .filter(ms -> ms.getDueDate().isPresent())
+                .sorted(getDueDateComparator())
+                .collect(Collectors.toList());
+        List<TurboMilestone> milestonesWithoutDueDate = milestones.stream()
+                .filter(ms -> !ms.getDueDate().isPresent())
+                .collect(Collectors.toList());
+        List<TurboMilestone> result = milestonesWithDueDate;
+        result.addAll(milestonesWithoutDueDate);
+        return result;
     }
 
     @Override
