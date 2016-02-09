@@ -3,13 +3,17 @@ package backend.stub;
 import backend.IssueMetadata;
 import backend.UserCredentials;
 import backend.github.CheckRateLimitTask;
+import backend.github.CreateIssueTask;
 import backend.github.DownloadRepoTask;
 import backend.github.ReplaceIssueLabelsTask;
 import backend.github.UpdateModelTask;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.egit.github.core.Issue;
+
 import util.Futures;
 
 import java.util.List;
@@ -61,6 +65,11 @@ public class DummySource extends RepoSource {
     @Override
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, dummy)).response;
+    }
+
+    @Override
+    public CompletableFuture<Issue> createIssue(TurboIssue issue) {
+        return addTask(new CreateIssueTask(this, dummy, issue)).response;
     }
 
 }
