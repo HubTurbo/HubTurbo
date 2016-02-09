@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <right>
+      <VBox fx:id="sidebar" prefHeight="200.0" prefWidth="150.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+         <children>
+            <Label fx:id="assigneeTitle" alignment="CENTER" text="Assignee">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="assigneeField" promptText="No assignee">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <Label fx:id="milestoneTitle" alignment="CENTER" text="Milestone">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="milestoneField" promptText="No milestone">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <Label fx:id="labelTitle" alignment="CENTER" text="Labels">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" />
+               </VBox.margin>
+            </Label>
+            <FlowPane fx:id="currentLabels" hgap="5.0" prefHeight="200.0" prefWidth="200.0" vgap="5.0">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+            </FlowPane>
+         </children>
+      </VBox>
+   </right>
+   <center>
+      <VBox fx:id="mainLayout" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+         <children>
+            <TextField fx:id="title" promptText="Title here ">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin></TextField>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <Label fx:id="prompt" text="Issue" BorderPane.alignment="CENTER_LEFT">
+         <BorderPane.margin>
+            <Insets left="10.0" top="10.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+</BorderPane>
