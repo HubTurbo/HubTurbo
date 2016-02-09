@@ -5,15 +5,18 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
+import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.GuiElement;
 import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
+import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
@@ -42,16 +45,13 @@ public class Logic {
     public Logic(UIManager uiManager, Preferences prefs) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        this.models = new MultiModel(prefs);
+        models = new MultiModel(prefs);
 
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) this::onLogicModelClear);
-
-        // Pass the currently-empty model to the UI
-        uiManager.updateEmpty(models);
     }
 
     private void onLogicModelClear(ClearLogicModelEvent e) {
@@ -121,18 +121,26 @@ public class Logic {
         return isRepositoryValid(repoId).thenCompose(valid -> {
             if (!valid) {
                 return Futures.unit(false);
-            } else {
-                logger.info("Opening " + repoId);
-                UI.status.displayMessage("Opening " + repoId);
-                return repoOpControl.openRepository(repoId)
-                        .thenApply(models::addPending)
-                        .thenRun(this::refreshUI)
-                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                        .thenCompose(n -> getRateLimitResetTime())
-                        .thenApply(this::updateRemainingRate)
-                        .thenApply(rateLimits -> true)
-                        .exceptionally(withResult(false));
             }
+
+            logger.info("Opening " + repoId);
+            UI.status.displayMessage("Opening " + repoId);
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+
+            return repoOpControl.openRepository(repoId)
+                    .thenApply(models::addPending)
+                    .thenRun(this::refreshUI)
+                    .thenRun(() ->
+                            Platform.runLater(() ->
+                                    // to trigger the event from the UI thread
+                                    UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
+                            )
+                    )
+                    .thenCompose(n -> getRateLimitResetTime())
+                    .thenApply(this::updateRemainingRate)
+                    .thenApply(rateLimits -> true)
+                    .exceptionally(withResult(false));
+
         });
     }
 
@@ -212,7 +220,7 @@ public class Logic {
      * and then sends the data to the GUI.
      */
     private void refreshUI() {
-        updateController.filterSortRefresh(getAllUIFilters());
+        updateController.processAndRefresh(getAllUIFilters());
     }
 
     /**
@@ -223,7 +231,7 @@ public class Logic {
     public void refreshPanel(FilterExpression filterExpr) {
         List<FilterExpression> panelExpr = new ArrayList<>();
         panelExpr.add(filterExpr);
-        updateController.filterSortRefresh(panelExpr);
+        updateController.processAndRefresh(panelExpr);
     }
 
     /**
@@ -266,10 +274,10 @@ public class Logic {
     }
 
     /**
-     * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
+     * Carries the current set of GUI elements, as well as the current list of users in the model, to the GUI.
      */
-    public void updateUI(Map<FilterExpression, List<TurboIssue>> issuesToShow) {
-        uiManager.update(models, issuesToShow);
+    public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
+        uiManager.update(elementsToShow, models.getUsers());
     }
 
     /**

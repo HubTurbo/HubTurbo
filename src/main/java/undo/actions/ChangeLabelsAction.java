@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ChangeLabelsAction implements Action<TurboIssue> {
 
-    public static final String DESCRIPTION = "change label(s)";
+    public static final String DESCRIPTION = "Label(s) changed";
 
     private final Logic logic;
     private final List<String> originalLabels;
