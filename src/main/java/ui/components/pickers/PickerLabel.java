@@ -87,53 +87,6 @@ public class PickerLabel extends TurboLabel {
         this.isFaded = isFaded;
     }
 
-    /**
-     * Set visual style of a top label based on query 
-     * @param assignedLabels    labels that will be associated with an issue
-     * @param suggestion        suggested label that matches user query 
-     * @return
-     */
-    public Node processAssignedLabel(List<String> assignedLabels, Optional<String> suggestion) {
-        if (isSuggested(suggestion) && !assignedLabels.contains(getActualName())) {
-            setIsFaded(true);
-            return getNode();
-        }
-        
-        if (!assignedLabels.contains(getActualName())) {
-           setIsRemoved(true); 
-           setIsFaded(true);
-           return getNode();
-        }
-        
-        if (isSuggested(suggestion) && assignedLabels.contains(getActualName())) {
-           setIsRemoved(true); 
-           setIsFaded(true);
-           return getNode();
-        }
-
-        // if (assignedLabels.contains(getActualName())) setIsSelected(true);
-
-        return getNode();
-    }
-
-    /**
-     * Set visual style of a bottom label based on query 
-     * @param assignedLabels    labels that will be associated with an issue
-     * @param suggestion        suggested label that matches user query 
-     * @return
-     */
-    public Node processChoiceLabel(List<String> assignedLabels, List<String> matchedLabels,
-                                   Optional<String> suggestion) {
-        String labelName = getActualName();
-        if (!assignedLabels.isEmpty() && assignedLabels.contains(labelName)) setIsSelected(true);
-        
-        if (!matchedLabels.isEmpty() && !matchedLabels.contains(labelName)) setIsFaded(true);
-        
-        if (isSuggested(suggestion)) setIsHighlighted(true);
-        
-        return getNode();
-    }
-
     public Optional<String> getGroupName() {
         Optional<String> groupName = Optional.empty();
         if (getGroup().isPresent()) {

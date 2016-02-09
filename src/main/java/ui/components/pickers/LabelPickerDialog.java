@@ -144,23 +144,18 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private PickerLabel processInitialLabel(String initialLabel, List<String> removedLabels, Optional<String> suggestion) {
         TurboLabel repoInitialLabel = getRepoTurboLabel(initialLabel);
-        if (!removedLabels.contains(initialLabel) && !suggestion.isPresent()) {
+        if (!removedLabels.contains(initialLabel)) {
+            if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
+                return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
+            }
             return getStyledPickerLabel(repoInitialLabel, false, false, false, false, true);
         }
 
-        if (!removedLabels.contains(initialLabel) && suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
-        }
-
-        if (removedLabels.contains(initialLabel) && !suggestion.isPresent()) {
-            return getStyledPickerLabel(repoInitialLabel, false, false, true, false, true);
-        }
-
-        if (removedLabels.contains(initialLabel) && suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
+        if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
             return getStyledPickerLabel(repoInitialLabel, true, false, false, false, true);
         }
 
-        return getStyledPickerLabel(repoInitialLabel, false, false, false, false, true);
+        return getStyledPickerLabel(repoInitialLabel, false, false, true, false, true);
     }
 
     private PickerLabel getStyledPickerLabel(TurboLabel label, boolean isFaded, boolean isHighlighted, boolean isRemoved, boolean isSelected, boolean isTop) {
@@ -224,7 +219,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private PickerLabel processSuggestedLabel(String suggestedLabel) {
-        return getStyledPickerLabel(getRepoTurboLabel(suggestedLabel), true, false, false, false, false);
+        return getStyledPickerLabel(getRepoTurboLabel(suggestedLabel), true, false, false, false, true);
     }
 
     private void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
