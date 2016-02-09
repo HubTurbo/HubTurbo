@@ -232,8 +232,15 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
-            if (SHOW_VIEWER.match(event)) {
-                createIssue();
+            if (SHOW_ISSUE_CREATOR.match(event)) {
+                createIssue(Optional.empty());
+            }
+            if (SHOW_ISSUES.match(event)) {
+                if (!getSelectedElement().isPresent()) {
+                    createIssue(Optional.empty());
+                } else {
+                    createIssue(Optional.of(getSelectedElement().get().getIssue()));
+                }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
@@ -406,11 +413,7 @@ public class ListPanel extends FilterPanel {
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
 
-    private void createIssue() {
-        Optional<TurboIssue> issue = Optional.empty();
-
-        // For editing of existing issue
-        if (getSelectedElement().isPresent()) issue = Optional.of(getSelectedElement().get().getIssue());
+    private void createIssue(Optional<TurboIssue> issue) {
         ui.triggerEvent(new ShowIssueCreatorEvent(issue));
     }
 }

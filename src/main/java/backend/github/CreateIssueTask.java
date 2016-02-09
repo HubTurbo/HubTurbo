@@ -8,6 +8,9 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.TurboIssue;
 
+/**
+ * Describes editing or creating new issue 
+ */
 public class CreateIssueTask extends GitHubRepoTask<Issue> {
 
     private TurboIssue issue;

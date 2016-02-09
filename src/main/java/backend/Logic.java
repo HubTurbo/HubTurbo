@@ -275,7 +275,7 @@ public class Logic {
     }
 
     /**
-     * Create new issue or edit details of existigng issue
+     * Create new issue or edit details of existing issue
      * @param repoId
      * @param issue
      * @return

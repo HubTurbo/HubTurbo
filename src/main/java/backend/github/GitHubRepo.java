@@ -8,6 +8,7 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.*;
 import github.update.*;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +17,9 @@ import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+
 import ui.UI;
+import ui.components.issue_creators.IssueCreatorPresenter;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
 
@@ -261,8 +264,12 @@ public class GitHubRepo implements Repo {
 
     @Override
     public Issue createIssue(TurboIssue issue) throws IOException {
-        return issueService.createIssue(
-            RepositoryId.createFromId(issue.getRepoId()), issue.convertToGitHubIssue());
+        Issue postIssue = issue.convertToGitHubIssue();
+        RepositoryId id = RepositoryId.createFromId(issue.getRepoId());
+        if (issue.getId() == IssueCreatorPresenter.NEWISSUE_ID) {
+            return issueService.createIssue(id, postIssue);
+        }
+        return issueService.editIssue(id, postIssue);
     }
 
     @Override
