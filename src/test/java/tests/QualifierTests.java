@@ -325,6 +325,8 @@ public class QualifierTests {
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
 
+        // test: "repo" alias with sort qualifier
+
         Collections.sort(renderedIssues,
             Qualifier.getSortComparator(model, "r", false, false));
 
@@ -361,6 +363,8 @@ public class QualifierTests {
         assertEquals(Arrays.asList(4, 3, 2, 1, 0), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
+
+        // test: "updated" alias with sort qualifier
 
         Collections.sort(renderedIssues,
             Qualifier.getSortComparator(model, "u", false, false));
@@ -426,6 +430,8 @@ public class QualifierTests {
         assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
             .map(TurboIssue::getId)
             .collect(Collectors.toList()));
+
+        // test: "comments" alias with sort qualifier
 
         Collections.sort(renderedIssues,
             Qualifier.getSortComparator(model, "cm", false, false));
