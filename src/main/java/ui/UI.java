@@ -4,9 +4,11 @@ import backend.Logic;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
+
 import com.google.common.eventbus.EventBus;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -24,13 +26,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
+import ui.components.issue_creators.IssueCreator;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
@@ -41,6 +46,7 @@ import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -187,10 +193,15 @@ public class UI extends Application implements EventDispatcher {
         if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
             createAndLoadSampleBoard();
         }
+        initialiseCreators();
     }
 
     private void initialisePickers() {
         new LabelPicker(this, mainStage);
+    }
+
+    private void initialiseCreators() {
+        new IssueCreator(this, mainStage);
     }
 
     protected void registerTestEvents() {
