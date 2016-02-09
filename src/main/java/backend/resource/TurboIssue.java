@@ -28,6 +28,7 @@ import static util.Utility.replaceNull;
 public class TurboIssue {
     private static final Logger logger = HTLog.get(TurboIssue.class);
 
+    public static final int NEWISSUE_ID = -1;
     public static final String STATE_CLOSED = "closed";
     public static final String STATE_OPEN = "open";
 
@@ -371,6 +372,7 @@ public class TurboIssue {
     public Issue convertToGitHubIssue() {
         Issue issue = generateBasicGitHubIssue();
 
+        if (id != NEWISSUE_ID) issue.setNumber(id);
         if (milestone.isPresent()) issue.setMilestone(new Milestone().setNumber(milestone.get()));
         if (assignee.isPresent()) issue.setAssignee(new User().setLogin(assignee.get()));
         return issue;

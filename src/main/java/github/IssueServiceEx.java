@@ -41,6 +41,12 @@ public class IssueServiceEx extends IssueService {
         return returnedIssue;
     }
 
+    @Override
+    public Issue editIssue(IRepositoryIdProvider repository, Issue issue) throws IOException {
+        Issue returnedIssue = super.editIssue(repository, issue);
+        return returnedIssue;
+    }
+
     public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean open) throws IOException {
         HttpURLConnection connection = createIssuePostConnection(repository, issueId);
         HashMap<Object, Object> data = new HashMap<>();
