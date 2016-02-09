@@ -2,10 +2,14 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
+
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
+
 import prefs.Preferences;
 import util.HTLog;
 import util.Utility;
@@ -233,6 +237,15 @@ public class TurboIssue {
     }
 
     /**
+     * Generates list of GitHub Labels from assigned labels
+     * @param labels
+     * @return GitHub compatible list of labels
+     */
+    private List<Label> convertToGitHubLabel(List<String> labels) {
+        return labels.stream().map(label -> new Label().setName(label)).collect(Collectors.toList());
+    }
+
+    /**
      * Conceptually, operations on issues. They should only modify non-serialized fields.
      */
     @SuppressWarnings("unused")
@@ -339,6 +352,29 @@ public class TurboIssue {
 
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
+
+    /**
+     * Generates bare-minimum GitHub Issue 
+     * @return
+     */
+    public Issue generateBasicGitHubIssue() {
+        return new Issue()
+            .setTitle(title).setBody(description).setState(STATE_OPEN)
+            .setLabels(convertToGitHubLabel(labels));
+    }
+
+    /**
+     * Convert TurboIssue to GitHub compatible Issue
+     * @param issue
+     * @return
+     */
+    public Issue convertToGitHubIssue() {
+        Issue issue = generateBasicGitHubIssue();
+
+        if (milestone.isPresent()) issue.setMilestone(new Milestone().setNumber(milestone.get()));
+        if (assignee.isPresent()) issue.setAssignee(new User().setLogin(assignee.get()));
+        return issue;
+    }
 
     public String getRepoId() {
         return repoId;
