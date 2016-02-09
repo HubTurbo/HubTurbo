@@ -69,6 +69,7 @@ allprojects {
         compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
         compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:$egitVersion"
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
+		compile "org.pegdown:pegdown:1.6.0"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
