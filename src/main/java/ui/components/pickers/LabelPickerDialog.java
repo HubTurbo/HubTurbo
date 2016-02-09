@@ -29,12 +29,11 @@ import org.apache.logging.log4j.Logger;
 
 import ui.UI;
 import util.HTLog;
-import util.Utility;
 
 /**
- * Serves as a presenter that synchronizes changes in labels with dialog view  
- * @author jinified
+ * Serves as a presenter that synchronizes changes in labels with dialog view
  *
+ * @author jinified
  */
 public class LabelPickerDialog extends Dialog<List<String>> implements Initializable {
 
@@ -50,7 +49,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private final TurboIssue issue;
 
     private List<String> finalAssignedLabels;
-    
+
     @FXML
     private VBox mainLayout;
     @FXML
@@ -80,10 +79,16 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
             queryField.setDisable(true);
         }
         finalAssignedLabels = updateFinalAssignedLabels(label);
-        populatePanes(new ArrayList<>(), Optional.empty());
+        populatePanes(getCleanState(finalAssignedLabels, getRepoLabelsSet()));
     }
 
-    // Initilisation of UI
+    private LabelPickerState getCleanState(List<String> initialLabels, Set<String> repoLabels) {
+        LabelPickerState state = new LabelPickerState(new HashSet<>(initialLabels));
+        state = state.updateMatchedLabels(repoLabels, "");
+        return state;
+    }
+
+    // Initialisation of UI
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -95,13 +100,13 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         setDialogPaneContent(issue);
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
-        
-        populatePanes(new ArrayList<>(), Optional.empty());
+
+        populatePanes(getCleanState(issue.getLabels(), getRepoLabelsSet()));
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
         initOwner(stage);
-        initModality(Modality.APPLICATION_MODAL); 
+        initModality(Modality.APPLICATION_MODAL);
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
     }
@@ -116,87 +121,162 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     /**
      * Updates ui elements based on current state
-     * @param state
      */
-    public void populatePanes(List<String> matchedLabels, Optional<String> suggestion) {
+    public void populatePanes(LabelPickerState state) {
         // Population of UI elements
-        populateAssignedLabels(finalAssignedLabels, suggestion);
-        populateFeedbackLabels(finalAssignedLabels, matchedLabels, suggestion);
+        populateAssignedLabels(state);
+        populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
     }
 
-    private void populateAssignedLabels(List<String> finalLabels, Optional<String> suggestion) {
+    private void populateAssignedLabels(LabelPickerState state) {
         assignedLabels.getChildren().clear();
-        populateInitialLabels(initialLabels, finalLabels, suggestion);
-        populateAddedLabels(getAddedLabels(initialLabels, finalLabels, suggestion), 
-                            finalLabels, suggestion);
+        populateInitialLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getCurrentSuggestion());
+        populateToBeAddedLabels(state.getAddedLabels(), state.getCurrentSuggestion());
 
         if (finalAssignedLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
-    private void populateInitialLabels(List<String> initialLabels, List<String> finalLabels,
+    private void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
                                        Optional<String> suggestion) {
-        repoLabels.stream()
-            .filter(label -> initialLabels.contains(label.getActualName()))
-            .map(label -> new PickerLabel(this, label, true))
-            .forEach(label -> assignedLabels.getChildren()
-                .add(label.processAssignedLabel(finalLabels, suggestion)));
+        initialLabels.stream()
+                .forEach(label -> assignedLabels.getChildren().add(processInitialLabel(label, removedLabels, suggestion).getNode()));
     }
 
-    private void populateAddedLabels(List<String> addedLabels, List<String> finalLabels, 
-                                     Optional<String> suggestion) {
-        if (!addedLabels.isEmpty()) {
+    private PickerLabel processInitialLabel(String initialLabel, List<String> removedLabels, Optional<String> suggestion) {
+        TurboLabel repoInitialLabel = getRepoTurboLabel(initialLabel);
+        if (!removedLabels.contains(initialLabel) && !suggestion.isPresent()) {
+            return getStyledPickerLabel(repoInitialLabel, false, false, false, false, true);
+        }
+
+        if (!removedLabels.contains(initialLabel) && suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
+            return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
+        }
+
+        if (removedLabels.contains(initialLabel) && !suggestion.isPresent()) {
+            return getStyledPickerLabel(repoInitialLabel, false, false, true, false, true);
+        }
+
+        if (removedLabels.contains(initialLabel) && suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
+            return getStyledPickerLabel(repoInitialLabel, true, false, false, false, true);
+        }
+
+        return getStyledPickerLabel(repoInitialLabel, false, false, false, false, true);
+    }
+
+    private PickerLabel getStyledPickerLabel(TurboLabel label, boolean isFaded, boolean isHighlighted, boolean isRemoved, boolean isSelected, boolean isTop) {
+        PickerLabel styledLabel = new PickerLabel(this, label, isTop);
+        styledLabel.setIsFaded(isFaded);
+        styledLabel.setIsHighlighted(isHighlighted);
+        styledLabel.setIsRemoved(isRemoved);
+        styledLabel.setIsSelected(isSelected);
+        return styledLabel;
+    }
+
+    /**
+     * To return the repo's TurboLabel that contains labelName
+     * <p>
+     * labelName MUST match a repo label's name
+     *
+     * @param labelName
+     * @return
+     */
+    private TurboLabel getRepoTurboLabel(String labelName) {
+        assert (repoLabels.stream()
+                .filter(label -> label.getActualName().equals(labelName))
+                .findFirst()
+                .isPresent());
+        return repoLabels.stream()
+                .filter(label -> label.getActualName().equals(labelName))
+                .findFirst()
+                .get();
+    }
+
+    private void populateToBeAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
+        if (!addedLabels.isEmpty() || hasNewSuggestion(addedLabels, suggestion)) {
             assignedLabels.getChildren().add(new Label("|"));
-            repoLabels.stream()
-                .filter(label -> addedLabels.contains(label.getActualName()))
-                .map(label -> new PickerLabel(this, label, true))
-                .forEach(label -> assignedLabels.getChildren()
-                    .add(label.processAssignedLabel(finalLabels, suggestion)));
+        }
+        populateAddedLabels(addedLabels, suggestion);
+        populateSuggestedLabel(addedLabels, suggestion);
+    }
+
+    private void populateAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
+        addedLabels.stream()
+                .forEach(label -> {
+                    assignedLabels.getChildren().add(processAddedLabel(label, suggestion).getNode());
+                });
+    }
+
+    private PickerLabel processAddedLabel(String addedLabel, Optional<String> suggestion) {
+        if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
+            return getStyledPickerLabel(getRepoTurboLabel(addedLabel), false, false, false, false, true);
+        }
+        return getStyledPickerLabel(getRepoTurboLabel(addedLabel), true, false, true, false, true);
+    }
+
+    private void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
+        if (hasNewSuggestion(addedLabels, suggestion)) {
+            assignedLabels.getChildren().add(processSuggestedLabel(suggestion.get()).getNode());
         }
     }
 
-    private void populateFeedbackLabels(List<String> finalLabels, List<String> matchedLabels,
+    private boolean hasNewSuggestion(List<String> addedLabels, Optional<String> suggestion) {
+        return suggestion.isPresent() && !initialLabels.contains(suggestion.get()) && !addedLabels.contains(suggestion.get());
+    }
+
+    private PickerLabel processSuggestedLabel(String suggestedLabel) {
+        return getStyledPickerLabel(getRepoTurboLabel(suggestedLabel), true, false, false, false, false);
+    }
+
+    private void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
                                         Optional<String> suggestion) {
         feedbackLabels.getChildren().clear();
-        populateGroupLabels(finalLabels, matchedLabels, suggestion);
-        populateGrouplessLabels(finalLabels, matchedLabels, suggestion);
+        populateGroupLabels(assignedLabels, matchedLabels, suggestion);
+        populateGrouplessLabels(assignedLabels, matchedLabels, suggestion);
     }
 
     private void populateGroupLabels(List<String> finalLabels, List<String> matchedLabels,
                                      Optional<String> suggestion) {
+
         Map<String, FlowPane> groupContent = getGroupContent(finalLabels, matchedLabels, suggestion);
         groupContent.entrySet().stream().forEach(entry -> {
             feedbackLabels.getChildren().addAll(
-                createGroupTitle(entry.getKey()), entry.getValue());
+                    createGroupTitle(entry.getKey()), entry.getValue());
         });
     }
 
     private Map<String, FlowPane> getGroupContent(List<String> finalLabels, List<String> matchedLabels,
-            Optional<String> suggestion) {
+                                                  Optional<String> suggestion) {
         Map<String, FlowPane> groupContent = new HashMap<>();
         repoLabels.stream().sorted()
-            .filter(label -> label.getGroup().isPresent())
-            .map(label -> new PickerLabel(this, label, false))
-            .forEach(label -> {
-                String group = label.getGroupName().get();
-                if (!groupContent.containsKey(group)) {
-                    groupContent.put(group, createGroupPane(GROUP_PAD));
-                } 
-                groupContent.get(group).getChildren()
-                    .add(label.processChoiceLabel(finalLabels, matchedLabels, suggestion));
-            });
+                .filter(label -> label.getGroup().isPresent())
+                .map(label -> new PickerLabel(this, label, false))
+                .forEach(label -> {
+                    String group = label.getGroupName().get();
+                    if (!groupContent.containsKey(group)) {
+                        groupContent.put(group, createGroupPane(GROUP_PAD));
+                    }
+                    groupContent.get(group).getChildren()
+                            .add(processMatchedLabel(label.getActualName(), matchedLabels, finalLabels, suggestion).getNode());
+                });
         return groupContent;
     }
 
-    private void populateGrouplessLabels(List<String> finalLabels, List<String> matchedLabels, 
+    private void populateGrouplessLabels(List<String> finalLabels, List<String> matchedLabels,
                                          Optional<String> suggestion) {
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
-        repoLabels.stream()                                                               
-            .filter(label -> !label.getGroup().isPresent())                               
-            .map(label -> new PickerLabel(this, label, false))
-            .forEach(label -> groupless.getChildren()
-                .add(label.processChoiceLabel(finalLabels, matchedLabels, suggestion)));
-        
+        repoLabels.stream()
+                .filter(label -> !label.getGroup().isPresent())
+                .map(label -> new PickerLabel(this, label, false))
+                .forEach(label -> groupless.getChildren()
+                        .add(processMatchedLabel(label.getActualName(), matchedLabels, finalLabels, suggestion).getNode()));
+
         if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
+    }
+
+    private PickerLabel processMatchedLabel(String repoLabel, List<String> matchedLabels, List<String> assignedLabels, Optional<String> suggestion) {
+        boolean shouldHighlight = (suggestion.isPresent()) ? suggestion.get().equals(repoLabel) : false;
+        PickerLabel label = getStyledPickerLabel(getRepoTurboLabel(repoLabel), !matchedLabels.contains(repoLabel), shouldHighlight, false, assignedLabels.contains(repoLabel), false);
+        return label;
     }
 
     private void createMainLayout() {
@@ -232,8 +312,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private void setTitleLabel(TurboIssue issue) {
-        title.setText((issue.isPullRequest() ? "PR #" : "Issue #") 
-            + issue.getId() + ": " + issue.getTitle());
+        title.setText((issue.isPullRequest() ? "PR #" : "Issue #")
+                + issue.getId() + ": " + issue.getTitle());
     }
 
     private Label createTextLabel(String input) {
@@ -245,14 +325,14 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Label createGroupTitle(String name) {
         Label groupName = new Label(name);
-        groupName.setPadding(new Insets(0, 5, 5, 0));                                     
-        groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);                                    
-        groupName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold;");            
+        groupName.setPadding(new Insets(0, 5, 5, 0));
+        groupName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
+        groupName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold;");
         return groupName;
     }
 
     private FlowPane createGroupPane(Insets padding) {
-        FlowPane group = new FlowPane();                                                
+        FlowPane group = new FlowPane();
         group.setHgap(5);
         group.setVgap(5);
         group.setPadding(padding);
@@ -270,10 +350,10 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void registerQueryHandler() {
         queryField.textProperty().addListener((observable, oldValue, newValue) -> {
             LabelPickerState state = uiLogic.determineState(
-                new LabelPickerState(new HashSet<String>(issue.getLabels())), 
-                repoLabelsSet, queryField.getText().toLowerCase());
+                    getCleanState(initialLabels, getRepoLabelsSet()),
+                    repoLabelsSet, queryField.getText().toLowerCase());
             finalAssignedLabels = state.getAssignedLabels();
-            populatePanes(state.getMatchedLabels(), state.getCurrentSuggestion());
+            populatePanes(state);
         });
     }
 
@@ -281,12 +361,12 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         if (getDialogHeight().isPresent()) {
             setX(stage.getX() + stage.getScene().getX());
             setY(stage.getY() +
-                 stage.getScene().getY() +
-                 (stage.getScene().getHeight() - getHeight()) / 2);
-        } 
+                    stage.getScene().getY() +
+                    (stage.getScene().getHeight() - getHeight()) / 2);
+        }
     }
 
-    // TODO refactor if else 
+    // TODO refactor if else & maintain label order
     private List<String> updateFinalAssignedLabels(PickerLabel selectedLabel) {
         List<String> finalLabels = finalAssignedLabels;
         String labelName = selectedLabel.getActualName();
@@ -307,24 +387,11 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
     }
 
-    private List<String> getAddedLabels(List<String> initialLabels, List<String> finalLabels,
-                                        Optional<String> suggestion) {
-        List<String> addedLabels = finalLabels.stream()
-            .filter(label -> !initialLabels.contains(label))
-            .collect(Collectors.toList());
-
-        if (suggestion.isPresent() && !initialLabels.contains(suggestion.get()) 
-            && !addedLabels.contains(suggestion.get())) {
-            addedLabels.add(suggestion.get());
-        }
-        return addedLabels;
-    }
-
 
     private Set<String> getRepoLabelsSet() {
         return repoLabels.stream()
-            .map(TurboLabel::getActualName)
-            .collect(Collectors.toSet());
+                .map(TurboLabel::getActualName)
+                .collect(Collectors.toSet());
     }
 
 }

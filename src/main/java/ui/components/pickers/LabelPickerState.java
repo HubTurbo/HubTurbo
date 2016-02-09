@@ -8,15 +8,15 @@ import java.util.stream.Collectors;
 
 
 public class LabelPickerState {
-    Set<String> addedLabels;
-    Set<String> removedLabels;
+    List<String> addedLabels;
+    List<String> removedLabels;
     Set<String> initialLabels;
     List<String> matchedLabels;
     OptionalInt currentSuggestionIndex;
 
     private LabelPickerState(Set<String> initialLabels,
-                             Set<String> addedLabels,
-                             Set<String> removedLabels,
+                             List<String> addedLabels,
+                             List<String> removedLabels,
                              List<String> matchedLabels,
                              OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
@@ -27,8 +27,8 @@ public class LabelPickerState {
     }
 
     private LabelPickerState(Set<String> initialLabels,
-                             Set<String> addedLabels,
-                             Set<String> removedLabels,
+                             List<String> addedLabels,
+                             List<String> removedLabels,
                              List<String> matchedLabels) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
@@ -43,8 +43,8 @@ public class LabelPickerState {
 
     public LabelPickerState(Set<String> initialLabels) {
         this.initialLabels = initialLabels;
-        this.addedLabels = new HashSet<>();
-        this.removedLabels = new HashSet<>();
+        this.addedLabels = new ArrayList<>();
+        this.removedLabels = new ArrayList<>();
         this.matchedLabels = new ArrayList<>();
         this.currentSuggestionIndex = OptionalInt.empty();
     }
@@ -81,7 +81,7 @@ public class LabelPickerState {
 
     public LabelPickerState nextSuggestion() {
         if (canIncreaseIndex()) {
-            return new LabelPickerState(initialLabels, removedLabels, addedLabels,
+            return new LabelPickerState(initialLabels, addedLabels, removedLabels,
                     matchedLabels, OptionalInt.of(currentSuggestionIndex.getAsInt() + 1));
         }
         return this;
@@ -89,7 +89,7 @@ public class LabelPickerState {
 
     public LabelPickerState previousSuggestion() {
         if (canDecreaseIndex()) {
-            return new LabelPickerState(initialLabels, removedLabels, addedLabels,
+            return new LabelPickerState(initialLabels, addedLabels, removedLabels,
                         matchedLabels, OptionalInt.of(currentSuggestionIndex.getAsInt() - 1));
         }
         return this;
@@ -128,11 +128,11 @@ public class LabelPickerState {
     }
 
     public List<String> getRemovedLabels() {
-        return convertToList(removedLabels);
+        return removedLabels;
     }
 
     public List<String> getAddedLabels() {
-        return convertToList(addedLabels);
+        return addedLabels;
     }
 
     public Optional<String> getCurrentSuggestion() {
@@ -175,7 +175,7 @@ public class LabelPickerState {
                         String labelGroup = getGroup(label);
                         return !labelGroup.equals(group);
                     })
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
             // Add to removedLabels all initialLabels that have conflicting group
             removedLabels.addAll(initialLabels.stream()
@@ -183,7 +183,7 @@ public class LabelPickerState {
                         String labelGroup = getGroup(label);
                         return labelGroup.equals(group) && !removedLabels.contains(name);
                     })
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toList()));
         }
     }
 
