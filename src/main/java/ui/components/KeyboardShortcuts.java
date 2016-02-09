@@ -99,6 +99,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.D);
     public static final KeyCodeCombination SHOW_RELATED_ISSUE_OR_PR =
             new KeyCodeCombination(KeyCode.E);
+    public static final KeyCodeCombination SHOW_VIEWER =
+            new KeyCodeCombination(KeyCode.Y, KeyCodeCombination.CONTROL_DOWN);
 
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
