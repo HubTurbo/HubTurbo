@@ -14,14 +14,28 @@ setlocal
 REM This gets the name of the HubTurbo .jar file in build/libs. The expected format is HubTurbo-X.X.X-all.jar, but
 REM any file that fits the format HubTurbo-(*).jar will be accepted.
 for /r build\libs %%i in (*.jar) do @set versionLine=%%~ni
-REM Based on the .jar file name, close relevant processes. The /t option specifies tree kill mode, which also
-REM targets child chromedriver processes.
+REM Get the chromedriver file name. Expecting chromedriver_X-X.exe, but chromedriver(*).exe is good enough.
+for /r build\libs %%i in (chromedriver*.exe) do @set chromedriverName=%%~ni
+REM Based on the .jar file name, close relevant processes.
 echo ^> Closing all javaw processes with window title format: HubTurbo V%versionLine:~9,5%*.
-taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "javaw.exe" /t
+taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "javaw.exe"
 echo(
 echo ^> Closing all java processes with window title format: HubTurbo V%versionLine:~9,5%*.
-taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "java.exe" /t
+taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "java.exe"
 echo(
+REM Wait for existing chromedriver processes to close.
+set chromedriverPid=""
+for /f "tokens=2" %%a in ('tasklist^|find /i "%chromedriverName%.exe"') do set chromedriverPid=%%a
+if not ("%chromedriverPid%"=="") (
+    echo ^> Waiting for all chromedriver processes with name %chromedriverName%.exe to close.
+    echo(
+    :chromedriverWaitLoop
+    tasklist|find " %chromedriverPid% " >nul
+    if not errorlevel 1 (
+        timeout /t 1 >nul
+        goto :chromedriverWaitLoop
+    )
+)
 
 REM rbar-ex.txt tells xcopy to avoid backing up any .jar and .exe files.
 REM (we avoid copying HubTurbo .jar and the chromedriver executable)
@@ -41,7 +55,7 @@ echo(
 
 REM After rebuilding the project, we move the backup cache back to build/libs
 REM and then delete the temporary rbar folder.
-echo ^> Moving your files files back to build/libs.
+echo ^> Moving your files back to build/libs.
 xcopy rbar build\libs /i /s
 rmdir /S /Q rbar
 
