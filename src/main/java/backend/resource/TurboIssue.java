@@ -2,6 +2,7 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
+import net.sf.cglib.core.Local;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -69,6 +70,8 @@ public class TurboIssue {
     private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
     private Optional<LocalDateTime> milestoneLastModifiedAt = Optional.empty();
     private Optional<LocalDateTime> stateLastModifiedAt = Optional.empty();
+    private Optional<LocalDateTime> assigneeLastModifiedAt = Optional.empty();
+
 
     @SuppressWarnings("unused")
     private void ______CONSTRUCTORS______() {}
@@ -440,11 +443,13 @@ public class TurboIssue {
     }
 
     public void setAssignee(String assignee) {
-        this.assignee = Optional.of(assignee);
+        this.assignee = Optional.ofNullable(assignee);
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now()); 
     }
 
     public void setAssignee(TurboUser assignee) {
         setAssignee(assignee.getLoginName());
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public List<String> getLabels() {
@@ -466,6 +471,10 @@ public class TurboIssue {
 
     public LocalDateTime getStateLastModifiedAt() {
         return stateLastModifiedAt.orElse(getUpdatedAt());
+    }
+
+    public LocalDateTime getAssigneeLastModifiedAt() {
+        return this.assigneeLastModifiedAt.orElse(getUpdatedAt());
     }
 
     public void addLabel(String label) {

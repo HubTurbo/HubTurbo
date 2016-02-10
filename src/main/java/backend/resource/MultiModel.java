@@ -139,6 +139,21 @@ public class MultiModel implements IModel {
             () -> logger.error("Model " + repoId + " not found in models"));
     }
 
+    /**
+     * Replaces assignee of an issue specified by {@code issueId} in {@code repoId} with {@code assigneeLoginName}
+     * @param repoId
+     * @param issueId
+     * @param assigneeLoginName
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueAssignee(String repoId, int issueId,
+                                                                  String assigneeLoginName) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult,
+                (model) -> model.replaceIssueAssignee(issueId, assigneeLoginName),
+                () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {

@@ -302,6 +302,21 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
+    public Issue setAssignee(String repoId, int issueId, String issueTitle, String issueAssigneeLoginName)
+            throws IOException {
+
+        User issueAssignee = new User();
+        issueAssignee.setLogin(issueAssigneeLoginName);
+
+        Issue createdIssue = new Issue();
+        createdIssue.setNumber(issueId);
+        createdIssue.setTitle(issueTitle);
+        createdIssue.setAssignee(issueAssignee);
+
+        return issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
+    }
+
+    @Override
     public boolean isRepositoryValid(String repoId) {
         String repoURL = SEGMENT_REPOS + "/" + repoId;
         try {

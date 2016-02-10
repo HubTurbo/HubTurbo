@@ -29,6 +29,7 @@ import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.issuepicker.IssuePicker;
+import ui.components.pickers.AssigneePicker;
 import ui.components.pickers.LabelPicker;
 import ui.components.pickers.MilestonePicker;
 import ui.components.pickers.RepositoryPicker;
@@ -208,6 +209,7 @@ public class UI extends Application implements EventDispatcher {
         new MilestonePicker(this, mainStage);
         new IssuePicker(this, mainStage);
         new RepositoryPicker(this, mainStage, this::primaryRepoChanged);
+        new AssigneePicker(this, mainStage);
     }
 
     protected void registerTestEvents() {

@@ -64,6 +64,12 @@ public class DummySource extends RepoSource {
     }
 
     @Override
+    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, String assigneeLoginName) {
+        return addTask(new ReplaceIssueAssigneeTask(this, dummy, issue.getRepoId(),
+                issue.getId(), issue.getTitle(), assigneeLoginName)).response;
+    }
+
+    @Override
     public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return Futures.unit(true);
     }

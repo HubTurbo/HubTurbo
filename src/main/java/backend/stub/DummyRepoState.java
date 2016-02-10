@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.*;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -467,6 +468,10 @@ public class DummyRepoState {
                 .setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
 
         toSet.removeMilestone();
+    }
+
+    protected final Issue setAssignee(int issueId, String issueAssigneeLoginName) {
+        return null;
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {

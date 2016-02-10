@@ -288,6 +288,30 @@ public class Logic {
     }
 
     /**
+     * Replaces existing assignee with new assignee in the issue object, the UI, and the server, in that order.
+     * Server update is done after the local update to reduce the lag between the user action and the UI response
+     *
+     * @param issue
+     * @param newAssigneeLoginName
+     * @return
+     */
+    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, String newAssigneeLoginName){
+        Optional<String> originalAssigneeLoginName = issue.getAssignee();
+
+        logger.info("Changing assignee for " + issue + " on UI");
+        Optional<TurboIssue> localReplaceResult =
+                models.replaceIssueAssignee(issue.getRepoId(), issue.getId(), newAssigneeLoginName);
+        if (!localReplaceResult.isPresent()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        refreshUI();
+
+        return updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
+                .thenApply((isUpdateSuccessful) -> handleIssueAssigneeUpdateOnServerResult(
+                        isUpdateSuccessful, localReplaceResult.get(), originalAssigneeLoginName.orElseGet(() -> null)));
+    }
+
+    /**
      * Gets the issue identified by {@code repoId} and {@code issueId} in {@link Logic#models}
      *
      * @param repoId
@@ -310,6 +334,11 @@ public class Logic {
     private CompletableFuture<Boolean> updateIssueMilestonesOnServer(TurboIssue issue, Optional<Integer> milestone) {
         logger.info("Changing milestone for " + issue + " on GitHub");
         return repoOpControl.replaceIssueMilestoneOnServer(issue, milestone);
+    }
+
+    private CompletableFuture<Boolean> updateIssueAssigneesOnServer(TurboIssue issue, String newAssigneeLoginName) {
+        logger.info("Changing assignee for " + issue + " on GitHub");
+        return repoOpControl.replaceIssueAssignee(issue, newAssigneeLoginName);
     }
 
     /**
@@ -354,6 +383,24 @@ public class Logic {
 
         logger.error("Unable to update model on server");
         revertLocalMilestoneReplace(originalIssue.get());
+    }
+
+    /**
+     * Handles the result of updating an issue's assignee on server. Current implementation includes
+     * reverting back to the original assignee locally if the server update failed.
+     * @param isUpdateSuccessful
+     * @param localModifiedIssue
+     * @param originalAssigneeLoginName
+     * @return true if the server update is successful
+     */
+    private boolean handleIssueAssigneeUpdateOnServerResult(boolean isUpdateSuccessful,
+                                                             TurboIssue localModifiedIssue,
+                                                             String originalAssigneeLoginName) {
+        if (isUpdateSuccessful) {
+            return true;
+        }
+        logger.error("Unable to update model on server ASSIGNEE");
+        revertLocalAssigneeReplace(localModifiedIssue, originalAssigneeLoginName);
         return false;
     }
 
@@ -373,6 +420,27 @@ public class Logic {
         if (isCurrentLabelsModifiedFromOriginalLabels) {
             logger.info("Reverting labels for issue " + currentIssue);
             models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
+            refreshUI();
+        }
+    }
+
+    /**
+     * Replaces assignee of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} with
+     * {@code originalAssigneeLoginName} if the current assignee on the issue is assigned at
+     * the same time as {@code modifiedIssue}
+     * @param modifiedIssue
+     * @param originalAssigneeLoginName
+     */
+    private void revertLocalAssigneeReplace(TurboIssue modifiedIssue, String originalAssigneeLoginName) {
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        LocalDateTime originalAssigneeModifiedAt = modifiedIssue.getAssigneeLastModifiedAt();
+        LocalDateTime currentAssigneeAssignedAt = currentIssue.getAssigneeLastModifiedAt();
+        boolean isCurrentAssigneeModifiedFromOriginalAssignee = originalAssigneeModifiedAt.isEqual(
+                currentAssigneeAssignedAt);
+
+        if (isCurrentAssigneeModifiedFromOriginalAssignee) {
+            logger.info("Reverting assignee for issue " + currentIssue);
+            models.replaceIssueAssignee(currentIssue.getRepoId(), currentIssue.getId(), originalAssigneeLoginName);
             refreshUI();
         }
     }

@@ -75,9 +75,10 @@ public class ListPanel extends FilterPanel {
     private static final Boolean READ = true;
     private final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
-
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
+    private static final MenuItem changeAssigneeMenuItem = new MenuItem();
+    private static final String changeAssigneeMenuItemText = "Change Assignee";
 
     private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
     private static final String closeIssueMenuItemText = "Close issue (C)";
@@ -408,9 +409,15 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
+
         changeMilestoneMenuItem.setText(CHANGE_MILESTONE_MENU_ITEM_TEXT);
         changeMilestoneMenuItem.setOnAction(e -> {
             getSelectedElement().ifPresent(this::changeMilestone);
+        });
+
+        changeAssigneeMenuItem.setText(changeAssigneeMenuItemText);
+        changeAssigneeMenuItem.setOnAction(e -> {
+            changeAssignee();
         });
 
         markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
@@ -427,7 +434,9 @@ public class ListPanel extends FilterPanel {
                                       markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
                                       changeLabelsMenuItem,
                                       changeMilestoneMenuItem,
+                                      changeAssigneeMenuItem,
                                       closeReopenIssueMenuItem);
+
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -588,8 +597,15 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+
     private void changeMilestone(GuiElement issueGuiElement) {
         ui.triggerEvent(new ShowMilestonePickerEvent(issueGuiElement.getIssue()));
+    }
+
+    private void changeAssignee() {
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowAssigneePickerEvent(getSelectedElement().get().getIssue()));
+        }
     }
 
     @Override

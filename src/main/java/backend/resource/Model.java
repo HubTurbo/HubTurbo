@@ -211,6 +211,7 @@ public class Model implements IBaseModel {
     }
 
     /**
+<<<<<<< 9a51430a102f2e64ae7cdd972d550d4025eba39a
      * Replaces the milestone of an issue specified by {@code issueId} with {@code milestone}
      *
      * @param issueId
@@ -242,6 +243,22 @@ public class Model implements IBaseModel {
             issue.setOpen(isOpen);
             return Optional.of(new TurboIssue(issue));
         }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
+    /**
+     * Replaces assignee of an issue specified by {@code issueId} with {@code assigneeLoginName}
+     * @param issueId
+     * @param assigneeLoginName
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueAssignee(int issueId, String assigneeLoginName) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult,
+                (issue) -> {
+                    issue.setAssignee(assigneeLoginName);
+                    return Optional.of(new TurboIssue(issue));
+                },
+                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     @SuppressWarnings("unused")
