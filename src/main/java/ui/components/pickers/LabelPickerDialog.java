@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -29,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 
 import ui.UI;
 import util.HTLog;
-import util.Utility;
 
 /**
  * Serves as a presenter that synchronizes changes in labels with dialog view  
@@ -69,13 +69,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         Platform.runLater(queryField::requestFocus);
     }
 
-    void handleLabelClick(PickerLabel label) {
-        if (!queryField.isDisabled()) {
-            queryField.setDisable(true);
-        }
-        finalAssignedLabels = updateFinalAssignedLabels(label);
-        populatePanes(getCleanState(finalAssignedLabels, getRepoLabelsSet()));
-    }
 
     private LabelPickerState getCleanState(List<String> initialLabels, Set<String> repoLabels) {
         LabelPickerState state = new LabelPickerState(new HashSet<>(initialLabels));
@@ -119,7 +112,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
      * @param matchedLabels
      * @param suggestion
      */
-    public void populatePanes(LabelPickerState state) {
+    private void populatePanes(LabelPickerState state) {
         // Population of UI elements
         populateAssignedLabels(state);
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
@@ -135,10 +128,12 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
                                        Optional<String> suggestion) {
         initialLabels.stream()
-                .forEach(label -> assignedLabels.getChildren().add(processInitialLabel(label, removedLabels, suggestion).getNode()));
+            .forEach(label -> assignedLabels.getChildren()
+            .add(processInitialLabel(label, removedLabels, suggestion)));
     }
 
-    private PickerLabel processInitialLabel(String initialLabel, List<String> removedLabels, Optional<String> suggestion) {
+    private Node processInitialLabel(String initialLabel, List<String> removedLabels, 
+                                            Optional<String> suggestion) {
         TurboLabel repoInitialLabel = getRepoTurboLabel(initialLabel);
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
@@ -154,13 +149,17 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         return getStyledPickerLabel(repoInitialLabel, false, false, true, false, true);
     }
 
-    private PickerLabel getStyledPickerLabel(TurboLabel label, boolean isFaded, boolean isHighlighted, boolean isRemoved, boolean isSelected, boolean isTop) {
-        PickerLabel styledLabel = new PickerLabel(this, label, isTop);
+    private Node getStyledPickerLabel(TurboLabel label, 
+        boolean isFaded, boolean isHighlighted, boolean isRemoved, boolean isSelected, boolean isTop) {
+        PickerLabel styledLabel = new PickerLabel(label, isTop);
         styledLabel.setIsFaded(isFaded);
         styledLabel.setIsHighlighted(isHighlighted);
         styledLabel.setIsRemoved(isRemoved);
         styledLabel.setIsSelected(isSelected);
-        return styledLabel;
+
+        Node node = styledLabel.getNode();
+        node.setOnMouseClicked(e -> handleLabelClick(styledLabel));
+        return node;
     }
 
     /**
@@ -172,10 +171,10 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
      * @return
      */
     private TurboLabel getRepoTurboLabel(String labelName) {
-        assert (repoLabels.stream()
+        assert repoLabels.stream()
                 .filter(label -> label.getActualName().equals(labelName))
                 .findFirst()
-                .isPresent());
+                .isPresent();
         return repoLabels.stream()
                 .filter(label -> label.getActualName().equals(labelName))
                 .findFirst()
@@ -193,11 +192,11 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void populateAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
         addedLabels.stream()
                 .forEach(label -> {
-                    assignedLabels.getChildren().add(processAddedLabel(label, suggestion).getNode());
+                    assignedLabels.getChildren().add(processAddedLabel(label, suggestion));
                 });
     }
 
-    private PickerLabel processAddedLabel(String addedLabel, Optional<String> suggestion) {
+    private Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
             return getStyledPickerLabel(getRepoTurboLabel(addedLabel), false, false, false, false, true);
         }
@@ -206,15 +205,16 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
         if (hasNewSuggestion(addedLabels, suggestion)) {
-            assignedLabels.getChildren().add(processSuggestedLabel(suggestion.get()).getNode());
+            assignedLabels.getChildren().add(processSuggestedLabel(suggestion.get()));
         }
     }
 
     private boolean hasNewSuggestion(List<String> addedLabels, Optional<String> suggestion) {
-        return suggestion.isPresent() && !initialLabels.contains(suggestion.get()) && !addedLabels.contains(suggestion.get());
+        return suggestion.isPresent() 
+            && !(issue.getLabels()).contains(suggestion.get()) && !addedLabels.contains(suggestion.get());
     }
 
-    private PickerLabel processSuggestedLabel(String suggestedLabel) {
+    private Node processSuggestedLabel(String suggestedLabel) {
         return getStyledPickerLabel(getRepoTurboLabel(suggestedLabel), true, false, false, false, true);
     }
 
@@ -240,14 +240,14 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         Map<String, FlowPane> groupContent = new HashMap<>();
         repoLabels.stream().sorted()
                 .filter(label -> label.getGroup().isPresent())
-                .map(label -> new PickerLabel(this, label, false))
+                .map(label -> new PickerLabel(label, false))
                 .forEach(label -> {
                     String group = label.getGroupName().get();
                     if (!groupContent.containsKey(group)) {
                         groupContent.put(group, createGroupPane(GROUP_PAD));
                     }
-                    groupContent.get(group).getChildren()
-                            .add(processMatchedLabel(label.getActualName(), matchedLabels, finalLabels, suggestion).getNode());
+                    groupContent.get(group).getChildren().add(processMatchedLabel(
+                        label.getActualName(), matchedLabels, finalLabels, suggestion));
                 });
         return groupContent;
     }
@@ -257,17 +257,18 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
         repoLabels.stream()
                 .filter(label -> !label.getGroup().isPresent())
-                .map(label -> new PickerLabel(this, label, false))
-                .forEach(label -> groupless.getChildren()
-                        .add(processMatchedLabel(label.getActualName(), matchedLabels, finalLabels, suggestion).getNode()));
+                .map(label -> new PickerLabel(label, false))
+                .forEach(label -> groupless.getChildren().add(processMatchedLabel(
+                    label.getActualName(), matchedLabels, finalLabels, suggestion)));
 
         if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
     }
 
-    private PickerLabel processMatchedLabel(String repoLabel, List<String> matchedLabels, List<String> assignedLabels, Optional<String> suggestion) {
-        boolean shouldHighlight = (suggestion.isPresent()) ? suggestion.get().equals(repoLabel) : false;
-        PickerLabel label = getStyledPickerLabel(getRepoTurboLabel(repoLabel), !matchedLabels.contains(repoLabel), shouldHighlight, false, assignedLabels.contains(repoLabel), false);
-        return label;
+    private Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
+                                            List<String> assignedLabels, Optional<String> suggestion) {
+        boolean shouldHighlight = suggestion.isPresent() && suggestion.get().equals(repoLabel);
+        return getStyledPickerLabel(getRepoTurboLabel(repoLabel), !matchedLabels.contains(repoLabel), 
+                                    shouldHighlight, false, assignedLabels.contains(repoLabel), false);
     }
 
     private void createMainLayout() {
@@ -341,20 +342,19 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void registerQueryHandler() {
         queryField.textProperty().addListener((observable, oldValue, newValue) -> {
             LabelPickerState state = uiLogic.determineState(
-                    getCleanState(initialLabels, getRepoLabelsSet()),
-                    repoLabelsSet, queryField.getText().toLowerCase());
+                    getCleanState(issue.getLabels(), getRepoLabelsSet()),
+                    getRepoLabelsSet(), queryField.getText().toLowerCase());
             finalAssignedLabels = state.getAssignedLabels();
             populatePanes(state);
         });
     }
 
-    // TODO passed in as callback to PickerLabel
-    void handleLabelClick(PickerLabel label) {
+    private void handleLabelClick(PickerLabel label) {
         if (!queryField.isDisabled()) {
             queryField.setDisable(true);
         }
         finalAssignedLabels = updateFinalAssignedLabels(label);
-        populatePanes(new ArrayList<>(), Optional.empty());
+        populatePanes(getCleanState(finalAssignedLabels, getRepoLabelsSet()));
     }
 
     private void positionDialog(Stage stage) {
@@ -383,6 +383,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         return finalLabels;
     }
 
+    // getHeight() returns NaN when the height is not set
     private Optional<Double> getDialogHeight() {
         return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
     }

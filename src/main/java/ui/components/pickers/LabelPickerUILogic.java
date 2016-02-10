@@ -4,9 +4,6 @@ import java.util.*;
 
 public class LabelPickerUILogic {
 
-    public LabelPickerUILogic() {
-    }
-
     public LabelPickerState determineState(LabelPickerState initialState, Set<String> repoLabels, String userInput) {
         String[] keywords = userInput.split("\\s+");
         LabelPickerState state = initialState;

@@ -1,6 +1,5 @@
 package ui.components.pickers;
 
-import java.util.List;
 import java.util.Optional;
 
 import backend.resource.TurboLabel;
@@ -15,17 +14,14 @@ import javafx.scene.control.Tooltip;
 // for use with LabelPickerDialog
 public class PickerLabel extends TurboLabel {
 
-    private final LabelPickerDialog presenter;
-
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
     private final boolean isTop;
 
-    public PickerLabel(LabelPickerDialog presenter, TurboLabel label, boolean isTop) {
+    public PickerLabel(TurboLabel label, boolean isTop) {
         super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.presenter = presenter;
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
@@ -52,10 +48,6 @@ public class PickerLabel extends TurboLabel {
             Tooltip groupTooltip = new Tooltip(getGroup().get());
             label.setTooltip(groupTooltip);
         }
-
-        label.setOnMouseClicked(e -> {
-            presenter.handleLabelClick(this);
-        });    
         return label;
     }
 
@@ -113,9 +105,5 @@ public class PickerLabel extends TurboLabel {
     @SuppressWarnings("PMD")
     public int hashCode() {
         return super.hashCode();
-    }
-    
-    private boolean isSuggested(Optional<String> suggestion) {
-        return suggestion.isPresent() && suggestion.get().equals(getActualName());
     }
 }

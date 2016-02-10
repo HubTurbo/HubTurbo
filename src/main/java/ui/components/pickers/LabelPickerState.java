@@ -268,5 +268,4 @@ public class LabelPickerState {
         resultingList.addAll(labelSet);
         return resultingList;
     }
-
 }
