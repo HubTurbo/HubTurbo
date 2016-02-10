@@ -109,6 +109,7 @@ public final class BoardNameDialog extends Dialog<String> {
         grid.add(nameArea, 0, 0);
 
         errorText = new Text("");
+        errorText.getStyleClass().add("text-red");
         grid.add(errorText, 0, 1);
 
         getDialogPane().setContent(grid);
