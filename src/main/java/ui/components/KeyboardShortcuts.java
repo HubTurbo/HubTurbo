@@ -85,6 +85,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.G);
     public static final KeyCodeCombination SHOW_LABELS =
             new KeyCodeCombination(KeyCode.L);
+    public static final KeyCodeCombination SHOW_COMMENTS =
+            new KeyCodeCombination(KeyCode.C);
     public static final KeyCodeCombination SHOW_ISSUES =
             new KeyCodeCombination(KeyCode.I);
     public static final KeyCodeCombination SHOW_MILESTONES =

@@ -29,6 +29,7 @@ import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.ShowCommentViewerEvent;
 import util.events.ShowLabelPickerEvent;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -54,6 +55,9 @@ public class ListPanel extends FilterPanel {
 
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
+
+    private static final MenuItem viewCommentMenuItem = new MenuItem();
+    private static final String viewCommentMenuItemText = "View comment (C)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -231,6 +235,9 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
+            if (SHOW_COMMENTS.match(event)) {
+                viewComments();
+            }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
@@ -376,6 +383,12 @@ public class ListPanel extends FilterPanel {
     private void changeLabels() {
         if (getSelectedElement().isPresent()) {
             ui.triggerEvent(new ShowLabelPickerEvent(getSelectedElement().get().getIssue()));
+        }
+    }
+
+    private void viewComments() {
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowCommentViewerEvent(getSelectedElement().get().getIssue()));
         }
     }
 
