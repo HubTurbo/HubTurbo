@@ -38,6 +38,8 @@ public class BoardTests extends UITest {
     public void duplicateNameTest() {
         // Save the current board
         clickMenu("Boards", "Save as");
+        // Use the default 'New Board' as board name
+        // Workaround since we are unable to get text field into focus on Travis
         click("OK");
         assertEquals(1, panelControl.getPanelCount());
 
