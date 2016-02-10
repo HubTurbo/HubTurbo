@@ -12,11 +12,6 @@ import util.PlatformEx;
 
 public class PlatformExTest extends UITest {
 
-    @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class);
-    }
-
     /**
      * This method is needed to sequence concurrent tests. Order matters for these
      * as they rely on Platform.runLater, so we can't let them run in arbitrary order.
