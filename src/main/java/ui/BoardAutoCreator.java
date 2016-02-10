@@ -27,30 +27,28 @@ public class BoardAutoCreator {
     private static final int MAX_WORK_ALLOCATION_PANELS = 5;
     public static final String SAMPLE_BOARD = "Sample Board!";
     private static final String FIRST_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
-    private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo2";
+    private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/HubTurbo";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
     public static final List<String> SAMPLE_PANEL_NAMES =
             Collections.unmodifiableList(Arrays.asList(
+                    "Seven Recent unread updates from my repos",
                     "All issues in my two sample repos",
-                    "Latest 3 urgent open issues",
                     "Open issues assigned to Darius or Manmeet",
                     "Progress of the current milestone",
-                    "Issues awaiting prioritization",
-                    "Recent unread updates from my repos"
+                    "Issues awaiting prioritization"
             ));
 
     public static final List<String> SAMPLE_PANEL_FILTERS =
             Collections.unmodifiableList(Arrays.asList(
+                    String.format("repo:%s;%s count:7 is:unread updated<24 sort:!updated",
+                            FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
             String.format("repo:%s;%s is:issue sort:!updated,comments",
                     FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
-            String.format("repo:%s count:3 is:issue is:open label:\"urgent\"", FIRST_SAMPLE_REPO_NAME),
             String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
                     FIRST_SAMPLE_REPO_NAME),
             String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME),
-            String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME),
-            String.format("repo:%s;%s is:unread updated<24 sort:!updated",
-                    FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME)
+            String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME)
             ));
 
     private final UI ui;
@@ -149,7 +147,9 @@ public class BoardAutoCreator {
         panelControl.selectPanel(0); // current
 
         triggerBoardSaveEventSequence(SAMPLE_BOARD);
-        if(!isCalledOnStartup){
+
+        //isCalledOnStartup is set to true when called on launch in UI.java
+        if (!isCalledOnStartup){
             DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
         }
     }

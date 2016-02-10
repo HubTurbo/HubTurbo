@@ -58,12 +58,21 @@ public final class TestController {
                         isTestJSONEnabled() ||
                         isTestChromeDriver() ||
                         isTestGlobalConfig() ||
+                        isTestStartupBoard() ||
                         isCloseOnQuit());
     }
 
     public static boolean isTestGlobalConfig() {
         return hasUI() && commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
     }
+
+    /** Used for testing startup board on launch (i.e. when the number of stored repos is 0)
+     * StartBoardLauncherTest makes use of this argument to test the launch of the board for first time users
+     */
+    public static boolean isTestStartupBoard() {
+        return hasUI() && commandLineArgs.getOrDefault("startupboard", "false").equalsIgnoreCase("true");
+    }
+
 
     // When --bypasslogin=true is passed as an argument, the username and password
     // are empty strings.
