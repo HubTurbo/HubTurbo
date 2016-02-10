@@ -82,6 +82,10 @@ public class IssueCreatorPresenter {
         }
     }
 
+    String getIssueTitle() {
+        return issue.getTitle();
+    }
+
     void setIssueTitle(String title) {
         issue.setTitle(title);
     }

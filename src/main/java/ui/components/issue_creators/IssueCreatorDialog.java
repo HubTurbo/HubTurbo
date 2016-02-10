@@ -120,6 +120,7 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
     private void initTitles(String input) {
         setTitle(input);
         prompt.setText(input);
+        title.setText(presenter.getIssueTitle());
         
         // Sets focus on title
         Platform.runLater(title::requestFocus);
