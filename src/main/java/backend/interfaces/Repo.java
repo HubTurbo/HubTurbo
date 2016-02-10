@@ -45,6 +45,9 @@ public interface Repo {
 
     Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle, Optional<Integer> issueMilestone)
             throws IOException;
+
+    boolean editIssueState(String repoId, int issueId, boolean open) throws IOException;
+
     ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
 
 }

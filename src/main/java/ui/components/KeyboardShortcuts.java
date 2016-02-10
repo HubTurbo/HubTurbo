@@ -39,6 +39,9 @@ public final class KeyboardShortcuts {
     public static KeyCodeCombination markAsRead;
     public static KeyCodeCombination markAsUnread;
 
+    public static KeyCodeCombination closeIssue;
+    public static KeyCodeCombination reopenIssue;
+
     public static KeyCodeCombination scrollToTop;
     public static KeyCodeCombination scrollToBottom;
     public static KeyCodeCombination scrollUp;
@@ -158,6 +161,8 @@ public final class KeyboardShortcuts {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
         defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
+        defaultKeyboardShortcuts.put("CLOSE_ISSUE", "C");
+        defaultKeyboardShortcuts.put("REOPEN_ISSUE", "O");
         defaultKeyboardShortcuts.put("SCROLL_TO_TOP", "I");
         defaultKeyboardShortcuts.put("SCROLL_TO_BOTTOM", "N");
         defaultKeyboardShortcuts.put("SCROLL_UP", "J");
@@ -180,6 +185,8 @@ public final class KeyboardShortcuts {
     private static void getKeyboardShortcutsFromHashMap() {
         markAsRead = getKeyCodeCombination("MARK_AS_READ");
         markAsUnread = getKeyCodeCombination("MARK_AS_UNREAD");
+        closeIssue = getKeyCodeCombination("CLOSE_ISSUE");
+        reopenIssue = getKeyCodeCombination("REOPEN_ISSUE");
         scrollToTop = getKeyCodeCombination("SCROLL_TO_TOP");
         scrollToBottom = getKeyCodeCombination("SCROLL_TO_BOTTOM");
         scrollUp = getKeyCodeCombination("SCROLL_UP");

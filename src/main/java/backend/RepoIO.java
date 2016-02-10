@@ -207,6 +207,10 @@ public class RepoIO {
         return repoSource.replaceIssueMilestone(issue, milestone);
     }
 
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean open) {
+        return repoSource.editIssueState(issue, open);
+    }
+
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
     }

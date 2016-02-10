@@ -384,13 +384,37 @@ public class Logic {
         LocalDateTime originalMilestoneModifiedAt = originalIssue.getMilestoneLastModifiedAt();
         LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();
         boolean isCurrentMilestoneModifiedFromOriginalMilestone = originalMilestoneModifiedAt
-                                                                    .isEqual(currentMilestoneAssignedAt);
+                .isEqual(currentMilestoneAssignedAt);
 
         if (!isCurrentMilestoneModifiedFromOriginalMilestone) return;
 
         logger.info("Reverting milestone for issue " + currentIssue);
         models.replaceIssueMilestone(currentIssue.getRepoId(), currentIssue.getId(), originalIssue.getMilestone());
         refreshUI();
+    }
+
+    /**
+     * Edit the state of an issue on GitHub
+     *
+     * @param issue The issue whose state is to be updated
+     * @param open The new state for the issue
+     * @return True for success, false otherwise
+     */
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean open) {
+        String action = open ? "Reopening" : "Closing";
+        logger.info(String.format("%s %s on GitHub", action, issue));
+        return repoIO.editIssueState(issue, open)
+                .thenApply(success -> {
+                    if (success) {
+                        logger.info("Changing state for " + issue + " on UI");
+                        issue.setOpen(open);
+                        refreshUI();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+                .exceptionally(Futures.withResult(false));
     }
 
     /**

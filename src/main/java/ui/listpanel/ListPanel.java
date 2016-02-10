@@ -31,6 +31,7 @@ import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import undo.actions.EditIssueStateAction;
 import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
@@ -77,6 +78,10 @@ public class ListPanel extends FilterPanel {
 
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
+
+    private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
+    private static final String closeIssueMenuItemText = "Close issue (C)";
+    private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -248,6 +253,12 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.markAsUnread.match(event)) {
                 markAsUnread();
             }
+            if (KeyboardShortcuts.closeIssue.match(event)) {
+                closeIssue();
+            }
+            if (KeyboardShortcuts.reopenIssue.match(event)) {
+                reopenIssue();
+            }
             if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
@@ -391,6 +402,16 @@ public class ListPanel extends FilterPanel {
             }
         });
 
+        closeReopenIssueMenuItem.setOnAction(e -> {
+            String menuItemText = closeReopenIssueMenuItem.getText();
+
+            if (menuItemText.equals(closeIssueMenuItemText)) {
+                closeIssue();
+            } else if (menuItemText.equals(reopenIssueMenuItemText)) {
+                reopenIssue();
+            }
+        });
+
         changeLabelsMenuItem.setText(CHANGE_LABELS_MENU_ITEM_TEXT);
         changeLabelsMenuItem.setOnAction(e -> {
             changeLabels();
@@ -411,8 +432,11 @@ public class ListPanel extends FilterPanel {
             markAllItemsBelow(!READ);
         });
         
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
-                markAllBelowAsUnreadMenuItem, changeLabelsMenuItem, changeMilestoneMenuItem);
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem,
+                                      markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
+                                      changeLabelsMenuItem,
+                                      changeMilestoneMenuItem,
+                                      closeReopenIssueMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -421,6 +445,7 @@ public class ListPanel extends FilterPanel {
 
     private ContextMenu updateContextMenu(ContextMenu contextMenu) {
         updateMarkAsReadUnreadMenuItem();
+        updateCloseReopenIssueMenuItem();
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
 
@@ -475,6 +500,24 @@ public class ListPanel extends FilterPanel {
         return issuesCount;
     }
 
+    private MenuItem updateCloseReopenIssueMenuItem() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            closeReopenIssueMenuItem.setDisable(false);
+            TurboIssue selectedIssue = item.get().getIssue();
+
+            if (selectedIssue.isOpen()) {
+                closeReopenIssueMenuItem.setText(closeIssueMenuItemText);
+            } else {
+                closeReopenIssueMenuItem.setText(reopenIssueMenuItemText);
+            }
+        } else {
+            closeReopenIssueMenuItem.setDisable(true);
+        }
+
+        return closeReopenIssueMenuItem;
+    }
+    
     public Optional<GuiElement> getSelectedElement() {
         return listView.getSelectedItem();
     }
@@ -521,6 +564,20 @@ public class ListPanel extends FilterPanel {
 
             parentPanelControl.refresh();
         }
+    }
+
+    private void closeIssue() {
+        getSelectedElement().ifPresent(element -> {
+            ui.undoController.addAction(element.getIssue(),
+                    new EditIssueStateAction(ui.logic, false));
+        });
+    }
+
+    private void reopenIssue() {
+        getSelectedElement().ifPresent(element -> {
+            ui.undoController.addAction(element.getIssue(),
+                    new EditIssueStateAction(ui.logic, true));
+        });
     }
 
     private void changeLabels() {
