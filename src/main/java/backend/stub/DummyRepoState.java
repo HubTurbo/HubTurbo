@@ -13,31 +13,32 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
-    private String dummyRepoId;
+    private final String dummyRepoId;
 
-    private TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> labels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> users = new TreeMap<>();
+    private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
+    private final TreeMap<String, TurboLabel> labels = new TreeMap<>();
+    private final TreeMap<Integer, TurboMilestone> milestones = new TreeMap<>();
+    private final TreeMap<String, TurboUser> users = new TreeMap<>();
 
-    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>();
-    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>();
-    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>();
-    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>();
+    private TreeMap<Integer, TurboIssue> updatedIssues = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboLabel> updatedLabels = new TreeMap<>(); // NOPMD
+    private TreeMap<Integer, TurboMilestone> updatedMilestones = new TreeMap<>(); // NOPMD
+    private TreeMap<String, TurboUser> updatedUsers = new TreeMap<>(); // NOPMD
 
     // We store issueMetadata separately from issues so that metadata of issues returned by getUpdatedIssues/getIssues
     // is empty. This is the case when interfacing with GitHub. (and then metadata gets retrieved separately from
     // getEvents and getComments).
-    private HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
+    private final HashMap<Integer, IssueMetadata> issueMetadata = new HashMap<>();
     // We keep track of issues that user has not gotten metadata from.
-    private HashSet<Integer> updatedEvents = new HashSet<>();
-    private HashSet<Integer> updatedComments = new HashSet<>();
+    private final HashSet<Integer> updatedEvents = new HashSet<>();
+    private final HashSet<Integer> updatedComments = new HashSet<>();
 
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
@@ -73,17 +74,26 @@ public class DummyRepoState {
         labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
         labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
         labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
+
+        // set milestones for testing milestone alias
+        milestones.get(1).setDueDate(Optional.of(LocalDate.now().minusMonths(3)));
+        milestones.get(1).setOpen(false);
+        milestones.get(2).setDueDate(Optional.of(LocalDate.now().minusMonths(2))); // current
+        milestones.get(3).setDueDate(Optional.of(LocalDate.now().minusMonths(1)));
+        milestones.get(3).setOpen(false);
+        milestones.get(4).setDueDate(Optional.of(LocalDate.now().plusMonths(1)));
     }
 
     private void connectRepoEntities() {
         // Issues #1-5 are assigned milestones 1-5 respectively
         for (int i = 1; i <= 5; i++) {
             issues.get(i).setMilestone(milestones.get(i));
+            milestones.get(i).setOpenIssues(1);
         }
 
         // Odd issues are assigned label 1, even issues are assigned label 2
         for (int i = 1; i <= 10; i++) {
-            issues.get(i).addLabel((i % 2 == 0) ? "Label 1" : "Label 2");
+            issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 
         // We assign a colorful label to issue 10
@@ -104,7 +114,7 @@ public class DummyRepoState {
         Comment[] ownComments = { ownComment };
         issues.get(9).setCommentCount(1);
         issues.get(9).setUpdatedAt(LocalDateTime.now());
-        issueMetadata.put(9, new IssueMetadata(
+        issueMetadata.put(9, IssueMetadata.intermediate(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(ownComments)),
                 "", ""
@@ -124,12 +134,25 @@ public class DummyRepoState {
         Comment[] dummyComments = { dummyComment1, dummyComment2, dummyComment3 };
         issues.get(10).setCommentCount(3);
         issues.get(10).setUpdatedAt(LocalDateTime.now());
-        issueMetadata.put(10, new IssueMetadata(
+        issueMetadata.put(10, IssueMetadata.intermediate(
                 new ArrayList<>(),
                 new ArrayList<>(Arrays.asList(dummyComments)),
                 "", ""
         ));
         updatedEvents.add(10);
+
+        // Then set label 3 and 11 for issue 8, and immediately remove label 11
+        String[] oldLabels = {"Label 3", "Label 11"};
+        String[] newLabels = {"Label 3"};
+        setLabels(8, Arrays.asList(oldLabels));
+        setLabels(8, Arrays.asList(newLabels));
+        // Then put a temporary (colourful) label into the repo
+        labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
+        String[] issue9Labels = {"Label 1"};
+        String[] deletedLabels = {"Label 1", "Deleted"};
+        setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
+        setLabels(9, Arrays.asList(issue9Labels));
+        labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date>
@@ -290,7 +313,7 @@ public class DummyRepoState {
         toRename.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedEvents(toRename, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+        markUpdatedEvents(toRename, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return toRename;
     }
@@ -336,7 +359,7 @@ public class DummyRepoState {
         return users.remove(idString);
     }
 
-    protected List<Label> setLabels(int issueId, List<String> labels) {
+    protected final List<Label> setLabels(int issueId, List<String> newLabels) {
         // Get copies of issue itself and its metadata
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();
@@ -345,23 +368,23 @@ public class DummyRepoState {
 
         // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.forEach(labelName ->
+        labelsOfIssue.stream().filter(existingLabel -> !newLabels.contains(existingLabel)).forEach(labelName ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Unlabeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
         );
-        labels.forEach(labelName ->
+        newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
                 eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                         IssueEventType.Labeled,
-                        new Date()).setLabelName(labelName))
+                        new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
         );
-        toSet.setLabels(labels);
+        toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedEvents(toSet, new IssueMetadata(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+        markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
-        return labels.stream().map(new Label()::setName).collect(Collectors.toList());
+        return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {
@@ -381,7 +404,8 @@ public class DummyRepoState {
         toComment.setCommentCount(toComment.getCommentCount() + 1);
 
         // Replace originals with copies, and queue them up to be retrieved
-        markUpdatedComments(toComment, new IssueMetadata(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
+        markUpdatedComments(toComment,
+            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }
@@ -404,7 +428,7 @@ public class DummyRepoState {
                 metadataOfIssue.getComments() :
                 new ArrayList<>();
 
-        return new ImmutablePair<>(toMutate, new IssueMetadata(eventsOfIssue, commentsOfIssue, "", ""));
+        return new ImmutablePair<>(toMutate, IssueMetadata.intermediate(eventsOfIssue, commentsOfIssue, "", ""));
     }
 
     /**

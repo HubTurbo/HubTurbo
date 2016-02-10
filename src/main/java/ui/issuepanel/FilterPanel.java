@@ -1,31 +1,38 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
+import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
+
+import filter.expression.QualifierType;
+import ui.GUIController;
+import ui.GuiElement;
+import ui.components.PanelMenuBar;
 import backend.resource.TurboUser;
 import filter.ParseException;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import javafx.collections.transformation.TransformationList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import javafx.scene.input.MouseButton;
+import javafx.scene.input.KeyEvent;
+import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
-import ui.components.PanelNameTextField;
-import util.events.ModelUpdatedEventHandler;
-import util.events.OpenReposChangedEvent;
-import util.events.PanelClickedEvent;
-import util.events.ShowRenamePanelEvent;
+import util.events.*;
+import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,26 +47,20 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private TransformationList<TurboIssue, TurboIssue> transformedIssueList = null;
+    private ObservableList<GuiElement> elementsToDisplay = null;
 
-    protected HBox panelMenuBar;
-    protected Text nameText;
-    protected HBox nameBox;
-    protected HBox menuBarNameArea;
-    protected Label renameButton;
-    protected PanelNameTextField renameTextField;
+    public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
-    
-    private String panelName = "Panel";
-    private UI ui;
+    private final UI ui;
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public FilterPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
-        super(model, parentPanelControl, panelIndex);
+    public FilterPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        super(guiController, parentPanelControl, panelIndex);
         this.ui = ui;
-        
-        getChildren().addAll(createPanelMenuBar(), createFilterBox());
+
+        panelMenuBar = new PanelMenuBar(this, guiController, ui);
+        getChildren().addAll(panelMenuBar, createFilterBox());
         setUpEventHandler();
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
             if (isFocused) {
@@ -68,7 +69,32 @@ public abstract class FilterPanel extends AbstractPanel {
                 getStyleClass().remove("panel-focused");
             }
         });
-        
+        setupKeyboardShortcuts();
+    }
+
+    private void setupKeyboardShortcuts() {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (MAXIMIZE_WINDOW.match(event)) {
+                ui.maximizeWindow();
+            } else if (MINIMIZE_WINDOW.match(event)) {
+                ui.minimizeWindow();
+            } else if (DEFAULT_SIZE_WINDOW.match(event)) {
+                ui.setDefaultWidth();
+            } else if (SWITCH_BOARD.match(event)) {
+                ui.getMenuControl().switchBoard();
+            } else if (JUMP_TO_FILTER_BOX.match(event)) {
+                setFocusToFilterBox();
+            }
+        });
+    }
+    
+    private void setFocusToFilterBox() {
+        if (TestController.isTestMode()) {
+            ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
+        }
+        filterTextField.requestFocus();
+        filterTextField.setText(filterTextField.getText().trim());
+        filterTextField.positionCaret(filterTextField.getLength());
     }
 
     private void setUpEventHandler() {
@@ -76,96 +102,34 @@ public abstract class FilterPanel extends AbstractPanel {
             ui.triggerEvent(new PanelClickedEvent(this.panelIndex));
             requestFocus();
         });
+
+        ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
+
+        ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
 
         // Update keywords
-        List<String> all = new ArrayList<>(Qualifier.KEYWORDS);
-        all.addAll(e.model.getUsers().stream()
+        List<String> all = new ArrayList<>(QualifierType.getCompletionKeywords());
+        all.addAll(e.users.stream()
             .map(TurboUser::getLoginName)
             .collect(Collectors.toList()));
 
-        filterTextField.setKeywords(all);
+        // Ensure that completions appear in lexicographical order
+        Collections.sort(all);
+
+        filterTextField.setCompletionKeywords(all);
     };
-    
-    private Node createPanelMenuBar() {
-        menuBarNameArea = createNameArea();
-        HBox menuBarCloseArea = createCloseButton();
-        
-        panelMenuBar = new HBox();
-        panelMenuBar.setSpacing(2);
-        panelMenuBar.setMinWidth(PANEL_WIDTH);
-        panelMenuBar.setMaxWidth(PANEL_WIDTH);
-        panelMenuBar.getChildren().addAll(menuBarNameArea, menuBarCloseArea);
-        panelMenuBar.setPadding(new Insets(0, 0, 8, 0));
-        return panelMenuBar;
-    }
-    
-    private HBox createNameArea() {
-        HBox nameArea = new HBox();
-        
-        nameText = new Text(panelName);
-        nameText.setId(model.getDefaultRepo() + "_col" + panelIndex + "_nameText");
-        
-        nameBox = new HBox();
-        nameBox.getChildren().add(nameText);
-        nameBox.setMinWidth(330);
-        nameBox.setMaxWidth(330);
-        nameBox.setAlignment(Pos.CENTER_LEFT);
-        
-        nameBox.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                if (mouseEvent.getClickCount() == 2) {
-                    mouseEvent.consume();
-                    activateInplaceRename();
-                }
-            }
-        });
-        
-        renameButton = new Label(RENAME_PANEL);
-        renameButton.getStyleClass().add("label-button");
-        renameButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameButton");
-        renameButton.setOnMouseClicked(e -> {
-            e.consume();
-            activateInplaceRename();
-        });
-        
-        HBox renameBox = new HBox();
-        renameBox.getChildren().add(renameButton);
-        renameBox.setAlignment(Pos.TOP_RIGHT);
-        
-        nameArea.getChildren().addAll(nameBox, renameButton);
-        nameArea.setMinWidth(360);
-        nameArea.setMaxWidth(360);
-        return nameArea;
-    }
-
-    private HBox createCloseButton() {
-        HBox closeArea = new HBox();
-        
-        Label closeButton = new Label(CLOSE_PANEL);
-        closeButton.setId(model.getDefaultRepo() + "_col" + panelIndex + "_closeButton");
-        closeButton.getStyleClass().add("label-button");
-        closeButton.setOnMouseClicked((e) -> {
-            e.consume();
-            parentPanelControl.closePanel(panelIndex);
-            UI.events.triggerEvent(new OpenReposChangedEvent());
-        });
-        
-        closeArea.getChildren().add(closeButton);
-
-        return closeArea;
-    }
 
     private Node createFilterBox() {
-        filterTextField = new FilterTextField("", 0)
+        filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
                     applyStringFilter(text);
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
-        filterTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
+        filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
 
@@ -234,7 +198,39 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    public void filterByString(String filterString) {
+    private void indicatePanelLoading(RepoOpeningEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            addPanelLoadingIndication();
+        }
+    }
+
+    private void unindicatePanelLoading(RepoOpenedEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            removePanelLoadingIndication();
+        }
+    }
+
+    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+
+        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
+
+        return isPrimaryRepoChanged;
+    }
+
+    /**
+     * Implements a user-visible indication that the current panel is loading a repo.
+     */
+    protected abstract void addPanelLoadingIndication();
+
+    /**
+     * Implements the removal of the panel-loading indication that was applied by the method
+     * addPanelLoadingIndication().
+     */
+    protected abstract void removePanelLoadingIndication();
+
+    public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);
     }
 
@@ -244,50 +240,48 @@ public abstract class FilterPanel extends AbstractPanel {
     
     public void restorePanel(String name, String filterString) {
         filterTextField.setFilterText(filterString);
-        this.panelName = name;
-        this.nameText.setText(panelName);
-    }
-    
-    private void activateInplaceRename() {
-        ui.triggerEvent(new ShowRenamePanelEvent(this.panelIndex));
-    }
-    
-    public void showRenameTextField() {
-        renameTextField = new PanelNameTextField(panelName, this);
-        renameTextField.setId(model.getDefaultRepo() + "_col" + panelIndex + "_renameTextField");
-        menuBarNameArea.getChildren().removeAll(nameBox, renameButton);
-        menuBarNameArea.getChildren().addAll(renameTextField);
-    }
-    
-    public void setPanelName(String newName) {
-        this.panelName = newName;
-        nameText.setText(newName);
-    }
-    
-    public void closeRenameTextField(PanelNameTextField renameTextField) {
-        menuBarNameArea.getChildren().remove(renameTextField);
-        menuBarNameArea.getChildren().addAll(nameBox, renameButton);
-        this.requestFocus();
-    }
-    
-    public String getCurrentName() {
-        return this.panelName;
+        panelMenuBar.setPanelName(name);
     }
 
-    public String getCurrentFilterString() {
-        return filterTextField.getText();
+    public void startRename(){
+        panelMenuBar.initRenameableTextFieldAndEvents();
+    }
+
+    public void setPanelName(String newName) {
+        panelMenuBar.setPanelName(newName);
     }
     
     public PanelInfo getCurrentInfo() {
-        return new PanelInfo(this.panelName, filterTextField.getText());
+        return new PanelInfo(this.panelMenuBar.getPanelName(), filterTextField.getText());
     }
 
-    public TransformationList<TurboIssue, TurboIssue> getIssueList() {
-        return transformedIssueList;
+    public ObservableList<GuiElement> getElementsList() {
+        return elementsToDisplay;
     }
 
-    public void setIssueList(TransformationList<TurboIssue, TurboIssue> transformedIssueList) {
-        this.transformedIssueList = transformedIssueList;
+    public Text getNameText() {
+        return this.panelMenuBar.getNameText();
+    }
+
+    public FilterTextField getFilterTextField() {
+        return this.filterTextField;
+    }
+
+    public Label getRenameButton() {
+        return this.panelMenuBar.getRenameButton();
+    }
+
+    public Label getCloseButton() {
+        return this.panelMenuBar.getCloseButton();
+    }
+
+    public void setElementsList(List<GuiElement> transformedElementList) {
+        this.elementsToDisplay = FXCollections.observableArrayList(transformedElementList);
+    }
+
+    public void updatePanel(List<GuiElement> filteredAndSortedElements) {
+        setElementsList(filteredAndSortedElements);
+        refreshItems();
     }
 
     @Override

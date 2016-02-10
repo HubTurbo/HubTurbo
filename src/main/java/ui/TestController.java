@@ -1,8 +1,15 @@
 package ui;
 
+import backend.RepoIO;
+import backend.interfaces.RepoStore;
+import backend.json.JSONStore;
+import backend.json.JSONStoreStub;
+import backend.stub.DummySource;
 import javafx.application.Application;
+import prefs.Preferences;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * A collection of methods that deal with the UI class which are mainly used for testing.
@@ -18,7 +25,6 @@ import java.util.HashMap;
  * instance which can be called from tests that need to access the UI class directly.
  */
 public final class TestController {
-
     private static UI ui;
     private static HashMap<String, String> commandLineArgs;
 
@@ -79,4 +85,58 @@ public final class TestController {
         return hasUI() && commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
     }
 
+    /**
+     * Creates a Preferences instance that stores data in test config file if run in
+     * test mode, or in a default config file specified in the Preferences class
+     * @return
+     */
+    public static Preferences loadApplicationPreferences() {
+        if (isTestMode()) {
+            return loadTestPreferences();
+        }
+
+        return Preferences.load(Preferences.GLOBAL_CONFIG_FILE);
+    }
+
+    /**
+     * Creates a Preferences instance that stores data in a config file for testing, loading
+     * from it if it already exists.
+     * @return
+     */
+    public static Preferences loadTestPreferences() {
+        return Preferences.load(Preferences.TEST_CONFIG_FILE);
+    }
+
+    /**
+     * Creates a Preferences instance that stores data in a config file for testing, unconditionally
+     * initialising it beforehand.
+     * @return
+     */
+    public static Preferences createTestPreferences() {
+        return Preferences.create(Preferences.TEST_CONFIG_FILE);
+    }
+
+    /**
+     * Creates a RepoIO for the application that uses different components
+     * depending on various test options: --test, --testjson etc.
+     * @return
+     */
+    public static RepoIO createApplicationRepoIO() {
+        if (isTestMode()) {
+            return createTestingRepoIO(isTestJSONEnabled() ? Optional.of(new JSONStoreStub()) : Optional.empty());
+        } else {
+            return new RepoIO(Optional.empty(), Optional.empty(), Optional.empty());
+        }
+    }
+
+    /**
+     * Creates a partially stubbed RepoIO used for testing
+     * @param jsonStoreToBeUsed store to be used with RepoIO,
+     *                          defaults to a new instance of JSONStore if this value is empty
+     * @return
+     */
+    public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
+        return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,
+                          Optional.of(RepoStore.TEST_DIRECTORY));
+    }
 }

@@ -1,68 +1,96 @@
 package guitests;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static junit.framework.TestCase.assertTrue;
+import static ui.components.KeyboardShortcuts.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
 
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import ui.TestController;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import util.events.PanelClickedEventHandler;
 
 public class PanelsTest extends UITest {
 
-    private static class Bool {
-        public boolean value = false;
-        public void negate() {
-            value = !value;
-        }
-    }
+    final AtomicBoolean eventTriggered = new AtomicBoolean(false);
 
-    // TODO check if interactions result in any effects
     @Test
     public void panelsTest() {
 
-        Bool eventTriggered = new Bool();
+        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.set(true));
 
-        UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.negate());
+        pushKeys(MAXIMIZE_WINDOW);
+        pushKeys(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
+        waitUntilNodeAppears(getPanel(0).getFilterTextField());
 
-        // maximize
-        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
-
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        type("repo");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("dummy2/dummy2");
+        type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
-        // Drag
-        // TODO check whether panels are actually reordered
-        drag("#dummy/dummy_col1_closeButton").to("#dummy/dummy_col0_closeButton");
+        selectPanel(1);
 
-        // Click
-        eventTriggered.value = false;
-        find("#dummy/dummy_col0_closeButton");
-        moveBy(-50, 0);
-        click(); // Click
-        assertTrue(eventTriggered.value);
+        final FilterPanel panel0 = getPanel(0);
+        final FilterPanel panel1 = getPanel(1);
+        final FilterPanel panel2 = getPanel(2);
 
-        // Close
-        click("#dummy/dummy_col0_closeButton");
-        try {
-            find("#dummy/dummy_col0");
-            fail();
-        } catch (NoNodesFoundException e) {
-            // Expected behavior.
-        }
+        reorderPanelsByDragging(panel0, panel1, panel2);
 
-        // Switch primary repo
-        doubleClick("#repositorySelector");
-        doubleClick();
+        click(panel0.getCloseButton());
+        waitUntilNodeDisappears(panel0);
+
+        // Switch default repo
+        click("#repositorySelector");
+        selectAll();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        // Actually a check. If #dummy2/dummy2_col1 did not exist, this would throw an exception.
-        click("#dummy2/dummy2_col1");
+        pushKeys(CREATE_RIGHT_PANEL);
+
+        // Ensure that new panels are associated with the current default repo
+        awaitCondition(() -> existsQuiet("#dummy2/dummy2_col2"));
+    }
+
+    private void reorderPanelsByDragging(FilterPanel panel0, FilterPanel panel1, FilterPanel panel2) {
+        dragUnconditionally(dragSrc(panel1), dragDest(panel0));
+        awaitCondition(() -> getPanel(0) == panel1);
+
+        dragUnconditionally(dragSrc(panel0), dragDest(panel1));
+        awaitCondition(() -> getPanel(0) == panel0);
+
+        dragUnconditionally(dragSrc(panel1), dragDest(panel0));
+        awaitCondition(() -> getPanel(0) == panel1);
+
+        dragUnconditionally(dragSrc(panel1), dragDest(panel2));
+        awaitCondition(() -> getPanel(0) == panel0 && getPanel(1) == panel2 && getPanel(2) == panel1);
+
+        dragUnconditionally(dragSrc(panel2), dragDest(panel1));
+        awaitCondition(() -> getPanel(0) == panel0 && getPanel(1) == panel1 && getPanel(2) == panel2);
+
+        dragUnconditionally(dragSrc(panel0), dragDest(panel1));
+        awaitCondition(() -> getPanel(0) == panel1);
+    }
+
+    private Node dragSrc(FilterPanel panel) {
+        return panel.getCloseButton();
+    }
+
+    private Node dragDest(FilterPanel panel) {
+        return panel.getFilterTextField();
+    }
+
+    private void selectPanel(int index) {
+        eventTriggered.set(false);
+        click(getPanel(index).getNameText());
+        awaitCondition(eventTriggered::get);
+    }
+
+    private FilterPanel getPanel(int index) {
+        PanelControl panels = TestController.getUI().getPanelControl();
+        return (FilterPanel) panels.getPanel(index);
     }
 }

@@ -3,21 +3,36 @@ package tests;
 import backend.resource.TurboIssue;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
+import util.Utility;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TurboIssueTest {
 
     private static final String REPO = "testrepo/testrepo";
+
+    private TurboIssue createIssueWithUpdatedAt(int number, LocalDateTime updatedAt) {
+        TurboIssue issue = new TurboIssue(REPO, number, "", "", null, false);
+        issue.setUpdatedAt(updatedAt);
+
+        return issue;
+    }
+
+    private PullRequest createPullRequestWithUpdatedAt(int number, LocalDateTime updatedAt) {
+        Date date = Utility.localDateTimeToDate(updatedAt);
+
+        PullRequest pullRequest = new PullRequest();
+        pullRequest.setNumber(number);
+        pullRequest.setUpdatedAt(date);
+
+        return pullRequest;
+    }
 
     @Test
     public void turboIssueTest() {
@@ -58,4 +73,42 @@ public class TurboIssueTest {
         assertTrue(issue.isCurrentlyRead());
     }
 
+    @Test
+    public void testCombinePullRequest() {
+        TurboIssue issue1 = createIssueWithUpdatedAt(1, LocalDateTime.of(2015, 2, 17, 2, 10));
+        TurboIssue issue2 = createIssueWithUpdatedAt(2, LocalDateTime.of(2015, 2, 18, 2, 10));
+        TurboIssue issue3 = createIssueWithUpdatedAt(3, LocalDateTime.of(2015, 2, 19, 2, 10));
+        TurboIssue issue4 = createIssueWithUpdatedAt(4, LocalDateTime.of(2015, 2, 20, 2, 10));
+
+        List<TurboIssue> issues = new ArrayList<>();
+        issues.add(issue1);
+        issues.add(issue2);
+        issues.add(issue3);
+        issues.add(issue4);
+        Collections.shuffle(issues);
+
+        PullRequest pr1 = createPullRequestWithUpdatedAt(1, LocalDateTime.of(2015, 7, 7, 1, 21));
+        PullRequest pr2 = createPullRequestWithUpdatedAt(2, LocalDateTime.of(2015, 2, 18, 2, 9));
+        PullRequest pr3 = new PullRequest();
+        pr3.setNumber(3);
+        PullRequest pr5 = new PullRequest();
+        pr5.setNumber(5);
+
+        List<PullRequest> pullRequests = new ArrayList<>();
+        pullRequests.add(pr1);
+        pullRequests.add(pr2);
+        pullRequests.add(pr3);
+        pullRequests.add(pr5);
+        Collections.shuffle(pullRequests);
+
+        List<TurboIssue> newIssues = TurboIssue.combineWithPullRequests(issues, pullRequests);
+        TurboIssue newIssue1 = newIssues.get(TurboIssue.findIssueWithId(newIssues, 1).get());
+        TurboIssue newIssue2 = newIssues.get(TurboIssue.findIssueWithId(newIssues, 2).get());
+        TurboIssue newIssue3 = newIssues.get(TurboIssue.findIssueWithId(newIssues, 3).get());
+        TurboIssue newIssue4 = newIssues.get(TurboIssue.findIssueWithId(newIssues, 4).get());
+        assertEquals(LocalDateTime.of(2015, 7, 7, 1, 21), newIssue1.getUpdatedAt());
+        assertEquals(issue2.getUpdatedAt(), newIssue2.getUpdatedAt());
+        assertEquals(issue3.getUpdatedAt(), newIssue3.getUpdatedAt());
+        assertEquals(issue4.getUpdatedAt(), newIssue4.getUpdatedAt());
+    }
 }

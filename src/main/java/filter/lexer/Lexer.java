@@ -13,7 +13,7 @@ public class Lexer {
     private static final boolean SKIP_WHITESPACE = true;
     private static final Pattern NO_WHITESPACE = Pattern.compile("\\S");
 
-    private List<Rule> rules = Arrays.asList(
+    private final List<Rule> rules = Arrays.asList(
             new Rule("AND|&&?", TokenType.AND),
             new Rule("OR|\\|\\|?", TokenType.OR),
             new Rule("NOT|~|!|-", TokenType.NOT),
@@ -21,12 +21,14 @@ public class Lexer {
             // These have higher priority than Symbol
             new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
             new Rule("[A-Za-z]+(-[A-Za-z]+)*\\s*:", TokenType.QUALIFIER),
-            new Rule("[A-Za-z0-9#][/A-Za-z0-9.'-]*", TokenType.SYMBOL),
+            new Rule(";", TokenType.SEMICOLON),
+            new Rule("[A-Za-z0-9#][/A-Za-z0-9.'+-]*", TokenType.SYMBOL),
 
             new Rule("\\(", TokenType.LBRACKET),
             new Rule("\\)", TokenType.RBRACKET),
             new Rule("\\\"", TokenType.QUOTE),
             new Rule(",", TokenType.COMMA),
+            new Rule("%", TokenType.PERCENT),
             new Rule("\\.\\.", TokenType.DOTDOT),
 
             // These have higher priority than < and >
@@ -38,7 +40,7 @@ public class Lexer {
             new Rule("\\*", TokenType.STAR)
         );
 
-    private String input;
+    private final String input;
     private int position;
 
     public Lexer(String input) {
@@ -46,7 +48,7 @@ public class Lexer {
         this.position = 0;
     }
 
-    private Pattern trailingWhitespace = Pattern.compile("\\s+$");
+    private final Pattern trailingWhitespace = Pattern.compile("\\s+$");
     private String stripTrailingWhitespace(String input) {
         return trailingWhitespace.matcher(input).replaceAll("");
     }

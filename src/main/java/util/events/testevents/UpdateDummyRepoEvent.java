@@ -2,7 +2,7 @@ package util.events.testevents;
 
 import util.events.Event;
 
-public class UpdateDummyRepoEvent extends Event {
+public final class UpdateDummyRepoEvent extends Event {
 
     public final UpdateType updateType;
     public final String repoId;

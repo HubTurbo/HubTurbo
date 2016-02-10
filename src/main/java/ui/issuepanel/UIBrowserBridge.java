@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit;
 public class UIBrowserBridge {
 
     private static final int BROWSER_REQUEST_DELAY = 400; //milliseconds
-    private TickingTimer timer;
-    private Optional<String> nextRepoId = Optional.empty();
-    private Optional<Integer> nextIssueId = Optional.empty();
-    private Optional<Boolean> isPullRequest = Optional.empty();
+    private final TickingTimer timer;
+    private Optional<String> nextRepoId = Optional.empty(); // NOPMD
+    private Optional<Integer> nextIssueId = Optional.empty(); // NOPMD
+    private Optional<Boolean> isPullRequest = Optional.empty(); // NOPMD
 
     public UIBrowserBridge(UI ui) {
         timer = createTickingTimer(ui);

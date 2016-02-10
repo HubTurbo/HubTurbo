@@ -8,39 +8,25 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.*;
 import github.update.*;
-
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubRequest;
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.client.PagedRequest;
-import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.client.*;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
-
 import ui.UI;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 public class GitHubRepo implements Repo {
 
@@ -48,12 +34,10 @@ public class GitHubRepo implements Repo {
 
     private final GitHubClientEx client = new GitHubClientEx();
     private final IssueServiceEx issueService = new IssueServiceEx(client);
+    private final PullRequestServiceEx pullRequestService = new PullRequestServiceEx(client);
     private final CollaboratorService collaboratorService = new CollaboratorService(client);
     private final LabelServiceEx labelService = new LabelServiceEx(client);
     private final MilestoneService milestoneService = new MilestoneService(client);
-
-    public GitHubRepo() {
-    }
 
     @Override
     public boolean login(UserCredentials credentials) {
@@ -82,6 +66,12 @@ public class GitHubRepo implements Repo {
             .collect(Collectors.toList());
         return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETags(),
             issueUpdateService.getUpdatedCheckTime());
+    }
+
+    @Override
+    public List<PullRequest> getUpdatedPullRequests(String repoId, Date lastCheckTime) {
+        PullRequestUpdateService updateService = new PullRequestUpdateService(client, lastCheckTime);
+        return updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
     }
 
     @Override
@@ -188,7 +178,7 @@ public class GitHubRepo implements Repo {
                 // Total is approximate: always >= the actual amount
                 assert totalIssueCount >= elements.size();
 
-                float progress = ((float) elements.size() / (float) totalIssueCount);
+                float progress = (float) elements.size() / (float) totalIssueCount;
                 UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
                 logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)",
                     elements.size(), progress * 100));
@@ -226,6 +216,36 @@ public class GitHubRepo implements Repo {
             HTLog.error(logger, e);
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
+        try {
+            return pullRequestService.getReviewComments(RepositoryId.createFromId(repoId),
+                                                        pullRequestId);
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get all types of comments for an issue. Review comments and commit comments
+     * are only relevant if the issue is a also pull request
+     * @param repoId
+     * @param issue
+     * @return list of comments for an issue
+     */
+    @Override
+    public List<Comment> getAllComments(String repoId, TurboIssue issue) {
+        List<Comment> result = new ArrayList<>();
+
+        result.addAll(getComments(repoId, issue.getId()));
+        if (issue.isPullRequest()) {
+            result.addAll(getReviewComments(repoId, issue.getId()));
+        }
+
+        return result;
     }
 
     @Override

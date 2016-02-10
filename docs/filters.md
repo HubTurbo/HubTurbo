@@ -108,10 +108,9 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`is`](#is)
 - [`created`](#created)
 - [`updated`](#updated)
-- [`updated-others`](#updated-others)
-- [`updated-self`](#updated-self)
 - [`repo`](#repo)
 - [`sort`](#sort)
+- [`count`](#count)
 
 #### Formats
 
@@ -146,11 +145,17 @@ Matches all issues with a title containing the given string.
 
 Matches all issues with a body (or description) containing the given string.
 
+Aliases: `desc`, `description`
+
 ### milestone
 
 *Expects a string*
 
 Matches all issues associated with any milestones whose names contain the given string.
+
+`current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. Milestones with no due date will not be considered in resolving `curr`/`current`. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
+
+Aliases: `m`
 
 ### label
 
@@ -164,11 +169,15 @@ Matches all issues with the given label. A group name may be used to qualify the
 
 Matches all issues assigned to the given person, identified by the given alias, GitHub username, or real name, in that priority.
 
+Aliases: `as`
+
 ### author
 
 *Expects a string*
 
 Matches all issues created by the given person, identified by the given alias, GitHub username, or real name, in that priority.
+
+Aliases: `au`, `creator`
 
 ### involves
 
@@ -176,29 +185,41 @@ Matches all issues created by the given person, identified by the given alias, G
 
 Matches all issues involving (assigned to or created by) the given person, identified by the given alias, GitHub username, or real name, in that priority.
 
+Aliases: `user`
+
 ### state
 
 *Expects one of `open` or `closed`*
 
 Matches all issues of the given state.
 
+Aliases: `s`, `status`
+
 ### has
 
-*Expects one of `label`, `milestone`, `assignee`
+*Expects one of `label`, `milestone`, `assignee`*
 
-Matches all issues possessing the given attribute.
+Matches issues associated with the given type of resource.
+
+Aliases:
+
+- `label` can be written as `labels`
+- `milestone` can be written as `milestone` or `m`
+- `assignee` can be written as `assignee` or `as`
 
 ### no
 
-*Expects one of `label`, `milestone`, `assignee`
+*Expects one of `label`, `milestone`, `assignee`*
 
-The negation of `has`. Matches all issues without the given attribute.
+The negation of `has`. Matches issues not associated with the given type of resource.
+
+Aliases: see [has](#has).
 
 ### in
 
 *Expects one of `title` or `body`*
 
-Meta-qualifier. Changes the semantics of `keyword` so it only searches in either the title or body.
+Meta-qualifier. Changes the semantics of search terms to check only either the title or body.
 
 ### type
 
@@ -224,18 +245,6 @@ Matches issues which were created on a given date, or within a given date range.
 
 Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`. Number ranges are written using a relational operator (.e.g `>5`, `<=10`).
 
-### updated-others
-
-*Expects a number or  number range*
-
-Like [`updated`](#updated), but considers only issues updated by others (not the logged in user).
-
-### updated-self
-
-*Expects a number or  number range*
-
-Like [`updated`](#updated), but considers only issues updated by the logged in user.
-
 ### repo
 
 *Expects a repo id*
@@ -244,9 +253,26 @@ Matches issues of the given repository. If omitted, will match issues of the def
 
 ### sort
 
-*Expects a comma-separated list of sorting keys. For example, `repo, ~updated, -comments`. Any negation operator can be used to invert them. Keys can be any of `comments`, `repo`, `updated`, `date` (an alias for `updated`), `id`, `assignee`, `status`(`open` or `closed`) or a label group. Label groups can be disambiguated by appending a `.`.*
+*Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`.*
 
-Sorts a repository by the list of keys, going from left to right. Negated keys will reverse the ordering that they describe.
+Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
+
+### count
+
+*Expects a number*
+
+The maximum number of issues that can be displayed in a panel. For example, `count:4` would display a maximum of 4 issues in the panel.
+
+Available sorting criteria:
+
+- `comments`: sorts by number of comments (in descending order)
+- `repo`: sorts by repo. Only applicable if the panel is showing issues from more than one repo
+- `updated` (or `date`): sorts issues by their updated time (latest updated issues are shown first)
+- `id`: sorts by issue id (in ascending order)
+- `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
+- `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `s`
+- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
+- Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
 
 ## Additional features
 
@@ -254,7 +280,7 @@ HubTurbo automatically downloads detailed information about issues when the [`up
 
 When the [`updated`](#updated) filter is specified, the issues to be displayed are also automatically sorted by the latest *non-self update* i.e. the last time someone other than the currently logged-in user makes a change to the issue. This order can be explicitly overridden by specifying another sort order through the [`sort`](#sort) filter.
 
-To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments` 
+To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments`
 
 ## Incompatibilities
 

@@ -1,6 +1,5 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.input.ClipboardContent;
@@ -8,6 +7,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import ui.DragData;
+import ui.GUIController;
 
 /**
  * A AbstractPanel is a JavaFX node that is contained by a PanelControl.
@@ -21,15 +21,17 @@ public abstract class AbstractPanel extends VBox {
 
     public static final int PANEL_WIDTH = 400;
 
-    public static final String CLOSE_PANEL = "\u2715";
-    public static final String RENAME_PANEL = "\u270E";
+    public static final String OCTICON_RENAME_PANEL = "\uf058";
+    public static final String OCTICON_CLOSE_PANEL = "\uf081";
+    public static final String OCTICON_TICK_MARK = "\uf03a";
+    public static final String OCTICON_UNDO = "\uf051";
 
-    protected final IModel model;
-    protected final PanelControl parentPanelControl;
-    protected int panelIndex;
+    protected final GUIController guiController;
+    public final PanelControl parentPanelControl;
+    public int panelIndex;
 
-    public AbstractPanel(IModel model, PanelControl parentPanelControl, int panelIndex) {
-        this.model = model;
+    public AbstractPanel(GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        this.guiController = guiController;
         this.parentPanelControl = parentPanelControl;
         this.panelIndex = panelIndex;
 
@@ -63,7 +65,7 @@ public abstract class AbstractPanel extends VBox {
         setOnDragDetected((event) -> {
             Dragboard db = startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            DragData dd = new DragData(DragData.Source.PANEL, -1, -1);
+            DragData dd = new DragData(-1);
             content.putString(dd.serialise());
             db.setContent(content);
             // We're using this because the content of a dragboard can't be changed
@@ -89,19 +91,22 @@ public abstract class AbstractPanel extends VBox {
 
     /**
      * This method is called when the item list is to be refreshed. This mainly happens
-     * when the user selects Refresh from the menu. Subclasses may also require it.
+     * when the user selects Refresh from the menu.
      * Currently implemented by ListPanel to re-render the list of IssuePanelCards.
-     *
-     * @param hasMetadata implies the issues to be filtered have metadata inside,
-     *                    and thus should be displayed and sorted accordingly.
-     *                    Currently it indicates whether the IssuePanelCards will
-     *                    show metadata details.
      */
-    public abstract void refreshItems(boolean hasMetadata);
+    public abstract void refreshItems();
 
     /**
      * This method is called when the panel control is deselected. It used to happen when
      * the issue panel was closed.
      */
     public abstract void close();
+
+    public PanelControl getParentPanelControl(){
+        return parentPanelControl;
+    }
+
+    public int getPanelIndex(){
+        return panelIndex;
+    }
 }

@@ -42,7 +42,7 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            String repoId = Utility.removeAllWhiteSpaces(newVal);
+            String repoId = Utility.removeAllWhitespace(newVal);
             if (!repoId.equals(newVal)) {
                 comboBox.setValue(repoId);
                 return;
@@ -53,13 +53,15 @@ public class RepositorySelector extends HBox {
             }
         });
 
-        //remove focus from the repo selector
-        comboBox.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-            event.consume();
+        comboBox.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+
+            //remove focus from the repo selector
             if (REMOVE_FOCUS.match(event)) {
+                event.consume();
                 getParent().requestFocus();
             }
         });
+
     }
 
     public void setOnValueChange(Consumer<String> callback) {
@@ -84,6 +86,7 @@ public class RepositorySelector extends HBox {
         changesDisabled = true;
         comboBox.setValue(repoId);
         changesDisabled = false;
+        comboBox.getEditor().positionCaret(repoId.length());
     }
 
     public void refreshContents() {

@@ -16,8 +16,8 @@ import javafx.scene.text.Text;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import ui.GuiElement;
 import util.Utility;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 
@@ -29,9 +29,10 @@ public class TurboIssueEvent {
     private static final String OCTICON_MILESTONE = "\uf075";
     private static final String OCTICON_ISSUE_CLOSED = "\uf028";
     private static final String OCTICON_ISSUE_OPENED = "\uf027";
-    private static final String OCTICON_MEGAPHONE = "\uf077";
+    private static final String OCTICON_PENCIL = "\uf058";
     private static final String OCTICON_PERSON = "\uf018";
     public static final String OCTICON_QUOTE = "\uf063";
+
 
     // Maximum time difference in seconds between label update events in the same group
     private static final long MAX_TIME_DIFF = 60;
@@ -80,9 +81,10 @@ public class TurboIssueEvent {
         assert isLabelUpdateEvent();
         return labelColour;
     }
-    public void setLabelColour(String labelColour) {
+    public TurboIssueEvent setLabelColour(String labelColour) {
         assert isLabelUpdateEvent();
         this.labelColour = labelColour;
+        return this;
     }
     public String getMilestoneTitle() {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
@@ -137,7 +139,7 @@ public class TurboIssueEvent {
         return text;
     }
 
-    public Node display(Model model, TurboIssue issue) {
+    public Node display(GuiElement guiElement, TurboIssue issue) {
         String actorName = getActor().getLogin();
         String time = new PrettyTime().format(getDate());
 
@@ -147,7 +149,7 @@ public class TurboIssueEvent {
         switch (getType()) {
             case Renamed: {
                 HBox display = new HBox();
-                display.getChildren().addAll(octicon(OCTICON_MEGAPHONE),
+                display.getChildren().addAll(octicon(OCTICON_PENCIL),
                     conditionallyBold(bold,
                         new Text(String.format("%s renamed this issue %s.", actorName, time))));
                 return display;
@@ -166,8 +168,10 @@ public class TurboIssueEvent {
                         "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
                 return display;
             }
+            // Labeled and Unlabeled are not invoked as createLabelUpdateEventNodes is invoked
+            // instead for these event types (see ListPanelCard.layoutEvents)
             case Labeled: {
-                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
+                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
@@ -180,7 +184,7 @@ public class TurboIssueEvent {
                 return display;
             }
             case Unlabeled: {
-                Optional<TurboLabel> label = model.getLabelByActualName(getLabelName());
+                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
                 HBox display = new HBox();
                 display.getChildren().addAll(
                     octicon(OCTICON_TAG),
@@ -267,12 +271,11 @@ public class TurboIssueEvent {
 
     /**
      * Create a list of JavaFX nodes to display label update events
-     * @param model
      * @param labelUpdateEvents
      * @return list of Node corresponding to groups of label update events
      */
     public static List<Node> createLabelUpdateEventNodes(
-            Model model, List<TurboIssueEvent> labelUpdateEvents) {
+            GuiElement guiElement, List<TurboIssueEvent> labelUpdateEvents) {
 
         assert labelUpdateEvents != null : "Error: Received null list of events";
 
@@ -292,7 +295,7 @@ public class TurboIssueEvent {
                     new Text(String.format("%s :", actorName)));
 
             group.forEach(e -> {
-                Node node = createLabelNode(model, e);
+                Node node = createLabelNode(guiElement, e);
                 box.getChildren().add(node);
             });
 
@@ -304,15 +307,15 @@ public class TurboIssueEvent {
         return result;
     }
 
-    private static Node createLabelNode(Model model, TurboIssueEvent e) {
-        Optional<TurboLabel> label = model.getLabelByActualName(e.getLabelName());
-
-        Node node = label.isPresent() ?
-                    label.get().getNode() : new Label(e.getLabelName());
+    private static Node createLabelNode(GuiElement guiElement, TurboIssueEvent e) {
+        // Unlabeled/Labeled events use data from the TurboIssueEvent itself (see GuiElement.getLabels documentation)
+        TurboLabel label = new TurboLabel(guiElement.getIssue().getRepoId(),
+                e.getLabelColour(),
+                e.getLabelName());
+        Node node = label.getNode();
         if (e.getType() == IssueEventType.Unlabeled) {
             node.getStyleClass().add("labels-removed");
         }
-
         return node;
     }
 

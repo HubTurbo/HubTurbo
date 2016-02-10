@@ -1,59 +1,49 @@
 package ui.listpanel;
 
+import static ui.components.KeyboardShortcuts.*;
+import static util.GithubPageElements.DISCUSSION_TAB;
+import static util.GithubPageElements.COMMITS_TAB;
+import static util.GithubPageElements.FILES_TAB;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-import backend.interfaces.IModel;
-import backend.resource.TurboIssue;
-import filter.expression.Qualifier;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
-import ui.TestController;
+
+import org.apache.logging.log4j.Logger;
+
+import ui.GUIController;
+import ui.GuiElement;
 import ui.UI;
-import ui.components.KeyboardShortcuts;
 import ui.components.IssueListView;
+import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import util.GithubPageElements;
+import util.HTLog;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
 import util.events.ShowLabelPickerEvent;
-import util.events.testevents.UIComponentFocusEvent;
-
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
-import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
-import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
-import static ui.components.KeyboardShortcuts.UNDO_LABEL_CHANGES;
-import static ui.components.KeyboardShortcuts.GOTO_MODIFIER;
-import static ui.components.KeyboardShortcuts.SHOW_DOCS;
-import static ui.components.KeyboardShortcuts.SHOW_CONTRIBUTORS;
-import static ui.components.KeyboardShortcuts.SHOW_HELP;
-import static ui.components.KeyboardShortcuts.SHOW_ISSUES;
-import static ui.components.KeyboardShortcuts.SHOW_LABELS;
-import static ui.components.KeyboardShortcuts.SHOW_MILESTONES;
-import static ui.components.KeyboardShortcuts.SHOW_PULL_REQUESTS;
-import static ui.components.KeyboardShortcuts.SHOW_KEYBOARD_SHORTCUTS;
-import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
-import static ui.components.KeyboardShortcuts.NEW_COMMENT;
-import static ui.components.KeyboardShortcuts.MANAGE_ASSIGNEES;
+import backend.resource.TurboIssue;
+import filter.expression.Qualifier;
 
 public class ListPanel extends FilterPanel {
 
-    private final IModel model;
+    private static final Logger logger = HTLog.get(ListPanel.class);
+
     private final UI ui;
+    private final GUIController guiController;
     private int issueCount;
 
-    private IssueListView listView;
-    private HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
-    private HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
+    private final IssueListView listView;
+    private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
+    private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
@@ -65,10 +55,10 @@ public class ListPanel extends FilterPanel {
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
 
-    public ListPanel(UI ui, IModel model, PanelControl parentPanelControl, int panelIndex) {
-        super(ui, model, parentPanelControl, panelIndex);
-        this.model = model;
+    public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+        super(ui, guiController, parentPanelControl, panelIndex);
         this.ui = ui;
+        this.guiController = guiController;
 
         listView = new IssueListView();
         setupListView();
@@ -101,7 +91,8 @@ public class ListPanel extends FilterPanel {
      */
     private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
         HashSet<Integer> result = new HashSet<>();
-        for (TurboIssue issue : getIssueList()) {
+        for (GuiElement guiElement : getElementsList()) {
+            TurboIssue issue = guiElement.getIssue();
             if (issueCommentCounts.containsKey(issue.getId())) {
                 // We know about this issue; check if it's been updated
                 if (issueHasNewComments(issue, hasMetadata)) {
@@ -117,27 +108,26 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Refreshes the list of issue cards shown to the user.
-     *
-     * @param hasMetadata Indicates the comment count hashmap to be used.
+     * Refreshes the list of issue cards shown to the user depending on the currently active filter expression
+     * in the panel.
      */
     @Override
-    public void refreshItems(boolean hasMetadata) {
-        final HashSet<Integer> issuesWithNewComments = updateIssueCommentCounts(hasMetadata);
+    public final void refreshItems() {
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
 
         // Set the cell factory every time - this forces the list view to update
-        listView.setCellFactory(list ->
-                new ListPanelCell(model, ListPanel.this, panelIndex, issuesWithNewComments));
+        listView.setCellFactory(list -> new ListPanelCell(this, panelIndex, issuesWithNewComments));
         listView.saveSelection();
 
         // Supposedly this also causes the list view to update - not sure
         // if it actually does on platforms other than Linux...
         listView.setItems(null);
-        listView.setItems(getIssueList());
-        issueCount = getIssueList().size();
+        listView.setItems(getElementsList());
+        issueCount = getElementsList().size();
 
         listView.restoreSelection();
-        this.setId(model.getDefaultRepo() + "_col" + panelIndex);
+        this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
     }
 
     private void setupListView() {
@@ -148,7 +138,7 @@ public class ListPanel extends FilterPanel {
         listView.setOnItemSelected(i -> {
             updateContextMenu(contextMenu);
 
-            TurboIssue issue = listView.getItems().get(i);
+            TurboIssue issue = listView.getItems().get(i).getIssue();
             ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
             );
@@ -158,37 +148,16 @@ public class ListPanel extends FilterPanel {
             // (if it was there before)
             issueCommentCounts.put(issue.getId(), issue.getCommentCount());
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
-            // We assume we already have metadata, so we pass true to avoid refreshItems from trying to get
-            // metadata after clicking.
-            refreshItems(true);
+
+            refreshItems();
         });
     }
 
-    private void setupKeyboardShortcuts() {
-        filterTextField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (JUMP_TO_FIRST_ISSUE.match(event)) {
-                event.consume();
-                listView.selectNthItem(1);
-            }
-            if (MAXIMIZE_WINDOW.match(event)) {
-                ui.maximizeWindow();
-            }
-            if (MINIMIZE_WINDOW.match(event)) {
-                ui.minimizeWindow();
-            }
-            if (DEFAULT_SIZE_WINDOW.match(event)) {
-                ui.setDefaultWidth();
-            }
-            if (SWITCH_DEFAULT_REPO.match(event)) {
-                ui.switchDefaultRepo();
-            }
-            if (SWITCH_BOARD.match(event)) {
-                ui.getMenuControl().switchBoard();
-            }
-        });
-
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-            if (KeyboardShortcuts.markAsRead.match(event)) {
+    private void setupKeyboardShortcuts() {        
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
+            // Will only work if the key for markAsRead is not the default key E.
+            if (KeyboardShortcuts.markAsRead.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
                 markAsRead();
             }
             if (KeyboardShortcuts.markAsUnread.match(event)) {
@@ -197,45 +166,37 @@ public class ListPanel extends FilterPanel {
             if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
-            if (JUMP_TO_FILTER_BOX.match(event)) {
-                setFocusToFilterBox();
+            if (SHOW_ISSUES.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showIssues();
             }
-            if (JUMP_TO_FIRST_ISSUE.match(event)) {
-                listView.selectNthItem(1);
+            if (SHOW_PULL_REQUESTS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showPullRequests();
             }
-            if (SHOW_ISSUES.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showIssues();
-                }
+            if (SHOW_HELP.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showDocs();
             }
-            if (SHOW_PULL_REQUESTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showPullRequests();
-                }
+            if (SHOW_KEYBOARD_SHORTCUTS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showKeyboardShortcuts();
             }
-            if (SHOW_HELP.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showDocs();
-                }
-            }
-            if (SHOW_KEYBOARD_SHORTCUTS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showKeyboardShortcuts();
-                }
-            }
-            if (SHOW_CONTRIBUTORS.match(event)) {
-                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().showContributors();
-                    event.consume();
-                }
+            if (SHOW_CONTRIBUTORS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().showContributors();
+                event.consume();
             }
             if (KeyboardShortcuts.scrollToTop.match(event)) {
                 ui.getBrowserComponent().scrollToTop();
             }
             if (KeyboardShortcuts.scrollToBottom.match(event)) {
-                if (!MINIMIZE_WINDOW.match(event)) {
-                    ui.getBrowserComponent().scrollToBottom();
-                }
+                ui.getBrowserComponent().scrollToBottom();
             }
             if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
                 ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
@@ -243,10 +204,25 @@ public class ListPanel extends FilterPanel {
             if (GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
             }
-            if (NEW_COMMENT.match(event) && 
-                    ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToConversationTab();
-                ui.getBrowserComponent().jumpToComment();
+            if (NEW_COMMENT.match(event)) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    ui.getBrowserComponent().jumpToComment();
+                }
+            }
+            if (PR_FILES_CHANGED.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().switchToTab(FILES_TAB);
+                event.consume();
+            }
+            if (PR_COMMITS.match(event)
+                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                ui.getBrowserComponent().switchToTab(COMMITS_TAB);
+                event.consume();
             }
             if (SHOW_LABELS.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -256,34 +232,22 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToConversationTab();
+                ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToConversationTab();
+                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     ui.getBrowserComponent().manageMilestones(event.getCode().toString());
                 }
             }
-            if (MAXIMIZE_WINDOW.match(event)) {
-                ui.maximizeWindow();
-            }
-            if (MINIMIZE_WINDOW.match(event)) {
-                ui.minimizeWindow();
-            }
-            if (DEFAULT_SIZE_WINDOW.match(event)) {
-                ui.setDefaultWidth();
-            }
-            if (SWITCH_BOARD.match(event)) {
-                ui.getMenuControl().switchBoard();
-            }
-            if (SWITCH_DEFAULT_REPO.match(event)) {
-                ui.switchDefaultRepo();
-            }
             if (UNDO_LABEL_CHANGES.match(event)) {
                 ui.triggerNotificationAction();
+            }
+            if (JUMP_TO_FIRST_ISSUE.match(event)) {
+                listView.selectNthItem(1);
             }
             for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
                 if (entry.getValue().match(event)){
@@ -292,7 +256,27 @@ public class ListPanel extends FilterPanel {
                     break;
                 }
             }
+            if (SHOW_RELATED_ISSUE_OR_PR.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
+                if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    showRelatedIssueOrPR();
+                // only for default. can remove if default key for MARK_AS_READ_CHANGES
+                } else if (KeyboardShortcuts.markAsRead.match(event)) {
+                    markAsRead();
+                }
+            }
         });
+    }
+
+    private void showRelatedIssueOrPR() {
+        if (!listView.getSelectedItem().isPresent()) return;
+        TurboIssue issue = listView.getSelectedItem().get().getIssue();
+        Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().getIssue().isPullRequest()
+            ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getIssue().getDescription())
+            : ui.getBrowserComponent().getPRNumberFromIssue();
+        if (!relatedIssueNumber.isPresent()) return;
+        ui.triggerEvent(
+            new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
+        );
     }
 
     private ContextMenu setupContextMenu() {
@@ -330,7 +314,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             changeLabelsMenuItem.setDisable(false);
         } else {
@@ -341,10 +325,10 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateMarkAsReadUnreadMenuItem() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             markAsReadUnreadMenuItem.setDisable(false);
-            TurboIssue selectedIssue = item.get();
+            TurboIssue selectedIssue = item.get().getIssue();
 
             if (selectedIssue.isCurrentlyRead()) {
                 markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
@@ -358,36 +342,21 @@ public class ListPanel extends FilterPanel {
         return markAsReadUnreadMenuItem;
     }
 
-    private void setFocusToFilterBox() {
-        if (TestController.isTestMode()) {
-            ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
-        }
-        filterTextField.requestFocus();
-        filterTextField.setText(filterTextField.getText().trim());
-        filterTextField.positionCaret(filterTextField.getLength());
-
-        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.downIssue.match(event) || KeyboardShortcuts.upIssue.match(event)) {
-                listView.selectNthItem(1);
-            }
-        });
-    }
-
     public int getIssueCount() {
         return issueCount;
     }
 
-    public TurboIssue getSelectedIssue() {
-        return listView.getSelectedItem().get();
+    public Optional<GuiElement> getSelectedElement() {
+        return listView.getSelectedItem();
     }
 
     /* Methods that perform user's actions under the context of this ListPanel */
 
     private void markAsRead() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
-            TurboIssue issue = item.get();
-            issue.markAsRead(ui.prefs);
+            TurboIssue issue = item.get().getIssue();
+            issue.markAsRead(UI.prefs);
 
             parentPanelControl.refresh();
             listView.selectNextItem();
@@ -395,9 +364,9 @@ public class ListPanel extends FilterPanel {
     }
 
     private void markAsUnread() {
-        Optional<TurboIssue> item = listView.getSelectedItem();
+        Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
-            TurboIssue issue = item.get();
+            TurboIssue issue = item.get().getIssue();
             issue.markAsUnread(ui.prefs);
 
             parentPanelControl.refresh();
@@ -405,6 +374,31 @@ public class ListPanel extends FilterPanel {
     }
 
     private void changeLabels() {
-        ui.triggerEvent(new ShowLabelPickerEvent(getSelectedIssue()));
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowLabelPickerEvent(getSelectedElement().get().getIssue()));
+        }
+    }
+
+    /**
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
+     */
+    @Override
+    protected void addPanelLoadingIndication() {
+        logger.info("Preparing to add panel loading indication");
+        listView.getStyleClass().add("listview-loading");
+
+        // Remove the items in the issue list because they are not relevant to the filter anymore.
+        // This also makes the listview background visible, since we intend to show a loading indicator on the
+        // background.
+        listView.setItems(null);
+    }
+
+    /**
+     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
+     */
+    @Override
+    protected void removePanelLoadingIndication() {
+        logger.info("Preparing to remove panel loading indication");
+        listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
 }

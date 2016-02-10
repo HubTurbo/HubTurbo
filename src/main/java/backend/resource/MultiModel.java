@@ -54,7 +54,13 @@ public class MultiModel implements IModel {
     }
 
     public synchronized MultiModel removeRepoModelById(String repoId) {
-        Optional<Model> repoModelToBeDeleted = getModelById(repoId);
+        Optional<String> repoIdCorrectCase = models.keySet().stream()
+                .filter(key -> key.equalsIgnoreCase(repoId)).findFirst();
+        if (!repoIdCorrectCase.isPresent()) {
+            logger.error("RepoId specified does not have a model.");
+        }
+        
+        Optional<Model> repoModelToBeDeleted = getModelById(repoIdCorrectCase.get());
         if (repoModelToBeDeleted.isPresent()) {
             this.models.remove(repoModelToBeDeleted.get().getRepoId());
         } else {
@@ -87,8 +93,8 @@ public class MultiModel implements IModel {
                 // TODO move ETag comparison here when comments ETag implementation is complete.
                 LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
                         issue.getCreatedAt(), currentUser, issue.getCreator());
-                issue.setMetadata(new IssueMetadata(toBeInserted, nonSelfUpdatedAt,
-                        issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
+                issue.setMetadata(toBeInserted.reconcile(nonSelfUpdatedAt,
+                    issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
             }
         });
     }
@@ -207,8 +213,8 @@ public class MultiModel implements IModel {
         }
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______BOILERPLATE______() {}
 
     @Override
     public boolean equals(Object o) {

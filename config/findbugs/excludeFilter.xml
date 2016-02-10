@@ -1,5 +1,4 @@
-<FindBugsFilter>        
-
+<FindBugsFilter>
     <!-- EC_UNRELATED_TYPES: Call to equals() comparing different types -->
     <!-- Add exceptions for tests here-->
 
@@ -53,7 +52,7 @@
 
     <Match>
         <Or>
-            <Class name="guitests.SavedLoginTest"/>
+            <Class name="unstable.SavedLoginTest"/>
             <Class name="guitests.WrongLastViewedTest"/>
         </Or>
         <Method name="setupMethod" />
@@ -75,5 +74,16 @@
             <Field name="scrollUp" />
             <Field name="upIssue" />
         </Or>
+    </Match>
+    <Match>
+        <Class name="tests.PreferencesTests" />
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+        <Or>
+            <Method name="testGetBoardPanels" />
+        </Or>
+    </Match>
+    <Match>
+        <Class name="tests.MilestoneUpdateServiceTests" />
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
     </Match>
 </FindBugsFilter>

@@ -2,11 +2,13 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
 import prefs.Preferences;
+import util.HTLog;
 import util.Utility;
-import static util.Utility.replaceNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,23 +16,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static util.Utility.replaceNull;
+
 /**
  * The guidelines in this class apply to all TurboResources.
  */
-@SuppressWarnings("unused")
 public class TurboIssue {
+    private static final Logger logger = HTLog.get(TurboIssue.class);
 
     public static final String STATE_CLOSED = "closed";
     public static final String STATE_OPEN = "open";
 
     /**
+     * Serialized fields.
+     *
      * Must have reasonable, NON-NULL defaults.
      * Should be primitive types, or at least easily-serializable ones.
      * Should be specified in order.
      * Should be immutable as much as possible.
      */
-    private void ______SERIALIZED_FIELDS______() {
-    }
 
     // Immutable
     private final int id;
@@ -52,15 +56,15 @@ public class TurboIssue {
     /**
      * Metadata associated with issues that is not serialized.
      */
-    private void ______TRANSIENT_FIELDS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______TRANSIENT_FIELDS______() {}
 
     private final String repoId;
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
 
-    private void ______CONSTRUCTORS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______CONSTRUCTORS______() {}
 
     /**
      * Default constructor: provides reasonable defaults for things.
@@ -109,7 +113,7 @@ public class TurboIssue {
         this.labels = new ArrayList<>(issue.labels);
         this.milestone = issue.milestone;
 
-        this.metadata = new IssueMetadata(issue.metadata);
+        this.metadata = issue.metadata;
         this.repoId = issue.repoId;
         this.markedReadAt = issue.markedReadAt;
     }
@@ -140,7 +144,7 @@ public class TurboIssue {
             ? Optional.empty()
             : Optional.of(issue.getMilestone().getNumber());
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
     }
@@ -160,13 +164,13 @@ public class TurboIssue {
         this.labels = issue.getLabels();
         this.milestone = issue.getMilestone();
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.repoId = repoId;
         this.markedReadAt = Optional.empty();
     }
 
-    private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______CONSTRUCTOR_HELPER_FUNCTIONS______() {}
 
     private static boolean isPullRequest(Issue issue) {
         return issue.getPullRequest() != null && issue.getPullRequest().getUrl() != null;
@@ -182,7 +186,7 @@ public class TurboIssue {
         this.labels = new ArrayList<>();
         this.milestone = Optional.empty();
 
-        this.metadata = new IssueMetadata();
+        this.metadata = IssueMetadata.empty();
         this.markedReadAt = Optional.empty();
     }
 
@@ -194,19 +198,19 @@ public class TurboIssue {
      * @param fromIssue
      */
     private void transferTransientState(TurboIssue fromIssue) {
-        this.metadata = new IssueMetadata(fromIssue.metadata, false);
+        this.metadata = fromIssue.metadata.invalidate();
         this.markedReadAt = fromIssue.markedReadAt;
     }
 
     /**
      * Conceptually, operations on issues. They should only modify non-serialized fields.
      */
-    private void ______METHODS______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______METHODS______() {}
 
     @Override
     public String toString() {
-        return "#" + id + " " + title;
+        return repoId + " #" + id;
     }
 
     /**
@@ -214,31 +218,80 @@ public class TurboIssue {
      * returning a list of TurboIssues with updates from the second.
      */
     public static List<TurboIssue> reconcile(String repoId, List<TurboIssue> existing, List<TurboIssue> changed) {
-        existing = new ArrayList<>(existing);
+        List<TurboIssue> existingCopy = new ArrayList<>(existing);
         for (TurboIssue issue : changed) {
             int id = issue.getId();
 
             // TODO O(n^2), fix by preprocessing and copying into a map
-            Optional<Integer> corresponding = findIssueWithId(existing, id);
+            Optional<Integer> corresponding = findIssueWithId(existingCopy, id);
             if (corresponding.isPresent()) {
 
                 // issue is constructed from an external Issue object.
                 // It won't have the transient state that its TurboIssue
                 // counterpart has, so we have to explicitly transfer it.
                 TurboIssue newIssue = new TurboIssue(issue);
-                newIssue.transferTransientState(existing.get(corresponding.get()));
+                newIssue.transferTransientState(existingCopy.get(corresponding.get()));
 
-                existing.set(corresponding.get(), newIssue);
+                existingCopy.set(corresponding.get(), newIssue);
             } else {
-                existing.add(new TurboIssue(issue));
+                existingCopy.add(new TurboIssue(issue));
             }
         }
-        return existing;
+        return existingCopy;
     }
 
-    private static Optional<Integer> findIssueWithId(List<TurboIssue> existing, int id) {
+    /**
+     * Updates data for issues with corresponding pull requests. Original list of
+     * issues and original issue instances are not mutated
+     * @param issues
+     * @param pullRequests
+     * @return a new list of issues
+     */
+    public static List<TurboIssue> combineWithPullRequests(List<TurboIssue> issues,
+                                                           List<PullRequest> pullRequests) {
+        List<TurboIssue> issuesCopy = new ArrayList<>(issues);
+
+        for (PullRequest pullRequest : pullRequests) {
+            int id = pullRequest.getNumber();
+
+            Optional<Integer> corresponding = findIssueWithId(issuesCopy, id);
+            if (corresponding.isPresent()) {
+                TurboIssue issue = issuesCopy.get(corresponding.get());
+                issuesCopy.set(corresponding.get(), issue.combineWithPullRequest(pullRequest));
+            } else {
+                String errorMsg = "No corresponding issue for pull request " + pullRequest;
+                logger.error(errorMsg);
+            }
+        }
+
+        return issuesCopy;
+    }
+
+    /**
+     * Combines data from a corresponding pull request with data in this issue
+     * This method returns a new combined issue and does not mutate this issue
+     * @param pullRequest
+     * @return new new combined issue
+     */
+    public TurboIssue combineWithPullRequest(PullRequest pullRequest) {
+        TurboIssue newIssue = new TurboIssue(this);
+
+        if (pullRequest.getUpdatedAt() == null) {
+            return newIssue;
+        }
+
+        LocalDateTime pullRequestUpdatedAt = Utility.dateToLocalDateTime(pullRequest.getUpdatedAt());
+        if (pullRequestUpdatedAt.isBefore(newIssue.getUpdatedAt())) {
+            return newIssue;
+        }
+
+        newIssue.setUpdatedAt(pullRequestUpdatedAt);
+        return newIssue;
+    }
+
+    public static Optional<Integer> findIssueWithId(List<TurboIssue> issues, int id) {
         int i = 0;
-        for (TurboIssue issue : existing) {
+        for (TurboIssue issue : issues) {
             if (issue.getId() == id) {
                 return Optional.of(i);
             }
@@ -247,8 +300,8 @@ public class TurboIssue {
         return Optional.empty();
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    @SuppressWarnings("unused")
+    private void ______BOILERPLATE______() {}
 
     public String getRepoId() {
         return repoId;

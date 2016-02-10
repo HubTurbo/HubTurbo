@@ -14,9 +14,7 @@ import java.util.concurrent.Executors;
  * Contains utility methods for running code in various ways,
  * on or off (but close to) the JavaFX application thread.
  */
-public class PlatformEx {
-
-    private static final Logger logger = LogManager.getLogger(PlatformEx.class.getName());
+public final class PlatformEx {
 
     private static final ExecutorService delayExecutor = Executors.newSingleThreadExecutor();
 
@@ -78,4 +76,6 @@ public class PlatformEx {
         }
         runLaterAndWait(action);
     }
+
+    private PlatformEx() {}
 }

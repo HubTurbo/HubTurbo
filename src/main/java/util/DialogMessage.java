@@ -5,7 +5,9 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
-public class DialogMessage {
+public final class DialogMessage {
+
+    private DialogMessage() {}
 
     public static void showErrorDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -28,5 +30,12 @@ public class DialogMessage {
         Optional<ButtonType> result = alert.showAndWait();
 
         return result.get().equals(yesButton);
+    }
+
+    public static void showInformationDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

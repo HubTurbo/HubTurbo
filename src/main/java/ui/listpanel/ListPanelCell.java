@@ -1,27 +1,25 @@
 package ui.listpanel;
 
-import backend.interfaces.IModel;
-import backend.resource.Model;
 import backend.resource.TurboIssue;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
+import org.apache.logging.log4j.Logger;
+import ui.GuiElement;
+import util.HTLog;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-public class ListPanelCell extends ListCell<TurboIssue> {
+public class ListPanelCell extends ListCell<GuiElement> {
 
-    private final IModel model;
     private final int parentPanelIndex;
     private final ListPanel parent;
     private final HashSet<Integer> issuesWithNewComments;
-    private TurboIssue issue;
+    private GuiElement guiElement;
 
-    public ListPanelCell(IModel model, ListPanel parent,
+    public ListPanelCell(ListPanel parent,
                          int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
         super();
-        this.model = model;
         this.parent = parent;
         this.parentPanelIndex = parentPanelIndex;
         this.issuesWithNewComments = issuesWithNewComments;
@@ -30,25 +28,42 @@ public class ListPanelCell extends ListCell<TurboIssue> {
     }
 
     @Override
-    public void updateItem(TurboIssue issue, boolean empty) {
-        super.updateItem(issue, empty);
-        if (issue == null) {
+    public void updateItem(GuiElement guiElement, boolean empty) {
+        super.updateItem(guiElement, empty);
+        if (guiElement == null) {
             return;
         }
-        this.issue = issue;
-        Optional<Model> currentModel = model.getModelById(issue.getRepoId());
-        assert currentModel.isPresent() : "Invalid repo id " + issue.getRepoId()
-            + " for issue " + issue.getId();
-        setGraphic(new ListPanelCard(currentModel.get(), issue, parent, issuesWithNewComments));
+        this.guiElement = guiElement;
+        TurboIssue issue = guiElement.getIssue();
+        updateStyleToMatchStatus(issue);
+
+        setGraphic(new ListPanelCard(guiElement, parent, issuesWithNewComments));
         this.setId(issue.getRepoId() + "_col" + parentPanelIndex + "_" + issue.getId());
     }
 
+    private void updateStyleToMatchStatus(TurboIssue issue){
+        final String closedStyle = "issue-cell-closed";
+        boolean isCurrentStyleClosed = getStyleClass().contains(closedStyle);
+        if (!issue.isOpen()){
+            if (!isCurrentStyleClosed) {
+                getStyleClass().add(closedStyle);
+            }
+        } else {
+            if (isCurrentStyleClosed) {
+                getStyleClass().remove(closedStyle);
+            }
+        }
+    }
+
     public List<String> getIssueLabels() {
-        return issue.getLabels();
+        return guiElement.getIssue().getLabels();
     }
 
     public TurboIssue getIssue() {
-        return issue;
+        return guiElement.getIssue();
     }
 
+    public GuiElement getGuiElement() {
+        return guiElement;
+    }
 }

@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,36 +30,42 @@ import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
-import ui.components.Notification;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
-import util.PlatformEx;
-import util.PlatformSpecific;
-import util.TickingTimer;
-import util.Utility;
+import undo.UndoController;
+import util.*;
 import util.events.*;
 import util.events.Event;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
+import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
 public class UI extends Application implements EventDispatcher {
 
-    private static final int VERSION_MAJOR = 3;
-    private static final int VERSION_MINOR = 7;
-    private static final int VERSION_PATCH = 0;
+    public static final int VERSION_MAJOR = 3;
+    public static final int VERSION_MINOR = 18;
+    public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
     private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
+    private static final String APPLICATION_LOGO_FILENAME = "logo.png";
+
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
+    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
 
     private static final int REFRESH_PERIOD = 60;
 
@@ -72,6 +80,7 @@ public class UI extends Application implements EventDispatcher {
     private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
+    public UndoController undoController;
 
 
     // Main UI elements
@@ -81,11 +90,11 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private RepositorySelector repoSelector;
-    private LabelPicker labelPicker;
     private Label apiBox;
     private ScrollPane panelsScrollPane;
     private NotificationPane notificationPane;
 
+    @SuppressWarnings("PMD")
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -168,11 +177,11 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initialisePickers() {
-        labelPicker = new LabelPicker(this, mainStage);
+        new LabelPicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
-        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(() -> logic.refresh(false)));
     }
 
     private void initPreApplicationState() {
@@ -180,17 +189,18 @@ public class UI extends Application implements EventDispatcher {
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
-            logger.error(throwable.getMessage(), throwable));
+                logger.error(throwable.getMessage(), throwable));
 
         TestController.setUI(this, getParameters());
-        prefs = new Preferences(TestController.isTestMode());
+        prefs = TestController.loadApplicationPreferences();
         KeyboardShortcuts.loadKeyboardShortcuts(prefs);
 
         eventBus = new EventBus();
         if (TestController.isTestMode()) {
             registerTestEvents();
         }
-        registerEvent((OpenReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UnusedStoredReposChangedEventHandler) e -> onRepoOpened());
+        registerEvent((UsedReposChangedEventHandler) e -> removeUnusedModelsAndUpdate());
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
@@ -199,11 +209,12 @@ public class UI extends Application implements EventDispatcher {
     private void initApplicationState() {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
-        logic = new Logic(uiManager, prefs, TestController.isTestMode(), TestController.isTestJSONEnabled());
-        clearCacheIfNecessary();
+        logic = new Logic(uiManager, prefs);
+        // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+            status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
         refreshTimer.start();
+        undoController = new UndoController(notificationController);
     }
 
     private void initUI(Stage stage) {
@@ -219,15 +230,42 @@ public class UI extends Application implements EventDispatcher {
 
         Scene scene = new Scene(createRootNode());
         setupMainStage(scene);
+        setupGlobalKeyboardShortcuts(scene);
         notificationController = new NotificationController(notificationPane);
         notificationPane.setId("notificationPane");
 
         loadFonts();
         String css = initCSS();
         applyCSS(css, scene);
+
+        setApplicationIcon(stage);
+    }
+
+    public void setApplicationIcon(Stage stage) {
+        stage.getIcons().add(new Image(UI.class.getResourceAsStream(APPLICATION_LOGO_FILENAME)));
+
+        // set Icon for OSX
+        // - need to use Apple Java Extension, using reflection to load the
+        //   class so that HubTurbo is compilable
+        if (PlatformSpecific.isOnMac()) {
+            try {
+                Class util = Class.forName("com.apple.eawt.Application");
+                Method getApplication = util.getMethod("getApplication", new Class[0]);
+                Object application = getApplication.invoke(util);
+                Class params[] = new Class[1];
+                params[0] = java.awt.Image.class;
+                Method setDockIconImage = util.getMethod("setDockIconImage", params);
+                setDockIconImage.invoke(application,
+                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
+            } catch (Exception e) {
+                logger.info("Not OSX", e);
+            }
+        }
+
     }
 
     public void quit() {
+        globalHotkey.quit();
         if (browserComponent != null) {
             browserComponent.onAppQuit();
         }
@@ -243,16 +281,6 @@ public class UI extends Application implements EventDispatcher {
 
     public void onRepoOpened() {
         Platform.runLater(repoSelector::refreshContents);
-    }
-
-    /**
-     * TODO Stop-gap measure pending a more robust updater
-     */
-    private void clearCacheIfNecessary() {
-        if (getCommandLineArgs().containsKey(ARG_UPDATED_TO)) {
-            // TODO
-//          CacheFileHandler.deleteCacheDirectory();
-        }
     }
 
     public String initCSS() {
@@ -285,13 +313,22 @@ public class UI extends Application implements EventDispatcher {
                     boolean shouldRefresh = browserComponent.hasBviewChanged();
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
-                        logic.refresh();
+                        logic.refresh(isNotificationPaneShowing());
                         refreshTimer.restart();
                     }
                 }
             });
         });
         mainStage.hide();
+    }
+
+    private void setupGlobalKeyboardShortcuts(Scene scene) {
+        globalHotkey.init();
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (SWITCH_DEFAULT_REPO.match(event)) {
+                switchDefaultRepo();
+            }
+        });
     }
 
     private static void getMainWindowHandle(String windowTitle) {
@@ -310,7 +347,7 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
 
-        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs);
+        menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
         HBox repoSelectorBar = new HBox();
@@ -329,6 +366,24 @@ public class UI extends Application implements EventDispatcher {
         notificationPane = new NotificationPane(root);
 
         return notificationPane;
+    }
+
+    public Set<String> getCurrentlyUsedRepos() {
+        Set<String> currentlyUsedRepos = new HashSet<>();
+        String defaultRepo = logic.getDefaultRepo();
+        currentlyUsedRepos.addAll(panels.getRepositoriesReferencedOnAllPanels());
+        if (!Utility.convertSetToLowerCase(currentlyUsedRepos)
+                .contains(defaultRepo.toLowerCase())) {
+            currentlyUsedRepos.add(defaultRepo);
+        }
+
+        return currentlyUsedRepos;
+    }
+
+    public void removeUnusedModelsAndUpdate() {
+        logic.removeUnusedModels(Utility.convertSetToLowerCase(getCurrentlyUsedRepos()));
+
+        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     /**
@@ -435,13 +490,13 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UsedReposChangedEvent());
     }
-    
+
     public void switchDefaultRepo(){
         String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
-        
+
         // Cycle to the next open repository
         for (int i = 0; i < openRepos.length; i++) {
             if (openRepos[i].equals(currentRepo)) {
@@ -455,7 +510,7 @@ public class UI extends Application implements EventDispatcher {
             }
         }
 
-        triggerEvent(new OpenReposChangedEvent());
+        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {
@@ -468,7 +523,11 @@ public class UI extends Application implements EventDispatcher {
     public MenuControl getMenuControl() {
         return menuBar;
     }
-    
+
+    public PanelControl getPanelControl() {
+        return panels;
+    }
+
     /**
      * Returns focus to UI mainStage. Invoked to eliminate NoNodesVisibleException.
      */
@@ -478,11 +537,10 @@ public class UI extends Application implements EventDispatcher {
 
     public void setDefaultWidth() {
         mainStage.setMaximized(false);
+        mainStage.setIconified(false);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(panels.getPanelWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(panels.getPanelWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(panels.getPanelWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
@@ -490,10 +548,8 @@ public class UI extends Application implements EventDispatcher {
     public void maximizeWindow() {
         mainStage.setMaximized(true);
         Rectangle dimensions = getDimensions();
-        mainStage.setMinWidth(dimensions.getWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(dimensions.getWidth());
-        mainStage.setMaxHeight(dimensions.getHeight());
+        mainStage.setWidth(dimensions.getWidth());
+        mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
         mainStage.setY(0);
     }
@@ -507,19 +563,34 @@ public class UI extends Application implements EventDispatcher {
         return mainWindowHandle;
     }
 
-    public void showNotification(Notification notification) {
-        notificationController.showNotification(notification);
-    }
-
     public void triggerNotificationAction() {
         notificationController.triggerNotificationAction();
     }
-    
+
+    public void hideNotification() {
+        notificationController.hideNotification();
+    }
+
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
                 + " (%s)", openBoard);
         mainStage.setTitle(title);
     }
-    
+
+    public boolean isNotificationPaneShowing() {
+        return notificationPane.isShowing();
+    }
+
+    public String getTitle() {
+        return mainStage.getTitle();
+    }
+
+    public boolean isWindowMinimized() {
+        return mainStage.isIconified();
+    }
+
+    public boolean isWindowFocused() {
+        return mainStage.isFocused();
+    }
 }

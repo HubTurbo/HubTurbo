@@ -4,9 +4,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +32,7 @@ import util.events.ShowErrorDialogEvent;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 
-public class Utility {
+public final class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
@@ -46,7 +44,7 @@ public class Utility {
     public static boolean isWellFormedRepoId(String repoId) {
         RepositoryId repositoryId = RepositoryId.createFromId(repoId);
         return repoId != null && !repoId.isEmpty() && repositoryId != null
-            && repositoryId.generateId().equals(repoId);
+            && repoId.equals(repositoryId.generateId());
     }
 
     public static Optional<String> readFile(String fileName) {
@@ -73,8 +71,11 @@ public class Utility {
         boolean validPath = !(fileName == null || fileName.isEmpty());
         if (validPath) {
             try {
-                PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-                writer.println(content);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName), "UTF-8"
+                ));
+                writer.write(content);
+                writer.newLine();
                 writer.close();
 
                 long sizeAfterWrite = Files.size(Paths.get(fileName));
@@ -109,8 +110,7 @@ public class Utility {
     private static boolean processFileGrowth(long sizeAfterWrite, int issueCount, String fileName) {
         // The average issue is about 0.75KB in size. If the total filesize is more than (2 * issueCount KB),
         // we consider the json to have exploded as the file is unusually large.
-        if ((issueCount > 0) &&
-                (sizeAfterWrite > ((long) issueCount * 2000))) {
+        if (issueCount > 0 && sizeAfterWrite > ((long) issueCount * 2000)) {
             UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
                             + "Now proceeding to delete the file and redownload the repository to prevent "
@@ -141,10 +141,13 @@ public class Utility {
             Path corruptedFile = Paths.get(fileName);
             if (Files.exists(corruptedFile)) {
                 String corruptedFileData = readFile(fileName).get();
-                PrintWriter writer = new PrintWriter(fileName + "-err", "UTF-8");
-                writer.println(new GsonBuilder().setPrettyPrinting().create().toJson(
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(fileName + "-err"), "UTF-8"
+                ));
+                writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(
                         new JsonParser().parse(corruptedFileData)
                 ));
+                writer.newLine();
                 writer.close();
 
                 Files.delete(corruptedFile);
@@ -158,7 +161,7 @@ public class Utility {
         return s.replaceAll("^\"|\"$", "");
     }
 
-    public static String removeAllWhiteSpaces(String s) {
+    public static String removeAllWhitespace(String s) {
         return s.replaceAll("\\s", "");
     }
 
@@ -190,7 +193,7 @@ public class Utility {
             return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US).parse(dateString);
         } catch (ParseException e) {
             logger.error(e.getLocalizedMessage(), e);
-            throw new IllegalArgumentException("Could not parse date " + dateString);
+            throw new IllegalArgumentException("Could not parse date " + dateString, e);
         }
     }
 
@@ -236,9 +239,9 @@ public class Utility {
      */
     public static Optional<int[]> parseVersionNumber(String version) {
         // Strip non-digits
-        version = version.replaceAll("[^0-9.]+", "");
+        String numericVersion = version.replaceAll("[^0-9.]+", "");
 
-        String[] temp = version.split("\\.");
+        String[] temp = numericVersion.split("\\.");
         try {
             int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
             int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
@@ -295,4 +298,35 @@ public class Utility {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
 
+    public static String getNameClosestToDesiredName(String desiredName, List<String> existingNames) {
+        String availableName = desiredName;
+
+        if (!existingNames.contains(desiredName)) {
+            return availableName;
+        }
+
+        List<String> existingSuffixes = existingNames.stream()
+                .filter(existing -> existing.startsWith(desiredName)
+                        && !existing.equalsIgnoreCase(desiredName))
+                .map(existing ->
+                        existing.substring(existing.indexOf(desiredName, 0) + desiredName.length()))
+                .collect(Collectors.toList());
+
+        int index = 1;
+
+        while (existingSuffixes.contains(Integer.toString(index))) {
+            index++;
+        }
+
+        availableName = desiredName + Integer.toString(index);
+
+        return availableName;
+    }
+
+    // TODO: remove once #1078 is solved from all repoIds normalization
+    public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
+        return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
+
+    private Utility() {}
 }

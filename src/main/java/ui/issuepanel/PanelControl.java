@@ -1,8 +1,8 @@
 package ui.issuepanel;
 
-import backend.interfaces.IModel;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -14,24 +14,21 @@ import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
-import util.events.IssueSelectedEventHandler;
-import util.events.PanelClickedEvent;
-import util.events.PanelClickedEventHandler;
-import util.events.ShowRenamePanelEventHandler;
+import util.events.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PanelControl extends HBox {
 
     private final UI ui;
     private final Preferences prefs;
     private ScrollPane panelsScrollPane;
-    private IModel model;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
@@ -47,7 +44,7 @@ public class PanelControl extends HBox {
         ui.registerEvent((PanelClickedEventHandler) e ->
                 setCurrentlySelectedPanel(Optional.of(e.panelIndex)));
         ui.registerEvent((ShowRenamePanelEventHandler) e ->
-                ((FilterPanel) getPanel(e.panelId)).showRenameTextField());
+                ((FilterPanel) getPanel(e.panelId)).startRename());
 
         setupKeyEvents();
     }
@@ -60,10 +57,6 @@ public class PanelControl extends HBox {
         this.panelsScrollPane = panelsScrollPane;
         restorePanels();
         selectFirstPanel();
-    }
-
-    public void updateModel(IModel newModel) {
-        model = newModel;
     }
 
     public void saveSession() {
@@ -100,7 +93,14 @@ public class PanelControl extends HBox {
      * For a quick refresh (without requesting updates)
      */
     public void refresh() {
-        forEach(child -> child.refreshItems(true));
+        forEach(child -> child.refreshItems());
+    }
+
+    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName){
+        FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
+        panelAdded.setPanelName(panelName);
+        panelAdded.setFilterByString(filterName);
+        return panelAdded;
     }
 
     private FilterPanel addPanel() {
@@ -108,7 +108,7 @@ public class PanelControl extends HBox {
     }
 
     public FilterPanel addPanelAt(int index) {
-        FilterPanel panel = new ListPanel(ui, model, this, index);
+        FilterPanel panel = new ListPanel(ui, guiController, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.
@@ -120,10 +120,19 @@ public class PanelControl extends HBox {
         return panel;
     }
 
+    public void selectPanel(int index) {
+        assert index >= 0 && index < getPanelCount();
+        setCurrentlySelectedPanel(Optional.of(index));
+        scrollToPanel(index);
+        getPanel(index).requestFocus();
+    }
+
     public void selectFirstPanel() {
-        setCurrentlySelectedPanel(Optional.of(0));
-        scrollToPanel(0);
-        getPanel(0).requestFocus();
+        selectPanel(0);
+    }
+
+    public void selectLastPanel() {
+        selectPanel(getPanelCount() - 1);
     }
 
     private void setCurrentlySelectedPanel(Optional<Integer> selectedPanel) {
@@ -161,6 +170,8 @@ public class PanelControl extends HBox {
         updatePanelIndices();
         ((AbstractPanel) child).close();
         updateFocus(index);
+
+        UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
     private void updatePanelIndices() {
@@ -219,9 +230,10 @@ public class PanelControl extends HBox {
         } else if (getChildren().size() == 0) {
             setCurrentlySelectedPanel(Optional.empty());
         } else {
-            int newPanelIndex = (closedPanelIndex > getChildren().size() - 1)
-                                 ? closedPanelIndex - 1
-                                 : closedPanelIndex;
+            int newPanelIndex =
+                closedPanelIndex > getChildren().size() - 1
+                    ? closedPanelIndex - 1
+                    : closedPanelIndex;
             setCurrentlySelectedPanel(Optional.of(newPanelIndex));
             getPanel(currentlySelectedPanel.get()).requestFocus();
         }
@@ -236,7 +248,7 @@ public class PanelControl extends HBox {
         return 40 + AbstractPanel.PANEL_WIDTH;
     }
     private void setupKeyEvents() {
-        addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
                 handleKeys(KeyboardShortcuts.rightPanel.match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
@@ -279,20 +291,20 @@ public class PanelControl extends HBox {
         return guiController;
     }
 
-    public int getNumberOfPanels() {
+    public int getPanelCount() {
         return getChildren().size();
     }
 
     public HashSet<String> getRepositoriesReferencedOnAllPanels() {
         HashSet<String> repositoriesOnPanels = new HashSet<>();
 
-        for (int i = 0; i < getNumberOfPanels(); i++) {
+        for (int i = 0; i < getPanelCount(); i++) {
             AbstractPanel currPanel = getPanel(i);
 
             if (currPanel instanceof FilterPanel) {
                 FilterPanel currFilterPanel = (FilterPanel) currPanel;
                 FilterExpression panelExpression = currFilterPanel.getCurrentFilterExpression();
-                repositoriesOnPanels.addAll(Qualifier.getContentOfMetaQualifier(panelExpression, Qualifier.REPO));
+                repositoriesOnPanels.addAll(Qualifier.getMetaQualifierContent(panelExpression, QualifierType.REPO));
             }
         }
 
@@ -303,11 +315,25 @@ public class PanelControl extends HBox {
         return prefs.getAllBoards().size();
     }
 
-    public void scrollToPanel(int panelIndex){
-        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getNumberOfPanels() - 1));
+    private void scrollToPanel(int panelIndex) {
+        setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getPanelCount() - 1));
     }
 
     private void setHvalue(double val) {
         panelsScrollPane.setHvalue(val);
+    }
+
+    /**
+     * Returns the list of panel names and filters currently showing the user interface
+     * @return
+     */
+    public List<PanelInfo> getCurrentPanelInfos() {
+        return getChildren().stream().flatMap(c -> {
+            if (c instanceof FilterPanel) {
+                return Stream.of(((FilterPanel) c).getCurrentInfo());
+            } else {
+                return Stream.of();
+            }
+        }).collect(Collectors.toList());
     }
 }

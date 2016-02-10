@@ -5,7 +5,6 @@
  * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
  */
 
-// Plugins
 plugins {
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "com.github.johnrengelman.shadow" version "1.2.1"
@@ -24,11 +23,12 @@ allprojects {
     }
 
     apply plugin: 'findbugs'
+    apply plugin: 'pmd'
 
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.7.0'
+    version = '3.18.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -41,7 +41,7 @@ allprojects {
 
     project.ext {
         log4jVersion = '2.3'
-        controlsfxVersion = '8.40.10-SNAPSHOT'
+        controlsfxVersion = '8.40.10'
         gsonVersion = '2.3.1'
         guavaVersion = '18.0'
         jnaVersion = '4.1.0'
@@ -54,6 +54,8 @@ allprojects {
 
         junitVersion = '4.12'
         testFxVersion = '3.1.0'
+        mockitoVersion = '1+'
+        mockServerVersion = '3.10.1'
     }
 
     dependencies {
@@ -72,32 +74,49 @@ allprojects {
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
+        testCompile "org.mockito:mockito-core:$mockitoVersion"
+        testCompile group: "org.mock-server", name: "mockserver-netty", version: "$mockServerVersion"
+        compile fileTree(dir: 'lib', include: '*.jar')
     }
 
     test {
+        systemProperty "logback.configurationFile", "${projectDir}/config/mockserver/mockserver.xml"
         forkEvery = 1
+        if (System.env.'CI') {
+            exclude 'unstable'
+        }
+    }
 
-        // uncomment to disable gui tests
-//        exclude 'guitests'
+    sourceSets {
+        unstableTests {
+            java.srcDir 'src/test/java/unstable'
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+
+            ext.guiTestResources = "${sourceSets.test.resources.getSrcDirs()[0]}/guitests"
+            ext.unstableTestResources = "${sourceSets.test.output.resourcesDir}/unstable"
+        }
+    }
+
+    configurations {
+        unstableTestsCompile.extendsFrom testCompile
+        unstableTestsRuntime.extendsFrom testRuntime
+    }
+
+    task generateUnstableTestResources(type: Copy) {
+        from sourceSets.unstableTests.ext.guiTestResources
+        into sourceSets.unstableTests.ext.unstableTestResources
+    }
+
+    task unstableTests(type: Test) {
+        forkEvery = 1
+        dependsOn generateUnstableTestResources
+        testClassesDir = sourceSets.unstableTests.output.classesDir
+        classpath = sourceSets.unstableTests.runtimeClasspath
     }
 
     jacoco {
         toolVersion = "0.7.5.201505241946"
-    }
-
-    jacocoTestReport {
-        dependsOn test
-        sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
-        classDirectories =  project.files(sourceSets.main.output)
-        afterEvaluate {
-            classDirectories = files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: 'tests/**')
-            })
-        }
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
     }
 
     jar {
@@ -108,6 +127,8 @@ allprojects {
 
     assemble.dependsOn shadowJar
 }
+
+test.dependsOn generateUnstableTestResources
 
 task checkstyleHtml << {
     ant.xslt(in: checkstyleMain.reports.xml.destination,
@@ -126,6 +147,12 @@ tasks.withType(FindBugs) {
 
 findbugs {
     excludeFilter = file("${projectDir}/config/findbugs/excludeFilter.xml")
+}
+
+pmd {
+    toolVersion = "5.4.1"
+    ruleSetFiles = files("${projectDir}/config/pmd/mainRuleset.xml", "${projectDir}/config/pmd/testRuleset.xml")
+    ruleSets = []
 }
 
 task jacocoRootReport(type: JacocoReport) {
@@ -158,5 +185,5 @@ tasks.coveralls {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4' //version required
+    gradleVersion = '2.4'
 }

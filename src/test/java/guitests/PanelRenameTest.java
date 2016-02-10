@@ -1,24 +1,28 @@
 package guitests;
 
-import java.util.Random;
-
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 import org.junit.Test;
+import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.utils.FXTestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import ui.TestController;
 import ui.UI;
-import ui.components.PanelNameTextField;
+import ui.issuepanel.FilterPanel;
+import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
 public class PanelRenameTest extends UITest {
 
-    public static final int EVENT_DELAY = 500;
+    public static final int EVENT_DELAY = 1000;
     public static final int PANEL_MAX_NAME_LENGTH = 36;
 
     @Override
@@ -28,13 +32,13 @@ public class PanelRenameTest extends UITest {
 
     @Test
     public void panelRenameTest() {
-        
-        Random rand = new Random();
+
+        UI ui = TestController.getUI();
+        PanelControl panels = ui.getPanelControl();
         
         // Test for saving panel name
-        
-        // maximize
-        press(KeyCode.CONTROL).press(KeyCode.X).release(KeyCode.X).release(KeyCode.CONTROL);
+
+        pushKeys(MAXIMIZE_WINDOW);
         sleep(EVENT_DELAY);
 
         // Testing case where rename is canceled with ESC
@@ -43,11 +47,12 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         type("Renamed panel");
         push(KeyCode.ESCAPE);
-        Text panelNameText0 = find("#dummy/dummy_col0_nameText");
+        FilterPanel panel0 = (FilterPanel) panels.getPanel(0);
+        Text panelNameText0 = panel0.getNameText();
         assertEquals("Panel", panelNameText0.getText());
         sleep(EVENT_DELAY);
         
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
+        pushKeys(CREATE_RIGHT_PANEL);
         
         // Testing case where a name with whitespaces at either end is submitted
         // Expected: new name accepted with whitespaces removed
@@ -55,104 +60,70 @@ public class PanelRenameTest extends UITest {
         sleep(EVENT_DELAY);
         type("   Renamed panel  ");
         push(KeyCode.ENTER);
-        Text panelNameText1 = find("#dummy/dummy_col1_nameText");
+        FilterPanel panel1 = (FilterPanel) panels.getPanel(1);
+        Text panelNameText1 = panel1.getNameText();
         assertEquals("Renamed panel", panelNameText1.getText());
         sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
+
+        pushKeys(CREATE_RIGHT_PANEL);
+
         // Testing case where empty name is submitted
         // Expected: new name not accepted
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(2)));
         sleep(EVENT_DELAY);
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
-        Text panelNameText2 = find("#dummy/dummy_col2_nameText");
+        FilterPanel panel2 = (FilterPanel) panels.getPanel(2);
+        Text panelNameText2 = panel2.getNameText();
         assertEquals("Panel", panelNameText2.getText());
         sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
-        // Testing boundary case where a name shorter than maximum allowed length is submitted
-        // Expected: new name accepted
+
+        // Testing whether the close button appears once rename box is opened.
+        // Expected: Close button should not appear once rename box is opened and while edits are being made.
+        //           It should appear once the rename box is closed and the edits are done.
+        pushKeys(CREATE_RIGHT_PANEL);
+        waitUntilNodeAppears("#dummy/dummy_col3_closeButton");
+        boolean isPresentBeforeEdit = exists("#dummy/dummy_col3_closeButton");
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
-        sleep(EVENT_DELAY);
+        PlatformEx.waitOnFxThread();
+        boolean isPresentDuringEdit = true; //stub value, this should change to false.
+        try {
+            exists("#dummy/dummy_col3_closeButton");
+        } catch (NoNodesFoundException e){
+            isPresentDuringEdit = false;
+        }
+
         String randomName3 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 1);
-        PanelNameTextField renameTextField3 = find("#dummy/dummy_col3_renameTextField");
+        TextField renameTextField3 = find("#dummy/dummy_col3_renameTextField");
         renameTextField3.setText(randomName3);
         push(KeyCode.ENTER);
+        boolean isPresentAfterEdit = exists("#dummy/dummy_col3_closeButton");
         Text panelNameText3 = find("#dummy/dummy_col3_nameText");
+        assertEquals(true, isPresentBeforeEdit);
+        assertEquals(false, isPresentDuringEdit);
+        assertEquals(true, isPresentAfterEdit);
         assertEquals(randomName3, panelNameText3.getText());
-        sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
-        // Testing boundary case where a name exactly at maximum allowed length is submitted
-        // Expected: new name accepted
+        PlatformEx.waitOnFxThread();
+
+        // Testing case where the edit is confirmed using the tick button in rename mode
+        // Expected: Panel is renamed after the button is pressed
+        pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(4)));
-        sleep(EVENT_DELAY);
-        String randomName4 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH);
-        PanelNameTextField renameTextField4 = find("#dummy/dummy_col4_renameTextField");
-        renameTextField4.setText(randomName4);
-        push(KeyCode.ENTER);
-        Text panelNameText4 = find("#dummy/dummy_col4_nameText");
-        assertEquals(randomName4, panelNameText4.getText());
-        sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
-        // Testing boundary case where a name longer than maximum allowed length is submitted
-        // Expected: new name not accepted
+        type("Renamed panel with confirm tick");
+        click("#dummy/dummy_col4_confirmButton");
+        FilterPanel panel4 = (FilterPanel) panels.getPanel(4);
+        Text panelNameText4 = panel4.getNameText();
+        assertEquals("Renamed panel with confirm tick", panelNameText4.getText());
+
+        // Testing case where the edit is undone after pressing the undo button in edit mode
+        // Expected: Panel name is unchanged after the button is pressed.
+        pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
-        sleep(EVENT_DELAY);
-        String randomName5 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH + 1);
-        PanelNameTextField renameTextField5 = find("#dummy/dummy_col5_renameTextField");
-        renameTextField5.setText(randomName5);
-        push(KeyCode.ENTER);
-        Text panelNameText5 = find("#dummy/dummy_col5_nameText");
+        type("Renamed panel with undo");
+        click("#dummy/dummy_col5_undoButton");
+        FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
+        Text panelNameText5 = panel5.getNameText();
         assertEquals("Panel", panelNameText5.getText());
-        sleep(EVENT_DELAY);
-        
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
-        // Testing typing more characters when textfield is full
-        // Expected: new name accepted with additional characters not added
-        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(6)));
-        sleep(EVENT_DELAY);
-        String randomName6 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH);
-        PanelNameTextField renameTextField6 = find("#dummy/dummy_col6_renameTextField");
-        renameTextField6.setText(randomName6);
-        
-        int randomCaret6 = rand.nextInt(PANEL_MAX_NAME_LENGTH - 1);
-        renameTextField6.positionCaret(randomCaret6);
-        type("characters that will not be added");
-        push(KeyCode.ENTER);
-        Text panelNameText6 = find("#dummy/dummy_col6_nameText");
-        assertEquals(randomName6, panelNameText6.getText());
-        sleep(EVENT_DELAY);
-        
-        press(KeyCode.CONTROL).press(KeyCode.P).release(KeyCode.P).release(KeyCode.CONTROL);
-        
-        PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(7)));
-        sleep(EVENT_DELAY);
-        String randomName7 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 4);
-        PanelNameTextField renameTextField7 = find("#dummy/dummy_col7_renameTextField");
-        renameTextField7.setText(randomName7);
-        
-        int randomCaret7 = rand.nextInt(randomName7.length());
-        renameTextField7.positionCaret(randomCaret7);
-        // Random string that will make the name longer than max length
-        String randomString = RandomStringUtils.randomAlphanumeric(5);
-        type(randomString);
-        push(KeyCode.ENTER);
-        String expected = (randomName7.substring(0, randomCaret7) + 
-                randomString.substring(0, 4) + randomName7.substring(randomCaret7, randomName7.length()));
-        Text panelNameText7 = find("#dummy/dummy_col7_nameText");
-        assertEquals(expected, panelNameText7.getText());
-        sleep(EVENT_DELAY);
-        
-        // Testing typing excessive characters when textfield is less than full
         
         // Quitting to update json
         click("File");

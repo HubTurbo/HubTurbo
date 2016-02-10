@@ -1,80 +1,83 @@
 package tests;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.TestController;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class BoardSwitchTest {
-    
-    Preferences testPrefs;
+
+    private static final String BOARDNAME1 = "Board 1";
+    private static final String BOARDNAME2 = "Board 2";
+    private static final String BOARDNAME3 = "Board 3";
 
     @Test
     public void boardsSwitchTest() {
-        testPrefs = new Preferences(true);
-        
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board2 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board3 = new ArrayList<PanelInfo>();
-        
-        testPrefs.addBoard("Board 1", board1);
-        testPrefs.addBoard("Board 2", board2);
-        testPrefs.addBoard("Board 3", board3);
-        
-        testPrefs.setLastOpenBoard("Board 1");
-        
+        Preferences testPrefs = TestController.createTestPreferences();
+
+        List<PanelInfo> board1 = new ArrayList<>();
+        List<PanelInfo> board2 = new ArrayList<>();
+        List<PanelInfo> board3 = new ArrayList<>();
+
+        testPrefs.addBoard(BOARDNAME1, board1);
+        testPrefs.addBoard(BOARDNAME2, board2);
+        testPrefs.addBoard(BOARDNAME3, board3);
+
+        testPrefs.setLastOpenBoard(BOARDNAME1);
+
         testPrefs.switchBoard();
-        assertEquals("Board 3", testPrefs.getLastOpenBoard().get());
-        
+        assertEquals(BOARDNAME3, testPrefs.getLastOpenBoard().get());
+
         testPrefs.switchBoard();
-        assertEquals("Board 2", testPrefs.getLastOpenBoard().get());
-        
+        assertEquals(BOARDNAME2, testPrefs.getLastOpenBoard().get());
+
         testPrefs.switchBoard();
-        assertEquals("Board 1", testPrefs.getLastOpenBoard().get());
-        
+        assertEquals(BOARDNAME1, testPrefs.getLastOpenBoard().get());
+
         testPrefs.switchBoard();
-        assertEquals("Board 3", testPrefs.getLastOpenBoard().get());
-        
+        assertEquals(BOARDNAME3, testPrefs.getLastOpenBoard().get());
+
     }
-    
+
     @Test
     public void noBoardSwitchTest() {
-        testPrefs = new Preferences(true);
-        
+        Preferences testPrefs = TestController.createTestPreferences();
+
         testPrefs.switchBoard();
         assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
     }
-    
+
     @Test
     public void noBoardOpenSwitchTest() {
-        testPrefs = new Preferences(true);
-        
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board2 = new ArrayList<PanelInfo>();
-        List<PanelInfo> board3 = new ArrayList<PanelInfo>();
-        
-        testPrefs.addBoard("Board 1", board1);
-        testPrefs.addBoard("Board 2", board2);
-        testPrefs.addBoard("Board 3", board3);
-        
+        Preferences testPrefs = TestController.createTestPreferences();
+
+        List<PanelInfo> board1 = new ArrayList<>();
+        List<PanelInfo> board2 = new ArrayList<>();
+        List<PanelInfo> board3 = new ArrayList<>();
+
+        testPrefs.addBoard(BOARDNAME1, board1);
+        testPrefs.addBoard(BOARDNAME2, board2);
+        testPrefs.addBoard(BOARDNAME3, board3);
+
         testPrefs.switchBoard();
         assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
     }
-    
+
     @Test
     public void oneBoardSwitchTest() {
-        testPrefs = new Preferences(true);
-        
-        List<PanelInfo> board1 = new ArrayList<PanelInfo>();
-        testPrefs.addBoard("Board 1", board1);
-        testPrefs.setLastOpenBoard("Board 1");
-        
+        Preferences testPrefs = TestController.createTestPreferences();
+
+        List<PanelInfo> board1 = new ArrayList<>();
+        testPrefs.addBoard(BOARDNAME1, board1);
+        testPrefs.setLastOpenBoard(BOARDNAME1);
+
         testPrefs.switchBoard();
-        assertEquals("Board 1", testPrefs.getLastOpenBoard().get());
+        assertEquals(BOARDNAME1, testPrefs.getLastOpenBoard().get());
     }
 
 }

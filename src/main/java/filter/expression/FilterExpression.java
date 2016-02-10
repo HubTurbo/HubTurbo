@@ -6,6 +6,7 @@ import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface FilterExpression {
@@ -27,9 +28,9 @@ public interface FilterExpression {
 
     void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException;
 
-    // Walks the syntax tree to get all the qualifier names that appear.
+    // Walks the syntax tree to get all the qualifier types that appear.
 
-    List<String> getQualifierNames();
+    List<QualifierType> getQualifierTypes();
 
     // A given FilterExpression has a string form that, when parsed, is
     // guaranteed to produce an equivalent FilterExpression. It can thus
@@ -45,4 +46,12 @@ public interface FilterExpression {
     // Gets references to all qualifiers in a syntax tree matching a given predicate.
 
     List<Qualifier> find(Predicate<Qualifier> pred);
+
+    // Apply the given function to the syntax tree, returning a new FilterExpression.
+
+    FilterExpression map(Function<Qualifier, Qualifier> func);
+
+    // Checks if a subtree is the empty qualifier.
+
+    boolean isEmpty();
 }

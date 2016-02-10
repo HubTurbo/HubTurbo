@@ -1,11 +1,11 @@
 package guitests;
 
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.After;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
+import ui.TestController;
 
 import java.io.File;
 
@@ -24,9 +24,7 @@ public class LogoutTest extends UITest {
 
     @Test
     public void logoutFunctionTest() {
-        TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        selectAll();
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
@@ -39,9 +37,11 @@ public class LogoutTest extends UITest {
 
         // checking that the json file exists and the saved credentials have been emptied
         File testConfig = new File(configFileDirectory, testConfigFileName);
-        if (!(testConfig.exists() && testConfig.isFile())) fail();
+        if (!(testConfig.exists() && testConfig.isFile())) {
+            fail();
+        }
 
-        Preferences testPref = new Preferences(true);
+        Preferences testPref = TestController.loadTestPreferences();
         assertEquals("", testPref.getLastLoginUsername());
         assertEquals("", testPref.getLastLoginPassword());
     }

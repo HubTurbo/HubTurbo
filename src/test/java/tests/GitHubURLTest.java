@@ -1,12 +1,14 @@
 package tests;
 
 import org.junit.Test;
+
 import util.GitHubURL;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class GitHubURLTest {
@@ -25,8 +27,11 @@ public class GitHubURLTest {
         assertEquals("https://github.com/dummy/dummy/graphs/contributors",
                 GitHubURL.getPathForContributors("dummy/dummy"));
         assertTrue(GitHubURL.isUrlIssue("https://github.com/dummy/dummy/issues/1"));
+        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1"));
+        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/"));
         assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/commits"));
         assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/files"));
+        assertFalse(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/c"));
     }
 
     @Test

@@ -65,6 +65,18 @@ public class FilterLexerTests {
             new Token(TokenType.NOT, "-"),
             new Token(TokenType.SYMBOL, "b"),
             new Token(TokenType.EOF, "")));
+
+        // milestone aliases
+        assertEquals(new Lexer("milestone:curr-1").lex(), Arrays.asList(
+                new Token(TokenType.QUALIFIER, "milestone:"),
+                new Token(TokenType.SYMBOL, "curr-1"),
+                new Token(TokenType.EOF, "")
+        ));
+        assertEquals(new Lexer("milestone:curr+1").lex(), Arrays.asList(
+                new Token(TokenType.QUALIFIER, "milestone:"),
+                new Token(TokenType.SYMBOL, "curr+1"),
+                new Token(TokenType.EOF, "")
+        ));
     }
 
 }

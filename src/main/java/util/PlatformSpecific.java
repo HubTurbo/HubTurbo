@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 import org.apache.logging.log4j.Logger;
 
-public class PlatformSpecific {
+public final class PlatformSpecific {
     private static final Logger logger = HTLog.get(PlatformSpecific.class);
 
 //    private static final PlatformSpecific instance = new PlatformSpecific();
@@ -64,7 +64,7 @@ public class PlatformSpecific {
                 String nextOutputLine = reader.readLine();
 
                 while (nextOutputLine != null) {
-                    output.append(nextOutputLine).append(" ");
+                    output.append(nextOutputLine).append(' ');
                     nextOutputLine = reader.readLine();
                 }
 

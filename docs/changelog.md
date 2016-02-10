@@ -1,4 +1,100 @@
+
 # Changelog
+
+# V3.18.0
+
+- Added shorthand syntax for OR
+- Added visuals for loading panels
+- Added an automatically-generated board for new users
+- Changes to labels are now committed immediately
+- Fixed rendering bug due to model inconsistency
+
+# V3.17.0
+
+- Added tooltips to panel buttons and improved layout
+- Changed icon used for updates to issue titles in feed
+- Reworked undo for label changes
+- Fixed race condition when performing actions on repositories
+- Fixed bug involving missing resources in unstable tests
+- Fixed bug where space key did not work in the filter field
+- Fixed bugs with filter field autocompletion
+- Refined developer documentation
+- Fixed errors in user guide
+
+# V3.16.0
+
+- Added an application icon for Windows and OS X
+- Added a few panel templates
+- Fixed bug with navigating to the related PR of an issue
+- Improved appearance of closed issue titles
+- Improved testing infrastructure (integrated Mockito)
+- Improvements to filter expression parser
+- Integrated PMD
+
+# V3.15.0
+
+- Added buttons to confirm and revert panel renaming
+
+# V3.14.0
+
+- Long panel names now wrap
+- Fixed regression in milestone aliases
+- Tests which involve dragging panels are now more reliable
+
+# V3.13.0
+
+- Added keyboard shortcut for swapping panels
+- Added keyboard shortcut for navigating to/from related issues/PRs
+- Fixed bug where milestone aliases wouldn't work if there was no open milestone
+- Restructuring of metadata update process
+
+# V3.12.0
+
+- Milestone and work allocation boards can be automatically generated
+- Closed issues are now shown in a different colour
+- Fixed bug where saved repositories were sometimes being deleted
+- Fixed bug where panel UI would go blank when switching repo
+- Fixed bugs with panel selection in tests
+- Upgraded to ControlsFX 8.40.10
+
+# V3.11.0
+
+- Users can now refer to milestones with aliases
+- Removable repos are now indicated as such
+- The close button won't be shown when panels are being renamed
+- Fixed paging bug which caused missing milestones
+- Fixed bug where repos were sometimes not saved after updating
+- Improved testing support for typing strings
+
+# V3.10.0
+
+- Issues can now be sorted by milestone
+- Keyboard shortcuts are now consistent with OS X conventions (using <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>)
+- Board names are now validated
+- Added a means of navigating PR tabs without leaving the panel view
+- Label positions in the label picker are now stable when typing
+- Fixed bug with label picker undo window which could lead to inconsistent model state
+- Fixed bug where repo list wasn't updated when a repo was added
+- Fixed bug where API requests for pull requests were unauthenticated
+- Unstable tests are no longer run on Travis
+- Improved documentation for `sort`
+
+# V3.9.0
+
+- Review comments are now taken into account by the `updated` qualifier
+- The browser view will scroll to the bottom on loading an issue
+- Fixed bug with hotkey for switching repository
+
+# V3.8.0
+
+- Fixed unresponsive <kbd>Ctrl</kbd> keybindings
+- Fixed a bug where I/O errors could go unreported
+
+# V3.7.1
+
+- Temporarily removed `updated-self` and `updated-others`
+- Fixed bug where adding labels quickly caused undo not to work properly
+- Improvements to testing infrastructure
 
 # V3.7.0
 

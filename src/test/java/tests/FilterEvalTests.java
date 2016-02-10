@@ -1,21 +1,21 @@
 package tests;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.mock;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import backend.IssueMetadata;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.ParseException;
 import filter.Parser;
+import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import prefs.Preferences;
 
@@ -25,12 +25,8 @@ public class FilterEvalTests {
     public static final String REPO = "test/test";
 
     public FilterEvalTests() {
-        empty = new MultiModel(new Preferences(true));
+        empty = new MultiModel(mock(Preferences.class));
         empty.setDefaultRepo(REPO);
-    }
-
-    @BeforeClass
-    public static void setup() {
     }
 
     /**
@@ -45,6 +41,16 @@ public class FilterEvalTests {
     public void invalid() {
         TurboIssue issue = new TurboIssue(REPO, 1, "title");
         assertEquals(false, matches("something:a", issue));
+    }
+
+    @Test
+    public void falseQualifier() {
+        TurboIssue issue = new TurboIssue(REPO, 1, "1");
+        TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
+
+        IModel model = TestUtils.modelWith(issue, milestone);
+
+        assertEquals(false, Qualifier.process(model, Qualifier.FALSE, issue));
     }
 
     @Test
@@ -112,6 +118,20 @@ public class FilterEvalTests {
         assertEquals(false, matches("in:something a is", issue));
     }
 
+    private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
+
+        try {
+            assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
+            fail(". is not a valid token on its own");
+        } catch (ParseException ignored) {
+        }
+        assertEquals(false, matches(milestoneQualifier + ":what", issue));
+    }
+
     @Test
     public void milestone() {
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
@@ -121,16 +141,219 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("milestone:v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("milestone:1"), issue));
-        try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("milestone:."), issue));
-            fail(". is not a valid token on its own");
-        } catch (ParseException ignored) {
-        }
-        assertEquals(false, matches("milestone:what", issue));
+        testMilestoneParsing("milestone", issue, model);
+
+        // milestone aliases
+        // - sorting of milestone is by due date
+        // - test different offset
+
+        // test: overdue open milestone with no open issues would not be current milestone
+        TurboMilestone msCurrMin3 = new TurboMilestone(REPO, 10, "V0.1");
+        msCurrMin3.setOpen(true);
+        msCurrMin3.setOpenIssues(0);
+        msCurrMin3.setDueDate(Optional.of(LocalDate.now().minusMonths(2)));
+        TurboIssue iCurrMin3 = new TurboIssue(REPO, 2, "curr-3");
+        iCurrMin3.setMilestone(msCurrMin3);
+        iCurrMin3.setOpen(false);
+
+        // test: sort by due date is correct
+        TurboMilestone msCurrMin2 = new TurboMilestone(REPO, 9, "V0.2");
+        msCurrMin2.setOpen(false);
+        msCurrMin2.setDueDate(Optional.of(LocalDate.now().minusMonths(1)));
+        TurboIssue iCurrMin2 = new TurboIssue(REPO, 3, "curr-2");
+        iCurrMin2.setMilestone(msCurrMin2);
+
+        // test: future closed milestone will not be current milestone
+        TurboMilestone msCurrMin1 = new TurboMilestone(REPO, 8, "V0.3");
+        msCurrMin1.setOpen(false);
+        msCurrMin1.setDueDate(Optional.of(LocalDate.now().plusDays(1)));
+        TurboIssue iCurrMin1 = new TurboIssue(REPO, 4, "curr-1");
+        iCurrMin1.setMilestone(msCurrMin1);
+
+        // test: earliest future open milestone with 0 open issues will
+        // be current milestone
+        TurboMilestone msCurr = new TurboMilestone(REPO, 7, "V0.5");
+        msCurr.setOpen(true);
+        msCurr.setOpenIssues(0);
+        msCurr.setDueDate(Optional.of(LocalDate.now().plusMonths(1)));
+        TurboIssue iCurr = new TurboIssue(REPO, 5, "curr");
+        iCurr.setMilestone(msCurr);
+        iCurr.setOpen(false);
+
+        // test: sort by due date is correct, even if in the future but
+        // closed
+        TurboMilestone msCurrPlus1 = new TurboMilestone(REPO, 6, "V0.7");
+        msCurrPlus1.setOpen(false);
+        msCurrPlus1.setDueDate(Optional.of(LocalDate.now().plusMonths(2)));
+        TurboIssue iCurrPlus1 = new TurboIssue(REPO, 6, "curr+1");
+        iCurrPlus1.setMilestone(msCurrPlus1);
+
+        // test: sort by due date is correct
+        TurboMilestone msCurrPlus2 = new TurboMilestone(REPO, 5, "V0.8");
+        msCurrPlus2.setOpen(true);
+        msCurrPlus2.setDueDate(Optional.of(LocalDate.now().plusMonths(3)));
+        TurboIssue iCurrPlus2 = new TurboIssue(REPO, 7, "curr+2");
+        iCurrPlus2.setMilestone(msCurrPlus2);
+
+        // test: milestone with no due date should not be included
+        TurboMilestone msCurrPlus3 = new TurboMilestone(REPO, 4, "V0.9");
+        msCurrPlus3.setDueDate(Optional.empty());
+        TurboIssue iCurrPlus3 = new TurboIssue(REPO, 8, "curr+3");
+        iCurrPlus3.setMilestone(msCurrPlus3);
+
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
+                        iCurr, iCurrPlus1, iCurrPlus2, iCurrPlus3)),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(msCurrMin3, msCurrMin2, msCurrMin1,
+                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3)),
+                new ArrayList<>()));
+
+        FilterExpression noMilestoneAlias;
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        // test: negation alias
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("-milestone:curr"));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        // test: no milestone in model should return qualifier false
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
+                        iCurr, iCurrPlus1, iCurrPlus2, iCurrPlus3)),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+
+        noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
     }
 
     @Test
@@ -220,12 +443,6 @@ public class FilterEvalTests {
     public void author() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, matches("creator:BOB", issue));
-        assertEquals(true, matches("creator:bob", issue));
-        assertEquals(false, matches("creator:alice", issue));
-        assertEquals(true, matches("creator:o", issue));
-        assertEquals(false, matches("creator:lic", issue));
-
         assertEquals(true, matches("author:BOB", issue));
         assertEquals(true, matches("author:bob", issue));
         assertEquals(false, matches("author:alice", issue));
@@ -280,7 +497,9 @@ public class FilterEvalTests {
 
         assertEquals(false, matches("has:label", issue));
         assertEquals(false, matches("has:milestone", issue));
+        assertEquals(false, matches("has:m", issue));
         assertEquals(false, matches("has:assignee", issue));
+        assertEquals(false, matches("has:as", issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.addLabel(label);
@@ -288,7 +507,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.setMilestone(milestone);
@@ -296,7 +517,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
 
         issue.setAssignee(user);
@@ -304,7 +527,9 @@ public class FilterEvalTests {
 
         assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("has:as"), issue));
         assertEquals(false, matches("has:something", issue));
     }
 
@@ -318,7 +543,9 @@ public class FilterEvalTests {
 
         assertEquals(true, matches("no:label", issue));
         assertEquals(true, matches("no:milestone", issue));
+        assertEquals(true, matches("no:m", issue));
         assertEquals(true, matches("no:assignee", issue));
+        assertEquals(true, matches("no:as", issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.addLabel(label);
@@ -326,7 +553,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.setMilestone(milestone);
@@ -334,7 +563,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
 
         issue.setAssignee(user);
@@ -342,7 +573,9 @@ public class FilterEvalTests {
 
         assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
         assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertEquals(false, Qualifier.process(model, Parser.parse("no:as"), issue));
         assertEquals(true, matches("no:something", issue));
     }
 
@@ -436,44 +669,6 @@ public class FilterEvalTests {
     }
 
     @Test
-    public void updatedBySelfAndOther(){
-        LocalDateTime now = LocalDateTime.now();
-        Qualifier.setCurrentTime(now);
-        TurboIssue issueUpdated = new TurboIssue(REPO, 1, "");
-        IssueMetadata updatedByOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
-                now.minusHours(4), 2, 2, true, false); //UpdatedByOther true with updated time 4 hours ago.
-        issueUpdated.setMetadata(updatedByOtherMetadata);
-        assertEquals(false, matches("updated-others:<2", issueUpdated));
-        assertEquals(false, matches("updated-self:<2", issueUpdated));
-        assertEquals(true, matches("updated-others:<=4", issueUpdated));
-        assertEquals(false, matches("updated-self:<=4", issueUpdated));
-
-        IssueMetadata updatedBySelfAndOtherMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
-                now.minusHours(4), 2, 2, true, true); //UpdatedByOther and UpdatedBySelf true with updated time 4 hours.
-        issueUpdated.setMetadata(updatedBySelfAndOtherMetadata);
-        assertEquals(false, matches("updated-others:<2", issueUpdated));
-        assertEquals(false, matches("updated-self:<2", issueUpdated));
-        assertEquals(true, matches("updated-others:<=4", issueUpdated));
-        assertEquals(true, matches("updated-self:<=4", issueUpdated));
-
-        IssueMetadata updatedBySelfMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
-                now.minusHours(4), 2, 2, false, true); //UpdatedBySelf true with updated time 4 hours ago.
-        issueUpdated.setMetadata(updatedBySelfMetadata);
-        assertEquals(false, matches("updated-others:<2", issueUpdated));
-        assertEquals(false, matches("updated-self:<2", issueUpdated));
-        assertEquals(false, matches("updated-others:<=4", issueUpdated));
-        assertEquals(true, matches("updated-self:<=4", issueUpdated));
-
-        IssueMetadata updatedByNoneMetadata = new IssueMetadata(issueUpdated.getMetadata(), now.minusHours(4),
-                now.minusHours(4), 2, 2, false, false); //UpdatedBySelf and UpdatedByOthers both false.
-        issueUpdated.setMetadata(updatedByNoneMetadata);
-        assertEquals(false, matches("updated-others:<2", issueUpdated));
-        assertEquals(false, matches("updated-self:<2", issueUpdated));
-        assertEquals(false, matches("updated-others:<=4", issueUpdated));
-        assertEquals(false, matches("updated-self:<=4", issueUpdated));
-    }
-
-    @Test
     public void updated() {
         LocalDateTime now = LocalDateTime.now();
         Qualifier.setCurrentTime(now);
@@ -484,7 +679,6 @@ public class FilterEvalTests {
         assertEquals(false, matches("updated:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
-        System.out.println(issue.getUpdatedAt());
         assertEquals(true, matches("updated:>24", issue));
         assertEquals(false, matches("updated:nondate", issue));
 

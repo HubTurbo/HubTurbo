@@ -3,8 +3,8 @@ package filter.lexer;
 import java.util.regex.Pattern;
 
 public class Rule {
-    private TokenType tokenType;
-    private Pattern pattern;
+    private final TokenType tokenType;
+    private final Pattern pattern;
 
     public Rule(String pattern, TokenType type) {
         this.tokenType = type;

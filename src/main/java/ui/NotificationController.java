@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NotificationController {
 
-    private NotificationPane notificationPane;
+    private final NotificationPane notificationPane;
     private TickingTimer notificationPaneTimer;
     private Optional<Notification> notification = Optional.empty();
 
@@ -19,10 +19,10 @@ public class NotificationController {
         this.notificationPane = notificationPane;
     }
 
-    void showNotification(Notification notification) {
+    public void showNotification(Notification notification) {
         Platform.runLater(() -> {
             if (notificationPane.isShowing()) {
-                triggerTimeoutAction();
+                hideNotification();
             }
             notificationPane.setGraphic(notification.getIcon());
             notificationPane.setText(notification.getMessage());
@@ -33,30 +33,14 @@ public class NotificationController {
                         hideNotification();
                     }));
             notificationPaneTimer = new TickingTimer("Notification Timer", notification.getTimeoutDuration(),
-                    integer -> {}, () -> Platform.runLater(this::triggerTimeoutAction), TimeUnit.SECONDS);
-            notificationPane.setOnHiding(event -> triggerTimeoutAction());
+                    integer -> {}, () -> {}, TimeUnit.SECONDS);
             notificationPane.show();
             notificationPaneTimer.start();
             this.notification = Optional.of(notification);
         });
     }
 
-    private void triggerTimeoutAction() {
-        // must be run in a Platform.runLater or from the UI thread
-        determineAndRunTimeoutAction();
-        hideNotification();
-    }
-
-    private void determineAndRunTimeoutAction() {
-        if (notification.isPresent()) {
-            if (notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
-                notification.get().getTimeoutRunnable().run();
-            }
-            // other NotifcationTypes can be implemented here if needed
-        }
-    }
-
-    private void hideNotification() {
+    public void hideNotification() {
         // must be run in a Platform.runLater or from the UI thread
         if (notificationPaneTimer.isStarted()) {
             notificationPaneTimer.stop();
@@ -65,7 +49,7 @@ public class NotificationController {
         notification = Optional.empty();
     }
 
-    void triggerNotificationAction() {
+    public void triggerNotificationAction() {
         Platform.runLater(() -> {
             if (notificationPane.isShowing()) {
                 determineAndRunNotificationAction();
@@ -75,10 +59,9 @@ public class NotificationController {
     }
 
     private void determineAndRunNotificationAction() {
-        if (notification.isPresent()) {
-            if (notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTONANDTIMEOUT) {
-                notification.get().getButtonRunnable().run();
-            }
+        if (notification.isPresent() &&
+            notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTON) {
+            notification.get().getButtonRunnable().run();
             // other NotifcationTypes can be implemented here if needed
         }
     }

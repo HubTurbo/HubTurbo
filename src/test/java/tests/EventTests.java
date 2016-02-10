@@ -1,7 +1,6 @@
 package tests;
 
 import com.google.common.eventbus.EventBus;
-import com.thoughtworks.selenium.webdriven.commands.Open;
 import org.junit.Test;
 import util.events.*;
 
@@ -12,7 +11,12 @@ import static org.junit.Assert.fail;
 
 public class EventTests {
 
-    private EventBus events = new EventBus();
+    private final EventBus events = new EventBus();
+
+    private final EventHandler succeed2 = (IssueSelectedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
+    private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
+    private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
 
     @Test
     public void basics() {
@@ -58,16 +62,11 @@ public class EventTests {
         events.post(te2);
     }
 
-    private final EventHandler succeed2 = (IssueSelectedEventHandler) e -> assertTrue(true);
-    private final EventHandler fail2 = (IssueSelectedEventHandler) e -> fail("IssueSelectedEventHandler failed");
-    private final EventHandler succeed1 = (BoardSavedEventHandler) e -> assertTrue(true);
-    private final EventHandler fail1 = (BoardSavedEventHandler) e -> fail("BoardSavedEventHandler failed");
-
     @Test
     public void testSuperclassHandlerOnSubclassEvent() {
         EventBus eventsSuperSub = new EventBus();
 
-        final EventHandler superclassHandlerSucceed = (OpenReposChangedEventHandler) e -> assertTrue(true);
+        final EventHandler superclassHandlerSucceed = (UnusedStoredReposChangedEventHandler) e -> assertTrue(true);
         final EventHandler subclassHandlerSucceed = (RepoOpenedEventHandler) e -> assertTrue(true);
         final EventHandler subclassHandlerFail =
                 (RepoOpenedEventHandler) e -> fail("RepoOpenedEventHandler failed");
@@ -76,7 +75,7 @@ public class EventTests {
         eventsSuperSub.register(superclassHandlerSucceed);
         eventsSuperSub.register(subclassHandlerFail);
 
-        OpenReposChangedEvent superclassEvent = new OpenReposChangedEvent();
+        UnusedStoredReposChangedEvent superclassEvent = new UnusedStoredReposChangedEvent();
 
         eventsSuperSub.post(superclassEvent);
 
@@ -87,7 +86,7 @@ public class EventTests {
         eventsSuperSub.register(superclassHandlerSucceed);
         eventsSuperSub.register(subclassHandlerSucceed);
 
-        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("");
+        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("", false);
 
         eventsSuperSub.post(subclassEvent);
     }

@@ -38,10 +38,7 @@ public class ScrollableListView<T> extends ListView<T> {
     private static final int DIRECTION_DOWN = 1;
 
     // Scroll events are queued, and only one will be active at a time.
-    private Executor executor = Executors.newSingleThreadExecutor();
-
-    public ScrollableListView() {
-    }
+    private final Executor executor = Executors.newSingleThreadExecutor();
 
     /**
      * Scrolls until the item with the given index is visible.
@@ -106,9 +103,9 @@ public class ScrollableListView<T> extends ListView<T> {
 
     private class ScrollThread extends Thread {
 
-        private BooleanSupplier continueRunning;
-        private IntSupplier direction;
-        private VirtualFlow<?> flow;
+        private final BooleanSupplier continueRunning;
+        private final IntSupplier direction;
+        private final VirtualFlow<?> flow;
 
         public ScrollThread(BooleanSupplier continueRunning, IntSupplier direction) {
             super("ScrollThread");

@@ -50,11 +50,12 @@
 }
 
 .issue-panel-name {
+    -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
 .issue-panel-name-read {
-    -fx-text-fill: #808080;
+    -fx-font-weight: normal;
 }
 
 .issue-panel-closed .text {
@@ -67,6 +68,17 @@
 
 .panel-focused {
     -fx-background-color: #A9BCF5;
+}
+
+.panel-loading {
+    -fx-background-color: grey;
+}
+
+.listview-loading {
+    -fx-background-image: url("loading.gif");
+    -fx-background-size: 40 40;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
 }
 
 .issue-creator {
@@ -159,6 +171,16 @@
     -fx-background-color: transparent;
 }
 
+.issue-cell-closed{
+    -fx-background-color: #e8f1e5;
+}
+.issue-cell-closed:odd{
+    -fx-background-color: derive(#e8f1e5, -3%);
+}
+.issue-cell-closed:selected {
+    -fx-background-color: -fx-selection-bar;
+}
+
 /*Scrollbar styling*/
 /* The main scrollbar **track** CSS class  */
 .scroll-bar:horizontal .track,
@@ -215,3 +237,11 @@
     -fx-text-fill: derive(black, 90%);
 }
 
+.tooltip {
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+
+.text-red {
+    -fx-fill: red;
+}

@@ -22,7 +22,8 @@ public class ChromeDriverTest extends UITest {
     private String url;
     private String script;
     private String keyCode;
-    private boolean jumpToComment;
+
+    private boolean jumpToComment = false; // NOPMD
 
     @Override
     public void launchApp() {
@@ -35,7 +36,7 @@ public class ChromeDriverTest extends UITest {
         clearUrl();
         clearScript();
         clearKeyCode();
-        jumpToComment = false;
+
         UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
         UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
         UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
@@ -93,7 +94,7 @@ public class ChromeDriverTest extends UITest {
         // scroll down
         push(KeyCode.K);
         sleep(EVENT_DELAY);
-        assertEquals("window.scrollBy(0,100)", script);
+        assertEquals("window.scrollBy(0, 100)", script);
         clearScript();
 
         // go to labels page

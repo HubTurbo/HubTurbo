@@ -12,11 +12,14 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
 import ui.UI;
 import util.GitHubURL;
+import util.GithubPageElements;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.io.*;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -30,7 +33,7 @@ public class BrowserComponent {
 
     private static final String CHROMEDRIVER_VERSION = "2-18";
     private static final boolean USE_MOBILE_USER_AGENT = false;
-    private boolean isTestChromeDriver;
+    private final boolean isTestChromeDriver;
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
@@ -60,7 +63,7 @@ public class BrowserComponent {
 
     // The first is not desirable and the second does not seem to be possible
     // at the moment.
-    private Executor executor;
+    private final Executor executor;
 
     public BrowserComponent(UI ui, boolean isTestChromeDriver) {
         this.ui = ui;
@@ -103,6 +106,7 @@ public class BrowserComponent {
                 driver.quit();
             } catch (WebDriverException e) {
                 // Chrome was closed; do nothing
+                logger.info("Chrome already closed");
             }
         }
     }
@@ -208,6 +212,7 @@ public class BrowserComponent {
             logger.info("Showing issue #" + id);
             runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
         }
+        runBrowserOperation(() -> scrollToBottom());
     }
 
     public void jumpToComment(){
@@ -215,7 +220,7 @@ public class BrowserComponent {
             UI.events.triggerEvent(new JumpToCommentEvent());
         }
         try {
-            WebElement comment = driver.findElementById("new_comment_field");
+            WebElement comment = driver.findElementById(GithubPageElements.NEW_COMMENT);
             comment.click();
             bringToTop();
         } catch (Exception e) {
@@ -296,9 +301,9 @@ public class BrowserComponent {
         runBrowserOperation(() -> {
             driver.get(GitHubURL.LOGIN_PAGE, false);
             try {
-                WebElement searchBox = driver.findElement(By.name("login"));
+                WebElement searchBox = driver.findElement(By.name(GithubPageElements.LOGIN_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.username);
-                searchBox = driver.findElement(By.name("password"));
+                searchBox = driver.findElement(By.name(GithubPageElements.PASSWORD_FIELD));
                 searchBox.sendKeys(ui.logic.loginController.credentials.password);
                 searchBox.submit();
             } catch (Exception e) {
@@ -412,21 +417,21 @@ public class BrowserComponent {
     }
 
     public void scrollToTop() {
-        String script = "window.scrollTo(0, 0)";
+        String script = GithubPageElements.SCROLL_TO_TOP;
         executeJavaScript(script);
     }
 
     public void scrollToBottom() {
-        String script = "window.scrollTo(0, document.body.scrollHeight)";
+        String script = GithubPageElements.SCROLL_TO_BOTTOM;
         executeJavaScript(script);
     }
 
     public void scrollPage(boolean isDownScroll) {
         String script;
         if (isDownScroll) {
-            script = "window.scrollBy(0,100)";
+            script = GithubPageElements.SCROLL_DOWN;
         } else {
-            script = "window.scrollBy(0, -100)";
+            script = GithubPageElements.SCROLL_UP;
         }
         executeJavaScript(script);
     }
@@ -437,7 +442,7 @@ public class BrowserComponent {
         }
         WebElement body;
         try {
-            body = driver.findElementByTagName("body");
+            body = driver.findElementByTagName(GithubPageElements.BODY);
             body.sendKeys(keyCode);
         } catch (Exception e) {
             logger.error("No such element");
@@ -487,9 +492,28 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
-    public void switchToConversationTab() {
+    public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            driver.findElement(By.xpath("//a[@data-container-id='discussion_bucket']")).click();
+            driver.findElement(By.xpath("//a[@data-container-id='" + tabName + "_bucket']")).click();
+        }
+    }
+
+    public Optional<Integer> getPRNumberFromIssue() {
+        // will only get the first PR number if multiple PR's are mentioned
+        try {
+            WebElement element = driver.findElement(By.xpath("//div[contains(@id, 'ref-pullrequest')]"));
+            return Optional.of(Integer.parseInt(element.findElement(By.xpath(".."))
+                    .findElement(By.xpath(".//h3/a/span"))
+                    .getAttribute("innerHTML").trim().substring(1)));
+        } catch (NoSuchElementException e) {
+            logger.info("no PR mention found");
+        }
+        return Optional.empty();
+    }
+    
+    public void minimizeWindow() {
+        if (PlatformSpecific.isOnWindows()) {
+            user32.ShowWindow(browserWindowHandle, WinUser.SW_MINIMIZE);
         }
     }
 }

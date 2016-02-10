@@ -17,9 +17,7 @@ import static util.Utility.stripQuotes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -81,7 +79,7 @@ public class UtilityTest {
         Date date = null;
 
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd-k-m-s").parse("1994-11-15-12-45-26");
+            date = new SimpleDateFormat("yyyy-MM-dd-k-m-s", Locale.US).parse("1994-11-15-12-45-26");
         } catch (ParseException e) {
             fail();
         }
@@ -124,5 +122,60 @@ public class UtilityTest {
         Object obj = new Object();
         assertEquals(obj, replaceNull(obj, new Object()));
         assertEquals(obj, replaceNull(null, obj));
+    }
+
+    @Test
+    public void generateNameTest() {
+        // append index '1' or greater to desired name,
+        // whichever smallest index is available
+
+        String desiredName = "test";
+
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName, new ArrayList<String>()));
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("not-test", "other", "even more")));
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test")));
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test1")));
+        assertEquals(desiredName + "2", Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test", "test1")));
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test", "test2")));
+        assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("tests")));
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test", "tests")));
+        assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
+                Arrays.asList("test", "test100")));
+    }
+
+    @Test
+    public void convertSetToLowerCaseTest() {
+        final String entry1 = "Test1";
+        final String entry2 = "tesT2";
+        final String entry3 = "correct";
+        final String entry4 = "WRONG";
+        final String entry5 = "wiTH/slaSH";
+
+        Set<String> testSet = new HashSet<>(Arrays.asList(
+                entry1, entry2, entry3, entry4, entry5
+        ));
+
+        Set<String> convertedSet = Utility.convertSetToLowerCase(testSet);
+
+        assertEquals(false, convertedSet.contains(entry1));
+        assertEquals(false, convertedSet.contains(entry2));
+        assertEquals(true, convertedSet.contains(entry3));
+        assertEquals(false, convertedSet.contains(entry4));
+        assertEquals(false, convertedSet.contains(entry5));
+
+        assertEquals(true, convertedSet.contains(entry1.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry2.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry3.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry4.toLowerCase()));
+        assertEquals(true, convertedSet.contains(entry5.toLowerCase()));
+
+
     }
 }

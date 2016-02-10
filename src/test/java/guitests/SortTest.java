@@ -6,56 +6,46 @@ import org.junit.Test;
 public class SortTest extends UITest {
 
     // TODO check that issue list is sorted correctly
-
     @Test
     public void sortTest () {
         click("#dummy/dummy_col0_filterTextField");
         // Ascending ID
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("id");
+        type("sort:id");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Descending ID (default)
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-id");
+        type("sort:-id");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Comment count
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("comments");
+        type("sort:comments");
         push(KeyCode.ENTER);
-        doubleClick("#dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Repo ID (e.g. dummy2/dummy)
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("repo");
+        type("sort:repo");
         push(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Updated time (ascending)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("updated");
+        type("sort:updated");
         push(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Updated time (descending)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-date");
+        type("sort:-date");
         push(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Issue state (open)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("status");
+        type("sort:status");
         push(KeyCode.ENTER);
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
         // Issue state (closed)
-        doubleClick("#dummy/dummy_col0_filterTextField");
-        type("sort");
-        press(KeyCode.SHIFT).press(KeyCode.SEMICOLON).release(KeyCode.SEMICOLON).release(KeyCode.SHIFT);
-        type("-status");
+        type("sort:-status");
         push(KeyCode.ENTER);
     }
 }

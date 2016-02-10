@@ -1,40 +1,72 @@
+
 # Workflow
 
-Notes:
-* The development workflow is a simplified version of the one used in [TEAMMATES](https://github.com/TEAMMATES/repo/blob/master/devdocs/process.md). 
-* The `master` branch always contains the latest stable code (may contain unreleased features/fixes).
-* The `release` branch always contains the latest release version.
+Working on HubTurbo involves a number of common tasks.
 
-## Workflow for new contributors
+Most are accessed via Gradle, which we will assume to be the lowest common denominator in terms of ways to do things, and which should work out of the box without any additional setup. Plugins providing graphical interfaces to these tasks in IDEs are generally also available and will be listed.
 
-First, 
-* Join the [contributor mailing list](https://groups.google.com/forum/#!forum/hubturbo-contributors).
-* Create a fork of the repo. 
+## Running Tests
 
-Fixing issues:
+```sh
+./gradlew clean test -i
+```
 
-1. Select an issue to handle. For your first issue, select an issue labelled `difficulty.beginner`. Optionally, you may discuss the issue using the issue tracker to see if your intended solution is suitable. 
-2. Create a branch off the current `master` named "X-short-description", where `X` is the issue number. For example, `2342-remove-println` for an issue named `Remove all unnecessary println statements`.
-3. Implement your changes in the created branch. Run tests locally and ensure that there are no failures or style violations (use the `test` and `check` tasks in Gradle).
-4. Push your changes to your fork.
-5. Create a pull request against the [`master`](https://github.com/HubTurbo/HubTurbo) branch of the main repo.
-    - The name of the PR should be in the format "TITLE #X", where `TITLE` is the title of the issue you selected, and `X` is its number. e.g. `Sorting order is incorrect #123`
-    - The description of the PR should include the text "Fixes #X" e.g. `Fixes #123` [or something similar](https://github.com/blog/1506-closing-issues-via-pull-requests) to auto-close the issue when the PR is merged.
-    - You don't have to wait until your changes are ready to do this. Feel free to use the PR to discuss any difficulties you run into, or any clarification you need.
-6. After creating the PR, you can check the status of the PR on the CI (Travis) [here](https://travis-ci.org/HubTurbo/HubTurbo/pull_requests), please ensure that all tests pass without any style violations. 
-    - If your PR includes additional functional code and coverage drops, either update an existing test to test for the added/fixed functionality or add a new test. 
-7. When ready, get someone on the dev team to review it. You can request a review by adding a comment to the PR.
-8. The reviewer will merge it when he/she is satisfied.
+The `-i` flag enables logging. This command will run all tests, [stable and unstable](testing.md#unstable-tests).
 
-If you need any clarification on the workflow, you may also post in the [mailing list](https://groups.google.com/forum/#!forum/hubturbo-contributors).
+To simulate testing in the CI environment, add the environment variable `CI=true`.
 
-## Workflow for developers
-Similar to above, except for following differences:
+```sh
+CI=true ./gradlew clean test -i
+```
 
-1. You'll be pushing to the main repo. 
-2. You can also create new issues, label issues, and review code from others.
-3. When creating a PR, also assing a reviewer for it. Choose another core developer as the reviewer. Try to pick one who is likely to know the code touched by the PR well.
-2. When your PR is marked as `status.toMerge` by the reviewer, you should merge the PR yourself. 
-   * Merging should be done locally, not using GitHub. 
-   * Format for the merge commit: `[issue number] issue name` e.g. `[324] keyboard shortcut for creating an issue`
-   * Ensure all tests are passing before you push the merge commit to the repo.
+This will run only the stable tests. To run the unstable tests separately,
+
+```sh
+./gradlew clean unstableTests
+```
+
+To run only a single test i.e. PanelFocusTest of the unstable tests.
+
+```sh
+./gradlew clean -DunstableTests.single=PanelFocus unstableTests -i
+```
+
+If you've [set up a project for your IDE](settingUp.md), there are also ways to run tests with the configuration specified in the project.
+
+## Code Coverage
+
+```sh
+./gradlew clean jacocoRootReport
+```
+
+This will run tests, then generate coverage reports in `build/reports`.
+
+If you've already just run tests,
+
+```sh
+./gradlew jacocoRootReport
+```
+
+should be sufficient. Adding `CI=true` will generate coverage only for stable tests.
+
+[EclEmma](http://eclemma.org/) is a plugin for Eclipse which allows tests be to selectively run, and coverage measured with more granularity than the default Gradle task.
+
+## Style Violations and Linting
+
+```sh
+./gradlew clean check
+```
+
+This will run all static analysis tools before running tests. Violations will cause the entire build to fail, so they must be resolved. Reports will be placed in `build/reports` if this happens. Configuration for these tools can be found in `config`.
+
+If you're not sure how to resolve a violation and wish to make an exception for it, please highlight it for discussion in your pull request.
+
+More information on tools can be found [here](staticAnalysis.md).
+
+## Building a JAR
+
+```sh
+./gradlew clean shadowJar
+```
+
+Eclipse and IntelliJ have built-in ways to export JARs.

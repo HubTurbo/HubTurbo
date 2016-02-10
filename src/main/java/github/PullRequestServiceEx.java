@@ -3,6 +3,7 @@ package github;
 import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.PullRequestService;
 import util.HTLog;
@@ -14,6 +15,10 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 
 public class PullRequestServiceEx extends PullRequestService {
     private static final Logger logger = HTLog.get(PullRequestServiceEx.class);
+
+    public PullRequestServiceEx(GitHubClient client) {
+        super(client);
+    }
 
     /**
      * Gets a pull request's review comments
@@ -62,10 +67,10 @@ public class PullRequestServiceEx extends PullRequestService {
         logger.info("Getting review comments for PR" + pullRequestNumber + " " + repoId);
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-        uri.append('/').append(repoId);
-        uri.append(SEGMENT_PULLS);
-        uri.append('/').append(pullRequestNumber);
-        uri.append(SEGMENT_COMMENTS);
+        uri.append('/').append(repoId)
+            .append(SEGMENT_PULLS)
+            .append('/').append(pullRequestNumber)
+            .append(SEGMENT_COMMENTS);
 
         PagedRequest<ReviewComment> request = createPagedRequest();
         request.setUri(uri);

@@ -30,12 +30,9 @@ public class GlobalConfig {
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
     private Optional<String> lastOpenBoard = Optional.empty();
-    private Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
-    private Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
+    private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
+    private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
-
-    public GlobalConfig() {
-    }
 
     public Map<String, String> getKeyboardShortcuts() {
         return new HashMap<>(keyboardShortcuts);

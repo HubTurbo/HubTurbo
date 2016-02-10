@@ -28,7 +28,7 @@ public class RepoViewRecordTest {
     public void equality() {
         assertTrue(repoViewRecord.equals(repoViewRecord));
         assertFalse(repoViewRecord.equals(null));
-        assertFalse(repoViewRecord.equals(""));
+        assertFalse(repoViewRecord.equals("")); // NOPMD
         assertFalse(repoViewRecord1.equals(repoViewRecord));
         assertTrue(repoViewRecord.equals(repoViewRecord2));
     }
