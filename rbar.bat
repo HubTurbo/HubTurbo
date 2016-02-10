@@ -14,12 +14,13 @@ setlocal
 REM This gets the name of the HubTurbo .jar file in build/libs. The expected format is HubTurbo-X.X.X-all.jar, but
 REM any file that fits the format HubTurbo-(*).jar will be accepted.
 for /r build\libs %%i in (*.jar) do @set versionLine=%%~ni
-REM Based on the .jar file name, close relevant processes.
+REM Based on the .jar file name, close relevant processes. The /t option specifies tree kill mode, which also
+REM targets child chromedriver processes.
 echo ^> Closing all javaw processes with window title format: HubTurbo V%versionLine:~9,5%*.
-taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "javaw.exe"
+taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "javaw.exe" /t
 echo(
 echo ^> Closing all java processes with window title format: HubTurbo V%versionLine:~9,5%*.
-taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "java.exe"
+taskkill /fi "Windowtitle eq HubTurbo V%versionLine:~9,5%*" /im "java.exe" /t
 echo(
 
 REM rbar-ex.txt tells xcopy to avoid backing up any .jar and .exe files.
