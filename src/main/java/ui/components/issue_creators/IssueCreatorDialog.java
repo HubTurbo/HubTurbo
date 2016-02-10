@@ -68,7 +68,7 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
         initModality(Modality.APPLICATION_MODAL);
         loadDialogContent();
         initTitles(presenter.isNewIssue() ? DEFAULT_TITLE : presenter.resolveIssueTitle());
-        initBody();
+        initBody(stage);
         initAssignee(presenter.getAssignee());
         initMilestone(presenter.getMilestone());
         initLabels();
@@ -126,8 +126,8 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
         Platform.runLater(title::requestFocus);
     }
     
-    private void initBody() {
-        body = new IssueContentPane(presenter.getIssueBody());
+    private void initBody(Stage stage) {
+        body = new IssueContentPane(presenter.getIssueBody(), presenter);
         mainLayout.getChildren().add(body);
     }
 
