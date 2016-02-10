@@ -108,20 +108,21 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     // Population of UI elements
 
     /**
-     * Populate respective panes with labels that matches current query
-     * @param matchedLabels
-     * @param suggestion
+     * Populate respective panes with labels that matches current user input
+     * @param state
      */
     private void populatePanes(LabelPickerState state) {
         // Population of UI elements
-        populateAssignedLabels(state);
+        populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
+                state.getCurrentSuggestion());
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
     }
 
-    private void populateAssignedLabels(LabelPickerState state) {
+    private void populateAssignedLabels(List<String> initialLabels, List<String> removedLabels,
+                                        List<String> addedLabels, Optional<String> suggestion) {
         assignedLabels.getChildren().clear();
-        populateInitialLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getCurrentSuggestion());
-        populateToBeAddedLabels(state.getAddedLabels(), state.getCurrentSuggestion());
+        populateInitialLabels(initialLabels, removedLabels, suggestion);
+        populateToBeAddedLabels(addedLabels, suggestion);
         if (finalAssignedLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 

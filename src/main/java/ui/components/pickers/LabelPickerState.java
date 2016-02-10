@@ -76,7 +76,7 @@ public class LabelPickerState {
             }
         }
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, new ArrayList<>());
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, convertToList(repoLabels));
     }
 
     public LabelPickerState nextSuggestion() {

@@ -18,7 +18,8 @@ public class LabelPickerStateTests {
 
     public Set<String> getTestRepoLabels() {
         Set<String> setOfLabelNames;
-        setOfLabelNames = getHashSet("priority.high", "priority.medium", "priority.low", "highest", "Problem.Heavy");
+        setOfLabelNames = getHashSet("priority.high", "priority.medium", "priority.low", "highest", "Problem.Heavy",
+                "f-aaa", "f-bbb");
 
         return setOfLabelNames;
     }
