@@ -302,7 +302,12 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
+        viewCommentMenuItem.setText(viewCommentMenuItemText);
+        viewCommentMenuItem.setOnAction(e -> {
+            viewComments();
+        });
+
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem, viewCommentMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
