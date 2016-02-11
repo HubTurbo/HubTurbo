@@ -92,8 +92,8 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> milestonesOfRepos = TurboMilestone.getMilestonesOfRepos(model.getMilestones(), repoIds);
-        List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfRepos);
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.getMilestonesOfRepos(model.getMilestones(), repoIds);
+        List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
         if (milestoneAliasIndex.isEmpty()) {
@@ -136,10 +136,10 @@ public class Qualifier implements FilterExpression {
     /**
      * Get all milestones that can be aliased with current-[n] to current+[n]
      */
-    private static List<TurboMilestone> getMilestonesWithinAliasRange(List<TurboMilestone> milestonesOfRepos) {
+    private static List<TurboMilestone> getMilestonesWithinAliasRange(List<TurboMilestone> milestonesOfReposInPanel) {
         List<TurboMilestone> milestones = new ArrayList<>();
         // add milestones with due date first
-        milestones.addAll(milestonesOfRepos.stream()
+        milestones.addAll(milestonesOfReposInPanel.stream()
                 .filter(ms -> ms.getDueDate().isPresent())
                 .collect(Collectors.toList()));
 
@@ -147,7 +147,7 @@ public class Qualifier implements FilterExpression {
         // it has due date or not.
         // In this case, if it is not included already (the open milestone does not
         // have due date), add it to the milestone list.
-        List<TurboMilestone> openMilestones = TurboMilestone.getOpenMilestones(milestonesOfRepos);
+        List<TurboMilestone> openMilestones = TurboMilestone.getOpenMilestones(milestonesOfReposInPanel);
         if (openMilestones.size() == 1) {
             TurboMilestone openMilestone = openMilestones.get(0);
             boolean hasDueDate = openMilestone.getDueDate().isPresent();
