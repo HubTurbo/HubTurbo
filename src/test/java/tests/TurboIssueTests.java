@@ -13,7 +13,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class TurboIssueTest {
+public class TurboIssueTests {
 
     private static final String REPO = "testrepo/testrepo";
 
