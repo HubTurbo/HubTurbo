@@ -191,18 +191,20 @@ public class Qualifier implements FilterExpression {
                     .filter(i -> milestones.get(i).isOpen())
                     .findFirst();
         } else {
-            // Look for the first milestone in the (sorted) list that is both open and ongoing.
-            int currentIndex = 0;
-            for (TurboMilestone checker : milestones) {
-                if (checker.isOpen() && checker.isOngoing()) {
-                    return Optional.of(currentIndex);
-                }
-                currentIndex++;
-            }
+            // Look for the first milestone in the (sorted) list that is ongoing.
+            Optional<Integer> firstOngoingMilestonePosition = IntStream
+                    .range(0, milestones.size())
+                    .boxed()
+                    .filter(i -> milestones.get(i).isOngoing())
+                    .findFirst();
 
-            // if no open and ongoing milestone, set current as one after last milestone
-            // - this means that no such milestone, which will return no issue
-            return Optional.of(milestones.size());
+            if (firstOngoingMilestonePosition.isPresent()) {
+                return firstOngoingMilestonePosition;
+            } else {
+                // if no ongoing milestone, set current as one after last milestone
+                // - this means that no such milestone, which will return no issue
+                return Optional.of(milestones.size());
+            }
         }
     }
 

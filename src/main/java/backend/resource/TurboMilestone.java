@@ -98,7 +98,7 @@ public class TurboMilestone {
      * A milestone is ongoing if it is not due yet or it is overdue but still has open issues.
      */
     public boolean isOngoing() {
-        return !isOverdue() || hasOpenIssues();
+        return isOpen() && (!isOverdue() || hasOpenIssues());
     }
 
     public static List<TurboMilestone> getMilestonesOfRepos(List<TurboMilestone> milestones, List<String> repoIds) {
