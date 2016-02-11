@@ -1,5 +1,6 @@
 package ui.components.issue_creators;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,8 @@ import org.pegdown.PegDownProcessor;
 
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -118,6 +121,7 @@ public class IssueContentPane extends StackPane {
         TextArea body = new TextArea();
         body.setPrefColumnCount(COL_PREF_COUNT);
         body.setWrapText(true);
+        suggestions.loadSuggestions(Arrays.asList("test", "babi","halo"));
         this.getChildren().add(0, body);
         return body;
     }
