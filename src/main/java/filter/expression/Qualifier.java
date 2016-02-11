@@ -92,7 +92,7 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.getMilestonesOfRepos(model.getMilestones(), repoIds);
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepos(model.getMilestones(), repoIds);
         List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
@@ -1053,7 +1053,7 @@ public class Qualifier implements FilterExpression {
             }
         }
 
-        // if out of milestone range, don't convert alias
+        // if the offset is not within alias range, no issue will be shown
         if (!milestoneAliasIndex.containsKey(offset)) {
             return Qualifier.FALSE;
         }
