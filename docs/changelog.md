@@ -1,6 +1,10 @@
 
 # Changelog
 
+# V3.19.0
+
+- Fixed HT not refreshing when the undo notification was visible
+
 # V3.18.0
 
 - Added shorthand syntax for OR
