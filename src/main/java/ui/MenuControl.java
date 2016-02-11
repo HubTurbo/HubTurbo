@@ -239,7 +239,7 @@ public class MenuControl extends MenuBar {
                 // we trigger the notification timeout action first before refreshing
                 ui.hideNotification();
             }
-            ui.logic.refresh(false);
+            ui.logic.refresh();
         });
         refreshMenuItem.setAccelerator(REFRESH);
         return refreshMenuItem;
