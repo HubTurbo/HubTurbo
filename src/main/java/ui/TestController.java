@@ -58,7 +58,7 @@ public final class TestController {
                         isTestJSONEnabled() ||
                         isTestChromeDriver() ||
                         isTestGlobalConfig() ||
-                        isTestStartupBoard() ||
+                        shouldTestStartupBoard() ||
                         isCloseOnQuit());
     }
 
@@ -66,10 +66,10 @@ public final class TestController {
         return hasUI() && commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
     }
 
-    /** Used for testing startup board on launch (i.e. when the number of stored repos is 0)
-     * StartBoardLauncherTest makes use of this argument to test the launch of the board for first time users
+    /**
+     * Determines whether the startup board should be tested using command line arguments.
      */
-    public static boolean isTestStartupBoard() {
+    public static boolean shouldTestStartupBoard() {
         return hasUI() && commandLineArgs.getOrDefault("startupboard", "false").equalsIgnoreCase("true");
     }
 
@@ -92,6 +92,15 @@ public final class TestController {
     // tests to fail).
     public static boolean isCloseOnQuit() {
         return hasUI() && commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
+    }
+
+    /**
+     * Returns true if HubTurbo is not being run on Test mode or if startup board creation is being tested.
+     * As for the other tests, they start on a clean state with dummy repos established
+     * so don't need boards created on startup.
+     */
+    public static boolean shouldOpenSampleBoard() {
+        return !TestController.isTestMode() || TestController.shouldTestStartupBoard();
     }
 
     /**

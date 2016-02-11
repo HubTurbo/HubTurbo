@@ -64,7 +64,7 @@ public class BoardAutoCreator {
     public Menu generateBoardAutoCreateMenu() {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
-        sample.setOnAction(e -> createSampleBoard(false));
+        sample.setOnAction(e -> createSampleBoard(true));
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
@@ -131,7 +131,12 @@ public class BoardAutoCreator {
                         "It is saved under the name \"" + boardName + "\".");
     }
 
-    public void createSampleBoard(boolean isCalledOnStartup) {
+    /**
+     * Creates a sample board to showcase HubTurbo's functionality with sample repos in filters.
+     * The confirmation dialog pops up for the creation of the sample board if isDialogShown is set to true.
+     * @param isDialogShown
+     */
+    public void createSampleBoard(boolean isDialogShown) {
         logger.info("Creating " + SAMPLE_BOARD);
 
         panelControl.closeAllPanels();
@@ -148,8 +153,7 @@ public class BoardAutoCreator {
 
         triggerBoardSaveEventSequence(SAMPLE_BOARD);
 
-        //isCalledOnStartup is set to true when called on launch in UI.java
-        if (!isCalledOnStartup){
+        if (isDialogShown){
             DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
         }
     }
