@@ -175,6 +175,9 @@ public class Qualifier implements FilterExpression {
                         i -> sortedMilestones.get(i)));
     }
 
+    /**
+     * This method expects the milestone list to be sorted (by due date)
+     */
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> milestones) {
         if (milestones.isEmpty()) {
             return Optional.empty();
