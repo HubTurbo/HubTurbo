@@ -101,7 +101,7 @@ public class TurboMilestone {
         return isOpen() && (!isOverdue() || hasOpenIssues());
     }
 
-    public static List<TurboMilestone> filterMilestonesOfGivenRepos(List<TurboMilestone> milestones, List<String> repoIds) {
+    public static List<TurboMilestone> filterMilestonesOfGivenRepoIds(List<TurboMilestone> milestones, List<String> repoIds) {
         return milestones.stream()
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
                 .collect(Collectors.toList());

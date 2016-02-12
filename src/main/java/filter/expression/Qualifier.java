@@ -92,7 +92,7 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepos(model.getMilestones(), repoIds);
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepoIds(model.getMilestones(), repoIds);
         List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
@@ -166,6 +166,8 @@ public class Qualifier implements FilterExpression {
     private static Map<Integer, TurboMilestone> getMilestoneAliasIndex(List<TurboMilestone> milestones) {
         List<TurboMilestone> sortedMilestones = TurboMilestone.getSortedMilestonesByDueDate(milestones);
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(sortedMilestones);
+
+        assert currentMilestoneIndex.isPresent() || (!currentMilestoneIndex.isPresent() && sortedMilestones.isEmpty());
 
         return IntStream
                 .range(0, sortedMilestones.size())
