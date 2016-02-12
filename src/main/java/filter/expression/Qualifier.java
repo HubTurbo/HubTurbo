@@ -185,7 +185,7 @@ public class Qualifier implements FilterExpression {
             return Optional.empty();
         }
 
-        long openMilestonesCount = milestones.stream().filter(TurboMilestone::isOpen).count();
+        int openMilestonesCount = TurboMilestone.getOpenMilestones(milestones).size();
         if (openMilestonesCount == 1) {
             return IntStream
                     .range(0, milestones.size())
