@@ -161,57 +161,63 @@ public class MilestoneAliasTests {
     }
 
     @Test
-    public void replaceMilestoneAliasesTestNoRelevantMilestone() {
-        //every milestone with due date is irrelevant
+    public void replaceMilestoneAliasesTestOngoingMilestoneWithNoDueDate() {
+        //ongoing milestone -> open && (!overdue || (overdue && openIssues > 0))
 
-        TurboMilestone msIrrelevant1 = new TurboMilestone(REPO, 1, "irrelevant1");
-        msIrrelevant1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
-        msIrrelevant1.setOpen(false);
+        TurboMilestone msFinished0 = new TurboMilestone(REPO, 0, "finished0");
+        msFinished0.setDueDate(Optional.of(LocalDate.now()));
+        msFinished0.setOpen(false);
 
-        TurboMilestone msIrrelevant2 = new TurboMilestone(REPO, 2, "irrelevant2");
-        msIrrelevant2.setDueDate(Optional.of(LocalDate.now().minusDays(2)));
-        msIrrelevant2.setOpen(true);
+        TurboMilestone msFinished1 = new TurboMilestone(REPO, 1, "finished1");
+        msFinished1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
+        msFinished1.setOpen(false);
 
-        TurboMilestone msRelevant1 = new TurboMilestone(REPO, 3, "relevant1");
-        msRelevant1.setDueDate(Optional.empty());
-        msRelevant1.setOpen(true);
+        TurboMilestone msFinished2 = new TurboMilestone(REPO, 2, "finished2");
+        msFinished2.setDueDate(Optional.of(LocalDate.now().minusDays(2)));
+        msFinished2.setOpen(false);
 
-        TurboMilestone msRelevant2 = new TurboMilestone(REPO, 4, "relevant2");
-        msRelevant2.setDueDate(Optional.empty());
-        msRelevant2.setOpen(true);
+        TurboMilestone msOngoing0 = new TurboMilestone(REPO, 0, "ongoing0");
+        msOngoing0.setDueDate(Optional.empty());
+        msOngoing0.setOpen(true);
+
+        TurboMilestone msOngoing1 = new TurboMilestone(REPO, 3, "ongoing1");
+        msOngoing1.setDueDate(Optional.empty());
+        msOngoing1.setOpen(true);
+
+        TurboMilestone msOngoing2 = new TurboMilestone(REPO, 4, "ongoing2");
+        msOngoing2.setDueDate(Optional.empty());
+        msOngoing2.setOpen(true);
 
         model = TestUtils.singletonModel(new Model(REPO,
                new ArrayList<>(),
                 new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2)),
+                new ArrayList<>(Arrays.asList(msOngoing0)),
                 new ArrayList<>()
         ));
 
         FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals("irrelevant2", msQ.getContent().get());
+            assertEquals("ongoing0", msQ.getContent().get());
         });
-
-        msIrrelevant2.setOpen(false);
 
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2, msRelevant1)),
+                new ArrayList<>(Arrays.asList(msFinished1, msFinished2, msOngoing1)),
                 new ArrayList<>()
         ));
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals("relevant1", msQ.getContent().get());
+            assertEquals("ongoing1", msQ.getContent().get());
         });
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-2"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         milestoneQualifiers.stream().forEach(msQ -> {
-            assertEquals("irrelevant2", msQ.getContent().get());
+            assertEquals("finished2", msQ.getContent().get());
         });
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-3"));
@@ -221,13 +227,28 @@ public class MilestoneAliasTests {
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msIrrelevant1, msIrrelevant2, msRelevant1, msRelevant2)),
+                new ArrayList<>(Arrays.asList(msFinished1, msFinished2, msOngoing1, msOngoing2)),
                 new ArrayList<>()
         ));
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         assertEquals(0, milestoneQualifiers.size());
+    }
+
+    @Test
+    public void replaceMilestoneAliasesTestNoMilestone() {
+        model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()));
+        FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
+        List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        assertEquals(1, milestoneQualifiers.size());
+        milestoneQualifiers.stream().forEach(msQ -> {
+            assertEquals("current", msQ.getContent().get());
+        });
     }
 
     @Test
