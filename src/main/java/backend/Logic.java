@@ -20,10 +20,7 @@ import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -201,7 +198,9 @@ public class Logic {
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on UI");
-        issue.setLabels(newLabels);
+        if (!models.replaceIssueLabels(issue, newLabels)) {
+           return CompletableFuture.completedFuture(false);
+        }
         refreshUI();
 
         return updateIssueLabelsOnRepo(issue, newLabels);
@@ -210,7 +209,7 @@ public class Logic {
     private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
         return repoOpControl.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> labels.containsAll(newLabels))
+                .thenApply(labels -> newLabels.containsAll(labels))
                 .exceptionally(Futures.withResult(false));
     }
 

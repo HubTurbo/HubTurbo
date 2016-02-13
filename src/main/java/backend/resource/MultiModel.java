@@ -83,6 +83,35 @@ public class MultiModel implements IModel {
         return this;
     }
 
+    /**
+     * Assigns {@code labels} to an issue corresponding to the argument {@code issue} in this MultiModel
+     * @param issue
+     * @param labels
+     * @return true if labels are successfully assigned
+     */
+    public synchronized boolean replaceIssueLabels(TurboIssue issue, List<String> labels) {
+        Optional<TurboIssue> issueLookUpResult = lookUpIssue(issue);
+        if (!issueLookUpResult.isPresent()) {
+            logger.error("Issue " + issue + " not found in models");
+            return false;
+        }
+        issueLookUpResult.get().setLabels(labels);
+        return true;
+    }
+
+    /**
+     * Looks up an issue corresponding to the argument {@code issue} in this MultiModel
+     * @param issue
+     * @return true if labels are successfully assigned
+     */
+    public synchronized Optional<TurboIssue> lookUpIssue(TurboIssue issue) {
+        Optional<Model> modelLookUpResult = getModelById(issue.getRepoId());
+        if (!modelLookUpResult.isPresent()) {
+            return Optional.empty();
+        }
+        return modelLookUpResult.get().getIssueById(issue.getId());
+    }
+
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
@@ -158,7 +187,7 @@ public class MultiModel implements IModel {
     }
 
     @Override
-    public Optional<Model> getModelById(String repoId) {
+    public synchronized Optional<Model> getModelById(String repoId) {
         return models.containsKey(repoId)
             ? Optional.of(models.get(repoId))
             : Optional.empty();

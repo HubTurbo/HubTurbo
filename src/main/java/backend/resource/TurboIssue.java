@@ -63,6 +63,14 @@ public class TurboIssue {
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
 
+    /**
+     * The following fields are used to control concurrent modifications to this issue.
+     */
+    /* This field records the most recently modified time of the issue's labels. Any method that updates
+       the labels must also update this field. If this is empty, the most recently modified time can
+       be considered to be the updatedAt time */
+    private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
+
     @SuppressWarnings("unused")
     private void ______CONSTRUCTORS______() {}
 
@@ -203,6 +211,31 @@ public class TurboIssue {
     }
 
     /**
+     * Reconciles content elements in this issue with {@code otherIssue} by taking
+     * the most recently updated elements based on their modified time.
+     * @param otherIssue
+     */
+    private void reconcile(TurboIssue otherIssue) {
+        logger.info("Reconciling issue %s in %s", this, otherIssue, this.getRepoId());
+        this.reconcileLabels(otherIssue);
+    }
+
+    /**
+     * See also {@link #reconcile(TurboIssue)}
+     * @param otherIssue
+     */
+    private void reconcileLabels(TurboIssue otherIssue) {
+        LocalDateTime thisIssueLabelsModifiedAt = this.getLabelsLastModifiedAt();
+        LocalDateTime otherIssueLabelsModifiedAt = otherIssue.getLabelsLastModifiedAt();
+        if (thisIssueLabelsModifiedAt.isBefore(otherIssueLabelsModifiedAt)) {
+            logger.info("Issue %s's labels %s are stale, replacing with %s",
+                        this, this.getLabels(), otherIssue.getLabels());
+            this.labels = otherIssue.getLabels();
+            this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
+        }
+    }
+
+    /**
      * Conceptually, operations on issues. They should only modify non-serialized fields.
      */
     @SuppressWarnings("unused")
@@ -222,17 +255,18 @@ public class TurboIssue {
         for (TurboIssue issue : changed) {
             int id = issue.getId();
 
-            // TODO O(n^2), fix by preprocessing and copying into a map
-            Optional<Integer> corresponding = findIssueWithId(existingCopy, id);
-            if (corresponding.isPresent()) {
+            Optional<Integer> correspondingIssueIndex = findIssueWithId(existingCopy, id);
+            if (correspondingIssueIndex.isPresent()) {
+                TurboIssue existingIssue = existingCopy.get(correspondingIssueIndex.get());
+                TurboIssue newIssue = new TurboIssue(issue);
 
-                // issue is constructed from an external Issue object.
+                // newIssue is constructed from an external Issue object.
                 // It won't have the transient state that its TurboIssue
                 // counterpart has, so we have to explicitly transfer it.
-                TurboIssue newIssue = new TurboIssue(issue);
-                newIssue.transferTransientState(existingCopy.get(corresponding.get()));
+                newIssue.transferTransientState(existingIssue);
+                newIssue.reconcile(existingIssue);
 
-                existingCopy.set(corresponding.get(), newIssue);
+                existingCopy.set(correspondingIssueIndex.get(), newIssue);
             } else {
                 existingCopy.add(new TurboIssue(issue));
             }
@@ -289,13 +323,17 @@ public class TurboIssue {
         return newIssue;
     }
 
+    /**
+     * Finds the index of an issue with specified id in a list of issues
+     * @param issues
+     * @param id
+     * @return the list's index of the issue or empty of there is no issue with such id in the list
+     */
     public static Optional<Integer> findIssueWithId(List<TurboIssue> issues, int id) {
-        int i = 0;
-        for (TurboIssue issue : issues) {
-            if (issue.getId() == id) {
+        for (int i = 0; i < issues.size(); i++) {
+            if (issues.get(i).getId() == id) {
                 return Optional.of(i);
             }
-            ++i;
         }
         return Optional.empty();
     }
@@ -306,81 +344,114 @@ public class TurboIssue {
     public String getRepoId() {
         return repoId;
     }
+
     public int getId() {
         return id;
     }
+
     public String getCreator() {
         return creator;
     }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public boolean isPullRequest() {
         return isPullRequest;
     }
+
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
+
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = replaceNull(updatedAt, this.createdAt);
     }
+
     public int getCommentCount() {
         return commentCount;
     }
+
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
     }
+
     public boolean isOpen() {
         return isOpen;
     }
+
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
     }
+
     public Optional<String> getAssignee() {
         return assignee;
     }
+
     public void setAssignee(String assignee) {
         this.assignee = Optional.of(assignee);
     }
+
     public void setAssignee(TurboUser assignee) {
         setAssignee(assignee.getLoginName());
     }
+
     public List<String> getLabels() {
-        return labels;
+        return new ArrayList<>(labels);
     }
+
     public void setLabels(List<String> labels) {
         this.labels = labels;
+        this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
     }
+
+    public LocalDateTime getLabelsLastModifiedAt() {
+        return this.labelsLastModifiedAt.orElse(getUpdatedAt());
+    }
+
     public void addLabel(String label) {
         this.labels.add(label);
+        this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
     }
+
     public void addLabel(TurboLabel label) {
         addLabel(label.getActualName());
+        this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
     }
+
     public Optional<Integer> getMilestone() {
         return milestone;
     }
+
     public void setMilestone(Integer milestone) {
         this.milestone = Optional.of(milestone);
     }
+
     public void setMilestone(TurboMilestone milestone) {
         setMilestone(milestone.getId());
     }
+
     public IssueMetadata getMetadata() {
         return metadata;
     }
+
     public void setMetadata(IssueMetadata metadata) {
         this.metadata = metadata;
     }
