@@ -95,13 +95,14 @@ public class TurboMilestone {
     }
 
     /**
-     * A milestone is ongoing if it is not due yet or it is overdue but still has open issues.
+     * A milestone is ongoing if it is open and not due yet or if it is overdue but still open and has open issues.
      */
     public boolean isOngoing() {
         return isOpen() && (!isOverdue() || hasOpenIssues());
     }
 
-    public static List<TurboMilestone> filterMilestonesOfGivenRepoIds(List<TurboMilestone> milestones, List<String> repoIds) {
+    public static List<TurboMilestone> filterMilestonesOfGivenRepoIds(List<TurboMilestone> milestones,
+                                                                      List<String> repoIds) {
         return milestones.stream()
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
                 .collect(Collectors.toList());
