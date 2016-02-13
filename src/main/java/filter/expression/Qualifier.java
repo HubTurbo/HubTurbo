@@ -92,7 +92,8 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepoIds(model.getMilestones(), repoIds);
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepoIds(
+                model.getMilestones(), repoIds);
         List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
@@ -167,7 +168,7 @@ public class Qualifier implements FilterExpression {
         List<TurboMilestone> sortedMilestones = TurboMilestone.getSortedMilestonesByDueDate(milestones);
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(sortedMilestones);
 
-        assert currentMilestoneIndex.isPresent() || (!currentMilestoneIndex.isPresent() && sortedMilestones.isEmpty());
+        assert currentMilestoneIndex.isPresent() || !currentMilestoneIndex.isPresent() && sortedMilestones.isEmpty();
 
         return IntStream
                 .range(0, sortedMilestones.size())
@@ -178,6 +179,10 @@ public class Qualifier implements FilterExpression {
     }
 
     /**
+     * "Current" milestone is an ongoing milestone with the earliest due date. However, if there
+     * is only one open milestone, it will be considered as the "current" milestone, even if it
+     * does not have due date.
+     *
      * This method expects the milestone list to be sorted (by due date)
      */
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> milestones) {
