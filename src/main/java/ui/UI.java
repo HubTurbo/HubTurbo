@@ -57,6 +57,8 @@ public class UI extends Application implements EventDispatcher {
     public static final int VERSION_MINOR = 19;
     public static final int VERSION_PATCH = 0;
 
+    public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
+
     public static final String ARG_UPDATED_TO = "--updated-to";
 
     private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
@@ -584,8 +586,8 @@ public class UI extends Application implements EventDispatcher {
 
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
-        String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
-                + " (%s)", openBoard);
+        String version = Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        String title = String.format(WINDOW_TITLE, version, openBoard);
         mainStage.setTitle(title);
     }
 
