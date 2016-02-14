@@ -287,7 +287,7 @@ public class Logic {
                     logger.info("Creating issue for " + issue + " on UI");
                     // TODO update changes locally first
                     refreshUI();
-                    refresh(false);
+                    refresh();
                     return true;
                 })
                 .exceptionally(Futures.withResult(false));
