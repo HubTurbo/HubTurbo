@@ -67,6 +67,9 @@ public class FilterEvalTests {
         assertTrue(matches("id:<=2", issue1));
         assertTrue(matches("id:>0", issue1));
         assertTrue(matches("id:>=0", issue1));
+
+        // Non-number
+        assertFalse(matches("id:a", issue1));
     }
 
     @Test
@@ -473,7 +476,6 @@ public class FilterEvalTests {
         IModel model = TestUtils.modelWith(issue, user);
 
         assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("user:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:alice"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
