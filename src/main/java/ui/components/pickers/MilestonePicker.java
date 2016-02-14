@@ -4,7 +4,9 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import javafx.application.Platform;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import ui.UI;
 import undo.actions.ChangeLabelsAction;
 import undo.actions.ChangeMilestoneAction;
@@ -26,10 +28,13 @@ public class MilestonePicker {
     private void showMilestonePicker(TurboIssue issue) {
         List<TurboMilestone> milestoneList = ui.logic.getRepo(issue.getRepoId()).getMilestones();
         MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestoneList);
-        Optional<Integer> assignedMilestone = dialog.showAndWait();;
+        Optional<Pair<ButtonType, Integer>> assignedMilestone = dialog.showAndWait();
 
-        if (!issue.getMilestone().equals(assignedMilestone)) {
-            ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(), assignedMilestone));
+        if (!assignedMilestone.isPresent()) return;
+        if (assignedMilestone.get().getKey().equals(ButtonType.CANCEL)) return;
+        if (!issue.getMilestone().equals(assignedMilestone.get().getValue())) {
+            ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(),
+                    Optional.of(assignedMilestone.get().getValue())));
         }
     }
 
