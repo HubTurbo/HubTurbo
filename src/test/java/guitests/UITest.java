@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +32,6 @@ import backend.interfaces.RepoStore;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -364,6 +364,14 @@ public class UITest extends GuiTest {
     }
 
     /**
+     * Captures the common pattern of waiting for the result of a function,
+     * then asserting that it is equal to some value.
+     */
+    public <T> void waitAndAssert(T expected, Supplier<T> actual) {
+        awaitCondition(() -> expected.equals(actual.get()));
+    }
+
+    /**
      * Automate menu traversal by clicking them in order of input parameter
      *
      * @param menuNames array of strings of menu item names in sequence of traversal
@@ -374,10 +382,6 @@ public class UITest extends GuiTest {
         }
     }
 
-    public <T> void waitForValue(ComboBoxBase<T> comboBoxBase) {
-        waitUntil(comboBoxBase, c -> c.getValue() != null);
-    }
-    
     @Override
     public GuiTest type(String text) {
         for (int i = 0; i < text.length(); i++) {
