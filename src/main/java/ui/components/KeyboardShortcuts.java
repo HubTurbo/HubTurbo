@@ -100,7 +100,7 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination SHOW_RELATED_ISSUE_OR_PR =
             new KeyCodeCombination(KeyCode.E);
     public static final KeyCodeCombination SHOW_ISSUE_CREATOR =
-            new KeyCodeCombination(KeyCode.N, KeyCodeCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.N, KeyCodeCombination.SHORTCUT_DOWN);
 
     public static final Map<Integer, KeyCodeCombination> JUMP_TO_NTH_ISSUE_KEYS = populateJumpToNthIssueMap();
 
