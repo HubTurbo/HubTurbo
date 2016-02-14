@@ -249,38 +249,25 @@ public class UITest extends GuiTest {
     }
 
     public void waitUntilNodeAppears(String selector) {
-        while (!existsQuiet(selector)) {
-            PlatformEx.waitOnFxThread();
-            sleep(100);
-        }
+        awaitCondition(() -> existsQuiet(selector));
     }
 
     public void waitUntilNodeDisappears(String selector) {
-        while (existsQuiet(selector)) {
-            PlatformEx.waitOnFxThread();
-            sleep(100);
-        }
+        awaitCondition(() -> !existsQuiet(selector));
     }
 
     public void waitUntilNodeAppears(Matcher<Object> matcher) {
-        while (!findQuiet(matcher).isPresent()) { // no `exists` for matcher, so using find
-            PlatformEx.waitOnFxThread();
-            sleep(100);
-        }
+        // We use find because there's no `exists` for matchers
+        awaitCondition(() -> findQuiet(matcher).isPresent());
     }
 
     public void waitUntilNodeDisappears(Matcher<Object> matcher) {
-        while (findQuiet(matcher).isPresent()) { // no `exists` for matcher, so using find
-            PlatformEx.waitOnFxThread();
-            sleep(100);
-        }
+        // We use find because there's no `exists` for matchers
+        awaitCondition(() -> !findQuiet(matcher).isPresent());
     }
 
     public <T extends Node> void waitUntil(String selector, Predicate<T> condition) {
-        while (!condition.test(find(selector))) {
-            PlatformEx.waitOnFxThread();
-            sleep(100);
-        }
+        awaitCondition(() -> condition.test(find(selector)));
     }
 
     public <T extends Node> T findOrWaitFor(String selector) {
