@@ -188,6 +188,7 @@ public class MilestoneAliasTests {
         msOngoing2.setDueDate(Optional.empty());
         msOngoing2.setOpen(true);
 
+        // only one milestone, open and no due date
         model = TestUtils.singletonModel(new Model(REPO,
                new ArrayList<>(),
                 new ArrayList<>(),
@@ -201,6 +202,8 @@ public class MilestoneAliasTests {
             assertEquals("ongoing0", msQ.getContent().get());
         });
 
+        // 2 finished milestones with due dates, and 1 open milestone with no due date
+        // the finished milestone should be able to be referred with current-1 and current-2
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -220,10 +223,18 @@ public class MilestoneAliasTests {
             assertEquals("finished2", msQ.getContent().get());
         });
 
+        // current-n where n >= 3 should not refer to any milestone
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-3"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         assertEquals(0, milestoneQualifiers.size());
 
+        // likewise for current+n where n >= 1
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current+1"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        assertEquals(0, milestoneQualifiers.size());
+
+        // 2 open milestones without due date and 2 finished milestone, there should be no
+        // "current" milestone, and current-1 and current-2 should refer to the finished milestones
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -234,6 +245,13 @@ public class MilestoneAliasTests {
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         assertEquals(0, milestoneQualifiers.size());
+
+        // current-2 should refer to msFinished2 since its due date is earlier than msFinished1
+        expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current-2"));
+        milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
+        milestoneQualifiers.stream().forEach(msQ -> {
+            assertEquals("finished2", msQ.getContent().get());
+        });
     }
 
     @Test

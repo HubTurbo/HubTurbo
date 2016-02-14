@@ -92,8 +92,8 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfGivenRepoIds(
-                model.getMilestones(), repoIds);
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfRepos(
+                                                                                    model.getMilestones(), repoIds);
         List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
@@ -136,6 +136,9 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Get all milestones that can be aliased with current-[n] to current+[n]
+     *
+     * A milestone can be aliased if and only if it is open and has due date or it does not have due date but it is
+     * the only open milestone.
      */
     private static List<TurboMilestone> getMilestonesWithinAliasRange(List<TurboMilestone> milestonesOfReposInPanel) {
         List<TurboMilestone> milestones = new ArrayList<>();
@@ -165,7 +168,7 @@ public class Qualifier implements FilterExpression {
      * i.e. 0 for "current" milestone, -1 for "current-1" milestone, etc.
      */
     private static Map<Integer, TurboMilestone> getMilestoneAliasIndex(List<TurboMilestone> milestones) {
-        List<TurboMilestone> sortedMilestones = TurboMilestone.getSortedMilestonesByDueDate(milestones);
+        List<TurboMilestone> sortedMilestones = TurboMilestone.sortByDueDate(milestones);
         Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(sortedMilestones);
 
         assert currentMilestoneIndex.isPresent() || !currentMilestoneIndex.isPresent() && sortedMilestones.isEmpty();

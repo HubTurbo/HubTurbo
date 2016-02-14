@@ -101,8 +101,8 @@ public class TurboMilestone {
         return isOpen() && (!isOverdue() || hasOpenIssues());
     }
 
-    public static List<TurboMilestone> filterMilestonesOfGivenRepoIds(List<TurboMilestone> milestones,
-                                                                      List<String> repoIds) {
+    public static List<TurboMilestone> filterMilestonesOfRepos(List<TurboMilestone> milestones,
+                                                               List<String> repoIds) {
         return milestones.stream()
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
                 .collect(Collectors.toList());
@@ -127,7 +127,7 @@ public class TurboMilestone {
         };
     }
 
-    public static List<TurboMilestone> getSortedMilestonesByDueDate(List<TurboMilestone> milestones) {
+    public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
         List<TurboMilestone> milestonesWithDueDate = milestones.stream()
                 .filter(ms -> ms.getDueDate().isPresent())
                 .sorted(getDueDateComparator())
