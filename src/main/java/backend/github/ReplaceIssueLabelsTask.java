@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ReplaceIssueLabelsTask extends GitHubRepoTask<List<String>> {
+public class ReplaceIssueLabelsTask extends GitHubRepoTask<Boolean> {
 
     private final String repoId;
     private final int issueId;
@@ -24,13 +24,13 @@ public class ReplaceIssueLabelsTask extends GitHubRepoTask<List<String>> {
     @Override
     public void run() {
         try {
-            response.complete(
+            List<String> responseLabels =
                     repo.setLabels(repoId, issueId, labels).stream()
                             .map(Label::getName)
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList());
+            response.complete(responseLabels.containsAll(labels));
         } catch (IOException e) {
-            response.completeExceptionally(e);
+            response.complete(false);
         }
     }
 }

@@ -20,6 +20,7 @@ import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -39,10 +40,10 @@ public class Logic {
     public LoginController loginController;
     public UpdateController updateController;
 
-    public Logic(UIManager uiManager, Preferences prefs) {
+    public Logic(UIManager uiManager, Preferences prefs, Optional<MultiModel> models) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        models = new MultiModel(prefs);
+        this.models = models.orElse(new MultiModel(prefs));
 
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
@@ -197,20 +198,51 @@ public class Logic {
      * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        List<String> originalLabels = issue.getLabels();
+
         logger.info("Changing labels for " + issue + " on UI");
-        if (!models.replaceIssueLabels(issue, newLabels)) {
-           return CompletableFuture.completedFuture(false);
+        Optional<TurboIssue> replaceResult = models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
+        if (!replaceResult.isPresent()) {
+            return CompletableFuture.completedFuture(false);
         }
         refreshUI();
 
-        return updateIssueLabelsOnRepo(issue, newLabels);
+        return updateIssueLabelsOnRepo(issue, newLabels)
+                .thenApply((isUpdateSuccessful) -> {
+                    if (isUpdateSuccessful) {
+                        return true;
+                    }
+                    logger.error("Unable to update model on server");
+                    revertLocalLabelsReplace(replaceResult.get(), originalLabels);
+                    return false;
+                });
+    }
+
+    private Optional<TurboIssue> lookUpIssue(String repoId, int issueId) {
+        Optional<Model> modelLookUpResult = models.getModelById(repoId);
+        if (!modelLookUpResult.isPresent()) {
+            logger.error("Model " + repoId + " not found in models");
+            return Optional.empty();
+        }
+        return modelLookUpResult.get().getIssueById(issueId);
     }
 
     private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> newLabels.containsAll(labels))
-                .exceptionally(Futures.withResult(false));
+        return repoOpControl.replaceIssueLabels(issue, newLabels);
+    }
+
+    private void revertLocalLabelsReplace(TurboIssue modifiedIssue, List<String> originalLabels) {
+        TurboIssue currentIssue = lookUpIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        LocalDateTime originalLabelsModifiedAt = modifiedIssue.getLabelsLastModifiedAt();
+        LocalDateTime currentLabelsAssignedAt = currentIssue.getLabelsLastModifiedAt();
+        boolean isCurrentLabelsModifiedFromOriginalLabels = originalLabelsModifiedAt.isEqual(currentLabelsAssignedAt);
+
+        if (isCurrentLabelsModifiedFromOriginalLabels) {
+            logger.info("Reverting labels for issue " + currentIssue);
+            models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
+            refreshUI();
+        }
     }
 
     /**

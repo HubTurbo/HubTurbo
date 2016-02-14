@@ -84,32 +84,19 @@ public class MultiModel implements IModel {
     }
 
     /**
-     * Assigns {@code labels} to an issue corresponding to the argument {@code issue} in this MultiModel
-     * @param issue
+     * Assigns {@code labels} to issue {@code issueId} in {@code repoId}
+     * @param repoId
+     * @param issueId
      * @param labels
-     * @return true if labels are successfully assigned
+     * @return the modified TurboIssue if successful
      */
-    public synchronized boolean replaceIssueLabels(TurboIssue issue, List<String> labels) {
-        Optional<TurboIssue> issueLookUpResult = lookUpIssue(issue);
-        if (!issueLookUpResult.isPresent()) {
-            logger.error("Issue " + issue + " not found in models");
-            return false;
-        }
-        issueLookUpResult.get().setLabels(labels);
-        return true;
-    }
-
-    /**
-     * Looks up an issue corresponding to the argument {@code issue} in this MultiModel
-     * @param issue
-     * @return true if labels are successfully assigned
-     */
-    public synchronized Optional<TurboIssue> lookUpIssue(TurboIssue issue) {
-        Optional<Model> modelLookUpResult = getModelById(issue.getRepoId());
+    public synchronized Optional<TurboIssue> replaceIssueLabels(String repoId, int issueId, List<String> labels) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
         if (!modelLookUpResult.isPresent()) {
+            logger.error("Model " + repoId + " not found in models");
             return Optional.empty();
         }
-        return modelLookUpResult.get().getIssueById(issue.getId());
+        return modelLookUpResult.get().replaceIssueLabels(issueId, labels);
     }
 
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {

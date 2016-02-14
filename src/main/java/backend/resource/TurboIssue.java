@@ -63,12 +63,8 @@ public class TurboIssue {
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
 
-    /**
-     * The following fields are used to control concurrent modifications to this issue.
-     */
     /* This field records the most recently modified time of the issue's labels. Any method that updates
-       the labels must also update this field. If this is empty, the most recently modified time can
-       be considered to be the updatedAt time */
+       the labels must also update this field. If this is empty, updatedAt time is used instead */
     private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
 
     @SuppressWarnings("unused")
@@ -124,6 +120,7 @@ public class TurboIssue {
         this.metadata = issue.metadata;
         this.repoId = issue.repoId;
         this.markedReadAt = issue.markedReadAt;
+        this.labelsLastModifiedAt = Optional.of(issue.getLabelsLastModifiedAt());
     }
 
     public TurboIssue(String repoId, Issue issue) {
@@ -414,7 +411,7 @@ public class TurboIssue {
     }
 
     public List<String> getLabels() {
-        return new ArrayList<>(labels);
+        return labels;
     }
 
     public void setLabels(List<String> labels) {
