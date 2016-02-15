@@ -33,6 +33,7 @@ public class BoardAutoCreatorTest extends UITest {
 
         List<String> boardNames = testPref.getAllBoardNames();
         boardNames.stream().forEach(testPref::removeBoard);
+        testPref.clearLastOpenBoard();
     }
 
     @Test
