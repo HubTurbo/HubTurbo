@@ -40,7 +40,7 @@ public final class RepoId {
         return repoName;
     }
 
-    public String getRepoIDString() {
+    public String getRepoIdString() {
         return repoOwner + "/" + repoName;
     }
 

@@ -23,14 +23,24 @@ public class RepoIdTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void createInstance() {
-        // Test invalid repoID
-        new RepoId("invalidTest");
+        // Test null and empty repoIdString
+        new RepoId(null);
+        new RepoId("");
+
+        // Test repoIdString of the wrong format
+        new RepoId("invalidFormat");
+        new RepoId("two//slashes");
     }
 
     @Test
     public void isWellFormed() {
-        // Test not well formed
+        // Test null and empty repoIdString
         assertFalse(RepoId.isWellFormedRepoIdString(""));
+        assertFalse(RepoId.isWellFormedRepoIdString(null));
+
+        // Test repoIdString of the wrong format
+        assertFalse(RepoId.isWellFormedRepoIdString("invalidFormat"));
+        assertFalse(RepoId.isWellFormedRepoIdString("two/slashes/"));
 
         // Test well formed
         assertTrue(RepoId.isWellFormedRepoIdString("hubturbo/hubturbo"));
@@ -52,10 +62,11 @@ public class RepoIdTest {
 
     @Test
     public void hashCodeTest() {
-        // Test different objects
+        // Test different objects have different hash code
         assertNotEquals(repoId.hashCode(), repoIdDiff.hashCode());
 
         // Test hashcode of objects initialised with different cases
+        // e.g. OWNER/REPO and owner/repo have the same hash code
         assertEquals(repoId.hashCode(), repoId.hashCode());
         assertEquals(repoId.hashCode(), repoIdAllCaps.hashCode());
         assertEquals(repoId.hashCode(), repoIdMixed.hashCode());
@@ -65,8 +76,8 @@ public class RepoIdTest {
     @Test
     public void getters(){
         //repoIDString
-        assertEquals(REPO1.toLowerCase(), repoIdMixed.getRepoIDString());
-        assertEquals(repoIdMixed.getRepoIDString(), repoIdMixed.getRepoIDString());
+        assertEquals(REPO1.toLowerCase(), repoIdMixed.getRepoIdString());
+        assertEquals(repoIdMixed.getRepoIdString(), repoIdMixed.getRepoIdString());
 
         //repoOwner
         assertEquals("owner1", repoIdMixed.getRepoOwner());
