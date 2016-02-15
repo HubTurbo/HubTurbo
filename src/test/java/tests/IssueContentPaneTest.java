@@ -20,17 +20,13 @@ public class IssueContentPaneTest {
     }
 
 
-    // ==============
-    // Helper methods
-    // ==============
-    
+    @Test
+    public void getAllUsers() {
+    }
+
     private IssueContentPane createContentPane(String content) {
         return new IssueContentPane(content, presenter);
     }
 
-    @Test
-    public void test() {
-        fail("Not yet implemented");
-    }
 
 }

@@ -1,23 +1,23 @@
 package ui.components.issue_creators;
 
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.parboiled.matchervisitors.GetStarterCharVisitor;
+import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.richtext.PopupAlignment;
 import org.pegdown.PegDownProcessor;
 
+import util.Utility;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
+import javafx.stage.WindowEvent;
 
 /**
  * Models GitHub comment box with toggleable Markdown preview
@@ -28,37 +28,41 @@ public class IssueContentPane extends StackPane {
             "<!DOCTYPE html><html><head></head><body>%s</body></html>";
     public static final String REFERENCE_ISSUE = "#%d %s";
     public static final int MAX_SUGGESTION_ENTRIES = 5;
-    // Magic number that accounts for width of each character in textarea
-    public static final int CARET_OFFSET = 8;
-    // Vertical offset for popup
-    public static final int VERTICAL_OFFSET = 20;
 
     public static final KeyCodeCombination PREVIEW = new KeyCodeCombination(KeyCode.P,
             KeyCodeCombination.ALT_DOWN);
-    public static final KeyCodeCombination MENTION = new KeyCodeCombination(KeyCode.AT);
-    public static final KeyCodeCombination REFERENCE = new KeyCodeCombination(KeyCode.POUND);
+    public static final KeyCodeCombination MENTION = new KeyCodeCombination(KeyCode.DIGIT2, 
+            KeyCodeCombination.SHIFT_DOWN);
+    public static final KeyCodeCombination REFERENCE = new KeyCodeCombination(KeyCode.DIGIT3,
+            KeyCodeCombination.SHIFT_DOWN);
     public static final KeyCodeCombination HIDE_SUGGGESTIONS =
             new KeyCodeCombination(KeyCode.SPACE);
 
-    private static final int COL_PREF_COUNT = 30;
+    private static final String LINK_STYLE = "-fx-font-weight: bold; -fx-fill: red";
+    private static final double CONTENT_WIDTH = 200;
+    private static final String MENTION_KEY = "@";
+    private static final String REFERENCE_KEY = "#";
 
     private final PegDownProcessor markdownProcessor;
-    private final TextArea body;
+    private final InlineCssTextArea body;
     private final WebView preview;
-
     private final SuggestionMenu suggestions;
     private final IssueCreatorPresenter presenter;
 
+    // Caret position of @mention or #reference
+    private int initialCaretPosition;
+
     public IssueContentPane(String content, IssueCreatorPresenter presenter) {
         this.presenter = presenter;
-        markdownProcessor = initMarkdownProcessor();
         suggestions = new SuggestionMenu(MAX_SUGGESTION_ENTRIES);
+        markdownProcessor = initMarkdownProcessor();
 
         // Order of these methods are important
-        body = initBody();
+        body = initContent();
         preview = initWebView();
 
-        body.setText(content);
+        body.replaceText(content);
+        initialCaretPosition = body.getCaretPosition();
         generatePreview(content);
         setupHandlers();
     }
@@ -78,8 +82,9 @@ public class IssueContentPane extends StackPane {
 
     private void setupHandlers() {
         setOnMouseClicked(this::mouseClickHandler);
-        setOnKeyPressed(this::keyPressHandler);
         body.setOnKeyPressed(this::bodyKeyPressHandler);
+        body.setOnKeyReleased(this::querySuggestionsHandler);
+        suggestions.setOnHiding(this::onHidingHandler);
     }
 
 
@@ -91,48 +96,116 @@ public class IssueContentPane extends StackPane {
         body.toFront();
     }
 
-    private void keyPressHandler(KeyEvent e) {
-        if (PREVIEW.match(e)) {
-            generatePreview(body.getText());
-            togglePane();
-        }
-        e.consume();
-    }
-
     /**
      * Triggers context menu for every keyword
      */
     private void bodyKeyPressHandler(KeyEvent e) {
-        Point2D pos = getPopupPosition(body.getCaretPosition());
-        suggestions.show(body, pos.getX(), pos.getY());
+        if (PREVIEW.match(e)) {
+            generatePreview(body.getText());
+            togglePane();
+            e.consume();
+        }
+        
+        if (canShowSuggestions(MENTION, e)) {
+            showSuggestions(getMatchedUsers(presenter.getUsers(), ""));
+        }
+        
+        if (canShowSuggestions(REFERENCE, e)) {
+            showSuggestions(getMatchedIssues(presenter.getIssues(), ""));
+        }
+        
+        if (HIDE_SUGGGESTIONS.match(e)) hideSuggestions();
+        
+    }
+
+    private void querySuggestionsHandler(KeyEvent event) {
+        if (body.getCaretPosition() > initialCaretPosition && suggestions.isShowing()) {
+            querySuggestions(body.getText(initialCaretPosition, body.getCaretPosition()));
+        } else {
+            suggestions.hide();
+        }
+    }
+
+    private void onHidingHandler(WindowEvent event) {
+        suggestions.getSelectedContent().ifPresent(c -> {
+            String content = processSelectedContent(c) + " ";
+            body.replaceText(initialCaretPosition + 1, body.getCaretPosition(), content);
+            body.setStyle(initialCaretPosition, body.getCaretPosition() - 1, LINK_STYLE);
+        });
     }
 
     // ===========
     // Suggestions
     // ===========
 
+    private void showSuggestions(List<String> content) {
+        // For extraction of query text
+        initialCaretPosition = body.getCaretPosition();
+        suggestions.loadSuggestions(content);
+        suggestions.show(this.getScene().getWindow());
+    }
+
+    private void hideSuggestions() {
+        initialCaretPosition = body.getCaretPosition();
+    }
+
+    private void querySuggestions(String input) {
+        String symbol = input.substring(0, 1);
+        String query = input.substring(1, input.length());
+        
+        if (MENTION_KEY.equals(symbol)) {
+            suggestions.loadSuggestions(getMatchedUsers(presenter.getUsers(), query));
+        }
+
+        if (REFERENCE_KEY.equals(symbol)) {
+            suggestions.loadSuggestions(getMatchedIssues(presenter.getIssues(), query));
+        }
+    }
+
+    private boolean canShowSuggestions(KeyCodeCombination key, KeyEvent event) {
+        int caretPosition = body.getCaretPosition();
+
+        return key.match(event) && !suggestions.isShowing() 
+           && body.getText(caretPosition - 1, caretPosition).equals(" ");
+    }
+
+    private String processSelectedContent(String input) {
+        if (isReferenceContent(input)) return extractIssueId(input);
+        return input;
+    }
+
+    private String extractIssueId(String input) {
+        return input.split(" ")[0].substring(1);
+    }
+
+    private boolean isReferenceContent(String input) {
+        return Utility.containsIgnoreCase(input, "#");
+    }
+
     /**
-     * Converts caret position from local offset to screen coordinate
-     * 
-     * @param caretPosition
-     * @return Point2D screen coordinates
+     * Get issues with title or id that matches the query.
+     * Supports only single word query 
+     * @param issues
+     * @param query
+     * @return list of matching issues title
      */
-    private Point2D getPopupPosition(int caretPosition) {
-        return body.localToScreen(caretPosition * CARET_OFFSET,
-                Math.ceil(caretPosition / COL_PREF_COUNT) * VERTICAL_OFFSET);
-    }
-
-    private void showSuggestions(List<String> searchResult) {
-        suggestions.loadSuggestions(searchResult);
-    }
-
-    private List<String> getAllIssues(List<TurboIssue> issues) {
-        return issues.stream().map(i -> String.format(REFERENCE_ISSUE, i.getId(), i.getTitle()))
+    private List<String> getMatchedIssues(List<TurboIssue> issues, String query) {
+        return issues.stream().sorted(Comparator.comparing(TurboIssue::getId))
+                .map(i -> String.format(REFERENCE_ISSUE, i.getId(), i.getTitle()))
+                .filter(str -> Utility.containsIgnoreCase(str, query))
                 .collect(Collectors.toList());
     }
 
-    private List<String> getAllUsers(List<TurboUser> users) {
-        return users.stream().map(TurboUser::getRealName).collect(Collectors.toList());
+    /**
+     * Get users which matches the query
+     * @param users
+     * @param query
+     * @return list of matching users 
+     */
+    private List<String> getMatchedUsers(List<TurboUser> users, String query) {
+        return users.stream().map(TurboUser::getLoginName).sorted()
+            .filter(str -> Utility.containsIgnoreCase(str, query))
+            .collect(Collectors.toList());
     }
 
     // =================
@@ -140,24 +213,26 @@ public class IssueContentPane extends StackPane {
     // =================
 
     /**
-     * Initializes WebView and set index
+     * Initializes WebView
      */
     private WebView initWebView() {
         WebView preview = new WebView();
-        this.getChildren().add(1, preview);
+        preview.setPrefWidth(CONTENT_WIDTH);
+        this.getChildren().add(preview);
         return preview;
     }
 
     /**
-     * Initializes TextArea and set index
+     * Initializes Styled Text Area
      */
-    private TextArea initBody() {
-        TextArea body = new TextArea();
-        body.setPrefColumnCount(COL_PREF_COUNT);
-        body.setWrapText(true);
-        suggestions.loadSuggestions(Arrays.asList("test", "babi", "halo"));
-        this.getChildren().add(0, body);
-        return body;
+    private InlineCssTextArea initContent() {
+        InlineCssTextArea content = new InlineCssTextArea();
+        content.setPrefWidth(CONTENT_WIDTH);
+        content.setWrapText(true);
+        content.setPopupWindow(suggestions);
+        content.setPopupAlignment(PopupAlignment.CARET_BOTTOM);
+        this.getChildren().add(content);
+        return content;
     }
 
     private void togglePane() {
