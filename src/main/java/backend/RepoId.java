@@ -8,7 +8,7 @@ import util.Utility;
  */
 public final class RepoId {
 
-    //repoOwner can be an org ID or username 
+    //repoOwner can be an org ID or username
     private final String repoOwner;
     private final String repoName;
 
@@ -21,15 +21,15 @@ public final class RepoId {
     }
 
     /**
-     * Returns true if the repoIdString is of the form
-     * <repoOwner>/<repoName> e.g. dave/foo-project
+     * Delegates to EGit's RepositoryId to check if repoString is
+     * of the correct format 
      * @param repoIdString
-     * @return
+     * @return true if the repoIdString is of the form
+     * <repoOwner>/<repoName> e.g. dave/foo-project
      */
     public static boolean isWellFormedRepoIdString(String repoIdString) {
-        RepositoryId repositoryId = RepositoryId.createFromId(repoIdString);
-        return repoIdString != null && !repoIdString.isEmpty() && repositoryId != null
-                && repoIdString.equals(repositoryId.generateId());
+        RepositoryId idGeneratedByEgit = RepositoryId.createFromId(repoIdString);
+        return idGeneratedByEgit != null && repoIdString.equals(idGeneratedByEgit.generateId());
     }
 
     public String getRepoOwner() {
