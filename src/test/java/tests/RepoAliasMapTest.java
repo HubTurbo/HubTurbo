@@ -99,4 +99,33 @@ public class RepoAliasMapTest {
         }
         assertEquals(expectedCount, count);
     }
+
+    @Test
+    public void testAddRemoveMappings() {
+        final String REPO_ID_NEW = "hello/world";
+        final String REPO_ALIAS_NEW = "hw";
+
+        RepoAliasMap testMap = RepoAliasMap.getTestInstance();
+        int sizeBefore = testMap.size();
+        testMap.addMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
+        assertEquals(sizeBefore + 1, testMap.size());
+        assertEquals(REPO_ALIAS_NEW, testMap.getAlias(REPO_ID_NEW));
+        assertEquals(REPO_ID_NEW, testMap.getRepoId(REPO_ALIAS_NEW));
+
+        testMap.removeMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
+        assertEquals(sizeBefore, testMap.size());
+        assertEquals(null, testMap.getAlias(REPO_ID_NEW));
+        assertEquals(null, testMap.getRepoId(REPO_ALIAS_NEW));
+    }
+
+    @Test
+    public void testResolveRepoId() {
+        RepoAliasMap testMap = RepoAliasMap.getTestInstance();
+
+        assertEquals(REPO_ID_1, testMap.resolveRepoId(REPO_ALIAS_1));
+        assertEquals(REPO_ID_2, testMap.resolveRepoId(REPO_ALIAS_2));
+
+        assertEquals(REPO_ID_DNE_1, testMap.resolveRepoId(REPO_ID_DNE_1));
+        assertEquals(REPO_ALIAS_DNE_1, testMap.resolveRepoId(REPO_ALIAS_DNE_1));
+    }
 }

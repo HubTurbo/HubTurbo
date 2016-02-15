@@ -13,8 +13,11 @@ import java.io.*;
  * The mapping is a bijection, i.e. a repo id can only have one alias, and an alias can only be mapped to one repo id.
  *
  * This is a singleton class. Use the getInstance method to retrieve the instance.
+ * One can also construct a test instance. However this is only meant for test usage.
  *
  * The mapping of aliases are pulled from a mapping file in the settings directory.
+ * There is currently no functionality to update the mapping file from the code.
+ * The file has to be manually inserted
  */
 public class RepoAliasMap {
 
@@ -22,21 +25,26 @@ public class RepoAliasMap {
     //   Key = repoID, Value = alias.
     private final HashBiMap<String, String> aliasMap;
 
+
     // Static attributes
     //------------------
-
     private static final Logger logger = LogManager.getLogger(RepoAliasMap.class.getName());
+
+    public static final String MAPPING_FILE_NAME_DEFAULT = "repo_alias_mapping.json";
+    public static final String TEST_MAPPING_FILE_NAME_DEFAULT = "test_repo_alias_mapping.json";
+    public static final String MAPPING_FILE_DIRECTORY_DEFAULT = "settings";
 
     // The sole instance of the map
     private static RepoAliasMap instance;
 
-    // The sole test instance for the map
+    // Test instances
     private static RepoAliasMap testInstance;
 
     // the mapping array length must be 2 because it is a bijection. Example: ["key", "value"]
     private static final int MAPPING_ARRAY_LENGTH = 2;
     private static final int MAPPING_ARRAY_KEY_INDEX = 0;
     private static final int MAPPING_ARRAY_VALUE_INDEX = 1;
+
 
     // Static methods
     //---------------
@@ -49,7 +57,8 @@ public class RepoAliasMap {
     public static RepoAliasMap getInstance() {
         if (instance == null) {
             instance = new RepoAliasMap();
-            instance.updateMappings(getMappingsArrayFromFile("settings", "repo_alias_mapping.json"));
+            instance.updateMappings(
+                    getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, MAPPING_FILE_NAME_DEFAULT));
         }
         return instance;
     }
@@ -61,7 +70,8 @@ public class RepoAliasMap {
     public static RepoAliasMap getTestInstance() {
         if (testInstance == null) {
             testInstance = new RepoAliasMap();
-            testInstance.updateMappings(getMappingsArrayFromFile("settings", "test_repo_alias_mapping.json"));
+            testInstance.updateMappings(
+                    getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, TEST_MAPPING_FILE_NAME_DEFAULT));
         }
         return testInstance;
     }
@@ -82,7 +92,7 @@ public class RepoAliasMap {
         } catch (IOException e) {
             e.printStackTrace();
             HTLog.error(logger, e);
-            return null;
+            return new String[0][2];
         }
     }
 
@@ -113,7 +123,9 @@ public class RepoAliasMap {
                         "Repo aliases may be wrong or not assigned.");
             }
             if (mapping.length >= MAPPING_ARRAY_LENGTH) {
-                aliasMap.put(mapping[MAPPING_ARRAY_KEY_INDEX], mapping[MAPPING_ARRAY_VALUE_INDEX]);
+                String repoId = mapping[MAPPING_ARRAY_KEY_INDEX];
+                String repoAlias = mapping[MAPPING_ARRAY_VALUE_INDEX];
+                addMapping(repoId, repoAlias);
             }
         }
     }
@@ -159,6 +171,7 @@ public class RepoAliasMap {
      * @return the alias, or null if the mapping doesn't exist
      */
     public String getAlias(String repoId) {
+        assert Utility.isWellFormedRepoId(repoId);
         return aliasMap.get(repoId);
     }
 
@@ -168,8 +181,54 @@ public class RepoAliasMap {
      * @return the repo id, or null if the mapping doesn't exist
      */
     public String getRepoId(String alias) {
+        assert Utility.isWellFormedRepoAlias(alias);
         // use the inverse mapping (alias -> repoId)
         return aliasMap.inverse().get(alias);
+    }
+
+    /**
+     * If an alias is supplied, this method resolves the alias against its repo id.
+     * Otherwise it assumes that the given string is a repo id and simply returns it.
+     * @param repoIdOrAlias
+     * @return
+     */
+    public String resolveRepoId(String repoIdOrAlias) {
+        String repoId;
+        // initialise the repoId with the appropriate values
+        if (isAlias(repoIdOrAlias)) {
+            String repoAlias = repoIdOrAlias;
+            logger.info("Repo alias supplied: " + repoAlias);
+            repoId = getRepoId(repoAlias);
+            logger.info("Retrieved repo id: " + repoId);
+        } else {
+            repoId = repoIdOrAlias;
+            logger.info("Not a repo alias: " + repoId + ", assume it to be repo id.");
+        }
+        return repoId;
+    }
+
+    /**
+     * Add a mapping of repo id to alias.
+     * Both values should be well formed according to their respective requirements.
+     * @param repoId A well-formed repoId
+     * @param repoAlias A well-formed alphanumeric repoAlias
+     */
+    public void addMapping(String repoId, String repoAlias) {
+        assert Utility.isWellFormedRepoId(repoId);
+        assert Utility.isWellFormedRepoAlias(repoAlias);
+        aliasMap.put(repoId, repoAlias);
+    }
+
+    /**
+     * Removes a mapping of repo id to alias.
+     * Both values should be well formed according to their respective requirements.
+     * @param repoId A well-formed repoId
+     * @param repoAlias A well-formed alphanumeric repoAlias
+     */
+    public void removeMapping(String repoId, String repoAlias) {
+        assert Utility.isWellFormedRepoId(repoId);
+        assert Utility.isWellFormedRepoAlias(repoAlias);
+        aliasMap.remove(repoId, repoAlias);
     }
 
     /**
