@@ -1,6 +1,7 @@
 package tests;
 
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
@@ -110,5 +111,70 @@ public class TurboIssueTests {
         assertEquals(issue2.getUpdatedAt(), newIssue2.getUpdatedAt());
         assertEquals(issue3.getUpdatedAt(), newIssue3.getUpdatedAt());
         assertEquals(issue4.getUpdatedAt(), newIssue4.getUpdatedAt());
+    }
+
+    /**
+     * Tests that when an issue is created and no manual labels change have been made, the labels
+     * modified time is equal to the issue's updatedAt time
+     */
+    @Test
+    public void testGetLabelsModifiedAtInitially() {
+        TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
+        assertEquals(issue.getUpdatedAt(), issue.getLabelsLastModifiedAt());
+    }
+
+    /**
+     * Tests that labels modified time is updated properly when methods mutating the issue' labels is called
+     */
+    @Test
+    public void testGetLabelsModifiedAtUpdate() throws InterruptedException {
+        TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
+
+        LocalDateTime checkPoint = issue.getLabelsLastModifiedAt();
+        Thread.sleep(10);
+        issue.setLabels(new ArrayList<>());
+        assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
+
+        checkPoint = issue.getLabelsLastModifiedAt();
+        Thread.sleep(10);
+        issue.addLabel("label");
+        assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
+
+        checkPoint = issue.getLabelsLastModifiedAt();
+        Thread.sleep(10);
+        issue.addLabel(new TurboLabel("testrepo", "label"));
+        assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
+    }
+
+    /**
+     * Tests that if the updated issue's labels are more recently modified,
+     * it overrides the original issue's labels
+     */
+    @Test
+    public void testReconcileUpdatedLabelsOverride() throws InterruptedException {
+        TurboIssue originalIssue = LogicTests.createIssueWithLabels(1, new ArrayList<>());
+        Thread.sleep(10);
+        List<String> newLabels = Arrays.asList("label1", "label2");
+        TurboIssue updatedIssue = LogicTests.createIssueWithLabels(1, newLabels);
+
+        List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
+                                                            Arrays.asList(updatedIssue));
+        assertEquals(newLabels, updatedList.get(0).getLabels());
+    }
+
+    /**
+     * Tests that if the original issue's labels are retained if it's more recently modified
+     * then the updated issue's labels
+     */
+    @Test
+    public void testReconcileUpdatedLabelsRetained() throws InterruptedException {
+        TurboIssue updatedIssue = LogicTests.createIssueWithLabels(1, new ArrayList<>());
+        Thread.sleep(10);
+        List<String> originalLabels = Arrays.asList("label1", "label2");
+        TurboIssue originalIssue = LogicTests.createIssueWithLabels(1, originalLabels);
+
+        List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
+                                                            Arrays.asList(updatedIssue));
+        assertEquals(originalLabels, updatedList.get(0).getLabels());
     }
 }

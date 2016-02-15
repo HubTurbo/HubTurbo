@@ -7,7 +7,9 @@ import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import prefs.Preferences;
 import ui.UI;
 import util.events.EventDispatcher;
@@ -22,9 +24,11 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class LogicTests {
     private final Logic logic;
@@ -45,12 +49,18 @@ public class LogicTests {
         repoOpControlField.set(logic, new RepoOpControl(mockedRepoIO));
     }
 
+    @Before
+    public void resetMockedObjects() {
+        reset(mockedRepoIO);
+        reset(mockedMultiModel);
+    }
+
     /**
      * Tests that replaceIssueLabels succeed when both models and repoIO succeeded
      */
     @Test
     public void testReplaceIssueLabelsSuccessful() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithLabels(Arrays.asList("label1", "label2"));
+        TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
 
@@ -62,7 +72,7 @@ public class LogicTests {
      */
     @Test
     public void testReplaceIssueLabelsRepoIOFailed() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithLabels(Arrays.asList("label1", "label2"));
+        TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.empty(), Optional.empty());
 
@@ -74,11 +84,56 @@ public class LogicTests {
      */
     @Test
     public void testReplaceIssueLabelsModelsFailed() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithLabels(Arrays.asList("label1", "label2"));
+        TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(false);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
 
         assertFalse(logic.replaceIssueLabels(issue, new ArrayList<>()).get());
+    }
+
+    /**
+     * Tests that {@link MultiModel#replaceIssueLabels(String, int, List)} is first called with the
+     * new labels then revert back to original labels when repoIO failed to update labels
+     */
+    @Test
+    public void testReplaceIssueLabelsRevert() throws ExecutionException, InterruptedException {
+        List<String> originalLabels = Arrays.asList("label1", "label2");
+        List<String> newLabels = Arrays.asList("label3", "label4");
+
+        TurboIssue issue = createIssueWithLabels(1, originalLabels);
+        mockRepoIOReplaceIssueLabelsResult(false);
+        mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
+
+        logic.replaceIssueLabels(issue, newLabels).get();
+
+        InOrder inOrder = inOrder(mockedMultiModel);
+        inOrder.verify(mockedMultiModel).replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
+        inOrder.verify(mockedMultiModel).replaceIssueLabels(issue.getRepoId(), issue.getId(), originalLabels);
+    }
+
+    /**
+     * Tests that no revert is taken place if the issue's labels are modified elsewhere after
+     * {@link Logic#replaceIssueLabels(TurboIssue, List)} is called
+     */
+    @Test
+    public void testReplaceIssueLabelsNoRevert() throws ExecutionException, InterruptedException {
+        List<String> originalLabels = Arrays.asList("label1", "label2");
+        List<String> newLabels = Arrays.asList("label3", "label4");
+
+        TurboIssue issue = createIssueWithLabels(1, originalLabels);
+        Thread.sleep(10);
+        TurboIssue modifiedIssue = createIssueWithLabels(1, originalLabels);
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.replaceIssueLabels(issue.getId(), newLabels)).thenReturn(Optional.of(issue));
+        when(mockedModel.getIssueById(issue.getId())).thenReturn(Optional.of(modifiedIssue));
+        mockRepoIOReplaceIssueLabelsResult(false);
+        mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.of(mockedModel));
+
+        logic.replaceIssueLabels(issue, newLabels).get();
+
+        verify(mockedMultiModel, atMost(1))
+                .replaceIssueLabels(anyString(), anyInt(), anyListOf(String.class));
     }
 
     private void mockRepoIOReplaceIssueLabelsResult(boolean replaceResult) {
@@ -93,8 +148,8 @@ public class LogicTests {
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
-    public static TurboIssue createIssueWithLabels(List<String> labels) {
-        TurboIssue issue = new TurboIssue("testowner/testrepo", 1, "Issue title");
+    public static TurboIssue createIssueWithLabels(int issueId, List<String> labels) {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
         issue.setLabels(labels);
         return issue;
     }

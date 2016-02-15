@@ -246,8 +246,10 @@ public class TurboIssue {
     /**
      * Takes lists of TurboIssues and reconciles the changes between them,
      * returning a list of TurboIssues with updates from the second.
+     * @param existing
+     * @param changed
      */
-    public static List<TurboIssue> reconcile(String repoId, List<TurboIssue> existing, List<TurboIssue> changed) {
+    public static List<TurboIssue> reconcile(List<TurboIssue> existing, List<TurboIssue> changed) {
         List<TurboIssue> existingCopy = new ArrayList<>(existing);
         for (TurboIssue issue : changed) {
             int id = issue.getId();
