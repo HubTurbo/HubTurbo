@@ -32,7 +32,6 @@ import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
 import updater.UpdateManager;
-import updater.UpdateManagerStub;
 import util.*;
 import util.events.*;
 import util.events.Event;
