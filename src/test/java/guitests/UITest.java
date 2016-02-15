@@ -29,16 +29,22 @@ import org.loadui.testfx.utils.FXTestUtils;
 import com.google.common.util.concurrent.SettableFuture;
 
 import backend.interfaces.RepoStore;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBoxBase;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.MenuControl;
+import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
 import util.PlatformSpecific;
@@ -103,12 +109,12 @@ public class UITest extends GuiTest {
         try {
             if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
                 Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
-                        .filter(Files::isRegularFile)
-                        .filter(p ->
-                                getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
-                                getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
-                        )
-                        .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+                    .filter(Files::isRegularFile)
+                    .filter(p ->
+                        getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
+                            getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
+                    )
+                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -315,19 +321,19 @@ public class UITest extends GuiTest {
 
     /**
      * Allows test threads to busy-wait on some condition.
-     *
+     * <p>
      * Taken from org.loadui.testfx.utils, but modified to synchronise with
      * the JavaFX Application Thread, with a lower frequency.
-     *
+     * <p>
      * The additional synchronisation prevents bugs where
-     *
+     * <p>
      * awaitCondition(a);
      * awaitCondition(b);
-     *
+     * <p>
      * sometimes may not be equivalent to
-     *
+     * <p>
      * awaitCondition(a && b);
-     *
+     * <p>
      * The lower frequency is a bit more efficient, since a frequency of 10 ms
      * just isn't necessary for GUI interactions, and we're bottlenecked by the FX
      * thread anyway.
@@ -396,13 +402,56 @@ public class UITest extends GuiTest {
         waitUntil(comboBoxBase, c -> c.getValue() != null);
     }
 
+    /**
+     * Traverses HubTurbo's menu, looking for a chain of nodes with the
+     * given names and triggering their associated action.
+     *
+     * This is a more reliable method of triggering menu items than
+     * {@link #clickMenu}, especially when dealing with nested menu items.
+     * It is a drop-in replacement in most cases.
+     *
+     * Caveats: ensure that adequate synchronisation is used after this method
+     * if it is called from a thread other than the UI thread.
+     *
+     * @param names the chain of menu nodes to visit
+     */
+    public void traverseMenu(String... names) {
+        assert names.length > 0 : "traverseMenu called with no arguments";
+
+        Platform.runLater(() -> {
+            MenuControl root = TestController.getUI().getMenuControl();
+            MenuItem current = root.getMenus().stream()
+                .filter(m -> m.getText().equals(names[0]))
+                .findFirst()
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        String.format("%s is not a valid menu item", names[0])));
+
+            for (int i = 1; i < names.length; i++) {
+                final int j = i;
+                if (!(current instanceof Menu)) {
+                    throw new IllegalArgumentException(
+                        String.format("Menu %s is not as nested as arguments require", names[0]));
+                }
+                current = ((Menu) current).getItems().stream()
+                    .filter(m -> m.getText().equals(names[j]))
+                    .findFirst()
+                    .orElseThrow(() ->
+                        new IllegalArgumentException(
+                            String.format("%s is not a valid menu item", names[j])));
+            }
+
+            current.getOnAction().handle(new ActionEvent());
+        });
+    }
+
     @Override
     public GuiTest type(String text) {
         for (int i = 0; i < text.length(); i++) {
-            if (specialCharsMap.containsKey(text.charAt(i))){
+            if (specialCharsMap.containsKey(text.charAt(i))) {
                 press(KeyCode.SHIFT).press(specialCharsMap.get(text.charAt(i)))
-                .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
-             
+                    .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
+
             } else {
                 type(text.charAt(i));
             }

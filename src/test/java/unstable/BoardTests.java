@@ -3,6 +3,7 @@ package unstable;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.loadui.testfx.controls.Commons.hasText;
 import static ui.components.KeyboardShortcuts.*;
 
 import org.junit.Before;
@@ -48,13 +49,13 @@ public class BoardTests extends UITest {
         press(CREATE_LEFT_PANEL);
         waitAndAssertEquals(2, panelControl::getPanelCount);
 
-        clickMenu("Panels", "Create");
+        traverseMenu("Panels", "Create");
         waitAndAssertEquals(3, panelControl::getPanelCount);
-        clickMenu("Panels", "Create (Left)");
+        traverseMenu("Panels", "Create (Left)");
         waitAndAssertEquals(4, panelControl::getPanelCount);
-        clickMenu("Panels", "Close");
+        traverseMenu("Panels", "Close");
         waitAndAssertEquals(3, panelControl::getPanelCount);
-        clickMenu("Panels", "Close");
+        traverseMenu("Panels", "Close");
         waitAndAssertEquals(2, panelControl::getPanelCount);
     }
 
@@ -68,7 +69,7 @@ public class BoardTests extends UITest {
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("none"));
 
         // Saving when no board is open should prompt the user to save a new board
-        clickMenu("Boards", "Save");
+        traverseMenu("Boards", "Save");
         type("Board 1");
         push(KeyCode.ESCAPE);
     }
@@ -77,7 +78,7 @@ public class BoardTests extends UITest {
     public void boardNotSavedOnCancellation() {
         PanelControl panelControl = TestController.getUI().getPanelControl();
 
-        clickMenu("Boards", "Save");
+        traverseMenu("Boards", "Save");
         type("Board 1");
         push(KeyCode.ESCAPE);
 
@@ -105,7 +106,7 @@ public class BoardTests extends UITest {
     }
 
     private void saveBoardWithName(String name) {
-        clickMenu("Boards", "Save as");
+        traverseMenu("Boards", "Save as");
         waitUntilNodeAppears("#boardnameinput");
         ((TextField) find("#boardnameinput")).setText(name);
         click("OK");
@@ -154,19 +155,12 @@ public class BoardTests extends UITest {
     }
 
     private void tryBoardName(String name) {
-        clickMenu("Boards", "Save as");
+        traverseMenu("Boards", "Save as");
         waitUntilNodeAppears("#boardnameinput");
         ((TextField) find("#boardnameinput")).setText(name);
         assertTrue(find("#boardsavebutton").isDisabled());
         pushKeys(KeyCode.ESCAPE);
         waitUntilNodeDisappears("#boardnameinput");
-    }
-
-    private void selectNthMenuItem(int n) {
-        for (int i = 0; i < n; i++) {
-            push(KeyCode.DOWN);
-        }
-        push(KeyCode.ENTER);
     }
 
     @Test
@@ -181,19 +175,13 @@ public class BoardTests extends UITest {
         saveBoardWithName("Board 2");
 
         // We're at Board 2 now
-        assertEquals(2, panelControl.getPanelCount());
+        waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("Board 2"));
 
-        // This navigates to the second item on the submenu under 'Open',
-        // 'Board 1'. We do this because trying to click it will move the
-        // mouse over 'Delete' and click the wrong node.
-        // There isn't a good solution to this without more specialised
-        // ways to move the mouse.
-        clickMenu("Boards", "Open");
-        selectNthMenuItem(2);
+        traverseMenu("Boards", "Open", "Board 1");
 
         // We've switched to Board 1
-        assertEquals(1, panelControl.getPanelCount());
+        waitAndAssertEquals(1, panelControl::getPanelCount);
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("Board 1"));
     }
 
@@ -204,16 +192,15 @@ public class BoardTests extends UITest {
 
         saveBoardWithName("Board 1");
         pushKeys(CREATE_RIGHT_PANEL);
+        awaitCondition(() -> 2 == panelControl.getPanelCount());
 
-        clickMenu("Boards", "Open");
-        selectNthMenuItem(1);
+        traverseMenu("Boards", "Open", "Board 1");
 
         // Without having saved, we lose the extra panel
         waitAndAssertEquals(1, panelControl::getPanelCount);
 
         pushKeys(CREATE_RIGHT_PANEL);
-        clickMenu("Boards", "Save");
-        selectNthMenuItem(1);
+        traverseMenu("Boards", "Save");
 
         // After saving, the panel is there
         waitAndAssertEquals(2, panelControl::getPanelCount);
@@ -227,8 +214,8 @@ public class BoardTests extends UITest {
 
         saveBoardWithName("Board 1");
 
-        clickMenu("Boards", "Delete");
-        selectNthMenuItem(1);
+        traverseMenu("Boards", "Delete", "Board 1");
+        waitUntilNodeAppears(hasText("OK"));
         click("OK");
 
         // No board is open now
@@ -251,7 +238,8 @@ public class BoardTests extends UITest {
         assertFalse(UI.prefs.getLastOpenBoard().isPresent());
 
         // Saving will prompt the user to save as a new board
-        clickMenu("Boards", "Save");
+        traverseMenu("Boards", "Save");
+        waitUntilNodeAppears("#boardnameinput");
         ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
 
