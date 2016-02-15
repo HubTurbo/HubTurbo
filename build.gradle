@@ -70,6 +70,7 @@ allprojects {
         compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:$egitVersion"
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
 		compile "org.pegdown:pegdown:1.6.0"
+    	compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
 
