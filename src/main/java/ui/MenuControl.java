@@ -104,6 +104,7 @@ public class MenuControl extends MenuBar {
         
         prefs.addBoard(prefs.getLastOpenBoard().get(), panelList);
         ui.triggerEvent(new BoardSavedEvent());
+        ui.setBoardModified(false);
         logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
     }
 
@@ -131,7 +132,7 @@ public class MenuControl extends MenuBar {
             prefs.setLastOpenBoard(boardName);
             ui.triggerEvent(new BoardSavedEvent());
             logger.info("New board " + boardName + " saved");
-            ui.updateTitle();
+            ui.setBoardModified(false);
         }
     }
 
@@ -145,9 +146,9 @@ public class MenuControl extends MenuBar {
         panels.openPanels(panelInfo);
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
-        ui.updateTitle();
 
         ui.triggerEvent(new UsedReposChangedEvent());
+        ui.setBoardModified(false);
     }
 
     /**
@@ -207,6 +208,8 @@ public class MenuControl extends MenuBar {
                 deleteItem.setOnAction(e1 -> onBoardDelete(boardName));
                 delete.getItems().add(deleteItem);
             }
+
+            ui.setBoardModified(false);
         });
 
         Menu autoCreate = boardAutoCreator.generateBoardAutoCreateMenu();

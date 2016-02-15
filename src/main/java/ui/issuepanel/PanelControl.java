@@ -154,6 +154,7 @@ public class PanelControl extends HBox {
     }
 
     public void closeAllPanels() {
+        ui.setBoardModified(true);
         getChildren().clear();
         // There aren't any children left, so we don't need to update indices
     }
@@ -171,6 +172,7 @@ public class PanelControl extends HBox {
         ((AbstractPanel) child).close();
         updateFocus(index);
 
+        ui.setBoardModified(true);
         UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
@@ -183,10 +185,12 @@ public class PanelControl extends HBox {
 
     public void createNewPanelAtStart() {
         addPanelAt(0).filterTextField.requestFocus();
+        ui.setBoardModified(true);
     }
 
     public void createNewPanelAtEnd() {
         addPanel().filterTextField.requestFocus();
+        ui.setBoardModified(true);
     }
 
     public void swapPanels(int panelIndex, int panelIndex2) {
@@ -202,6 +206,8 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, new HBox());
         getChildren().set(panelIndex, two);
         getChildren().set(panelIndex2, one);
+
+        ui.setBoardModified(true);
     }
 
     public Optional<Integer> getCurrentlySelectedPanel() {

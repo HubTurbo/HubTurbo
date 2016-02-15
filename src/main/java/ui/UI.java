@@ -94,6 +94,8 @@ public class UI extends Application implements EventDispatcher {
     private ScrollPane panelsScrollPane;
     private NotificationPane notificationPane;
 
+    boolean isBoardModified = false;
+
     @SuppressWarnings("PMD")
     public static void main(String[] args) {
         Application.launch(args);
@@ -574,7 +576,7 @@ public class UI extends Application implements EventDispatcher {
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
-                + " (%s)", openBoard);
+                + " (%s%s)", openBoard, isBoardModified ? "*" : "");
         mainStage.setTitle(title);
     }
 
@@ -592,5 +594,10 @@ public class UI extends Application implements EventDispatcher {
 
     public boolean isWindowFocused() {
         return mainStage.isFocused();
+    }
+
+    public void setBoardModified(boolean isBoardModified) {
+        this.isBoardModified = isBoardModified;
+        updateTitle();
     }
 }
