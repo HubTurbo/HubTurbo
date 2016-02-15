@@ -45,11 +45,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
     private final TurboIssue issue;
-    private static LabelPickerState state;
+    private LabelPickerState state;
 
     private ChangeListener<String> listener;
-
-    private List<String> finalAssignedLabels;
 
     @FXML
     private VBox mainLayout;
@@ -66,7 +64,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         this.repoLabels = repoLabels;
         this.issue = issue;
         this.state = getCleanState(issue.getLabels(), getRepoLabelsSet());
-        finalAssignedLabels = new ArrayList<>(issue.getLabels());
         uiLogic = new LabelPickerUILogic();
 
         initUI(stage, issue);
@@ -120,6 +117,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
                 state.getCurrentSuggestion());
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
+        // Ensures dialog pane resize according to content
+        getDialogPane().getScene().getWindow().sizeToScene();
     }
 
     private void populateAssignedLabels(List<String> initialLabels, List<String> removedLabels,
@@ -127,7 +126,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
         populateToBeAddedLabels(addedLabels, suggestion);
-        if (finalAssignedLabels.isEmpty()) createTextLabel("No currently selected labels. ");
+        if (initialLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
     private void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
@@ -294,7 +293,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return finalAssignedLabels;
+                return state.getAssignedLabels();
             }
             return null;
         });

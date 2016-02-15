@@ -21,7 +21,6 @@ public class LabelPickerTests extends UITest {
 
     private static final String textFieldId = "#queryField";
 
-    @Ignore
     @Test
     public void showLabelPickerTest() {
         FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
@@ -45,7 +44,6 @@ public class LabelPickerTests extends UITest {
         waitUntilNodeDisappears(textFieldId);
     }
 
-    @Ignore
     @Test
     public void addAndRemoveLabelTest() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
@@ -81,7 +79,6 @@ public class LabelPickerTests extends UITest {
         assertEquals(1, listPanelCell.getIssueLabels().size());
     }
 
-    @Ignore
     @Test
     public void undoLabelChangeTest() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
