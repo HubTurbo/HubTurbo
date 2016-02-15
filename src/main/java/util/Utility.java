@@ -36,6 +36,15 @@ public final class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
+    private static final String REGEX_FOR_ALPHANUMERIC = "^[a-zA-Z0-9]*$";
+
+    public static boolean isWellFormedRepoAlias(String alias) {
+        boolean isAliasNull = alias == null;
+        boolean isAliasEmpty = alias.isEmpty();
+        boolean isAliasAlphanumeric = alias.matches(REGEX_FOR_ALPHANUMERIC);
+        return !isAliasNull && !isAliasEmpty && isAliasAlphanumeric;
+    }
+
     public static boolean isWellFormedRepoId(String owner, String repo) {
         return !(owner == null || owner.isEmpty() || repo == null || repo.isEmpty())
                 && isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
