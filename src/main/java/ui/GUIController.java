@@ -1,12 +1,15 @@
 package ui;
 
 import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import org.apache.logging.log4j.Logger;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
 import util.DialogMessage;
+import util.HTLog;
 import util.Utility;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
  */
 
 public class GUIController {
+    private static final Logger logger = HTLog.get(GUIController.class);
 
     private final PanelControl panelControl;
     private final UI ui;
@@ -62,8 +66,14 @@ public class GUIController {
                 .filter(child -> child instanceof FilterPanel)
                 .forEach(child -> {
                     // Search for the corresponding entry in e.issuesToShow.
-                    List<GuiElement> filterResult =
-                            e.elementsToShow.get(((FilterPanel) child).getCurrentFilterExpression());
+                    FilterExpression currentFilterExpression = ((FilterPanel) child).getCurrentFilterExpression();
+                    FilterExpression currentFilterExpressionNoRepoAlias
+                            = Qualifier.replaceRepoAliases(currentFilterExpression);
+                    logger.info("Panel filter expression: " + currentFilterExpression.toString());
+                    logger.info("Panel filter expression after repo alias replacement: "
+                            + currentFilterExpressionNoRepoAlias.toString());
+
+                    List<GuiElement> filterResult = e.elementsToShow.get(currentFilterExpressionNoRepoAlias);
 
                     if (filterResult != null) ((FilterPanel) child).updatePanel(filterResult);
                 });

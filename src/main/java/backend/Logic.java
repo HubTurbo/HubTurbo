@@ -14,6 +14,7 @@ import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
+import util.RepoAliasMap;
 import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.RepoOpeningEvent;
@@ -103,8 +104,11 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
-    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
-        assert Utility.isWellFormedRepoId(repoId);
+    private CompletableFuture<Boolean> openRepository(String repoIdOrAlias, boolean isPrimaryRepository) {
+        // First resolves the given string to a repo id.
+        RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
+        final String repoId = repoAliasMap.resolveRepoId(repoIdOrAlias);
+
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.

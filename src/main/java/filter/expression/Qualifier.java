@@ -10,8 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import backend.interfaces.Repo;
 import backend.resource.*;
 import filter.ParseException;
+import util.RepoAliasMap;
 import util.Utility;
 import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
@@ -110,6 +112,35 @@ public class Qualifier implements FilterExpression {
                 return q;
             }
         });
+    }
+
+    /**
+     * Returns a filter expression with all the repo aliases replaced with their mapped repo ids.
+     * @param expr The filter expression before replacement
+     * @return The filter expression after replacement
+     */
+    public static FilterExpression replaceRepoAliases(FilterExpression expr) {
+        return expr.map(q -> {
+            if (Qualifier.isRepoQualifier(q)) {
+                return q.convertRepoAliasQualifier();
+            } else {
+                return q;
+            }
+        });
+    }
+
+    /**
+     * Returns true if the qualifier is a repo qualifier
+     * @param q The qualifier to check
+     * @return True if the qualifier is a repo qualifier
+     */
+    private static boolean isRepoQualifier(Qualifier q) {
+        switch (q.getType()) {
+            case REPO:
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**
@@ -979,6 +1010,20 @@ public class Qualifier implements FilterExpression {
 
     public QualifierType getType() {
         return type;
+    }
+
+    /**
+     * Converts the current repo id or alias into the mapped repo id.
+     * @return The qualifier with the actual repo id
+     */
+    private Qualifier convertRepoAliasQualifier() {
+        if (!content.isPresent()) {
+            return Qualifier.EMPTY;
+        }
+        String repoIdOrAlias = content.get();
+        RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
+
+        return new Qualifier(type, repoAliasMap.resolveRepoId(repoIdOrAlias));
     }
 
     private Qualifier convertMilestoneAliasQualifier(List<TurboMilestone> allMilestones, int currentIndex) {
