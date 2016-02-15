@@ -387,8 +387,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     /**
-     * Sets the dimensions of the stage to the maximum usable size
-     * of the desktop, or to the screen size if this fails.
+     * Returns the maximum usable size of the stage, or to the screen size if this fails.
      */
     private Rectangle getDimensions() {
         Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
@@ -436,6 +435,13 @@ public class UI extends Application implements EventDispatcher {
             return getDimensions().getWidth() * WINDOW_DEFAULT_PROPORTION;
         }
         return mainStage.getWidth();
+    }
+
+    /**
+     * Returns the width of the entire screen.
+     */
+    public double getScreenWidth() {
+        return getDimensions().getWidth();
     }
 
     /**

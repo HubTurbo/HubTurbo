@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
 import ui.UI;
@@ -17,6 +19,7 @@ import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
+import java.awt.*;
 import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -123,9 +126,16 @@ public class BrowserComponent {
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
         WebDriver.Options manage = driver.manage();
         if (!isTestChromeDriver) {
-            manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-            manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
-                    (int) ui.getAvailableDimensions().getHeight()));
+            Rectangle availableDimensions = ui.getAvailableDimensions();
+            if (availableDimensions.getWidth() > 0) {
+                manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
+                manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
+                        (int) ui.getAvailableDimensions().getHeight()));
+            } else {
+                manage.window().setPosition(new Point(0, 0));
+                manage.window().setSize(new Dimension((int) ui.getScreenWidth(),
+                        (int) ui.getAvailableDimensions().getHeight()));
+            }
             initialiseJNA();
         }
         return driver;
