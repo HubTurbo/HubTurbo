@@ -202,7 +202,9 @@ public class Qualifier implements FilterExpression {
         Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(sortedMilestones);
 
         // if no ongoing milestone, set current as one after last milestone
-        // - this means that no such milestone, which will return no issue
+        // - this means that there is no "current" milestone, but it is possible
+        // that there is a milestone before the "current" one (i.e. current-[n]
+        // where n >= 1)
         return firstOngoingMilestonePosition.isPresent()
                 ? firstOngoingMilestonePosition
                 : Optional.of(sortedMilestones.size());
