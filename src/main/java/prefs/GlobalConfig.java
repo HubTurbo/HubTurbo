@@ -30,6 +30,7 @@ public class GlobalConfig {
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
     private Optional<String> lastOpenBoard = Optional.empty();
+    private Optional<Integer> lastDeletedBoardIndex = Optional.empty();
     private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
     private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
@@ -88,6 +89,14 @@ public class GlobalConfig {
     
     public Optional<String> getLastOpenBoard() {
         return lastOpenBoard;
+    }
+
+    public Optional<Integer> getLastDeletedBoardIndex() {
+        return lastDeletedBoardIndex;
+    }
+
+    public void setLastDeletedBoardIndex(Integer index) {
+        lastDeletedBoardIndex = Optional.of(index);
     }
     
     public void clearLastOpenBoard() {

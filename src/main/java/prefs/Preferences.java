@@ -118,6 +118,16 @@ public class Preferences { // NOPMD
     public void removeBoard(String name) {
         global.removeBoard(name);
     }
+
+    public void setLastDeletedIndex(String deletedBoardName){
+        List<String> boardNames = getAllBoardNames();
+        int index = boardNames.indexOf(deletedBoardName);
+        global.setLastDeletedBoardIndex(index);
+    }
+
+    public Optional<Integer> getLastDeletedBoardIndex() {
+        return global.getLastDeletedBoardIndex();
+    }
     
     public void setLastOpenBoard(String board) {
         global.setLastOpenBoard(board);
@@ -128,15 +138,18 @@ public class Preferences { // NOPMD
     }
     
     public Optional<String> switchBoard() {
+
         List<String> boardNames = getAllBoardNames();
         if (getLastOpenBoard().isPresent() && getAllBoardNames().size() > 1) {
             int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
             int index = (lastBoard + 1) % boardNames.size();
             
             setLastOpenBoard(boardNames.get(index));
-        } else if (!getLastOpenBoard().isPresent() && getAllBoardNames().size() > 1) {
+        } else if (getLastDeletedBoardIndex().isPresent() && getAllBoardNames().size() > 1) {
+            int lastDeletedBoardIndex = getLastDeletedBoardIndex().get();
+            int index = lastDeletedBoardIndex % boardNames.size();
 
-            setLastOpenBoard(boardNames.get(0));
+            setLastOpenBoard(boardNames.get(index));
         }
         
         return getLastOpenBoard();
