@@ -188,33 +188,37 @@ public class Qualifier implements FilterExpression {
      *
      * This method expects the milestone list to be sorted (by due date)
      */
-    private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> milestones) {
-        if (milestones.isEmpty()) {
+    private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> sortedMilestones) {
+        if (sortedMilestones.isEmpty()) {
             return Optional.empty();
         }
 
-        int openMilestonesCount = TurboMilestone.getOpenMilestones(milestones).size();
+        int openMilestonesCount = TurboMilestone.getOpenMilestones(sortedMilestones).size();
         if (openMilestonesCount == 1) {
-            return IntStream
-                    .range(0, milestones.size())
-                    .boxed()
-                    .filter(i -> milestones.get(i).isOpen())
-                    .findFirst();
+            return getFirstOpenMilestonePosition(sortedMilestones);
         }
 
         // Look for the first milestone in the (sorted) list that is ongoing.
-        Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(milestones);
+        Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(sortedMilestones);
 
         // if no ongoing milestone, set current as one after last milestone
         // - this means that no such milestone, which will return no issue
         return firstOngoingMilestonePosition.isPresent()
                 ? firstOngoingMilestonePosition
-                : Optional.of(milestones.size());
+                : Optional.of(sortedMilestones.size());
+    }
+
+    private static Optional<Integer> getFirstOpenMilestonePosition(List<TurboMilestone> milestones) {
+        return IntStream
+                .range(0, milestones.size())
+                .boxed()
+                .filter(i -> milestones.get(i).isOpen())
+                .findFirst();
     }
 
     private static Optional<Integer> getFirstOngoingMilestonePosition(List<TurboMilestone> milestones) {
-        return IntStream.
-                range(0, milestones.size())
+        return IntStream
+                .range(0, milestones.size())
                 .boxed()
                 .filter(i -> milestones.get(i).isOngoing())
                 .findFirst();
