@@ -132,6 +132,7 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
+        filterTextField.setOnKeyTyped(e -> ui.setBoardModified(true));
 
         ui.registerEvent(onModelUpdate);
 
