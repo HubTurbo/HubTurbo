@@ -171,7 +171,7 @@ public final class TestController {
             return new UpdateManagerStub();
         } else {
             UpdateProgressWindow updateProgressWindow = new UpdateProgressWindow();
-            return new UpdateManager(updateProgressWindow);
+            return new UpdateManager(ui, updateProgressWindow);
         }
     }
 }

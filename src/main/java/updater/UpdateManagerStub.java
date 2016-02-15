@@ -5,7 +5,7 @@ package updater;
  */
 public class UpdateManagerStub extends UpdateManager {
     public UpdateManagerStub() {
-        super(null);
+        super(null, null);
     }
 
     @Override
