@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import util.Utility;
+
 public final class Parser {
 
     private Parser(ArrayList<Token> input) {
@@ -56,7 +58,6 @@ public final class Parser {
         // Prefix
 
         FilterExpression left;
-
         switch (token.getType()) {
         case LBRACKET:
             left = parseGroup();
@@ -67,8 +68,8 @@ public final class Parser {
         case QUALIFIER:
             left = parseQualifier(token);
             break;
-        case QUOTE:
-            left = parseQuotedKeywords();
+        case QUOTED_CONTENT:
+            left = parseQuotedContent(QualifierType.KEYWORD, token);
             break;
         case SYMBOL:
             left = parseKeyword(token);
@@ -107,18 +108,9 @@ public final class Parser {
         return left;
     }
 
-    private FilterExpression parseQuotedKeywords() {
-        FilterExpression result = parseQuotedContent(QualifierType.KEYWORD);
-        consume(TokenType.QUOTE);
-        return result;
-    }
-
-    private FilterExpression parseQuotedContent(QualifierType type) {
-        StringBuilder sb = new StringBuilder();
-        while (!isQuoteToken(lookAhead())) {
-            sb.append(consume().getValue()).append(' ');
-        }
-        return new Qualifier(type, sb.toString().trim());
+    private FilterExpression parseQuotedContent(QualifierType type, Token token) {
+        String keywords = token.getValue();
+        return new Qualifier(type, Utility.stripQuotes(keywords));
     }
 
     private FilterExpression parseKeyword(Token token) {
@@ -174,7 +166,7 @@ public final class Parser {
         qualifierName = qualifierName.substring(0, qualifierName.length() - 1).trim();
 
         QualifierType type = QualifierType.parse(qualifierName).orElse(QualifierType.FALSE);
-        return parseSeparatedContent(() -> parseQualifierContent(type, false));
+        return parseSeparatedContent(() -> parseQualifierContent(type));
     }
 
     private FilterExpression parseSeparatedContent(Supplier<FilterExpression> contentParser) {
@@ -186,7 +178,7 @@ public final class Parser {
         return expr;
     }
 
-    private FilterExpression parseQualifierContent(QualifierType type, boolean allowMultipleKeywords) {
+    private FilterExpression parseQualifierContent(QualifierType type) {
         if (type == QualifierType.SORT) {
             return parseSortKeys();
         } else if (isRangeOperatorToken(lookAhead())) {
@@ -198,20 +190,12 @@ public final class Parser {
         } else if (isNumberToken(lookAhead())) {
             // [number] | [number] .. [number]
             return parseNumberOrNumberRange(type);
-        } else if (isQuoteToken(lookAhead())) {
+        } else if (isQuotedContentToken(lookAhead())) {
             // " [content] "
-            consume(TokenType.QUOTE);
-            FilterExpression result = parseQualifierContent(type, true);
-            consume(TokenType.QUOTE);
-            return result;
+            Token quotedContent = consume();
+            return parseQuotedContent(type, quotedContent);
         } else if (isKeywordToken(lookAhead())) {
-            if (allowMultipleKeywords) {
-                // We're within quotes, with the ability to parse multiple consecutive keywords
-                return parseQuotedContent(type);
-            } else {
-                // Everything else
-                return new Qualifier(type, consume().getValue());
-            }
+            return new Qualifier(type, consume().getValue());
         } else {
             throw new ParseException(String.format("Invalid content for qualifier %s: %s",
                 type, lookAhead()));
@@ -222,8 +206,8 @@ public final class Parser {
         return token.getType() == TokenType.SYMBOL;
     }
 
-    private boolean isQuoteToken(Token token) {
-        return token.getType() == TokenType.QUOTE;
+    private boolean isQuotedContentToken(Token token) {
+        return token.getType() == TokenType.QUOTED_CONTENT;
     }
 
     private boolean isRangeOperatorToken(Token token) {
