@@ -100,6 +100,7 @@ public class PanelControl extends HBox {
         FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
         panelAdded.setPanelName(panelName);
         panelAdded.setFilterByString(filterName);
+        ui.updateTitle(this.hasUnsavedPanels());
         return panelAdded;
     }
 
@@ -345,7 +346,7 @@ public class PanelControl extends HBox {
      * @return true if there is difference between panels from storage and current panels
      */
     public boolean hasUnsavedPanels(){
-        if(!prefs.getLastOpenBoard().isPresent()){
+        if (!prefs.getLastOpenBoard().isPresent()) {
             return true;
         }
         List<PanelInfo> savedPanelInfos = prefs.getBoardPanels(prefs.getLastOpenBoard().get());
