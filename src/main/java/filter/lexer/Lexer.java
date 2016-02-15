@@ -26,7 +26,7 @@ public class Lexer {
 
             new Rule("\\(", TokenType.LBRACKET),
             new Rule("\\)", TokenType.RBRACKET),
-            new Rule("\\\"", TokenType.QUOTE),
+            new Rule("\"[^\"]+\"", TokenType.QUOTED_CONTENT),
             new Rule(",", TokenType.COMMA),
             new Rule("%", TokenType.PERCENT),
             new Rule("\\.\\.", TokenType.DOTDOT),

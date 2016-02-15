@@ -54,7 +54,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 17;
+    public static final int VERSION_MINOR = 19;
     public static final int VERSION_PATCH = 0;
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -181,7 +181,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     protected void registerTestEvents() {
-        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(() -> logic.refresh(false)));
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
     }
 
     private void initPreApplicationState() {
@@ -212,7 +212,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs);
         // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
+            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
     }
@@ -313,7 +313,7 @@ public class UI extends Application implements EventDispatcher {
                     boolean shouldRefresh = browserComponent.hasBviewChanged();
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
-                        logic.refresh(isNotificationPaneShowing());
+                        logic.refresh();
                         refreshTimer.restart();
                     }
                 }

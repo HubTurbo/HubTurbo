@@ -5,15 +5,18 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
+import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import ui.GuiElement;
 import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
 import util.events.RepoOpenedEvent;
+import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
@@ -42,16 +45,13 @@ public class Logic {
     public Logic(UIManager uiManager, Preferences prefs) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        this.models = new MultiModel(prefs);
+        models = new MultiModel(prefs);
 
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
         // Only relevant to testing, need a different event type to avoid race condition
         UI.events.registerEvent((ClearLogicModelEventHandler) this::onLogicModelClear);
-
-        // Pass the currently-empty model to the UI
-        uiManager.updateEmpty(models);
     }
 
     private void onLogicModelClear(ClearLogicModelEvent e) {
@@ -77,12 +77,7 @@ public class Logic {
         return repoIO.isRepositoryValid(repoId);
     }
 
-    public void refresh(boolean isNotificationPaneShowing) {
-        // TODO fix refresh to take into account the possible pending actions associated with the notification pane
-        if (isNotificationPaneShowing) {
-            logger.info("Notification Pane is currently showing, not going to refresh. ");
-            return;
-        }
+    public void refresh() {
         String message = "Refreshing " + models.toModels().stream()
                 .map(Model::getRepoId)
                 .collect(Collectors.joining(", "));
@@ -121,18 +116,26 @@ public class Logic {
         return isRepositoryValid(repoId).thenCompose(valid -> {
             if (!valid) {
                 return Futures.unit(false);
-            } else {
-                logger.info("Opening " + repoId);
-                UI.status.displayMessage("Opening " + repoId);
-                return repoOpControl.openRepository(repoId)
-                        .thenApply(models::addPending)
-                        .thenRun(this::refreshUI)
-                        .thenRun(() -> UI.events.triggerEvent(new RepoOpenedEvent(repoId)))
-                        .thenCompose(n -> getRateLimitResetTime())
-                        .thenApply(this::updateRemainingRate)
-                        .thenApply(rateLimits -> true)
-                        .exceptionally(withResult(false));
             }
+
+            logger.info("Opening " + repoId);
+            UI.status.displayMessage("Opening " + repoId);
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+
+            return repoOpControl.openRepository(repoId)
+                    .thenApply(models::addPending)
+                    .thenRun(this::refreshUI)
+                    .thenRun(() ->
+                            Platform.runLater(() ->
+                                    // to trigger the event from the UI thread
+                                    UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
+                            )
+                    )
+                    .thenCompose(n -> getRateLimitResetTime())
+                    .thenApply(this::updateRemainingRate)
+                    .thenApply(rateLimits -> true)
+                    .exceptionally(withResult(false));
+
         });
     }
 
@@ -189,21 +192,25 @@ public class Logic {
     }
 
     /**
-     * Replaces labels of issue on GitHub
+     * Replaces existing labels with new labels in the issue object, the UI, and the server, in that order.
+     * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue whose labels are to be replaced on GitHub.
-     * @param newLabels The list of new labels to be applied on the issue.
-     * @return True if label replacement on GitHub was a success, false otherwise.
+     * @param issue The issue object whose labels are to be replaced.
+     * @param newLabels The list of new labels to be assigned to the issue.
+     * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        logger.info("Changing labels for " + issue + " on UI");
+        issue.setLabels(newLabels);
+        refreshUI();
+
+        return updateIssueLabelsOnRepo(issue, newLabels);
+    }
+
+    private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoIO.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> {
-                    logger.info("Changing labels for " + issue + " on UI");
-                    issue.setLabels(labels);
-                    refreshUI();
-                    return true;
-                })
+        return repoOpControl.replaceIssueLabels(issue, newLabels)
+                .thenApply(labels -> labels.containsAll(newLabels))
                 .exceptionally(Futures.withResult(false));
     }
 
@@ -212,7 +219,7 @@ public class Logic {
      * and then sends the data to the GUI.
      */
     private void refreshUI() {
-        updateController.filterSortRefresh(getAllUIFilters());
+        updateController.processAndRefresh(getAllUIFilters());
     }
 
     /**
@@ -223,7 +230,7 @@ public class Logic {
     public void refreshPanel(FilterExpression filterExpr) {
         List<FilterExpression> panelExpr = new ArrayList<>();
         panelExpr.add(filterExpr);
-        updateController.filterSortRefresh(panelExpr);
+        updateController.processAndRefresh(panelExpr);
     }
 
     /**
@@ -266,10 +273,10 @@ public class Logic {
     }
 
     /**
-     * Carries the current model in Logic, as well as issues to be displayed in panels, to the GUI.
+     * Carries the current set of GUI elements, as well as the current list of users in the model, to the GUI.
      */
-    public void updateUI(Map<FilterExpression, List<TurboIssue>> issuesToShow) {
-        uiManager.update(models, issuesToShow);
+    public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
+        uiManager.update(elementsToShow, models.getUsers());
     }
 
     /**

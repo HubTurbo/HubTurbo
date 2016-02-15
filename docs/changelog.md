@@ -1,6 +1,18 @@
 
 # Changelog
 
+# V3.19.0
+
+- Fixed HT not refreshing when the undo notification was visible
+
+# V3.18.0
+
+- Added shorthand syntax for OR
+- Added visuals for loading panels
+- Added an automatically-generated board for new users
+- Changes to labels are now committed immediately
+- Fixed rendering bug due to model inconsistency
+
 # V3.17.0
 
 - Added tooltips to panel buttons and improved layout

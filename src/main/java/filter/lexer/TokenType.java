@@ -12,7 +12,7 @@ public enum TokenType {
     SEMICOLON,
     COLON,
     COMMA,
-    QUOTE,
+    QUOTED_CONTENT,
     DOTDOT,
     LT,
     LTE,
