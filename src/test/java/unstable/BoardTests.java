@@ -42,11 +42,20 @@ public class BoardTests extends UITest {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
 
-        press(CLOSE_PANEL);
-        waitAndAssert(0, panelControl::getPanelCount);
-        press(CREATE_RIGHT_PANEL);
+        System.out.println("1");
         waitAndAssert(1, panelControl::getPanelCount);
-        press(CREATE_LEFT_PANEL);
+//        press(CLOSE_PANEL);
+        System.out.println("2");
+        traverseMenu("Panels", "Close");
+        System.out.println("3");
+        waitAndAssert(0, panelControl::getPanelCount);
+//        press(CREATE_RIGHT_PANEL);
+        System.out.println("4");
+//        press(CREATE_RIGHT_PANEL);
+        traverseMenu("Panels", "Create");
+        waitAndAssert(1, panelControl::getPanelCount);
+        traverseMenu("Panels", "Create (Left)");
+//        press(CREATE_LEFT_PANEL);
         waitAndAssert(2, panelControl::getPanelCount);
 
         traverseMenu("Panels", "Create");
@@ -74,7 +83,7 @@ public class BoardTests extends UITest {
         push(KeyCode.ESCAPE);
     }
 
-    @Test
+//    @Test
     public void boardNotSavedOnCancellation() {
         PanelControl panelControl = TestController.getUI().getPanelControl();
 
@@ -86,14 +95,14 @@ public class BoardTests extends UITest {
         waitAndAssert(0, panelControl::getNumberOfSavedBoards);
     }
 
-    @Test
+//    @Test
     public void switchWhenNoBoardOpen() {
         // Switching when no board is open should do nothing
         pushKeys(SWITCH_BOARD);
         assertFalse(UI.prefs.getLastOpenBoard().isPresent());
     }
 
-    @Test
+//    @Test
     public void boardSaveAs() {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
@@ -108,11 +117,16 @@ public class BoardTests extends UITest {
     private void saveBoardWithName(String name) {
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears("#boardnameinput");
-        ((TextField) find("#boardnameinput")).setText(name);
+
+        TextField field = find("#boardnameinput");
+
+        field.setText(name);
+//        ((TextField) find("#boardnameinput")).setText(name);
         click("OK");
+        waitUntilNodeDisappears(field);
     }
 
-    @Test
+//    @Test
     public void switchingBoardWithOnlyOneSaved() {
 
         Preferences prefs = UI.prefs;
@@ -121,11 +135,11 @@ public class BoardTests extends UITest {
 
         // Nothing happens
         press(SWITCH_BOARD);
-        assertTrue(prefs.getLastOpenBoard().isPresent());
+        waitAndAssert(true, prefs.getLastOpenBoard()::isPresent);
         assertEquals("Board 1", prefs.getLastOpenBoard().get());
     }
 
-    @Test
+//    @Test
     public void switchingBoardWithManySaved() {
 
         Preferences prefs = UI.prefs;
@@ -133,21 +147,21 @@ public class BoardTests extends UITest {
         saveBoardWithName("Board 1");
         saveBoardWithName("Board 2");
 
-        assertTrue(prefs.getLastOpenBoard().isPresent());
+        waitAndAssert(true, prefs.getLastOpenBoard()::isPresent);
         assertEquals("Board 2", prefs.getLastOpenBoard().get());
 
         // Wraps around to the first board
         press(SWITCH_BOARD);
-        assertTrue(prefs.getLastOpenBoard().isPresent());
+        waitAndAssert(true, prefs.getLastOpenBoard()::isPresent);
         assertEquals("Board 1", prefs.getLastOpenBoard().get());
 
         // Back to the second board
         press(SWITCH_BOARD);
-        assertTrue(prefs.getLastOpenBoard().isPresent());
+        waitAndAssert(true, prefs.getLastOpenBoard()::isPresent);
         assertEquals("Board 2", prefs.getLastOpenBoard().get());
     }
 
-    @Test
+//    @Test
     public void boardNameValidation() {
         tryBoardName("");
         tryBoardName("   ");
@@ -170,7 +184,7 @@ public class BoardTests extends UITest {
 //        push(KeyCode.ENTER);
 //    }
 
-    @Test
+//    @Test
     public void openingBoard() {
 
         UI ui = TestController.getUI();
@@ -197,7 +211,7 @@ public class BoardTests extends UITest {
         assertEquals(ui.getTitle(), uiTitleWithBoard("Board 1"));
     }
 
-    @Test
+//    @Test
     public void savingBoard() {
 
         PanelControl panelControl = TestController.getUI().getPanelControl();
@@ -220,7 +234,7 @@ public class BoardTests extends UITest {
         waitAndAssert(2, panelControl::getPanelCount);
     }
 
-    @Test
+//    @Test
     public void deleteBoard() {
 
         UI ui = TestController.getUI();
@@ -234,12 +248,12 @@ public class BoardTests extends UITest {
         click("OK");
 
         // No board is open now
-        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        waitAndAssert(0, panelControl::getNumberOfSavedBoards);
         assertEquals(ui.getTitle(), uiTitleWithBoard("none"));
 
     }
 
-    @Test
+//    @Test
     public void noBoardsOpen() {
 
         deleteBoard();
@@ -257,6 +271,8 @@ public class BoardTests extends UITest {
         waitUntilNodeAppears("#boardnameinput");
         ((TextField) find("#boardnameinput")).setText("Board 1");
         click("OK");
+
+
 
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(ui.getTitle(), uiTitleWithBoard("Board 1"));

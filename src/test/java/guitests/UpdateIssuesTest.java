@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 public class UpdateIssuesTest extends UITest {
 
-    @Test
+//    @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
         Label apiBox = find("#apiBox");
         resetRepo();
