@@ -83,15 +83,28 @@ public class RepoAliasMap {
     private static String[][] getMappingsArrayFromFile(String mappingFileDirectoryName, String mappingFileName) {
         Gson gson = new GsonBuilder().create();
         File mappingsFile = new File(mappingFileDirectoryName, mappingFileName);
-
+        if (!mappingsFile.exists()) {
+            try {
+                mappingsFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                HTLog.error(logger, e);
+                logger.info("File creation error, loading an empty repo alias mapping");
+            }
+        }
         try (Reader reader = new InputStreamReader(new FileInputStream(mappingsFile), "UTF-8")) {
             String[][] array = gson.fromJson(reader, String[][].class);
             reader.close();
-            return array;
+            if (array == null) {
+                return new String[0][2];
+            } else {
+                return array;
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
             HTLog.error(logger, e);
+            logger.info("File read error, loading an empty repo alias mapping");
             return new String[0][2];
         }
     }
