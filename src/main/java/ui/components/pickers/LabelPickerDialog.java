@@ -3,6 +3,7 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -44,6 +45,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
     private final TurboIssue issue;
+    private static LabelPickerState state;
+
+    private ChangeListener<String> listener;
 
     private List<String> finalAssignedLabels;
 
@@ -61,6 +65,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
+        this.state = getCleanState(issue.getLabels(), getRepoLabelsSet());
         finalAssignedLabels = new ArrayList<>(issue.getLabels());
         uiLogic = new LabelPickerUILogic();
 
@@ -68,7 +73,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         setupEvents(stage);
         Platform.runLater(queryField::requestFocus);
     }
-
 
     private LabelPickerState getCleanState(List<String> initialLabels, Set<String> repoLabels) {
         LabelPickerState state = new LabelPickerState(new HashSet<>(initialLabels));
@@ -80,7 +84,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        registerQueryHandler();
+        initialiseAndregisterQueryHandler();
     }
 
     private void initUI(Stage stage, TurboIssue issue) {
@@ -340,22 +344,25 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         });
     }
 
-    private void registerQueryHandler() {
-        queryField.textProperty().addListener((observable, oldValue, newValue) -> {
-            LabelPickerState state = uiLogic.determineState(
+    private void initialiseAndregisterQueryHandler() {
+        listener = (observable, oldValue, newValue) -> {
+            state = uiLogic.determineState(
                     getCleanState(issue.getLabels(), getRepoLabelsSet()),
                     getRepoLabelsSet(), queryField.getText().toLowerCase());
-            finalAssignedLabels = state.getAssignedLabels();
             populatePanes(state);
-        });
+        };
+        queryField.textProperty().addListener(listener);
     }
 
     private void handleLabelClick(PickerLabel label) {
+        state.toggleLabel(getRepoLabelsSet(), label.getActualName());
+        populatePanes(state);
+
         if (!queryField.isDisabled()) {
             queryField.setDisable(true);
         }
-        finalAssignedLabels = updateFinalAssignedLabels(label);
-        populatePanes(getCleanState(finalAssignedLabels, getRepoLabelsSet()));
+        queryField.textProperty().removeListener(listener);
+        queryField.clear();
     }
 
     private void positionDialog(Stage stage) {
@@ -365,23 +372,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
                     stage.getScene().getY() +
                     (stage.getScene().getHeight() - getHeight()) / 2);
         }
-    }
-
-    // TODO refactor if else & maintain label order
-    private List<String> updateFinalAssignedLabels(PickerLabel selectedLabel) {
-        List<String> finalLabels = finalAssignedLabels;
-        String labelName = selectedLabel.getActualName();
-
-        if (!finalLabels.contains(labelName)) {
-            if (selectedLabel.isExclusive()) {
-                finalLabels.removeIf(label -> label.contains(selectedLabel.getGroup().get()));
-            }
-
-            finalLabels.add(labelName);
-        } else {
-            finalLabels.remove(labelName);
-        }
-        return finalLabels;
     }
 
     // getHeight() returns NaN when the height is not set
