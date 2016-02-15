@@ -74,7 +74,7 @@ public class RepositorySelector extends HBox {
     }
 
     private void loadContents() {
-        comboBox.getItems().addAll(ui.logic.getStoredRepos());
+        comboBox.getItems().addAll(ui.logic.getStoredReposWithAlias());
         comboBox.getItems().sort(String.CASE_INSENSITIVE_ORDER);
     }
 

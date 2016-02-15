@@ -151,6 +151,21 @@ public class Logic {
         return repoIO.getStoredRepos().stream().collect(Collectors.toSet());
     }
 
+    /**
+     * Gets the repo ids of the stored repos, but replaces the repo id with its alias if it has one
+     * @return
+     */
+    public Set<String> getStoredReposWithAlias() {
+        return repoIO.getStoredRepos().stream().map(repoId -> {
+            RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
+            if (repoAliasMap.hasAlias(repoId)) {
+                return repoAliasMap.getAlias(repoId);
+            } else {
+                return repoId;
+            }
+        }).collect(Collectors.toSet());
+    }
+
     public boolean isAlreadyOpen(String repoId) {
         return getOpenRepositories().contains(repoId.toLowerCase());
     }
