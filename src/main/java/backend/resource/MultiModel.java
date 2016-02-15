@@ -186,8 +186,9 @@ public class MultiModel implements IModel {
     }
 
     @Override
-    public TurboUser getAuthorOfIssue(TurboIssue issue) {
-        return getModelById(issue.getRepoId()).get().getCreatorOfIssue(issue);
+    public Optional<TurboUser> getAuthorOfIssue(TurboIssue issue) {
+        return getModelById(issue.getRepoId())
+                .flatMap(m -> m.getCreatorOfIssue(issue));
     }
 
     @Override

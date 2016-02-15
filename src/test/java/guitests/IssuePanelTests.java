@@ -100,7 +100,7 @@ public class IssuePanelTests extends UITest {
                 new ArrayList<>(),
                 Optional.empty(),
                 Optional.empty(),
-                new TurboUser("test/test", "username"));
+                Optional.empty());
 
         assertEquals(0,
                 TurboIssueEvent.createLabelUpdateEventNodes(
@@ -128,7 +128,7 @@ public class IssuePanelTests extends UITest {
                 labels,
                 Optional.empty(),
                 Optional.empty(),
-                new TurboUser("test/test", "username"));
+                Optional.empty());
 
         List<TurboIssueEvent> events =
                 new ArrayList<>(new TurboIssueEventTests().sampleEvents);
@@ -151,7 +151,7 @@ public class IssuePanelTests extends UITest {
                 new ArrayList<>(),
                 Optional.empty(),
                 Optional.empty(),
-                new TurboUser("test/test", "user"));
+                Optional.empty());
 
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(

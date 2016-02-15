@@ -235,32 +235,29 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
         }
 
-        TurboUser author = guiElement.getAuthor();
-        Label authorLabel = new Label("Author: ");
-        Label authorNameLabel = new Label(issue.getCreator());
+        if (guiElement.getAuthor().isPresent()) {
+            TurboUser author = guiElement.getAuthor().get();
+            Label authorLabel = new Label("Author: ");
+            Label authorNameLabel = new Label(issue.getCreator());
 
-        //authorNameLabel.setStyle("-fx-border-color:black;");
-        //authorNameLabel.getStyleClass().add("display-box-padding");
+            ImageView authorAvatar = new ImageView();
+            if (author.getAvatarURL().length() != 0) {
+                Image image = author.getAvatar();
+                assert image != null;
+                authorAvatar.setImage(image);
+            }
 
-        ImageView authorAvatar = new ImageView();
-        if (author.getAvatarURL().length() != 0) {
-            Image image = author.getAvatar();
-            assert image != null;
-            authorAvatar.setImage(image);
+            HBox authorBox = new HBox();
+            authorBox.setAlignment(Pos.BASELINE_CENTER);
+            authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
+            authorBox.setPrefWidth(CARD_WIDTH / 2);
+            authorAssigneeBox.getChildren().add(authorBox);
         }
-
-        HBox authorBox = new HBox();
-        authorBox.setAlignment(Pos.BASELINE_CENTER);
-        authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
-        authorBox.setPrefWidth(CARD_WIDTH/2);
-        authorAssigneeBox.getChildren().add(authorBox);
 
         if (issue.getAssignee().isPresent() && guiElement.getAssignee().isPresent()) {
             TurboUser assignee = guiElement.getAssignee().get();
             Label assigneeLabel = new Label("Assignee: ");
             Label assigneeNameLabel = new Label(issue.getAssignee().get());
-            //assigneeNameLabel.setStyle("-fx-border-color:black;");
-            //assigneeNameLabel.getStyleClass().add("display-box-padding");
 
             ImageView assigneeAvatar = new ImageView();
             if (assignee.getAvatarURL().length() != 0) {
