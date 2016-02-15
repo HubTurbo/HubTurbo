@@ -1,18 +1,17 @@
 package tests;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import prefs.PanelInfo;
-import prefs.Preferences;
-import ui.TestController;
 import util.RepoAliasMap;
 
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RepoAliasMapTest {
 
@@ -32,6 +31,43 @@ public class RepoAliasMapTest {
      */
     private static final String REPO_ID_DNE_1 = "DoesNotExist/DNE";
     private static final String REPO_ALIAS_DNE_1 = "dne";
+
+    /**
+     * The test file to create for the test
+     */
+    public static final String TEST_FILE_DIRECTORY = "settings";
+    public static final String TEST_FILE_NAME = "test_repo_alias_mapping.json";
+
+    @Before
+    public void init() {
+        try {
+            File testFile = new File(TEST_FILE_DIRECTORY, TEST_FILE_NAME);
+            if (testFile.exists()) {
+                assertTrue(testFile.delete());
+            }
+            
+            assertTrue(testFile.createNewFile());
+            try (FileOutputStream os = new FileOutputStream(testFile)) {
+                os.write(String.format("[[\"%s\", \"%s\"], [\"%s\", \"%s\"]]",
+                        REPO_ID_1,
+                        REPO_ALIAS_1,
+                        REPO_ID_2,
+                        REPO_ALIAS_2).getBytes("UTF-8"));
+                os.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @After
+    public void tearDown() {
+        File testFile = new File(TEST_FILE_DIRECTORY, TEST_FILE_NAME);
+        if (testFile.exists()) {
+            assertTrue(testFile.delete());
+        }
+    }
 
     @Test
     public void testHasAlias() {
