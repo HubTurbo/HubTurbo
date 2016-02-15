@@ -166,7 +166,9 @@ public class UpdateController {
             return new GuiElement(issue,
                     models.getLabelsOfIssue(issue),
                     models.getMilestoneOfIssue(issue),
-                    models.getAssigneeOfIssue(issue));
+                    models.getAssigneeOfIssue(issue),
+                    models.getAuthorOfIssue(issue)
+            );
         }).collect(Collectors.toList());
     }
 }

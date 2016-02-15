@@ -42,6 +42,7 @@ public class ListPanelCard extends VBox {
 
     private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
+    private final HBox authorAssigneeBox = new HBox();
     private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
@@ -77,11 +78,13 @@ public class ListPanelCard extends VBox {
         }
 
         setupIssueDetailsBox();
+        setupAuthorAssigneeBox();
+        updateDetails();
 
-        setPadding(new Insets(0, 0, 3, 0));
+        setPadding(new Insets(0, 0, 0, 0));
         setSpacing(1);
 
-        getChildren().addAll(issueTitle, issueDetails);
+        getChildren().addAll(issueTitle, issueDetails, authorAssigneeBox);
 
         if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
@@ -191,8 +194,12 @@ public class ListPanelCard extends VBox {
         issueDetails.setPrefWrapLength(CARD_WIDTH);
         issueDetails.setHgap(3);
         issueDetails.setVgap(3);
+    }
 
-        updateDetails();
+    private void setupAuthorAssigneeBox() {
+        authorAssigneeBox.setPrefWidth(CARD_WIDTH);
+        authorAssigneeBox.setPadding(new Insets(0, 0, 1, 0));
+        //authorAssigneeBox.setSpacing(1);
     }
 
     private void updateDetails() {
@@ -228,22 +235,45 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
         }
 
+        TurboUser author = guiElement.getAuthor();
+        Label authorLabel = new Label("Author: ");
+        Label authorNameLabel = new Label(issue.getCreator());
+
+        //authorNameLabel.setStyle("-fx-border-color:black;");
+        //authorNameLabel.getStyleClass().add("display-box-padding");
+
+        ImageView authorAvatar = new ImageView();
+        if (author.getAvatarURL().length() != 0) {
+            Image image = author.getAvatar();
+            assert image != null;
+            authorAvatar.setImage(image);
+        }
+
+        HBox authorBox = new HBox();
+        authorBox.setAlignment(Pos.BASELINE_CENTER);
+        authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
+        authorBox.setPrefWidth(CARD_WIDTH/2);
+        authorAssigneeBox.getChildren().add(authorBox);
+
         if (issue.getAssignee().isPresent() && guiElement.getAssignee().isPresent()) {
             TurboUser assignee = guiElement.getAssignee().get();
+            Label assigneeLabel = new Label("Assignee: ");
             Label assigneeNameLabel = new Label(issue.getAssignee().get());
-            assigneeNameLabel.getStyleClass().add("display-box-padding");
+            //assigneeNameLabel.setStyle("-fx-border-color:black;");
+            //assigneeNameLabel.getStyleClass().add("display-box-padding");
 
-            ImageView avatar = new ImageView();
+            ImageView assigneeAvatar = new ImageView();
             if (assignee.getAvatarURL().length() != 0) {
                 Image image = assignee.getAvatar();
                 assert image != null;
-                avatar.setImage(image);
+                assigneeAvatar.setImage(image);
             }
 
             HBox assigneeBox = new HBox();
             assigneeBox.setAlignment(Pos.BASELINE_CENTER);
-            assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
-            issueDetails.getChildren().add(assigneeBox);
+            assigneeBox.getChildren().addAll(assigneeLabel, assigneeAvatar, assigneeNameLabel);
+            assigneeBox.setPrefWidth(CARD_WIDTH/2);
+            authorAssigneeBox.getChildren().add(assigneeBox);
         }
     }
 

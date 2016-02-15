@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
 
+import backend.resource.TurboUser;
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
@@ -98,7 +99,8 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),
-                Optional.empty());
+                Optional.empty(),
+                new TurboUser("test/test", "username"));
 
         assertEquals(0,
                 TurboIssueEvent.createLabelUpdateEventNodes(
@@ -125,7 +127,8 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "issue"),
                 labels,
                 Optional.empty(),
-                Optional.empty());
+                Optional.empty(),
+                new TurboUser("test/test", "username"));
 
         List<TurboIssueEvent> events =
                 new ArrayList<>(new TurboIssueEventTests().sampleEvents);
@@ -147,7 +150,8 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),
-                Optional.empty());
+                Optional.empty(),
+                new TurboUser("test/test", "user"));
 
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(
