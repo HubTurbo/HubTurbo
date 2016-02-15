@@ -38,6 +38,12 @@ public final class Utility {
 
     private static final String REGEX_FOR_ALPHANUMERIC = "^[a-zA-Z0-9]*$";
 
+    /**
+     * Checks whether a given string is a well formed repo alias or not.
+     * It is well formed if the given string is alphanumeric
+     * @param alias The alias to check
+     * @return true if the given string is a well formed repo alias
+     */
     public static boolean isWellFormedRepoAlias(String alias) {
         boolean isAliasNull = alias == null;
         boolean isAliasEmpty = alias.isEmpty();
