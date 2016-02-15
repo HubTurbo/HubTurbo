@@ -7,7 +7,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
-import javafx.stage.WindowEvent;
 
 /**
  * Pop-up menu that appears with suggestions for auto-completion
@@ -22,7 +21,6 @@ public class SuggestionMenu extends ContextMenu {
 
     public SuggestionMenu(int maxEntries) {
         this.maxEntries = maxEntries;
-        setOnShowing(this::onShowingHandler);
     }
 
     /**
@@ -53,9 +51,6 @@ public class SuggestionMenu extends ContextMenu {
         assert getItems().size() <= maxEntries;
     }
     
-    private void onShowingHandler(WindowEvent event) {
-    }
-
     private void onActionHandler(ActionEvent event) {
         selected = Optional.of(((CustomMenuItem) event.getSource()).getText());
         hide();

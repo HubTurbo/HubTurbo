@@ -92,6 +92,7 @@ public class IssueContentPane extends StackPane {
     // Event handlers
     // ==============
 
+    @SuppressWarnings("PMD")
     private void mouseClickHandler(MouseEvent e) {
         body.toFront();
     }
@@ -118,6 +119,7 @@ public class IssueContentPane extends StackPane {
         
     }
 
+    @SuppressWarnings("PMD")
     private void querySuggestionsHandler(KeyEvent event) {
         if (body.getCaretPosition() > initialCaretPosition && suggestions.isShowing()) {
             querySuggestions(body.getText(initialCaretPosition, body.getCaretPosition()));
@@ -126,6 +128,7 @@ public class IssueContentPane extends StackPane {
         }
     }
 
+    @SuppressWarnings("PMD")
     private void onHidingHandler(WindowEvent event) {
         suggestions.getSelectedContent().ifPresent(c -> {
             String content = processSelectedContent(c) + " ";

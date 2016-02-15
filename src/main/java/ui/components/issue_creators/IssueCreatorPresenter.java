@@ -24,7 +24,7 @@ public class IssueCreatorPresenter {
     private final Model repo;
     private final TurboIssue issue;
     
-    private List<String> currentLabels;
+    private final List<String> currentLabels;
 
     public IssueCreatorPresenter(Model repo, Optional<TurboIssue> issue) {
         this.repo = repo;

@@ -43,8 +43,7 @@ public class IssueServiceEx extends IssueService {
 
     @Override
     public Issue editIssue(IRepositoryIdProvider repository, Issue issue) throws IOException {
-        Issue returnedIssue = super.editIssue(repository, issue);
-        return returnedIssue;
+        return super.editIssue(repository, issue);
     }
 
     public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean open) throws IOException {

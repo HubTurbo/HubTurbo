@@ -36,19 +36,11 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
     @FXML
     private VBox mainLayout;
     @FXML
-    private VBox sidebar;
-    @FXML
     private TextField title;
-    @FXML
-    private Label assigneeTitle;
     @FXML
     private TextField assigneeField;
     @FXML
-    private Label milestoneTitle;
-    @FXML
     private TextField milestoneField;
-    @FXML
-    private Label labelTitle;
     @FXML
     private FlowPane currentLabels;
     
@@ -68,7 +60,7 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
         initModality(Modality.APPLICATION_MODAL);
         loadDialogContent();
         initTitles(presenter.isNewIssue() ? DEFAULT_TITLE : presenter.resolveIssueTitle());
-        initBody(stage);
+        initBody();
         initAssignee(presenter.getAssignee());
         initMilestone(presenter.getMilestone());
         initLabels();
@@ -126,7 +118,7 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
         Platform.runLater(title::requestFocus);
     }
     
-    private void initBody(Stage stage) {
+    private void initBody() {
         body = new IssueContentPane(presenter.getIssueBody(), presenter);
         mainLayout.getChildren().add(body);
     }

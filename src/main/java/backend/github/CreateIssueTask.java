@@ -13,7 +13,7 @@ import backend.resource.TurboIssue;
  */
 public class CreateIssueTask extends GitHubRepoTask<Issue> {
 
-    private TurboIssue issue;
+    private final TurboIssue issue;
 
     public CreateIssueTask(TaskRunner taskRunner, Repo repo, TurboIssue issue) {
         super(taskRunner, repo);
