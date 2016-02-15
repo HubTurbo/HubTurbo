@@ -191,6 +191,7 @@ public abstract class FilterPanel extends AbstractPanel {
         currentFilterExpression = filter;
 
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
+        ui.updateTitle(parentPanelControl.hasUnsavedPanels());
     }
 
     public void setFilterByString(String filterString) {
@@ -212,6 +213,7 @@ public abstract class FilterPanel extends AbstractPanel {
 
     public void setPanelName(String newName) {
         panelMenuBar.setPanelName(newName);
+        ui.updateTitle(parentPanelControl.hasUnsavedPanels());
     }
     
     public PanelInfo getCurrentInfo() {
