@@ -200,22 +200,24 @@ public class Qualifier implements FilterExpression {
                     .boxed()
                     .filter(i -> milestones.get(i).isOpen())
                     .findFirst();
-        } else {
-            // Look for the first milestone in the (sorted) list that is ongoing.
-            Optional<Integer> firstOngoingMilestonePosition = IntStream
-                    .range(0, milestones.size())
-                    .boxed()
-                    .filter(i -> milestones.get(i).isOngoing())
-                    .findFirst();
-
-            if (firstOngoingMilestonePosition.isPresent()) {
-                return firstOngoingMilestonePosition;
-            } else {
-                // if no ongoing milestone, set current as one after last milestone
-                // - this means that no such milestone, which will return no issue
-                return Optional.of(milestones.size());
-            }
         }
+
+        // Look for the first milestone in the (sorted) list that is ongoing.
+        Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(milestones);
+
+        // if no ongoing milestone, set current as one after last milestone
+        // - this means that no such milestone, which will return no issue
+        return firstOngoingMilestonePosition.isPresent()
+                ? firstOngoingMilestonePosition
+                : Optional.of(milestones.size());
+    }
+
+    private static Optional<Integer> getFirstOngoingMilestonePosition(List<TurboMilestone> milestones) {
+        return IntStream.
+                range(0, milestones.size())
+                .boxed()
+                .filter(i -> milestones.get(i).isOngoing())
+                .findFirst();
     }
 
     public static HashSet<String> getMetaQualifierContent(FilterExpression expr, QualifierType qualifierType) {
