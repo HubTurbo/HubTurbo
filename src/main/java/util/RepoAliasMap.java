@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * This class acts like a bi-directional map that maps repo ids with their aliases, if the aliases exist.
@@ -19,7 +20,7 @@ import java.io.*;
  * There is currently no functionality to update the mapping file from the code.
  * The file has to be manually inserted
  */
-public class RepoAliasMap {
+public final class RepoAliasMap {
 
     // Original mapping:
     //   Key = repoID, Value = alias.
@@ -54,11 +55,12 @@ public class RepoAliasMap {
      * The instance is instantiated if it has not been yet.
      * @return The sole instance of the RepoAliasMap
      */
-    public static RepoAliasMap getInstance() {
+    public static synchronized RepoAliasMap getInstance() {
         if (instance == null) {
-            instance = new RepoAliasMap();
-            instance.updateMappings(
+            RepoAliasMap newInstance = new RepoAliasMap();
+            newInstance.updateMappings(
                     getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, MAPPING_FILE_NAME_DEFAULT));
+            instance = newInstance;
         }
         return instance;
     }
@@ -67,11 +69,12 @@ public class RepoAliasMap {
      * Gets a test instance of the map. For testing purposes
      * @return the test version of the map
      */
-    public static RepoAliasMap getTestInstance() {
+    public static synchronized RepoAliasMap getTestInstance() {
         if (testInstance == null) {
-            testInstance = new RepoAliasMap();
-            testInstance.updateMappings(
+            RepoAliasMap newTestInstance = new RepoAliasMap();
+            newTestInstance.updateMappings(
                     getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, TEST_MAPPING_FILE_NAME_DEFAULT));
+            testInstance = newTestInstance;
         }
         return testInstance;
     }
@@ -122,9 +125,11 @@ public class RepoAliasMap {
 
     /**
      * Replaces all current mappings with the new mappings in the mappings array.
-     * @param allMappings The new mappings; the inner arrays must be of length 2
+     * @param allMappings The new mappings;
+     *                    Can either be an array of string[] or a set of parameters each of string[].
      */
-    private void updateMappings(String[][] allMappings) {
+    private void updateMappings(String[]... allMappings) {
+        // Varargs were used to pass the pmd violations of using arrays
         assert allMappings != null;
         for (int i = 0; i < allMappings.length; i++) {
             String[] mapping = allMappings[i];
@@ -150,10 +155,10 @@ public class RepoAliasMap {
     public String[][] toMappingsArray() {
         String[][] allMappings = new String[aliasMap.size()][MAPPING_ARRAY_LENGTH];
         int i = 0;
-        for (String repoId : aliasMap.keySet()) {
+        for (Map.Entry<String, String> mappingEntry : aliasMap.entrySet()) {
             String[] mapping = new String[MAPPING_ARRAY_LENGTH];
-            mapping[MAPPING_ARRAY_KEY_INDEX] = repoId;
-            mapping[MAPPING_ARRAY_VALUE_INDEX] = aliasMap.get(repoId);
+            mapping[MAPPING_ARRAY_KEY_INDEX] = mappingEntry.getKey();
+            mapping[MAPPING_ARRAY_VALUE_INDEX] = mappingEntry.getValue();
             allMappings[i] = mapping;
             i++;
         }
