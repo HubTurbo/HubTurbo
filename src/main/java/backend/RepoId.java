@@ -8,6 +8,7 @@ import util.Utility;
  */
 public final class RepoId {
 
+    //repoOwner can be an org ID or username 
     private final String repoOwner;
     private final String repoName;
 
@@ -20,10 +21,10 @@ public final class RepoId {
     }
 
     /**
-     * Checks if repoIdString non-null, non-empty
-     * and is of form <repoOwner>/<repoName>
+     * Returns true if the repoIdString is of the form
+     * <repoOwner>/<repoName> e.g. dave/foo-project
      * @param repoIdString
-     * @return True if the above conditions are met else False is returned
+     * @return
      */
     public static boolean isWellFormedRepoIdString(String repoIdString) {
         RepositoryId repositoryId = RepositoryId.createFromId(repoIdString);
