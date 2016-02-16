@@ -451,7 +451,7 @@ public class UI extends Application implements EventDispatcher {
                     (int) dimensions.getHeight());
         }
         return new Rectangle(
-                (int) (dimensions.getWidth() - mainStage.getWidth()),
+                (int) (dimensions.getWidth() - mainStage.getWidth() - mainStage.getX()),
                 (int) dimensions.getHeight());
     }
 

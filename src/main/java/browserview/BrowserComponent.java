@@ -19,7 +19,7 @@ import util.PlatformSpecific;
 import util.events.testevents.JumpToCommentEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -55,7 +55,7 @@ public class BrowserComponent {
 
     // The minimum fraction of available width to total screen width for the browser to be
     // resized to available width.
-    private double maximiseThreshold = 0.1;
+    private static final double maximiseThreshold = 0.1;
 
     private final UI ui;
     private ChromeDriverEx driver = null;
@@ -140,7 +140,7 @@ public class BrowserComponent {
         Rectangle availableDimensions = ui.getAvailableDimensions();
         Rectangle screenDimensions = ui.getDimensions();
 
-        if (availableDimensions.getWidth() > 0.1 * screenDimensions.getWidth()) {
+        if (availableDimensions.getWidth() > maximiseThreshold * screenDimensions.getWidth()) {
             manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
             manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
                     (int) ui.getAvailableDimensions().getHeight()));
