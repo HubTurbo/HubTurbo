@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import backend.interfaces.Repo;
 import backend.resource.*;
 import filter.ParseException;
 import util.RepoAliasMap;
@@ -132,15 +131,9 @@ public class Qualifier implements FilterExpression {
     /**
      * Returns true if the qualifier is a repo qualifier
      * @param q The qualifier to check
-     * @return True if the qualifier is a repo qualifier
      */
     private static boolean isRepoQualifier(Qualifier q) {
-        switch (q.getType()) {
-            case REPO:
-                return true;
-            default:
-                return false;
-        }
+        return q.getType() == QualifierType.REPO;
     }
 
     /**

@@ -7,7 +7,6 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
-import org.apache.logging.log4j.core.Filter;
 import ui.GuiElement;
 import util.Futures;
 import util.HTLog;

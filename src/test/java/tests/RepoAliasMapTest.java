@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import util.RepoAliasMap;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class RepoAliasMapTest {
             if (testFile.exists()) {
                 assertTrue(testFile.delete());
             }
-            
+
             assertTrue(testFile.createNewFile());
             try (FileOutputStream os = new FileOutputStream(testFile)) {
                 os.write(String.format("[[\"%s\", \"%s\"], [\"%s\", \"%s\"]]",

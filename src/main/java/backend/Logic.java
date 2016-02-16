@@ -104,6 +104,12 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
+    /**
+     * Opens the repository represented by a repo id or alias.
+     * @param repoIdOrAlias A string that is either a repo id or a repo alias
+     * @param isPrimaryRepository True if the repo in repoIdOrAlias is the primary repository
+     * @return A CompletableFuture (Boolean) indicating if the opening succeeded
+     */
     private CompletableFuture<Boolean> openRepository(String repoIdOrAlias, boolean isPrimaryRepository) {
         // First resolves the given string to a repo id.
         RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
@@ -153,16 +159,11 @@ public class Logic {
 
     /**
      * Gets the repo ids of the stored repos, but replaces the repo id with its alias if it has one
-     * @return
      */
     public Set<String> getStoredReposWithAlias() {
         return repoIO.getStoredRepos().stream().map(repoId -> {
             RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
-            if (repoAliasMap.hasAlias(repoId)) {
-                return repoAliasMap.getAlias(repoId);
-            } else {
-                return repoId;
-            }
+            return repoAliasMap.hasAlias(repoId) ? repoAliasMap.getAlias(repoId) : repoId;
         }).collect(Collectors.toSet());
     }
 
