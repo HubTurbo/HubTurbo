@@ -49,7 +49,7 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
+            RepoAliasMap repoAliasMap = UI.prefs.getRepoAliasMap();
             String repoId = repoAliasMap.resolveRepoId(repoIdOrAlias);
 
             if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {

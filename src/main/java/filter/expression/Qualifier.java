@@ -115,13 +115,14 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Returns a filter expression with all the repo aliases replaced with their mapped repo ids.
+     * @param repoAliasMap The repo alias mapping
      * @param expr The filter expression before replacement
      * @return The filter expression after replacement
      */
-    public static FilterExpression replaceRepoAliases(FilterExpression expr) {
+    public static FilterExpression replaceRepoAliases(RepoAliasMap repoAliasMap, FilterExpression expr) {
         return expr.map(q -> {
             if (Qualifier.isRepoQualifier(q)) {
-                return q.convertRepoAliasQualifier();
+                return q.convertRepoAliasQualifier(repoAliasMap);
             } else {
                 return q;
             }
@@ -1007,15 +1008,14 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Converts the current repo id or alias into the mapped repo id.
+     * @param repoAliasMap The repo alias mapping
      * @return The qualifier with the actual repo id
      */
-    private Qualifier convertRepoAliasQualifier() {
+    private Qualifier convertRepoAliasQualifier(RepoAliasMap repoAliasMap) {
         if (!content.isPresent()) {
             return Qualifier.EMPTY;
         }
         String repoIdOrAlias = content.get();
-        RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
-
         return new Qualifier(type, repoAliasMap.resolveRepoId(repoIdOrAlias));
     }
 

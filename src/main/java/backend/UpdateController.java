@@ -8,6 +8,7 @@ import filter.expression.Qualifier;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
+import ui.UI;
 import util.Futures;
 import util.HTLog;
 
@@ -108,8 +109,10 @@ public class UpdateController {
         filterExprs.stream().distinct().forEach(filterExpr -> {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
-            FilterExpression filterExprNoRepoAlias = Qualifier.replaceRepoAliases(filterExpr);
-            FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExprNoRepoAlias);
+            FilterExpression filterExprNoRepoAlias
+                    = Qualifier.replaceRepoAliases(UI.prefs.getRepoAliasMap(), filterExpr);
+            FilterExpression filterExprNoAlias
+                    = Qualifier.replaceMilestoneAliases(models, filterExprNoRepoAlias);
 
             List<TurboIssue> processedIssues = allModelIssues.stream()
                     .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))

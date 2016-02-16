@@ -112,8 +112,7 @@ public class Logic {
      */
     private CompletableFuture<Boolean> openRepository(String repoIdOrAlias, boolean isPrimaryRepository) {
         // First resolves the given string to a repo id.
-        RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
-        final String repoId = repoAliasMap.resolveRepoId(repoIdOrAlias);
+        final String repoId = prefs.getRepoAliasMap().resolveRepoId(repoIdOrAlias);
 
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
@@ -162,7 +161,7 @@ public class Logic {
      */
     public Set<String> getStoredReposWithAlias() {
         return repoIO.getStoredRepos().stream().map(repoId -> {
-            RepoAliasMap repoAliasMap = RepoAliasMap.getInstance();
+            RepoAliasMap repoAliasMap = prefs.getRepoAliasMap();
             return repoAliasMap.hasAlias(repoId) ? repoAliasMap.getAlias(repoId) : repoId;
         }).collect(Collectors.toSet());
     }

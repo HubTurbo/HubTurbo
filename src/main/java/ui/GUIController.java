@@ -68,7 +68,7 @@ public class GUIController {
                     // Search for the corresponding entry in e.issuesToShow.
                     FilterExpression currentFilterExpression = ((FilterPanel) child).getCurrentFilterExpression();
                     FilterExpression currentFilterExpressionNoRepoAlias
-                            = Qualifier.replaceRepoAliases(currentFilterExpression);
+                            = Qualifier.replaceRepoAliases(UI.prefs.getRepoAliasMap(), currentFilterExpression);
                     logger.info("Panel filter expression: " + currentFilterExpression.toString());
                     logger.info("Panel filter expression after repo alias replacement: "
                             + currentFilterExpressionNoRepoAlias.toString());

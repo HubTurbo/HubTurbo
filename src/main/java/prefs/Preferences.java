@@ -1,6 +1,7 @@
 package prefs;
 
 import org.eclipse.egit.github.core.RepositoryId;
+import util.RepoAliasMap;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -186,5 +187,12 @@ public class Preferences { // NOPMD
 
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
         global.setKeyboardShortcuts(keyboardShortcuts);
+    }
+
+    /**
+     * Gets the repo alias mapping
+     */
+    public RepoAliasMap getRepoAliasMap() {
+        return global.getRepoAliasMap();
     }
 }

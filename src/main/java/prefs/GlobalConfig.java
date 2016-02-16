@@ -2,6 +2,7 @@ package prefs;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.RepoAliasMap;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -33,6 +34,16 @@ public class GlobalConfig {
     private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
     private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
+    private final Map<String, String> repoAliasMapping = new HashMap<>();
+
+    /**
+     * Returns the repo alias mapping as a RepoAliasMap.
+     * The RepoAliasMap is only valid for the instant that this method is called.
+     * It will not be updated if the original mapping is modified.
+     */
+    public RepoAliasMap getRepoAliasMap() {
+        return new RepoAliasMap(repoAliasMapping);
+    }
 
     public Map<String, String> getKeyboardShortcuts() {
         return new HashMap<>(keyboardShortcuts);

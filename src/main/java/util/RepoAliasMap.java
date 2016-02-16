@@ -1,168 +1,28 @@
 package util;
 
 import com.google.common.collect.HashBiMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.common.collect.BiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
 import java.util.Map;
 
 /**
  * This class acts like a bi-directional map that maps repo ids with their aliases, if the aliases exist.
- * The mapping is a bijection, i.e. a repo id can only have one alias, and an alias can only be mapped to one repo id.
- *
- * This is a singleton class. Use the getInstance method to retrieve the instance.
- * One can also construct a test instance. However this is only meant for test usage.
- *
- * The mapping of aliases are pulled from a mapping file in the settings directory.
- * There is currently no functionality to update the mapping file from the code.
- * The file has to be manually inserted
+ * The mapping is a bijection i.e. a repo id can only have one alias, and an alias can only be mapped to one repo id.
  */
 public final class RepoAliasMap {
 
-    // Original mapping:
-    //   Key = repoID, Value = alias.
-    private final HashBiMap<String, String> aliasMap;
-
-
-    // Static attributes
-    //------------------
     private static final Logger logger = LogManager.getLogger(RepoAliasMap.class.getName());
 
-    public static final String MAPPING_FILE_NAME_DEFAULT = "repo_alias_mapping.json";
-    public static final String TEST_MAPPING_FILE_NAME_DEFAULT = "test_repo_alias_mapping.json";
-    public static final String MAPPING_FILE_DIRECTORY_DEFAULT = "settings";
+    // Original mapping:
+    //   Key = repoId, Value = alias.
+    // Inverted mapping:
+    //   Key = alias, Value = repoId.
+    private final BiMap<String, String> aliasMap;
 
-    // The sole instance of the map
-    private static RepoAliasMap instance;
-
-    // Test instances
-    private static RepoAliasMap testInstance;
-
-    // the mapping array length must be 2 because it is a bijection. Example: ["key", "value"]
-    private static final int MAPPING_ARRAY_LENGTH = 2;
-    private static final int MAPPING_ARRAY_KEY_INDEX = 0;
-    private static final int MAPPING_ARRAY_VALUE_INDEX = 1;
-
-
-    // Static methods
-    //---------------
-
-    /**
-     * Since there is only one instance of the RepoAliasMap, this method retrieves it.
-     * The instance is instantiated if it has not been yet.
-     * @return The sole instance of the RepoAliasMap
-     */
-    public static synchronized RepoAliasMap getInstance() {
-        if (instance == null) {
-            RepoAliasMap newInstance = new RepoAliasMap();
-            newInstance.updateMappings(
-                    getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, MAPPING_FILE_NAME_DEFAULT));
-            instance = newInstance;
-        }
-        return instance;
-    }
-
-    /**
-     * Gets a test instance of the map. For testing purposes
-     * @return the test version of the map
-     */
-    public static synchronized RepoAliasMap getTestInstance() {
-        if (testInstance == null) {
-            RepoAliasMap newTestInstance = new RepoAliasMap();
-            newTestInstance.updateMappings(
-                    getMappingsArrayFromFile(MAPPING_FILE_DIRECTORY_DEFAULT, TEST_MAPPING_FILE_NAME_DEFAULT));
-            testInstance = newTestInstance;
-        }
-        return testInstance;
-    }
-
-    /**
-     * Reads the mapping file and returns a 2d String array of the mapping
-     * @return the 2d String array representation of the mappings
-     */
-    private static String[][] getMappingsArrayFromFile(String mappingFileDirectoryName, String mappingFileName) {
-        Gson gson = new GsonBuilder().create();
-        File mappingsFile = new File(mappingFileDirectoryName, mappingFileName);
-        if (!mappingsFile.exists()) {
-            try {
-                mappingsFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                HTLog.error(logger, e);
-                logger.info("File creation error, loading an empty repo alias mapping");
-            }
-        }
-        try (Reader reader = new InputStreamReader(new FileInputStream(mappingsFile), "UTF-8")) {
-            String[][] array = gson.fromJson(reader, String[][].class);
-            reader.close();
-            if (array == null) {
-                return new String[0][2];
-            } else {
-                return array;
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            HTLog.error(logger, e);
-            logger.info("File read error, loading an empty repo alias mapping");
-            return new String[0][2];
-        }
-    }
-
-
-    // Instance methods
-    //-----------------
-
-    /**
-     * Private constructor due to singleton class structure
-     */
-    private RepoAliasMap() {
-        aliasMap = HashBiMap.create();
-    }
-
-    /**
-     * Replaces all current mappings with the new mappings in the mappings array.
-     * @param allMappings The new mappings;
-     *                    Can either be an array of string[] or a set of parameters each of string[].
-     */
-    private void updateMappings(String[]... allMappings) {
-        // Varargs were used to pass the pmd violations of using arrays
-        assert allMappings != null;
-        for (int i = 0; i < allMappings.length; i++) {
-            String[] mapping = allMappings[i];
-            assert mapping != null;
-
-            if (mapping.length != MAPPING_ARRAY_LENGTH) {
-                logger.warn("Repo alias mapping array is not the correct length! " +
-                        "Detected length: " + mapping.length + ". " +
-                        "Repo aliases may be wrong or not assigned.");
-            }
-            if (mapping.length >= MAPPING_ARRAY_LENGTH) {
-                String repoId = mapping[MAPPING_ARRAY_KEY_INDEX];
-                String repoAlias = mapping[MAPPING_ARRAY_VALUE_INDEX];
-                addMapping(repoId, repoAlias);
-            }
-        }
-    }
-
-    /**
-     * Produces a 2d string array representation of the mappings.
-     * @return 2d string representation of the mappings.
-     */
-    public String[][] toMappingsArray() {
-        String[][] allMappings = new String[aliasMap.size()][MAPPING_ARRAY_LENGTH];
-        int i = 0;
-        for (Map.Entry<String, String> mappingEntry : aliasMap.entrySet()) {
-            String[] mapping = new String[MAPPING_ARRAY_LENGTH];
-            mapping[MAPPING_ARRAY_KEY_INDEX] = mappingEntry.getKey();
-            mapping[MAPPING_ARRAY_VALUE_INDEX] = mappingEntry.getValue();
-            allMappings[i] = mapping;
-            i++;
-        }
-        return allMappings;
+    public RepoAliasMap(Map<String, String> map) {
+        aliasMap = HashBiMap.create(map);
     }
 
     /**
