@@ -119,7 +119,7 @@ public class Preferences { // NOPMD
         global.removeBoard(name);
     }
 
-    public void setLastDeletedIndex(String deletedBoardName){
+    public void setLastDeletedBoardIndex(String deletedBoardName){
         List<String> boardNames = getAllBoardNames();
         int index = boardNames.indexOf(deletedBoardName);
         global.setLastDeletedBoardIndex(index);
