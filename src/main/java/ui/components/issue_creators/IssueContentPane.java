@@ -39,6 +39,8 @@ public class IssueContentPane extends StackPane {
             KeyCodeCombination.SHIFT_DOWN);
     public static final KeyCodeCombination REFERENCE = new KeyCodeCombination(KeyCode.DIGIT3,
             KeyCodeCombination.SHIFT_DOWN);
+    public static final KeyCodeCombination PASTE = new KeyCodeCombination(KeyCode.V,
+            KeyCodeCombination.CONTROL_DOWN);
     public static final KeyCodeCombination HIDE_SUGGGESTIONS =
             new KeyCodeCombination(KeyCode.SPACE);
 
@@ -106,6 +108,10 @@ public class IssueContentPane extends StackPane {
      * Triggers context menu for every keyword
      */
     private void bodyKeyPressHandler(KeyEvent e) {
+        if (PASTE.match(e)) {
+            Optional<Image> paste = getImageFromClipboard();
+        }
+
         if (PREVIEW.match(e)) {
             generatePreview(body.getText());
             togglePane();
