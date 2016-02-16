@@ -1,9 +1,12 @@
 package tests;
 
 import backend.resource.TurboLabel;
+
 import org.eclipse.egit.github.core.Label;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -70,6 +73,27 @@ public class TurboLabelTest {
         TurboLabel turboLabel = new TurboLabel("dummy/dummy", label);
         assertEquals("dummy/dummy", turboLabel.getRepoId());
 
+    }
+    
+    @Test
+    public void matchedLabel() {
+        List<TurboLabel> labels = new ArrayList<>();
+        TurboLabel test = new TurboLabel(REPO, "test");
+        labels.add(test);
+        
+        assertEquals(test, TurboLabel.getMatchingTurboLabel(labels, "test"));
+    }
+    
+    @Test
+    public void getLabelNames() {
+        
+        // test: confirms label names are unique
+        TurboLabel test = new TurboLabel(REPO, "dummy");
+        List<TurboLabel> labels = new ArrayList<>();
+        labels.add(test);
+        labels.add(test);
+
+        assertEquals(1, TurboLabel.getLabelsNameList(labels).size());
     }
 
 }

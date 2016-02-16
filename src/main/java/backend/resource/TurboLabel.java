@@ -4,6 +4,7 @@ package backend.resource;
 import backend.resource.serialization.SerializableLabel;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
+
 import org.eclipse.egit.github.core.Label;
 
 import java.util.List;
